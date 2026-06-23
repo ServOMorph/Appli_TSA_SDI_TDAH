@@ -1,3 +1,16 @@
+## v0.2 — 2026-06-23
+
+### Ajouté
+- `roadmap.md` : 15 phases (MVP 0–7, V1 8–12, V2 13–14), coches de suivi `[ ]`/`[~]`/`[x]`
+- `LICENSE` : MIT, copyright ServOMorph 2026
+- `.gitignore` : Node/Vite/Capacitor/coverage
+
+### Modifié
+- `_contexte/signals.md` : actions P1/P2 alignées sur la roadmap
+- `README.md` : état actuel et prochaine étape mis à jour
+
+---
+
 ## v0.1 — 2026-06-23
 
 ### Ajouté

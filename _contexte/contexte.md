@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Documentation produit complète et cohérente (6 docs de dev + cahier des charges). Stack technique arrêtée. Trous fonctionnels comblés (action immédiate, énergie skipped, notifs). Aucun code produit. Prêt à démarrer le développement du MVP.
+Documentation produit complète et cohérente (6 docs de dev + cahier des charges). Stack technique arrêtée. Roadmap créée (15 phases, coches de suivi). Repo public GitHub prêt (MIT, .gitignore). Aucun code produit. Prêt à démarrer Phase 0 de la roadmap.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Initialisation du protocole vibecoding.
@@ -21,3 +21,4 @@ Documentation produit complète et cohérente (6 docs de dev + cahier des charge
 - 2026-06-23 : Entité Event hors MVP, documentée pour V1 post-validation.
 - 2026-06-23 : Cascade "Action immédiate" formalisée (déterministe, 4 étapes MVP).
 - 2026-06-23 : Distinction notification push (max 2/j) vs suggestion in-app (illimitée/passive).
+- 2026-06-23 : Roadmap créée (15 phases MVP→V1→V2), licence MIT, repo public GitHub configuré.

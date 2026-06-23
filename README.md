@@ -8,7 +8,7 @@ Agir comme un système externe de fonctions exécutives : réduire la charge men
 
 ## État actuel
 
-Documentation produit complète et cohérente. Stack technique arrêtée. Aucun code produit. Prêt à démarrer le développement du MVP.
+Documentation produit complète et cohérente. Stack technique arrêtée. Roadmap créée (15 phases). Aucun code produit. Prêt à démarrer Phase 0 (initialisation socle technique).
 
 ## Stack
 
@@ -28,4 +28,8 @@ CHANGELOG.md
 
 ## Prochaine étape
 
-Initialiser le projet React/TS/PWA et implémenter les 5 entités MVP (User, Task, SubTask, EnergyEntry, Settings).
+Phase 0 — Initialiser le projet React/TS/PWA : Vite, ESLint, Prettier, Vitest, structure de dossiers découplée (`domain/`, `data/`, `ui/`, `crypto/`, `app/`).
+
+## Licence
+
+MIT — voir [LICENSE](LICENSE).

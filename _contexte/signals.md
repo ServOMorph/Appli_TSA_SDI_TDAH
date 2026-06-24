@@ -1,9 +1,12 @@
 # Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-06-24)
 
 ## Actions ouvertes
-- [P1|ouvert] Démarrer Phase 1 de la roadmap (couche données & domaine)
-  - fait quand: schéma Dexie 5 entités créé, repositories CRUD opérationnels, logique domaine testée ≥ 85 % couverture
-  - réf: `roadmap.md` Phase 1, `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md`
+- [P1|✅ terminé] Phase 1 — Couche données & domaine (complétée 2026-06-24)
+  - Schéma Dexie 5 entités (User, Task, SubTask, EnergyEntry, Settings) ✅
+  - Repositories CRUD avec chiffrement transparent ✅
+  - Domaine pur (taskRules, energyRules, actionImmediateRules) ✅
+  - Couverture 98.26 % global, isolement domaine/infra validé ✅
+  - 71/71 tests passent
 - [P2|ouvert] Tests utilisateurs AuDHD réels (Phase 7 — post-MVP)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés
   - réf: `roadmap.md` Phase 7

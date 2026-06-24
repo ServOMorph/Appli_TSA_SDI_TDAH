@@ -1,3 +1,25 @@
+## v0.6 — 2026-06-24
+
+### Ajouté
+- `src/ui/screens/tasks/E20Inbox.tsx` + tests : liste inbox, déplacement today/later, modale M04
+- `src/ui/screens/tasks/E21CreateTask.tsx` + tests : formulaire création tâche
+- `src/ui/screens/tasks/E22TaskDetail.tsx` + tests : détail tâche, sous-tâches, terminer, supprimer
+- `src/ui/screens/tasks/E23Decompose.tsx` + tests : décomposition manuelle en sous-tâches
+- `src/ui/screens/tasks/E24Today.tsx` + tests : liste aujourd'hui, terminer, retirer
+- `src/ui/screens/tasks/E25Later.tsx` + tests : liste plus tard, déplacer vers aujourd'hui, modale M04
+- `AppContext.tsx` : inboxTasks, todayTasks, laterTasks, moveTask, completeTask, deleteTask, selectTask, getSubTasks, toggleSubTask
+- `DevResetButton.tsx` : SCREEN_CODES mapping, affichage code écran (E01–E25)
+
+### Corrigé
+- `E20/E22/E25` : `backgroundColor: var(--color-bg)` inexistant → `var(--color-surface)` ; overlay 75 % opacité ; zIndex 1000
+- `Button.tsx` : disabled state — opacity 0.4 + cursor not-allowed
+
+### Modifié
+- `src/App.tsx` : renderScreen() helper, DevResetButton dans AppScreens
+- `roadmap.md` : Phase 3 cochée `[x]`
+
+---
+
 ## v0.5 — 2026-06-24
 
 ### Ajouté

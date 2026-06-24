@@ -21,7 +21,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 2 complète. Onboarding (E01–E04) + Dashboard (E10 D10A/D10B) opérationnels, tests manuels validés. AppContext state machine React, composants Button/Card extraits, design tokens CSS neurodivergents. 116 tests, couverture 98.9 %. Prêt pour Phase 3 (Gestion des tâches).
+Phase 3 complète. Gestion des tâches opérationnelle : inbox (E20), création (E21), détail (E22), décomposition (E23), aujourd'hui (E24), plus tard (E25). Modales M01/M04 fonctionnelles en dark mode. 168 tests, couverture 94.17 %, 31 tests manuels validés. Prêt pour Phase 4 (Gestion de l'énergie).
 
 ## Stack
 

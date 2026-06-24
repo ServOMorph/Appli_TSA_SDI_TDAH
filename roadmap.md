@@ -67,16 +67,16 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 - [x] **Test manuel** : parcours onboarding complet jusqu'au dashboard peuplé (validé)
 - [x] **Sortie** : un nouvel utilisateur arrive sur un dashboard fonctionnel
 
-## [ ] Phase 3 — Gestion des tâches
+## [x] Phase 3 — Gestion des tâches
 
-- [ ] Écrans E20 (inbox) → E25 (plus tard) : création, détail, décomposition en SubTasks, "Aujourd'hui", "Plus tard"
-- [ ] États inbox vide, limite 3 tâches atteinte
-- [ ] Modale M01 (suppression) / M04 (remplacement Aujourd'hui)
-- [ ] **Refacto** : factoriser la logique de liste/filtre tâches
-- [ ] **Doc** : mise à jour doc parcours tâches
-- [ ] **Tests** : couverture ≥ 85 %
-- [ ] **Test manuel** : créer, décomposer, planifier, supprimer une tâche
-- [ ] **Sortie** : cycle de vie complet d'une tâche utilisable
+- [x] Écrans E20 (inbox) → E25 (plus tard) : création, détail, décomposition en SubTasks, "Aujourd'hui", "Plus tard"
+- [x] États inbox vide, limite 3 tâches atteinte
+- [x] Modale M01 (suppression) / M04 (remplacement Aujourd'hui)
+- [x] **Refacto** : factoriser la logique de liste/filtre tâches
+- [x] **Doc** : mise à jour doc parcours tâches
+- [x] **Tests** : 168 tests, couverture 94.17 %
+- [x] **Test manuel** : 31 tests manuels validés (créer, décomposer, planifier, supprimer)
+- [x] **Sortie** : cycle de vie complet d'une tâche utilisable
 
 ## [ ] Phase 4 — Gestion de l'énergie
 

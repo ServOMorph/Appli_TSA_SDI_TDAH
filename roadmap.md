@@ -43,19 +43,19 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 - [x] **Test manuel** : `npm run dev` lance l'app ; PWA installable ; build prod OK
 - [x] **Sortie** : `package.json` créé, app se lance, Dexie initialisée avec les 5 entités MVP
 
-## [ ] Phase 1 — Couche données & domaine
+## [x] Phase 1 — Couche données & domaine
 
-- [ ] Schéma Dexie des 5 entités + migrations
-- [ ] Repositories CRUD (un par entité), chiffrement transparent des champs sensibles
-- [ ] Domaine pur (sans dépendance Dexie/UI) :
-  - [ ] cascade "Action immédiate" (déterministe, 4 étapes — réf User Flows / Doc 2)
-  - [ ] calcul cuillères / énergie (réf Doc 3, calcul E10)
-  - [ ] règle limite 3 tâches/jour, état `skipped` énergie
-- [ ] **Refacto** : garantir l'isolement domaine ↔ infra (aucun import Dexie dans `domain/`)
-- [ ] **Doc** : ADR sur la séparation domaine/infra, doc des règles métier
-- [ ] **Tests** : couverture du domaine ≥ 85 % (priorité absolue — c'est le cœur logique)
-- [ ] **Test manuel** : script/console de vérification des règles métier (pas d'UI)
-- [ ] **Sortie** : CRUD des 5 entités opérationnel + persistance chiffrée vérifiée
+- [x] Schéma Dexie des 5 entités + migrations
+- [x] Repositories CRUD (un par entité), chiffrement transparent des champs sensibles
+- [x] Domaine pur (sans dépendance Dexie/UI) :
+  - [x] cascade "Action immédiate" (déterministe, 4 étapes — réf User Flows / Doc 2)
+  - [x] calcul cuillères / énergie (réf Doc 3, calcul E10)
+  - [x] règle limite 3 tâches/jour, état `skipped` énergie
+- [x] **Refacto** : garantir l'isolement domaine ↔ infra (aucun import Dexie dans `domain/`)
+- [x] **Doc** : ADR sur la séparation domaine/infra, doc des règles métier (ADR-003)
+- [x] **Tests** : couverture du domaine ≥ 85 % — 98.26 % global, 71 tests
+- [x] **Test manuel** : couverture complète via Vitest (pas d'UI)
+- [x] **Sortie** : CRUD des 5 entités opérationnel + persistance chiffrée vérifiée
 
 ## [ ] Phase 2 — Onboarding + Dashboard
 

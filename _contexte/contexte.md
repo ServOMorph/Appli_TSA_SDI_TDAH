@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 0 complète. Socle technique opérationnel : Vite 8 + React 19 + TypeScript 6, ESLint, Prettier, Vitest (couverture 85 % configurée), PWA (service worker Workbox), wrapper crypto AES-GCM/PBKDF2, structure découplée (domain/data/ui/crypto/app), ADR-001 et ADR-002 créés. 5/5 tests passent. Build prod validé. App tourne sur localhost:5173. Prêt pour Phase 1 (couche données & domaine).
+Phase 1 complète. Couche données & domaine opérationnelle : schéma Dexie v1 (5 entités MVP), 5 repositories CRUD avec chiffrement transparent (Task.title, SubTask.title, EnergyEntry.value), domaine pur isolé (taskRules, energyRules, actionImmediateRules), ADR-003. 71 tests, couverture 98.26 %. Isolement domaine/infra vérifié par grep. Prêt pour Phase 2 (Onboarding + Dashboard).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Initialisation du protocole vibecoding.
@@ -24,3 +24,5 @@ Phase 0 complète. Socle technique opérationnel : Vite 8 + React 19 + TypeScrip
 - 2026-06-23 : Roadmap créée (15 phases MVP→V1→V2), licence MIT, repo public GitHub configuré.
 - 2026-06-24 : Phase 0 complète — socle Vite/React/TS, PWA, crypto wrapper, Vitest, ADRs.
 - 2026-06-24 : TS6 strict — casts `as Uint8Array<ArrayBuffer>` aux appels Web Crypto API.
+- 2026-06-24 : Phase 1 complète — schéma Dexie, repositories CRUD, domaine pur isolé, 71 tests 98.26 %.
+- 2026-06-24 : fake-indexeddb via import auto + AppDatabase name optionnel pour isoler les tests.

@@ -21,7 +21,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 0 complète. Socle opérationnel : Vite 8 + React 19 + TypeScript 6, ESLint, Prettier, Vitest (seuil 85 %), PWA (Workbox), wrapper crypto AES-GCM/PBKDF2, structure découplée, ADR-001/ADR-002. Build prod validé. Prêt pour Phase 1.
+Phase 1 complète. Couche données & domaine opérationnelle : schéma Dexie v1 (5 entités MVP), repositories CRUD avec chiffrement transparent, domaine pur isolé (taskRules, energyRules, actionImmediateRules), ADR-003. 71 tests, couverture 98.26 %. Prêt pour Phase 2 (Onboarding + Dashboard).
 
 ## Stack
 
@@ -49,7 +49,7 @@ roadmap.md   — Roadmap 15 phases (MVP → V1 → V2)
 
 ## Prochaine étape
 
-Phase 1 — Couche données & domaine : schéma Dexie des 5 entités MVP, repositories CRUD, logique domaine pure.
+Phase 2 — Onboarding + Dashboard : écrans E01–E04 (bienvenue, profil, énergie initiale, première tâche) et E10 (dashboard avec Action immédiate, cuillères, tâches du jour).
 
 ## Licence
 

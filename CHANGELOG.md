@@ -1,3 +1,24 @@
+## v0.4 — 2026-06-24
+
+### Ajouté
+- `src/domain/entities/` : types purs User, Task, SubTask, EnergyEntry, Settings
+- `src/domain/rules/taskRules.ts` : canAddToToday (max 3), sortByPosition, nextPosition, completeTask
+- `src/domain/rules/energyRules.ts` : hasCheckedInToday, getLatestFilledValue, getTodayEntry
+- `src/domain/rules/actionImmediateRules.ts` : cascade Action immédiate MVP (déterministe)
+- `src/data/db.ts` : schéma Dexie v1, 5 tables indexées, name optionnel pour tests isolés
+- `src/data/repositories/` : 5 repositories CRUD (User, Task, SubTask, EnergyEntry, Settings)
+- Chiffrement transparent des champs sensibles : Task.title, SubTask.title, EnergyEntry.value
+- `docs/adr/ADR-003-domaine-infra.md` : règle d'isolement domaine/infra
+- 71 tests, couverture globale 98.26 %, isolement domaine/infra validé par grep
+
+### Modifié
+- `src/test/setup.ts` : ajout `import 'fake-indexeddb/auto'`
+- `package.json` : devDependency `fake-indexeddb`
+- `roadmap.md` : Phase 1 cochée `[x]`
+- `README.md` : état actuel et prochaine étape mis à jour
+
+---
+
 ## v0.3 — 2026-06-24
 
 ### Ajouté

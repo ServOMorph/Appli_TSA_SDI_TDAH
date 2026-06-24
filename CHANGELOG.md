@@ -1,3 +1,19 @@
+## v0.3 — 2026-06-24
+
+### Ajouté
+- `package.json` : React 19, Vite 8, TypeScript 6, ESLint, Prettier, Vitest + coverage v8, Dexie, vite-plugin-pwa
+- `vite.config.ts` + `vitest.config.ts` : PWA (manifest, service worker Workbox), couverture 85 %
+- `src/crypto/crypto.ts` : wrapper AES-GCM + PBKDF2 (Web Crypto API)
+- `src/crypto/crypto.test.ts` + `src/test/smoke.test.ts` : 5 tests, couverture 100 % crypto
+- `docs/adr/ADR-001-stack.md` + `ADR-002-architecture-couches.md` : décisions d'architecture
+- `run.py` : script Python pour lancer `npm run dev` sur Windows
+
+### Modifié
+- `roadmap.md` : Phase 0 cochée `[x]`
+- `README.md` : lancement local, structure des dossiers src/, état actuel
+
+---
+
 ## v0.2 — 2026-06-23
 
 ### Ajouté

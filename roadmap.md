@@ -31,17 +31,17 @@ Version : 1.0 — MAJ 2026-06-23
 Entités : User, Task, SubTask, EnergyEntry, Settings.
 Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26.
 
-## [ ] Phase 0 — Initialisation & socle technique
+## [x] Phase 0 — Initialisation & socle technique
 
-- [ ] Init Vite + React + TypeScript
-- [ ] Outillage : ESLint, Prettier, Vitest + coverage (seuil 85 % configuré), Testing Library
-- [ ] Structure de dossiers découplée : `domain/` (logique pure), `data/` (Dexie/repositories), `ui/` (composants/écrans), `crypto/`, `app/`
-- [ ] Config PWA (manifest, service worker Vite)
-- [ ] Wrapper chiffrement Web Crypto (AES-GCM, dérivation PBKDF2)
-- [ ] **Doc** : README (lancement local), ADR-001 (stack), ADR-002 (architecture en couches)
-- [ ] **Tests** : smoke test du harness, test unitaire du wrapper crypto
-- [ ] **Test manuel** : `npm run dev` lance l'app ; PWA installable ; build prod OK
-- [ ] **Sortie** : `package.json` créé, app se lance, Dexie initialisée avec les 5 entités MVP
+- [x] Init Vite + React + TypeScript
+- [x] Outillage : ESLint, Prettier, Vitest + coverage (seuil 85 % configuré), Testing Library
+- [x] Structure de dossiers découplée : `domain/` (logique pure), `data/` (Dexie/repositories), `ui/` (composants/écrans), `crypto/`, `app/`
+- [x] Config PWA (manifest, service worker Vite)
+- [x] Wrapper chiffrement Web Crypto (AES-GCM, dérivation PBKDF2)
+- [x] **Doc** : README (lancement local), ADR-001 (stack), ADR-002 (architecture en couches)
+- [x] **Tests** : smoke test du harness, test unitaire du wrapper crypto
+- [x] **Test manuel** : `npm run dev` lance l'app ; PWA installable ; build prod OK
+- [x] **Sortie** : `package.json` créé, app se lance, Dexie initialisée avec les 5 entités MVP
 
 ## [ ] Phase 1 — Couche données & domaine
 

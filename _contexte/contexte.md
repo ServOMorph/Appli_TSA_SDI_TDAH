@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Documentation produit complète et cohérente (6 docs de dev + cahier des charges). Stack technique arrêtée. Roadmap créée (15 phases, coches de suivi). Repo public GitHub prêt (MIT, .gitignore). Aucun code produit. Prêt à démarrer Phase 0 de la roadmap.
+Phase 0 complète. Socle technique opérationnel : Vite 8 + React 19 + TypeScript 6, ESLint, Prettier, Vitest (couverture 85 % configurée), PWA (service worker Workbox), wrapper crypto AES-GCM/PBKDF2, structure découplée (domain/data/ui/crypto/app), ADR-001 et ADR-002 créés. 5/5 tests passent. Build prod validé. App tourne sur localhost:5173. Prêt pour Phase 1 (couche données & domaine).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Initialisation du protocole vibecoding.
@@ -22,3 +22,5 @@ Documentation produit complète et cohérente (6 docs de dev + cahier des charge
 - 2026-06-23 : Cascade "Action immédiate" formalisée (déterministe, 4 étapes MVP).
 - 2026-06-23 : Distinction notification push (max 2/j) vs suggestion in-app (illimitée/passive).
 - 2026-06-23 : Roadmap créée (15 phases MVP→V1→V2), licence MIT, repo public GitHub configuré.
+- 2026-06-24 : Phase 0 complète — socle Vite/React/TS, PWA, crypto wrapper, Vitest, ADRs.
+- 2026-06-24 : TS6 strict — casts `as Uint8Array<ArrayBuffer>` aux appels Web Crypto API.

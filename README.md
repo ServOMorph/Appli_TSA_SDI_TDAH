@@ -6,9 +6,22 @@ Application neuroinclusive (web PWA + mobile) pour personnes AuDHD (TSA sans dé
 
 Agir comme un système externe de fonctions exécutives : réduire la charge mentale quotidienne, soutenir les routines, maintenir les relations sociales, gérer l'énergie. Pas un outil de productivité classique.
 
+## Lancement local
+
+```bash
+npm install
+npm run dev        # serveur de développement http://localhost:5173
+npm run build      # build de production
+npm run preview    # prévisualisation du build
+npm test           # tests unitaires (Vitest)
+npm run test:coverage  # couverture (seuil 85 %)
+npm run lint       # ESLint
+npm run format     # Prettier
+```
+
 ## État actuel
 
-Documentation produit complète et cohérente. Stack technique arrêtée. Roadmap créée (15 phases). Aucun code produit. Prêt à démarrer Phase 0 (initialisation socle technique).
+Phase 0 complète. Socle opérationnel : Vite 8 + React 19 + TypeScript 6, ESLint, Prettier, Vitest (seuil 85 %), PWA (Workbox), wrapper crypto AES-GCM/PBKDF2, structure découplée, ADR-001/ADR-002. Build prod validé. Prêt pour Phase 1.
 
 ## Stack
 
@@ -21,14 +34,22 @@ Documentation produit complète et cohérente. Stack technique arrêtée. Roadma
 ## Structure
 
 ```
-_docs/              Documentation produit (cahier des charges + 6 docs de dev)
-_contexte/          Contexte de session (protocole vibecoding)
-CHANGELOG.md
+src/
+  domain/    — logique métier pure (zéro import Dexie / React)
+  data/      — repositories Dexie, migrations
+  ui/        — composants React, écrans, hooks
+  crypto/    — wrapper Web Crypto (AES-GCM, PBKDF2)
+  app/       — point d'entrée, routing, providers
+  test/      — setup Vitest, helpers partagés
+docs/adr/    — Architecture Decision Records
+_docs/       — Documentation produit (cahier des charges + 6 docs de dev)
+_contexte/   — Contexte de session (protocole vibecoding)
+roadmap.md   — Roadmap 15 phases (MVP → V1 → V2)
 ```
 
 ## Prochaine étape
 
-Phase 0 — Initialiser le projet React/TS/PWA : Vite, ESLint, Prettier, Vitest, structure de dossiers découplée (`domain/`, `data/`, `ui/`, `crypto/`, `app/`).
+Phase 1 — Couche données & domaine : schéma Dexie des 5 entités MVP, repositories CRUD, logique domaine pure.
 
 ## Licence
 

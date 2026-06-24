@@ -1,4 +1,5 @@
-import Dexie, { Table } from 'dexie'
+import Dexie from 'dexie'
+import type { Table } from 'dexie'
 import type { User } from '@/domain/entities/user'
 import type { Task } from '@/domain/entities/task'
 import type { SubTask } from '@/domain/entities/subTask'

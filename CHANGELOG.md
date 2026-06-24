@@ -1,3 +1,25 @@
+## v0.5 — 2026-06-24
+
+### Ajouté
+- `src/app/AppContext.tsx` : state machine React (Screen), repositories, logique onboarding complète
+- `src/app/AppContext.test.tsx` : 9 tests intégration avec real DB (fake-indexeddb)
+- `src/ui/components/Button.tsx` + `Card.tsx` : composants UI réutilisables
+- `src/ui/components/DevResetButton.tsx` : reset IndexedDB en DEV uniquement (import.meta.env.DEV)
+- `src/ui/screens/onboarding/E01Welcome.tsx` + `E02Profile.tsx` + `E03Energy.tsx` + `E04FirstTask.tsx` + tests
+- `src/ui/screens/dashboard/E10Dashboard.tsx` + tests : D10A (normal) / D10B (surcharge)
+- `src/test/testUtils.tsx` : makeAppContext + renderWithApp pour tests UI découplés
+- Design tokens CSS neurodivergents dans `src/index.css` (palette, grille 8px, dark mode)
+
+### Corrigé
+- `src/data/db.ts` : `import type { Table }` — Rolldown/Vite 8 refuse l'import valeur
+
+### Modifié
+- `src/App.tsx` : router principal via AppContext + DevResetButton
+- `vitest.config.ts` : exclusion `src/domain/entities/**` de la couverture
+- `roadmap.md` : Phase 2 cochée `[x]`
+
+---
+
 ## v0.4 — 2026-06-24
 
 ### Ajouté

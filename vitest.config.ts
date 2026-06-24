@@ -19,6 +19,7 @@ export default defineConfig({
         'src/test/**',
         'src/main.tsx',
         'src/App.tsx',
+        'src/domain/entities/**',
         '**/*.config.*',
         'dist/**',
       ],

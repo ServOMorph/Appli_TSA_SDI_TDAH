@@ -1,0 +1,78 @@
+import { useState } from 'react'
+import { useApp } from '@/app/AppContext'
+import { Button } from '@/ui/components/Button'
+
+const SPOON_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+export function E03Energy() {
+  const { saveTodayEnergy, skipTodayEnergy, goTo } = useApp()
+  const [selected, setSelected] = useState<number | null>(null)
+
+  async function confirm() {
+    if (selected !== null) {
+      await saveTodayEnergy(selected)
+    }
+    goTo('first-task')
+  }
+
+  async function skip() {
+    await skipTodayEnergy()
+    goTo('first-task')
+  }
+
+  return (
+    <main
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        padding: 'var(--spacing-xl)',
+        gap: 'var(--spacing-lg)',
+        maxWidth: '480px',
+        margin: '0 auto',
+        minHeight: '100svh',
+        justifyContent: 'center',
+      }}
+    >
+      <div>
+        <h1>Votre énergie aujourd'hui</h1>
+        <p>Combien de cuillères avez-vous aujourd'hui ?</p>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 'var(--spacing-sm)',
+        }}
+      >
+        {SPOON_OPTIONS.map((n) => (
+          <button
+            key={n}
+            aria-pressed={selected === n}
+            onClick={() => setSelected(n)}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 'var(--radius-md)',
+              border: selected === n
+                ? '2px solid var(--color-primary)'
+                : '1px solid var(--color-border)',
+              backgroundColor: selected === n ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: selected === n ? '#ffffff' : 'var(--color-text)',
+              fontSize: '1rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {n}
+          </button>
+        ))}
+      </div>
+      <Button fullWidth onClick={confirm} disabled={selected === null}>
+        Valider
+      </Button>
+      <Button variant="secondary" fullWidth onClick={skip}>
+        Ignorer
+      </Button>
+    </main>
+  )
+}

@@ -57,16 +57,15 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 - [x] **Test manuel** : couverture complète via Vitest (pas d'UI)
 - [x] **Sortie** : CRUD des 5 entités opérationnel + persistance chiffrée vérifiée
 
-## [ ] Phase 2 — Onboarding + Dashboard
+## [x] Phase 2 — Onboarding + Dashboard
 
-- [ ] Écrans E01–E04 (bienvenue, profil, estimation énergie, première tâche)
-- [ ] Écran E10 (dashboard) + affichage Action immédiate + cuillères + tâches du jour
-- [ ] États D10A (vide) / D10B (surcharge)
-- [ ] **Refacto** : extraction des composants UI réutilisables (boutons, cartes, layout)
-- [ ] **Doc** : doc des composants partagés
-- [ ] **Tests** : tests composants + parcours onboarding (couverture ≥ 85 %)
-- [ ] **Test manuel** : parcours onboarding complet jusqu'au dashboard peuplé
-- [ ] **Sortie** : un nouvel utilisateur arrive sur un dashboard fonctionnel
+- [x] Écrans E01–E04 (bienvenue, profil, estimation énergie, première tâche)
+- [x] Écran E10 (dashboard) + affichage Action immédiate + cuillères + tâches du jour
+- [x] États D10A (vide) / D10B (surcharge)
+- [x] **Refacto** : extraction des composants UI réutilisables (Button, Card, DevResetButton)
+- [x] **Tests** : 116 tests, couverture 98.9 % global
+- [x] **Test manuel** : parcours onboarding complet jusqu'au dashboard peuplé (validé)
+- [x] **Sortie** : un nouvel utilisateur arrive sur un dashboard fonctionnel
 
 ## [ ] Phase 3 — Gestion des tâches
 

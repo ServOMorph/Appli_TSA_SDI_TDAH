@@ -21,7 +21,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 1 complète. Couche données & domaine opérationnelle : schéma Dexie v1 (5 entités MVP), repositories CRUD avec chiffrement transparent, domaine pur isolé (taskRules, energyRules, actionImmediateRules), ADR-003. 71 tests, couverture 98.26 %. Prêt pour Phase 2 (Onboarding + Dashboard).
+Phase 2 complète. Onboarding (E01–E04) + Dashboard (E10 D10A/D10B) opérationnels, tests manuels validés. AppContext state machine React, composants Button/Card extraits, design tokens CSS neurodivergents. 116 tests, couverture 98.9 %. Prêt pour Phase 3 (Gestion des tâches).
 
 ## Stack
 
@@ -49,7 +49,7 @@ roadmap.md   — Roadmap 15 phases (MVP → V1 → V2)
 
 ## Prochaine étape
 
-Phase 2 — Onboarding + Dashboard : écrans E01–E04 (bienvenue, profil, énergie initiale, première tâche) et E10 (dashboard avec Action immédiate, cuillères, tâches du jour).
+Phase 3 — Gestion des tâches : écrans E20 (inbox) → E25 (plus tard), modales M01/M04, décomposition SubTasks, cycle de vie complet d'une tâche.
 
 ## Licence
 

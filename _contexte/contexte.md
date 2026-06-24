@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 2 complète. Onboarding (E01–E04) + Dashboard (E10 D10A/D10B) opérationnels, tests manuels validés. AppContext state machine React, composants Button/Card/DevResetButton extraits, design tokens CSS neurodivergents. 116 tests, couverture 98.9 %. Fix Rolldown : import type Table from dexie. Prêt pour Phase 3 (Gestion des tâches).
+Phase 3 complète. Gestion des tâches opérationnelle : inbox (E20), création (E21), détail (E22), décomposition (E23), aujourd'hui (E24), plus tard (E25). Modales M01/M04 fonctionnelles en dark mode. 168 tests, couverture 94.17 %, 31 tests manuels validés. Button disabled state corrigé. DevResetButton affiche le code écran (E01–E25). Prêt pour Phase 4.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Entité Event hors MVP, documentée pour V1 post-validation.
@@ -25,3 +25,5 @@ Phase 2 complète. Onboarding (E01–E04) + Dashboard (E10 D10A/D10B) opération
 - 2026-06-24 : fake-indexeddb via import auto + AppDatabase name optionnel pour isoler les tests.
 - 2026-06-24 : Phase 2 complète — AppContext state machine React, E01–E04 + E10, 116 tests 98.9 %.
 - 2026-06-24 : import type { Table } from 'dexie' — Rolldown/Vite 8 refuse les imports valeurs inexistants à l'exécution.
+- 2026-06-24 : Phase 3 complète — E20–E25, modales M01/M04, cycle vie tâche, 168 tests 94.17 %, 31 tests manuels ok.
+- 2026-06-24 : var(--color-bg) inexistant — toujours utiliser var(--color-surface) pour les fonds opaques.

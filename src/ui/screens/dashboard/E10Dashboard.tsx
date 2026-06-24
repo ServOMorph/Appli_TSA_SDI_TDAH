@@ -97,9 +97,23 @@ export function E10Dashboard() {
         </section>
       ) : null}
 
-      <Button fullWidth onClick={() => goTo('first-task')}>
-        Ajouter une tâche
-      </Button>
+      <nav
+        aria-label="Navigation principale"
+        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}
+      >
+        <Button fullWidth onClick={() => goTo('task-create')}>
+          Ajouter une tâche
+        </Button>
+        <Button variant="secondary" fullWidth onClick={() => goTo('inbox')}>
+          Inbox
+        </Button>
+        <Button variant="secondary" fullWidth onClick={() => goTo('today')}>
+          Aujourd'hui
+        </Button>
+        <Button variant="secondary" fullWidth onClick={() => goTo('later')}>
+          Plus tard
+        </Button>
+      </nav>
     </main>
   )
 }

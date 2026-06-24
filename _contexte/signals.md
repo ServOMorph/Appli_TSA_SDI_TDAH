@@ -1,9 +1,9 @@
 # Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-06-24)
 
 ## Actions ouvertes
-- [P1|ouvert] Démarrer Phase 3 (Gestion des tâches)
-  - fait quand: écrans E20–E25 créés, modales M01/M04, cycle de vie tâche complet, tests ≥ 85 %, test manuel validé
-  - réf: `roadmap.md` Phase 3, `_docs/docs de dev/3- ARCHITECTURE DES ÉCRANS.md`
+- [P1|ouvert] Démarrer Phase 4 (Décomposition & SubTasks avancée)
+  - fait quand: E23 enrichi, génération automatique de sous-tâches, tests ≥ 85 %, test manuel validé
+  - réf: `roadmap.md` Phase 4
 - [P2|ouvert] Tests utilisateurs AuDHD réels (Phase 7 — post-MVP)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés
   - réf: `roadmap.md` Phase 7
@@ -15,44 +15,46 @@
 ## Blocages
 
 ## Contexte chaud
-- Phase 2 complète : 116 tests, couverture 98.9 %, tests manuels onboarding validés
-- AppContext = state machine React useState (Screen), pas de react-router
-- import type { Table } from 'dexie' — Rolldown/Vite 8 refuse l'import valeur (fix appliqué)
-- DevResetButton : bouton rouge fixe en DEV uniquement — reset IndexedDB + reload
-- Routing : Screen = 'welcome' | 'profile' | 'energy' | 'first-task' | 'dashboard'
-- testUtils.tsx : makeAppContext + renderWithApp pour mocker AppContext dans les tests UI
-- Singletons module-level dans AppContext.tsx : db, userRepo, taskRepo, energyRepo, settingsRepo
+- Phase 3 complète : 168 tests, couverture 94.17 %, 31 tests manuels validés
+- AppContext étendu : inboxTasks, todayTasks, laterTasks, moveTask, completeTask, deleteTask, selectTask, getSubTasks, toggleSubTask
+- Screens ajoutés : E20 (Inbox), E21 (CreateTask), E22 (TaskDetail), E23 (Decompose), E24 (Today), E25 (Later)
+- DevResetButton : affiche aussi le code écran (E01…E25) sous le bouton Reset DB
+- Modales M01/M04 : backgroundColor var(--color-surface), overlay rgba(0,0,0,0.75), zIndex 1000
+- Bug var(--color-bg) inexistant corrigé → var(--color-surface) = #1e293b en dark mode
+- Button.tsx : opacity 0.4 + cursor not-allowed sur disabled
+- Routing : Screen étendu à 'inbox' | 'task-create' | 'task-detail' | 'task-decompose' | 'today' | 'later'
 
 ## Dernière session (2026-06-24)
 
-# Session du 2026-06-24
+# Session du 2026-06-24 — Phase 3
 
 ## Décisions prises
-- Phase 2 complète : onboarding + dashboard opérationnels, tests manuels validés
-- AppContext comme state machine React (pas de react-router) — suffisant pour la Phase 2
-- import type { Table } from 'dexie' — Rolldown/Vite 8 refuse les imports de valeurs inexistantes à l'exécution
-- DevResetButton uniquement en import.meta.env.DEV (reset IndexedDB en un clic, absent du build prod)
+- Phase 3 complète : gestion tâches inbox/today/later opérationnelle, 31 tests manuels validés
+- DevResetButton déplacé dans AppScreens() (a accès à useApp) — DevScreenBadge abandonné, E-code dans l'overlay
+- var(--color-bg) n'existe pas dans index.css — variable correcte : var(--color-surface)
+- Limite 3 tâches aujourd'hui appliquée côté UI (modale M04 pour remplacement)
+- Tâches E10 non cliquables par design — accès détail via E20 ou E24 uniquement
 
 ## Livrables produits ou modifiés
-- `src/app/AppContext.tsx` : state machine, repositories, logique onboarding
-- `src/app/AppContext.test.tsx` : 9 tests intégration (real DB via fake-indexeddb)
-- `src/ui/components/Button.tsx` + `Card.tsx` + `DevResetButton.tsx` : composants réutilisables
-- `src/ui/screens/onboarding/E01–E04.tsx` + tests : parcours onboarding complet
-- `src/ui/screens/dashboard/E10Dashboard.tsx` + tests : D10A / D10B, action immédiate, cuillères
-- `src/test/testUtils.tsx` : makeAppContext + renderWithApp pour tests UI
-- `src/index.css` : design tokens neurodivergents (palette, grille 8px, dark mode)
-- `src/App.tsx` : router principal + DevResetButton
-- `src/data/db.ts` : fix import type Table (Rolldown compat)
-- `vitest.config.ts` : exclusion src/domain/entities/** de la couverture
+- `src/app/AppContext.tsx` : state machine étendue, 11 screens, logique tâches complète
+- `src/ui/screens/tasks/E20Inbox.tsx` + tests : liste inbox, déplacement today/later, modale M04
+- `src/ui/screens/tasks/E21CreateTask.tsx` + tests : formulaire création tâche
+- `src/ui/screens/tasks/E22TaskDetail.tsx` + tests : détail, sous-tâches, terminer, supprimer
+- `src/ui/screens/tasks/E23Decompose.tsx` + tests : décomposition manuelle en sous-tâches
+- `src/ui/screens/tasks/E24Today.tsx` + tests : liste today, terminer, retirer
+- `src/ui/screens/tasks/E25Later.tsx` + tests : liste later, déplacer vers today, modale M04
+- `src/ui/components/Button.tsx` : disabled state (opacity 0.4, cursor not-allowed)
+- `src/ui/components/DevResetButton.tsx` : SCREEN_CODES mapping, affichage E-code
+- `src/App.tsx` : renderScreen() helper, DevResetButton dans AppScreens
 
 ## Hypothèses validées / invalidées
-- VALIDE : state machine React useState suffit pour Phase 2 (pas besoin de react-router)
-- VALIDE : 116/116 tests passent, couverture 98.9 % global
-- VALIDE : parcours onboarding complet → dashboard (tests manuels ok)
-- INVALIDE : import { Table } from 'dexie' → Rolldown crash en build prod (fix : import type)
+- VALIDE : 168/168 tests passent, couverture 94.17 %
+- VALIDE : 31 tests manuels passent (cycle complet tâche, modales, dark mode)
+- INVALIDE : var(--color-bg) — n'existe pas dans index.css (var(--color-surface) est le bon)
+- VALIDE : state machine React useState suffit pour Phase 3
 
 ## Prochaine étape exacte
-Phase 3 — Gestion des tâches : écrans E20 (inbox) → E25 (plus tard), modales M01/M04, décomposition SubTasks, états limite 3 tâches.
+Phase 4 — voir roadmap.md
 
 ## Question bloquante pour la session suivante
 Aucune

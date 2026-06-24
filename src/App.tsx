@@ -4,6 +4,12 @@ import { E02Profile } from '@/ui/screens/onboarding/E02Profile'
 import { E03Energy } from '@/ui/screens/onboarding/E03Energy'
 import { E04FirstTask } from '@/ui/screens/onboarding/E04FirstTask'
 import { E10Dashboard } from '@/ui/screens/dashboard/E10Dashboard'
+import { E20Inbox } from '@/ui/screens/tasks/E20Inbox'
+import { E21CreateTask } from '@/ui/screens/tasks/E21CreateTask'
+import { E22TaskDetail } from '@/ui/screens/tasks/E22TaskDetail'
+import { E23Decompose } from '@/ui/screens/tasks/E23Decompose'
+import { E24Today } from '@/ui/screens/tasks/E24Today'
+import { E25Later } from '@/ui/screens/tasks/E25Later'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 
 function AppScreens() {
@@ -27,24 +33,33 @@ function AppScreens() {
     )
   }
 
-  switch (screen) {
-    case 'welcome':
-      return <E01Welcome />
-    case 'profile':
-      return <E02Profile />
-    case 'energy':
-      return <E03Energy />
-    case 'first-task':
-      return <E04FirstTask />
-    case 'dashboard':
-      return <E10Dashboard />
+  function renderScreen() {
+    switch (screen) {
+      case 'welcome':      return <E01Welcome />
+      case 'profile':      return <E02Profile />
+      case 'energy':       return <E03Energy />
+      case 'first-task':   return <E04FirstTask />
+      case 'dashboard':    return <E10Dashboard />
+      case 'inbox':        return <E20Inbox />
+      case 'task-create':  return <E21CreateTask />
+      case 'task-detail':  return <E22TaskDetail />
+      case 'task-decompose': return <E23Decompose />
+      case 'today':        return <E24Today />
+      case 'later':        return <E25Later />
+    }
   }
+
+  return (
+    <>
+      <DevResetButton />
+      {renderScreen()}
+    </>
+  )
 }
 
 export default function App() {
   return (
     <AppProvider>
-      <DevResetButton />
       <AppScreens />
     </AppProvider>
   )

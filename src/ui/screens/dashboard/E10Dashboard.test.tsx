@@ -30,11 +30,11 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('button', { name: 'Ajouter une tâche' })).toBeDefined()
     })
 
-    it('navigue vers first-task au clic sur Ajouter une tâche', async () => {
+    it('navigue vers task-create au clic sur Ajouter une tâche', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('first-task')
+      expect(ctx.goTo).toHaveBeenCalledWith('task-create')
     })
   })
 

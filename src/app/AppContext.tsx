@@ -2,13 +2,26 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { AppDatabase } from '@/data/db'
 import { UserRepository } from '@/data/repositories/userRepository'
 import { TaskRepository } from '@/data/repositories/taskRepository'
+import { SubTaskRepository } from '@/data/repositories/subTaskRepository'
 import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository'
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import type { User, ProfileType } from '@/domain/entities/user'
-import type { Task } from '@/domain/entities/task'
+import type { Task, TaskStatus } from '@/domain/entities/task'
+import type { SubTask } from '@/domain/entities/subTask'
 import type { Settings } from '@/domain/entities/settings'
 
-export type Screen = 'welcome' | 'profile' | 'energy' | 'first-task' | 'dashboard'
+export type Screen =
+  | 'welcome'
+  | 'profile'
+  | 'energy'
+  | 'first-task'
+  | 'dashboard'
+  | 'inbox'
+  | 'today'
+  | 'later'
+  | 'task-create'
+  | 'task-detail'
+  | 'task-decompose'
 
 interface AppContextValue {
   screen: Screen
@@ -16,13 +29,26 @@ interface AppContextValue {
   loading: boolean
   currentUser: User | null
   todayTasks: Task[]
+  inboxTasks: Task[]
+  laterTasks: Task[]
   todayEnergy: number | null
   overloadMode: boolean
   setOverloadMode: (v: boolean) => void
+  selectedTaskId: string | null
+  selectTask: (id: string | null) => void
   createUser: (profile: ProfileType) => Promise<void>
   saveTodayEnergy: (value: number) => Promise<void>
   skipTodayEnergy: () => Promise<void>
   addTask: (title: string) => Promise<void>
+  createTaskInbox: (title: string) => Promise<void>
+  moveTask: (id: string, status: TaskStatus) => Promise<void>
+  completeTask: (id: string) => Promise<void>
+  deleteTask: (id: string) => Promise<void>
+  addSubTask: (taskId: string, title: string) => Promise<void>
+  deleteSubTask: (id: string) => Promise<void>
+  toggleSubTask: (subTask: SubTask) => Promise<void>
+  getSubTasks: (taskId: string) => Promise<SubTask[]>
+  updateTaskTitle: (id: string, title: string) => Promise<void>
   refreshDashboard: () => Promise<void>
 }
 
@@ -31,6 +57,7 @@ export const AppContext = createContext<AppContextValue | null>(null)
 const db = new AppDatabase()
 const userRepo = new UserRepository(db)
 const taskRepo = new TaskRepository(db)
+const subTaskRepo = new SubTaskRepository(db)
 const energyRepo = new EnergyEntryRepository(db)
 const settingsRepo = new SettingsRepository(db)
 
@@ -47,8 +74,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [todayTasks, setTodayTasks] = useState<Task[]>([])
+  const [inboxTasks, setInboxTasks] = useState<Task[]>([])
+  const [laterTasks, setLaterTasks] = useState<Task[]>([])
   const [todayEnergy, setTodayEnergy] = useState<number | null>(null)
   const [overloadMode, setOverloadModeState] = useState(false)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -57,7 +87,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setCurrentUser(user)
         const settings = await settingsRepo.getByUserId(user.id)
         if (settings?.overload_mode) setOverloadModeState(true)
-        await loadDashboard()
+        await loadAll()
         setScreen('dashboard')
       }
       setLoading(false)
@@ -65,12 +95,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     init()
   }, [])
 
-  async function loadDashboard() {
-    const [tasks, entry] = await Promise.all([
+  async function loadAll() {
+    const [inbox, today, later, entry] = await Promise.all([
+      taskRepo.getByStatus('inbox'),
       taskRepo.getTodayTasks(),
+      taskRepo.getByStatus('later'),
       energyRepo.getByDate(todayDate()),
     ])
-    setTodayTasks(tasks)
+    setInboxTasks(inbox)
+    setTodayTasks(today)
+    setLaterTasks(later)
     setTodayEnergy(entry?.value ?? null)
   }
 
@@ -133,8 +167,76 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodayTasks((prev) => [...prev, task])
   }
 
+  async function createTaskInbox(title: string) {
+    const now = new Date().toISOString()
+    const task: Task = {
+      id: newId(),
+      title,
+      status: 'inbox',
+      position: inboxTasks.length,
+      created_at: now,
+      updated_at: now,
+      completed_at: null,
+    }
+    await taskRepo.create(task)
+    setInboxTasks((prev) => [...prev, task])
+  }
+
+  async function moveTask(id: string, status: TaskStatus) {
+    const task = await taskRepo.getById(id)
+    if (!task) return
+    await taskRepo.update({ ...task, status, updated_at: new Date().toISOString() })
+    await loadAll()
+  }
+
+  async function completeTask(id: string) {
+    const task = await taskRepo.getById(id)
+    if (!task) return
+    const now = new Date().toISOString()
+    await taskRepo.update({ ...task, status: 'completed', completed_at: now, updated_at: now })
+    await loadAll()
+  }
+
+  async function deleteTask(id: string) {
+    const subs = await subTaskRepo.getByTaskId(id)
+    await Promise.all(subs.map((st) => subTaskRepo.delete(st.id)))
+    await taskRepo.delete(id)
+    await loadAll()
+  }
+
+  async function addSubTask(taskId: string, title: string) {
+    const existing = await subTaskRepo.getByTaskId(taskId)
+    const subTask: SubTask = {
+      id: newId(),
+      task_id: taskId,
+      title,
+      is_completed: false,
+      position: existing.length,
+    }
+    await subTaskRepo.create(subTask)
+  }
+
+  async function deleteSubTask(id: string) {
+    await subTaskRepo.delete(id)
+  }
+
+  async function toggleSubTask(subTask: SubTask) {
+    await subTaskRepo.update({ ...subTask, is_completed: !subTask.is_completed })
+  }
+
+  async function getSubTasks(taskId: string): Promise<SubTask[]> {
+    return subTaskRepo.getByTaskId(taskId)
+  }
+
+  async function updateTaskTitle(id: string, title: string) {
+    const task = await taskRepo.getById(id)
+    if (!task) return
+    await taskRepo.update({ ...task, title, updated_at: new Date().toISOString() })
+    await loadAll()
+  }
+
   async function refreshDashboard() {
-    await loadDashboard()
+    await loadAll()
   }
 
   async function setOverloadMode(v: boolean) {
@@ -155,13 +257,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         loading,
         currentUser,
         todayTasks,
+        inboxTasks,
+        laterTasks,
         todayEnergy,
         overloadMode,
         setOverloadMode,
+        selectedTaskId,
+        selectTask: setSelectedTaskId,
         createUser,
         saveTodayEnergy,
         skipTodayEnergy,
         addTask,
+        createTaskInbox,
+        moveTask,
+        completeTask,
+        deleteTask,
+        addSubTask,
+        deleteSubTask,
+        toggleSubTask,
+        getSubTasks,
+        updateTaskTitle,
         refreshDashboard,
       }}
     >

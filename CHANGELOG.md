@@ -1,3 +1,21 @@
+## v0.14 — 2026-06-25
+
+### Ajouté
+- `src/ui/components/TopBar.tsx` : nouveau composant — titre « Appli pour AuDHD », pill énergie, pill surcharge, roue ⚙ paramètres
+- `run_dev.py` / `run_prod.py` : scripts de lancement dev/prod avec `--host` (accès mobile réseau local)
+- `SERVEURS.md` : liens localhost PC + mobile (192.168.1.180)
+
+### Modifié
+- `E10Dashboard.tsx` : refacto sans scroll — TopBar + nav segmentée (Inbox / Aujourd'hui / Plus tard) remplace 7 boutons empilés
+- `E10Dashboard.test.tsx` : tests adaptés aux nouveaux libellés (26/26)
+- `e2e/*.spec.ts` + `helpers/reset.ts` : libellés remappés (Tableau de bord → Appli pour AuDHD, Mon énergie → pill, Activer mode surcharge → Activer le mode surcharge)
+
+### Corrigé
+- `AppContext.tsx` : `taskId` → `_taskId` dans `reorderSubTasks` (erreur TS6133 bloquant le build prod)
+- Fix scroll latéral mobile validé en build prod (overflow-x: clip, DevResetButton absent) ✅
+
+---
+
 ## v0.13 — 2026-06-25
 
 ### Corrigé

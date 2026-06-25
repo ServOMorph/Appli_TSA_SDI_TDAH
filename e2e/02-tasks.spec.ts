@@ -78,7 +78,7 @@ test('T16 — Terminer tâche → retour dashboard', async ({ page }) => {
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.getByText('Tâche à terminer').click()
   await page.getByRole('button', { name: 'Terminer' }).click()
-  await expect(page.getByRole('heading', { name: 'Tableau de bord' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/16-task-completed.png' })
 })
 

@@ -278,7 +278,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await subTaskRepo.update({ ...subTask, is_completed: !subTask.is_completed })
   }
 
-  async function reorderSubTasks(taskId: string, ids: string[]) {
+  async function reorderSubTasks(_taskId: string, ids: string[]) {
     await subTaskRepo.reorder(ids)
     await loadAll()
   }

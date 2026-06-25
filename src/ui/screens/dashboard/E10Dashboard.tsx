@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import type { Task } from '@/domain/entities/task'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
+import { TopBar } from '@/ui/components/TopBar'
 import { getActionImmediate } from '@/domain/rules/actionImmediateRules'
 import {
   DndContext,
@@ -22,6 +23,20 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+function segmentStyle(withDivider: boolean): React.CSSProperties {
+  return {
+    flex: 1,
+    padding: '12px 8px',
+    background: 'transparent',
+    border: 'none',
+    borderLeft: withDivider ? '1px solid var(--color-border)' : 'none',
+    color: 'var(--color-secondary)',
+    fontSize: '0.9375rem',
+    fontFamily: 'var(--font-body)',
+    cursor: 'pointer',
+  }
+}
 
 interface SortableTaskItemProps {
   task: { id: string; title: string }
@@ -104,6 +119,19 @@ export function E10Dashboard() {
   const action = getActionImmediate([...visibleOrder, ...todayTasks.slice(3)], todaySubTasksMap)
   const isEmpty = todayTasks.length === 0
 
+  const energyLabel =
+    todayEnergyStatus === 'filled' && todayEnergy !== null
+      ? `${todayEnergy} cuillères`
+      : todayEnergyStatus === 'skipped'
+        ? 'Énergie ignorée'
+        : 'Mon énergie'
+  const energyAriaLabel =
+    todayEnergyStatus === 'filled' && todayEnergy !== null
+      ? `${todayEnergy} cuillères aujourd'hui`
+      : todayEnergyStatus === 'skipped'
+        ? 'Énergie ignorée aujourd\'hui'
+        : 'Renseigner mon énergie'
+
   if (overloadMode) {
     return (
       <main
@@ -160,36 +188,14 @@ export function E10Dashboard() {
         minHeight: '100svh',
       }}
     >
-      <header style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <h1 style={{ margin: 0 }}>Tableau de bord</h1>
-        {todayEnergyStatus === 'filled' && todayEnergy !== null ? (
-          <button
-            aria-label={`${todayEnergy} cuillères aujourd'hui`}
-            onClick={() => goTo('energy-view')}
-            style={{
-              alignSelf: 'flex-start',
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: '4px 12px',
-              fontSize: '0.875rem',
-              color: 'var(--color-text-muted)',
-              cursor: 'pointer',
-            }}
-          >
-            {todayEnergy} cuillères
-          </button>
-        ) : todayEnergyStatus === 'skipped' ? (
-          <span
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-muted)',
-            }}
-          >
-            Énergie ignorée
-          </span>
-        ) : null}
-      </header>
+      <TopBar
+        title="Appli pour AuDHD"
+        energyLabel={energyLabel}
+        energyAriaLabel={energyAriaLabel}
+        onEnergyClick={() => goTo('energy-view')}
+        onOverloadClick={() => setOverloadMode(true)}
+        onSettingsClick={() => goTo('settings')}
+      />
 
       <section aria-label="Action immédiate">
         <h2>Que faire maintenant ?</h2>
@@ -234,50 +240,33 @@ export function E10Dashboard() {
         </section>
       ) : null}
 
-      {todayEnergyStatus === null && (
-        <button
-          onClick={() => goTo('energy-view')}
-          style={{
-            backgroundColor: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--spacing-md)',
-            fontSize: '0.875rem',
-            color: 'var(--color-text-muted)',
-            cursor: 'pointer',
-            textAlign: 'left',
-            width: '100%',
-          }}
-        >
-          Vous n'avez pas encore renseigné votre énergie aujourd'hui
-        </button>
-      )}
-
       <nav
         aria-label="Navigation principale"
-        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)', marginTop: 'auto' }}
       >
         <Button fullWidth onClick={() => goTo('task-create')}>
           Ajouter une tâche
         </Button>
-        <Button variant="secondary" fullWidth onClick={() => goTo('inbox')}>
-          Inbox
-        </Button>
-        <Button variant="secondary" fullWidth onClick={() => goTo('today')}>
-          Aujourd'hui
-        </Button>
-        <Button variant="secondary" fullWidth onClick={() => goTo('later')}>
-          Plus tard
-        </Button>
-        <Button variant="secondary" fullWidth onClick={() => goTo('energy-view')}>
-          Mon énergie
-        </Button>
-        <Button variant="secondary" fullWidth onClick={() => setOverloadMode(true)}>
-          Activer mode surcharge
-        </Button>
-        <Button variant="secondary" fullWidth onClick={() => goTo('settings')}>
-          Paramètres
-        </Button>
+        <div
+          role="group"
+          aria-label="Listes de tâches"
+          style={{
+            display: 'flex',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            overflow: 'hidden',
+          }}
+        >
+          <button onClick={() => goTo('inbox')} style={segmentStyle(false)}>
+            Inbox
+          </button>
+          <button onClick={() => goTo('today')} style={segmentStyle(true)}>
+            Aujourd'hui
+          </button>
+          <button onClick={() => goTo('later')} style={segmentStyle(true)}>
+            Plus tard
+          </button>
+        </div>
       </nav>
     </main>
   )

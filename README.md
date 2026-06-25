@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 6 close — MVP stable et validé. 241 tests Vitest (99.34 % couverture) + 46 tests E2E Playwright (onboarding, tâches, énergie, settings, surcharge, offline/IndexedDB). Validé sur appareil mobile physique réel. Phase 7 à démarrer : sessions de test avec utilisateurs AuDHD réels.
+Phase 6 close — MVP stable et validé. Dashboard refactorisé sans scroll : TopBar (titre « Appli pour AuDHD », ⚙ réglages, pills énergie/surcharge) + nav segmentée. 253 tests Vitest (252 passants) + 46 E2E Playwright. Validé sur mobile physique. Phase 7 à démarrer : sessions de test avec utilisateurs AuDHD réels.
 
 ## Stack
 

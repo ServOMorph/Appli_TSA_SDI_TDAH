@@ -4,9 +4,12 @@
 - [P1|ouvert] Tests utilisateurs AuDHD réels (Phase 7)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés dans un fichier dédié
   - réf: `roadmap.md` Phase 7
-- [P1|ouvert] Valider fix scroll latéral mobile en build prod
-  - fait quand: build prod lancé, DevResetButton absent, scroll latéral absent sur iOS Safari
-  - réf: `src/index.css` — overflow-x: clip sur html/body
+- [P1|ouvert] Valider E2E Playwright après refacto dashboard
+  - fait quand: `npm run test:e2e` passe 46/46
+  - réf: `e2e/` — libellés mis à jour (Tableau de bord → Appli pour AuDHD, Mon énergie → pill, Activer mode surcharge → Activer le mode surcharge)
+- [P2|ouvert] Fix test préexistant `E22TaskDetail > affiche les sous-étapes chargées`
+  - fait quand: test passe dans `npm run test`
+  - réf: `src/ui/screens/tasks/E22TaskDetail.test.tsx` — lié aux modifs non commitées de subTaskRepository / actionImmediateRules (hors refacto UI)
 
 ## Questions ouvertes
 
@@ -15,29 +18,37 @@
 ## Blocages
 
 ## Contexte chaud
-- Phase 6 close — MVP stable, 46/46 E2E Playwright + 241 tests Vitest (99.34%), validé mobile physique
-- Fix scroll latéral : overflow-x: clip posé, mais à revalider sans le bouton dev (position:fixed top-right qui déborde lui aussi)
+- Dashboard refactorisé : TopBar (nom + pill énergie + pill surcharge + roue ⚙), nav compactée (1 bouton + rangée segmentée 3 sections)
+- Fix scroll latéral validé en build prod (overflow-x: clip, DevResetButton absent) ✅
+- run_dev.py / run_prod.py (+ --host) disponibles à la racine
 
 ## Dernière session (2026-06-25)
 
-# Session du 2026-06-25 — fix scroll latéral mobile
+# Session du 2026-06-25 — refacto dashboard UI + outils de lancement
 
 ## Décisions prises
-- `overflow-x: clip` sur html/body : bloque le scroll latéral causé par le sr-only de dnd-kit (-1px hors viewport). À valider en build prod sans le bouton dev.
+- Dashboard sans scroll : TopBar (titre « Appli pour AuDHD » + roue ⚙ + pills énergie/surcharge) + nav segmentée (Inbox / Aujourd'hui / Plus tard) remplace les 7 boutons empilés
+- `run_dev.py` / `run_prod.py` remplacent `run.py` pour lancer dev et prod séparément avec `--host`
+- Fix scroll latéral validé en build prod (overflow-x: clip, DevResetButton absent) ✅
 
 ## Livrables produits ou modifiés
-- `src/index.css` : overflow-x: clip sur html et body (remplace overflow-x: hidden + max-width)
-- `src/main.tsx` : outil de debug débordement ajouté puis retiré (propre)
+- `src/ui/components/TopBar.tsx` : nouveau composant (titre, pill énergie, pill surcharge, roue ⚙)
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : refacto complète (TopBar, nav segmentée, marginTop auto)
+- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : tests adaptés (26/26)
+- `e2e/*.spec.ts` + `e2e/helpers/reset.ts` : libellés remappés (Tableau de bord, Mon énergie, Activer mode surcharge)
+- `src/app/AppContext.tsx` : fix TS `taskId` → `_taskId`
+- `run_dev.py` / `run_prod.py` : scripts de lancement avec `--host`
+- `SERVEURS.md` : liens localhost PC + mobile
 
 ## Hypothèses validées / invalidées
-- INVALIDE : overflow-x: hidden suffit → ne bloque pas les enfants position:fixed/absolute
-- VALIDE : overflow-x: clip contraint aussi les enfants fixed/absolute — résout le cas dnd-kit sr-only
-- EN ATTENTE : validation en build prod (sans DevResetButton)
+- VALIDE : fix scroll latéral (overflow-x: clip) confirmé en build prod sans DevResetButton
+- VALIDE : dashboard tient sans scroll avec TopBar + nav segmentée
+- EN ATTENTE : E2E Playwright 46/46 à relancer sur le build prod (libellés mis à jour)
 
 ## Prochaine étape exacte
-1. Passer l'app en build prod et retirer l'affichage dev (DevResetButton)
-2. Tester le scroll latéral sur mobile en prod pour confirmer le fix
+1. Lancer `npm run test:e2e` pour valider les 46 E2E avec les nouveaux libellés
+2. Corriger le test préexistant E22TaskDetail (subTaskRepository)
 3. Démarrer Phase 7 : recruter 5 à 10 utilisateurs AuDHD réels
 
 ## Question bloquante pour la session suivante
-Le scroll latéral est-il résolu en mode prod sans le bouton dev ?
+Aucune

@@ -1,3 +1,20 @@
+## v0.7 — 2026-06-25
+
+### Ajouté
+- `src/ui/screens/energy/E30EnergyView.tsx` + tests : affichage énergie du jour (3 états : null / filled / skipped)
+- `src/ui/screens/energy/E31EnergyCheckIn.tsx` + tests : check-in grille 1-10, skip, pré-sélection, 8 tests
+- `AppContext.tsx` : Screen + 'energy-view'/'energy-checkin', state todayEnergyStatus ('filled'|'skipped'|null)
+- `DevResetButton.tsx` : sélecteur date simulée (localStorage dev_fake_date) pour tests J+1 en DEV
+
+### Modifié
+- `src/App.tsx` : +2 routes energy-view / energy-checkin
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : badge énergie cliquable, encart CTA J+1, "Énergie ignorée", bouton "Mon énergie"
+- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : +5 cas énergie
+- `src/test/testUtils.tsx` : todayEnergyStatus: null dans makeAppContext
+- `roadmap.md` : Phase 4 cochée [x]
+
+---
+
 ## v0.6 — 2026-06-24
 
 ### Ajouté

@@ -22,6 +22,8 @@ export type Screen =
   | 'task-create'
   | 'task-detail'
   | 'task-decompose'
+  | 'energy-view'
+  | 'energy-checkin'
 
 interface AppContextValue {
   screen: Screen
@@ -32,6 +34,7 @@ interface AppContextValue {
   inboxTasks: Task[]
   laterTasks: Task[]
   todayEnergy: number | null
+  todayEnergyStatus: 'filled' | 'skipped' | null
   overloadMode: boolean
   setOverloadMode: (v: boolean) => void
   selectedTaskId: string | null
@@ -62,6 +65,10 @@ const energyRepo = new EnergyEntryRepository(db)
 const settingsRepo = new SettingsRepository(db)
 
 function todayDate(): string {
+  if (import.meta.env.DEV) {
+    const fake = localStorage.getItem('dev_fake_date')
+    if (fake) return fake
+  }
   return new Date().toISOString().slice(0, 10)
 }
 
@@ -77,6 +84,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [inboxTasks, setInboxTasks] = useState<Task[]>([])
   const [laterTasks, setLaterTasks] = useState<Task[]>([])
   const [todayEnergy, setTodayEnergy] = useState<number | null>(null)
+  const [todayEnergyStatus, setTodayEnergyStatus] = useState<'filled' | 'skipped' | null>(null)
   const [overloadMode, setOverloadModeState] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
 
@@ -106,6 +114,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodayTasks(today)
     setLaterTasks(later)
     setTodayEnergy(entry?.value ?? null)
+    setTodayEnergyStatus(entry?.status ?? null)
   }
 
   async function createUser(profile: ProfileType) {
@@ -141,6 +150,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       await energyRepo.create({ id: newId(), value, status: 'filled', entry_date: date })
     }
     setTodayEnergy(value)
+    setTodayEnergyStatus('filled')
   }
 
   async function skipTodayEnergy() {
@@ -150,6 +160,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       await energyRepo.create({ id: newId(), value: null, status: 'skipped', entry_date: date })
     }
     setTodayEnergy(null)
+    setTodayEnergyStatus('skipped')
   }
 
   async function addTask(title: string) {
@@ -260,6 +271,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         inboxTasks,
         laterTasks,
         todayEnergy,
+        todayEnergyStatus,
         overloadMode,
         setOverloadMode,
         selectedTaskId,

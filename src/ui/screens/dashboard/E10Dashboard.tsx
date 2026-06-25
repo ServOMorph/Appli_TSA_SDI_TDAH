@@ -4,7 +4,7 @@ import { Button } from '@/ui/components/Button'
 import { getActionImmediate } from '@/domain/rules/actionImmediateRules'
 
 export function E10Dashboard() {
-  const { todayTasks, todayEnergy, overloadMode, setOverloadMode, goTo } = useApp()
+  const { todayTasks, todayEnergy, todayEnergyStatus, overloadMode, setOverloadMode, goTo } = useApp()
 
   const action = getActionImmediate(todayTasks)
   const isEmpty = todayTasks.length === 0
@@ -52,23 +52,35 @@ export function E10Dashboard() {
         minHeight: '100svh',
       }}
     >
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <header style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <h1 style={{ margin: 0 }}>Tableau de bord</h1>
-        {todayEnergy !== null && (
-          <span
+        {todayEnergyStatus === 'filled' && todayEnergy !== null ? (
+          <button
             aria-label={`${todayEnergy} cuillères aujourd'hui`}
+            onClick={() => goTo('energy-view')}
             style={{
+              alignSelf: 'flex-start',
               backgroundColor: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-md)',
               padding: '4px 12px',
               fontSize: '0.875rem',
               color: 'var(--color-text-muted)',
+              cursor: 'pointer',
             }}
           >
             {todayEnergy} cuillères
+          </button>
+        ) : todayEnergyStatus === 'skipped' ? (
+          <span
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            Énergie ignorée
           </span>
-        )}
+        ) : null}
       </header>
 
       <section aria-label="Action immédiate">
@@ -97,6 +109,25 @@ export function E10Dashboard() {
         </section>
       ) : null}
 
+      {todayEnergyStatus === null && (
+        <button
+          onClick={() => goTo('energy-view')}
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--spacing-md)',
+            fontSize: '0.875rem',
+            color: 'var(--color-text-muted)',
+            cursor: 'pointer',
+            textAlign: 'left',
+            width: '100%',
+          }}
+        >
+          Vous n'avez pas encore renseigné votre énergie aujourd'hui
+        </button>
+      )}
+
       <nav
         aria-label="Navigation principale"
         style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}
@@ -112,6 +143,9 @@ export function E10Dashboard() {
         </Button>
         <Button variant="secondary" fullWidth onClick={() => goTo('later')}>
           Plus tard
+        </Button>
+        <Button variant="secondary" fullWidth onClick={() => goTo('energy-view')}>
+          Mon énergie
         </Button>
       </nav>
     </main>

@@ -78,14 +78,14 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 - [x] **Test manuel** : 31 tests manuels validés (créer, décomposer, planifier, supprimer)
 - [x] **Sortie** : cycle de vie complet d'une tâche utilisable
 
-## [ ] Phase 4 — Gestion de l'énergie
+## [x] Phase 4 — Gestion de l'énergie
 
-- [ ] Écrans E30 (énergie) + E31 (check-in quotidien) + skip énergie
-- [ ] Intégration énergie ↔ Action immédiate
-- [ ] **Refacto** : n/a (module court — inclus dans Phase 6 si besoin)
-- [ ] **Tests** : couverture ≥ 85 %
-- [ ] **Test manuel** : check-in, skip, impact sur le dashboard
-- [ ] **Sortie** : suivi énergie quotidien fonctionnel
+- [x] Écrans E30 (énergie) + E31 (check-in quotidien) + skip énergie
+- [x] Intégration énergie ↔ Action immédiate (affichage dashboard — liaison fonctionnelle reportée V2)
+- [x] **Refacto** : n/a (module court — inclus dans Phase 6 si besoin)
+- [x] **Tests** : 190 tests, couverture ≥ 85 %
+- [x] **Test manuel** : 17 tests manuels validés (check-in, skip, cycle complet, J+1)
+- [x] **Sortie** : suivi énergie quotidien fonctionnel
 
 ## [ ] Phase 5 — Paramètres, accessibilité, surcharge, export
 

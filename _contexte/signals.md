@@ -1,9 +1,9 @@
-# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-06-24)
+# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-06-25)
 
 ## Actions ouvertes
-- [P1|ouvert] Démarrer Phase 4 (Décomposition & SubTasks avancée)
-  - fait quand: E23 enrichi, génération automatique de sous-tâches, tests ≥ 85 %, test manuel validé
-  - réf: `roadmap.md` Phase 4
+- [P1|ouvert] Démarrer Phase 5 (Paramètres, accessibilité, surcharge, export)
+  - fait quand: E111–E117, E90, export JSON RGPD, tests ≥ 85 %, test manuel validé
+  - réf: `roadmap.md` Phase 5
 - [P2|ouvert] Tests utilisateurs AuDHD réels (Phase 7 — post-MVP)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés
   - réf: `roadmap.md` Phase 7
@@ -15,46 +15,43 @@
 ## Blocages
 
 ## Contexte chaud
-- Phase 3 complète : 168 tests, couverture 94.17 %, 31 tests manuels validés
-- AppContext étendu : inboxTasks, todayTasks, laterTasks, moveTask, completeTask, deleteTask, selectTask, getSubTasks, toggleSubTask
-- Screens ajoutés : E20 (Inbox), E21 (CreateTask), E22 (TaskDetail), E23 (Decompose), E24 (Today), E25 (Later)
-- DevResetButton : affiche aussi le code écran (E01…E25) sous le bouton Reset DB
-- Modales M01/M04 : backgroundColor var(--color-surface), overlay rgba(0,0,0,0.75), zIndex 1000
-- Bug var(--color-bg) inexistant corrigé → var(--color-surface) = #1e293b en dark mode
-- Button.tsx : opacity 0.4 + cursor not-allowed sur disabled
-- Routing : Screen étendu à 'inbox' | 'task-create' | 'task-detail' | 'task-decompose' | 'today' | 'later'
+- Phase 4 complète : 190 tests, 17 tests manuels validés
+- E30 (EnergyView) + E31 (EnergyCheckIn) créés dans `src/ui/screens/energy/`
+- todayEnergyStatus: 'filled' | 'skipped' | null ajouté à AppContext (distingue skipped de non-fait)
+- DevResetButton : sélecteur date simulée via localStorage('dev_fake_date') pour tester J+1
+- DevResetButton : SCREEN_CODES complété avec E30/E31
+- Liaison énergie ↔ Action immédiate : confirmé reportée en V2 (doc User Flows §9)
+- Génération auto sous-tâches : post-V1 (nice-to-have, décidé cette session)
 
-## Dernière session (2026-06-24)
+## Dernière session (2026-06-25)
 
-# Session du 2026-06-24 — Phase 3
+# Session du 2026-06-25 — Phase 4
 
 ## Décisions prises
-- Phase 3 complète : gestion tâches inbox/today/later opérationnelle, 31 tests manuels validés
-- DevResetButton déplacé dans AppScreens() (a accès à useApp) — DevScreenBadge abandonné, E-code dans l'overlay
-- var(--color-bg) n'existe pas dans index.css — variable correcte : var(--color-surface)
-- Limite 3 tâches aujourd'hui appliquée côté UI (modale M04 pour remplacement)
-- Tâches E10 non cliquables par design — accès détail via E20 ou E24 uniquement
+- Phase 4 complète : gestion énergie quotidienne opérationnelle (E30, E31, skip)
+- Génération auto sous-tâches (E23 enrichi) → post-V1, nice-to-have
+- todayEnergyStatus ajouté à AppContext car todayEnergy: null ne distingue pas skipped de non-fait
+- Liaison énergie ↔ Action immédiate confirmée reportée en V2 (doc User Flows §9, ligne 364)
+- DevResetButton enrichi : sélecteur date simulée (localStorage) pour tests J+1 en DEV
 
 ## Livrables produits ou modifiés
-- `src/app/AppContext.tsx` : state machine étendue, 11 screens, logique tâches complète
-- `src/ui/screens/tasks/E20Inbox.tsx` + tests : liste inbox, déplacement today/later, modale M04
-- `src/ui/screens/tasks/E21CreateTask.tsx` + tests : formulaire création tâche
-- `src/ui/screens/tasks/E22TaskDetail.tsx` + tests : détail, sous-tâches, terminer, supprimer
-- `src/ui/screens/tasks/E23Decompose.tsx` + tests : décomposition manuelle en sous-tâches
-- `src/ui/screens/tasks/E24Today.tsx` + tests : liste today, terminer, retirer
-- `src/ui/screens/tasks/E25Later.tsx` + tests : liste later, déplacer vers today, modale M04
-- `src/ui/components/Button.tsx` : disabled state (opacity 0.4, cursor not-allowed)
-- `src/ui/components/DevResetButton.tsx` : SCREEN_CODES mapping, affichage E-code
-- `src/App.tsx` : renderScreen() helper, DevResetButton dans AppScreens
+- `src/ui/screens/energy/E30EnergyView.tsx` + tests : affichage énergie du jour (3 états), 7 tests
+- `src/ui/screens/energy/E31EnergyCheckIn.tsx` + tests : formulaire check-in grille 1-10, 8 tests
+- `src/app/AppContext.tsx` : Screen + 'energy-view'/'energy-checkin', todayEnergyStatus state
+- `src/App.tsx` : +2 routes energy-view / energy-checkin
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : badge cliquable, encart CTA, "Énergie ignorée", bouton "Mon énergie"
+- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : +5 cas énergie
+- `src/ui/components/DevResetButton.tsx` : sélecteur date simulée + E30/E31 dans SCREEN_CODES
+- `src/test/testUtils.tsx` : todayEnergyStatus: null dans makeAppContext
 
 ## Hypothèses validées / invalidées
-- VALIDE : 168/168 tests passent, couverture 94.17 %
-- VALIDE : 31 tests manuels passent (cycle complet tâche, modales, dark mode)
-- INVALIDE : var(--color-bg) — n'existe pas dans index.css (var(--color-surface) est le bon)
-- VALIDE : state machine React useState suffit pour Phase 3
+- VALIDE : 190/190 tests passent, couverture maintenue ≥ 85 %
+- VALIDE : 17 tests manuels validés (check-in, skip, cycle complet, J+1)
+- VALIDE : liaison énergie ↔ Action immédiate = affichage seul en MVP (doc confirme V2)
+- VALIDE : todayEnergyStatus nécessaire pour distinguer skipped de non-fait
 
 ## Prochaine étape exacte
-Phase 4 — voir roadmap.md
+Phase 5 — Paramètres, accessibilité, surcharge, export. Démarrer par E111 (profil) ou E90 (surcharge).
 
 ## Question bloquante pour la session suivante
 Aucune

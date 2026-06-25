@@ -21,7 +21,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 3 complète. Gestion des tâches opérationnelle : inbox (E20), création (E21), détail (E22), décomposition (E23), aujourd'hui (E24), plus tard (E25). Modales M01/M04 fonctionnelles en dark mode. 168 tests, couverture 94.17 %, 31 tests manuels validés. Prêt pour Phase 4 (Gestion de l'énergie).
+Phase 4 complète. Suivi énergie quotidien opérationnel : E30 (vue énergie), E31 (check-in 1-10, skip). Dashboard intègre badge énergie cliquable, encart CTA et bouton "Mon énergie". DevResetButton enrichi d'un sélecteur de date simulée pour tests J+1. 190 tests, 17 tests manuels validés. Prêt pour Phase 5 (Paramètres, accessibilité, surcharge, export).
 
 ## Stack
 

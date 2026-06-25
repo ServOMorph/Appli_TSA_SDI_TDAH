@@ -10,6 +10,8 @@ import { E22TaskDetail } from '@/ui/screens/tasks/E22TaskDetail'
 import { E23Decompose } from '@/ui/screens/tasks/E23Decompose'
 import { E24Today } from '@/ui/screens/tasks/E24Today'
 import { E25Later } from '@/ui/screens/tasks/E25Later'
+import { E30EnergyView } from '@/ui/screens/energy/E30EnergyView'
+import { E31EnergyCheckIn } from '@/ui/screens/energy/E31EnergyCheckIn'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 
 function AppScreens() {
@@ -44,8 +46,10 @@ function AppScreens() {
       case 'task-create':  return <E21CreateTask />
       case 'task-detail':  return <E22TaskDetail />
       case 'task-decompose': return <E23Decompose />
-      case 'today':        return <E24Today />
-      case 'later':        return <E25Later />
+      case 'today':          return <E24Today />
+      case 'later':          return <E25Later />
+      case 'energy-view':    return <E30EnergyView />
+      case 'energy-checkin': return <E31EnergyCheckIn />
     }
   }
 

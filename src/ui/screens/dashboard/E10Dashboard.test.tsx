@@ -62,6 +62,7 @@ describe('E10Dashboard', () => {
     it('affiche les cuillères si énergie renseignée', () => {
       const ctx = makeAppContext({
         todayEnergy: 7,
+        todayEnergyStatus: 'filled',
         todayTasks: [makeTask()],
       })
       renderWithApp(<E10Dashboard />, ctx)
@@ -79,6 +80,38 @@ describe('E10Dashboard', () => {
       })
       const { container } = renderWithApp(<E10Dashboard />, ctx)
       expect(container.querySelectorAll('[aria-label="Tâches du jour"] > div > *').length).toBe(3)
+    })
+  })
+
+  describe('énergie (intégration)', () => {
+    it('affiche l\'encart énergie non renseignée si todayEnergyStatus null', () => {
+      renderWithApp(<E10Dashboard />)
+      expect(screen.getByText("Vous n'avez pas encore renseigné votre énergie aujourd'hui")).toBeDefined()
+    })
+
+    it('clic sur l\'encart énergie navigue vers energy-view', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByText("Vous n'avez pas encore renseigné votre énergie aujourd'hui"))
+      expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+    })
+
+    it('clic sur badge cuillères navigue vers energy-view', async () => {
+      const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByLabelText(/7 cuillères/i))
+      expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+    })
+
+    it('affiche "Énergie ignorée" si todayEnergyStatus skipped', () => {
+      const ctx = makeAppContext({ todayEnergyStatus: 'skipped' })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(screen.getByText('Énergie ignorée')).toBeDefined()
+    })
+
+    it('affiche le bouton Mon énergie dans la nav', () => {
+      renderWithApp(<E10Dashboard />)
+      expect(screen.getByRole('button', { name: 'Mon énergie' })).toBeDefined()
     })
   })
 

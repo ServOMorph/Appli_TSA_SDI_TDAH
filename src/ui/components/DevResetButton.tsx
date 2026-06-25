@@ -13,15 +13,29 @@ const SCREEN_CODES: Record<Screen, string> = {
   'task-decompose': 'E23',
   'today':          'E24',
   'later':          'E25',
+  'energy-view':    'E30',
+  'energy-checkin': 'E31',
 }
 
 export function DevResetButton() {
   if (!import.meta.env.DEV) return null
 
   const { screen } = useApp()
+  const realToday = new Date().toISOString().slice(0, 10)
+  const fakeDate = localStorage.getItem('dev_fake_date') ?? ''
 
   async function handleReset() {
     await window.indexedDB.deleteDatabase('appli-tsa-sdi-tdah')
+    window.location.reload()
+  }
+
+  function handleDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value
+    if (val) {
+      localStorage.setItem('dev_fake_date', val)
+    } else {
+      localStorage.removeItem('dev_fake_date')
+    }
     window.location.reload()
   }
 
@@ -65,6 +79,23 @@ export function DevResetButton() {
       >
         {SCREEN_CODES[screen]}
       </span>
+      <input
+        type="date"
+        value={fakeDate || realToday}
+        min="2026-01-01"
+        max="2030-12-31"
+        onChange={handleDateChange}
+        title="Date simulée (dev)"
+        style={{
+          fontSize: '0.7rem',
+          padding: '1px 4px',
+          borderRadius: '3px',
+          border: fakeDate ? '1px solid #f59e0b' : '1px solid #d1d5db',
+          background: fakeDate ? '#fef3c7' : 'transparent',
+          color: '#374151',
+          cursor: 'pointer',
+        }}
+      />
     </div>
   )
 }

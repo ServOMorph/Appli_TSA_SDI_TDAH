@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 3 complète. Gestion des tâches opérationnelle : inbox (E20), création (E21), détail (E22), décomposition (E23), aujourd'hui (E24), plus tard (E25). Modales M01/M04 fonctionnelles en dark mode. 168 tests, couverture 94.17 %, 31 tests manuels validés. Button disabled state corrigé. DevResetButton affiche le code écran (E01–E25). Prêt pour Phase 4.
+Phase 4 complète. Suivi énergie quotidien opérationnel : E30 (vue énergie), E31 (check-in 1-10, skip). AppContext enrichi avec todayEnergyStatus ('filled'|'skipped'|null). Dashboard intègre badge cliquable, encart CTA J+1, bouton "Mon énergie". DevResetButton : sélecteur date simulée pour tests J+1. 190 tests, 17 tests manuels validés. Prêt pour Phase 5.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Entité Event hors MVP, documentée pour V1 post-validation.
@@ -27,3 +27,5 @@ Phase 3 complète. Gestion des tâches opérationnelle : inbox (E20), création 
 - 2026-06-24 : import type { Table } from 'dexie' — Rolldown/Vite 8 refuse les imports valeurs inexistants à l'exécution.
 - 2026-06-24 : Phase 3 complète — E20–E25, modales M01/M04, cycle vie tâche, 168 tests 94.17 %, 31 tests manuels ok.
 - 2026-06-24 : var(--color-bg) inexistant — toujours utiliser var(--color-surface) pour les fonds opaques.
+- 2026-06-25 : Phase 4 complète — E30/E31, todayEnergyStatus, sélecteur date DEV, 190 tests, 17 tests manuels ok.
+- 2026-06-25 : liaison énergie ↔ Action immédiate reportée en V2 (doc User Flows §9). Génération auto sous-tâches post-V1.

@@ -13,6 +13,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     inboxTasks: [],
     laterTasks: [],
     todayEnergy: null,
+    todayEnergyStatus: null,
     overloadMode: false,
     setOverloadMode: vi.fn(),
     selectedTaskId: null,

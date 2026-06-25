@@ -1,3 +1,25 @@
+## v0.17 — 2026-06-25
+
+### Ajouté
+- `TopBar.tsx` : bouton icône document “Ressources” ajouté au dashboard
+- `E120Resources.tsx` : nouvel écran ressources avec fondements de conception, mode d’emploi de l’application et liens utiles en attente
+- `E120Resources.test.tsx` : couverture du nouvel écran ressources
+
+### Modifié
+- `App.tsx`, `AppContext.tsx`, `DevResetButton.tsx` : route `resources` et code écran E120 branchés
+- `E10Dashboard.tsx` / `E10Dashboard.test.tsx` : navigation dashboard → ressources ajoutée et testée
+- `_contexte/`, `README.md`, `roadmap.md` : clôture session mise à jour
+
+### Corrigé
+- `E22TaskDetail.tsx`, `E23Decompose.tsx` : dépendances `useEffect` complétées pour validation ESLint
+- `DevResetButton.tsx` : appel `useApp()` rendu non conditionnel
+
+### Validé
+- `npm run lint`, `npm run build`, `npm run test` : 259/259 tests passent
+- `npm run test:e2e` : 46/46 scénarios passent sans serveur manuel
+
+---
+
 ## v0.16 — 2026-06-25
 
 ### Corrigé

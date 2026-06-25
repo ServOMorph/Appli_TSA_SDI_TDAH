@@ -73,7 +73,9 @@ interface SortableSubTaskItemProps {
 }
 
 function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: subTask.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: subTask.id,
+  })
 
   return (
     <div
@@ -90,12 +92,32 @@ function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
     >
       <Card style={{ padding: 'var(--spacing-md)' }}>
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
-          <span aria-hidden style={{ fontSize: '1rem', color: 'var(--color-text-muted)', flexShrink: 0, lineHeight: 1 }}>⠿</span>
+          <span
+            aria-hidden
+            style={{
+              fontSize: '1rem',
+              color: 'var(--color-text-muted)',
+              flexShrink: 0,
+              lineHeight: 1,
+            }}
+          >
+            ⠿
+          </span>
           <span style={{ color: 'var(--color-text)', flex: 1 }}>{subTask.title}</span>
           <button
             aria-label={`Supprimer ${subTask.title}`}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: '4px' }}
-            onClick={(e) => { e.stopPropagation(); onDelete(subTask.id) }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--color-text-muted)',
+              fontSize: '1rem',
+              padding: '4px',
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(subTask.id)
+            }}
           >
             ×
           </button>
@@ -137,7 +159,7 @@ export function E22TaskDetail() {
     if (selectedTaskId) {
       getSubTasks(selectedTaskId).then(setSubTasks)
     }
-  }, [selectedTaskId])
+  }, [getSubTasks, selectedTaskId])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -150,9 +172,16 @@ export function E22TaskDetail() {
     if (!over || active.id === over.id) return
     const oldIndex = subTasks.findIndex((st) => st.id === active.id)
     const newIndex = subTasks.findIndex((st) => st.id === over.id)
-    const newOrder = arrayMove(subTasks, oldIndex, newIndex).map((st, i) => ({ ...st, position: i }))
+    const newOrder = arrayMove(subTasks, oldIndex, newIndex).map((st, i) => ({
+      ...st,
+      position: i,
+    }))
     setSubTasks(newOrder)
-    if (selectedTaskId) reorderSubTasks(selectedTaskId, newOrder.map((st) => st.id))
+    if (selectedTaskId)
+      reorderSubTasks(
+        selectedTaskId,
+        newOrder.map((st) => st.id),
+      )
   }
 
   async function handleDeleteSubTask(id: string) {
@@ -202,8 +231,15 @@ export function E22TaskDetail() {
       {subTasks.length > 0 && (
         <section aria-label="Sous-étapes">
           <h2>Sous-étapes</h2>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={subTasks.map((st) => st.id)} strategy={verticalListSortingStrategy}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={subTasks.map((st) => st.id)}
+              strategy={verticalListSortingStrategy}
+            >
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                 {subTasks.map((st) => (
                   <SortableSubTaskItem key={st.id} subTask={st} onDelete={handleDeleteSubTask} />

@@ -4,9 +4,6 @@
 - [P1|ouvert] Tests utilisateurs AuDHD réels (Phase 7)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés dans un fichier dédié
   - réf: `roadmap.md` Phase 7
-- [P2|ouvert] Stabiliser l'orchestration `npm run test:e2e`
-  - fait quand: `npm run test:e2e` lance le preview et passe 46/46 sans serveur manuel
-  - réf: `playwright.config.ts`, `package.json` — première exécution: ERR_CONNECTION_REFUSED sur localhost:4173 ; `npx playwright test` passe 46/46 avec preview lancé manuellement
 
 ## Questions ouvertes
 
@@ -15,10 +12,10 @@
 ## Blocages
 
 ## Contexte chaud
-- `npm run test` passe 253/253 ; Vitest limité à `src/**/*.{test,spec}.{ts,tsx}` pour exclure les specs Playwright
-- E22TaskDetail corrigé : la sous-étape est vérifiée par texte visible (item dnd-kit), plus par label inexistant
-- E2E Playwright validés fonctionnellement : 46/46 avec `npm run preview` manuel + `npx playwright test`
-- Orchestration `npm run test:e2e` à vérifier : preview non disponible sur localhost:4173 lors de la première exécution
+- `npm run test` passe 259/259
+- `npm run test:e2e` passe 46/46 et lance le preview sans serveur manuel
+- `npm run lint` et `npm run build` passent
+- E120Resources ajouté : fondements de conception, mode d’emploi de l’application, liens utiles en attente
 - run_dev.py / run_prod.py (+ --host) disponibles à la racine
 
 ## Dernière session (2026-06-25)
@@ -26,26 +23,25 @@
 # Session du 2026-06-25
 
 ## Décisions prises
-- Vitest doit exécuter uniquement les tests `src/` ; les specs `e2e/` restent au runner Playwright.
-- Les tests énergie utilisent désormais le terme UI "souffle".
+- E120Resources devient l’écran de ressources utilisateur, accessible depuis le dashboard par icône document.
+- L’orchestration `npm run test:e2e` est validée : build + preview + 46 scénarios Playwright sans serveur manuel.
 
 ## Livrables produits ou modifiés
-- `src/ui/screens/tasks/E22TaskDetail.test.tsx` : test sous-étapes corrigé
-- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : assertions "souffle" corrigées
-- `src/ui/screens/energy/E30EnergyView.test.tsx` : assertion "souffle" corrigée
-- `src/ui/screens/onboarding/E03Energy.test.tsx` : question "souffle" corrigée
-- `vitest.config.ts` : collecte bornée aux tests `src/`
-- `_contexte/`, `README.md`, `roadmap.md`, `CHANGELOG.md` : clôture session mise à jour
-- `.claude/commands/start.md`, `.claude/commands/close.md` : glob `roadmap*.md`
+- `src/ui/components/TopBar.tsx` : bouton icône document “Ressources” ajouté
+- `src/ui/screens/resources/E120Resources.tsx` : écran ressources créé
+- `src/ui/screens/resources/E120Resources.test.tsx` : tests du nouvel écran ajoutés
+- `src/App.tsx`, `src/app/AppContext.tsx`, `src/ui/components/DevResetButton.tsx` : route `resources` / code E120 branchés
+- `src/ui/screens/dashboard/E10Dashboard*.tsx` : navigation dashboard → ressources testée
+- `src/ui/screens/tasks/E22TaskDetail.tsx`, `src/ui/screens/tasks/E23Decompose.tsx` : dépendances `useEffect` corrigées pour lint
 
 ## Hypothèses validées / invalidées
-- VALIDE : `npm run test` passe 253/253 après correction E22 et exclusion `e2e/` de Vitest
-- VALIDE : les 46 scénarios Playwright passent avec preview lancé manuellement
-- EN ATTENTE : `npm run test:e2e` doit être stabilisé sans serveur manuel
+- VALIDE : `npm run test` passe 259/259
+- VALIDE : `npm run test:e2e` passe 46/46 sans serveur manuel
+- VALIDE : `npm run lint` et `npm run build` passent
 
 ## Prochaine étape exacte
-1. Vérifier pourquoi `npm run test:e2e` n'a pas lancé/détecté le preview sur localhost:4173
-2. Démarrer Phase 7 : tests utilisateurs AuDHD réels
+1. Démarrer Phase 7 : tests utilisateurs AuDHD réels
+2. Documenter les retours et prioriser le backlog d’ajustements pré-V1
 
 ## Question bloquante pour la session suivante
 Aucune

@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 6 close — MVP stable et validé. Dashboard refactorisé sans scroll : TopBar (titre « Appli pour AuDHD », ⚙ réglages, pills énergie/surcharge) + nav segmentée. 253 tests Vitest passent. Les 46 scénarios E2E Playwright passent avec preview manuel ; l'orchestration `npm run test:e2e` reste à stabiliser sans serveur manuel. Phase 7 à démarrer : sessions de test avec utilisateurs AuDHD réels.
+Phase 6 close — MVP stable et validé. Dashboard refactorisé sans scroll : TopBar (titre « Appli pour AuDHD », ressources, réglages, pills énergie/surcharge) + nav segmentée. Écran ressources E120 ajouté : fondements de conception, mode d’emploi, liens utiles en attente. 259 tests Vitest passent. Les 46 scénarios E2E Playwright passent via `npm run test:e2e`. Phase 7 à démarrer : sessions de test avec utilisateurs AuDHD réels.
 
 ## Stack
 

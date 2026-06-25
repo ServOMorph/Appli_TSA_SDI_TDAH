@@ -45,7 +45,9 @@ interface SortableTaskItemProps {
 }
 
 function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: task.id,
+  })
   const done = subs.filter((s) => s.is_completed).length
   const total = subs.length
 
@@ -63,11 +65,40 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
       }}
     >
       <Card style={{ padding: 'var(--spacing-xs)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
-          <span aria-hidden style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', flexShrink: 0, lineHeight: 1 }}>⠿</span>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 'var(--spacing-xs)',
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              fontSize: '0.75rem',
+              color: 'var(--color-text-muted)',
+              flexShrink: 0,
+              lineHeight: 1,
+            }}
+          >
+            ⠿
+          </span>
           <button
-            onClick={(e) => { e.stopPropagation(); onOpen(task.id) }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', fontSize: '0.75rem', padding: 0, textAlign: 'left', flex: 1 }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpen(task.id)
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--color-text)',
+              fontSize: '0.75rem',
+              padding: 0,
+              textAlign: 'left',
+              flex: 1,
+            }}
           >
             {task.title}
           </button>
@@ -86,7 +117,18 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
 }
 
 export function E10Dashboard() {
-  const { todayTasks, todaySubTasksMap, todayEnergy, todayEnergyStatus, overloadMode, setOverloadMode, goTo, selectTask, setTaskDetailOrigin, reorderTodayTasks } = useApp()
+  const {
+    todayTasks,
+    todaySubTasksMap,
+    todayEnergy,
+    todayEnergyStatus,
+    overloadMode,
+    setOverloadMode,
+    goTo,
+    selectTask,
+    setTaskDetailOrigin,
+    reorderTodayTasks,
+  } = useApp()
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks.slice(0, 3))
 
@@ -111,7 +153,10 @@ export function E10Dashboard() {
     if (!over || active.id === over.id) return
     const oldIndex = visibleOrder.findIndex((t) => t.id === active.id)
     const newIndex = visibleOrder.findIndex((t) => t.id === over.id)
-    const newVisible = arrayMove(visibleOrder, oldIndex, newIndex).map((t, i) => ({ ...t, position: i }))
+    const newVisible = arrayMove(visibleOrder, oldIndex, newIndex).map((t, i) => ({
+      ...t,
+      position: i,
+    }))
     setVisibleOrder(newVisible)
     reorderTodayTasks([...newVisible, ...todayTasks.slice(3)].map((t) => t.id))
   }
@@ -129,7 +174,7 @@ export function E10Dashboard() {
     todayEnergyStatus === 'filled' && todayEnergy !== null
       ? `${todayEnergy} souffle aujourd'hui`
       : todayEnergyStatus === 'skipped'
-        ? 'Énergie ignorée aujourd\'hui'
+        ? "Énergie ignorée aujourd'hui"
         : 'Renseigner mon énergie'
 
   if (overloadMode) {
@@ -151,13 +196,33 @@ export function E10Dashboard() {
           {action.type === 'task' && action.task ? (
             <button
               onClick={() => openDetail(action.task!.id)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left', width: '100%' }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                textAlign: 'left',
+                width: '100%',
+              }}
             >
-              <p style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '1.1rem', margin: 0 }}>
+              <p
+                style={{
+                  fontWeight: 600,
+                  color: 'var(--color-text)',
+                  fontSize: '1.1rem',
+                  margin: 0,
+                }}
+              >
                 {action.task.title}
               </p>
               {action.nextSubTask && (
-                <p style={{ margin: '6px 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                <p
+                  style={{
+                    margin: '6px 0 0',
+                    fontSize: '0.875rem',
+                    color: 'var(--color-text-muted)',
+                  }}
+                >
                   Prochaine étape : {action.nextSubTask.title}
                 </p>
               )}
@@ -194,6 +259,7 @@ export function E10Dashboard() {
         energyAriaLabel={energyAriaLabel}
         onEnergyClick={() => goTo('energy-view')}
         onOverloadClick={() => setOverloadMode(true)}
+        onResourcesClick={() => goTo('resources')}
         onSettingsClick={() => goTo('settings')}
       />
 
@@ -203,13 +269,33 @@ export function E10Dashboard() {
           {action.type === 'task' && action.task ? (
             <button
               onClick={() => openDetail(action.task!.id)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left', width: '100%' }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                textAlign: 'left',
+                width: '100%',
+              }}
             >
-              <p style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '1.1rem', margin: 0 }}>
+              <p
+                style={{
+                  fontWeight: 600,
+                  color: 'var(--color-text)',
+                  fontSize: '1.1rem',
+                  margin: 0,
+                }}
+              >
                 {action.task.title}
               </p>
               {action.nextSubTask && (
-                <p style={{ margin: '6px 0 0', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                <p
+                  style={{
+                    margin: '6px 0 0',
+                    fontSize: '0.875rem',
+                    color: 'var(--color-text-muted)',
+                  }}
+                >
                   Prochaine étape : {action.nextSubTask.title}
                 </p>
               )}
@@ -223,8 +309,15 @@ export function E10Dashboard() {
       {!isEmpty ? (
         <section aria-label="Tâches du jour">
           <h2>Tâches du jour</h2>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={visibleOrder.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={visibleOrder.map((t) => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                 {visibleOrder.map((task) => (
                   <SortableTaskItem
@@ -242,7 +335,12 @@ export function E10Dashboard() {
 
       <nav
         aria-label="Navigation principale"
-        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)', marginTop: 'auto' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--spacing-sm)',
+          marginTop: 'auto',
+        }}
       >
         <Button fullWidth onClick={() => goTo('task-create')}>
           Ajouter une tâche

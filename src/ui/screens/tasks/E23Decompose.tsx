@@ -59,7 +59,9 @@ interface SortableSubTaskItemProps {
 }
 
 function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: subTask.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: subTask.id,
+  })
 
   return (
     <div
@@ -75,13 +77,40 @@ function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
       }}
     >
       <Card style={{ padding: 'var(--spacing-md)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-          <span aria-hidden style={{ fontSize: '1rem', color: 'var(--color-text-muted)', flexShrink: 0, lineHeight: 1 }}>⠿</span>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 'var(--spacing-sm)',
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              fontSize: '1rem',
+              color: 'var(--color-text-muted)',
+              flexShrink: 0,
+              lineHeight: 1,
+            }}
+          >
+            ⠿
+          </span>
           <span style={{ color: 'var(--color-text)', flex: 1 }}>{subTask.title}</span>
           <button
             aria-label={`Supprimer ${subTask.title}`}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: '4px' }}
-            onClick={(e) => { e.stopPropagation(); onDelete(subTask.id) }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--color-text-muted)',
+              fontSize: '1rem',
+              padding: '4px',
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(subTask.id)
+            }}
           >
             ×
           </button>
@@ -113,7 +142,7 @@ export function E23Decompose() {
     if (selectedTaskId) {
       getSubTasks(selectedTaskId).then(setSubTasks)
     }
-  }, [selectedTaskId])
+  }, [getSubTasks, selectedTaskId])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -126,9 +155,16 @@ export function E23Decompose() {
     if (!over || active.id === over.id) return
     const oldIndex = subTasks.findIndex((st) => st.id === active.id)
     const newIndex = subTasks.findIndex((st) => st.id === over.id)
-    const newOrder = arrayMove(subTasks, oldIndex, newIndex).map((st, i) => ({ ...st, position: i }))
+    const newOrder = arrayMove(subTasks, oldIndex, newIndex).map((st, i) => ({
+      ...st,
+      position: i,
+    }))
     setSubTasks(newOrder)
-    if (selectedTaskId) reorderSubTasks(selectedTaskId, newOrder.map((st) => st.id))
+    if (selectedTaskId)
+      reorderSubTasks(
+        selectedTaskId,
+        newOrder.map((st) => st.id),
+      )
   }
 
   async function handleAdd(e: React.FormEvent) {
@@ -156,15 +192,16 @@ export function E23Decompose() {
       </button>
 
       <h1 style={{ margin: 0 }}>Décomposer</h1>
-      {task && (
-        <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{task.title}</p>
-      )}
+      {task && <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{task.title}</p>}
 
       {subTasks.length === 0 ? (
         <p aria-live="polite">Aucune sous-étape.</p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={subTasks.map((st) => st.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={subTasks.map((st) => st.id)}
+            strategy={verticalListSortingStrategy}
+          >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               {subTasks.map((st) => (
                 <SortableSubTaskItem key={st.id} subTask={st} onDelete={handleDelete} />
@@ -174,7 +211,10 @@ export function E23Decompose() {
         </DndContext>
       )}
 
-      <form onSubmit={handleAdd} style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+      <form
+        onSubmit={handleAdd}
+        style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}
+      >
         <input
           type="text"
           value={newTitle}

@@ -100,8 +100,8 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 ## [x] Phase 6 — Consolidation MVP (refacto + couverture globale + offline)
 
 - [x] **Refacto d'architecture** : audit du découpage global, suppression dead code/duplication, normalisation du nommage, revue des limites de couches
-- [x] **Couverture** : 253 tests Vitest passants
-- [x] **PWA / offline-first** : tests offline complets (coupure réseau, rechargement, persistance) — 46 scénarios E2E Playwright passants avec preview manuel
+- [x] **Couverture** : 259 tests Vitest passants
+- [x] **PWA / offline-first** : tests offline complets (coupure réseau, rechargement, persistance) — 46 scénarios E2E Playwright passants via `npm run test:e2e`
 - [x] **Doc** : documentation MVP finale (README à jour, schéma données consolidé)
 - [x] **Test manuel** : parcours bout-en-bout hors ligne, desktop (Playwright) + mobile physique réel
 - [x] **Sortie** : MVP stable, couvert à 99.34 %, fonctionnel hors ligne

@@ -51,7 +51,7 @@ describe('E10Dashboard', () => {
   })
 
   describe('avec tâches', () => {
-    it('affiche l\'action immédiate (première tâche)', () => {
+    it("affiche l'action immédiate (première tâche)", () => {
       const ctx = makeAppContext({
         todayTasks: [makeTask({ title: 'Appeler le médecin' })],
       })
@@ -81,7 +81,7 @@ describe('E10Dashboard', () => {
       expect(screen.getByLabelText(/7 souffle/i)).toBeDefined()
     })
 
-    it('limite l\'affichage à 3 tâches', () => {
+    it("limite l'affichage à 3 tâches", () => {
       const ctx = makeAppContext({
         todayTasks: [
           makeTask({ id: '1', title: 'T1', position: 0 }),
@@ -107,7 +107,7 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
     })
 
-    it('clic sur l\'action immédiate ouvre E22', async () => {
+    it("clic sur l'action immédiate ouvre E22", async () => {
       const ctx = makeAppContext({
         todayTasks: [makeTask({ id: 'task-1', title: 'Appeler le médecin' })],
       })
@@ -120,13 +120,18 @@ describe('E10Dashboard', () => {
   })
 
   describe('sous-tâches (Prop 1 + Prop 2)', () => {
-    it('affiche la prochaine sous-tâche dans l\'action immédiate', () => {
+    it("affiche la prochaine sous-tâche dans l'action immédiate", () => {
       const task = makeTask({ id: 'task-1', title: 'Rédiger rapport' })
       const ctx = makeAppContext({
         todayTasks: [task],
         todaySubTasksMap: {
           'task-1': [
-            makeSubTask({ id: 'st-1', title: 'Ouvrir le template', position: 0, is_completed: false }),
+            makeSubTask({
+              id: 'st-1',
+              title: 'Ouvrir le template',
+              position: 0,
+              is_completed: false,
+            }),
           ],
         },
       })
@@ -134,7 +139,7 @@ describe('E10Dashboard', () => {
       expect(screen.getByText('Prochaine étape : Ouvrir le template')).toBeDefined()
     })
 
-    it('n\'affiche pas de sous-tâche si toutes complétées', () => {
+    it("n'affiche pas de sous-tâche si toutes complétées", () => {
       const task = makeTask({ id: 'task-1' })
       const ctx = makeAppContext({
         todayTasks: [task],
@@ -162,7 +167,7 @@ describe('E10Dashboard', () => {
       expect(screen.getByLabelText('1 sur 3 étapes')).toBeDefined()
     })
 
-    it('n\'affiche pas de badge si la tâche n\'a pas de sous-tâches', () => {
+    it("n'affiche pas de badge si la tâche n'a pas de sous-tâches", () => {
       const task = makeTask({ id: 'task-1' })
       const ctx = makeAppContext({
         todayTasks: [task],
@@ -227,12 +232,19 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('settings')
     })
 
+    it('navigue vers ressources au clic sur le document', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Ressources' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('resources')
+    })
+
     it('navigue vers inbox / today / later via la nav segmentée', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Inbox' }))
       expect(ctx.goTo).toHaveBeenCalledWith('inbox')
-      await userEvent.click(screen.getByRole('button', { name: 'Aujourd\'hui' }))
+      await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
       expect(ctx.goTo).toHaveBeenCalledWith('today')
       await userEvent.click(screen.getByRole('button', { name: 'Plus tard' }))
       expect(ctx.goTo).toHaveBeenCalledWith('later')
@@ -259,7 +271,7 @@ describe('E10Dashboard', () => {
       expect(ctx.setOverloadMode).toHaveBeenCalledWith(false)
     })
 
-    it('affiche l\'action immédiate en mode surcharge', () => {
+    it("affiche l'action immédiate en mode surcharge", () => {
       const ctx = makeAppContext({
         overloadMode: true,
         todayTasks: [makeTask({ title: 'Tâche urgente' })],

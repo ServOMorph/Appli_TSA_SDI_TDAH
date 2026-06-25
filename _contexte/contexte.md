@@ -12,11 +12,12 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 6 close. MVP stable : 253 tests Vitest passent, 46 scénarios E2E Playwright passent avec preview manuel. Dashboard refactorisé + polish UX validés. Terme énergie = "souffle". À vérifier : orchestration `npm run test:e2e` sans serveur manuel. Phase 7 à démarrer.
+Phase 6 close. MVP stable : 259 tests Vitest passent, 46 scénarios E2E Playwright passent via `npm run test:e2e` sans serveur manuel.
+Dashboard refactorisé + ressources E120 ajoutées : fondements de conception, mode d’emploi, liens utiles en attente.
+Terme énergie = "souffle". `npm run lint`, `npm run build`, `npm run test` et `npm run test:e2e` passent.
+Phase 7 à démarrer : tests utilisateurs AuDHD réels.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
-- 2026-06-25 : Phase 5 complète — E90/E110–E117, Settings DOM, export RGPD, 232 tests, 22 tests manuels ok.
-- 2026-06-25 : E90 simplifié — "Retour au dashboard" supprimé (boucle sans issue), seul "Désactiver" disponible.
 - 2026-06-25 : Phase 6 code complète — audit architecture, 99.34% couverture, build PWA, erasableSyntaxOnly fix, offline validé.
 - 2026-06-25 : Tests E2E Playwright adoptés (46/46, 12.7s) — remplacent les tests manuels desktop.
 - 2026-06-25 : Phase 6 close — flux validés mobile physique. crypto.randomUUID() remplacé par fallback getRandomValues (non-secure context HTTP).
@@ -25,3 +26,5 @@ Phase 6 close. MVP stable : 253 tests Vitest passent, 46 scénarios E2E Playwrig
 - 2026-06-25 : "cuillères" renommé "souffle" — terme inventé, court, compréhensible, sans référence théorique (spoon theory).
 - 2026-06-25 : Bug fix addSubTask() — await loadAll() ajouté → todaySubTasksMap rafraîchi → sous-tâche visible dans "Que faire maintenant?" après décomposition.
 - 2026-06-25 : Vitest limité aux tests `src/` ; les specs `e2e/` sont réservées au runner Playwright.
+- 2026-06-25 : E120Resources ajouté — écran ressources depuis dashboard, avec fondements de conception, mode d’emploi et liens utiles en attente.
+- 2026-06-25 : Orchestration `npm run test:e2e` validée — build + preview Playwright + 46/46 sans serveur manuel.

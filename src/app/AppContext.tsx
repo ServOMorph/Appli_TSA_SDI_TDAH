@@ -25,6 +25,7 @@ export type Screen =
   | 'energy-view'
   | 'energy-checkin'
   | 'overload-recovery'
+  | 'resources'
   | 'settings'
   | 'settings-profile'
   | 'settings-accessibility'
@@ -94,9 +95,9 @@ function newId(): string {
   const b = crypto.getRandomValues(new Uint8Array(16))
   b[6] = (b[6] & 0x0f) | 0x40
   b[8] = (b[8] & 0x3f) | 0x80
-  return [...b].map((v, i) =>
-    ([4, 6, 8, 10].includes(i) ? '-' : '') + v.toString(16).padStart(2, '0')
-  ).join('')
+  return [...b]
+    .map((v, i) => ([4, 6, 8, 10].includes(i) ? '-' : '') + v.toString(16).padStart(2, '0'))
+    .join('')
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
@@ -151,7 +152,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     ])
     const subTaskArrays = await Promise.all(today.map((t) => subTaskRepo.getByTaskId(t.id)))
     const subTasksMap: Record<string, SubTask[]> = {}
-    today.forEach((t, i) => { subTasksMap[t.id] = subTaskArrays[i] })
+    today.forEach((t, i) => {
+      subTasksMap[t.id] = subTaskArrays[i]
+    })
     setInboxTasks(inbox)
     setTodayTasks(today)
     setTodaySubTasksMap(subTasksMap)

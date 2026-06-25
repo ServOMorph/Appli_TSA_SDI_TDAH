@@ -13,6 +13,7 @@ import { E25Later } from '@/ui/screens/tasks/E25Later'
 import { E30EnergyView } from '@/ui/screens/energy/E30EnergyView'
 import { E31EnergyCheckIn } from '@/ui/screens/energy/E31EnergyCheckIn'
 import { E90OverloadRecovery } from '@/ui/screens/overload/E90OverloadRecovery'
+import { E120Resources } from '@/ui/screens/resources/E120Resources'
 import { E110Settings } from '@/ui/screens/settings/E110Settings'
 import { E111Profile } from '@/ui/screens/settings/E111Profile'
 import { E112Accessibility } from '@/ui/screens/settings/E112Accessibility'
@@ -45,27 +46,50 @@ function AppScreens() {
 
   function renderScreen() {
     switch (screen) {
-      case 'welcome':              return <E01Welcome />
-      case 'profile':              return <E02Profile />
-      case 'energy':               return <E03Energy />
-      case 'first-task':           return <E04FirstTask />
-      case 'dashboard':            return <E10Dashboard />
-      case 'inbox':                return <E20Inbox />
-      case 'task-create':          return <E21CreateTask />
-      case 'task-detail':          return <E22TaskDetail />
-      case 'task-decompose':       return <E23Decompose />
-      case 'today':                return <E24Today />
-      case 'later':                return <E25Later />
-      case 'energy-view':          return <E30EnergyView />
-      case 'energy-checkin':       return <E31EnergyCheckIn />
-      case 'overload-recovery':    return <E90OverloadRecovery />
-      case 'settings':             return <E110Settings />
-      case 'settings-profile':     return <E111Profile />
-      case 'settings-accessibility': return <E112Accessibility />
-      case 'settings-stimulation': return <E113Stimulation />
-      case 'settings-organisation': return <E114Organisation />
-      case 'settings-privacy':     return <E116Privacy />
-      case 'settings-export':      return <E117Export />
+      case 'welcome':
+        return <E01Welcome />
+      case 'profile':
+        return <E02Profile />
+      case 'energy':
+        return <E03Energy />
+      case 'first-task':
+        return <E04FirstTask />
+      case 'dashboard':
+        return <E10Dashboard />
+      case 'inbox':
+        return <E20Inbox />
+      case 'task-create':
+        return <E21CreateTask />
+      case 'task-detail':
+        return <E22TaskDetail />
+      case 'task-decompose':
+        return <E23Decompose />
+      case 'today':
+        return <E24Today />
+      case 'later':
+        return <E25Later />
+      case 'energy-view':
+        return <E30EnergyView />
+      case 'energy-checkin':
+        return <E31EnergyCheckIn />
+      case 'overload-recovery':
+        return <E90OverloadRecovery />
+      case 'resources':
+        return <E120Resources />
+      case 'settings':
+        return <E110Settings />
+      case 'settings-profile':
+        return <E111Profile />
+      case 'settings-accessibility':
+        return <E112Accessibility />
+      case 'settings-stimulation':
+        return <E113Stimulation />
+      case 'settings-organisation':
+        return <E114Organisation />
+      case 'settings-privacy':
+        return <E116Privacy />
+      case 'settings-export':
+        return <E117Export />
     }
   }
 

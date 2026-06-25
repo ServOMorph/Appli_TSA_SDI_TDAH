@@ -1,3 +1,19 @@
+## v0.9 — 2026-06-25
+
+### Ajouté
+- `AppContext.test.tsx` : +3 describe blocks couvrant inbox ops, sous-tâches, settings/données (241 tests, 99.34% couverture)
+
+### Corrigé
+- Repositories (user, settings, task, subTask, energyEntry) : fix `erasableSyntaxOnly` TS 5.8+ (déclaration explicite des champs privés)
+- `E117Export.test.tsx` : fix act() warning sur handleExport async
+- `taskRules.test.ts` : suppression import inutilisé TASK_TODAY_MAX
+- `vitest.config.ts` : DevResetButton exclus de la couverture (composant dev-only)
+
+### Modifié
+- `README.md` : Phase 6 code complète, 241 tests, 99.34% couverture
+
+---
+
 ## v0.8 — 2026-06-25
 
 ### Ajouté

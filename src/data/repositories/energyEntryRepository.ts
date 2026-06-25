@@ -10,10 +10,9 @@ interface StoredEnergyEntry {
 }
 
 export class EnergyEntryRepository {
-  constructor(
-    private db: AppDatabase,
-    private password?: string,
-  ) {}
+  private db: AppDatabase
+  private password?: string
+  constructor(db: AppDatabase, password?: string) { this.db = db; this.password = password }
 
   private async encryptValue(value: number | null): Promise<string | null> {
     if (value === null) return null

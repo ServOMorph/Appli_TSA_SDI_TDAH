@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { E117Export } from './E117Export'
 import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
@@ -42,7 +42,9 @@ describe('E117Export', () => {
     const exportData = vi.fn().mockResolvedValue(undefined)
     renderE117({ exportData })
     fireEvent.click(screen.getByLabelText('Exporter mes données JSON'))
-    fireEvent.click(screen.getByText('Télécharger'))
+    await act(async () => {
+      fireEvent.click(screen.getByText('Télécharger'))
+    })
     await vi.waitFor(() => {
       expect(exportData).toHaveBeenCalled()
       expect(screen.getByRole('status')).toHaveTextContent('Export téléchargé avec succès.')

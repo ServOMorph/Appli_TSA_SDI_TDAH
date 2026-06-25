@@ -2,7 +2,8 @@ import type { AppDatabase } from '@/data/db'
 import type { Settings } from '@/domain/entities/settings'
 
 export class SettingsRepository {
-  constructor(private db: AppDatabase) {}
+  private db: AppDatabase
+  constructor(db: AppDatabase) { this.db = db }
 
   async create(settings: Settings): Promise<string> {
     return this.db.settings.add(settings)

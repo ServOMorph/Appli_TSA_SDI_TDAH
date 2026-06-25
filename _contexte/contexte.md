@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 5 complète. Paramètres (E110–E114, E116, E117), accessibilité (dark mode, font size, reduce-motion), mode surcharge (E90), export JSON RGPD opérationnels. Settings persistés via SettingsRepository, appliqués au DOM. CSS stimulation mode (calm/dynamic) visible. 232 tests, 22 tests manuels validés. Prêt pour Phase 6 (consolidation MVP).
+Phase 6 code complète. Audit architecture ✓ (aucune violation cross-layer), couverture 99.34% (241 tests), build PWA propre (sw.js + workbox, 9 entrées précachées). Repositories corrigés pour erasableSyntaxOnly TS 5.8+. Test offline navigateur validé. En attente : tests manuels complets (parcours bout-en-bout offline desktop + mobile) pour clore officiellement Phase 6.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Entité Event hors MVP, documentée pour V1 post-validation.
@@ -31,3 +31,4 @@ Phase 5 complète. Paramètres (E110–E114, E116, E117), accessibilité (dark m
 - 2026-06-25 : liaison énergie ↔ Action immédiate reportée en V2 (doc User Flows §9). Génération auto sous-tâches post-V1.
 - 2026-06-25 : Phase 5 complète — E90/E110–E117, Settings DOM, export RGPD, 232 tests, 22 tests manuels ok.
 - 2026-06-25 : E90 simplifié — "Retour au dashboard" supprimé (boucle sans issue), seul "Désactiver" disponible.
+- 2026-06-25 : Phase 6 code complète — audit architecture, 99.34% couverture, build PWA, erasableSyntaxOnly fix, offline validé. Tests manuels complets à finaliser.

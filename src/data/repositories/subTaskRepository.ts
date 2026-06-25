@@ -3,10 +3,9 @@ import type { SubTask } from '@/domain/entities/subTask'
 import { encrypt, decrypt } from '@/crypto/crypto'
 
 export class SubTaskRepository {
-  constructor(
-    private db: AppDatabase,
-    private password?: string,
-  ) {}
+  private db: AppDatabase
+  private password?: string
+  constructor(db: AppDatabase, password?: string) { this.db = db; this.password = password }
 
   private async encryptTitle(title: string): Promise<string> {
     if (!this.password) return title

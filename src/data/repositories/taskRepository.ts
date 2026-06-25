@@ -4,10 +4,9 @@ import type { TaskStatus } from '@/domain/entities/task'
 import { encrypt, decrypt } from '@/crypto/crypto'
 
 export class TaskRepository {
-  constructor(
-    private db: AppDatabase,
-    private password?: string,
-  ) {}
+  private db: AppDatabase
+  private password?: string
+  constructor(db: AppDatabase, password?: string) { this.db = db; this.password = password }
 
   private async encryptTitle(title: string): Promise<string> {
     if (!this.password) return title

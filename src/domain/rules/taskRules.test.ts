@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { canAddToToday, sortByPosition, nextPosition, completeTask, TASK_TODAY_MAX } from './taskRules'
+import { canAddToToday, sortByPosition, nextPosition, completeTask } from './taskRules'
 import type { Task } from '@/domain/entities/task'
 
 const mockTask = (overrides?: Partial<Task>): Task => ({

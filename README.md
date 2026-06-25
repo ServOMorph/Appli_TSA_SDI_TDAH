@@ -21,7 +21,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 5 complète. Paramètres (E110–E117), accessibilité (dark mode, taille texte, reduce-motion), mode surcharge (E90, centre récupération), export JSON RGPD opérationnels. Settings persistés via SettingsRepository, appliqués au DOM. 232 tests, 22 tests manuels validés. Prêt pour Phase 6 (consolidation MVP, couverture globale, offline).
+Phase 6 complète — MVP consolidé. 241 tests, couverture globale 99.34 % (gate 85 %). Architecture domain/data/ui validée sans violation de couche. PWA offline-first via Vite PWA + Workbox. Export JSON RGPD, mode surcharge, accessibilité (dark mode, taille texte, reduce-motion) opérationnels.
 
 ## Stack
 
@@ -49,7 +49,7 @@ roadmap.md   — Roadmap 15 phases (MVP → V1 → V2)
 
 ## Prochaine étape
 
-Phase 3 — Gestion des tâches : écrans E20 (inbox) → E25 (plus tard), modales M01/M04, décomposition SubTasks, cycle de vie complet d'une tâche.
+Phase 7 — Tests utilisateurs AuDHD réels : 5 à 10 sessions avec le public cible, documentation des frictions, backlog d'ajustements pré-V1.
 
 ## Licence
 

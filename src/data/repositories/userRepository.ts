@@ -2,7 +2,8 @@ import type { AppDatabase } from '@/data/db'
 import type { User } from '@/domain/entities/user'
 
 export class UserRepository {
-  constructor(private db: AppDatabase) {}
+  private db: AppDatabase
+  constructor(db: AppDatabase) { this.db = db }
 
   async create(user: User): Promise<string> {
     return this.db.users.add(user)

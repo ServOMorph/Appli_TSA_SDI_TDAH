@@ -20,6 +20,7 @@ export default defineConfig({
         'src/main.tsx',
         'src/App.tsx',
         'src/domain/entities/**',
+        'src/ui/components/DevResetButton.tsx',
         '**/*.config.*',
         'dist/**',
       ],

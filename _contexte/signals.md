@@ -1,9 +1,9 @@
 # Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-06-25)
 
 ## Actions ouvertes
-- [P1|ouvert] Démarrer Phase 6 (Consolidation MVP : refacto, couverture globale, offline)
-  - fait quand: audit architecture fait, couverture ≥ 85 % global, tests PWA offline validés, README à jour
-  - réf: `roadmap.md` Phase 6
+- [P1|ouvert] Tests manuels Phase 6 — parcours bout-en-bout hors ligne, desktop + mobile
+  - fait quand: tous les tests manuels Phase 6 validés, puis `/close` Phase 6
+  - réf: `roadmap.md` Phase 6 (liste des tests manuels)
 - [P2|ouvert] Tests utilisateurs AuDHD réels (Phase 7 — post-MVP)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés
   - réf: `roadmap.md` Phase 7
@@ -15,48 +15,44 @@
 ## Blocages
 
 ## Contexte chaud
-- Phase 5 complète : 232 tests, 22 tests manuels validés
-- Settings persistés via SettingsRepository, appliqués au DOM via useEffect dans AppContext
-- Font sizes : small=13px, medium=16px, large=22px
-- CSS stimulation : `html[data-stimulation="calm"]` → boutons teal, `html[data-stimulation="dynamic"]` → boutons violet
-- E90OverloadRecovery : "Retour au dashboard" supprimé (créait une boucle), seul "Désactiver" disponible
-- "Activer mode surcharge" ajouté au dashboard normal (bouton nav en bas)
+- Phase 6 code complète : audit architecture ✓, couverture 99.34% ✓, build PWA ✓, README ✓, offline testé ✓
+- 241 tests passent, 99.34% couverture stmts
+- PWA : sw.js + workbox générés, 9 entrées précachées (346 KiB)
+- erasableSyntaxOnly : tous les repositories utilisent déclaration explicite (pas de parameter property shorthand)
+- DevResetButton exclus de la couverture (composant dev-only)
 
 ## Dernière session (2026-06-25)
 
-# Session du 2026-06-25 — Phase 5
+# Session du 2026-06-25 — Phase 6 (code)
 
 ## Décisions prises
-- Phase 5 complète : paramètres, accessibilité, surcharge, export RGPD opérationnels
-- Font sizes : small=13px / medium=16px / large=22px (écarts perceptibles)
-- Stimulation mode : différenciation CSS visuelle via `html[data-stimulation]` (teal / violet / default)
-- E90 simplifié : suppression du bouton "Retour au dashboard" qui créait une boucle impossible à sortir
-- "Activer mode surcharge" ajouté dans la nav normale du dashboard
+- Phase 6 code terminée : audit ✓, couverture 99.34% ✓, build PWA propre ✓, README à jour ✓
+- erasableSyntaxOnly TS 5.8+ : parameter property shorthand interdit — tous les repositories corrigés
+- DevResetButton exclu de la couverture vitest (composant dev-only sans logique testable)
+- Tests manuels Phase 6 reportés à prochaine session (offline desktop + mobile)
 
 ## Livrables produits ou modifiés
-- `src/ui/screens/settings/E110Settings.tsx` + tests : menu paramètres, 6 entrées
-- `src/ui/screens/settings/E111Profile.tsx` + tests : profil, stockage local
-- `src/ui/screens/settings/E112Accessibility.tsx` + tests : taille texte, dark mode, reduce-motion
-- `src/ui/screens/settings/E113Stimulation.tsx` + tests : mode calm/standard/dynamic
-- `src/ui/screens/settings/E114Organisation.tsx` + tests : placeholder V1
-- `src/ui/screens/settings/E116Privacy.tsx` + tests : suppression données (M06)
-- `src/ui/screens/settings/E117Export.tsx` + tests : export JSON RGPD (M05)
-- `src/ui/screens/overload/E90OverloadRecovery.tsx` + tests : centre récupération, flux simplifié
-- `src/app/AppContext.tsx` : +8 screens, settings state, updateSettings, exportData, deleteAllData, font sizes
-- `src/App.tsx` : +8 routes settings + overload-recovery
-- `src/ui/screens/dashboard/E10Dashboard.tsx` : bouton "Activer mode surcharge" + "Centre récupération"
-- `src/ui/components/DevResetButton.tsx` : SCREEN_CODES E90–E117
-- `src/test/testUtils.tsx` : settings/updateSettings/exportData/deleteAllData dans makeAppContext
-- `src/index.css` : dark-mode, reduce-motion, stimulation mode CSS
+- `src/app/AppContext.test.tsx` : +3 describe blocks (inbox ops, sous-tâches, settings/données) — 241 tests
+- `src/data/repositories/userRepository.ts` : fix erasableSyntaxOnly
+- `src/data/repositories/settingsRepository.ts` : fix erasableSyntaxOnly
+- `src/data/repositories/taskRepository.ts` : fix erasableSyntaxOnly
+- `src/data/repositories/subTaskRepository.ts` : fix erasableSyntaxOnly
+- `src/data/repositories/energyEntryRepository.ts` : fix erasableSyntaxOnly
+- `src/domain/rules/taskRules.test.ts` : suppression import inutilisé TASK_TODAY_MAX
+- `src/ui/screens/settings/E117Export.test.tsx` : fix act() warning
+- `vitest.config.ts` : DevResetButton.tsx ajouté aux exclusions coverage
+- `README.md` : Phase 6 complète, 241 tests, 99.34% couverture
 
 ## Hypothèses validées / invalidées
-- VALIDE : 232/232 tests passent, couverture maintenue ≥ 85 %
-- VALIDE : 22 tests manuels validés (accessibilité, surcharge, export, suppression)
-- VALIDE : export JSON RGPD déclenche bien le téléchargement fichier
-- VALIDE : deleteAllData remet l'app à l'état initial (welcome)
+- VALIDE : 241/241 tests passent
+- VALIDE : couverture 99.34% (gate 85% largement dépassé)
+- VALIDE : build prod clean, PWA sw.js généré (9 entrées précachées)
+- VALIDE : audit architecture — aucune violation cross-layer
+- VALIDE : test offline navigateur — app fonctionne hors ligne
+- EN ATTENTE : tests manuels complets Phase 6 (parcours bout-en-bout offline, mobile)
 
 ## Prochaine étape exacte
-Phase 6 — Consolidation MVP : audit architecture, couverture globale ≥ 85 %, tests offline PWA, README final.
+Tests manuels Phase 6 : parcours bout-en-bout hors ligne sur navigateur desktop + mobile, puis `/close` Phase 6.
 
 ## Question bloquante pour la session suivante
 Aucune

@@ -87,16 +87,15 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 - [x] **Test manuel** : 17 tests manuels validés (check-in, skip, cycle complet, J+1)
 - [x] **Sortie** : suivi énergie quotidien fonctionnel
 
-## [ ] Phase 5 — Paramètres, accessibilité, surcharge, export
+## [x] Phase 5 — Paramètres, accessibilité, surcharge, export
 
-- [ ] Paramètres MVP : E111 (profil), E112 (accessibilité), E113 (stimulation cognitive), E114 (organisation), E116 (confidentialité), E117 (export)
-- [ ] E90 (centre récupération / mode surcharge)
-- [ ] Export JSON intégral (conformité RGPD), M05/M06
-- [ ] **Refacto** : centraliser l'état Settings et son application (thème, accessibilité)
-- [ ] **Doc** : doc accessibilité + procédure export/suppression données
-- [ ] **Tests** : couverture ≥ 85 %, dont test de l'export intégral
-- [ ] **Test manuel** : changer réglages d'accessibilité, activer surcharge, exporter et supprimer les données
-- [ ] **Sortie** : app paramétrable, export RGPD vérifié
+- [x] Paramètres MVP : E111 (profil), E112 (accessibilité), E113 (stimulation cognitive), E114 (organisation), E116 (confidentialité), E117 (export)
+- [x] E90 (centre récupération / mode surcharge)
+- [x] Export JSON intégral (conformité RGPD), M05/M06
+- [x] **Refacto** : centraliser l'état Settings et son application (thème, accessibilité)
+- [x] **Tests** : 232 tests, couverture ≥ 85 %
+- [x] **Test manuel** : 22 tests manuels validés (accessibilité, surcharge, export, suppression)
+- [x] **Sortie** : app paramétrable, export RGPD vérifié
 
 ## [ ] Phase 6 — Consolidation MVP (refacto + couverture globale + offline)
 

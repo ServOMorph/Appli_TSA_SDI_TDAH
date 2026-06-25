@@ -115,6 +115,20 @@ describe('E10Dashboard', () => {
     })
   })
 
+  describe('activation surcharge (D10C)', () => {
+    it('affiche le bouton Activer mode surcharge en mode normal', () => {
+      renderWithApp(<E10Dashboard />)
+      expect(screen.getByRole('button', { name: 'Activer mode surcharge' })).toBeDefined()
+    })
+
+    it('appelle setOverloadMode(true) au clic', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Activer mode surcharge' }))
+      expect(ctx.setOverloadMode).toHaveBeenCalledWith(true)
+    })
+  })
+
   describe('mode surcharge (D10B)', () => {
     it('affiche le titre Mode surcharge', () => {
       const ctx = makeAppContext({ overloadMode: true })

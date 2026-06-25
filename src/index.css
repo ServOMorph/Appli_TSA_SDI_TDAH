@@ -54,6 +54,36 @@
   }
 }
 
+html.dark-mode {
+  --color-primary: #5a9ab5;
+  --color-primary-hover: #6aaac5;
+  --color-secondary: #94a3b8;
+  --color-success: #5cc68d;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-background: #0f172a;
+  --color-surface: #1e293b;
+  --color-text: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-border: #334155;
+}
+
+html.reduce-motion, html.reduce-motion * {
+  animation-duration: 0ms !important;
+  transition-duration: 0ms !important;
+}
+
+html[data-stimulation="calm"] {
+  --color-primary: #4a8a80;
+  --color-primary-hover: #3a7a70;
+  --color-background: #f0f5f4;
+}
+
+html[data-stimulation="dynamic"] {
+  --color-primary: #6a4cb3;
+  --color-primary-hover: #5a3ca3;
+}
+
 * {
   box-sizing: border-box;
 }

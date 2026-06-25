@@ -21,7 +21,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 4 complète. Suivi énergie quotidien opérationnel : E30 (vue énergie), E31 (check-in 1-10, skip). Dashboard intègre badge énergie cliquable, encart CTA et bouton "Mon énergie". DevResetButton enrichi d'un sélecteur de date simulée pour tests J+1. 190 tests, 17 tests manuels validés. Prêt pour Phase 5 (Paramètres, accessibilité, surcharge, export).
+Phase 5 complète. Paramètres (E110–E117), accessibilité (dark mode, taille texte, reduce-motion), mode surcharge (E90, centre récupération), export JSON RGPD opérationnels. Settings persistés via SettingsRepository, appliqués au DOM. 232 tests, 22 tests manuels validés. Prêt pour Phase 6 (consolidation MVP, couverture globale, offline).
 
 ## Stack
 

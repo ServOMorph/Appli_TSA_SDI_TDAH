@@ -24,12 +24,21 @@ export type Screen =
   | 'task-decompose'
   | 'energy-view'
   | 'energy-checkin'
+  | 'overload-recovery'
+  | 'settings'
+  | 'settings-profile'
+  | 'settings-accessibility'
+  | 'settings-stimulation'
+  | 'settings-organisation'
+  | 'settings-privacy'
+  | 'settings-export'
 
 interface AppContextValue {
   screen: Screen
   goTo: (s: Screen) => void
   loading: boolean
   currentUser: User | null
+  settings: Settings | null
   todayTasks: Task[]
   inboxTasks: Task[]
   laterTasks: Task[]
@@ -37,6 +46,9 @@ interface AppContextValue {
   todayEnergyStatus: 'filled' | 'skipped' | null
   overloadMode: boolean
   setOverloadMode: (v: boolean) => void
+  updateSettings: (patch: Partial<Settings>) => Promise<void>
+  exportData: () => Promise<void>
+  deleteAllData: () => Promise<void>
   selectedTaskId: string | null
   selectTask: (id: string | null) => void
   createUser: (profile: ProfileType) => Promise<void>
@@ -80,6 +92,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [screen, setScreen] = useState<Screen>('welcome')
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [settings, setSettings] = useState<Settings | null>(null)
   const [todayTasks, setTodayTasks] = useState<Task[]>([])
   const [inboxTasks, setInboxTasks] = useState<Task[]>([])
   const [laterTasks, setLaterTasks] = useState<Task[]>([])
@@ -93,8 +106,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const user = await userRepo.getFirst()
       if (user) {
         setCurrentUser(user)
-        const settings = await settingsRepo.getByUserId(user.id)
-        if (settings?.overload_mode) setOverloadModeState(true)
+        const s = await settingsRepo.getByUserId(user.id)
+        if (s) {
+          setSettings(s)
+          if (s.overload_mode) setOverloadModeState(true)
+        }
         await loadAll()
         setScreen('dashboard')
       }
@@ -102,6 +118,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
     init()
   }, [])
+
+  useEffect(() => {
+    if (!settings) return
+    const root = document.documentElement
+    const fontSizes: Record<string, string> = { small: '13px', medium: '16px', large: '22px' }
+    root.style.fontSize = fontSizes[settings.font_size] ?? '16px'
+    root.classList.toggle('dark-mode', settings.dark_mode)
+    root.classList.toggle('reduce-motion', settings.reduced_motion)
+    root.dataset.stimulation = settings.stimulation_mode
+  }, [settings])
 
   async function loadAll() {
     const [inbox, today, later, entry] = await Promise.all([
@@ -253,11 +279,70 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   async function setOverloadMode(v: boolean) {
     setOverloadModeState(v)
     if (currentUser) {
-      const settings = await settingsRepo.getByUserId(currentUser.id)
-      if (settings) {
-        await settingsRepo.update({ ...settings, overload_mode: v })
+      const s = await settingsRepo.getByUserId(currentUser.id)
+      if (s) {
+        const updated = { ...s, overload_mode: v }
+        await settingsRepo.update(updated)
+        setSettings(updated)
       }
     }
+  }
+
+  async function updateSettings(patch: Partial<Settings>) {
+    if (!currentUser) return
+    const s = await settingsRepo.getByUserId(currentUser.id)
+    if (!s) return
+    const updated = { ...s, ...patch }
+    await settingsRepo.update(updated)
+    setSettings(updated)
+    if (patch.overload_mode !== undefined) setOverloadModeState(patch.overload_mode)
+  }
+
+  async function exportData() {
+    if (!currentUser) return
+    const [user, tasks, subTasks, energyEntries, settingsData] = await Promise.all([
+      userRepo.getFirst(),
+      db.tasks.toArray(),
+      db.subTasks.toArray(),
+      db.energyEntries.toArray(),
+      settingsRepo.getByUserId(currentUser.id),
+    ])
+    const payload = {
+      export_date: new Date().toISOString(),
+      version: '1.0',
+      user,
+      tasks,
+      sub_tasks: subTasks,
+      energy_entries: energyEntries,
+      settings: settingsData,
+    }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `export-audhd-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function deleteAllData() {
+    await Promise.all([
+      db.users.clear(),
+      db.tasks.clear(),
+      db.subTasks.clear(),
+      db.energyEntries.clear(),
+      db.settings.clear(),
+    ])
+    setCurrentUser(null)
+    setSettings(null)
+    setTodayTasks([])
+    setInboxTasks([])
+    setLaterTasks([])
+    setTodayEnergy(null)
+    setTodayEnergyStatus(null)
+    setOverloadModeState(false)
+    setSelectedTaskId(null)
+    setScreen('welcome')
   }
 
   return (
@@ -267,6 +352,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         goTo: setScreen,
         loading,
         currentUser,
+        settings,
         todayTasks,
         inboxTasks,
         laterTasks,
@@ -274,6 +360,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         todayEnergyStatus,
         overloadMode,
         setOverloadMode,
+        updateSettings,
+        exportData,
+        deleteAllData,
         selectedTaskId,
         selectTask: setSelectedTaskId,
         createUser,

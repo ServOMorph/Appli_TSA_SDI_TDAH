@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 4 complète. Suivi énergie quotidien opérationnel : E30 (vue énergie), E31 (check-in 1-10, skip). AppContext enrichi avec todayEnergyStatus ('filled'|'skipped'|null). Dashboard intègre badge cliquable, encart CTA J+1, bouton "Mon énergie". DevResetButton : sélecteur date simulée pour tests J+1. 190 tests, 17 tests manuels validés. Prêt pour Phase 5.
+Phase 5 complète. Paramètres (E110–E114, E116, E117), accessibilité (dark mode, font size, reduce-motion), mode surcharge (E90), export JSON RGPD opérationnels. Settings persistés via SettingsRepository, appliqués au DOM. CSS stimulation mode (calm/dynamic) visible. 232 tests, 22 tests manuels validés. Prêt pour Phase 6 (consolidation MVP).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Entité Event hors MVP, documentée pour V1 post-validation.
@@ -29,3 +29,5 @@ Phase 4 complète. Suivi énergie quotidien opérationnel : E30 (vue énergie), 
 - 2026-06-24 : var(--color-bg) inexistant — toujours utiliser var(--color-surface) pour les fonds opaques.
 - 2026-06-25 : Phase 4 complète — E30/E31, todayEnergyStatus, sélecteur date DEV, 190 tests, 17 tests manuels ok.
 - 2026-06-25 : liaison énergie ↔ Action immédiate reportée en V2 (doc User Flows §9). Génération auto sous-tâches post-V1.
+- 2026-06-25 : Phase 5 complète — E90/E110–E117, Settings DOM, export RGPD, 232 tests, 22 tests manuels ok.
+- 2026-06-25 : E90 simplifié — "Retour au dashboard" supprimé (boucle sans issue), seul "Désactiver" disponible.

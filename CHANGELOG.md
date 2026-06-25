@@ -1,3 +1,18 @@
+## v0.8 — 2026-06-25
+
+### Ajouté
+- `src/ui/screens/settings/` : E110–E114, E116, E117 + tests (paramètres, accessibilité, stimulation, export, suppression)
+- `src/ui/screens/overload/E90OverloadRecovery.tsx` + tests : centre récupération, désactivation surcharge
+- `AppContext.tsx` : settings state, updateSettings, exportData, deleteAllData, 8 nouveaux écrans
+- `src/index.css` : dark-mode class, reduce-motion class, stimulation mode CSS (calm/dynamic)
+- `E10Dashboard.tsx` : bouton "Activer mode surcharge" (nav normale) + "Centre récupération" (mode surcharge)
+
+### Corrigé
+- Font sizes : small=13px / medium=16px / large=22px (différences perceptibles)
+- E90 : suppression "Retour au dashboard" — créait une boucle sans possibilité de sortir du mode surcharge
+
+---
+
 ## v0.7 — 2026-06-25
 
 ### Ajouté

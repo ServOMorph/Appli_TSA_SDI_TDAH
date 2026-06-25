@@ -33,6 +33,9 @@ export function E10Dashboard() {
             <p>Que souhaitez-vous ajouter ?</p>
           )}
         </Card>
+        <Button fullWidth onClick={() => goTo('overload-recovery')}>
+          Centre récupération
+        </Button>
         <Button variant="secondary" fullWidth onClick={() => setOverloadMode(false)}>
           Désactiver le mode surcharge
         </Button>
@@ -146,6 +149,12 @@ export function E10Dashboard() {
         </Button>
         <Button variant="secondary" fullWidth onClick={() => goTo('energy-view')}>
           Mon énergie
+        </Button>
+        <Button variant="secondary" fullWidth onClick={() => setOverloadMode(true)}>
+          Activer mode surcharge
+        </Button>
+        <Button variant="secondary" fullWidth onClick={() => goTo('settings')}>
+          Paramètres
         </Button>
       </nav>
     </main>

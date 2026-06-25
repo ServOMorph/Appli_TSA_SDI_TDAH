@@ -1,11 +1,8 @@
 # Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-06-25)
 
 ## Actions ouvertes
-- [P1|ouvert] Tests mobiles Phase 6 — parcours sur appareil physique réel (iOS ou Android)
-  - fait quand: flux principaux validés sur mobile physique (onboarding, tâche, énergie, offline), puis `/close` Phase 6
-  - réf: `roadmap.md` Phase 6, `e2e/` (protocoles automatisés comme référence des scénarios)
-- [P2|ouvert] Tests utilisateurs AuDHD réels (Phase 7 — post-MVP)
-  - fait quand: 5 à 10 sessions de test réalisées, résultats documentés
+- [P1|ouvert] Tests utilisateurs AuDHD réels (Phase 7)
+  - fait quand: 5 à 10 sessions de test réalisées, résultats documentés dans un fichier dédié
   - réf: `roadmap.md` Phase 7
 
 ## Questions ouvertes
@@ -15,41 +12,28 @@
 ## Blocages
 
 ## Contexte chaud
-- Phase 6 : 46/46 tests Playwright E2E passent en 12.7s (Chromium headless, build prod)
-- Tests E2E couvrent onboarding, tâches, énergie, settings, surcharge, offline/SW/IndexedDB
-- `npm run test:e2e` : build prod + playwright test (remplace les tests manuels desktop)
-- Seul manquant pour clore Phase 6 : 1 session de tests sur appareil mobile physique réel
-- Race condition IDB/reload : toujours attendre `waitForLoadState('networkidle')` ou visibilité avant reload dans les tests E2E
+- Phase 6 close — MVP stable, 46/46 E2E Playwright + 241 tests Vitest (99.34%), validé mobile physique
+- `crypto.randomUUID()` indisponible hors HTTPS : fallback `crypto.getRandomValues` dans `AppContext.tsx`
+- Accès mobile local : `npm run dev -- --host` puis URL Network affichée par Vite
 
 ## Dernière session (2026-06-25)
 
-# Session du 2026-06-25 — Phase 6 (tests E2E Playwright)
+# Session du 2026-06-25 — clôture Phase 6
 
 ## Décisions prises
-- Tests E2E Playwright adoptés pour automatiser les tests manuels Phase 6 (46 tests, 12.7s, Chromium)
-- `npm run test:e2e` devient le standard de validation fonctionnelle avant `/close` Phase 6
-- Tests mobiles physiques (1 session) restent à faire avant la clôture officielle Phase 6
+- `crypto.randomUUID()` remplacé par un fallback `crypto.getRandomValues` dans AppContext pour compatibilité HTTP non-sécurisé (accès mobile par IP locale)
+- Tests mobiles Phase 6 validés sur appareil physique réel — clôture Phase 6 officielle
 
 ## Livrables produits ou modifiés
-- `playwright.config.ts` : config Playwright webServer vite preview + chromium headless
-- `e2e/helpers/reset.ts` : helpers resetApp + completeFastOnboarding
-- `e2e/01-onboarding.spec.ts` : 7 tests parcours onboarding
-- `e2e/02-tasks.spec.ts` : 10 tests gestion tâches (création, déplacement, suppression, limite 3)
-- `e2e/03-energy.spec.ts` : 7 tests check-in énergie, badges, skip
-- `e2e/04-settings.spec.ts` : 11 tests accessibilité CSS, dark mode, export, suppression
-- `e2e/05-overload.spec.ts` : 5 tests mode surcharge + persistance
-- `e2e/06-offline.spec.ts` : 6 tests offline/SW/IndexedDB
-- `package.json` : scripts test:e2e, test:e2e:headed, test:e2e:report
+- `src/app/AppContext.tsx` : fix newId() — fallback UUID v4 sans secure context
 
 ## Hypothèses validées / invalidées
-- VALIDE : 46/46 tests Playwright passent en 12.7s
-- VALIDE : Service worker enregistré en build production
-- VALIDE : App accessible offline (SW cache) + données IndexedDB persistées après rechargement
-- VALIDE : Mode surcharge persisté via settings.overload_mode en IDB
-- EN ATTENTE : Tests sur appareil mobile physique réel (gestes, clavier iOS/Android)
+- VALIDE : flux principaux (onboarding, tâche, énergie, offline) fonctionnels sur mobile physique réel
+- VALIDE : accès réseau local via `npm run dev --host` opérationnel
+- INVALIDE : `crypto.randomUUID()` disponible hors HTTPS → plante silencieusement sur IP locale
 
 ## Prochaine étape exacte
-Tests mobiles Phase 6 : parcourir les flux principaux sur appareil physique réel (onboarding, tâche, énergie, mode offline), puis `/close` Phase 6.
+Phase 7 — Recruter 5 à 10 utilisateurs AuDHD réels, organiser les sessions de test, documenter les frictions.
 
 ## Question bloquante pour la session suivante
 Aucune

@@ -1,3 +1,14 @@
+## v0.11 — 2026-06-25
+
+### Corrigé
+- `src/app/AppContext.tsx` : fallback UUID v4 via `crypto.getRandomValues` — `crypto.randomUUID()` indisponible hors HTTPS (accès mobile par IP locale)
+
+### Modifié
+- `roadmap.md` : Phase 6 clôturée `[x]`
+- `README.md` : état actuel mis à jour (Phase 6 close, Phase 7 à démarrer)
+
+---
+
 ## v0.10 — 2026-06-25
 
 ### Ajouté

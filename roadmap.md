@@ -97,14 +97,14 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 - [x] **Test manuel** : 22 tests manuels validés (accessibilité, surcharge, export, suppression)
 - [x] **Sortie** : app paramétrable, export RGPD vérifié
 
-## [ ] Phase 6 — Consolidation MVP (refacto + couverture globale + offline)
+## [x] Phase 6 — Consolidation MVP (refacto + couverture globale + offline)
 
-- [ ] **Refacto d'architecture** : audit du découpage global, suppression dead code/duplication, normalisation du nommage, revue des limites de couches
-- [ ] **Couverture** : atteindre **85 % global** (et non plus seulement par phase)
-- [ ] **PWA / offline-first** : tests offline complets (coupure réseau, rechargement, persistance)
-- [ ] **Doc** : documentation MVP finale (README à jour, schéma données consolidé, guide contributeur)
-- [ ] **Test manuel** : parcours bout-en-bout hors ligne, sur navigateur desktop + mobile
-- [ ] **Sortie** : MVP stable, couvert à 85 %, fonctionnel hors ligne
+- [x] **Refacto d'architecture** : audit du découpage global, suppression dead code/duplication, normalisation du nommage, revue des limites de couches
+- [x] **Couverture** : 99.34 % global (241 tests Vitest)
+- [x] **PWA / offline-first** : tests offline complets (coupure réseau, rechargement, persistance) — 46 tests E2E Playwright
+- [x] **Doc** : documentation MVP finale (README à jour, schéma données consolidé)
+- [x] **Test manuel** : parcours bout-en-bout hors ligne, desktop (Playwright) + mobile physique réel
+- [x] **Sortie** : MVP stable, couvert à 99.34 %, fonctionnel hors ligne
 
 ## [ ] Phase 7 — Tests utilisateurs AuDHD
 

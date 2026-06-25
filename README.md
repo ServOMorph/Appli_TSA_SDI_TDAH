@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 6 code complète — MVP consolidé. 241 tests Vitest (99.34 % couverture) + 46 tests E2E Playwright (onboarding, tâches, énergie, settings, surcharge, offline/IndexedDB). Architecture domain/data/ui validée sans violation de couche. PWA offline-first via Vite PWA + Workbox. En attente : tests sur appareil mobile physique avant clôture officielle Phase 6.
+Phase 6 close — MVP stable et validé. 241 tests Vitest (99.34 % couverture) + 46 tests E2E Playwright (onboarding, tâches, énergie, settings, surcharge, offline/IndexedDB). Validé sur appareil mobile physique réel. Phase 7 à démarrer : sessions de test avec utilisateurs AuDHD réels.
 
 ## Stack
 

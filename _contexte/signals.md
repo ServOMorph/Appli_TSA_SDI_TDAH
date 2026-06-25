@@ -16,8 +16,9 @@
 - `npm run test:e2e` passe 46/46 et lance le preview sans serveur manuel
 - `npm run lint` et `npm run build` passent
 - E120Resources ajouté : fondements de conception, mode d’emploi de l’application, liens utiles en attente
+- Onboarding modifié : écran bienvenue avec image générée, bouton `Entrer`, profils sans âges affichés
 - run_dev.py / run_prod.py (+ --host) disponibles à la racine
-- Build production régénéré pour déploiement manuel Netlify : dossier `dist/`
+- Build production régénéré après modifications onboarding : dossier `dist/`
 - Test utilisateur distant à préparer : visio/partage écran, données locales navigateur, pas de collecte automatique
 
 ## Dernière session (2026-06-25)
@@ -25,23 +26,21 @@
 # Session du 2026-06-25
 
 ## Décisions prises
-- Phase 7 démarre par un test utilisateur distant, via lien Netlify et observation accompagnée.
-- La connexion Google reste hors périmètre immédiat : à envisager plus tard avec la sync V2.
+- L’onboarding est rendu plus accueillant : image de bienvenue dédiée, bouton `Entrer`, profils sans âges affichés.
 
 ## Livrables produits ou modifiés
-- `dist/` : build production régénéré pour dépôt manuel Netlify
-- `_contexte/signals.md` : clôture session mise à jour
-- `_contexte/contexte.md` : état actuel mis à jour
-- `README.md` : état actuel aligné sur la préparation Phase 7
-- `CHANGELOG.md` : entrée de session ajoutée
+- `src/ui/screens/onboarding/E01Welcome.tsx` : écran bienvenue refondu avec image et bouton `Entrer`
+- `src/ui/screens/onboarding/E02Profile.tsx` : âges retirés des profils
+- `public/images/welcome-hero.png` : image générée ajoutée au projet
+- `dist/` : build production régénéré
 
 ## Hypothèses validées / invalidées
-- VALIDE : `npm run build` passe et génère `dist/`
-- VALIDE : un testeur distant ne donne pas accès automatiquement à ses données ; elles restent dans son navigateur
+- VALIDE : `npm run test -- E01Welcome E02Profile`, `npm run lint` et `npm run build` passent
+- VALIDE : écran bienvenue mobile sans scroll mesuré en preview 390x844
 - EN ATTENTE : lien Netlify public à générer par dépôt manuel du dossier `dist/`
 
 ## Prochaine étape exacte
-1. Déposer `dist/` sur Netlify.
+1. Déposer le nouveau `dist/` sur Netlify.
 2. Envoyer le lien au testeur avec consignes de confidentialité.
 3. Réaliser la session distante et documenter les retours.
 

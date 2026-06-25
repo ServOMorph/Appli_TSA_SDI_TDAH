@@ -10,21 +10,30 @@ export function E01Welcome() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100svh',
-        padding: 'var(--spacing-xl)',
-        gap: 'var(--spacing-xl)',
+        justifyContent: 'space-between',
+        height: '100svh',
+        overflow: 'hidden',
+        padding: 'clamp(16px, 4svh, 32px)',
+        gap: 'var(--spacing-md)',
         textAlign: 'center',
         maxWidth: '480px',
         margin: '0 auto',
       }}
     >
-      <div>
-        <h1>Bienvenue</h1>
-        <p>Une application conçue pour réduire votre charge mentale quotidienne.</p>
-      </div>
-      <Button fullWidth onClick={() => goTo('profile')}>
-        Commencer
+      <h1 className="sr-only">Bienvenue</h1>
+      <img
+        src="/images/welcome-hero.png"
+        alt="Bienvenue - Appli TSA SDI TDAH"
+        style={{
+          width: '100%',
+          maxHeight: 'calc(100svh - 96px)',
+          minHeight: 0,
+          objectFit: 'contain',
+          borderRadius: 'var(--radius-md)',
+        }}
+      />
+      <Button fullWidth onClick={() => goTo('profile')} style={{ flex: '0 0 auto' }}>
+        Entrer
       </Button>
     </main>
   )

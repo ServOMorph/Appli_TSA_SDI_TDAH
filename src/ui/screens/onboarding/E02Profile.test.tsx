@@ -10,6 +10,9 @@ describe('E02Profile', () => {
     expect(screen.getByText('Adolescent')).toBeDefined()
     expect(screen.getByText('Étudiant')).toBeDefined()
     expect(screen.getByText('Adulte')).toBeDefined()
+    expect(screen.queryByText('14–17 ans')).toBeNull()
+    expect(screen.queryByText('18–25 ans')).toBeNull()
+    expect(screen.queryByText('26–40 ans')).toBeNull()
   })
 
   it('affiche le bouton Ignorer', () => {

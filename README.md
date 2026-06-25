@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 6 close — MVP stable et validé. 259 tests Vitest passent. Les 46 scénarios E2E Playwright passent via `npm run test:e2e`. Phase 7 démarrée côté préparation : premier testeur distant identifié, test prévu via lien Netlify manuel, avec données conservées localement dans le navigateur du testeur.
+Phase 6 close — MVP stable et validé. 259 tests Vitest passent. Les 46 scénarios E2E Playwright passent via `npm run test:e2e`. Phase 7 démarrée côté préparation : premier testeur distant identifié, onboarding ajusté pour le test, déploiement prévu via lien Netlify manuel, avec données conservées localement dans le navigateur du testeur.
 
 ## Stack
 

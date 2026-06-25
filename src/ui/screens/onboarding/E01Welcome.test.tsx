@@ -10,15 +10,15 @@ describe('E01Welcome', () => {
     expect(screen.getByRole('heading', { name: 'Bienvenue' })).toBeDefined()
   })
 
-  it('affiche le bouton Commencer', () => {
+  it('affiche le bouton Entrer', () => {
     renderWithApp(<E01Welcome />)
-    expect(screen.getByRole('button', { name: 'Commencer' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Entrer' })).toBeDefined()
   })
 
-  it('navigue vers profile au clic sur Commencer', async () => {
+  it('navigue vers profile au clic sur Entrer', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E01Welcome />, ctx)
-    await userEvent.click(screen.getByRole('button', { name: 'Commencer' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Entrer' }))
     expect(ctx.goTo).toHaveBeenCalledWith('profile')
   })
 })

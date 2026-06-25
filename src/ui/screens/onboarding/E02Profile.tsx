@@ -2,10 +2,10 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import type { ProfileType } from '@/domain/entities/user'
 
-const profiles: { value: ProfileType; label: string; description: string }[] = [
-  { value: 'teenager', label: 'Adolescent', description: '14–17 ans' },
-  { value: 'student', label: 'Étudiant', description: '18–25 ans' },
-  { value: 'adult', label: 'Adulte', description: '26–40 ans' },
+const profiles: { value: ProfileType; label: string }[] = [
+  { value: 'teenager', label: 'Adolescent' },
+  { value: 'student', label: 'Étudiant' },
+  { value: 'adult', label: 'Adulte' },
 ]
 
 export function E02Profile() {
@@ -52,9 +52,6 @@ export function E02Profile() {
           >
             <span style={{ fontWeight: 600, color: 'var(--color-text)', fontSize: '1rem' }}>
               {p.label}
-            </span>
-            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-              {p.description}
             </span>
           </button>
         ))}

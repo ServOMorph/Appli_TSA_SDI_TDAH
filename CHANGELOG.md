@@ -1,3 +1,19 @@
+## v0.19 — 2026-06-25
+
+### Ajouté
+- `public/images/welcome-hero.png` : image générée pour l’écran de bienvenue.
+
+### Modifié
+- `E01Welcome.tsx` : écran de bienvenue refondu autour de l’image et du bouton `Entrer`, sans scroll mobile.
+- `E02Profile.tsx` : âges retirés des choix de profil.
+- `_contexte/`, `README.md` : clôture session alignée sur l’onboarding préparé pour test utilisateur.
+
+### Validé
+- `npm run test -- E01Welcome E02Profile`, `npm run lint`, `npm run build` : OK.
+- Preview mobile 390x844 : écran bienvenue sans scroll, image chargée, bouton visible.
+
+---
+
 ## v0.18 — 2026-06-25
 
 ### Modifié

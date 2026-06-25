@@ -13,15 +13,17 @@ npm install
 npm run dev        # serveur de développement http://localhost:5173
 npm run build      # build de production
 npm run preview    # prévisualisation du build
-npm test           # tests unitaires (Vitest)
+npm test               # tests unitaires (Vitest)
 npm run test:coverage  # couverture (seuil 85 %)
+npm run test:e2e       # tests E2E Playwright (build + 46 scénarios)
+npm run test:e2e:report  # ouvrir le rapport HTML Playwright
 npm run lint       # ESLint
 npm run format     # Prettier
 ```
 
 ## État actuel
 
-Phase 6 complète — MVP consolidé. 241 tests, couverture globale 99.34 % (gate 85 %). Architecture domain/data/ui validée sans violation de couche. PWA offline-first via Vite PWA + Workbox. Export JSON RGPD, mode surcharge, accessibilité (dark mode, taille texte, reduce-motion) opérationnels.
+Phase 6 code complète — MVP consolidé. 241 tests Vitest (99.34 % couverture) + 46 tests E2E Playwright (onboarding, tâches, énergie, settings, surcharge, offline/IndexedDB). Architecture domain/data/ui validée sans violation de couche. PWA offline-first via Vite PWA + Workbox. En attente : tests sur appareil mobile physique avant clôture officielle Phase 6.
 
 ## Stack
 

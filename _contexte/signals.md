@@ -1,9 +1,9 @@
 # Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-06-25)
 
 ## Actions ouvertes
-- [P1|ouvert] Tests manuels Phase 6 — parcours bout-en-bout hors ligne, desktop + mobile
-  - fait quand: tous les tests manuels Phase 6 validés, puis `/close` Phase 6
-  - réf: `roadmap.md` Phase 6 (liste des tests manuels)
+- [P1|ouvert] Tests mobiles Phase 6 — parcours sur appareil physique réel (iOS ou Android)
+  - fait quand: flux principaux validés sur mobile physique (onboarding, tâche, énergie, offline), puis `/close` Phase 6
+  - réf: `roadmap.md` Phase 6, `e2e/` (protocoles automatisés comme référence des scénarios)
 - [P2|ouvert] Tests utilisateurs AuDHD réels (Phase 7 — post-MVP)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés
   - réf: `roadmap.md` Phase 7
@@ -15,44 +15,41 @@
 ## Blocages
 
 ## Contexte chaud
-- Phase 6 code complète : audit architecture ✓, couverture 99.34% ✓, build PWA ✓, README ✓, offline testé ✓
-- 241 tests passent, 99.34% couverture stmts
-- PWA : sw.js + workbox générés, 9 entrées précachées (346 KiB)
-- erasableSyntaxOnly : tous les repositories utilisent déclaration explicite (pas de parameter property shorthand)
-- DevResetButton exclus de la couverture (composant dev-only)
+- Phase 6 : 46/46 tests Playwright E2E passent en 12.7s (Chromium headless, build prod)
+- Tests E2E couvrent onboarding, tâches, énergie, settings, surcharge, offline/SW/IndexedDB
+- `npm run test:e2e` : build prod + playwright test (remplace les tests manuels desktop)
+- Seul manquant pour clore Phase 6 : 1 session de tests sur appareil mobile physique réel
+- Race condition IDB/reload : toujours attendre `waitForLoadState('networkidle')` ou visibilité avant reload dans les tests E2E
 
 ## Dernière session (2026-06-25)
 
-# Session du 2026-06-25 — Phase 6 (code)
+# Session du 2026-06-25 — Phase 6 (tests E2E Playwright)
 
 ## Décisions prises
-- Phase 6 code terminée : audit ✓, couverture 99.34% ✓, build PWA propre ✓, README à jour ✓
-- erasableSyntaxOnly TS 5.8+ : parameter property shorthand interdit — tous les repositories corrigés
-- DevResetButton exclu de la couverture vitest (composant dev-only sans logique testable)
-- Tests manuels Phase 6 reportés à prochaine session (offline desktop + mobile)
+- Tests E2E Playwright adoptés pour automatiser les tests manuels Phase 6 (46 tests, 12.7s, Chromium)
+- `npm run test:e2e` devient le standard de validation fonctionnelle avant `/close` Phase 6
+- Tests mobiles physiques (1 session) restent à faire avant la clôture officielle Phase 6
 
 ## Livrables produits ou modifiés
-- `src/app/AppContext.test.tsx` : +3 describe blocks (inbox ops, sous-tâches, settings/données) — 241 tests
-- `src/data/repositories/userRepository.ts` : fix erasableSyntaxOnly
-- `src/data/repositories/settingsRepository.ts` : fix erasableSyntaxOnly
-- `src/data/repositories/taskRepository.ts` : fix erasableSyntaxOnly
-- `src/data/repositories/subTaskRepository.ts` : fix erasableSyntaxOnly
-- `src/data/repositories/energyEntryRepository.ts` : fix erasableSyntaxOnly
-- `src/domain/rules/taskRules.test.ts` : suppression import inutilisé TASK_TODAY_MAX
-- `src/ui/screens/settings/E117Export.test.tsx` : fix act() warning
-- `vitest.config.ts` : DevResetButton.tsx ajouté aux exclusions coverage
-- `README.md` : Phase 6 complète, 241 tests, 99.34% couverture
+- `playwright.config.ts` : config Playwright webServer vite preview + chromium headless
+- `e2e/helpers/reset.ts` : helpers resetApp + completeFastOnboarding
+- `e2e/01-onboarding.spec.ts` : 7 tests parcours onboarding
+- `e2e/02-tasks.spec.ts` : 10 tests gestion tâches (création, déplacement, suppression, limite 3)
+- `e2e/03-energy.spec.ts` : 7 tests check-in énergie, badges, skip
+- `e2e/04-settings.spec.ts` : 11 tests accessibilité CSS, dark mode, export, suppression
+- `e2e/05-overload.spec.ts` : 5 tests mode surcharge + persistance
+- `e2e/06-offline.spec.ts` : 6 tests offline/SW/IndexedDB
+- `package.json` : scripts test:e2e, test:e2e:headed, test:e2e:report
 
 ## Hypothèses validées / invalidées
-- VALIDE : 241/241 tests passent
-- VALIDE : couverture 99.34% (gate 85% largement dépassé)
-- VALIDE : build prod clean, PWA sw.js généré (9 entrées précachées)
-- VALIDE : audit architecture — aucune violation cross-layer
-- VALIDE : test offline navigateur — app fonctionne hors ligne
-- EN ATTENTE : tests manuels complets Phase 6 (parcours bout-en-bout offline, mobile)
+- VALIDE : 46/46 tests Playwright passent en 12.7s
+- VALIDE : Service worker enregistré en build production
+- VALIDE : App accessible offline (SW cache) + données IndexedDB persistées après rechargement
+- VALIDE : Mode surcharge persisté via settings.overload_mode en IDB
+- EN ATTENTE : Tests sur appareil mobile physique réel (gestes, clavier iOS/Android)
 
 ## Prochaine étape exacte
-Tests manuels Phase 6 : parcours bout-en-bout hors ligne sur navigateur desktop + mobile, puis `/close` Phase 6.
+Tests mobiles Phase 6 : parcourir les flux principaux sur appareil physique réel (onboarding, tâche, énergie, mode offline), puis `/close` Phase 6.
 
 ## Question bloquante pour la session suivante
 Aucune

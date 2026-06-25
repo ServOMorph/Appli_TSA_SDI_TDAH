@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 6 code complète. Audit architecture ✓ (aucune violation cross-layer), couverture 99.34% (241 tests), build PWA propre (sw.js + workbox, 9 entrées précachées). Repositories corrigés pour erasableSyntaxOnly TS 5.8+. Test offline navigateur validé. En attente : tests manuels complets (parcours bout-en-bout offline desktop + mobile) pour clore officiellement Phase 6.
+Phase 6 code complète + tests E2E Playwright automatisés (46/46, 12.7s, Chromium). Couverture 99.34% (241 tests Vitest). Tests E2E couvrent onboarding, tâches, énergie, settings, surcharge, offline/SW/IndexedDB persistance. Seul manquant pour clore Phase 6 : 1 session de tests sur appareil mobile physique réel (gestes, clavier iOS/Android).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Entité Event hors MVP, documentée pour V1 post-validation.
@@ -32,3 +32,4 @@ Phase 6 code complète. Audit architecture ✓ (aucune violation cross-layer), c
 - 2026-06-25 : Phase 5 complète — E90/E110–E117, Settings DOM, export RGPD, 232 tests, 22 tests manuels ok.
 - 2026-06-25 : E90 simplifié — "Retour au dashboard" supprimé (boucle sans issue), seul "Désactiver" disponible.
 - 2026-06-25 : Phase 6 code complète — audit architecture, 99.34% couverture, build PWA, erasableSyntaxOnly fix, offline validé. Tests manuels complets à finaliser.
+- 2026-06-25 : Tests E2E Playwright adoptés (46/46, 12.7s) — remplacent les tests manuels desktop. Tests mobiles physiques restent à faire avant clôture Phase 6.

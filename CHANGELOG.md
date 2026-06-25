@@ -1,3 +1,13 @@
+## v0.10 — 2026-06-25
+
+### Ajouté
+- Suite E2E Playwright : 46 tests (onboarding, tâches, énergie, settings, surcharge, offline/SW/IndexedDB)
+- `playwright.config.ts` : configuration Playwright webServer vite preview + Chromium headless
+- `e2e/` : 6 fichiers de tests + helper reset/onboarding
+- `package.json` : scripts `test:e2e`, `test:e2e:headed`, `test:e2e:report`
+
+---
+
 ## v0.9 — 2026-06-25
 
 ### Ajouté

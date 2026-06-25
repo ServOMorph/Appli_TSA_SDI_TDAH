@@ -62,7 +62,7 @@ describe('E112Accessibility', () => {
   it('navigue vers settings via Retour', () => {
     const goTo = vi.fn()
     renderE112({ goTo })
-    fireEvent.click(screen.getByText('Retour'))
+    fireEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(goTo).toHaveBeenCalledWith('settings')
   })
 })

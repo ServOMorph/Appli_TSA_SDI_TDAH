@@ -40,6 +40,7 @@ interface AppContextValue {
   currentUser: User | null
   settings: Settings | null
   todayTasks: Task[]
+  todaySubTasksMap: Record<string, SubTask[]>
   inboxTasks: Task[]
   laterTasks: Task[]
   todayEnergy: number | null
@@ -51,6 +52,8 @@ interface AppContextValue {
   deleteAllData: () => Promise<void>
   selectedTaskId: string | null
   selectTask: (id: string | null) => void
+  taskDetailOrigin: Screen | null
+  setTaskDetailOrigin: (s: Screen) => void
   createUser: (profile: ProfileType) => Promise<void>
   saveTodayEnergy: (value: number) => Promise<void>
   skipTodayEnergy: () => Promise<void>
@@ -62,8 +65,10 @@ interface AppContextValue {
   addSubTask: (taskId: string, title: string) => Promise<void>
   deleteSubTask: (id: string) => Promise<void>
   toggleSubTask: (subTask: SubTask) => Promise<void>
+  reorderSubTasks: (taskId: string, ids: string[]) => Promise<void>
   getSubTasks: (taskId: string) => Promise<SubTask[]>
   updateTaskTitle: (id: string, title: string) => Promise<void>
+  reorderTodayTasks: (ids: string[]) => Promise<void>
   refreshDashboard: () => Promise<void>
 }
 
@@ -100,12 +105,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [settings, setSettings] = useState<Settings | null>(null)
   const [todayTasks, setTodayTasks] = useState<Task[]>([])
+  const [todaySubTasksMap, setTodaySubTasksMap] = useState<Record<string, SubTask[]>>({})
   const [inboxTasks, setInboxTasks] = useState<Task[]>([])
   const [laterTasks, setLaterTasks] = useState<Task[]>([])
   const [todayEnergy, setTodayEnergy] = useState<number | null>(null)
   const [todayEnergyStatus, setTodayEnergyStatus] = useState<'filled' | 'skipped' | null>(null)
   const [overloadMode, setOverloadModeState] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [taskDetailOrigin, setTaskDetailOrigin] = useState<Screen | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -142,8 +149,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       taskRepo.getByStatus('later'),
       energyRepo.getByDate(todayDate()),
     ])
+    const subTaskArrays = await Promise.all(today.map((t) => subTaskRepo.getByTaskId(t.id)))
+    const subTasksMap: Record<string, SubTask[]> = {}
+    today.forEach((t, i) => { subTasksMap[t.id] = subTaskArrays[i] })
     setInboxTasks(inbox)
     setTodayTasks(today)
+    setTodaySubTasksMap(subTasksMap)
     setLaterTasks(later)
     setTodayEnergy(entry?.value ?? null)
     setTodayEnergyStatus(entry?.status ?? null)
@@ -267,6 +278,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await subTaskRepo.update({ ...subTask, is_completed: !subTask.is_completed })
   }
 
+  async function reorderSubTasks(taskId: string, ids: string[]) {
+    await subTaskRepo.reorder(ids)
+    await loadAll()
+  }
+
   async function getSubTasks(taskId: string): Promise<SubTask[]> {
     return subTaskRepo.getByTaskId(taskId)
   }
@@ -275,6 +291,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const task = await taskRepo.getById(id)
     if (!task) return
     await taskRepo.update({ ...task, title, updated_at: new Date().toISOString() })
+    await loadAll()
+  }
+
+  async function reorderTodayTasks(ids: string[]) {
+    await taskRepo.reorder(ids)
     await loadAll()
   }
 
@@ -360,6 +381,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         currentUser,
         settings,
         todayTasks,
+        todaySubTasksMap,
         inboxTasks,
         laterTasks,
         todayEnergy,
@@ -371,6 +393,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         deleteAllData,
         selectedTaskId,
         selectTask: setSelectedTaskId,
+        taskDetailOrigin,
+        setTaskDetailOrigin,
         createUser,
         saveTodayEnergy,
         skipTodayEnergy,
@@ -382,8 +406,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addSubTask,
         deleteSubTask,
         toggleSubTask,
+        reorderSubTasks,
         getSubTasks,
         updateTaskTitle,
+        reorderTodayTasks,
         refreshDashboard,
       }}
     >

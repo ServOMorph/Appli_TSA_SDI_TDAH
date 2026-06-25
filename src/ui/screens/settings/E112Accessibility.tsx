@@ -3,6 +3,16 @@ import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import type { FontSize } from '@/domain/entities/settings'
 
+const backBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '1rem',
+  padding: 0,
+  alignSelf: 'flex-start',
+}
+
 const fontSizeLabels: Record<FontSize, string> = {
   small: 'Petite',
   medium: 'Normale',
@@ -28,6 +38,10 @@ export function E112Accessibility() {
         minHeight: '100svh',
       }}
     >
+      <button style={backBtnStyle} onClick={() => goTo('settings')} aria-label="Retour">
+        ← Retour
+      </button>
+
       <h1>Accessibilité</h1>
 
       <Card>
@@ -78,9 +92,6 @@ export function E112Accessibility() {
         </label>
       </Card>
 
-      <Button variant="secondary" fullWidth onClick={() => goTo('settings')}>
-        Retour
-      </Button>
     </main>
   )
 }

@@ -2,6 +2,16 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 
+const backBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '1rem',
+  padding: 0,
+  alignSelf: 'flex-start',
+}
+
 export function E30EnergyView() {
   const { todayEnergy, todayEnergyStatus, goTo } = useApp()
 
@@ -45,13 +55,14 @@ export function E30EnergyView() {
         minHeight: '100svh',
       }}
     >
+      <button style={backBtnStyle} onClick={() => goTo('dashboard')} aria-label="Retour">
+        ← Retour
+      </button>
+
       <h1>Mon énergie</h1>
       {renderEnergyState()}
       <Button fullWidth onClick={() => goTo('energy-checkin')}>
         {todayEnergyStatus === 'filled' ? 'Modifier' : 'Faire mon check-in'}
-      </Button>
-      <Button variant="secondary" fullWidth onClick={() => goTo('dashboard')}>
-        Retour
       </Button>
     </main>
   )

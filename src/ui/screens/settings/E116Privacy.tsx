@@ -3,6 +3,16 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 
+const backBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '1rem',
+  padding: 0,
+  alignSelf: 'flex-start',
+}
+
 const modalOverlay: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
@@ -46,6 +56,10 @@ export function E116Privacy() {
         minHeight: '100svh',
       }}
     >
+      <button style={backBtnStyle} onClick={() => goTo('settings')} aria-label="Retour">
+        ← Retour
+      </button>
+
       <h1>Confidentialité</h1>
 
       <Card>
@@ -78,10 +92,6 @@ export function E116Privacy() {
           Supprimer mes données
         </Button>
       </Card>
-
-      <Button variant="secondary" fullWidth onClick={() => goTo('settings')}>
-        Retour
-      </Button>
 
       {showConfirm && (
         <div role="dialog" aria-modal="true" aria-label="Confirmer la suppression" style={modalOverlay}>

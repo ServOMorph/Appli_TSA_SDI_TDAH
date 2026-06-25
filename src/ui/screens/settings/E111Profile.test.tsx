@@ -39,7 +39,7 @@ describe('E111Profile', () => {
   it('navigue vers settings via Retour', () => {
     const goTo = vi.fn()
     renderE111({ goTo })
-    fireEvent.click(screen.getByText('Retour'))
+    fireEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(goTo).toHaveBeenCalledWith('settings')
   })
 })

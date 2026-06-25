@@ -1,6 +1,15 @@
 import { useApp } from '@/app/AppContext'
-import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+
+const backBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '1rem',
+  padding: 0,
+  alignSelf: 'flex-start',
+}
 
 const profileLabels: Record<string, string> = {
   audhd: 'AuDHD (TSA + TDAH)',
@@ -27,6 +36,10 @@ export function E111Profile() {
         minHeight: '100svh',
       }}
     >
+      <button style={backBtnStyle} onClick={() => goTo('settings')} aria-label="Retour">
+        ← Retour
+      </button>
+
       <h1>Profil</h1>
 
       <Card>
@@ -47,9 +60,6 @@ export function E111Profile() {
         </p>
       </Card>
 
-      <Button variant="secondary" fullWidth onClick={() => goTo('settings')}>
-        Retour
-      </Button>
     </main>
   )
 }

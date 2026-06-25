@@ -1,3 +1,21 @@
+## v0.12 — 2026-06-25
+
+### Ajouté
+- `AppContext.tsx` : `taskDetailOrigin` state — mémorise l'écran d'origine pour corriger la navigation retour depuis E22
+- Braille dots ⠿ sur cartes E10 et sous-tâches E22/E23 (indicateur drag)
+- Drag-and-drop des sous-tâches dans E22 (dnd-kit, pattern optimiste identique E23)
+- Bouton supprimer (×) sur chaque sous-tâche dans E22
+
+### Corrigé
+- E22 : sous-tâche supprimée encore visible dans E10 → `refreshDashboard()` après `deleteSubTask`
+- E22 : bouton Retour naviguait vers E24 au lieu de E10 lors d'une navigation depuis le dashboard
+
+### Modifié
+- E110–E117, E30–E31 : bouton "← Retour" déplacé en haut des écrans (harmonisation pattern E22)
+- Tests E110–E117 : `getByText('Retour')` → `getByRole('button', { name: 'Retour' })`
+
+---
+
 ## v0.11 — 2026-06-25
 
 ### Corrigé

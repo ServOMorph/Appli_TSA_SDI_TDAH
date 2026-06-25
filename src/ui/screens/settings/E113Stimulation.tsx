@@ -1,7 +1,16 @@
 import { useApp } from '@/app/AppContext'
-import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import type { StimulationMode } from '@/domain/entities/settings'
+
+const backBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '1rem',
+  padding: 0,
+  alignSelf: 'flex-start',
+}
 
 const modes: { value: StimulationMode; label: string; description: string }[] = [
   {
@@ -38,6 +47,10 @@ export function E113Stimulation() {
         minHeight: '100svh',
       }}
     >
+      <button style={backBtnStyle} onClick={() => goTo('settings')} aria-label="Retour">
+        ← Retour
+      </button>
+
       <h1>Stimulation cognitive</h1>
 
       <p style={{ color: 'var(--color-text-muted)' }}>
@@ -72,9 +85,6 @@ export function E113Stimulation() {
         </div>
       </fieldset>
 
-      <Button variant="secondary" fullWidth onClick={() => goTo('settings')}>
-        Retour
-      </Button>
     </main>
   )
 }

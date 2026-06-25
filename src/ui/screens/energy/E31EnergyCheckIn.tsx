@@ -2,6 +2,16 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 
+const backBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '1rem',
+  padding: 0,
+  alignSelf: 'flex-start',
+}
+
 const SPOON_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 export function E31EnergyCheckIn() {
@@ -33,6 +43,10 @@ export function E31EnergyCheckIn() {
         justifyContent: 'center',
       }}
     >
+      <button style={backBtnStyle} onClick={() => goTo('energy-view')} aria-label="Retour">
+        ← Retour
+      </button>
+
       <div>
         <h1>Mon énergie aujourd'hui</h1>
         <p>Combien de cuillères avez-vous aujourd'hui ?</p>
@@ -72,9 +86,6 @@ export function E31EnergyCheckIn() {
       </Button>
       <Button variant="secondary" fullWidth onClick={skip}>
         Ignorer
-      </Button>
-      <Button variant="secondary" fullWidth onClick={() => goTo('energy-view')}>
-        Retour
       </Button>
     </main>
   )

@@ -55,7 +55,7 @@ describe('E113Stimulation', () => {
   it('navigue vers settings via Retour', () => {
     const goTo = vi.fn()
     renderE113({ goTo })
-    fireEvent.click(screen.getByText('Retour'))
+    fireEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(goTo).toHaveBeenCalledWith('settings')
   })
 })

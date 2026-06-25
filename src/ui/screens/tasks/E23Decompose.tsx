@@ -3,6 +3,24 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import type { SubTask } from '@/domain/entities/subTask'
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -35,6 +53,44 @@ const inputStyle: React.CSSProperties = {
   color: 'var(--color-text)',
 }
 
+interface SortableSubTaskItemProps {
+  subTask: SubTask
+  onDelete: (id: string) => void
+}
+
+function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: subTask.id })
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        touchAction: 'none',
+        cursor: 'grab',
+      }}
+    >
+      <Card style={{ padding: 'var(--spacing-md)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+          <span aria-hidden style={{ fontSize: '1rem', color: 'var(--color-text-muted)', flexShrink: 0, lineHeight: 1 }}>⠿</span>
+          <span style={{ color: 'var(--color-text)', flex: 1 }}>{subTask.title}</span>
+          <button
+            aria-label={`Supprimer ${subTask.title}`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: '4px' }}
+            onClick={(e) => { e.stopPropagation(); onDelete(subTask.id) }}
+          >
+            ×
+          </button>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
 export function E23Decompose() {
   const {
     selectedTaskId,
@@ -44,6 +100,7 @@ export function E23Decompose() {
     getSubTasks,
     addSubTask,
     deleteSubTask,
+    reorderSubTasks,
     goTo,
   } = useApp()
 
@@ -57,6 +114,22 @@ export function E23Decompose() {
       getSubTasks(selectedTaskId).then(setSubTasks)
     }
   }, [selectedTaskId])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = subTasks.findIndex((st) => st.id === active.id)
+    const newIndex = subTasks.findIndex((st) => st.id === over.id)
+    const newOrder = arrayMove(subTasks, oldIndex, newIndex).map((st, i) => ({ ...st, position: i }))
+    setSubTasks(newOrder)
+    if (selectedTaskId) reorderSubTasks(selectedTaskId, newOrder.map((st) => st.id))
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -90,22 +163,15 @@ export function E23Decompose() {
       {subTasks.length === 0 ? (
         <p aria-live="polite">Aucune sous-étape.</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-          {subTasks.map((st) => (
-            <Card key={st.id} style={{ padding: 'var(--spacing-md)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: 'var(--color-text)' }}>{st.title}</span>
-                <button
-                  aria-label={`Supprimer ${st.title}`}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: '4px' }}
-                  onClick={() => handleDelete(st.id)}
-                >
-                  ×
-                </button>
-              </div>
-            </Card>
-          ))}
-        </div>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={subTasks.map((st) => st.id)} strategy={verticalListSortingStrategy}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+              {subTasks.map((st) => (
+                <SortableSubTaskItem key={st.id} subTask={st} onDelete={handleDelete} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       <form onSubmit={handleAdd} style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>

@@ -1,7 +1,16 @@
 import { useApp } from '@/app/AppContext'
-import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import type { Screen } from '@/app/AppContext'
+
+const backBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '1rem',
+  padding: 0,
+  alignSelf: 'flex-start',
+}
 
 interface SettingsEntry {
   label: string
@@ -33,6 +42,10 @@ export function E110Settings() {
         minHeight: '100svh',
       }}
     >
+      <button style={backBtnStyle} onClick={() => goTo('dashboard')} aria-label="Retour">
+        ← Retour
+      </button>
+
       <h1>Paramètres</h1>
 
       <nav aria-label="Sections paramètres">
@@ -72,9 +85,6 @@ export function E110Settings() {
         </ul>
       </nav>
 
-      <Button variant="secondary" fullWidth onClick={() => goTo('dashboard')}>
-        Retour
-      </Button>
     </main>
   )
 }

@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 6 close — MVP stable et validé. 241 tests Vitest (99.34%) + 46 tests E2E Playwright (12.7s). Flux principaux validés sur appareil mobile physique réel. Fix crypto.randomUUID() pour compatibilité HTTP non-sécurisé (accès IP locale). Phase 7 à démarrer : sessions de test avec utilisateurs AuDHD réels.
+Phase 6 close + polish UX. MVP stable : 241 tests Vitest (99.34%), 46 E2E Playwright. UX améliorée : DnD sous-tâches E22, braille dots, fix navigation taskDetailOrigin, harmonisation boutons "← Retour" sur tous les écrans. Phase 7 à démarrer : tests utilisateurs AuDHD réels.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-23 : Entité Event hors MVP, documentée pour V1 post-validation.

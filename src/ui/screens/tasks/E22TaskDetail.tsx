@@ -5,6 +5,24 @@ import { Card } from '@/ui/components/Card'
 import type { SubTask } from '@/domain/entities/subTask'
 import type { Task } from '@/domain/entities/task'
 import type { Screen } from '@/app/AppContext'
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -49,6 +67,44 @@ const modalBox: React.CSSProperties = {
   gap: 'var(--spacing-md)',
 }
 
+interface SortableSubTaskItemProps {
+  subTask: SubTask
+  onDelete: (id: string) => void
+}
+
+function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: subTask.id })
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        touchAction: 'none',
+        cursor: 'grab',
+      }}
+    >
+      <Card style={{ padding: 'var(--spacing-md)' }}>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+          <span aria-hidden style={{ fontSize: '1rem', color: 'var(--color-text-muted)', flexShrink: 0, lineHeight: 1 }}>⠿</span>
+          <span style={{ color: 'var(--color-text)', flex: 1 }}>{subTask.title}</span>
+          <button
+            aria-label={`Supprimer ${subTask.title}`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: '4px' }}
+            onClick={(e) => { e.stopPropagation(); onDelete(subTask.id) }}
+          >
+            ×
+          </button>
+        </div>
+      </Card>
+    </div>
+  )
+}
+
 function backScreenForTask(task: Task): Screen {
   if (task.status === 'today') return 'today'
   if (task.status === 'later') return 'later'
@@ -62,10 +118,13 @@ export function E22TaskDetail() {
     todayTasks,
     laterTasks,
     getSubTasks,
-    toggleSubTask,
+    deleteSubTask,
     completeTask,
     deleteTask,
     selectTask,
+    reorderSubTasks,
+    refreshDashboard,
+    taskDetailOrigin,
     goTo,
   } = useApp()
 
@@ -80,8 +139,25 @@ export function E22TaskDetail() {
     }
   }, [selectedTaskId])
 
-  async function handleToggle(subTask: SubTask) {
-    await toggleSubTask(subTask)
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    const oldIndex = subTasks.findIndex((st) => st.id === active.id)
+    const newIndex = subTasks.findIndex((st) => st.id === over.id)
+    const newOrder = arrayMove(subTasks, oldIndex, newIndex).map((st, i) => ({ ...st, position: i }))
+    setSubTasks(newOrder)
+    if (selectedTaskId) reorderSubTasks(selectedTaskId, newOrder.map((st) => st.id))
+  }
+
+  async function handleDeleteSubTask(id: string) {
+    await deleteSubTask(id)
+    await refreshDashboard()
     if (selectedTaskId) {
       const updated = await getSubTasks(selectedTaskId)
       setSubTasks(updated)
@@ -113,7 +189,7 @@ export function E22TaskDetail() {
     )
   }
 
-  const back = backScreenForTask(task)
+  const back = taskDetailOrigin ?? backScreenForTask(task)
 
   return (
     <main style={pageStyle}>
@@ -126,23 +202,15 @@ export function E22TaskDetail() {
       {subTasks.length > 0 && (
         <section aria-label="Sous-étapes">
           <h2>Sous-étapes</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            {subTasks.map((st) => (
-              <Card key={st.id} style={{ padding: 'var(--spacing-md)' }}>
-                <label style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={st.is_completed}
-                    onChange={() => handleToggle(st)}
-                    aria-label={st.title}
-                  />
-                  <span style={{ textDecoration: st.is_completed ? 'line-through' : 'none', color: st.is_completed ? 'var(--color-text-muted)' : 'var(--color-text)' }}>
-                    {st.title}
-                  </span>
-                </label>
-              </Card>
-            ))}
-          </div>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={subTasks.map((st) => st.id)} strategy={verticalListSortingStrategy}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                {subTasks.map((st) => (
+                  <SortableSubTaskItem key={st.id} subTask={st} onDelete={handleDeleteSubTask} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </section>
       )}
 

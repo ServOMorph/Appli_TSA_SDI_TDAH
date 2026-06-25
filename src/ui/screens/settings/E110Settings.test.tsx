@@ -46,7 +46,7 @@ describe('E110Settings', () => {
   it('navigue vers dashboard via Retour', () => {
     const goTo = vi.fn()
     renderE110({ goTo })
-    fireEvent.click(screen.getByText('Retour'))
+    fireEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(goTo).toHaveBeenCalledWith('dashboard')
   })
 })

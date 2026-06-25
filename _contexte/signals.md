@@ -4,6 +4,9 @@
 - [P1|ouvert] Tests utilisateurs AuDHD réels (Phase 7)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés dans un fichier dédié
   - réf: `roadmap.md` Phase 7
+- [P1|ouvert] Valider fix scroll latéral mobile en build prod
+  - fait quand: build prod lancé, DevResetButton absent, scroll latéral absent sur iOS Safari
+  - réf: `src/index.css` — overflow-x: clip sur html/body
 
 ## Questions ouvertes
 
@@ -13,36 +16,28 @@
 
 ## Contexte chaud
 - Phase 6 close — MVP stable, 46/46 E2E Playwright + 241 tests Vitest (99.34%), validé mobile physique
-- UX polish réalisée : drag-and-drop E22, braille dots, boutons retour harmonisés, fix navigation taskDetailOrigin
-- Tous les écrans ont désormais le même pattern "← Retour" en haut (bouton natif, aria-label="Retour")
+- Fix scroll latéral : overflow-x: clip posé, mais à revalider sans le bouton dev (position:fixed top-right qui déborde lui aussi)
 
 ## Dernière session (2026-06-25)
 
-# Session du 2026-06-25 — polish UX post-Phase 6
+# Session du 2026-06-25 — fix scroll latéral mobile
 
 ## Décisions prises
-- Drag-and-drop des sous-tâches dans E22 (pas E23 — E23 sert à la décomposition)
-- taskDetailOrigin dans AppContext pour mémoriser l'écran d'origine et corriger la navigation retour
-- Bouton supprimer (×) à droite des sous-tâches E22 (remplace la checkbox)
-- Harmonisation boutons "← Retour" en haut sur tous les écrans (pattern E22 comme référence)
-- "Terminer" et "Supprimer" conservés tous les deux dans E22 (fonctions distinctes)
+- `overflow-x: clip` sur html/body : bloque le scroll latéral causé par le sr-only de dnd-kit (-1px hors viewport). À valider en build prod sans le bouton dev.
 
 ## Livrables produits ou modifiés
-- `src/ui/screens/dashboard/E10Dashboard.tsx` : braille dots ⠿ sur cartes + setTaskDetailOrigin
-- `src/ui/screens/tasks/E22TaskDetail.tsx` : DnD sous-tâches, bouton ×, fix retour taskDetailOrigin, refreshDashboard
-- `src/ui/screens/tasks/E23Decompose.tsx` : braille dots ⠿ sur sous-tâches
-- `src/app/AppContext.tsx` : taskDetailOrigin state + setTaskDetailOrigin exposé
-- `src/test/testUtils.tsx` : taskDetailOrigin + setTaskDetailOrigin dans makeAppContext
-- `src/ui/screens/settings/E110–E117` : bouton "← Retour" déplacé en haut
-- `src/ui/screens/energy/E30–E31` : bouton "← Retour" déplacé en haut
-- `src/ui/screens/settings/E110–E117.test.tsx` : getByRole au lieu de getByText pour Retour
+- `src/index.css` : overflow-x: clip sur html et body (remplace overflow-x: hidden + max-width)
+- `src/main.tsx` : outil de debug débordement ajouté puis retiré (propre)
 
 ## Hypothèses validées / invalidées
-- VALIDE : pattern taskDetailOrigin minimal suffit pour corriger la navigation retour sans refacto du routeur
-- VALIDE : refreshDashboard() après deleteSubTask corrige l'affichage périmé dans E10
+- INVALIDE : overflow-x: hidden suffit → ne bloque pas les enfants position:fixed/absolute
+- VALIDE : overflow-x: clip contraint aussi les enfants fixed/absolute — résout le cas dnd-kit sr-only
+- EN ATTENTE : validation en build prod (sans DevResetButton)
 
 ## Prochaine étape exacte
-Phase 7 — Recruter 5 à 10 utilisateurs AuDHD réels, organiser les sessions de test, documenter les frictions.
+1. Passer l'app en build prod et retirer l'affichage dev (DevResetButton)
+2. Tester le scroll latéral sur mobile en prod pour confirmer le fix
+3. Démarrer Phase 7 : recruter 5 à 10 utilisateurs AuDHD réels
 
 ## Question bloquante pour la session suivante
-Aucune
+Le scroll latéral est-il résolu en mode prod sans le bouton dev ?

@@ -1,3 +1,10 @@
+## v0.13 — 2026-06-25
+
+### Corrigé
+- Scroll latéral mobile : `overflow-x: clip` sur html/body — neutralise le débordement du sr-only dnd-kit (-1px) que `overflow-x: hidden` ne bloquait pas
+
+---
+
 ## v0.12 — 2026-06-25
 
 ### Ajouté

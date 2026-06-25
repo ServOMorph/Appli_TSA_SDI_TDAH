@@ -88,8 +88,10 @@ html[data-stimulation="dynamic"] {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
+  overflow-x: clip;
   background: var(--color-background);
 }
 

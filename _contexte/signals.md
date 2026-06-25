@@ -4,9 +4,9 @@
 - [P1|ouvert] Tests utilisateurs AuDHD réels (Phase 7)
   - fait quand: 5 à 10 sessions de test réalisées, résultats documentés dans un fichier dédié
   - réf: `roadmap.md` Phase 7
-- [P1|ouvert] Valider E2E Playwright après refacto dashboard
+- [P1|ouvert] Valider E2E Playwright après refacto dashboard + renommage "souffle"
   - fait quand: `npm run test:e2e` passe 46/46
-  - réf: `e2e/` — libellés mis à jour (Tableau de bord → Appli pour AuDHD, Mon énergie → pill, Activer mode surcharge → Activer le mode surcharge)
+  - réf: `e2e/` — libellés mis à jour (cuillères → souffle dans 03-energy.spec.ts)
 - [P2|ouvert] Fix test préexistant `E22TaskDetail > affiche les sous-étapes chargées`
   - fait quand: test passe dans `npm run test`
   - réf: `src/ui/screens/tasks/E22TaskDetail.test.tsx` — lié aux modifs non commitées de subTaskRepository / actionImmediateRules (hors refacto UI)
@@ -21,34 +21,35 @@
 - Dashboard refactorisé : TopBar (nom + pill énergie + pill surcharge + roue ⚙), nav compactée (1 bouton + rangée segmentée 3 sections)
 - Fix scroll latéral validé en build prod (overflow-x: clip, DevResetButton absent) ✅
 - run_dev.py / run_prod.py (+ --host) disponibles à la racine
+- "cuillères" renommé "souffle" partout dans l'UI et les tests E2E
 
 ## Dernière session (2026-06-25)
 
-# Session du 2026-06-25 — refacto dashboard UI + outils de lancement
+# Session du 2026-06-25 — UX polish : padding, polices, terme "souffle", bug sous-tâche
 
 ## Décisions prises
-- Dashboard sans scroll : TopBar (titre « Appli pour AuDHD » + roue ⚙ + pills énergie/surcharge) + nav segmentée (Inbox / Aujourd'hui / Plus tard) remplace les 7 boutons empilés
-- `run_dev.py` / `run_prod.py` remplacent `run.py` pour lancer dev et prod séparément avec `--host`
-- Fix scroll latéral validé en build prod (overflow-x: clip, DevResetButton absent) ✅
+- "cuillères" remplacé par "souffle" comme terme pour l'énergie (court, compréhensible, inventé)
+- Padding "Que faire maintenant?" réduit de 24px → 12px (--spacing-12 ajouté à index.css)
+- Police et padding des items "Tâches du jour" réduits (0.75rem, var(--spacing-xs))
+- Bug fix : addSubTask() appelle loadAll() → todaySubTasksMap actualisé → sous-tâche visible dans "Que faire maintenant?" après décomposition
 
 ## Livrables produits ou modifiés
-- `src/ui/components/TopBar.tsx` : nouveau composant (titre, pill énergie, pill surcharge, roue ⚙)
-- `src/ui/screens/dashboard/E10Dashboard.tsx` : refacto complète (TopBar, nav segmentée, marginTop auto)
-- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : tests adaptés (26/26)
-- `e2e/*.spec.ts` + `e2e/helpers/reset.ts` : libellés remappés (Tableau de bord, Mon énergie, Activer mode surcharge)
-- `src/app/AppContext.tsx` : fix TS `taskId` → `_taskId`
-- `run_dev.py` / `run_prod.py` : scripts de lancement avec `--host`
-- `SERVEURS.md` : liens localhost PC + mobile
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : padding Card réduit, SortableTaskItem redesigné, label "souffle"
+- `src/ui/screens/energy/E30EnergyView.tsx` : "cuillères" → "souffle"
+- `src/ui/screens/energy/E31EnergyCheckIn.tsx` : "cuillères" → "souffle"
+- `src/ui/screens/onboarding/E03Energy.tsx` : "cuillères" → "souffle"
+- `src/app/AppContext.tsx` : addSubTask() + await loadAll() (bug fix)
+- `src/index.css` : --spacing-12: 12px ajouté
+- `e2e/03-energy.spec.ts` : libellés "cuillères" → "souffle"
 
 ## Hypothèses validées / invalidées
-- VALIDE : fix scroll latéral (overflow-x: clip) confirmé en build prod sans DevResetButton
-- VALIDE : dashboard tient sans scroll avec TopBar + nav segmentée
-- EN ATTENTE : E2E Playwright 46/46 à relancer sur le build prod (libellés mis à jour)
+- VALIDE : loadAll() dans addSubTask résout l'absence de sous-tâche dans "Que faire maintenant?"
+- EN ATTENTE : E2E Playwright 46/46 à relancer (libellés "souffle" mis à jour)
 
 ## Prochaine étape exacte
-1. Lancer `npm run test:e2e` pour valider les 46 E2E avec les nouveaux libellés
-2. Corriger le test préexistant E22TaskDetail (subTaskRepository)
-3. Démarrer Phase 7 : recruter 5 à 10 utilisateurs AuDHD réels
+1. Lancer `npm run test:e2e` pour valider les 46 E2E
+2. Corriger le test E22TaskDetail (subTaskRepository)
+3. Démarrer Phase 7
 
 ## Question bloquante pour la session suivante
 Aucune

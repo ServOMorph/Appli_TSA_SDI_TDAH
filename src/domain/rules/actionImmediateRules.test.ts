@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { getActionImmediate } from './actionImmediateRules'
 import type { Task } from '@/domain/entities/task'
+import type { SubTask } from '@/domain/entities/subTask'
 
 const mockTask = (overrides?: Partial<Task>): Task => ({
   id: 'task-1',
@@ -10,6 +11,15 @@ const mockTask = (overrides?: Partial<Task>): Task => ({
   created_at: '2026-06-24T00:00:00Z',
   updated_at: '2026-06-24T00:00:00Z',
   completed_at: null,
+  ...overrides,
+})
+
+const mockSubTask = (overrides?: Partial<SubTask>): SubTask => ({
+  id: 'st-1',
+  task_id: 'task-1',
+  title: 'Sous-tâche',
+  is_completed: false,
+  position: 0,
   ...overrides,
 })
 
@@ -44,6 +54,48 @@ describe('actionImmediateRules', () => {
     it('returns empty when list empty', () => {
       const result = getActionImmediate([])
       expect(result.type).toBe('empty')
+    })
+
+    it('returns nextSubTask when task has incomplete subtasks', () => {
+      const task = mockTask({ id: 'task-1' })
+      const subTasksMap = {
+        'task-1': [
+          mockSubTask({ id: 'st-1', position: 0, is_completed: true }),
+          mockSubTask({ id: 'st-2', position: 1, is_completed: false }),
+          mockSubTask({ id: 'st-3', position: 2, is_completed: false }),
+        ],
+      }
+      const result = getActionImmediate([task], subTasksMap)
+      expect(result.nextSubTask?.id).toBe('st-2')
+    })
+
+    it('returns no nextSubTask when all subtasks completed', () => {
+      const task = mockTask({ id: 'task-1' })
+      const subTasksMap = {
+        'task-1': [
+          mockSubTask({ id: 'st-1', is_completed: true }),
+        ],
+      }
+      const result = getActionImmediate([task], subTasksMap)
+      expect(result.nextSubTask).toBeUndefined()
+    })
+
+    it('returns no nextSubTask when task has no subtasks', () => {
+      const task = mockTask({ id: 'task-1' })
+      const result = getActionImmediate([task], {})
+      expect(result.nextSubTask).toBeUndefined()
+    })
+
+    it('returns nextSubTask by position order', () => {
+      const task = mockTask({ id: 'task-1' })
+      const subTasksMap = {
+        'task-1': [
+          mockSubTask({ id: 'st-b', position: 2, is_completed: false }),
+          mockSubTask({ id: 'st-a', position: 0, is_completed: false }),
+        ],
+      }
+      const result = getActionImmediate([task], subTasksMap)
+      expect(result.nextSubTask?.id).toBe('st-a')
     })
   })
 })

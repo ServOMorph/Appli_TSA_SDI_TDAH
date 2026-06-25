@@ -35,7 +35,7 @@ export function E03Energy() {
     >
       <div>
         <h1>Votre énergie aujourd'hui</h1>
-        <p>Combien de cuillères avez-vous aujourd'hui ?</p>
+        <p>Combien de souffle avez-vous aujourd'hui ?</p>
       </div>
       <div
         style={{

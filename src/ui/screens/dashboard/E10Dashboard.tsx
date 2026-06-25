@@ -62,19 +62,19 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
         cursor: 'grab',
       }}
     >
-      <Card style={{ padding: 'var(--spacing-md)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-          <span aria-hidden style={{ fontSize: '1rem', color: 'var(--color-text-muted)', flexShrink: 0, lineHeight: 1 }}>⠿</span>
+      <Card style={{ padding: 'var(--spacing-xs)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+          <span aria-hidden style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', flexShrink: 0, lineHeight: 1 }}>⠿</span>
           <button
             onClick={(e) => { e.stopPropagation(); onOpen(task.id) }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', fontSize: '1rem', padding: 0, textAlign: 'left', flex: 1 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', fontSize: '0.75rem', padding: 0, textAlign: 'left', flex: 1 }}
           >
             {task.title}
           </button>
           {total > 0 && (
             <span
               aria-label={`${done} sur ${total} étapes`}
-              style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', flexShrink: 0 }}
+              style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', flexShrink: 0 }}
             >
               {done}/{total}
             </span>
@@ -121,13 +121,13 @@ export function E10Dashboard() {
 
   const energyLabel =
     todayEnergyStatus === 'filled' && todayEnergy !== null
-      ? `${todayEnergy} cuillères`
+      ? `${todayEnergy} souffle`
       : todayEnergyStatus === 'skipped'
         ? 'Énergie ignorée'
         : 'Mon énergie'
   const energyAriaLabel =
     todayEnergyStatus === 'filled' && todayEnergy !== null
-      ? `${todayEnergy} cuillères aujourd'hui`
+      ? `${todayEnergy} souffle aujourd'hui`
       : todayEnergyStatus === 'skipped'
         ? 'Énergie ignorée aujourd\'hui'
         : 'Renseigner mon énergie'
@@ -199,7 +199,7 @@ export function E10Dashboard() {
 
       <section aria-label="Action immédiate">
         <h2>Que faire maintenant ?</h2>
-        <Card>
+        <Card style={{ padding: 'var(--spacing-12)' }}>
           {action.type === 'task' && action.task ? (
             <button
               onClick={() => openDetail(action.task!.id)}

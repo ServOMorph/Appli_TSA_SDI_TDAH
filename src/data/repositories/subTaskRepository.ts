@@ -51,12 +51,20 @@ export class SubTaskRepository {
   }
 
   async getByTaskId(taskId: string): Promise<SubTask[]> {
-    const subTasks = await this.db.subTasks.where('task_id').equals(taskId).toArray()
+    const subTasks = await this.db.subTasks.where('task_id').equals(taskId).sortBy('position')
     return Promise.all(
       subTasks.map(async (st) => ({
         ...st,
         title: await this.decryptTitle(st.title),
       })),
     )
+  }
+
+  async reorder(ids: string[]): Promise<void> {
+    const subTasks = await Promise.all(ids.map((id) => this.db.subTasks.get(id)))
+    const filtered = subTasks.filter((st): st is SubTask => st !== undefined)
+    for (const [index, st] of filtered.entries()) {
+      await this.db.subTasks.put({ ...st, position: index })
+    }
   }
 }

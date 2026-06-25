@@ -62,7 +62,13 @@ export class TaskRepository {
   }
 
   async getTodayTasks(): Promise<Task[]> {
-    return this.getByStatus('today')
+    const tasks = await this.db.tasks.where('status').equals('today').sortBy('position')
+    return Promise.all(
+      tasks.map(async (task) => ({
+        ...task,
+        title: await this.decryptTitle(task.title),
+      })),
+    )
   }
 
   async reorder(ids: string[]): Promise<void> {

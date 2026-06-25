@@ -268,6 +268,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       position: existing.length,
     }
     await subTaskRepo.create(subTask)
+    await loadAll()
   }
 
   async function deleteSubTask(id: string) {

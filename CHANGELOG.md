@@ -1,3 +1,16 @@
+## v0.15 — 2026-06-25
+
+### Modifié
+- `E10Dashboard.tsx`, `E30EnergyView.tsx`, `E31EnergyCheckIn.tsx`, `E03Energy.tsx` : "cuillères" → "souffle" (terme énergie)
+- `e2e/03-energy.spec.ts` : libellés mis à jour ("cuillères" → "souffle")
+- `E10Dashboard.tsx` : padding Card "Que faire maintenant?" 24px → 12px ; SortableTaskItem police 0.75rem + spacing-xs
+- `src/index.css` : --spacing-12: 12px ajouté
+
+### Corrigé
+- `AppContext.tsx` : addSubTask() — await loadAll() ajouté → todaySubTasksMap rafraîchi après décomposition d'une tâche
+
+---
+
 ## v0.14 — 2026-06-25
 
 ### Ajouté

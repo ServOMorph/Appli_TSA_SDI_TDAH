@@ -20,12 +20,12 @@ export function E30EnergyView() {
       return (
         <Card style={{ textAlign: 'center' }}>
           <p
-            aria-label={`${todayEnergy} cuillères aujourd'hui`}
+            aria-label={`${todayEnergy} souffle aujourd'hui`}
             style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}
           >
             {todayEnergy}
           </p>
-          <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0' }}>cuillères aujourd'hui</p>
+          <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0' }}>souffle aujourd'hui</p>
         </Card>
       )
     }

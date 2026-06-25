@@ -18,10 +18,10 @@ describe('E30EnergyView', () => {
   })
 
   describe('état filled', () => {
-    it('affiche le nombre de cuillères', () => {
+    it('affiche le nombre de souffle', () => {
       const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
       renderWithApp(<E30EnergyView />, ctx)
-      expect(screen.getByLabelText(/7 cuillères/i)).toBeDefined()
+      expect(screen.getByLabelText(/7 souffle/i)).toBeDefined()
     })
 
     it('affiche le bouton "Modifier"', () => {

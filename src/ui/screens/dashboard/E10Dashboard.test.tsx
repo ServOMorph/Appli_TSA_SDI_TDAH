@@ -71,14 +71,14 @@ describe('E10Dashboard', () => {
       expect(screen.getAllByText('Tâche B').length).toBeGreaterThan(0)
     })
 
-    it('affiche les cuillères si énergie renseignée', () => {
+    it('affiche le souffle si énergie renseignée', () => {
       const ctx = makeAppContext({
         todayEnergy: 7,
         todayEnergyStatus: 'filled',
         todayTasks: [makeTask()],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByLabelText(/7 cuillères/i)).toBeDefined()
+      expect(screen.getByLabelText(/7 souffle/i)).toBeDefined()
     })
 
     it('limite l\'affichage à 3 tâches', () => {
@@ -186,10 +186,10 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
     })
 
-    it('clic sur badge cuillères navigue vers energy-view', async () => {
+    it('clic sur badge souffle navigue vers energy-view', async () => {
       const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByLabelText(/7 cuillères/i))
+      await userEvent.click(screen.getByLabelText(/7 souffle/i))
       expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
     })
 

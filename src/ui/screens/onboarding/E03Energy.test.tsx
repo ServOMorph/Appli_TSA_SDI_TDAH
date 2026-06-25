@@ -5,9 +5,9 @@ import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E03Energy } from './E03Energy'
 
 describe('E03Energy', () => {
-  it('affiche la question des cuillères', () => {
+  it('affiche la question du souffle', () => {
     renderWithApp(<E03Energy />)
-    expect(screen.getByText(/combien de cuillères/i)).toBeDefined()
+    expect(screen.getByText(/combien de souffle/i)).toBeDefined()
   })
 
   it('affiche les 10 options numériques', () => {

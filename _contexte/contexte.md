@@ -12,10 +12,9 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 6 close. MVP stable : 253 tests Vitest (252 passent — 1 préexistant E22 à corriger), 46 E2E Playwright (à relancer — libellés "cuillères" → "souffle" mis à jour). Dashboard refactorisé + polish UX (padding réduit, polices réduites). Bug fix addSubTask → loadAll(). Terme énergie = "souffle". Phase 7 à démarrer.
+Phase 6 close. MVP stable : 253 tests Vitest passent, 46 scénarios E2E Playwright passent avec preview manuel. Dashboard refactorisé + polish UX validés. Terme énergie = "souffle". À vérifier : orchestration `npm run test:e2e` sans serveur manuel. Phase 7 à démarrer.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
-- 2026-06-25 : liaison énergie ↔ Action immédiate reportée en V2 (doc User Flows §9). Génération auto sous-tâches post-V1.
 - 2026-06-25 : Phase 5 complète — E90/E110–E117, Settings DOM, export RGPD, 232 tests, 22 tests manuels ok.
 - 2026-06-25 : E90 simplifié — "Retour au dashboard" supprimé (boucle sans issue), seul "Désactiver" disponible.
 - 2026-06-25 : Phase 6 code complète — audit architecture, 99.34% couverture, build PWA, erasableSyntaxOnly fix, offline validé.
@@ -25,3 +24,4 @@ Phase 6 close. MVP stable : 253 tests Vitest (252 passent — 1 préexistant E22
 - 2026-06-25 : Dashboard refactorisé sans scroll — TopBar (titre « Appli pour AuDHD », ⚙ réglages, pill énergie, pill surcharge) + nav segmentée (Inbox / Aujourd'hui / Plus tard). Remplace les 7 boutons empilés.
 - 2026-06-25 : "cuillères" renommé "souffle" — terme inventé, court, compréhensible, sans référence théorique (spoon theory).
 - 2026-06-25 : Bug fix addSubTask() — await loadAll() ajouté → todaySubTasksMap rafraîchi → sous-tâche visible dans "Que faire maintenant?" après décomposition.
+- 2026-06-25 : Vitest limité aux tests `src/` ; les specs `e2e/` sont réservées au runner Playwright.

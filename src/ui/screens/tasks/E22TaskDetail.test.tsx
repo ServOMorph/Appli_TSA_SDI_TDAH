@@ -53,7 +53,7 @@ describe('E22TaskDetail', () => {
     })
     renderWithApp(<E22TaskDetail />, ctx)
     await waitFor(() => {
-      expect(screen.getByLabelText('Prendre le téléphone')).toBeDefined()
+      expect(screen.getByText('Prendre le téléphone')).toBeDefined()
     })
   })
 

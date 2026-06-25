@@ -1,3 +1,17 @@
+## v0.16 — 2026-06-25
+
+### Corrigé
+- `E22TaskDetail.test.tsx` : assertion sous-étape alignée sur l'item drag-and-drop visible
+- `E10Dashboard.test.tsx`, `E30EnergyView.test.tsx`, `E03Energy.test.tsx` : assertions restantes "cuillères" → "souffle"
+- `vitest.config.ts` : Vitest limité aux tests `src/` pour exclure les specs Playwright `e2e/`
+- `.claude/commands/start.md`, `.claude/commands/close.md` : détection des fichiers `roadmap*.md`
+
+### Validé
+- `npm run test` : 253/253 tests passent
+- E2E Playwright : 46/46 scénarios passent avec preview lancé manuellement
+
+---
+
 ## v0.15 — 2026-06-25
 
 ### Modifié

@@ -106,7 +106,7 @@ Réf : `_docs/docs de dev/6- MODÈLE DE DONNÉES & ARCHITECTURE BACKEND.md` §26
 - [x] **Test manuel** : parcours bout-en-bout hors ligne, desktop (Playwright) + mobile physique réel
 - [x] **Sortie** : MVP stable, couvert à 99.34 %, fonctionnel hors ligne
 
-## [ ] Phase 7 — Tests utilisateurs AuDHD
+## [~] Phase 7 — Tests utilisateurs AuDHD
 
 Réf : `_docs/docs de dev/4- WIREFRAMES BASSE FIDÉLITÉ.md` §23.
 

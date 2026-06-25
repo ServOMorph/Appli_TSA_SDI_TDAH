@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 6 close — MVP stable et validé. Dashboard refactorisé sans scroll : TopBar (titre « Appli pour AuDHD », ressources, réglages, pills énergie/surcharge) + nav segmentée. Écran ressources E120 ajouté : fondements de conception, mode d’emploi, liens utiles en attente. 259 tests Vitest passent. Les 46 scénarios E2E Playwright passent via `npm run test:e2e`. Phase 7 à démarrer : sessions de test avec utilisateurs AuDHD réels.
+Phase 6 close — MVP stable et validé. 259 tests Vitest passent. Les 46 scénarios E2E Playwright passent via `npm run test:e2e`. Phase 7 démarrée côté préparation : premier testeur distant identifié, test prévu via lien Netlify manuel, avec données conservées localement dans le navigateur du testeur.
 
 ## Stack
 
@@ -51,7 +51,7 @@ roadmap.md   — Roadmap 15 phases (MVP → V1 → V2)
 
 ## Prochaine étape
 
-Phase 7 — Tests utilisateurs AuDHD réels : 5 à 10 sessions avec le public cible, documentation des frictions, backlog d'ajustements pré-V1.
+Phase 7 — Déposer `dist/` sur Netlify, envoyer le lien au testeur distant, conduire la session avec observation accompagnée, puis documenter frictions et ajustements pré-V1.
 
 ## Licence
 

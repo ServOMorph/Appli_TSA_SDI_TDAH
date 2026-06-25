@@ -12,13 +12,13 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 6 close. MVP stable : 259 tests Vitest passent, 46 scénarios E2E Playwright passent via `npm run test:e2e` sans serveur manuel.
-Dashboard refactorisé + ressources E120 ajoutées : fondements de conception, mode d’emploi, liens utiles en attente.
-Terme énergie = "souffle". `npm run lint`, `npm run build`, `npm run test` et `npm run test:e2e` passent.
-Phase 7 à démarrer : tests utilisateurs AuDHD réels.
+Phase 6 close. MVP stable : 259 tests Vitest passent, 46 scénarios E2E Playwright passent via `npm run test:e2e`.
+Phase 7 démarrée côté préparation : premier testeur distant identifié, consignes de test et confidentialité cadrées.
+Déploiement test prévu via Netlify manuel : `npm run build` passe et régénère `dist/`.
+Les données testeur restent locales dans son navigateur ; aucune collecte automatique.
+Connexion Google écartée du périmètre immédiat, à réévaluer avec la sync V2.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
-- 2026-06-25 : Phase 6 code complète — audit architecture, 99.34% couverture, build PWA, erasableSyntaxOnly fix, offline validé.
 - 2026-06-25 : Tests E2E Playwright adoptés (46/46, 12.7s) — remplacent les tests manuels desktop.
 - 2026-06-25 : Phase 6 close — flux validés mobile physique. crypto.randomUUID() remplacé par fallback getRandomValues (non-secure context HTTP).
 - 2026-06-25 : overflow-x: clip sur html/body — bloque scroll latéral mobile (sr-only dnd-kit à -1px). Validé en prod ✅
@@ -28,3 +28,4 @@ Phase 7 à démarrer : tests utilisateurs AuDHD réels.
 - 2026-06-25 : Vitest limité aux tests `src/` ; les specs `e2e/` sont réservées au runner Playwright.
 - 2026-06-25 : E120Resources ajouté — écran ressources depuis dashboard, avec fondements de conception, mode d’emploi et liens utiles en attente.
 - 2026-06-25 : Orchestration `npm run test:e2e` validée — build + preview Playwright + 46/46 sans serveur manuel.
+- 2026-06-25 : Phase 7 démarre par test distant — déploiement manuel Netlify, observation accompagnée, données locales navigateur.

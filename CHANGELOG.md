@@ -1,3 +1,14 @@
+## v0.18 — 2026-06-25
+
+### Modifié
+- `_contexte/`, `README.md` : clôture session Phase 7 mise à jour autour du test utilisateur distant
+- Décision actée : connexion Google hors périmètre immédiat, à réévaluer avec la sync V2
+
+### Validé
+- `npm run build` : build production OK et dossier `dist/` régénéré pour dépôt manuel Netlify
+
+---
+
 ## v0.17 — 2026-06-25
 
 ### Ajouté

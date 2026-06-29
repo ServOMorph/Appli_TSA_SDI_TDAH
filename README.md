@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 et V2-1 closes (2026-06-29). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). Vocabulaire UI aligné : énergie / Todo / À faire plus tard. Tests 259/259. Prochaine étape : V2-2 (modèle de données Dexie v2).
+V2 en cours sur branche `v2` — Phases V2-0, V2-1, V2-2 closes (2026-06-29). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). Vocabulaire UI aligné. Schéma Dexie v2 (TaskV2, List, Routine) parallèle à v1. Tests 301/301. Prochaine étape : V2-3 (écran ajout 3 destinations).
 
 ## Stack
 

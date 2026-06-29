@@ -1,3 +1,21 @@
+## v0.22 — 2026-06-29
+
+### Ajouté
+- `TaskV2`, `List`, `ListItem`, `Routine`, `RoutineStep` : entités domaine v2.
+- `taskRulesV2.ts` : règles métier v2 (createTaskV2, scheduleTaskV2, completeTaskV2, moveTaskToLaterV2, toggleEssentialV2).
+- Repositories v2 : `TaskV2Repository`, `ListRepository`, `ListItemRepository`, `RoutineRepository`, `RoutineStepRepository`.
+- `_contexte/archive_decisions.md` : archive des décisions 2026-06-25 déplacées hors de `contexte.md`.
+
+### Modifié
+- `db.ts` : version(2) + tables v2 en parallèle de v1 (sans breaking change).
+- `roadmap_v2.md` : Phase V2-2 cochée [x].
+- `_contexte/signals.md`, `contexte.md`, `README.md` : état V2-2 close, V2-3 prochaine.
+
+### Infrastructure
+- Tests : 301/301 ✓ (42 fichiers test, dont 5 fichiers V2 nouveaux).
+
+---
+
 ## v0.21 — 2026-06-29
 
 ### Ajouté

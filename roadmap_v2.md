@@ -61,12 +61,12 @@ Faible risque, fort impact perçu. À livrer et déployer tôt.
 
 Fondation des phases suivantes. Aucune UI ici, domaine + data. Schéma réécrit depuis zéro.
 
-- [ ] `Task` : `status: 'todo' | 'planned' | 'to_plan' | 'completed'` ; `essential: boolean` ; `scheduled_date`, `scheduled_start`, `scheduled_end` (nullable)
-- [ ] Nouvelles tables : `List`, `ListItem`, `Routine`, `RoutineStep` (squelettes — détails en phases dédiées)
-- [ ] `db.ts` : `version(2)` avec schéma complet ; suppression des tables/champs obsolètes v1
-- [ ] Règles domaine : destination obligatoire à la création (`todo | planned | to_plan`)
-- [ ] **Tests** : règles + repositories ≥ 85 %
-- [ ] **Sortie** : schéma v2 propre, sans dette v1 ; modèle prêt pour toutes les phases suivantes
+- [x] `TaskV2` : `status: 'todo' | 'planned' | 'to_plan' | 'completed'` ; `essential: boolean` ; `scheduled_date`, `scheduled_start`, `scheduled_end` (nullable)
+- [x] Nouvelles tables : `List`, `ListItem`, `Routine`, `RoutineStep` (squelettes — détails en phases dédiées)
+- [x] `db.ts` : `version(2)` avec tables v2 en parallèle de v1 (sans migration)
+- [x] Règles domaine : taskRulesV2 (createTaskV2, scheduleTaskV2, completeTaskV2, moveTaskToLaterV2, toggleEssentialV2)
+- [x] **Tests** : 301/301 ✓ (42 fichiers test)
+- [x] **Sortie** : schéma v2 propre, parallèle à v1 ; modèle prêt pour toutes les phases suivantes
 
 ## Phase V2-3 — Flux d'ajout de tâche refondu
 

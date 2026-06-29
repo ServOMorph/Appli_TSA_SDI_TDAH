@@ -1,3 +1,19 @@
+## v0.21 — 2026-06-29
+
+### Ajouté
+- `dist_v1/` : archive build V1 pour rollback immédiat.
+
+### Modifié
+- Vocabulaire UI V2-1 : "souffle" → "énergie", "Inbox" → "Todo", "Plus tard" → "À faire plus tard" (8 composants, 6 fichiers de tests).
+- `roadmap_v2.md` : Phases V2-0 et V2-1 cochées [x].
+- `_contexte/signals.md`, `contexte.md`, `README.md` : état V2 en cours mis à jour.
+
+### Infrastructure
+- Tag `v1.0-mvp` posé sur le dernier commit `main`.
+- Branche `v2` créée depuis `main`.
+
+---
+
 ## v0.20 — 2026-06-29
 
 ### Ajouté

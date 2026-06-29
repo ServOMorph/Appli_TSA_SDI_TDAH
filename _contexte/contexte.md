@@ -12,11 +12,10 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 7 en cours : première session test avec Marie complétée (2026-06-29, 35 min, Netlify fonctionnel).
-Retours utilisateur documentés et analysés ; `roadmap_v2.md` créée (11 phases).
-V2 prête à démarrer : Phase V2-0 (tag + branche + archive dist) est la prochaine action.
-Marie accepte le reset données ; schéma Dexie v2 peut repartir proprement sans contrainte de compatibilité.
-MVP V1 stable archivé : `Archives/roadmap_v1.md`, tag `v1.0-mvp` à poser en V2-0.
+V2 démarrée sur branche `v2` : Phases V2-0 et V2-1 closes (tag `v1.0-mvp`, `dist_v1/` archivé, vocabulaire UI aligné).
+Tests 259/259 ; rollback V1 opérationnel (`git checkout v1.0-mvp` + `dist_v1/`).
+Prochaine action : Phase V2-2 — réécriture schéma Dexie v2 (Task/List/Routine) sans dette V1.
+Maquettes Marie (dessins visio 2026-06-29) non encore reçues — nécessaires pour V2-4 et V2-9.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-25 : "cuillères" renommé "souffle" — terme inventé, court, compréhensible, sans référence théorique (spoon theory).
@@ -29,3 +28,5 @@ MVP V1 stable archivé : `Archives/roadmap_v1.md`, tag `v1.0-mvp` à poser en V2
 - 2026-06-29 : Session test Marie — Netlify déployé et fonctionnel ; retours documentés dans `Note de réunion/`.
 - 2026-06-29 : `roadmap_v2.md` créée (11 phases) ; `roadmap.md` archivé dans `Archives/roadmap_v1.md`.
 - 2026-06-29 : Reset données accepté par Marie — schéma Dexie v2 propre, sans migration de compatibilité v1.
+- 2026-06-29 : V2-0 close — tag `v1.0-mvp`, branche `v2`, `dist_v1/` archivé ; rollback V1 en une commande.
+- 2026-06-29 : V2-1 close — vocabulaire UI : souffle→énergie, Inbox→Todo, Plus tard→À faire plus tard (259/259 tests).

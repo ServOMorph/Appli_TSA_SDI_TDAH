@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-Phase 7 en cours — Première session test utilisateur réelle complétée avec Marie (2026-06-29, AuDHD). Netlify déployé et fonctionnel. Retours positifs et détaillés documentés dans `Note de réunion/`. `roadmap_v2.md` créée (11 phases pilotées par les retours Marie). V2 prête à démarrer (Phase V2-0 : tag + branche + archive dist). MVP V1 archivé dans `Archives/`.
+V2 en cours sur branche `v2` — Phases V2-0 et V2-1 closes (2026-06-29). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). Vocabulaire UI aligné : énergie / Todo / À faire plus tard. Tests 259/259. Prochaine étape : V2-2 (modèle de données Dexie v2).
 
 ## Stack
 

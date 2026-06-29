@@ -13,12 +13,17 @@ describe('AppDatabase', () => {
     expect(db.users).toBeDefined()
     expect(db.tasks).toBeDefined()
     expect(db.subTasks).toBeDefined()
+    expect(db.tasksV2).toBeDefined()
+    expect(db.lists).toBeDefined()
+    expect(db.listItems).toBeDefined()
+    expect(db.routines).toBeDefined()
+    expect(db.routineSteps).toBeDefined()
     expect(db.energyEntries).toBeDefined()
     expect(db.settings).toBeDefined()
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(1)
+    expect(db.verno).toBe(2)
   })
 
   it('creates and retrieves users', async () => {

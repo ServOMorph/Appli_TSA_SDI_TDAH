@@ -51,7 +51,7 @@ describe('E20Inbox', () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
       const ctx = makeAppContext({ inboxTasks: [task] })
       renderWithApp(<E20Inbox />, ctx)
-      await userEvent.click(screen.getByLabelText("Déplacer Lire livre vers Plus tard"))
+      await userEvent.click(screen.getByLabelText("Déplacer Lire livre vers À faire plus tard"))
       expect(ctx.moveTask).toHaveBeenCalledWith('abc', 'later')
     })
 

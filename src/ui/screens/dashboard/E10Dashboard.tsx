@@ -166,13 +166,13 @@ export function E10Dashboard() {
 
   const energyLabel =
     todayEnergyStatus === 'filled' && todayEnergy !== null
-      ? `${todayEnergy} souffle`
+      ? `${todayEnergy} énergie`
       : todayEnergyStatus === 'skipped'
         ? 'Énergie ignorée'
         : 'Mon énergie'
   const energyAriaLabel =
     todayEnergyStatus === 'filled' && todayEnergy !== null
-      ? `${todayEnergy} souffle aujourd'hui`
+      ? `${todayEnergy} énergie aujourd'hui`
       : todayEnergyStatus === 'skipped'
         ? "Énergie ignorée aujourd'hui"
         : 'Renseigner mon énergie'
@@ -356,13 +356,13 @@ export function E10Dashboard() {
           }}
         >
           <button onClick={() => goTo('inbox')} style={segmentStyle(false)}>
-            Inbox
+            Todo
           </button>
           <button onClick={() => goTo('today')} style={segmentStyle(true)}>
             Aujourd'hui
           </button>
           <button onClick={() => goTo('later')} style={segmentStyle(true)}>
-            Plus tard
+            À faire plus tard
           </button>
         </div>
       </nav>

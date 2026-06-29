@@ -49,7 +49,7 @@ export function E31EnergyCheckIn() {
 
       <div>
         <h1>Mon énergie aujourd'hui</h1>
-        <p>Combien de souffle avez-vous aujourd'hui ?</p>
+        <p>Combien d'énergie avez-vous aujourd'hui ?</p>
       </div>
       <div
         style={{

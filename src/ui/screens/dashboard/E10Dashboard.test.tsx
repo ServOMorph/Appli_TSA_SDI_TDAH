@@ -71,14 +71,14 @@ describe('E10Dashboard', () => {
       expect(screen.getAllByText('Tâche B').length).toBeGreaterThan(0)
     })
 
-    it('affiche le souffle si énergie renseignée', () => {
+    it('affiche l\'énergie si énergie renseignée', () => {
       const ctx = makeAppContext({
         todayEnergy: 7,
         todayEnergyStatus: 'filled',
         todayTasks: [makeTask()],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByLabelText(/7 souffle/i)).toBeDefined()
+      expect(screen.getByLabelText(/7 énergie/i)).toBeDefined()
     })
 
     it("limite l'affichage à 3 tâches", () => {
@@ -191,10 +191,10 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
     })
 
-    it('clic sur badge souffle navigue vers energy-view', async () => {
+    it('clic sur badge énergie navigue vers energy-view', async () => {
       const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByLabelText(/7 souffle/i))
+      await userEvent.click(screen.getByLabelText(/7 énergie/i))
       expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
     })
 
@@ -242,11 +242,11 @@ describe('E10Dashboard', () => {
     it('navigue vers inbox / today / later via la nav segmentée', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Inbox' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
       expect(ctx.goTo).toHaveBeenCalledWith('inbox')
       await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
       expect(ctx.goTo).toHaveBeenCalledWith('today')
-      await userEvent.click(screen.getByRole('button', { name: 'Plus tard' }))
+      await userEvent.click(screen.getByRole('button', { name: 'À faire plus tard' }))
       expect(ctx.goTo).toHaveBeenCalledWith('later')
     })
   })

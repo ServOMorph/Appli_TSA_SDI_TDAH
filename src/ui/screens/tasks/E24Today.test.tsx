@@ -86,10 +86,10 @@ describe('E24Today', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
     })
 
-    it("Voir l'inbox navigue vers inbox", async () => {
+    it("Voir le Todo navigue vers inbox", async () => {
       const ctx = makeAppContext()
       renderWithApp(<E24Today />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: "Voir l'inbox" }))
+      await userEvent.click(screen.getByRole('button', { name: "Voir le Todo" }))
       expect(ctx.goTo).toHaveBeenCalledWith('inbox')
     })
   })

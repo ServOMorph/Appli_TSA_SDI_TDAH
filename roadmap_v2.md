@@ -50,10 +50,10 @@ Ce document redéfinit les termes par rapport à `roadmap.md` :
 
 Faible risque, fort impact perçu. À livrer et déployer tôt.
 
-- [ ] "Souffle" → "Batterie" / "Énergie" (libellés UI uniquement)
-- [ ] "Inbox" → "Todo" / "Choses à faire"
-- [ ] Suppression du libellé "Plus tard" (reformuler ou retirer la section)
-- [ ] **Tests** : composants impactés mis à jour
+- [x] "Souffle" → "Énergie" (libellés UI uniquement)
+- [x] "Inbox" → "Todo"
+- [x] "Plus tard" → "À faire plus tard" (reformulation)
+- [x] **Tests** : composants impactés mis à jour (259/259)
 - [ ] **Test manuel** : aucun terme "souffle/inbox/plus tard" résiduel dans l'UI
 - [ ] **Sortie** : vocabulaire aligné sur le public TSA
 

@@ -85,7 +85,7 @@ export function E24Today() {
       )}
 
       <Button variant="secondary" fullWidth onClick={() => goTo('inbox')}>
-        Voir l'inbox
+        Voir le Todo
       </Button>
     </main>
   )

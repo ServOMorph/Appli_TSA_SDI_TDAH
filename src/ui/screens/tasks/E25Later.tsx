@@ -76,7 +76,7 @@ export function E25Later() {
         ← Retour
       </button>
 
-      <h1 style={{ margin: 0 }}>Plus tard</h1>
+      <h1 style={{ margin: 0 }}>À faire plus tard</h1>
 
       {laterTasks.length === 0 ? (
         <p aria-live="polite">Aucune tâche reportée.</p>
@@ -105,7 +105,7 @@ export function E25Later() {
       )}
 
       <Button variant="secondary" fullWidth onClick={() => goTo('inbox')}>
-        Voir l'inbox
+        Voir le Todo
       </Button>
 
       {pendingMoveId && (

@@ -77,7 +77,7 @@ export function E20Inbox() {
         ← Retour
       </button>
 
-      <h1 style={{ margin: 0 }}>Inbox</h1>
+      <h1 style={{ margin: 0 }}>Todo</h1>
 
       {inboxTasks.length === 0 ? (
         <p aria-live="polite">Aucune tâche enregistrée.</p>
@@ -101,11 +101,11 @@ export function E20Inbox() {
                     Aujourd'hui
                   </button>
                   <button
-                    aria-label={`Déplacer ${task.title} vers Plus tard`}
+                    aria-label={`Déplacer ${task.title} vers À faire plus tard`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
                     onClick={() => moveTask(task.id, 'later')}
                   >
-                    Plus tard
+                    À faire plus tard
                   </button>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export function E20Inbox() {
           <div style={modalBox}>
             <h2 style={{ margin: 0 }}>Choisir la tâche à remplacer</h2>
             <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-              Vous avez déjà 3 tâches aujourd'hui. Sélectionnez celle à déplacer vers l'inbox :
+              Vous avez déjà 3 tâches aujourd'hui. Sélectionnez celle à déplacer vers le Todo :
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               {todayTasks.map((t) => (

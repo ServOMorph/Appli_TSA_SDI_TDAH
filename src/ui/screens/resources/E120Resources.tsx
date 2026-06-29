@@ -45,7 +45,7 @@ const foundations = [
   },
   {
     title: 'Traiter l’énergie comme une indication',
-    text: 'Le “souffle” est demandé comme repère du jour, pas comme mesure objective. La demande peut être ignorée, car l’auto-estimation de l’énergie peut être difficile, notamment en contexte d’alexithymie.',
+    text: "L’énergie est demandée comme repère du jour, pas comme mesure objective. La demande peut être ignorée, car l’auto-estimation de l’énergie peut être difficile, notamment en contexte d’alexithymie.",
   },
   {
     title: 'Prévoir la surcharge',
@@ -64,7 +64,7 @@ const guide = [
   },
   {
     title: 'Capturer sans organiser tout de suite',
-    text: 'Le bouton “Ajouter une tâche” permet de noter rapidement une idée. Une tâche peut ensuite rester dans l’inbox, être mise à Aujourd’hui ou être reportée à Plus tard.',
+    text: `Le bouton “Ajouter une tâche” permet de noter rapidement une idée. Une tâche peut ensuite rester dans le Todo, être mise à Aujourd’hui ou être reportée à faire plus tard.`,
   },
   {
     title: 'Limiter la journée',
@@ -75,8 +75,8 @@ const guide = [
     text: 'Depuis le détail d’une tâche, “Décomposer” sert à créer des sous-étapes. La prochaine sous-étape peut ensuite apparaître comme aide au démarrage.',
   },
   {
-    title: 'Indiquer son souffle si c’est utile',
-    text: 'Le souffle du jour peut être renseigné ou ignoré. L’ignorer n’a pas de conséquence punitive et l’application ne repropose pas automatiquement la question le même jour.',
+    title: "Indiquer son énergie si c’est utile",
+    text: "L’énergie du jour peut être renseignée ou ignorée. L’ignorer n’a pas de conséquence punitive et l’application ne repropose pas automatiquement la question le même jour.",
   },
   {
     title: 'Activer le mode surcharge',

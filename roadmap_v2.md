@@ -39,12 +39,12 @@ Ce document redéfinit les termes par rapport à `roadmap.md` :
 
 ## Phase V2-0 — Nettoyage racine & socle de bascule
 
-- [ ] Créer `Archives/` à la racine
-- [ ] Déplacer `roadmap.md` → `Archives/roadmap_v1.md`
-- [ ] Tag `v1.0-mvp` sur le commit actuel
-- [ ] Archive du `dist/` V1 (dossier `dist_v1/` ou zip)
-- [ ] Branche `v2` créée depuis `main`
-- [ ] **Sortie** : V1 restaurable en une commande (`git checkout v1.0-mvp` + redéploiement `dist/` archivé)
+- [x] Créer `Archives/` à la racine
+- [x] Déplacer `roadmap.md` → `Archives/roadmap_v1.md`
+- [x] Tag `v1.0-mvp` sur le commit actuel
+- [x] Archive du `dist/` V1 (dossier `dist_v1/`)
+- [x] Branche `v2` créée depuis `main`
+- [x] **Sortie** : V1 restaurable en une commande (`git checkout v1.0-mvp` + redéploiement `dist_v1/`)
 
 ## Phase V2-1 — Vocabulaire & quick wins
 

@@ -12,17 +12,13 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-Phase 6 close. MVP stable : 259 tests Vitest passent, 46 scénarios E2E Playwright passent via `npm run test:e2e`.
-Phase 7 démarrée côté préparation : premier testeur distant identifié, consignes de test et confidentialité cadrées.
-Onboarding ajusté pour le test : image de bienvenue dédiée, bouton `Entrer`, profils sans âges affichés.
-Déploiement test prévu via Netlify manuel : `npm run build` passe et régénère `dist/`.
-Les données testeur restent locales dans son navigateur ; aucune collecte automatique.
-Connexion Google écartée du périmètre immédiat, à réévaluer avec la sync V2.
+Phase 7 en cours : première session test avec Marie complétée (2026-06-29, 35 min, Netlify fonctionnel).
+Retours utilisateur documentés et analysés ; `roadmap_v2.md` créée (11 phases).
+V2 prête à démarrer : Phase V2-0 (tag + branche + archive dist) est la prochaine action.
+Marie accepte le reset données ; schéma Dexie v2 peut repartir proprement sans contrainte de compatibilité.
+MVP V1 stable archivé : `Archives/roadmap_v1.md`, tag `v1.0-mvp` à poser en V2-0.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
-- 2026-06-25 : Phase 6 close — flux validés mobile physique. crypto.randomUUID() remplacé par fallback getRandomValues (non-secure context HTTP).
-- 2026-06-25 : overflow-x: clip sur html/body — bloque scroll latéral mobile (sr-only dnd-kit à -1px). Validé en prod ✅
-- 2026-06-25 : Dashboard refactorisé sans scroll — TopBar (titre « Appli pour AuDHD », ⚙ réglages, pill énergie, pill surcharge) + nav segmentée (Inbox / Aujourd'hui / Plus tard). Remplace les 7 boutons empilés.
 - 2026-06-25 : "cuillères" renommé "souffle" — terme inventé, court, compréhensible, sans référence théorique (spoon theory).
 - 2026-06-25 : Bug fix addSubTask() — await loadAll() ajouté → todaySubTasksMap rafraîchi → sous-tâche visible dans "Que faire maintenant?" après décomposition.
 - 2026-06-25 : Vitest limité aux tests `src/` ; les specs `e2e/` sont réservées au runner Playwright.
@@ -30,3 +26,6 @@ Connexion Google écartée du périmètre immédiat, à réévaluer avec la sync
 - 2026-06-25 : Orchestration `npm run test:e2e` validée — build + preview Playwright + 46/46 sans serveur manuel.
 - 2026-06-25 : Phase 7 démarre par test distant — déploiement manuel Netlify, observation accompagnée, données locales navigateur.
 - 2026-06-25 : Onboarding ajusté pour test utilisateur — image bienvenue générée, bouton `Entrer`, profils sans âges affichés, écran mobile sans scroll vérifié.
+- 2026-06-29 : Session test Marie — Netlify déployé et fonctionnel ; retours documentés dans `Note de réunion/`.
+- 2026-06-29 : `roadmap_v2.md` créée (11 phases) ; `roadmap.md` archivé dans `Archives/roadmap_v1.md`.
+- 2026-06-29 : Reset données accepté par Marie — schéma Dexie v2 propre, sans migration de compatibilité v1.

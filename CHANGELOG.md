@@ -1,3 +1,17 @@
+## v0.20 — 2026-06-29
+
+### Ajouté
+- `roadmap_v2.md` : roadmap V2 complète (11 phases, pilotée par retours Marie).
+- `Archives/roadmap_v1.md` : roadmap V1 archivée.
+- `Note de réunion/synthese_reunion_marie_2026-06-29.md` : synthèse session test utilisateur.
+- `Note de réunion/analyse_conduite_visio_marie.md` : méthodo prochaines visios.
+
+### Modifié
+- `_contexte/signals.md`, `contexte.md` : état V2 prête à démarrer, reset données acté.
+- `README.md` : état actuel mis à jour (Phase 7 en cours, V2 cadrée).
+
+---
+
 ## v0.19 — 2026-06-25
 
 ### Ajouté

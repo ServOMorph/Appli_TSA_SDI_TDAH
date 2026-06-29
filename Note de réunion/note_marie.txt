@@ -1,0 +1,49 @@
+
+action à faire
+remplacer souffle par batterie
+renomme Inbox : en choses à faire
+supprimer plus tard
+
+
+message marie du 28/06/2026
+Ducoup j’ai regardé l’appli. 
+Déjà quand j’ai recliquer sur le lien j’ai pas eu besoin de refaire les étapes de la dernière fois ça m’a direct envoyer sur la page d’accueil donc ça c’est super.
+
+Mode surcharge je trouve l’idée super cool mais faudrait qu’il soit mis à disposition autrement on en parlera à la prochaine réunion.
+
+Les 3 truc en bas, je suis pas sûr d’avoir compris ce que c’était (inbox, aujourd’hui, plus tard)
+
+Je pense qu’il faudrait que les tâches à faire soient intégré à un planning. 
+On pourra en parler à la prochaine réunion mais faire que il y est des routines à compléter et les taches à faire aille se joindre à cette routine/planning les autistes aime faire les mêmes routines chaques jours. Donc par exemple dans la page de connexion il faudrait que on doive remplir notre routine personnalisé selon les semaine/week-end etc tu vois ou pas ? 
+Sinon j’adore l’idée, c’est fluide ça beug pas le design épuré j’adore
+
+
+note du 29/06/2026
+mode surcharge
+pastille mode surcharge : bouton mis en valeur 
+marie : va me dire plus tard ce qu'elle sent quand elle est en surcharge
+Marie peut évaluer la surcharge surtout le matin
+
+Choses à faire avec planning
+renomme Inbox : Todo
+
+Ajouter une tâche
+Todo (faire partie de la liste)
+Plannifié sous forme de case (une colonne par jour et une ligne par heure)
+Tableau sur calendrier
+
+Ajoute une tache
+Nom de la tache
+Mettre dans une liste
+Plannifié : affichage par jour sous forme de case 
+A plannifié plus tard
+
+planning d'aujourd'hui avec les heures (on peut scroll pour accéder aux autres heures) afficher à l'haure qu'on est
+
+icone agenda en haut qui permet d'avoir accès à l'agenda
+Dans A planifier sur tableau de bord on ajoute une pastille rouge quand y'a une tache à planifier.
+
+Quand on clique sur planifier on ouvre et on a la liste des tâches quand on clique dessus on ouvre le planning et on peut la planifier (avec plus rien)
+
+QUand on clique sur liste on ouvre un écran avec toutes les listes et on peut ajouter tâche directement et posisibilité d'ajouté une liste
+

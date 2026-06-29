@@ -1,0 +1,169 @@
+# Roadmap — V2 (refonte UX post-test Marie)
+
+Version : 2.1 — MAJ 2026-06-29 (reset données accepté par Marie)
+Source : `Note de réunion/` (synthèse + note_marie + maquettes dessinées + analyse visio)
+
+## Clarification de vocabulaire (prioritaire)
+
+Ce document redéfinit les termes par rapport à `roadmap.md` :
+
+- **V1** = le MVP actuellement déployé sur Netlify, testé par Marie (Phases 0-6 closes). Reste la base de retour arrière.
+- **V2** = la refonte UX décrite ici, pilotée par les retours utilisateurs réels (Phase 7).
+
+> Les anciennes phases 8-12 de `roadmap.md` (Routines, Social, Modèles sociaux, Event/notifications, Consolidation V1) sont **réordonnées et partiellement absorbées** par cette roadmap. Les Routines remontent en priorité (demande forte de Marie). Le Module social et les modèles sociaux restent reportés après la stabilisation V2.
+
+## Légende statut
+- `[ ]` non démarrée · `[~]` en cours · `[x]` terminée (gate validé)
+
+## Gate commun (rappel)
+1. Livrables fonctionnels · 2. Tests ≥ 85 % code ajouté · 3. Refacto fin de phase · 4. Doc à jour · 5. Test manuel parcours · 6. Critère de sortie atteint
+
+---
+
+## Stratégie de retour arrière
+
+**Marie a explicitement accepté un reset des données** : la contrainte de migration additive est levée. Le rollback ne concerne que le code.
+
+**Côté code** :
+- Taguer le commit V1 actuel : `git tag v1.0-mvp` (snapshot immuable).
+- Développer la V2 sur une branche dédiée `v2` ; `main` reste la V1 déployable jusqu'au basculement.
+- Conserver le `dist/` V1 (build Netlify) archivé pour redéploiement immédiat.
+- En cas de rollback : `git checkout v1.0-mvp` + redéployer le `dist/` archivé.
+
+**Côté données** :
+- Schéma Dexie v2 **réécrit proprement** (pas de migration de compatibilité v1).
+- L'utilisateur repart de zéro à la première ouverture de la V2 (onboarding rejoué).
+- Informer explicitement Marie avant le déploiement V2 : ses données V1 ne seront pas conservées.
+
+---
+
+## Phase V2-0 — Nettoyage racine & socle de bascule
+
+- [ ] Créer `Archives/` à la racine
+- [ ] Déplacer `roadmap.md` → `Archives/roadmap_v1.md`
+- [ ] Tag `v1.0-mvp` sur le commit actuel
+- [ ] Archive du `dist/` V1 (dossier `dist_v1/` ou zip)
+- [ ] Branche `v2` créée depuis `main`
+- [ ] **Sortie** : V1 restaurable en une commande (`git checkout v1.0-mvp` + redéploiement `dist/` archivé)
+
+## Phase V2-1 — Vocabulaire & quick wins
+
+Faible risque, fort impact perçu. À livrer et déployer tôt.
+
+- [ ] "Souffle" → "Batterie" / "Énergie" (libellés UI uniquement)
+- [ ] "Inbox" → "Todo" / "Choses à faire"
+- [ ] Suppression du libellé "Plus tard" (reformuler ou retirer la section)
+- [ ] **Tests** : composants impactés mis à jour
+- [ ] **Test manuel** : aucun terme "souffle/inbox/plus tard" résiduel dans l'UI
+- [ ] **Sortie** : vocabulaire aligné sur le public TSA
+
+## Phase V2-2 — Modèle de données v2 (schéma propre)
+
+Fondation des phases suivantes. Aucune UI ici, domaine + data. Schéma réécrit depuis zéro.
+
+- [ ] `Task` : `status: 'todo' | 'planned' | 'to_plan' | 'completed'` ; `essential: boolean` ; `scheduled_date`, `scheduled_start`, `scheduled_end` (nullable)
+- [ ] Nouvelles tables : `List`, `ListItem`, `Routine`, `RoutineStep` (squelettes — détails en phases dédiées)
+- [ ] `db.ts` : `version(2)` avec schéma complet ; suppression des tables/champs obsolètes v1
+- [ ] Règles domaine : destination obligatoire à la création (`todo | planned | to_plan`)
+- [ ] **Tests** : règles + repositories ≥ 85 %
+- [ ] **Sortie** : schéma v2 propre, sans dette v1 ; modèle prêt pour toutes les phases suivantes
+
+## Phase V2-3 — Flux d'ajout de tâche refondu
+
+- [ ] Écran ajout : nom + **choix obligatoire** entre 3 destinations (Todo / Planifier / À planifier plus tard)
+- [ ] Pas de destination par défaut (validation bloquée tant que non choisie)
+- [ ] "Planifier" → ouvre directement le planning pour caser la tâche
+- [ ] "À planifier plus tard" → entre dans la file d'attente
+- [ ] Option : associer la tâche à une liste
+- [ ] **Tests** + **Test manuel** : 3 chemins
+- [ ] **Sortie** : plus de tâche perdue dans un inbox ambigu
+
+## Phase V2-4 — Vue Planning (calendrier en cases)
+
+Maquette : capture 183750 (cases AUJOURD'HUI) + capture 184709 (planning hebdo réel de Marie).
+
+- [ ] Vue **par jour**, cases par heure (1 colonne jour, lignes heures)
+- [ ] Scroll vertical sur les heures ; ouverture **à l'heure courante**
+- [ ] Navigation jour précédent / suivant (flèches)
+- [ ] Icône agenda dans la barre du haut (accès direct)
+- [ ] Placement / déplacement d'une tâche dans une case
+- [ ] **Tests** + **Test manuel** : planifier, naviguer, scroller
+- [ ] **Sortie** : planning visuel utilisable, pas de liste texte type Google Agenda
+
+## Phase V2-5 — File "À planifier" séquentielle
+
+- [ ] Pastille rouge sur le tableau de bord si ≥ 1 tâche en attente (signal visuel, sans nombre)
+- [ ] Au clic : affichage de la 1re tâche → choix date/heure → tâche suivante
+- [ ] Arrêt possible à tout moment ; reste de la file conservé
+- [ ] **Tests** + **Test manuel** : enchaînement et interruption
+- [ ] **Sortie** : traitement fluide du backlog de planification
+
+## Phase V2-6 — Mode surcharge repensé
+
+En attente : Marie doit décrire son ressenti de surcharge (question ouverte) pour affiner le filtrage. Démarrable sur la mécanique, à affiner ensuite.
+
+- [ ] Bouton/pastille **isolé en haut**, visible, hors du flux des autres éléments
+- [ ] Toggle **instantané** de l'interface (comme un mode sombre), sans navigation de page
+- [ ] En surcharge : masquer les tâches `essential = false`, ne garder que l'indispensable
+- [ ] **Tests** + **Test manuel** : activation/désactivation, filtrage
+- [ ] **Sortie** : mode surcharge reconnaissable et actionnable en un geste
+
+## Phase V2-7 — Listes (référentiel personnel)
+
+Nouvelle entité. Exemples Marie : habits, musiques, livres, routines.
+
+- [ ] Entités `List` + `ListItem` (squelettes définis en V2-2, implémentés ici)
+- [ ] Page Listes : toutes les listes de l'utilisateur
+- [ ] Bouton "Ajouter" : l'appli propose dans quelle liste ranger l'élément
+- [ ] Création d'une nouvelle liste à la volée
+- [ ] Les listes ne sont **pas** planifiables (référentiel, pas tâches)
+- [ ] **Tests** + **Test manuel** : créer liste, ajouter élément, suggestion
+- [ ] **Sortie** : référentiel personnel fonctionnel
+
+## Phase V2-8 — Routines (matin / soir)
+
+Maquette : capture 184750 (routines détaillées de Marie). Absorbe l'ancienne Phase 8.
+
+- [ ] Routines = listes spéciales avec **bloc de temps réservé** (ex. RM = 1h30), pas étape minutée dans le planning
+- [ ] Routine matin (RM) / routine soir (RS) ; possibilité de variantes semaine/week-end
+- [ ] Intégration au planning comme **bloc** unique
+- [ ] Cases à cocher des étapes au sein de la routine
+- [ ] **Tests** + **Test manuel** : créer routine, l'insérer comme bloc, cocher étapes
+- [ ] **Sortie** : routines centralisées (besoin n°1 exprimé par Marie)
+
+## Phase V2-9 — Refonte page d'accueil
+
+Maquette : capture 183750. Dépend des phases planning + listes.
+
+- [ ] Haut : "Mon énergie" + bouton mode surcharge isolé + icône agenda
+- [ ] Centre : planning d'aujourd'hui en cases, à l'heure courante, scrollable
+- [ ] Bas : bouton "Ajouter une tâche" + navigation (Todo / Planifier / Listes)
+- [ ] **Tests** + **Test manuel** : parcours d'accueil complet mobile sans scroll parasite
+- [ ] **Sortie** : page d'accueil conforme à la maquette de Marie
+
+## Phase V2-10 — Consolidation V2 & 2e vague de tests
+
+- [ ] Refacto d'architecture, dead code, couverture globale ≥ 85 %
+- [ ] E2E Playwright mis à jour (flux V2)
+- [ ] Doc V2 : README, schéma données v2, ADR migration
+- [ ] Build + déploiement Netlify V2 ; bascule `main`
+- [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD
+  - Méthodo (réf `analyse_conduite_visio_marie.md`) : maquettes envoyées avant, partage d'écran cadré en début, **1-2 sujets approfondis** par session (pas 6), laisser finir les phrases (silence 2-3 s), clôture par les 3 points retenus dictés par le testeur
+  - Premier sujet récurrent : ressenti de surcharge de Marie
+- [ ] **Sortie** : V2 stable, couverte, validée par tests utilisateurs ; V1 toujours restaurable
+
+---
+
+## Reporté après V2
+
+- Module social (ancienne Phase 9) : Contact, ContactInteraction
+- Modèles sociaux & préparation d'interactions (ancienne Phase 10)
+- Event dédié + notifications push (ancienne Phase 11) — partiellement couvert par le planning V2
+- Sync cloud Supabase (ancienne Phase 13) et portage Capacitor (ancienne Phase 14) : inchangés, post-V2
+
+## Risques / angles morts
+
+- **Maquettes manquantes** : les dessins de Marie sont des photos basse-déf ; valider l'interprétation avant de coder le planning et la page d'accueil.
+- **Définition "essentiel"** : le filtrage surcharge dépend d'un marquage `essential` dont le critère n'est pas encore défini par l'usage réel (Phase V2-6 en attente du retour de Marie).
+- **Rollback données** : Marie accepte le reset. Informer explicitement avant tout déploiement V2.
+- **Charge des sessions test** : 1 testeuse à ce jour. Le gate Phase 7 vise 5-10 sessions ; recruter d'autres profils AuDHD.

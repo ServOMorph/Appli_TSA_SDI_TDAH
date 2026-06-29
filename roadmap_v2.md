@@ -54,8 +54,8 @@ Faible risque, fort impact perçu. À livrer et déployer tôt.
 - [x] "Inbox" → "Todo"
 - [x] "Plus tard" → "À faire plus tard" (reformulation)
 - [x] **Tests** : composants impactés mis à jour (259/259)
-- [ ] **Test manuel** : aucun terme "souffle/inbox/plus tard" résiduel dans l'UI
-- [ ] **Sortie** : vocabulaire aligné sur le public TSA
+- [x] **Test manuel** : aucun terme "souffle/inbox/plus tard" résiduel dans l'UI (vérifié 2026-06-29)
+- [x] **Sortie** : vocabulaire aligné sur le public TSA
 
 ## Phase V2-2 — Modèle de données v2 (schéma propre)
 

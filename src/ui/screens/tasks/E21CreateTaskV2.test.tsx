@@ -48,14 +48,14 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it('chemin Planifier : crée avec status planned et navigue vers inbox', async () => {
+  it('chemin Planifier : crée avec status planned et navigue vers planning', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche planifiée')
     await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     expect(ctx.createTaskV2Dest).toHaveBeenCalledWith('Tâche planifiée', 'planned')
-    expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+    expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
   it('chemin À planifier plus tard : crée avec status to_plan et navigue vers inbox', async () => {

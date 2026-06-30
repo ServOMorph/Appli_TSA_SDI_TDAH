@@ -82,13 +82,13 @@ Fondation des phases suivantes. Aucune UI ici, domaine + data. Schéma réécrit
 
 Maquette : capture 183750 (cases AUJOURD'HUI) + capture 184709 (planning hebdo réel de Marie).
 
-- [ ] Vue **par jour**, cases par heure (1 colonne jour, lignes heures)
-- [ ] Scroll vertical sur les heures ; ouverture **à l'heure courante**
-- [ ] Navigation jour précédent / suivant (flèches)
-- [ ] Icône agenda dans la barre du haut (accès direct)
-- [ ] Placement / déplacement d'une tâche dans une case
-- [ ] **Tests** + **Test manuel** : planifier, naviguer, scroller
-- [ ] **Sortie** : planning visuel utilisable, pas de liste texte type Google Agenda
+- [x] Vue **par jour**, cases par heure (1 colonne jour, lignes heures)
+- [x] Scroll vertical sur les heures ; ouverture **à l'heure courante**
+- [x] Navigation jour précédent / suivant (flèches)
+- [ ] Icône agenda dans la barre du haut (accès direct) — reporté V2-9 (page d'accueil)
+- [x] Placement / déplacement d'une tâche dans une case
+- [x] **Tests** : 11 tests (324/324 total) · **Test manuel** : validé
+- [x] **Sortie** : planning visuel utilisable (2026-06-30)
 
 ## Phase V2-5 — File "À planifier" séquentielle
 

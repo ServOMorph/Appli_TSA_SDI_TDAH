@@ -66,7 +66,11 @@ export function E21CreateTaskV2() {
     const trimmed = title.trim()
     if (!trimmed || !destination) return
     await createTaskV2Dest(trimmed, destination)
-    goTo('inbox')
+    if (destination === 'planned') {
+      goTo('planning')
+    } else {
+      goTo('inbox')
+    }
   }
 
   return (

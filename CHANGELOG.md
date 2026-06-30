@@ -1,3 +1,22 @@
+## v0.24 — 2026-06-30
+
+### Ajouté
+- `E40Planning.tsx` : vue Planning — grille 6h–22h, scroll auto heure courante, navigation précédent/suivant, picker de placement et de déplacement de tâches.
+- `E40Planning.test.tsx` : 11 tests (navigation, placement, déplacement, picker vide).
+- `AppContext` : screen `'planning'` + `scheduleV2Task` / `getPlannedTasksForDate` / `getUnscheduledPlannedTasks`.
+
+### Modifié
+- `E21CreateTaskV2.tsx` : "Planifier" navigue vers `'planning'` (corrige le placeholder inbox).
+- `App.tsx` : route `'planning'` → E40Planning.
+- `testUtils.tsx` : 3 nouvelles fonctions mock.
+- `roadmap_v2.md` : Phase V2-4 cochée [x].
+- `_contexte/signals.md`, `contexte.md`, `README.md` : état V2-4 close, V2-5 prochaine.
+
+### Infrastructure
+- Tests : 324/324 ✓ (44 fichiers test).
+
+---
+
 ## v0.23 — 2026-06-30
 
 ### Ajouté

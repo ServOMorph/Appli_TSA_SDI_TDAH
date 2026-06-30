@@ -6,10 +6,10 @@ import { TaskV2Repository } from '@/data/repositories/taskV2Repository'
 import { SubTaskRepository } from '@/data/repositories/subTaskRepository'
 import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository'
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
-import { createTaskV2 as createTaskV2Rule } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule } from '@/domain/rules/taskRulesV2'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
-import type { TaskStatusV2 } from '@/domain/entities/taskV2'
+import type { TaskV2, TaskStatusV2 } from '@/domain/entities/taskV2'
 import type { SubTask } from '@/domain/entities/subTask'
 import type { Settings } from '@/domain/entities/settings'
 
@@ -24,6 +24,7 @@ export type Screen =
   | 'later'
   | 'task-create'
   | 'task-create-v2'
+  | 'planning'
   | 'task-detail'
   | 'task-decompose'
   | 'energy-view'
@@ -65,6 +66,9 @@ interface AppContextValue {
   addTask: (title: string) => Promise<void>
   createTaskInbox: (title: string) => Promise<void>
   createTaskV2Dest: (title: string, status: TaskStatusV2) => Promise<void>
+  scheduleV2Task: (taskId: string, date: string, start: string, end: string) => Promise<void>
+  getPlannedTasksForDate: (date: string) => Promise<TaskV2[]>
+  getUnscheduledPlannedTasks: () => Promise<TaskV2[]>
   moveTask: (id: string, status: TaskStatus) => Promise<void>
   completeTask: (id: string) => Promise<void>
   deleteTask: (id: string) => Promise<void>
@@ -234,6 +238,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const now = new Date().toISOString()
     const task = createTaskV2Rule(newId(), title, status, false, now)
     await taskV2Repo.create(task)
+  }
+
+  async function scheduleV2Task(taskId: string, date: string, start: string, end: string) {
+    const task = await taskV2Repo.getById(taskId)
+    if (!task) return
+    const updated = scheduleTaskV2Rule(task, date, start, end, new Date().toISOString())
+    await taskV2Repo.update(updated)
+  }
+
+  async function getPlannedTasksForDate(date: string): Promise<TaskV2[]> {
+    return taskV2Repo.getByDate(date)
+  }
+
+  async function getUnscheduledPlannedTasks(): Promise<TaskV2[]> {
+    const planned = await taskV2Repo.getPlannedTasks()
+    return planned.filter((t) => t.scheduled_date === null)
   }
 
   async function createTaskInbox(title: string) {
@@ -417,6 +437,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addTask,
         createTaskInbox,
         createTaskV2Dest,
+        scheduleV2Task,
+        getPlannedTasksForDate,
+        getUnscheduledPlannedTasks,
         moveTask,
         completeTask,
         deleteTask,

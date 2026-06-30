@@ -3,6 +3,7 @@ interface TopBarProps {
   energyLabel: string
   energyAriaLabel: string
   onEnergyClick: () => void
+  overloadActive: boolean
   onOverloadClick: () => void
   onResourcesClick: () => void
   onSettingsClick: () => void
@@ -18,11 +19,26 @@ const chipStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
+function overloadButtonStyle(active: boolean): React.CSSProperties {
+  return {
+    backgroundColor: active ? 'var(--color-warning)' : 'var(--color-surface)',
+    border: `2px solid ${active ? 'var(--color-warning)' : 'var(--color-border)'}`,
+    borderRadius: 'var(--radius-md)',
+    padding: '6px 12px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: active ? '#fff' : 'var(--color-text-muted)',
+    cursor: 'pointer',
+    flexShrink: 0,
+  }
+}
+
 export function TopBar({
   title,
   energyLabel,
   energyAriaLabel,
   onEnergyClick,
+  overloadActive,
   onOverloadClick,
   onResourcesClick,
   onSettingsClick,
@@ -41,6 +57,14 @@ export function TopBar({
         <div
           style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', flexShrink: 0 }}
         >
+          <button
+            onClick={onOverloadClick}
+            aria-pressed={overloadActive}
+            aria-label={overloadActive ? 'Désactiver le mode surcharge' : 'Activer le mode surcharge'}
+            style={overloadButtonStyle(overloadActive)}
+          >
+            Mode surcharge
+          </button>
           <button
             onClick={onResourcesClick}
             aria-label="Ressources"
@@ -105,9 +129,6 @@ export function TopBar({
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
         <button onClick={onEnergyClick} aria-label={energyAriaLabel} style={chipStyle}>
           {energyLabel}
-        </button>
-        <button onClick={onOverloadClick} aria-label="Activer le mode surcharge" style={chipStyle}>
-          Mode surcharge
         </button>
       </div>
     </header>

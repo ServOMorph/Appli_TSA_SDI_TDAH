@@ -1,3 +1,13 @@
+## v0.27 — 2026-06-30
+
+### Modifié
+- `TopBar.tsx` : bouton "Mode surcharge" isolé en haut (top-right), prop `overloadActive`, `aria-pressed`, style actif/inactif distinct ; chip énergie seul dans la seconde ligne.
+- `E10Dashboard.tsx` : toggle instantané surcharge sans navigation — bandeau "Mode surcharge actif" + accès Centre récupération inline ; suppression branche full-page overload.
+- `E10Dashboard.test.tsx` : tests mode surcharge D10B réécrits + enrichis (337/337).
+- `roadmap_v2.md` : Phase V2-6 close (mécanique [x] ; masquage `essential=false` différé V2-9).
+
+---
+
 ## v0.26 — 2026-06-30
 
 ### Corrigé

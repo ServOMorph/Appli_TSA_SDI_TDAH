@@ -178,70 +178,6 @@ export function E10Dashboard() {
         ? "Énergie ignorée aujourd'hui"
         : 'Renseigner mon énergie'
 
-  if (overloadMode) {
-    return (
-      <main
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          padding: 'var(--spacing-xl)',
-          gap: 'var(--spacing-lg)',
-          maxWidth: '480px',
-          margin: '0 auto',
-          minHeight: '100svh',
-          justifyContent: 'center',
-        }}
-      >
-        <h1>Mode surcharge</h1>
-        <Card>
-          {action.type === 'task' && action.task ? (
-            <button
-              onClick={() => openDetail(action.task!.id)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                textAlign: 'left',
-                width: '100%',
-              }}
-            >
-              <p
-                style={{
-                  fontWeight: 600,
-                  color: 'var(--color-text)',
-                  fontSize: '1.1rem',
-                  margin: 0,
-                }}
-              >
-                {action.task.title}
-              </p>
-              {action.nextSubTask && (
-                <p
-                  style={{
-                    margin: '6px 0 0',
-                    fontSize: '0.875rem',
-                    color: 'var(--color-text-muted)',
-                  }}
-                >
-                  Prochaine étape : {action.nextSubTask.title}
-                </p>
-              )}
-            </button>
-          ) : (
-            <p>Que souhaitez-vous ajouter ?</p>
-          )}
-        </Card>
-        <Button fullWidth onClick={() => goTo('overload-recovery')}>
-          Centre récupération
-        </Button>
-        <Button variant="secondary" fullWidth onClick={() => setOverloadMode(false)}>
-          Désactiver le mode surcharge
-        </Button>
-      </main>
-    )
-  }
-
   return (
     <main
       style={{
@@ -252,6 +188,7 @@ export function E10Dashboard() {
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',
+        backgroundColor: overloadMode ? 'var(--color-surface)' : undefined,
       }}
     >
       <TopBar
@@ -259,10 +196,30 @@ export function E10Dashboard() {
         energyLabel={energyLabel}
         energyAriaLabel={energyAriaLabel}
         onEnergyClick={() => goTo('energy-view')}
-        onOverloadClick={() => setOverloadMode(true)}
+        overloadActive={overloadMode}
+        onOverloadClick={() => setOverloadMode(!overloadMode)}
         onResourcesClick={() => goTo('resources')}
         onSettingsClick={() => goTo('settings')}
       />
+
+      {overloadMode && (
+        <Card style={{ borderColor: 'var(--color-warning)' }}>
+          <p style={{ fontWeight: 600, margin: 0, color: 'var(--color-warning)' }}>
+            Mode surcharge actif
+          </p>
+          <p style={{ margin: '6px 0 0', color: 'var(--color-text-muted)' }}>
+            Prenez le temps qu'il vous faut.
+          </p>
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={() => goTo('overload-recovery')}
+            style={{ marginTop: 'var(--spacing-sm)' }}
+          >
+            Centre récupération
+          </Button>
+        </Card>
+      )}
 
       <section aria-label="Action immédiate">
         <h2>Que faire maintenant ?</h2>

@@ -206,7 +206,7 @@ describe('E10Dashboard', () => {
   })
 
   describe('activation surcharge (D10C)', () => {
-    it('affiche la pill Mode surcharge en mode normal', () => {
+    it('affiche le bouton Mode surcharge isolé en mode normal', () => {
       renderWithApp(<E10Dashboard />)
       expect(screen.getByRole('button', { name: 'Activer le mode surcharge' })).toBeDefined()
     })
@@ -252,32 +252,40 @@ describe('E10Dashboard', () => {
   })
 
   describe('mode surcharge (D10B)', () => {
-    it('affiche le titre Mode surcharge', () => {
+    it('affiche le bandeau Mode surcharge actif sans changer de page', () => {
       const ctx = makeAppContext({ overloadMode: true })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByRole('heading', { name: 'Mode surcharge' })).toBeDefined()
+      expect(screen.getByText('Mode surcharge actif')).toBeDefined()
+      expect(screen.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeDefined()
     })
 
-    it('affiche le bouton pour désactiver la surcharge', () => {
+    it('affiche le bouton Mode surcharge en état actif (aria-pressed)', () => {
       const ctx = makeAppContext({ overloadMode: true })
       renderWithApp(<E10Dashboard />, ctx)
       expect(screen.getByRole('button', { name: 'Désactiver le mode surcharge' })).toBeDefined()
     })
 
-    it('appelle setOverloadMode(false) au clic', async () => {
+    it('appelle setOverloadMode(false) au clic sur le bouton isolé quand actif', async () => {
       const ctx = makeAppContext({ overloadMode: true })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Désactiver le mode surcharge' }))
       expect(ctx.setOverloadMode).toHaveBeenCalledWith(false)
     })
 
-    it("affiche l'action immédiate en mode surcharge", () => {
+    it('navigue vers le centre de récupération au clic', async () => {
+      const ctx = makeAppContext({ overloadMode: true })
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Centre récupération' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('overload-recovery')
+    })
+
+    it("affiche l'action immédiate et les tâches du jour en mode surcharge", () => {
       const ctx = makeAppContext({
         overloadMode: true,
         todayTasks: [makeTask({ title: 'Tâche urgente' })],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByText('Tâche urgente')).toBeDefined()
+      expect(screen.getAllByText('Tâche urgente').length).toBeGreaterThan(0)
     })
   })
 })

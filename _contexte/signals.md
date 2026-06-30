@@ -8,12 +8,12 @@
   - réf: `Note de réunion/synthese_reunion_marie_2026-06-29.md` + `Note de réunion/analyse_conduite_visio_marie.md`
 
 ### V2 — En cours
-- [P1|ouvert] Démarrer Phase V2-6 (mode surcharge repensé)
-  - fait quand: toggle instantané surcharge, masquage tâches non-essentielles, tests ≥ 85 %
-  - réf: `roadmap_v2.md` Phase V2-6
+- [P1|ouvert] Démarrer Phase V2-7 (Listes — référentiel personnel)
+  - fait quand: page Listes, ajout élément, création liste à la volée, tests ≥ 85 %
+  - réf: `roadmap_v2.md` Phase V2-7
 
 ## Questions ouvertes
-- Quand Marie vivra une vraie surcharge, elle détaillera son ressenti pour affiner le filtrage d'essentiels (V2-6)
+- Quand Marie vivra une vraie surcharge, elle détaillera son ressenti pour définir le critère "essentiel" exact (masquage tâches non-essentielles V2-9)
 
 ## Échéances
 
@@ -22,33 +22,29 @@ Aucun.
 
 ## Contexte chaud
 - Branche `v2` active ; tag `v1.0-mvp` posé ; `dist_v1/` archivé (rollback V1 opérationnel)
-- `npm run test` passe 336/336 ; `npm run test:e2e` : 46/46 passent
-- V2-0 à V2-5 closes — prochaine phase : V2-6 (mode surcharge)
-- `toPlanTasks` dans AppContext : chargé au démarrage via `loadAll()`, retiré côté client après `scheduleV2Task`
-- `E50ToPlanQueue.tsx` : file séquentielle — affiche 1re tâche `to_plan`, date/heure, planifier/arrêter
-- Pastille rouge "À planifier" dans E10Dashboard : visible si `toPlanTasks.length > 0`
-- `E20Inbox` (Todo) utilise flux V1 : `task-create` (E21CreateTask) → V1 inboxTasks ; `task-create-v2` non exposé depuis l'inbox (décision : cohérence données V1 en attendant V2-7/V2-9)
+- `npm run test` passe 337/337 ; `npm run test:e2e` : 46/46 passent
+- V2-0 à V2-6 closes — prochaine phase : V2-7 (Listes)
+- `TopBar.tsx` : bouton "Mode surcharge" isolé en haut (top-right), `overloadActive` prop, `aria-pressed`, style actif/inactif ; chip énergie seul dans la seconde ligne
+- `E10Dashboard.tsx` : toggle instantané surcharge (bandeau "Mode surcharge actif" + "Centre récupération") — plus de bascule de page
+- Masquage `essential=false` en mode surcharge : non implémenté (todayTasks = Task V1 sans champ essential) — tracé dans `roadmap_v2.md` V2-6, différé V2-9
 
 ## Dernière session (2026-06-30)
 
 ## Décisions prises
-- V2-5 close : file "À planifier" séquentielle — pastille rouge dashboard, E50ToPlanQueue (traitement 1 par 1, interruption, page de fin)
-- Dette e2e soldée : 46/46 passent (Commencer→Entrer, souffle→énergie, Inbox→Todo, Plus tard→À faire plus tard, revert E20Inbox add button vers task-create)
-- E20Inbox add button remis sur 'task-create' (V1) — E21CreateTaskV2 non exposé depuis inbox ; sera rewired en V2-7 ou V2-9 lors de la refonte
+- V2-6 close (mécanique) : bouton surcharge isolé dans TopBar avec état aria-pressed, toggle instantané sans navigation, bandeau inline "Mode surcharge actif" + accès Centre récupération. Masquage `essential=false` explicitement différé à V2-9 (todayTasks V1 n'a pas de champ essential).
 
 ## Livrables produits ou modifiés
-- `e2e/01-onboarding.spec.ts` : Commencer → Entrer
-- `e2e/helpers/reset.ts` : Commencer → Entrer dans completeFastOnboarding
-- `e2e/02-tasks.spec.ts` : Inbox→Todo, Plus tard→À faire plus tard, aria-labels à jour
-- `e2e/03-energy.spec.ts` : souffle → énergie
-- `e2e/06-offline.spec.ts` : Inbox → Todo
-- `src/ui/screens/tasks/E20Inbox.tsx` : add button goTo('task-create') au lieu de 'task-create-v2'
-- `src/ui/screens/tasks/E20Inbox.test.tsx` : test mis à jour (task-create-v2 → task-create)
+- `src/ui/components/TopBar.tsx` : prop `overloadActive: boolean`, bouton isolé top-right avec style actif/inactif, suppression chip "Mode surcharge" du flux énergie
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : suppression branche full-page overload, toggle instantané, bandeau surcharge inline, passage `overloadActive` + `onOverloadClick={() => setOverloadMode(!overloadMode)}` à TopBar
+- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : section D10B réécrite (5 tests, +1 net → 337/337)
+- `roadmap_v2.md` : Phase V2-6 mise à jour (mécaniques [x], masquage bloqué documenté)
 
 ## Hypothèses validées / invalidées
-- VALIDE : 336/336 tests unitaires après corrections
-- VALIDE : 46/46 e2e passent (dette e2e V1→V2 soldée)
-- CONSTATÉ : E21CreateTaskV2 crée des TaskV2 dans taskV2Repo — non visible dans E20Inbox (inboxTasks = V1) ; sera résolu en V2-7 ou V2-9
+- VALIDE : toggle instantané sans navigation de page implémentable sur l'existant (337/337)
+- CONSTATÉ : masquage tâches `essential=false` impossible sur `todayTasks` V1 — `Task` n'a pas de champ `essential` ; aucune tâche `TaskV2` n'arrive encore dans le dashboard ; différé V2-9
 
 ## Prochaine étape exacte
-Démarrer V2-6 — mode surcharge repensé (toggle instantané, masquage tâches non-essentielles).
+Démarrer V2-7 — Listes (référentiel personnel) : entités `List` + `ListItem`, page Listes, ajout/création à la volée.
+
+## Question bloquante pour la session suivante
+Quand Marie vivra une vraie surcharge, quelle est la définition exacte du critère `essential` (quelles tâches masquer en mode surcharge) ?

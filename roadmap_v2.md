@@ -100,13 +100,13 @@ Maquette : capture 183750 (cases AUJOURD'HUI) + capture 184709 (planning hebdo r
 
 ## Phase V2-6 — Mode surcharge repensé
 
-En attente : Marie doit décrire son ressenti de surcharge (question ouverte) pour affiner le filtrage. Démarrable sur la mécanique, à affiner ensuite.
+En attente : Marie doit décrire son ressenti de surcharge (question ouverte) pour affiner le filtrage.
 
-- [ ] Bouton/pastille **isolé en haut**, visible, hors du flux des autres éléments
-- [ ] Toggle **instantané** de l'interface (comme un mode sombre), sans navigation de page
-- [ ] En surcharge : masquer les tâches `essential = false`, ne garder que l'indispensable
-- [ ] **Tests** + **Test manuel** : activation/désactivation, filtrage
-- [ ] **Sortie** : mode surcharge reconnaissable et actionnable en un geste
+- [x] Bouton **isolé en haut** de la TopBar, séparé du chip énergie, état visuel actif/inactif (aria-pressed)
+- [x] Toggle **instantané** de l'interface (même page, pas de navigation) : bandeau "Mode surcharge actif" + accès Centre récupération
+- [ ] En surcharge : masquer les tâches `essential = false` — **bloqué** : `todayTasks` (dashboard) est composé d'entités `Task` V1 qui n'ont pas de champ `essential` (seul `TaskV2` l'a, cf. V2-2). Aucune tâche `essential=false` n'atteint le dashboard aujourd'hui. Ce point sera traité avec le branchement `TaskV2` au dashboard (V2-9).
+- [x] **Tests** : 337/337 (E10Dashboard.test.tsx mis à jour)
+- [x] **Sortie** : mode surcharge reconnaissable et actionnable en un geste (mécanique livrée 2026-06-30 ; masquage réel différé à V2-9)
 
 ## Phase V2-7 — Listes (référentiel personnel)
 

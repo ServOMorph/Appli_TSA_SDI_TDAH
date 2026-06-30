@@ -12,10 +12,9 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-V2 en cours sur branche `v2` — Phases V2-0 à V2-5 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel).
-`db.ts` version(2) : TaskV2 + List + ListItem + Routine + RoutineStep en parallèle de v1. Tests 336/336.
-File "À planifier" : pastille rouge dashboard → E50ToPlanQueue (traitement séquentiel, interruption possible).
-Dette e2e soldée (2026-06-30) : 46/46 passent. E20Inbox add button revert sur `task-create` (V1) — E21CreateTaskV2 sera reconnecté en V2-7/V2-9. Prochaine action : V2-6 (mode surcharge).
+V2 en cours sur branche `v2` — Phases V2-0 à V2-6 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel).
+Mode surcharge : toggle instantané (bandeau inline, pas de navigation), bouton isolé TopBar (aria-pressed, actif/inactif). Masquage `essential=false` différé à V2-9 (todayTasks V1 sans champ essential).
+Tests 337/337 unitaires, 46/46 e2e. Prochaine action : V2-7 (Listes).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-29 : Session test Marie — Netlify déployé et fonctionnel ; retours documentés dans `Note de réunion/`.
@@ -28,3 +27,4 @@ Dette e2e soldée (2026-06-30) : 46/46 passent. E20Inbox add button revert sur `
 - 2026-06-30 : V2-4 close — vue Planning (E40Planning : grille 6h–22h, scroll auto heure courante, nav jour, picker placement/déplacement) + 324/324 tests.
 - 2026-06-30 : V2-5 close — file "À planifier" séquentielle (E50ToPlanQueue, pastille rouge dashboard, toPlanTasks dans AppContext) + 336/336 tests.
 - 2026-06-30 : Dette e2e V1→V2 soldée — 46/46 passent (vocabulaire + revert E20Inbox vers flux V1 cohérent avec inboxTasks).
+- 2026-06-30 : V2-6 close (mécanique) — mode surcharge toggle instantané, bouton isolé TopBar ; masquage `essential=false` différé V2-9 (todayTasks V1 sans champ essential) + 337/337 tests.

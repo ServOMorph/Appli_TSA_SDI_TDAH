@@ -2,11 +2,14 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { AppDatabase } from '@/data/db'
 import { UserRepository } from '@/data/repositories/userRepository'
 import { TaskRepository } from '@/data/repositories/taskRepository'
+import { TaskV2Repository } from '@/data/repositories/taskV2Repository'
 import { SubTaskRepository } from '@/data/repositories/subTaskRepository'
 import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository'
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
+import { createTaskV2 as createTaskV2Rule } from '@/domain/rules/taskRulesV2'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
+import type { TaskStatusV2 } from '@/domain/entities/taskV2'
 import type { SubTask } from '@/domain/entities/subTask'
 import type { Settings } from '@/domain/entities/settings'
 
@@ -20,6 +23,7 @@ export type Screen =
   | 'today'
   | 'later'
   | 'task-create'
+  | 'task-create-v2'
   | 'task-detail'
   | 'task-decompose'
   | 'energy-view'
@@ -60,6 +64,7 @@ interface AppContextValue {
   skipTodayEnergy: () => Promise<void>
   addTask: (title: string) => Promise<void>
   createTaskInbox: (title: string) => Promise<void>
+  createTaskV2Dest: (title: string, status: TaskStatusV2) => Promise<void>
   moveTask: (id: string, status: TaskStatus) => Promise<void>
   completeTask: (id: string) => Promise<void>
   deleteTask: (id: string) => Promise<void>
@@ -78,6 +83,7 @@ export const AppContext = createContext<AppContextValue | null>(null)
 const db = new AppDatabase()
 const userRepo = new UserRepository(db)
 const taskRepo = new TaskRepository(db)
+const taskV2Repo = new TaskV2Repository(db)
 const subTaskRepo = new SubTaskRepository(db)
 const energyRepo = new EnergyEntryRepository(db)
 const settingsRepo = new SettingsRepository(db)
@@ -222,6 +228,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
     await taskRepo.create(task)
     setTodayTasks((prev) => [...prev, task])
+  }
+
+  async function createTaskV2Dest(title: string, status: TaskStatusV2) {
+    const now = new Date().toISOString()
+    const task = createTaskV2Rule(newId(), title, status, false, now)
+    await taskV2Repo.create(task)
   }
 
   async function createTaskInbox(title: string) {
@@ -404,6 +416,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         skipTodayEnergy,
         addTask,
         createTaskInbox,
+        createTaskV2Dest,
         moveTask,
         completeTask,
         deleteTask,

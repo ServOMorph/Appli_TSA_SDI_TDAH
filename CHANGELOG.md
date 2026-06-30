@@ -1,3 +1,22 @@
+## v0.23 — 2026-06-30
+
+### Ajouté
+- `E21CreateTaskV2.tsx` : écran d'ajout V2 avec 3 destinations obligatoires (Todo / Planifier / À planifier plus tard), validation bloquée si destination non choisie.
+- `AppContext` : `createTaskV2Dest(title, status)` + screen `'task-create-v2'`.
+- `E21CreateTaskV2.test.tsx` : 11 tests (3 chemins + cas limites).
+
+### Modifié
+- `E20Inbox.tsx` : bouton "Ajouter une tâche" pointe vers `'task-create-v2'`.
+- `App.tsx` : route `'task-create-v2'` ajoutée.
+- `testUtils.tsx` : mock `createTaskV2Dest` ajouté.
+- `roadmap_v2.md` : Phase V2-3 cochée [x].
+- `_contexte/signals.md`, `contexte.md`, `README.md` : état V2-3 close, V2-4 prochaine.
+
+### Infrastructure
+- Tests : 313/313 ✓ (43 fichiers test).
+
+---
+
 ## v0.22 — 2026-06-29
 
 ### Ajouté

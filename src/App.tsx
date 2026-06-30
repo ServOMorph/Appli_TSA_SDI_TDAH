@@ -6,6 +6,7 @@ import { E04FirstTask } from '@/ui/screens/onboarding/E04FirstTask'
 import { E10Dashboard } from '@/ui/screens/dashboard/E10Dashboard'
 import { E20Inbox } from '@/ui/screens/tasks/E20Inbox'
 import { E21CreateTask } from '@/ui/screens/tasks/E21CreateTask'
+import { E21CreateTaskV2 } from '@/ui/screens/tasks/E21CreateTaskV2'
 import { E22TaskDetail } from '@/ui/screens/tasks/E22TaskDetail'
 import { E23Decompose } from '@/ui/screens/tasks/E23Decompose'
 import { E24Today } from '@/ui/screens/tasks/E24Today'
@@ -60,6 +61,8 @@ function AppScreens() {
         return <E20Inbox />
       case 'task-create':
         return <E21CreateTask />
+      case 'task-create-v2':
+        return <E21CreateTaskV2 />
       case 'task-detail':
         return <E22TaskDetail />
       case 'task-decompose':

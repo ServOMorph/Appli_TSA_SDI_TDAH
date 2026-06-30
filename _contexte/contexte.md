@@ -12,10 +12,10 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-V2 en cours sur branche `v2` — Phases V2-0, V2-1, V2-2 closes (2026-06-29). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel).
-`db.ts` version(2) : TaskV2 + List + ListItem + Routine + RoutineStep en parallèle de v1. Tests 301/301.
-Maquettes Marie reçues (`Note de réunion/` — 3 captures : accueil, planning hebdo, RM détaillée).
-Prochaine action : Phase V2-3 — écran ajout refondu (3 destinations obligatoires).
+V2 en cours sur branche `v2` — Phases V2-0 à V2-3 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel).
+`db.ts` version(2) : TaskV2 + List + ListItem + Routine + RoutineStep en parallèle de v1. Tests 313/313.
+Flux d'ajout refondu : E21CreateTaskV2 avec 3 destinations obligatoires (Todo / Planifier / À planifier plus tard).
+Maquettes Marie disponibles (`Note de réunion/` — 3 captures). Prochaine action : Phase V2-4 — vue Planning (calendrier en cases).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-29 : Session test Marie — Netlify déployé et fonctionnel ; retours documentés dans `Note de réunion/`.
@@ -24,3 +24,4 @@ Prochaine action : Phase V2-3 — écran ajout refondu (3 destinations obligatoi
 - 2026-06-29 : V2-0 close — tag `v1.0-mvp`, branche `v2`, `dist_v1/` archivé ; rollback V1 en une commande.
 - 2026-06-29 : V2-1 close — vocabulaire UI : souffle→énergie, Inbox→Todo, Plus tard→À faire plus tard (259/259 tests).
 - 2026-06-29 : V2-2 close — schéma Dexie v2 parallèle (TaskV2, List, ListItem, Routine, RoutineStep) + règles métier + 301/301 tests.
+- 2026-06-30 : V2-3 close — flux d'ajout refondu (E21CreateTaskV2, 3 destinations obligatoires, createTaskV2Dest) + 313/313 tests.

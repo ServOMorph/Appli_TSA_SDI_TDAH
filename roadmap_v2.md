@@ -70,13 +70,13 @@ Fondation des phases suivantes. Aucune UI ici, domaine + data. Schéma réécrit
 
 ## Phase V2-3 — Flux d'ajout de tâche refondu
 
-- [ ] Écran ajout : nom + **choix obligatoire** entre 3 destinations (Todo / Planifier / À planifier plus tard)
-- [ ] Pas de destination par défaut (validation bloquée tant que non choisie)
-- [ ] "Planifier" → ouvre directement le planning pour caser la tâche
-- [ ] "À planifier plus tard" → entre dans la file d'attente
-- [ ] Option : associer la tâche à une liste
-- [ ] **Tests** + **Test manuel** : 3 chemins
-- [ ] **Sortie** : plus de tâche perdue dans un inbox ambigu
+- [x] Écran ajout : nom + **choix obligatoire** entre 3 destinations (Todo / Planifier / À planifier plus tard)
+- [x] Pas de destination par défaut (validation bloquée tant que non choisie)
+- [x] "Planifier" → crée status 'planned' (navigue inbox, placeholder jusqu'à V2-4)
+- [x] "À planifier plus tard" → crée status 'to_plan'
+- [ ] Option : associer la tâche à une liste (reporté V2-7)
+- [x] **Tests** + **Test manuel** : 3 chemins (313/313 — TM-01 à TM-12 validés)
+- [x] **Sortie** : plus de tâche perdue dans un inbox ambigu
 
 ## Phase V2-4 — Vue Planning (calendrier en cases)
 

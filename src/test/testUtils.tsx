@@ -30,6 +30,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     skipTodayEnergy: vi.fn().mockResolvedValue(undefined),
     addTask: vi.fn().mockResolvedValue(undefined),
     createTaskInbox: vi.fn().mockResolvedValue(undefined),
+    createTaskV2Dest: vi.fn().mockResolvedValue(undefined),
     moveTask: vi.fn().mockResolvedValue(undefined),
     completeTask: vi.fn().mockResolvedValue(undefined),
     deleteTask: vi.fn().mockResolvedValue(undefined),

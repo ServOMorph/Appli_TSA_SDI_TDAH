@@ -17,7 +17,7 @@ export async function resetApp(page: Page) {
 }
 
 export async function completeFastOnboarding(page: Page) {
-  await page.getByRole('button', { name: 'Commencer' }).click()
+  await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await page.getByRole('button', { name: '5' }).click()
   await page.getByRole('button', { name: 'Valider' }).click()

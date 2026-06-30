@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-5 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). File "À planifier" séquentielle opérationnelle (pastille rouge dashboard → E50ToPlanQueue). Tests 336/336. Dette urgente : specs e2e périmées (à corriger avant V2-6). Prochaine étape : corriger e2e puis V2-6 (mode surcharge).
+V2 en cours sur branche `v2` — Phases V2-0 à V2-5 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). File "À planifier" séquentielle opérationnelle (pastille rouge dashboard → E50ToPlanQueue). Tests unitaires 336/336, e2e 46/46. Prochaine étape : V2-6 (mode surcharge).
 
 ## Stack
 
@@ -52,7 +52,7 @@ Archives/        — Roadmap V1 archivée
 
 ## Prochaine étape
 
-Phase V2-0 — Poser le tag `v1.0-mvp`, créer la branche `v2`, archiver `dist/` V1. Puis démarrer V2-1 (vocabulaire : "Batterie", "Todo") dès réception des maquettes de Marie.
+Phase V2-6 — Mode surcharge repensé (toggle instantané, masquage tâches non-essentielles).
 
 ## Licence
 

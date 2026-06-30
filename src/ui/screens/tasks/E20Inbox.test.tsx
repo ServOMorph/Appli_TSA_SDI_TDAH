@@ -118,11 +118,11 @@ describe('E20Inbox', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
     })
 
-    it('Ajouter une tâche navigue vers task-create-v2', async () => {
+    it('Ajouter une tâche navigue vers task-create', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('task-create-v2')
+      expect(ctx.goTo).toHaveBeenCalledWith('task-create')
     })
   })
 })

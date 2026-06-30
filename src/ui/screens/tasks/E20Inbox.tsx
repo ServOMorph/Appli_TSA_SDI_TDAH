@@ -114,7 +114,7 @@ export function E20Inbox() {
         </div>
       )}
 
-      <Button fullWidth onClick={() => goTo('task-create-v2')}>
+      <Button fullWidth onClick={() => goTo('task-create')}>
         Ajouter une tâche
       </Button>
 

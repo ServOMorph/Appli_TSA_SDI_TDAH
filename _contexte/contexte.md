@@ -15,7 +15,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 V2 en cours sur branche `v2` — Phases V2-0 à V2-5 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel).
 `db.ts` version(2) : TaskV2 + List + ListItem + Routine + RoutineStep en parallèle de v1. Tests 336/336.
 File "À planifier" : pastille rouge dashboard → E50ToPlanQueue (traitement séquentiel, interruption possible).
-Dette urgente : specs e2e V1 périmées (44/46 échouent — cherchent "Commencer", bouton dit "Entrer"). Prochaine action : corriger e2e puis V2-6 (mode surcharge).
+Dette e2e soldée (2026-06-30) : 46/46 passent. E20Inbox add button revert sur `task-create` (V1) — E21CreateTaskV2 sera reconnecté en V2-7/V2-9. Prochaine action : V2-6 (mode surcharge).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-06-29 : Session test Marie — Netlify déployé et fonctionnel ; retours documentés dans `Note de réunion/`.
@@ -27,3 +27,4 @@ Dette urgente : specs e2e V1 périmées (44/46 échouent — cherchent "Commence
 - 2026-06-30 : V2-3 close — flux d'ajout refondu (E21CreateTaskV2, 3 destinations obligatoires, createTaskV2Dest) + 313/313 tests.
 - 2026-06-30 : V2-4 close — vue Planning (E40Planning : grille 6h–22h, scroll auto heure courante, nav jour, picker placement/déplacement) + 324/324 tests.
 - 2026-06-30 : V2-5 close — file "À planifier" séquentielle (E50ToPlanQueue, pastille rouge dashboard, toPlanTasks dans AppContext) + 336/336 tests.
+- 2026-06-30 : Dette e2e V1→V2 soldée — 46/46 passent (vocabulaire + revert E20Inbox vers flux V1 cohérent avec inboxTasks).

@@ -1,3 +1,17 @@
+## v0.26 — 2026-06-30
+
+### Corrigé
+- Dette e2e V1→V2 soldée : 46/46 tests Playwright passent (était 2/46).
+- `01-onboarding.spec.ts`, `helpers/reset.ts` : `Commencer` → `Entrer` (vocabulaire V2-1).
+- `03-energy.spec.ts` : `souffle` → `énergie`.
+- `02-tasks.spec.ts`, `06-offline.spec.ts` : `Inbox` → `Todo`, `Plus tard` → `À faire plus tard`, aria-labels alignés.
+- `E20Inbox.tsx` : bouton "Ajouter une tâche" revert sur `task-create` (V1) — incohérence corrigée (le bouton créait des TaskV2 invisibles dans l'inbox V1). `E21CreateTaskV2` sera reconnecté en V2-7/V2-9.
+
+### Infrastructure
+- Tests unitaires : 336/336 ✓. Tests e2e : 46/46 ✓.
+
+---
+
 ## v0.25 — 2026-06-30
 
 ### Ajouté

@@ -92,11 +92,11 @@ Maquette : capture 183750 (cases AUJOURD'HUI) + capture 184709 (planning hebdo r
 
 ## Phase V2-5 — File "À planifier" séquentielle
 
-- [ ] Pastille rouge sur le tableau de bord si ≥ 1 tâche en attente (signal visuel, sans nombre)
-- [ ] Au clic : affichage de la 1re tâche → choix date/heure → tâche suivante
-- [ ] Arrêt possible à tout moment ; reste de la file conservé
-- [ ] **Tests** + **Test manuel** : enchaînement et interruption
-- [ ] **Sortie** : traitement fluide du backlog de planification
+- [x] Pastille rouge sur le tableau de bord si ≥ 1 tâche en attente (signal visuel, sans nombre)
+- [x] Au clic : affichage de la 1re tâche → choix date/heure → tâche suivante
+- [x] Arrêt possible à tout moment ; reste de la file conservé
+- [x] **Tests** : 12 tests (336/336 total) · **Test manuel** : 7/7 TM validés
+- [x] **Sortie** : traitement fluide du backlog de planification (2026-06-30)
 
 ## Phase V2-6 — Mode surcharge repensé
 

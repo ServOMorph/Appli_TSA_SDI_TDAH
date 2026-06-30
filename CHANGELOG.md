@@ -1,3 +1,24 @@
+## v0.25 — 2026-06-30
+
+### Ajouté
+- `E50ToPlanQueue.tsx` : écran file "À planifier" séquentielle — affiche 1re tâche `to_plan`, choix date/heure, planifier/arrêter, page de fin.
+- `E50ToPlanQueue.test.tsx` : 12 tests (file vide, tâche affichée, champs, enchaînement, interruption).
+- `AppContext` : screen `'to-plan-queue'`, state `toPlanTasks` (chargé dans `loadAll`, retiré après `scheduleV2Task`).
+
+### Modifié
+- `E10Dashboard.tsx` : pastille rouge "À planifier" → `goTo('to-plan-queue')` si `toPlanTasks.length > 0`.
+- `App.tsx` : route `'to-plan-queue'` → E50ToPlanQueue.
+- `testUtils.tsx` : mock `toPlanTasks: []`.
+- `DevResetButton.tsx` : entrées manquantes `'task-create-v2'`, `'planning'`, `'to-plan-queue'` (fix build TypeScript).
+- `roadmap_v2.md` : Phase V2-5 cochée [x].
+- `_contexte/signals.md`, `contexte.md`, `README.md` : état V2-5 close, dette e2e P0, V2-6 prochaine.
+
+### Infrastructure
+- Tests unitaires : 336/336 ✓ (45 fichiers test).
+- ⚠ Tests e2e : 44/46 échouent — specs V1 périmées (cherchent "Commencer", bouton dit "Entrer" depuis V2-1). À corriger en priorité.
+
+---
+
 ## v0.24 — 2026-06-30
 
 ### Ajouté

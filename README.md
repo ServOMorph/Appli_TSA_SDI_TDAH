@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-4 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). Vue Planning opérationnelle (grille 6h–22h, nav jour, placement/déplacement de tâches). Schéma Dexie v2 parallèle à v1. Tests 324/324. Prochaine étape : V2-5 (file "À planifier" séquentielle).
+V2 en cours sur branche `v2` — Phases V2-0 à V2-5 closes (2026-06-30). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). File "À planifier" séquentielle opérationnelle (pastille rouge dashboard → E50ToPlanQueue). Tests 336/336. Dette urgente : specs e2e périmées (à corriger avant V2-6). Prochaine étape : corriger e2e puis V2-6 (mode surcharge).
 
 ## Stack
 

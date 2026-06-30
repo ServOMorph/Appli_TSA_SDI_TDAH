@@ -128,6 +128,7 @@ export function E10Dashboard() {
     selectTask,
     setTaskDetailOrigin,
     reorderTodayTasks,
+    toPlanTasks,
   } = useApp()
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks.slice(0, 3))
@@ -345,6 +346,38 @@ export function E10Dashboard() {
         <Button fullWidth onClick={() => goTo('task-create')}>
           Ajouter une tâche
         </Button>
+        {toPlanTasks.length > 0 && (
+          <button
+            aria-label="Tâches à planifier"
+            onClick={() => goTo('to-plan-queue')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-sm)',
+              background: 'none',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              padding: '10px var(--spacing-md)',
+              cursor: 'pointer',
+              color: 'var(--color-text)',
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.9375rem',
+              width: '100%',
+            }}
+          >
+            <span
+              aria-hidden
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                background: '#d32f2f',
+                flexShrink: 0,
+              }}
+            />
+            À planifier
+          </button>
+        )}
         <div
           role="group"
           aria-label="Listes de tâches"

@@ -112,13 +112,15 @@ En attente : Marie doit décrire son ressenti de surcharge (question ouverte) po
 
 Nouvelle entité. Exemples Marie : habits, musiques, livres, routines.
 
-- [ ] Entités `List` + `ListItem` (squelettes définis en V2-2, implémentés ici)
-- [ ] Page Listes : toutes les listes de l'utilisateur
-- [ ] Bouton "Ajouter" : l'appli propose dans quelle liste ranger l'élément
-- [ ] Création d'une nouvelle liste à la volée
-- [ ] Les listes ne sont **pas** planifiables (référentiel, pas tâches)
-- [ ] **Tests** + **Test manuel** : créer liste, ajouter élément, suggestion
-- [ ] **Sortie** : référentiel personnel fonctionnel
+- [x] Entités `List` + `ListItem` (squelettes définis en V2-2, implémentés ici)
+- [x] Page Listes : toutes les listes de l'utilisateur (`E60Lists.tsx`)
+- [x] Écran détail liste avec ajout/suppression d'élément (`E61ListDetail.tsx`)
+- [x] Création d'une nouvelle liste à la volée
+- [x] Les listes ne sont **pas** planifiables (référentiel, pas tâches)
+- [ ] Bouton "Ajouter" : suggestion de liste depuis le flux d'ajout de tâche — reporté (non couvert par cette itération, à raccorder en V2-9)
+- [x] **Tests** : 28 tests (365/365 total)
+- [ ] **Test manuel** : à valider par l'utilisateur
+- [x] **Sortie** : référentiel personnel fonctionnel (2026-06-30)
 
 ## Phase V2-8 — Routines (matin / soir)
 

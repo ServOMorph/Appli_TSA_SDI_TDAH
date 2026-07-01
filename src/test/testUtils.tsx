@@ -46,6 +46,14 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     updateTaskTitle: vi.fn().mockResolvedValue(undefined),
     reorderTodayTasks: vi.fn().mockResolvedValue(undefined),
     refreshDashboard: vi.fn().mockResolvedValue(undefined),
+    lists: [],
+    selectedListId: null,
+    selectList: vi.fn(),
+    createList: vi.fn().mockResolvedValue(undefined),
+    deleteList: vi.fn().mockResolvedValue(undefined),
+    getListItems: vi.fn().mockResolvedValue([]),
+    addListItem: vi.fn().mockResolvedValue(undefined),
+    deleteListItem: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }

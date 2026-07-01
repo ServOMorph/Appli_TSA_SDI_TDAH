@@ -1,5 +1,12 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-06-29 (archivé depuis contexte.md 2026-07-01)
+- Session test Marie — Netlify déployé et fonctionnel ; retours documentés dans `Note de réunion/`.
+- `roadmap_v2.md` créée (11 phases) ; `roadmap.md` archivé dans `Archives/roadmap_v1.md`.
+- Reset données accepté par Marie — schéma Dexie v2 propre, sans migration de compatibilité v1.
+- V2-0 close — tag `v1.0-mvp`, branche `v2`, `dist_v1/` archivé ; rollback V1 en une commande.
+- V2-1 close — vocabulaire UI : souffle→énergie, Inbox→Todo, Plus tard→À faire plus tard (259/259 tests).
+
 ## 2026-06-25 (archivé depuis contexte.md 2026-06-29 session 2)
 - "cuillères" renommé "souffle" — terme inventé, court, compréhensible, sans référence théorique (spoon theory).
 - Bug fix addSubTask() — await loadAll() ajouté → todaySubTasksMap rafraîchi → sous-tâche visible dans "Que faire maintenant?" après décomposition.

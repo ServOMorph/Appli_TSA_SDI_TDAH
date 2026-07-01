@@ -1,3 +1,16 @@
+## v0.28 — 2026-07-01
+
+### Ajouté
+- Phase V2-7 — Listes (référentiel personnel) : `E60Lists.tsx` (page listes, création à la volée), `E61ListDetail.tsx` (détail liste, ajout/suppression d'élément).
+- `src/domain/rules/listRules.ts` : règles pures `createList`/`createListItem`.
+- `AppContext.tsx` : state et méthodes listes (`lists`, `createList`, `deleteList`, `getListItems`, `addListItem`, `deleteListItem`), branchées sur `ListRepository`/`ListItemRepository` existants.
+- 28 tests ajoutés (365/365 total).
+
+### Modifié
+- `roadmap_v2.md` : Phase V2-7 close (mécanique) ; suggestion de liste depuis le flux d'ajout de tâche reportée V2-9.
+
+---
+
 ## v0.27 — 2026-06-30
 
 ### Modifié

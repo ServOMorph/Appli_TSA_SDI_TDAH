@@ -6,12 +6,17 @@ import { TaskV2Repository } from '@/data/repositories/taskV2Repository'
 import { SubTaskRepository } from '@/data/repositories/subTaskRepository'
 import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository'
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
+import { ListRepository } from '@/data/repositories/listRepository'
+import { ListItemRepository } from '@/data/repositories/listItemRepository'
 import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule } from '@/domain/rules/taskRulesV2'
+import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
 import type { TaskV2, TaskStatusV2 } from '@/domain/entities/taskV2'
 import type { SubTask } from '@/domain/entities/subTask'
 import type { Settings } from '@/domain/entities/settings'
+import type { List } from '@/domain/entities/list'
+import type { ListItem } from '@/domain/entities/listItem'
 
 export type Screen =
   | 'welcome'
@@ -39,6 +44,8 @@ export type Screen =
   | 'settings-organisation'
   | 'settings-privacy'
   | 'settings-export'
+  | 'lists'
+  | 'list-detail'
 
 interface AppContextValue {
   screen: Screen
@@ -82,6 +89,14 @@ interface AppContextValue {
   updateTaskTitle: (id: string, title: string) => Promise<void>
   reorderTodayTasks: (ids: string[]) => Promise<void>
   refreshDashboard: () => Promise<void>
+  lists: List[]
+  selectedListId: string | null
+  selectList: (id: string | null) => void
+  createList: (name: string) => Promise<void>
+  deleteList: (id: string) => Promise<void>
+  getListItems: (listId: string) => Promise<ListItem[]>
+  addListItem: (listId: string, title: string) => Promise<void>
+  deleteListItem: (id: string) => Promise<void>
 }
 
 export const AppContext = createContext<AppContextValue | null>(null)
@@ -93,6 +108,8 @@ const taskV2Repo = new TaskV2Repository(db)
 const subTaskRepo = new SubTaskRepository(db)
 const energyRepo = new EnergyEntryRepository(db)
 const settingsRepo = new SettingsRepository(db)
+const listRepo = new ListRepository(db)
+const listItemRepo = new ListItemRepository(db)
 
 function todayDate(): string {
   if (import.meta.env.DEV) {
@@ -127,6 +144,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [taskDetailOrigin, setTaskDetailOrigin] = useState<Screen | null>(null)
   const [toPlanTasks, setToPlanTasks] = useState<TaskV2[]>([])
+  const [lists, setLists] = useState<List[]>([])
+  const [selectedListId, setSelectedListId] = useState<string | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -157,12 +176,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [settings])
 
   async function loadAll() {
-    const [inbox, today, later, entry, toPlan] = await Promise.all([
+    const [inbox, today, later, entry, toPlan, listsData] = await Promise.all([
       taskRepo.getByStatus('inbox'),
       taskRepo.getTodayTasks(),
       taskRepo.getByStatus('later'),
       energyRepo.getByDate(todayDate()),
       taskV2Repo.getToPlantasks(),
+      listRepo.getAll(),
     ])
     const subTaskArrays = await Promise.all(today.map((t) => subTaskRepo.getByTaskId(t.id)))
     const subTasksMap: Record<string, SubTask[]> = {}
@@ -176,6 +196,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodayEnergy(entry?.value ?? null)
     setTodayEnergyStatus(entry?.status ?? null)
     setToPlanTasks(toPlan)
+    setLists(listsData)
   }
 
   async function createUser(profile: ProfileType) {
@@ -345,6 +366,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await loadAll()
   }
 
+  async function createList(name: string) {
+    const now = new Date().toISOString()
+    const list = createListRule(newId(), name, now)
+    await listRepo.create(list)
+    setLists((prev) => [...prev, list])
+  }
+
+  async function deleteList(id: string) {
+    const items = await listItemRepo.getByListId(id)
+    await Promise.all(items.map((item) => listItemRepo.delete(item.id)))
+    await listRepo.delete(id)
+    setLists((prev) => prev.filter((l) => l.id !== id))
+  }
+
+  async function getListItems(listId: string): Promise<ListItem[]> {
+    return listItemRepo.getByListId(listId)
+  }
+
+  async function addListItem(listId: string, title: string) {
+    const existing = await listItemRepo.getByListId(listId)
+    const now = new Date().toISOString()
+    const item = createListItemRule(newId(), listId, title, existing.length, now)
+    await listItemRepo.create(item)
+  }
+
+  async function deleteListItem(id: string) {
+    await listItemRepo.delete(id)
+  }
+
   async function setOverloadMode(v: boolean) {
     setOverloadModeState(v)
     if (currentUser) {
@@ -401,6 +451,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       db.subTasks.clear(),
       db.energyEntries.clear(),
       db.settings.clear(),
+      db.lists.clear(),
+      db.listItems.clear(),
     ])
     setCurrentUser(null)
     setSettings(null)
@@ -411,6 +463,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodayEnergyStatus(null)
     setOverloadModeState(false)
     setSelectedTaskId(null)
+    setLists([])
+    setSelectedListId(null)
     setScreen('welcome')
   }
 
@@ -458,6 +512,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateTaskTitle,
         reorderTodayTasks,
         refreshDashboard,
+        lists,
+        selectedListId,
+        selectList: setSelectedListId,
+        createList,
+        deleteList,
+        getListItems,
+        addListItem,
+        deleteListItem,
       }}
     >
       {children}

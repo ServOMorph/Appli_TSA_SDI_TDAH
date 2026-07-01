@@ -1,6 +1,8 @@
 import { useApp } from '@/app/AppContext'
 import { useState, useEffect } from 'react'
 import type { Task } from '@/domain/entities/task'
+import type { TaskV2 } from '@/domain/entities/taskV2'
+import type { Routine } from '@/domain/entities/routine'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
@@ -23,6 +25,38 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+function todayStr(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function planningChipStyle(essential: boolean): React.CSSProperties {
+  return {
+    background: essential ? 'var(--color-primary)' : 'color-mix(in srgb, var(--color-primary) 18%, transparent)',
+    color: essential ? '#fff' : 'var(--color-text)',
+    border: 'none',
+    borderRadius: 'var(--radius-sm)',
+    padding: '6px 10px',
+    fontSize: '0.8125rem',
+    cursor: 'pointer',
+    textAlign: 'left',
+    fontFamily: 'var(--font-body)',
+    width: '100%',
+  }
+}
+
+const planningRoutineChipStyle: React.CSSProperties = {
+  background: 'var(--color-secondary)',
+  color: '#fff',
+  border: 'none',
+  borderRadius: 'var(--radius-sm)',
+  padding: '6px 10px',
+  fontSize: '0.8125rem',
+  cursor: 'pointer',
+  textAlign: 'left',
+  fontFamily: 'var(--font-body)',
+  width: '100%',
+}
 
 function segmentStyle(withDivider: boolean): React.CSSProperties {
   return {
@@ -129,13 +163,31 @@ export function E10Dashboard() {
     setTaskDetailOrigin,
     reorderTodayTasks,
     toPlanTasks,
+    getPlannedTasksForDate,
+    getRoutinesForDate,
+    selectRoutine,
   } = useApp()
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks.slice(0, 3))
+  const [todayPlanned, setTodayPlanned] = useState<TaskV2[]>([])
+  const [todayRoutinesScheduled, setTodayRoutinesScheduled] = useState<Routine[]>([])
 
   useEffect(() => {
     setVisibleOrder(todayTasks.slice(0, 3))
   }, [todayTasks])
+
+  useEffect(() => {
+    async function loadPlanningToday() {
+      const date = todayStr()
+      const [planned, routinesForDate] = await Promise.all([
+        getPlannedTasksForDate(date),
+        getRoutinesForDate(date),
+      ])
+      setTodayPlanned(planned)
+      setTodayRoutinesScheduled(routinesForDate)
+    }
+    loadPlanningToday()
+  }, [getPlannedTasksForDate, getRoutinesForDate])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -148,6 +200,14 @@ export function E10Dashboard() {
     setTaskDetailOrigin('dashboard')
     goTo('task-detail')
   }
+
+  function openRoutine(routineId: string) {
+    selectRoutine(routineId)
+    goTo('routine-detail')
+  }
+
+  const visiblePlannedTasks = todayPlanned.filter((t) => overloadMode ? t.essential : true)
+  const hasPlanningToday = visiblePlannedTasks.length > 0 || todayRoutinesScheduled.length > 0
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -198,6 +258,7 @@ export function E10Dashboard() {
         onEnergyClick={() => goTo('energy-view')}
         overloadActive={overloadMode}
         onOverloadClick={() => setOverloadMode(!overloadMode)}
+        onPlanningClick={() => goTo('planning')}
         onResourcesClick={() => goTo('resources')}
         onSettingsClick={() => goTo('settings')}
       />
@@ -264,6 +325,36 @@ export function E10Dashboard() {
         </Card>
       </section>
 
+      <section aria-label="Planning du jour">
+        <h2>Planning du jour</h2>
+        {hasPlanningToday ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+            {todayRoutinesScheduled.map((routine) => (
+              <button
+                key={routine.id}
+                style={planningRoutineChipStyle}
+                onClick={() => openRoutine(routine.id)}
+                aria-label={`${routine.name} — routine (${routine.duration_minutes} min)`}
+              >
+                {routine.scheduled_start} · {routine.name} ({routine.duration_minutes} min)
+              </button>
+            ))}
+            {visiblePlannedTasks.map((task) => (
+              <button
+                key={task.id}
+                style={planningChipStyle(task.essential)}
+                onClick={() => goTo('planning')}
+                aria-label={`${task.title} — voir dans le planning`}
+              >
+                {task.scheduled_start} · {task.title}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Rien de planifié aujourd'hui.</p>
+        )}
+      </section>
+
       {!isEmpty ? (
         <section aria-label="Tâches du jour">
           <h2>Tâches du jour</h2>
@@ -300,7 +391,7 @@ export function E10Dashboard() {
           marginTop: 'auto',
         }}
       >
-        <Button fullWidth onClick={() => goTo('task-create')}>
+        <Button fullWidth onClick={() => goTo('task-create-v2')}>
           Ajouter une tâche
         </Button>
         {toPlanTasks.length > 0 && (
@@ -356,6 +447,12 @@ export function E10Dashboard() {
           </button>
           <button onClick={() => goTo('routines')} style={segmentStyle(true)}>
             Routines
+          </button>
+          <button onClick={() => goTo('planning')} style={segmentStyle(true)}>
+            Planifier
+          </button>
+          <button onClick={() => goTo('lists')} style={segmentStyle(true)}>
+            Listes
           </button>
         </div>
       </nav>

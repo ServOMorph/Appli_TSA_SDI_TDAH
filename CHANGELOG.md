@@ -1,3 +1,19 @@
+## v0.30 — 2026-07-01
+
+### Ajouté
+- Phase V2-9 — Refonte page d'accueil : icône agenda dans `TopBar.tsx` (`onPlanningClick`, accès direct au planning), boutons "Planifier"/"Listes" ajoutés à la nav segmentée du dashboard.
+- `E10Dashboard.tsx` : nouvelle section "Planning du jour" (mini, `TaskV2`+`Routine` du jour triés par heure), masquant les tâches `essential=false` en mode surcharge.
+- 8 tests ajoutés (396/396 total, pool par défaut).
+
+### Corrigé
+- Navigation orpheline (`task-create-v2`) : bouton "Ajouter une tâche" du dashboard repointé vers le flux 3-destinations. Vérifié sans régression : les e2e T11-T19 passent par le bouton propre à `E20Inbox`, indépendant de celui du dashboard.
+
+### Modifié
+- `roadmap_v2.md` : V2-9 close (mécanique + test manuel TM-01 à TM-06 validés) ; test manuel V2-7 (12 TM) et TM-07/08 de V2-8 validés en cascade, débloqués par la nouvelle nav.
+- `README.md` : état actuel et prochaine étape mis à jour (V2-10).
+
+---
+
 ## v0.29 — 2026-07-01
 
 ### Ajouté

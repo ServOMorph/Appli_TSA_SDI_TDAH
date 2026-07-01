@@ -5,6 +5,7 @@ interface TopBarProps {
   onEnergyClick: () => void
   overloadActive: boolean
   onOverloadClick: () => void
+  onPlanningClick: () => void
   onResourcesClick: () => void
   onSettingsClick: () => void
 }
@@ -40,6 +41,7 @@ export function TopBar({
   onEnergyClick,
   overloadActive,
   onOverloadClick,
+  onPlanningClick,
   onResourcesClick,
   onSettingsClick,
 }: TopBarProps) {
@@ -64,6 +66,36 @@ export function TopBar({
             style={overloadButtonStyle(overloadActive)}
           >
             Mode surcharge
+          </button>
+          <button
+            onClick={onPlanningClick}
+            aria-label="Planning"
+            title="Planning"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px',
+              color: 'var(--color-text-muted)',
+              display: 'inline-flex',
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4" />
+              <path d="M8 2v4" />
+              <path d="M3 10h18" />
+            </svg>
           </button>
           <button
             onClick={onResourcesClick}

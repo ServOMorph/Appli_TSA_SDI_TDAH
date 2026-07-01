@@ -5,6 +5,39 @@ import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E10Dashboard } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
 import type { SubTask } from '@/domain/entities/subTask'
+import type { TaskV2 } from '@/domain/entities/taskV2'
+import type { Routine } from '@/domain/entities/routine'
+
+function makeTaskV2(overrides: Partial<TaskV2> = {}): TaskV2 {
+  return {
+    id: 'taskv2-1',
+    title: 'Tâche planifiée',
+    status: 'planned',
+    essential: true,
+    position: 0,
+    scheduled_date: '2026-07-01',
+    scheduled_start: '09:00',
+    scheduled_end: '09:30',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    completed_at: null,
+    ...overrides,
+  }
+}
+
+function makeRoutine(overrides: Partial<Routine> = {}): Routine {
+  return {
+    id: 'routine-1',
+    name: 'Routine matin',
+    type: 'morning',
+    duration_minutes: 90,
+    scheduled_date: '2026-07-01',
+    scheduled_start: '07:00',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    ...overrides,
+  }
+}
 
 function makeTask(overrides: Partial<Task> = {}): Task {
   return {
@@ -42,11 +75,11 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('button', { name: 'Ajouter une tâche' })).toBeDefined()
     })
 
-    it('navigue vers task-create au clic sur Ajouter une tâche', async () => {
+    it('navigue vers task-create-v2 au clic sur Ajouter une tâche', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('task-create')
+      expect(ctx.goTo).toHaveBeenCalledWith('task-create-v2')
     })
   })
 
@@ -255,6 +288,57 @@ describe('E10Dashboard', () => {
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Routines' }))
       expect(ctx.goTo).toHaveBeenCalledWith('routines')
+    })
+
+    it('navigue vers planning via la nav segmentée', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    })
+
+    it('navigue vers lists via la nav segmentée', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Listes' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('lists')
+    })
+
+    it('navigue vers planning au clic sur l\'icône agenda', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Planning' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    })
+  })
+
+  describe('planning du jour (V2-9)', () => {
+    it('affiche un message si rien n\'est planifié', async () => {
+      renderWithApp(<E10Dashboard />)
+      expect(await screen.findByText('Rien de planifié aujourd\'hui.')).toBeDefined()
+    })
+
+    it('affiche une tâche planifiée et une routine du jour', async () => {
+      const ctx = makeAppContext({
+        getPlannedTasksForDate: async () => [makeTaskV2({ title: 'RDV médecin' })],
+        getRoutinesForDate: async () => [makeRoutine({ name: 'Routine matin' })],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(await screen.findByText(/RDV médecin/)).toBeDefined()
+      expect(await screen.findByText(/Routine matin/)).toBeDefined()
+    })
+
+    it('masque une tâche non essentielle en mode surcharge', async () => {
+      const ctx = makeAppContext({
+        overloadMode: true,
+        getPlannedTasksForDate: async () => [
+          makeTaskV2({ id: 'a', title: 'Tâche essentielle', essential: true }),
+          makeTaskV2({ id: 'b', title: 'Tâche non essentielle', essential: false }),
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(await screen.findByText(/Tâche essentielle/)).toBeDefined()
+      expect(screen.queryByText(/Tâche non essentielle/)).toBeNull()
     })
   })
 

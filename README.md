@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-8 closes (mécaniques). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). Listes et Routines (référentiel personnel) livrées : pages Listes + détail, Routines + détail (étapes cochables, réservation de créneau, bloc visible dans le planning). Régression identifiée : l'accès au planning n'est plus navigable depuis un revert e2e antérieur — correction prévue en V2-9. Tests unitaires 390/390, e2e 46/46 (dernier run connu). Prochaine étape : V2-9 (refonte page d'accueil).
+V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes (mécaniques + tests manuels). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). Page d'accueil refondue (V2-9) : icône agenda + nav Planifier/Listes donnent un accès direct au planning et aux listes, bouton d'ajout repointé vers le flux 3-destinations, nouvelle section "Planning du jour" avec masquage des tâches non essentielles en mode surcharge. Navigation orpheline résolue sans régression e2e. Tests unitaires 396/396, e2e 46/46. Prochaine étape : V2-10 (consolidation V2, couverture ≥85 %, doc, déploiement).
 
 ## Stack
 
@@ -52,7 +52,7 @@ Archives/        — Roadmap V1 archivée
 
 ## Prochaine étape
 
-Phase V2-9 — Refonte page d'accueil (icône agenda, nav Todo/Planifier/Listes, masquage `essential=false`).
+Phase V2-10 — Consolidation V2 & 2e vague de tests (refacto, couverture ≥85 %, doc V2, déploiement Netlify, sessions test 2-5 avec Marie).
 
 ## Licence
 

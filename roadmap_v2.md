@@ -119,20 +119,9 @@ Nouvelle entité. Exemples Marie : habits, musiques, livres, routines.
 - [x] Les listes ne sont **pas** planifiables (référentiel, pas tâches)
 - [ ] Bouton "Ajouter" : suggestion de liste depuis le flux d'ajout de tâche — reporté (non couvert par cette itération, à raccorder en V2-9)
 - [x] **Tests** : 28 tests (365/365 total)
-- [ ] **Test manuel** : reporté à V2-9 — aucun point d'entrée dashboard vers `E60Lists` avant le branchement de la nav (Todo / Planifier / Listes) prévu en V2-9. Écrans non accessibles en conditions réelles avant cette phase.
-  - TM-01 : Depuis le tableau de bord, cliquer sur "Listes" (nav V2-9) → la page "Mes listes" s'affiche
-  - TM-02 : Liste vide → message "Aucune liste pour l'instant." affiché
-  - TM-03 : Cliquer "Nouvelle liste" → formulaire (champ nom) apparaît, focus automatique sur le champ
-  - TM-04 : Bouton "Créer" désactivé tant que le nom est vide
-  - TM-05 : Saisir un nom, cliquer "Créer" → la liste apparaît dans "Mes listes", formulaire refermé
-  - TM-06 : Saisir un nom puis appuyer sur "Entrée" → même résultat que TM-05 (raccourci clavier)
-  - TM-07 : Cliquer "Annuler" pendant la création → formulaire refermé, aucune liste créée
-  - TM-08 : Cliquer sur une liste existante → navigation vers l'écran détail, titre = nom de la liste
-  - TM-09 : Liste sans élément → message "Cette liste est vide." affiché
-  - TM-10 : Cliquer "Ajouter un élément", saisir un titre, valider → élément affiché dans la liste
-  - TM-11 : Cliquer "×" sur un élément → élément supprimé immédiatement de l'affichage
-  - TM-12 : Bouton retour (←) dans le détail → retour à "Mes listes" ; bouton retour dans "Mes listes" → retour au tableau de bord
-- [x] **Sortie** : référentiel personnel fonctionnel (2026-06-30)
+- [x] **Test manuel** : TM-01 à TM-12 validés par l'utilisateur (2026-07-01, débloqué par la nav "Listes" de V2-9)
+  - TM-01 à TM-12 : OK
+- [x] **Sortie** : référentiel personnel fonctionnel (2026-06-30), test manuel validé 2026-07-01
 
 ## Phase V2-8 — Routines (matin / soir)
 
@@ -144,27 +133,28 @@ Maquette : capture 184750 (routines détaillées de Marie). Absorbe l'ancienne P
 - [x] Cases à cocher des étapes au sein de la routine
 - [x] Point d'entrée dashboard : segment "Routines" ajouté à la nav (Todo/Aujourd'hui/À faire plus tard/Routines)
 - [x] **Tests** : 25 tests (390/390 total)
-- [x] **Test manuel** : TM-01 à TM-06 validés par l'utilisateur (2026-07-01)
+- [x] **Test manuel** : TM-01 à TM-08 validés par l'utilisateur (2026-07-01)
   - TM-01 : Depuis le tableau de bord, cliquer "Routines" → page "Mes routines" s'affiche — OK
   - TM-02 : Créer une routine (nom, type matin/soir, durée) → apparaît dans la liste — OK
   - TM-03 : Ouvrir une routine, ajouter une étape → apparaît dans la liste des étapes — OK
   - TM-04 : Cocher une étape → coché visuellement (barré) — OK
   - TM-05 : Supprimer une étape → disparaît de la liste — OK
   - TM-06 : Réserver un créneau (date + heure) → message "Prévue le … à …" affiché — OK
-  - TM-07 et TM-08 : **reportés à V2-9** — constat 2026-07-01 : `task-create-v2` (seul chemin vers "Planifier" → planning) est orphelin depuis le revert e2e du 2026-06-30 (dashboard/Todo repointés vers `task-create` V1). Le planning n'a donc plus aucun accès navigable réel. Re-router maintenant risquerait de recasser les e2e T11-T13 (flux V1 simple). V2-9 prévoit déjà l'icône agenda comme accès direct : à valider avec cette icône.
-    - TM-07 (différé) : Ouvrir le planning à la date choisie → bloc routine visible dans la case horaire correspondante
-    - TM-08 (différé) : Cliquer sur le bloc routine dans le planning → navigue vers le détail de la routine
-- [x] **Sortie** : routines centralisées (besoin n°1 exprimé par Marie) — mécanique livrée et test manuel TM-01 à TM-06 validés 2026-07-01 ; TM-07/TM-08 (intégration planning visible) reportés V2-9
+  - TM-07 : Ouvrir le planning à la date choisie → bloc routine visible dans la case horaire correspondante — OK (débloqué par l'icône agenda de V2-9)
+  - TM-08 : Cliquer sur le bloc routine dans le planning → navigue vers le détail de la routine — OK
+- [x] **Sortie** : routines centralisées (besoin n°1 exprimé par Marie) — mécanique livrée et test manuel TM-01 à TM-08 validés 2026-07-01
 
 ## Phase V2-9 — Refonte page d'accueil
 
 Maquette : capture 183750. Dépend des phases planning + listes.
 
-- [ ] Haut : "Mon énergie" + bouton mode surcharge isolé + icône agenda
-- [ ] Centre : planning d'aujourd'hui en cases, à l'heure courante, scrollable
-- [ ] Bas : bouton "Ajouter une tâche" + navigation (Todo / Planifier / Listes)
-- [ ] **Tests** + **Test manuel** : parcours d'accueil complet mobile sans scroll parasite
-- [ ] **Sortie** : page d'accueil conforme à la maquette de Marie
+- [x] Haut : "Mon énergie" + bouton mode surcharge isolé + icône agenda (accès direct `planning`)
+- [x] Centre : nouvelle section "Planning du jour" (mini, `TaskV2`/`Routine` du jour, tri par heure) — masque les tâches `essential=false` en mode surcharge. Le planning en cases complet (grille horaire scrollable) reste dans `E40Planning`, accessible via l'icône agenda ou le bouton "Planifier" ; pas dupliqué en miniature dans le dashboard (risque de double UI, écarté)
+- [x] Bas : bouton "Ajouter une tâche" repointé vers `task-create-v2` (3 destinations, résout la navigation orpheline) ; nav segmentée étendue avec "Planifier" et "Listes" (les 4 segments existants Todo/Aujourd'hui/À faire plus tard/Routines sont conservés — testés par e2e T14/T15 — plutôt que remplacés strictement par les 3 items de la maquette)
+- [x] **Tests** : 8 tests ajoutés (396/396 total) — nav planning/lists, icône agenda, section planning du jour, masquage essential
+- [x] **Test manuel** : TM-01 à TM-06 validés par l'utilisateur (2026-07-01)
+  - TM-01 à TM-06 : OK
+- [x] **Sortie** : page d'accueil conforme à l'esprit de la maquette de Marie ; navigation orpheline (`task-create-v2`, planning, listes) résolue ; test manuel validé 2026-07-01
 
 ## Phase V2-10 — Consolidation V2 & 2e vague de tests
 
@@ -188,7 +178,7 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 
 ## Risques / angles morts
 
-- **Navigation orpheline (constat 2026-07-01)** : le revert e2e du 2026-06-30 (dashboard/Todo repointés vers `task-create` V1 pour stabiliser T11-T13) a rendu `task-create-v2` — et donc l'écran planning (`E40Planning`) — inaccessible par toute navigation réelle, sans que cela soit détecté ni documenté sur le moment (V2-3 restait marquée validée). Gate commun complété (point 7) pour prévenir la récidive. À corriger explicitement en V2-9 (icône agenda = accès direct planning).
+- **Navigation orpheline (constat 2026-07-01, résolu en V2-9)** : le revert e2e du 2026-06-30 (dashboard/Todo repointés vers `task-create` V1 pour stabiliser T11-T13) avait rendu `task-create-v2` — et donc l'écran planning (`E40Planning`) — inaccessible par toute navigation réelle. Résolu en V2-9 : bouton "Ajouter une tâche" du dashboard repointé vers `task-create-v2`, icône agenda + bouton "Planifier" donnent un accès direct au planning, bouton "Listes" donne accès à `E60Lists`. Vérifié : aucun e2e cassé (T11-T19 passent par le bouton d'ajout propre à `E20Inbox`, indépendant de celui du dashboard). Gate commun complété (point 7) pour prévenir la récidive.
 - **Maquettes manquantes** : les dessins de Marie sont des photos basse-déf ; valider l'interprétation avant de coder le planning et la page d'accueil.
 - **Définition "essentiel"** : le filtrage surcharge dépend d'un marquage `essential` dont le critère n'est pas encore défini par l'usage réel (Phase V2-6 en attente du retour de Marie).
 - **Rollback données** : Marie accepte le reset. Informer explicitement avant tout déploiement V2.

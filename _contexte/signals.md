@@ -1,4 +1,4 @@
-# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-01 session 2)
+# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-01 session 3)
 
 ## Actions ouvertes
 
@@ -17,6 +17,15 @@
 - [P3|ouvert] Trou fonctionnel TaskV2 : aucune interaction UI pour compléter/reporter/toggle `essential` une tâche planifiée
   - fait quand: décision produit prise (implémenter ou explicitement abandonner) sur `completeTaskV2`/`moveTaskToLaterV2`/`toggleEssentialV2` (`src/domain/rules/taskRulesV2.ts`), actuellement non appelées nulle part dans l'UI
   - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`
+- [P1|ouvert] À DÉCIDER PROCHAINE SESSION — Collision de nommage "À planifier plus tard" (V2) vs "À faire plus tard" (V1)
+  - constat : signalé comme "bug" par l'utilisateur (tâche créée en "À planifier plus tard" invisible dans "À faire plus tard") — en réalité pas un bug, deux systèmes distincts et non reliés qui portent des libellés quasi identiques
+  - explication technique : créer une tâche via `E21CreateTaskV2` (bouton "Ajouter une tâche") avec destination "À planifier plus tard" crée une `TaskV2` statut `to_plan`. Cette tâche est visible UNIQUEMENT via le bouton "À planifier" (point rouge, dashboard) → `E50ToPlanQueue`. Elle n'apparaît PAS dans l'onglet nav "À faire plus tard" (`E25Later`), qui affiche exclusivement les tâches V1 (`Task`, statut `later`) — un modèle de données totalement différent, sans lien avec `TaskV2`/`to_plan`.
+  - options à trancher :
+    1. Fusionner les deux systèmes (migrer `E25Later` vers `TaskV2`/`to_plan`, supprimer le doublon V1 `later`)
+    2. Renommer l'un des deux libellés pour lever l'ambiguïté sans toucher au code (ex: "À dater" vs "Choses à faire plus tard")
+    3. Ne rien changer, mais documenter/expliquer la distinction dans l'UI (ex: tooltip, texte d'aide)
+  - fait quand: une des 3 options est choisie et actée
+  - réf: `src/ui/screens/tasks/E21CreateTaskV2.tsx`, `src/ui/screens/planning/E50ToPlanQueue.tsx`, `src/ui/screens/tasks/E25Later.tsx`, `src/domain/entities/task.ts` (statut `later`) vs `src/domain/entities/taskV2.ts` (statut `to_plan`)
 
 ## Questions ouvertes
 
@@ -36,27 +45,20 @@ Aucun.
 - Dashboard : nouvelle section "Planning du jour" (mini, `TaskV2`+`Routine` du jour triés par heure) — masque les tâches `essential=false` en mode surcharge. Le planning en cases complet reste dans `E40Planning` seul (pas de duplication de la grille horaire dans le dashboard)
 - Nav segmentée dashboard : 6 boutons (Todo/Aujourd'hui/À faire plus tard/Routines/Planifier/Listes) — les 4 premiers conservés tels quels car testés par e2e T14/T15, Planifier/Listes ajoutés à la suite plutôt que remplacement strict par les 3 items de la maquette
 
-## Dernière session (2026-07-01 session 2)
+## Dernière session (2026-07-01 session 3)
 
 ## Décisions prises
-- V2-10 démarrée : chantier "refacto/dead code/couverture" traité en premier (choix utilisateur)
-- `vitest.config.ts` : exclusion `dist_v1/**` + `e2e/**` du coverage (polluaient le rapport à 0%) — couverture réelle mesurée : 95.48% lignes / 91.74% branches / 89.11% fonctions, seuil 85% dépassé
-- Suppression de `TASK_TODAY_MAX`/`canAddToToday` (`src/domain/rules/taskRules.ts`) — dead code V1 confirmé (aucune limite quotidienne appliquée nulle part)
-- `completeTaskV2`/`moveTaskToLaterV2`/`toggleEssentialV2` (`taskRulesV2.ts`) conservés — pas du code mort mais un trou fonctionnel (aucune UI ne les appelle), documenté en action ouverte plutôt que supprimé
+- Aucune décision actée — session d'analyse : clarification Todo/À faire plus tard (V1), vérification de la pastille "À planifier" (déjà livrée V2-5), diagnostic d'un signalement utilisateur ("bug" à la création de tâche)
 
 ## Livrables produits ou modifiés
-- `vitest.config.ts` : ajout `dist_v1/**`/`e2e/**` dans `coverage.exclude`
-- `src/domain/rules/taskRules.ts` : suppression `TASK_TODAY_MAX`/`canAddToToday`
-- `src/domain/rules/taskRules.test.ts` : tests correspondants supprimés (392/392 total après nettoyage)
-- `_contexte/signals.md` : question ouverte sur le critère `essential` retirée (demande explicite utilisateur)
+- `_contexte/signals.md` : nouvelle action P1 documentée — collision de nommage "À planifier plus tard" (V2, `TaskV2`/`to_plan`) vs "À faire plus tard" (V1, `Task`/`later`), avec 3 options de résolution à trancher
 
 ## Hypothèses validées / invalidées
-- VALIDE : `TASK_TODAY_MAX`/`canAddToToday` sont du dead code réel (grep confirme aucun usage hors test)
-- INVALIDE : les 3 fonctions `taskRulesV2.ts` restantes sont du code mort -> pivot vers "trou fonctionnel non câblé", à trancher comme décision produit
-- EN ATTENTE : décision sur l'implémentation (ou l'abandon explicite) de compléter/reporter/toggle essentiel une `TaskV2`
+- VALIDE : le signalement utilisateur n'est pas un bug logiciel — c'est une confusion UX réelle entre deux systèmes de données distincts (V1 `later` / V2 `to_plan`) sous des libellés quasi identiques, confirmé par lecture de `E21CreateTaskV2.tsx`, `E50ToPlanQueue.tsx`, `E25Later.tsx`
+- VALIDE : la pastille rouge "À planifier" (Phase V2-5) est bien codée et fonctionnelle (`E10Dashboard.tsx:397-427`)
 
 ## Prochaine étape exacte
-Poursuivre V2-10 : doc V2 (README/schéma données/ADR), build + déploiement Netlify (bascule `main`), sessions test 2-5 avec Marie et autres testeurs AuDHD.
+Trancher la collision de nommage V1/V2 (voir action P1 ci-dessus, 3 options proposées), puis poursuivre V2-10 : doc V2, build + déploiement Netlify, sessions test 2-5 avec Marie.
 
 ## Question bloquante pour la session suivante
-Aucune.
+Collision de nommage "À planifier plus tard" / "À faire plus tard" : fusionner les deux systèmes, renommer, ou documenter la distinction dans l'UI ?

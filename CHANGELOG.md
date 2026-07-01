@@ -1,3 +1,10 @@
+## v0.32 — 2026-07-01
+
+### Modifié
+- `_contexte/signals.md` : diagnostic d'un signalement utilisateur ("tâche 'à planifier plus tard' invisible") — pas un bug, collision de nommage entre deux systèmes distincts (V1 `Task`/`later` vs V2 `TaskV2`/`to_plan`). Documenté en action ouverte avec 3 options de résolution, à trancher la prochaine session.
+
+---
+
 ## v0.31 — 2026-07-01
 
 ### Modifié

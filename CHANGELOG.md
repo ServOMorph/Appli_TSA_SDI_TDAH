@@ -1,3 +1,22 @@
+## v0.29 — 2026-07-01
+
+### Ajouté
+- Phase V2-8 — Routines (matin/soir) : `E70Routines.tsx` (liste, création nom/type/durée), `E71RoutineDetail.tsx` (étapes cochables, réservation de créneau).
+- `src/domain/rules/routineRules.ts` : règles pures `createRoutine`/`createRoutineStep`/`scheduleRoutine`/`toggleRoutineStep`.
+- `Routine` (entité) : ajout `scheduled_date`/`scheduled_start` optionnels.
+- `AppContext.tsx` : state et méthodes routines, branchées sur `RoutineRepository`/`RoutineStepRepository` existants.
+- `E40Planning.tsx` : affichage des routines planifiées comme bloc distinct dans la grille horaire.
+- Dashboard : segment nav "Routines".
+- 25 tests ajoutés (390/390 total). Test manuel TM-01 à TM-06 validé.
+
+### Corrigé
+- Roadmap : gate commun complété (point 7 — vérifier qu'un écran livré ne perd pas son accès navigable) suite à la découverte d'une régression silencieuse (`task-create-v2` orphelin depuis le revert e2e du 2026-06-30, planning inaccessible par navigation réelle).
+
+### Modifié
+- `roadmap_v2.md` : V2-8 close (mécanique + TM-01 à TM-06) ; V2-7 test manuel formellement reporté V2-9 ; TM-07/08 V2-8 reportés V2-9 ; angles morts "Navigation orpheline" documenté.
+
+---
+
 ## v0.28 — 2026-07-01
 
 ### Ajouté

@@ -16,7 +16,7 @@ Ce document redéfinit les termes par rapport à `roadmap.md` :
 - `[ ]` non démarrée · `[~]` en cours · `[x]` terminée (gate validé)
 
 ## Gate commun (rappel)
-1. Livrables fonctionnels · 2. Tests ≥ 85 % code ajouté · 3. Refacto fin de phase · 4. Doc à jour · 5. Test manuel parcours · 6. Critère de sortie atteint
+1. Livrables fonctionnels · 2. Tests ≥ 85 % code ajouté · 3. Refacto fin de phase · 4. Doc à jour · 5. Test manuel parcours · 6. Critère de sortie atteint · 7. Aucun écran livré dans une phase antérieure n'a perdu son point d'entrée navigable (vérifier les chemins de navigation réels, pas seulement les tests)
 
 ---
 
@@ -119,19 +119,42 @@ Nouvelle entité. Exemples Marie : habits, musiques, livres, routines.
 - [x] Les listes ne sont **pas** planifiables (référentiel, pas tâches)
 - [ ] Bouton "Ajouter" : suggestion de liste depuis le flux d'ajout de tâche — reporté (non couvert par cette itération, à raccorder en V2-9)
 - [x] **Tests** : 28 tests (365/365 total)
-- [ ] **Test manuel** : à valider par l'utilisateur
+- [ ] **Test manuel** : reporté à V2-9 — aucun point d'entrée dashboard vers `E60Lists` avant le branchement de la nav (Todo / Planifier / Listes) prévu en V2-9. Écrans non accessibles en conditions réelles avant cette phase.
+  - TM-01 : Depuis le tableau de bord, cliquer sur "Listes" (nav V2-9) → la page "Mes listes" s'affiche
+  - TM-02 : Liste vide → message "Aucune liste pour l'instant." affiché
+  - TM-03 : Cliquer "Nouvelle liste" → formulaire (champ nom) apparaît, focus automatique sur le champ
+  - TM-04 : Bouton "Créer" désactivé tant que le nom est vide
+  - TM-05 : Saisir un nom, cliquer "Créer" → la liste apparaît dans "Mes listes", formulaire refermé
+  - TM-06 : Saisir un nom puis appuyer sur "Entrée" → même résultat que TM-05 (raccourci clavier)
+  - TM-07 : Cliquer "Annuler" pendant la création → formulaire refermé, aucune liste créée
+  - TM-08 : Cliquer sur une liste existante → navigation vers l'écran détail, titre = nom de la liste
+  - TM-09 : Liste sans élément → message "Cette liste est vide." affiché
+  - TM-10 : Cliquer "Ajouter un élément", saisir un titre, valider → élément affiché dans la liste
+  - TM-11 : Cliquer "×" sur un élément → élément supprimé immédiatement de l'affichage
+  - TM-12 : Bouton retour (←) dans le détail → retour à "Mes listes" ; bouton retour dans "Mes listes" → retour au tableau de bord
 - [x] **Sortie** : référentiel personnel fonctionnel (2026-06-30)
 
 ## Phase V2-8 — Routines (matin / soir)
 
 Maquette : capture 184750 (routines détaillées de Marie). Absorbe l'ancienne Phase 8.
 
-- [ ] Routines = listes spéciales avec **bloc de temps réservé** (ex. RM = 1h30), pas étape minutée dans le planning
-- [ ] Routine matin (RM) / routine soir (RS) ; possibilité de variantes semaine/week-end
-- [ ] Intégration au planning comme **bloc** unique
-- [ ] Cases à cocher des étapes au sein de la routine
-- [ ] **Tests** + **Test manuel** : créer routine, l'insérer comme bloc, cocher étapes
-- [ ] **Sortie** : routines centralisées (besoin n°1 exprimé par Marie)
+- [x] Routines = listes spéciales avec **bloc de temps réservé** (ex. RM = 1h30), pas étape minutée dans le planning
+- [x] Routine matin (RM) / routine soir (RS) — pas de variantes semaine/week-end (non couvert, à raccorder si besoin exprimé)
+- [x] Intégration au planning comme **bloc** unique (chip dans la case de l'heure de début, avec durée affichée)
+- [x] Cases à cocher des étapes au sein de la routine
+- [x] Point d'entrée dashboard : segment "Routines" ajouté à la nav (Todo/Aujourd'hui/À faire plus tard/Routines)
+- [x] **Tests** : 25 tests (390/390 total)
+- [x] **Test manuel** : TM-01 à TM-06 validés par l'utilisateur (2026-07-01)
+  - TM-01 : Depuis le tableau de bord, cliquer "Routines" → page "Mes routines" s'affiche — OK
+  - TM-02 : Créer une routine (nom, type matin/soir, durée) → apparaît dans la liste — OK
+  - TM-03 : Ouvrir une routine, ajouter une étape → apparaît dans la liste des étapes — OK
+  - TM-04 : Cocher une étape → coché visuellement (barré) — OK
+  - TM-05 : Supprimer une étape → disparaît de la liste — OK
+  - TM-06 : Réserver un créneau (date + heure) → message "Prévue le … à …" affiché — OK
+  - TM-07 et TM-08 : **reportés à V2-9** — constat 2026-07-01 : `task-create-v2` (seul chemin vers "Planifier" → planning) est orphelin depuis le revert e2e du 2026-06-30 (dashboard/Todo repointés vers `task-create` V1). Le planning n'a donc plus aucun accès navigable réel. Re-router maintenant risquerait de recasser les e2e T11-T13 (flux V1 simple). V2-9 prévoit déjà l'icône agenda comme accès direct : à valider avec cette icône.
+    - TM-07 (différé) : Ouvrir le planning à la date choisie → bloc routine visible dans la case horaire correspondante
+    - TM-08 (différé) : Cliquer sur le bloc routine dans le planning → navigue vers le détail de la routine
+- [x] **Sortie** : routines centralisées (besoin n°1 exprimé par Marie) — mécanique livrée et test manuel TM-01 à TM-06 validés 2026-07-01 ; TM-07/TM-08 (intégration planning visible) reportés V2-9
 
 ## Phase V2-9 — Refonte page d'accueil
 
@@ -165,6 +188,7 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 
 ## Risques / angles morts
 
+- **Navigation orpheline (constat 2026-07-01)** : le revert e2e du 2026-06-30 (dashboard/Todo repointés vers `task-create` V1 pour stabiliser T11-T13) a rendu `task-create-v2` — et donc l'écran planning (`E40Planning`) — inaccessible par toute navigation réelle, sans que cela soit détecté ni documenté sur le moment (V2-3 restait marquée validée). Gate commun complété (point 7) pour prévenir la récidive. À corriger explicitement en V2-9 (icône agenda = accès direct planning).
 - **Maquettes manquantes** : les dessins de Marie sont des photos basse-déf ; valider l'interprétation avant de coder le planning et la page d'accueil.
 - **Définition "essentiel"** : le filtrage surcharge dépend d'un marquage `essential` dont le critère n'est pas encore défini par l'usage réel (Phase V2-6 en attente du retour de Marie).
 - **Rollback données** : Marie accepte le reset. Informer explicitement avant tout déploiement V2.

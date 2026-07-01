@@ -26,6 +26,8 @@ import { E116Privacy } from '@/ui/screens/settings/E116Privacy'
 import { E117Export } from '@/ui/screens/settings/E117Export'
 import { E60Lists } from '@/ui/screens/lists/E60Lists'
 import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
+import { E70Routines } from '@/ui/screens/routines/E70Routines'
+import { E71RoutineDetail } from '@/ui/screens/routines/E71RoutineDetail'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 
 function AppScreens() {
@@ -105,6 +107,10 @@ function AppScreens() {
         return <E60Lists />
       case 'list-detail':
         return <E61ListDetail />
+      case 'routines':
+        return <E70Routines />
+      case 'routine-detail':
+        return <E71RoutineDetail />
     }
   }
 

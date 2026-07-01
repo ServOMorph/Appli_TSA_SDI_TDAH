@@ -54,6 +54,17 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     getListItems: vi.fn().mockResolvedValue([]),
     addListItem: vi.fn().mockResolvedValue(undefined),
     deleteListItem: vi.fn().mockResolvedValue(undefined),
+    routines: [],
+    selectedRoutineId: null,
+    selectRoutine: vi.fn(),
+    createRoutine: vi.fn().mockResolvedValue(undefined),
+    deleteRoutine: vi.fn().mockResolvedValue(undefined),
+    getRoutineSteps: vi.fn().mockResolvedValue([]),
+    addRoutineStep: vi.fn().mockResolvedValue(undefined),
+    deleteRoutineStep: vi.fn().mockResolvedValue(undefined),
+    toggleRoutineStep: vi.fn().mockResolvedValue(undefined),
+    scheduleRoutine: vi.fn().mockResolvedValue(undefined),
+    getRoutinesForDate: vi.fn().mockResolvedValue([]),
     ...overrides,
   }
 }

@@ -354,6 +354,9 @@ export function E10Dashboard() {
           <button onClick={() => goTo('later')} style={segmentStyle(true)}>
             À faire plus tard
           </button>
+          <button onClick={() => goTo('routines')} style={segmentStyle(true)}>
+            Routines
+          </button>
         </div>
       </nav>
     </main>

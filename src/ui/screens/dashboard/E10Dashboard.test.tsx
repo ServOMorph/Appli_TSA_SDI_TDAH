@@ -249,6 +249,13 @@ describe('E10Dashboard', () => {
       await userEvent.click(screen.getByRole('button', { name: 'À faire plus tard' }))
       expect(ctx.goTo).toHaveBeenCalledWith('later')
     })
+
+    it('navigue vers routines via la nav segmentée', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Routines' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('routines')
+    })
   })
 
   describe('mode surcharge (D10B)', () => {

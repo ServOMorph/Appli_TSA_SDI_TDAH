@@ -1,12 +1,5 @@
 import type { Task } from '@/domain/entities/task'
 
-export const TASK_TODAY_MAX = 3
-
-export function canAddToToday(tasks: Task[]): boolean {
-  const todayCount = tasks.filter((t) => t.status === 'today').length
-  return todayCount < TASK_TODAY_MAX
-}
-
 export function sortByPosition<T extends { position: number }>(items: T[]): T[] {
   return [...items].sort((a, b) => a.position - b.position)
 }

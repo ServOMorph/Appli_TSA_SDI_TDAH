@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { canAddToToday, sortByPosition, nextPosition, completeTask } from './taskRules'
+import { sortByPosition, nextPosition, completeTask } from './taskRules'
 import type { Task } from '@/domain/entities/task'
 
 const mockTask = (overrides?: Partial<Task>): Task => ({
@@ -14,36 +14,6 @@ const mockTask = (overrides?: Partial<Task>): Task => ({
 })
 
 describe('taskRules', () => {
-  describe('canAddToToday', () => {
-    it('returns true when less than max tasks', () => {
-      const tasks = [mockTask({ id: 't1' }), mockTask({ id: 't2' })]
-      expect(canAddToToday(tasks)).toBe(true)
-    })
-
-    it('returns false when max tasks reached', () => {
-      const tasks = [
-        mockTask({ id: 't1' }),
-        mockTask({ id: 't2' }),
-        mockTask({ id: 't3' }),
-      ]
-      expect(canAddToToday(tasks)).toBe(false)
-    })
-
-    it('returns true when no today tasks', () => {
-      const tasks = [mockTask({ status: 'inbox' })]
-      expect(canAddToToday(tasks)).toBe(true)
-    })
-
-    it('ignores non-today tasks', () => {
-      const tasks = [
-        mockTask({ id: 't1', status: 'today' }),
-        mockTask({ id: 't2', status: 'today' }),
-        mockTask({ id: 't3', status: 'inbox' }),
-      ]
-      expect(canAddToToday(tasks)).toBe(true)
-    })
-  })
-
   describe('sortByPosition', () => {
     it('sorts items by position ascending', () => {
       const items = [mockTask({ position: 2 }), mockTask({ position: 0 }), mockTask({ position: 1 })]

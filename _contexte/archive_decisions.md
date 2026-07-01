@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-06-29 (archivé depuis contexte.md 2026-07-01 session 2)
+- V2-2 close — schéma Dexie v2 parallèle (TaskV2, List, ListItem, Routine, RoutineStep) + règles métier + 301/301 tests.
+
 ## 2026-06-29 (archivé depuis contexte.md 2026-07-01)
 - Session test Marie — Netlify déployé et fonctionnel ; retours documentés dans `Note de réunion/`.
 - `roadmap_v2.md` créée (11 phases) ; `roadmap.md` archivé dans `Archives/roadmap_v1.md`.

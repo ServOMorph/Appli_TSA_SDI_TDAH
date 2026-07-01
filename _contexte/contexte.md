@@ -13,12 +13,11 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 
 ## État actuel (réécrit intégralement à chaque /close)
 V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes (mécaniques + tests manuels). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel).
-V2-9 (refonte page d'accueil) livrée : icône agenda (TopBar) + bouton "Planifier" → accès direct au planning, bouton "Listes" → `E60Lists`, bouton "Ajouter une tâche" repointé vers `task-create-v2`. Navigation orpheline résolue sans casser aucun e2e. Nouvelle section "Planning du jour" (mini, TaskV2+Routine) sur le dashboard, avec masquage `essential=false` en mode surcharge.
-Tests manuels validés en cascade : V2-9 (TM-01 à TM-06), V2-8 (TM-07/08, débloqués par l'icône agenda), V2-7 (12 TM, débloqués par le bouton Listes).
-Tests 396/396 unitaires (pool par défaut), 46/46 e2e (relancés cette session, aucune régression). Prochaine action : V2-10 (consolidation V2, couverture ≥85%, doc, déploiement).
+V2-10 (Consolidation) démarrée : chantier dead code/couverture traité — `TASK_TODAY_MAX`/`canAddToToday` (V1, jamais utilisés) supprimés ; couverture réelle mesurée à 95.48% (config coverage corrigée, `dist_v1`/`e2e` exclus). Trois fonctions `taskRulesV2.ts` (compléter/reporter/toggle essentiel une TaskV2) identifiées comme trou fonctionnel non câblé à l'UI — conservées, décision produit à trancher.
+Reste sur V2-10 : doc V2 (README/schéma/ADR), build + déploiement Netlify (bascule `main`), sessions test 2-5 avec Marie et autres testeurs AuDHD.
+Tests 392/392 unitaires (pool par défaut), 46/46 e2e (aucune régression).
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
-- 2026-06-29 : V2-2 close — schéma Dexie v2 parallèle (TaskV2, List, ListItem, Routine, RoutineStep) + règles métier + 301/301 tests.
 - 2026-06-30 : V2-3 close — flux d'ajout refondu (E21CreateTaskV2, 3 destinations obligatoires, createTaskV2Dest) + 313/313 tests.
 - 2026-06-30 : V2-4 close — vue Planning (E40Planning : grille 6h–22h, scroll auto heure courante, nav jour, picker placement/déplacement) + 324/324 tests.
 - 2026-06-30 : V2-5 close — file "À planifier" séquentielle (E50ToPlanQueue, pastille rouge dashboard, toPlanTasks dans AppContext) + 336/336 tests.
@@ -28,3 +27,4 @@ Tests 396/396 unitaires (pool par défaut), 46/46 e2e (relancés cette session, 
 - 2026-07-01 : Constat local — `npm run test` par défaut sature la mémoire Node sur cette machine ; utiliser `--pool=vmThreads --poolOptions.vmThreads.maxThreads=1` + `NODE_OPTIONS=--max-old-space-size=4096`.
 - 2026-07-01 : V2-8 close (mécanique + TM-01 à TM-06) — Routines (E70Routines, E71RoutineDetail), createRoutine/createRoutineStep/scheduleRoutine/toggleRoutineStep, bloc visible dans E40Planning + 390/390 tests. TM-07/08 reportés V2-9 : `task-create-v2` orphelin depuis revert e2e 2026-06-30 (planning inaccessible par nav réelle). Gate commun roadmap complété (point 7 : vérifier qu'un écran antérieur ne perd pas son accès navigable).
 - 2026-07-01 : V2-9 close (mécanique + TM-01 à TM-06) — icône agenda (TopBar) + bouton "Planifier"/"Listes" sur le dashboard, bouton d'ajout repointé vers `task-create-v2` (navigation orpheline résolue, zéro e2e cassé) ; section "Planning du jour" (mini, TaskV2+Routine) avec masquage `essential=false` en surcharge, sans migrer `todayTasks` V1 + 396/396 tests. Déblocage en cascade : V2-7 (12 TM) et V2-8 (TM-07/08) validés dans la foulée.
+- 2026-07-01 : V2-10 démarrée (chantier dead code/couverture) — suppression `TASK_TODAY_MAX`/`canAddToToday` (V1, jamais appliqués) ; config coverage corrigée (exclusion `dist_v1`/`e2e`), couverture réelle 95.48% (seuil 85% dépassé) ; `completeTaskV2`/`moveTaskToLaterV2`/`toggleEssentialV2` (V2) conservés mais identifiés comme trou fonctionnel non câblé à l'UI, décision produit différée.

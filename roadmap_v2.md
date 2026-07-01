@@ -158,7 +158,7 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 
 ## Phase V2-10 — Consolidation V2 & 2e vague de tests
 
-- [ ] Refacto d'architecture, dead code, couverture globale ≥ 85 %
+- [x] Refacto d'architecture, dead code, couverture globale ≥ 85 % — config coverage corrigée (exclusion `dist_v1`/`e2e`), couverture réelle 95.48% ; `TASK_TODAY_MAX`/`canAddToToday` (V1) supprimés. `completeTaskV2`/`moveTaskToLaterV2`/`toggleEssentialV2` (V2) conservés : trou fonctionnel (non code mort), décision produit différée (signals.md)
 - [x] E2E Playwright mis à jour (flux V2) — 46/46 passent depuis 2026-06-30 (soldé en avance de V2-10)
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`

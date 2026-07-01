@@ -1,3 +1,14 @@
+## v0.31 — 2026-07-01
+
+### Modifié
+- `vitest.config.ts` : exclusion `dist_v1/**`/`e2e/**` du calcul de couverture (polluaient le rapport à 0%) — couverture réelle mesurée : 95.48% lignes / 91.74% branches / 89.11% fonctions (seuil 85% dépassé).
+- `roadmap_v2.md` : Phase V2-10 — item "refacto d'architecture, dead code, couverture ≥85%" clos.
+
+### Corrigé
+- `src/domain/rules/taskRules.ts` : suppression de `TASK_TODAY_MAX`/`canAddToToday`, dead code V1 confirmé (aucune limite quotidienne appliquée nulle part dans l'app) — 392/392 tests après nettoyage.
+
+---
+
 ## v0.30 — 2026-07-01
 
 ### Ajouté

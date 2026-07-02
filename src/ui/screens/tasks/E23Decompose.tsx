@@ -125,7 +125,6 @@ export function E23Decompose() {
     selectedTaskId,
     inboxTasks,
     todayTasks,
-    laterTasks,
     getSubTasks,
     addSubTask,
     deleteSubTask,
@@ -136,7 +135,7 @@ export function E23Decompose() {
   const [subTasks, setSubTasks] = useState<SubTask[]>([])
   const [newTitle, setNewTitle] = useState('')
 
-  const task = [...inboxTasks, ...todayTasks, ...laterTasks].find((t) => t.id === selectedTaskId)
+  const task = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
 
   useEffect(() => {
     if (selectedTaskId) {

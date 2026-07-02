@@ -1,5 +1,9 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-06-30 (archivé depuis contexte.md 2026-07-02)
+- V2-3 close — flux d'ajout refondu (E21CreateTaskV2, 3 destinations obligatoires, createTaskV2Dest) + 313/313 tests.
+- V2-4 close — vue Planning (E40Planning : grille 6h–22h, scroll auto heure courante, nav jour, picker placement/déplacement) + 324/324 tests.
+
 ## 2026-06-29 (archivé depuis contexte.md 2026-07-01 session 2)
 - V2-2 close — schéma Dexie v2 parallèle (TaskV2, List, ListItem, Routine, RoutineStep) + règles métier + 301/301 tests.
 

@@ -16,8 +16,6 @@ describe('AppDatabase', () => {
     expect(db.tasksV2).toBeDefined()
     expect(db.lists).toBeDefined()
     expect(db.listItems).toBeDefined()
-    expect(db.routines).toBeDefined()
-    expect(db.routineSteps).toBeDefined()
     expect(db.energyEntries).toBeDefined()
     expect(db.settings).toBeDefined()
   })

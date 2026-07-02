@@ -2,7 +2,6 @@ import { useApp } from '@/app/AppContext'
 import { useState, useEffect } from 'react'
 import type { Task } from '@/domain/entities/task'
 import type { TaskV2 } from '@/domain/entities/taskV2'
-import type { Routine } from '@/domain/entities/routine'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
@@ -45,22 +44,10 @@ function planningChipStyle(essential: boolean): React.CSSProperties {
   }
 }
 
-const planningRoutineChipStyle: React.CSSProperties = {
-  background: 'var(--color-secondary)',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 'var(--radius-sm)',
-  padding: '6px 10px',
-  fontSize: '0.8125rem',
-  cursor: 'pointer',
-  textAlign: 'left',
-  fontFamily: 'var(--font-body)',
-  width: '100%',
-}
-
 function segmentStyle(withDivider: boolean): React.CSSProperties {
   return {
     flex: 1,
+    position: 'relative',
     padding: '12px 8px',
     background: 'transparent',
     border: 'none',
@@ -70,6 +57,16 @@ function segmentStyle(withDivider: boolean): React.CSSProperties {
     fontFamily: 'var(--font-body)',
     cursor: 'pointer',
   }
+}
+
+const segmentPastilleStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 6,
+  right: 6,
+  width: 8,
+  height: 8,
+  borderRadius: '50%',
+  background: '#d32f2f',
 }
 
 interface SortableTaskItemProps {
@@ -163,14 +160,12 @@ export function E10Dashboard() {
     setTaskDetailOrigin,
     reorderTodayTasks,
     toPlanTasks,
+    inboxTasks,
     getPlannedTasksForDate,
-    getRoutinesForDate,
-    selectRoutine,
   } = useApp()
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks.slice(0, 3))
   const [todayPlanned, setTodayPlanned] = useState<TaskV2[]>([])
-  const [todayRoutinesScheduled, setTodayRoutinesScheduled] = useState<Routine[]>([])
 
   useEffect(() => {
     setVisibleOrder(todayTasks.slice(0, 3))
@@ -179,15 +174,11 @@ export function E10Dashboard() {
   useEffect(() => {
     async function loadPlanningToday() {
       const date = todayStr()
-      const [planned, routinesForDate] = await Promise.all([
-        getPlannedTasksForDate(date),
-        getRoutinesForDate(date),
-      ])
+      const planned = await getPlannedTasksForDate(date)
       setTodayPlanned(planned)
-      setTodayRoutinesScheduled(routinesForDate)
     }
     loadPlanningToday()
-  }, [getPlannedTasksForDate, getRoutinesForDate])
+  }, [getPlannedTasksForDate])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -201,13 +192,8 @@ export function E10Dashboard() {
     goTo('task-detail')
   }
 
-  function openRoutine(routineId: string) {
-    selectRoutine(routineId)
-    goTo('routine-detail')
-  }
-
   const visiblePlannedTasks = todayPlanned.filter((t) => overloadMode ? t.essential : true)
-  const hasPlanningToday = visiblePlannedTasks.length > 0 || todayRoutinesScheduled.length > 0
+  const hasPlanningToday = visiblePlannedTasks.length > 0
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -329,16 +315,6 @@ export function E10Dashboard() {
         <h2>Planning du jour</h2>
         {hasPlanningToday ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-            {todayRoutinesScheduled.map((routine) => (
-              <button
-                key={routine.id}
-                style={planningRoutineChipStyle}
-                onClick={() => openRoutine(routine.id)}
-                aria-label={`${routine.name} — routine (${routine.duration_minutes} min)`}
-              >
-                {routine.scheduled_start} · {routine.name} ({routine.duration_minutes} min)
-              </button>
-            ))}
             {visiblePlannedTasks.map((task) => (
               <button
                 key={task.id}
@@ -438,15 +414,10 @@ export function E10Dashboard() {
         >
           <button onClick={() => goTo('inbox')} style={segmentStyle(false)}>
             Todo
+            {inboxTasks.length > 0 && <span aria-hidden style={segmentPastilleStyle} />}
           </button>
           <button onClick={() => goTo('today')} style={segmentStyle(true)}>
             Aujourd'hui
-          </button>
-          <button onClick={() => goTo('later')} style={segmentStyle(true)}>
-            À faire plus tard
-          </button>
-          <button onClick={() => goTo('routines')} style={segmentStyle(true)}>
-            Routines
           </button>
           <button onClick={() => goTo('planning')} style={segmentStyle(true)}>
             Planifier

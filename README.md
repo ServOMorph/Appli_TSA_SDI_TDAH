@@ -15,7 +15,7 @@ npm run build      # build de production
 npm run preview    # prévisualisation du build
 npm test               # tests unitaires (Vitest)
 npm run test:coverage  # couverture (seuil 85 %)
-npm run test:e2e       # tests E2E Playwright (build + 46 scénarios)
+npm run test:e2e       # tests E2E Playwright (build + 45 scénarios)
 npm run test:e2e:report  # ouvrir le rapport HTML Playwright
 npm run lint       # ESLint
 npm run format     # Prettier
@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes (mécaniques + tests manuels). Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). V2-10 (consolidation) démarrée : dead code nettoyé (`TASK_TODAY_MAX`/`canAddToToday` V1 supprimés), couverture réelle mesurée à 95.48 % (config coverage corrigée). Reste : doc V2 (README/schéma/ADR), déploiement Netlify (bascule `main`), sessions test 2-5 avec Marie. Tests unitaires 392/392, e2e 46/46.
+V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes. Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). V2-10 (consolidation) en cours : dead code nettoyé, couverture ≥85 % atteinte. Fonctionnalité Routines (V2-8) retirée — non demandée par Marie. Collision de nommage V1/V2 "plus tard" résolue (système V1 retiré). Écran Todo enrichi (actions Planifier/Liste par tâche). Reste : doc V2 (README/schéma/ADR), déploiement Netlify (bascule `main`), sessions test 2-5 avec Marie. Tests unitaires 345/345, e2e 42/45 (3 échecs préexistants sans lien).
 
 ## Stack
 

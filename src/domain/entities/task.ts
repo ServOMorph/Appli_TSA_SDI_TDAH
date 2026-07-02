@@ -1,4 +1,4 @@
-export type TaskStatus = 'inbox' | 'today' | 'later' | 'completed'
+export type TaskStatus = 'inbox' | 'today' | 'completed'
 
 export interface Task {
   id: string

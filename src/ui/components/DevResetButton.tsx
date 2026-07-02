@@ -8,14 +8,12 @@ const SCREEN_CODES: Record<Screen, string> = {
   'first-task': 'E04',
   dashboard: 'E10',
   inbox: 'E20',
-  'task-create': 'E21',
   'task-create-v2': 'E21v2',
   planning: 'E40',
   'to-plan-queue': 'E50',
   'task-detail': 'E22',
   'task-decompose': 'E23',
   today: 'E24',
-  later: 'E25',
   'energy-view': 'E30',
   'energy-checkin': 'E31',
   'overload-recovery': 'E90',
@@ -27,6 +25,8 @@ const SCREEN_CODES: Record<Screen, string> = {
   'settings-organisation': 'E114',
   'settings-privacy': 'E116',
   'settings-export': 'E117',
+  lists: 'E60',
+  'list-detail': 'E61',
 }
 
 export function DevResetButton() {

@@ -57,7 +57,7 @@ function destinationBtnStyle(selected: boolean): React.CSSProperties {
 }
 
 export function E21CreateTaskV2() {
-  const { createTaskV2Dest, goTo } = useApp()
+  const { createTaskV2Dest, createTaskInbox, goTo } = useApp()
   const [title, setTitle] = useState('')
   const [destination, setDestination] = useState<TaskStatusV2 | null>(null)
 
@@ -65,6 +65,11 @@ export function E21CreateTaskV2() {
     e.preventDefault()
     const trimmed = title.trim()
     if (!trimmed || !destination) return
+    if (destination === 'todo') {
+      await createTaskInbox(trimmed)
+      goTo('inbox')
+      return
+    }
     await createTaskV2Dest(trimmed, destination)
     if (destination === 'planned') {
       goTo('planning')

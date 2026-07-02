@@ -6,7 +6,6 @@ import { E10Dashboard } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
 import type { SubTask } from '@/domain/entities/subTask'
 import type { TaskV2 } from '@/domain/entities/taskV2'
-import type { Routine } from '@/domain/entities/routine'
 
 function makeTaskV2(overrides: Partial<TaskV2> = {}): TaskV2 {
   return {
@@ -21,20 +20,6 @@ function makeTaskV2(overrides: Partial<TaskV2> = {}): TaskV2 {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     completed_at: null,
-    ...overrides,
-  }
-}
-
-function makeRoutine(overrides: Partial<Routine> = {}): Routine {
-  return {
-    id: 'routine-1',
-    name: 'Routine matin',
-    type: 'morning',
-    duration_minutes: 90,
-    scheduled_date: '2026-07-01',
-    scheduled_start: '07:00',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
     ...overrides,
   }
 }
@@ -272,22 +257,27 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('resources')
     })
 
-    it('navigue vers inbox / today / later via la nav segmentée', async () => {
+    it('navigue vers inbox / today via la nav segmentée', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
       expect(ctx.goTo).toHaveBeenCalledWith('inbox')
       await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
       expect(ctx.goTo).toHaveBeenCalledWith('today')
-      await userEvent.click(screen.getByRole('button', { name: 'À faire plus tard' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('later')
     })
 
-    it('navigue vers routines via la nav segmentée', async () => {
-      const ctx = makeAppContext()
+    it('affiche une pastille sur Todo si des tâches sont en attente', () => {
+      const ctx = makeAppContext({ inboxTasks: [makeTask({ id: 'i1' })] })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Routines' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('routines')
+      const todoButton = screen.getByRole('button', { name: 'Todo' })
+      expect(todoButton.querySelector('[aria-hidden="true"]')).not.toBeNull()
+    })
+
+    it("n'affiche pas de pastille sur Todo si aucune tâche en attente", () => {
+      const ctx = makeAppContext({ inboxTasks: [] })
+      renderWithApp(<E10Dashboard />, ctx)
+      const todoButton = screen.getByRole('button', { name: 'Todo' })
+      expect(todoButton.querySelector('[aria-hidden="true"]')).toBeNull()
     })
 
     it('navigue vers planning via la nav segmentée', async () => {
@@ -318,14 +308,12 @@ describe('E10Dashboard', () => {
       expect(await screen.findByText('Rien de planifié aujourd\'hui.')).toBeDefined()
     })
 
-    it('affiche une tâche planifiée et une routine du jour', async () => {
+    it('affiche une tâche planifiée du jour', async () => {
       const ctx = makeAppContext({
         getPlannedTasksForDate: async () => [makeTaskV2({ title: 'RDV médecin' })],
-        getRoutinesForDate: async () => [makeRoutine({ name: 'Routine matin' })],
       })
       renderWithApp(<E10Dashboard />, ctx)
       expect(await screen.findByText(/RDV médecin/)).toBeDefined()
-      expect(await screen.findByText(/Routine matin/)).toBeDefined()
     })
 
     it('masque une tâche non essentielle en mode surcharge', async () => {

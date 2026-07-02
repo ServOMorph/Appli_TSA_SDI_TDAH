@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
-import type { Routine } from '@/domain/entities/routine'
 
 const HOURS = Array.from({ length: 17 }, (_, i) => i + 6)
 
@@ -26,11 +25,6 @@ function formatDate(date: string): string {
 function taskHour(task: TaskV2): number | null {
   if (!task.scheduled_start) return null
   return parseInt(task.scheduled_start.slice(0, 2), 10)
-}
-
-function routineHour(routine: Routine): number | null {
-  if (!routine.scheduled_start) return null
-  return parseInt(routine.scheduled_start.slice(0, 2), 10)
 }
 
 type Picker =
@@ -115,19 +109,6 @@ function taskChipStyle(essential: boolean): React.CSSProperties {
   }
 }
 
-const routineChipStyle: React.CSSProperties = {
-  background: 'var(--color-secondary)',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 'var(--radius-sm)',
-  padding: '4px 8px',
-  fontSize: '0.8125rem',
-  cursor: 'pointer',
-  textAlign: 'left',
-  fontFamily: 'var(--font-body)',
-  width: '100%',
-}
-
 const overlayStyle: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
@@ -178,14 +159,11 @@ export function E40Planning() {
     getPlannedTasksForDate,
     getUnscheduledPlannedTasks,
     scheduleV2Task,
-    getRoutinesForDate,
-    selectRoutine,
   } = useApp()
 
   const [displayDate, setDisplayDate] = useState(todayStr)
   const [scheduledTasks, setScheduledTasks] = useState<TaskV2[]>([])
   const [unscheduled, setUnscheduled] = useState<TaskV2[]>([])
-  const [scheduledRoutines, setScheduledRoutines] = useState<Routine[]>([])
   const [picker, setPicker] = useState<Picker>(null)
 
   const currentHour = new Date().getHours()
@@ -193,22 +171,15 @@ export function E40Planning() {
 
   useEffect(() => {
     async function load() {
-      const [sched, unsched, routinesForDate] = await Promise.all([
+      const [sched, unsched] = await Promise.all([
         getPlannedTasksForDate(displayDate),
         getUnscheduledPlannedTasks(),
-        getRoutinesForDate(displayDate),
       ])
       setScheduledTasks(sched)
       setUnscheduled(unsched)
-      setScheduledRoutines(routinesForDate)
     }
     load()
   }, [displayDate]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  function handleOpenRoutine(routineId: string) {
-    selectRoutine(routineId)
-    goTo('routine-detail')
-  }
 
   useEffect(() => {
     if (currentSlotRef.current) {
@@ -262,7 +233,6 @@ export function E40Planning() {
         {HOURS.map((hour) => {
           const isNow = isToday && hour === currentHour
           const tasksInSlot = scheduledTasks.filter((t) => taskHour(t) === hour)
-          const routinesInSlot = scheduledRoutines.filter((r) => routineHour(r) === hour)
 
           return (
             <div
@@ -280,19 +250,6 @@ export function E40Planning() {
                 onClick={() => tasksInSlot.length === 0 && setPicker({ mode: 'assign', hour })}
                 aria-label={`Créneau ${hour}h`}
               >
-                {routinesInSlot.map((routine) => (
-                  <button
-                    key={routine.id}
-                    style={routineChipStyle}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleOpenRoutine(routine.id)
-                    }}
-                    aria-label={`${routine.name} — routine (${routine.duration_minutes} min)`}
-                  >
-                    {routine.name} ({routine.duration_minutes} min)
-                  </button>
-                ))}
                 {tasksInSlot.map((task) => (
                   <button
                     key={task.id}

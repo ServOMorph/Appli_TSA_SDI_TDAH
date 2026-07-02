@@ -38,13 +38,14 @@ describe('E21CreateTaskV2', () => {
     expect(btn.disabled).toBe(false)
   })
 
-  it('chemin Todo : crée avec status todo et navigue vers inbox', async () => {
+  it('chemin Todo : crée une tâche V1 inbox et navigue vers inbox', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche todo')
     await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.createTaskV2Dest).toHaveBeenCalledWith('Tâche todo', 'todo')
+    expect(ctx.createTaskInbox).toHaveBeenCalledWith('Tâche todo')
+    expect(ctx.createTaskV2Dest).not.toHaveBeenCalled()
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 

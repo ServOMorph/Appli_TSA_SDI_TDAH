@@ -48,8 +48,9 @@ const modalBox: React.CSSProperties = {
 }
 
 export function E20Inbox() {
-  const { inboxTasks, todayTasks, selectTask, goTo, moveTask } = useApp()
+  const { inboxTasks, todayTasks, lists, selectTask, goTo, moveTask, planTodoTask, moveTodoTaskToList } = useApp()
   const [pendingMoveId, setPendingMoveId] = useState<string | null>(null)
+  const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
 
   async function handleMoveToToday(taskId: string) {
     if (todayTasks.length >= 3) {
@@ -64,6 +65,17 @@ export function E20Inbox() {
     await moveTask(replacedId, 'inbox')
     await moveTask(pendingMoveId, 'today')
     setPendingMoveId(null)
+  }
+
+  async function handlePlan(taskId: string) {
+    await planTodoTask(taskId)
+    goTo('planning')
+  }
+
+  async function handleChooseList(listId: string) {
+    if (!listPickerTask) return
+    await moveTodoTaskToList(listPickerTask.id, listId)
+    setListPickerTask(null)
   }
 
   function openDetail(task: Task) {
@@ -92,7 +104,7 @@ export function E20Inbox() {
                 >
                   {task.title}
                 </button>
-                <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
+                <div style={{ display: 'flex', gap: 'var(--spacing-xs)', flexWrap: 'wrap' }}>
                   <button
                     aria-label={`Déplacer ${task.title} vers Aujourd'hui`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
@@ -101,11 +113,18 @@ export function E20Inbox() {
                     Aujourd'hui
                   </button>
                   <button
-                    aria-label={`Déplacer ${task.title} vers À faire plus tard`}
+                    aria-label={`Planifier ${task.title}`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
-                    onClick={() => moveTask(task.id, 'later')}
+                    onClick={() => handlePlan(task.id)}
                   >
-                    À faire plus tard
+                    Planifier
+                  </button>
+                  <button
+                    aria-label={`Ajouter ${task.title} à une liste`}
+                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
+                    onClick={() => setListPickerTask(task)}
+                  >
+                    Liste
                   </button>
                 </div>
               </div>
@@ -114,9 +133,41 @@ export function E20Inbox() {
         </div>
       )}
 
-      <Button fullWidth onClick={() => goTo('task-create')}>
+      <Button fullWidth onClick={() => goTo('task-create-v2')}>
         Ajouter une tâche
       </Button>
+
+      {listPickerTask && (
+        <div role="dialog" aria-modal="true" aria-label="Choisir une liste" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Ajouter à une liste</h2>
+            {lists.length === 0 ? (
+              <>
+                <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
+                <Button fullWidth onClick={() => goTo('lists')}>
+                  Créer une liste
+                </Button>
+              </>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                {lists.map((l) => (
+                  <button
+                    key={l.id}
+                    aria-label={`Ajouter à ${l.name}`}
+                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
+                    onClick={() => handleChooseList(l.id)}
+                  >
+                    {l.name}
+                  </button>
+                ))}
+              </div>
+            )}
+            <Button variant="secondary" fullWidth onClick={() => setListPickerTask(null)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
 
       {pendingMoveId && (
         <div role="dialog" aria-modal="true" aria-label="Remplacer une tâche" style={modalOverlay}>

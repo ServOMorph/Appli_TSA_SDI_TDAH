@@ -8,16 +8,8 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { RoutineRepository } from '@/data/repositories/routineRepository'
-import { RoutineStepRepository } from '@/data/repositories/routineStepRepository'
 import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule } from '@/domain/rules/taskRulesV2'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
-import {
-  createRoutine as createRoutineRule,
-  createRoutineStep as createRoutineStepRule,
-  scheduleRoutine as scheduleRoutineRule,
-  toggleRoutineStep as toggleRoutineStepRule,
-} from '@/domain/rules/routineRules'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
 import type { TaskV2, TaskStatusV2 } from '@/domain/entities/taskV2'
@@ -25,8 +17,6 @@ import type { SubTask } from '@/domain/entities/subTask'
 import type { Settings } from '@/domain/entities/settings'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
-import type { Routine, RoutineType } from '@/domain/entities/routine'
-import type { RoutineStep } from '@/domain/entities/routineStep'
 
 export type Screen =
   | 'welcome'
@@ -36,8 +26,6 @@ export type Screen =
   | 'dashboard'
   | 'inbox'
   | 'today'
-  | 'later'
-  | 'task-create'
   | 'task-create-v2'
   | 'planning'
   | 'to-plan-queue'
@@ -56,8 +44,6 @@ export type Screen =
   | 'settings-export'
   | 'lists'
   | 'list-detail'
-  | 'routines'
-  | 'routine-detail'
 
 interface AppContextValue {
   screen: Screen
@@ -68,7 +54,6 @@ interface AppContextValue {
   todayTasks: Task[]
   todaySubTasksMap: Record<string, SubTask[]>
   inboxTasks: Task[]
-  laterTasks: Task[]
   todayEnergy: number | null
   todayEnergyStatus: 'filled' | 'skipped' | null
   overloadMode: boolean
@@ -85,6 +70,8 @@ interface AppContextValue {
   skipTodayEnergy: () => Promise<void>
   addTask: (title: string) => Promise<void>
   createTaskInbox: (title: string) => Promise<void>
+  planTodoTask: (taskId: string) => Promise<void>
+  moveTodoTaskToList: (taskId: string, listId: string) => Promise<void>
   toPlanTasks: TaskV2[]
   createTaskV2Dest: (title: string, status: TaskStatusV2) => Promise<void>
   scheduleV2Task: (taskId: string, date: string, start: string, end: string) => Promise<void>
@@ -109,17 +96,6 @@ interface AppContextValue {
   getListItems: (listId: string) => Promise<ListItem[]>
   addListItem: (listId: string, title: string) => Promise<void>
   deleteListItem: (id: string) => Promise<void>
-  routines: Routine[]
-  selectedRoutineId: string | null
-  selectRoutine: (id: string | null) => void
-  createRoutine: (name: string, type: RoutineType, durationMinutes: number) => Promise<void>
-  deleteRoutine: (id: string) => Promise<void>
-  getRoutineSteps: (routineId: string) => Promise<RoutineStep[]>
-  addRoutineStep: (routineId: string, title: string) => Promise<void>
-  deleteRoutineStep: (id: string) => Promise<void>
-  toggleRoutineStep: (step: RoutineStep) => Promise<void>
-  scheduleRoutine: (routineId: string, date: string, start: string) => Promise<void>
-  getRoutinesForDate: (date: string) => Promise<Routine[]>
 }
 
 export const AppContext = createContext<AppContextValue | null>(null)
@@ -133,8 +109,6 @@ const energyRepo = new EnergyEntryRepository(db)
 const settingsRepo = new SettingsRepository(db)
 const listRepo = new ListRepository(db)
 const listItemRepo = new ListItemRepository(db)
-const routineRepo = new RoutineRepository(db)
-const routineStepRepo = new RoutineStepRepository(db)
 
 function todayDate(): string {
   if (import.meta.env.DEV) {
@@ -162,7 +136,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [todayTasks, setTodayTasks] = useState<Task[]>([])
   const [todaySubTasksMap, setTodaySubTasksMap] = useState<Record<string, SubTask[]>>({})
   const [inboxTasks, setInboxTasks] = useState<Task[]>([])
-  const [laterTasks, setLaterTasks] = useState<Task[]>([])
   const [todayEnergy, setTodayEnergy] = useState<number | null>(null)
   const [todayEnergyStatus, setTodayEnergyStatus] = useState<'filled' | 'skipped' | null>(null)
   const [overloadMode, setOverloadModeState] = useState(false)
@@ -171,8 +144,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [toPlanTasks, setToPlanTasks] = useState<TaskV2[]>([])
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
-  const [routines, setRoutines] = useState<Routine[]>([])
-  const [selectedRoutineId, setSelectedRoutineId] = useState<string | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -203,14 +174,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [settings])
 
   async function loadAll() {
-    const [inbox, today, later, entry, toPlan, listsData, routinesData] = await Promise.all([
+    const [inbox, today, entry, toPlan, listsData] = await Promise.all([
       taskRepo.getByStatus('inbox'),
       taskRepo.getTodayTasks(),
-      taskRepo.getByStatus('later'),
       energyRepo.getByDate(todayDate()),
       taskV2Repo.getToPlantasks(),
       listRepo.getAll(),
-      routineRepo.getAll(),
     ])
     const subTaskArrays = await Promise.all(today.map((t) => subTaskRepo.getByTaskId(t.id)))
     const subTasksMap: Record<string, SubTask[]> = {}
@@ -220,12 +189,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setInboxTasks(inbox)
     setTodayTasks(today)
     setTodaySubTasksMap(subTasksMap)
-    setLaterTasks(later)
     setTodayEnergy(entry?.value ?? null)
     setTodayEnergyStatus(entry?.status ?? null)
     setToPlanTasks(toPlan)
     setLists(listsData)
-    setRoutines(routinesData)
   }
 
   async function createUser(profile: ProfileType) {
@@ -327,6 +294,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setInboxTasks((prev) => [...prev, task])
   }
 
+  async function planTodoTask(taskId: string) {
+    const task = await taskRepo.getById(taskId)
+    if (!task) return
+    const now = new Date().toISOString()
+    const planned = createTaskV2Rule(newId(), task.title, 'planned', false, now)
+    await taskV2Repo.create(planned)
+    const subs = await subTaskRepo.getByTaskId(taskId)
+    await Promise.all(subs.map((st) => subTaskRepo.delete(st.id)))
+    await taskRepo.delete(taskId)
+    await loadAll()
+  }
+
+  async function moveTodoTaskToList(taskId: string, listId: string) {
+    const task = await taskRepo.getById(taskId)
+    if (!task) return
+    const now = new Date().toISOString()
+    const existing = await listItemRepo.getByListId(listId)
+    const item = createListItemRule(newId(), listId, task.title, existing.length, now)
+    await listItemRepo.create(item)
+    const subs = await subTaskRepo.getByTaskId(taskId)
+    await Promise.all(subs.map((st) => subTaskRepo.delete(st.id)))
+    await taskRepo.delete(taskId)
+    await loadAll()
+  }
+
   async function moveTask(id: string, status: TaskStatus) {
     const task = await taskRepo.getById(id)
     if (!task) return
@@ -424,54 +416,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await listItemRepo.delete(id)
   }
 
-  async function createRoutine(name: string, type: RoutineType, durationMinutes: number) {
-    const now = new Date().toISOString()
-    const routine = createRoutineRule(newId(), name, type, durationMinutes, now)
-    await routineRepo.create(routine)
-    setRoutines((prev) => [...prev, routine])
-  }
-
-  async function deleteRoutine(id: string) {
-    const steps = await routineStepRepo.getByRoutineId(id)
-    await Promise.all(steps.map((s) => routineStepRepo.delete(s.id)))
-    await routineRepo.delete(id)
-    setRoutines((prev) => prev.filter((r) => r.id !== id))
-  }
-
-  async function getRoutineSteps(routineId: string): Promise<RoutineStep[]> {
-    return routineStepRepo.getByRoutineId(routineId)
-  }
-
-  async function addRoutineStep(routineId: string, title: string) {
-    const existing = await routineStepRepo.getByRoutineId(routineId)
-    const now = new Date().toISOString()
-    const step = createRoutineStepRule(newId(), routineId, title, existing.length, now)
-    await routineStepRepo.create(step)
-  }
-
-  async function deleteRoutineStep(id: string) {
-    await routineStepRepo.delete(id)
-  }
-
-  async function toggleRoutineStep(step: RoutineStep) {
-    const updated = toggleRoutineStepRule(step)
-    await routineStepRepo.update(updated)
-  }
-
-  async function scheduleRoutine(routineId: string, date: string, start: string) {
-    const routine = routines.find((r) => r.id === routineId) ?? (await routineRepo.getById(routineId))
-    if (!routine) return
-    const now = new Date().toISOString()
-    const updated = scheduleRoutineRule(routine, date, start, now)
-    await routineRepo.update(updated)
-    setRoutines((prev) => prev.map((r) => (r.id === routineId ? updated : r)))
-  }
-
-  async function getRoutinesForDate(date: string): Promise<Routine[]> {
-    const all = await routineRepo.getAll()
-    return all.filter((r) => r.scheduled_date === date)
-  }
-
   async function setOverloadMode(v: boolean) {
     setOverloadModeState(v)
     if (currentUser) {
@@ -530,22 +474,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       db.settings.clear(),
       db.lists.clear(),
       db.listItems.clear(),
-      db.routines.clear(),
-      db.routineSteps.clear(),
+      db.tasksV2.clear(),
     ])
     setCurrentUser(null)
     setSettings(null)
     setTodayTasks([])
     setInboxTasks([])
-    setLaterTasks([])
     setTodayEnergy(null)
     setTodayEnergyStatus(null)
     setOverloadModeState(false)
     setSelectedTaskId(null)
     setLists([])
     setSelectedListId(null)
-    setRoutines([])
-    setSelectedRoutineId(null)
+    setToPlanTasks([])
     setScreen('welcome')
   }
 
@@ -560,7 +501,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         todayTasks,
         todaySubTasksMap,
         inboxTasks,
-        laterTasks,
         todayEnergy,
         todayEnergyStatus,
         overloadMode,
@@ -577,6 +517,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         skipTodayEnergy,
         addTask,
         createTaskInbox,
+        planTodoTask,
+        moveTodoTaskToList,
         toPlanTasks,
         createTaskV2Dest,
         scheduleV2Task,
@@ -601,17 +543,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         getListItems,
         addListItem,
         deleteListItem,
-        routines,
-        selectedRoutineId,
-        selectRoutine: setSelectedRoutineId,
-        createRoutine,
-        deleteRoutine,
-        getRoutineSteps,
-        addRoutineStep,
-        deleteRoutineStep,
-        toggleRoutineStep,
-        scheduleRoutine,
-        getRoutinesForDate,
       }}
     >
       {children}

@@ -57,6 +57,8 @@ Faible risque, fort impact perçu. À livrer et déployer tôt.
 - [x] **Test manuel** : aucun terme "souffle/inbox/plus tard" résiduel dans l'UI (vérifié 2026-06-29)
 - [x] **Sortie** : vocabulaire aligné sur le public TSA
 
+> **[2026-07-02] "À faire plus tard" (V1, statut `later`) retiré intégralement** — collision de nommage avec "À planifier plus tard" (V2, statut `to_plan`) résolue en supprimant le système V1 (écran `E25Later`, statut `TaskStatus.later`, bouton nav dashboard). Le système V2 (`to_plan`, pastille rouge, `E50ToPlanQueue`) est l'unique mécanisme de report désormais.
+
 ## Phase V2-2 — Modèle de données v2 (schéma propre)
 
 Fondation des phases suivantes. Aucune UI ici, domaine + data. Schéma réécrit depuis zéro.
@@ -117,42 +119,27 @@ Nouvelle entité. Exemples Marie : habits, musiques, livres, routines.
 - [x] Écran détail liste avec ajout/suppression d'élément (`E61ListDetail.tsx`)
 - [x] Création d'une nouvelle liste à la volée
 - [x] Les listes ne sont **pas** planifiables (référentiel, pas tâches)
-- [ ] Bouton "Ajouter" : suggestion de liste depuis le flux d'ajout de tâche — reporté (non couvert par cette itération, à raccorder en V2-9)
+- [x] Bouton "Ajouter" : suggestion de liste depuis le flux d'ajout de tâche — résolu différemment (2026-07-02) : action "Liste" ajoutée sur chaque tâche Todo existante (`E20Inbox`), plutôt qu'une suggestion au moment de la création
 - [x] **Tests** : 28 tests (365/365 total)
 - [x] **Test manuel** : TM-01 à TM-12 validés par l'utilisateur (2026-07-01, débloqué par la nav "Listes" de V2-9)
   - TM-01 à TM-12 : OK
 - [x] **Sortie** : référentiel personnel fonctionnel (2026-06-30), test manuel validé 2026-07-01
 
-## Phase V2-8 — Routines (matin / soir)
+## Phase V2-8 — Routines (matin / soir) — RETIRÉE
 
-Maquette : capture 184750 (routines détaillées de Marie). Absorbe l'ancienne Phase 8.
+Maquette : capture 184750 (routines détaillées de Marie). Absorbait l'ancienne Phase 8.
 
-> **[P1|ouvert] À retirer** — Marie n'a pas demandé d'onglet "Routines" dédié. Sa demande réelle (note_marie.txt, synthèse §4) : les routines sont des **listes** (parmi d'autres exemples : habits, musiques, livres), pas une entité séparée avec onglet nav propre. Sa maquette dessinée (nav bas) ne comporte que 3 items : Todo / Planifier / Listes — aucun "Routines". L'onglet et les entités `Routine`/`RoutineStep` sont une extension non sollicitée. À retirer ou fusionner dans Listes.
+**[2026-07-02] Retirée** — Marie n'a jamais demandé d'onglet "Routines" dédié (note_marie.txt, synthèse §4 : les routines sont des **listes**, pas une entité séparée ; sa maquette dessinée ne comporte que 3 items de nav : Todo / Planifier / Listes). L'implémentation V2-8 (onglet dédié + entités `Routine`/`RoutineStep`) était une extension non sollicitée. Code intégralement retiré : écrans `E70Routines`/`E71RoutineDetail`, `routineRules.ts`, `routineRepository`/`routineStepRepository`, entités `routine.ts`/`routineStep.ts`, tables Dexie `routines`/`routineSteps`, intégrations dans `E10Dashboard`/`E40Planning`/`AppContext`/`App.tsx`. 355/355 tests, build OK.
 
-- [x] Routines = listes spéciales avec **bloc de temps réservé** (ex. RM = 1h30), pas étape minutée dans le planning
-- [x] Routine matin (RM) / routine soir (RS) — pas de variantes semaine/week-end (non couvert, à raccorder si besoin exprimé)
-- [x] Intégration au planning comme **bloc** unique (chip dans la case de l'heure de début, avec durée affichée)
-- [x] Cases à cocher des étapes au sein de la routine
-- [x] Point d'entrée dashboard : segment "Routines" ajouté à la nav (Todo/Aujourd'hui/À faire plus tard/Routines)
-- [x] **Tests** : 25 tests (390/390 total)
-- [x] **Test manuel** : TM-01 à TM-08 validés par l'utilisateur (2026-07-01)
-  - TM-01 : Depuis le tableau de bord, cliquer "Routines" → page "Mes routines" s'affiche — OK
-  - TM-02 : Créer une routine (nom, type matin/soir, durée) → apparaît dans la liste — OK
-  - TM-03 : Ouvrir une routine, ajouter une étape → apparaît dans la liste des étapes — OK
-  - TM-04 : Cocher une étape → coché visuellement (barré) — OK
-  - TM-05 : Supprimer une étape → disparaît de la liste — OK
-  - TM-06 : Réserver un créneau (date + heure) → message "Prévue le … à …" affiché — OK
-  - TM-07 : Ouvrir le planning à la date choisie → bloc routine visible dans la case horaire correspondante — OK (débloqué par l'icône agenda de V2-9)
-  - TM-08 : Cliquer sur le bloc routine dans le planning → navigue vers le détail de la routine — OK
-- [x] **Sortie** : routines centralisées (besoin n°1 exprimé par Marie) — mécanique livrée et test manuel TM-01 à TM-08 validés 2026-07-01
+Fonctionnalité non abandonnée sur le fond : si Marie exprime le besoin, les routines pourront être réintroduites comme un type de **liste** (cohérent avec sa demande initiale), pas comme onglet séparé.
 
 ## Phase V2-9 — Refonte page d'accueil
 
 Maquette : capture 183750. Dépend des phases planning + listes.
 
 - [x] Haut : "Mon énergie" + bouton mode surcharge isolé + icône agenda (accès direct `planning`)
-- [x] Centre : nouvelle section "Planning du jour" (mini, `TaskV2`/`Routine` du jour, tri par heure) — masque les tâches `essential=false` en mode surcharge. Le planning en cases complet (grille horaire scrollable) reste dans `E40Planning`, accessible via l'icône agenda ou le bouton "Planifier" ; pas dupliqué en miniature dans le dashboard (risque de double UI, écarté)
-- [x] Bas : bouton "Ajouter une tâche" repointé vers `task-create-v2` (3 destinations, résout la navigation orpheline) ; nav segmentée étendue avec "Planifier" et "Listes" (les 4 segments existants Todo/Aujourd'hui/À faire plus tard/Routines sont conservés — testés par e2e T14/T15 — plutôt que remplacés strictement par les 3 items de la maquette)
+- [x] Centre : nouvelle section "Planning du jour" (mini, `TaskV2` du jour, tri par heure) — masque les tâches `essential=false` en mode surcharge. Le planning en cases complet (grille horaire scrollable) reste dans `E40Planning`, accessible via l'icône agenda ou le bouton "Planifier" ; pas dupliqué en miniature dans le dashboard (risque de double UI, écarté)
+- [x] Bas : bouton "Ajouter une tâche" repointé vers `task-create-v2` (3 destinations, résout la navigation orpheline) ; nav segmentée étendue avec "Planifier" et "Listes" (segment "Routines" retiré 2026-07-02 ; segment "À faire plus tard" (V1 `later`) retiré 2026-07-02, résolution de la collision de nommage avec "À planifier plus tard" (V2 `to_plan`) — un seul système conservé)
 - [x] **Tests** : 8 tests ajoutés (396/396 total) — nav planning/lists, icône agenda, section planning du jour, masquage essential
 - [x] **Test manuel** : TM-01 à TM-06 validés par l'utilisateur (2026-07-01)
   - TM-01 à TM-06 : OK
@@ -160,8 +147,11 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 
 ## Phase V2-10 — Consolidation V2 & 2e vague de tests
 
-- [x] Refacto d'architecture, dead code, couverture globale ≥ 85 % — config coverage corrigée (exclusion `dist_v1`/`e2e`), couverture réelle 95.48% ; `TASK_TODAY_MAX`/`canAddToToday` (V1) supprimés. `completeTaskV2`/`moveTaskToLaterV2`/`toggleEssentialV2` (V2) conservés : trou fonctionnel (non code mort), décision produit différée (signals.md)
-- [x] E2E Playwright mis à jour (flux V2) — 46/46 passent depuis 2026-06-30 (soldé en avance de V2-10)
+- [x] Refacto d'architecture, dead code, couverture globale ≥ 85 % — config coverage corrigée (exclusion `dist_v1`/`e2e`), couverture réelle 95.48% (mesure 2026-07-01) ; `TASK_TODAY_MAX`/`canAddToToday` (V1) supprimés. `completeTaskV2`/`toggleEssentialV2` (V2) conservés : trou fonctionnel (non code mort), décision produit différée (signals.md)
+- [x] E2E Playwright mis à jour (flux V2) — 42/45 passent (2026-07-02, après retrait Routines/Later et adaptation du flux de création) ; 3 échecs préexistants sans lien (`05-overload.spec.ts`, voir signals.md)
+- [x] **[2026-07-02]** Fonctionnalité Routines (V2-8) retirée intégralement — non demandée par Marie (voir Phase V2-8 ci-dessus)
+- [x] **[2026-07-02]** Collision de nommage V1/V2 "plus tard" résolue — système V1 `later` retiré, `to_plan` (V2) seul mécanisme de report
+- [x] **[2026-07-02]** Écran Todo enrichi : actions "Planifier" et "Liste" par tâche (conversion à l'action vers `TaskV2`/`ListItem`), bug orphelin corrigé (destination "Todo" de `E21CreateTaskV2` créait des `TaskV2` jamais affichées), bug `deleteAllData` (tasksV2 non vidé) corrigé
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
 - [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD

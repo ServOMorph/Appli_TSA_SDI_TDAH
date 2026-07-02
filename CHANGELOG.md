@@ -1,3 +1,20 @@
+## v0.34 — 2026-07-02
+
+### Ajouté
+- Écran Todo (`E20Inbox`) : actions "Planifier" et "Liste" par tâche, en plus de "Aujourd'hui" — convertissent la tâche vers `TaskV2`/`ListItem` au moment du clic et vident Todo.
+- Pastille rouge sur le bouton "Todo" du dashboard dès qu'une tâche est en attente.
+
+### Modifié
+- Le système V1 `Task` (inbox→today, sous-tâches, action immédiate) reste le moteur du dashboard — pas d'unification sur `TaskV2`, conversion à l'action à la place.
+
+### Corrigé
+- Fonctionnalité Routines (V2-8) retirée intégralement — jamais demandée explicitement par Marie (écrans, règles, repositories, entités, tables Dexie supprimés).
+- Collision de nommage V1/V2 "plus tard" résolue — système V1 "À faire plus tard" (`E25Later`, statut `later`) retiré, seul `to_plan` (V2) subsiste.
+- Bug orphelin : la destination "Todo" de `E21CreateTaskV2` créait des `TaskV2` jamais affichées nulle part — crée maintenant une `Task` V1 cohérente avec l'écran Todo. Écran `E21CreateTask` (V1) devenu inaccessible, supprimé.
+- `deleteAllData` ne vidait jamais la table `tasksV2` — corrigé.
+
+---
+
 ## v0.33 — 2026-07-02
 
 ### Modifié

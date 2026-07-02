@@ -47,14 +47,6 @@ describe('E20Inbox', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
     })
 
-    it('déplace vers Plus tard', async () => {
-      const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const ctx = makeAppContext({ inboxTasks: [task] })
-      renderWithApp(<E20Inbox />, ctx)
-      await userEvent.click(screen.getByLabelText("Déplacer Lire livre vers À faire plus tard"))
-      expect(ctx.moveTask).toHaveBeenCalledWith('abc', 'later')
-    })
-
     it('déplace vers Aujourd\'hui si moins de 3 tâches', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
       const ctx = makeAppContext({ inboxTasks: [task], todayTasks: [] })
@@ -118,11 +110,69 @@ describe('E20Inbox', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
     })
 
-    it('Ajouter une tâche navigue vers task-create', async () => {
+    it('Ajouter une tâche navigue vers task-create-v2', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('task-create')
+      expect(ctx.goTo).toHaveBeenCalledWith('task-create-v2')
+    })
+  })
+
+  describe('planifier et mettre dans une liste', () => {
+    it('planifier une tâche appelle planTodoTask puis navigue vers planning', async () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const ctx = makeAppContext({ inboxTasks: [task] })
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByLabelText('Planifier Lire livre'))
+      expect(ctx.planTodoTask).toHaveBeenCalledWith('abc')
+      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    })
+
+    it('ouvre le sélecteur de liste au clic sur Liste', async () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const ctx = makeAppContext({
+        inboxTasks: [task],
+        lists: [{ id: 'l1', name: 'Livres', created_at: '', updated_at: '' }],
+      })
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
+      expect(screen.getByRole('dialog', { name: 'Choisir une liste' })).toBeDefined()
+      expect(screen.getByRole('button', { name: 'Ajouter à Livres' })).toBeDefined()
+    })
+
+    it('choisir une liste appelle moveTodoTaskToList et ferme la modale', async () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const ctx = makeAppContext({
+        inboxTasks: [task],
+        lists: [{ id: 'l1', name: 'Livres', created_at: '', updated_at: '' }],
+      })
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
+      await userEvent.click(screen.getByLabelText('Ajouter à Livres'))
+      expect(ctx.moveTodoTaskToList).toHaveBeenCalledWith('abc', 'l1')
+      expect(screen.queryByRole('dialog')).toBeNull()
+    })
+
+    it('affiche un message si aucune liste et propose de créer', async () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const ctx = makeAppContext({ inboxTasks: [task], lists: [] })
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
+      expect(screen.getByText("Aucune liste pour l'instant.")).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Créer une liste' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('lists')
+    })
+
+    it('annuler le sélecteur de liste ferme la modale', async () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const ctx = makeAppContext({
+        inboxTasks: [task],
+        lists: [{ id: 'l1', name: 'Livres', created_at: '', updated_at: '' }],
+      })
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
+      await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+      expect(screen.queryByRole('dialog')).toBeNull()
     })
   })
 })

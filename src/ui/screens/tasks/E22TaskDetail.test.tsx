@@ -125,12 +125,5 @@ describe('E22TaskDetail', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('today')
     })
 
-    it('retour vers later pour tâche later', async () => {
-      const task = makeTask({ status: 'later' })
-      const ctx = makeAppContext({ selectedTaskId: 'task-1', laterTasks: [task] })
-      renderWithApp(<E22TaskDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('later')
-    })
   })
 })

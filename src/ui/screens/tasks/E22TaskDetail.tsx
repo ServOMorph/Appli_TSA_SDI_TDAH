@@ -129,7 +129,6 @@ function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
 
 function backScreenForTask(task: Task): Screen {
   if (task.status === 'today') return 'today'
-  if (task.status === 'later') return 'later'
   return 'inbox'
 }
 
@@ -138,7 +137,6 @@ export function E22TaskDetail() {
     selectedTaskId,
     inboxTasks,
     todayTasks,
-    laterTasks,
     getSubTasks,
     deleteSubTask,
     completeTask,
@@ -153,7 +151,7 @@ export function E22TaskDetail() {
   const [subTasks, setSubTasks] = useState<SubTask[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  const task = [...inboxTasks, ...todayTasks, ...laterTasks].find((t) => t.id === selectedTaskId)
+  const task = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
 
   useEffect(() => {
     if (selectedTaskId) {

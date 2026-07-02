@@ -1,4 +1,4 @@
-# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-01 session 3)
+# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-02)
 
 ## Actions ouvertes
 
@@ -26,6 +26,10 @@
     3. Ne rien changer, mais documenter/expliquer la distinction dans l'UI (ex: tooltip, texte d'aide)
   - fait quand: une des 3 options est choisie et actée
   - réf: `src/ui/screens/tasks/E21CreateTaskV2.tsx`, `src/ui/screens/planning/E50ToPlanQueue.tsx`, `src/ui/screens/tasks/E25Later.tsx`, `src/domain/entities/task.ts` (statut `later`) vs `src/domain/entities/taskV2.ts` (statut `to_plan`)
+- [P1|ouvert] Onglet "Routines" (V2-8) à retirer ou fusionner dans Listes — non demandé explicitement par Marie
+  - constat : vérification des sources (note_marie.txt, synthèse §4, maquette dessinée) — Marie décrit les routines comme un type de **liste** (au même titre que habits/musiques/livres), pas une entité séparée avec onglet nav dédié. Sa maquette dessinée (nav bas) ne comporte que 3 items : Todo / Planifier / Listes — aucun "Routines".
+  - fait quand: décision produit prise (retirer l'onglet et fusionner Routine/RoutineStep dans List/ListItem, ou confirmer explicitement le maintien de l'onglet séparé malgré l'écart avec la demande initiale)
+  - réf: note ajoutée dans `roadmap_v2.md` Phase V2-8 ; `Note de réunion/note_marie.txt` ligne 79 ; `Note de réunion/synthese_reunion_marie_2026-06-29.md` §4 et §3 (nav dessinée : Todo/Planifier/Listes)
 
 ## Questions ouvertes
 
@@ -45,20 +49,22 @@ Aucun.
 - Dashboard : nouvelle section "Planning du jour" (mini, `TaskV2`+`Routine` du jour triés par heure) — masque les tâches `essential=false` en mode surcharge. Le planning en cases complet reste dans `E40Planning` seul (pas de duplication de la grille horaire dans le dashboard)
 - Nav segmentée dashboard : 6 boutons (Todo/Aujourd'hui/À faire plus tard/Routines/Planifier/Listes) — les 4 premiers conservés tels quels car testés par e2e T14/T15, Planifier/Listes ajoutés à la suite plutôt que remplacement strict par les 3 items de la maquette
 
-## Dernière session (2026-07-01 session 3)
+## Dernière session (2026-07-02)
 
 ## Décisions prises
-- Aucune décision actée — session d'analyse : clarification Todo/À faire plus tard (V1), vérification de la pastille "À planifier" (déjà livrée V2-5), diagnostic d'un signalement utilisateur ("bug" à la création de tâche)
+- Aucune décision actée — session courte d'analyse : lecture de la maquette dessinée par Marie (capture 183750) + vérification croisée avec les sources écrites (note_marie.txt, synthèse réunion)
 
 ## Livrables produits ou modifiés
-- `_contexte/signals.md` : nouvelle action P1 documentée — collision de nommage "À planifier plus tard" (V2, `TaskV2`/`to_plan`) vs "À faire plus tard" (V1, `Task`/`later`), avec 3 options de résolution à trancher
+- `roadmap_v2.md` : note ajoutée sous Phase V2-8 — l'onglet "Routines" dédié n'a pas été demandé explicitement par Marie, à retirer ou fusionner dans Listes
+- `_contexte/signals.md` : nouvelle action P1 documentée — décision à prendre sur le sort de l'onglet Routines
 
 ## Hypothèses validées / invalidées
-- VALIDE : le signalement utilisateur n'est pas un bug logiciel — c'est une confusion UX réelle entre deux systèmes de données distincts (V1 `later` / V2 `to_plan`) sous des libellés quasi identiques, confirmé par lecture de `E21CreateTaskV2.tsx`, `E50ToPlanQueue.tsx`, `E25Later.tsx`
-- VALIDE : la pastille rouge "À planifier" (Phase V2-5) est bien codée et fonctionnelle (`E10Dashboard.tsx:397-427`)
+- VALIDE : la maquette dessinée par Marie (dashboard) ne comporte que 3 items de nav en bas (Todo/Planifier/Listes) — aucun "Routines"
+- VALIDE : dans ses notes écrites, Marie cite "routines" comme exemple de contenu d'une liste (au même titre que habits/musiques/livres), pas comme entité séparée
+- INVALIDE (constat rétroactif) : l'onglet "Routines" livré en V2-8 avec entités dédiées (`Routine`/`RoutineStep`) et point d'entrée nav propre est une extension non sollicitée par Marie
 
 ## Prochaine étape exacte
-Trancher la collision de nommage V1/V2 (voir action P1 ci-dessus, 3 options proposées), puis poursuivre V2-10 : doc V2, build + déploiement Netlify, sessions test 2-5 avec Marie.
+Trancher deux décisions en attente : (1) collision de nommage V1/V2 "à planifier/faire plus tard" (3 options déjà posées), (2) sort de l'onglet Routines (retrait/fusion dans Listes ou maintien assumé). Puis poursuivre V2-10 : doc V2, build + déploiement Netlify, sessions test 2-5 avec Marie.
 
 ## Question bloquante pour la session suivante
-Collision de nommage "À planifier plus tard" / "À faire plus tard" : fusionner les deux systèmes, renommer, ou documenter la distinction dans l'UI ?
+Onglet Routines : le retirer et fusionner Routine/RoutineStep dans Listes, ou maintenir tel quel malgré l'écart avec la demande initiale de Marie ?

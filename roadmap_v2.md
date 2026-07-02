@@ -127,6 +127,8 @@ Nouvelle entité. Exemples Marie : habits, musiques, livres, routines.
 
 Maquette : capture 184750 (routines détaillées de Marie). Absorbe l'ancienne Phase 8.
 
+> **[P1|ouvert] À retirer** — Marie n'a pas demandé d'onglet "Routines" dédié. Sa demande réelle (note_marie.txt, synthèse §4) : les routines sont des **listes** (parmi d'autres exemples : habits, musiques, livres), pas une entité séparée avec onglet nav propre. Sa maquette dessinée (nav bas) ne comporte que 3 items : Todo / Planifier / Listes — aucun "Routines". L'onglet et les entités `Routine`/`RoutineStep` sont une extension non sollicitée. À retirer ou fusionner dans Listes.
+
 - [x] Routines = listes spéciales avec **bloc de temps réservé** (ex. RM = 1h30), pas étape minutée dans le planning
 - [x] Routine matin (RM) / routine soir (RS) — pas de variantes semaine/week-end (non couvert, à raccorder si besoin exprimé)
 - [x] Intégration au planning comme **bloc** unique (chip dans la case de l'heure de début, avec durée affichée)

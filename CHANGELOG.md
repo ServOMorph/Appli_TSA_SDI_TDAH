@@ -1,3 +1,11 @@
+## v0.33 — 2026-07-02
+
+### Modifié
+- `roadmap_v2.md` : note ajoutée sous Phase V2-8 — l'onglet "Routines" dédié n'a pas été demandé explicitement par Marie (sa maquette dessinée et ses notes écrites décrivent les routines comme un type de liste, pas une entité séparée). À retirer ou fusionner dans Listes, décision à trancher.
+- `_contexte/signals.md` : action P1 ajoutée pour cette décision.
+
+---
+
 ## v0.32 — 2026-07-01
 
 ### Modifié

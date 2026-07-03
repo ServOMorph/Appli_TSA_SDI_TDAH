@@ -118,8 +118,27 @@ describe('E40Planning', () => {
 
     await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
     await userEvent.click(screen.getByRole('button', { name: 'Appel dentiste' }))
+    await userEvent.click(screen.getByRole('button', { name: /valider/i }))
 
     expect(scheduleV2Task).toHaveBeenCalledWith('u1', '2026-06-30', '10:00', '11:00')
+  })
+
+  it('le bouton valider est désactivé tant qu\'aucune tâche n\'est sélectionnée', async () => {
+    const task = makeTaskV2({ id: 'u1', title: 'Appel dentiste', scheduled_date: null })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    expect(screen.getByRole('button', { name: /valider/i })).toBeDisabled()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Appel dentiste' }))
+    expect(screen.getByRole('button', { name: /valider/i })).toBeEnabled()
   })
 
   it('tap sur une tâche existante ouvre le picker de déplacement', async () => {
@@ -155,6 +174,49 @@ describe('E40Planning', () => {
     await userEvent.click(screen.getByRole('button', { name: '14h00' }))
 
     expect(scheduleV2Task).toHaveBeenCalledWith('t1', '2026-06-30', '14:00', '15:00')
+  })
+
+  it('avec une tâche en attente (selectedTaskId), le tap sur un créneau vide affiche directement la confirmation sans liste', async () => {
+    const scheduleV2Task = vi.fn().mockResolvedValue(undefined)
+    const task = makeTaskV2({ id: 'u1', title: 'Laver machine', scheduled_date: null })
+    const otherTask = makeTaskV2({ id: 'u2', title: 'Truc planifier', scheduled_date: null })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        scheduleV2Task,
+        selectedTaskId: 'u1',
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task, otherTask]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    expect(screen.getByText(/placer « laver machine » à 10h00/i)).toBeInTheDocument()
+    expect(screen.queryByText('Truc planifier')).not.toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /valider/i }))
+    expect(scheduleV2Task).toHaveBeenCalledWith('u1', '2026-06-30', '10:00', '11:00')
+  })
+
+  it('valide la tâche en attente et désélectionne la tâche après planification', async () => {
+    const selectTask = vi.fn()
+    const task = makeTaskV2({ id: 'u1', title: 'Laver machine', scheduled_date: null })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        selectTask,
+        selectedTaskId: 'u1',
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('button', { name: /valider/i }))
+
+    expect(selectTask).toHaveBeenCalledWith(null)
   })
 
   it('fermer le picker ferme le dialogue', async () => {

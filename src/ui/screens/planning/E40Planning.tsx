@@ -153,18 +153,49 @@ const pickerItemStyle: React.CSSProperties = {
   width: '100%',
 }
 
+function pickerItemSelectedStyle(selected: boolean): React.CSSProperties {
+  return {
+    ...pickerItemStyle,
+    border: selected ? '2px solid var(--color-primary)' : pickerItemStyle.border,
+    background: selected ? 'color-mix(in srgb, var(--color-primary) 12%, var(--color-surface))' : pickerItemStyle.background,
+  }
+}
+
+const validateBtnStyle: React.CSSProperties = {
+  padding: '12px 16px',
+  background: 'var(--color-primary)',
+  border: 'none',
+  borderRadius: 'var(--radius-md)',
+  color: '#fff',
+  fontSize: '0.9375rem',
+  fontWeight: 600,
+  fontFamily: 'var(--font-body)',
+  cursor: 'pointer',
+  width: '100%',
+}
+
+const validateBtnDisabledStyle: React.CSSProperties = {
+  ...validateBtnStyle,
+  background: 'var(--color-border)',
+  color: 'var(--color-text-muted)',
+  cursor: 'not-allowed',
+}
+
 export function E40Planning() {
   const {
     goTo,
     getPlannedTasksForDate,
     getUnscheduledPlannedTasks,
     scheduleV2Task,
+    selectedTaskId: pendingTaskId,
+    selectTask,
   } = useApp()
 
   const [displayDate, setDisplayDate] = useState(todayStr)
   const [scheduledTasks, setScheduledTasks] = useState<TaskV2[]>([])
   const [unscheduled, setUnscheduled] = useState<TaskV2[]>([])
   const [picker, setPicker] = useState<Picker>(null)
+  const [pickerSelectedId, setPickerSelectedId] = useState<string | null>(null)
 
   const currentHour = new Date().getHours()
   const currentSlotRef = useRef<HTMLDivElement | null>(null)
@@ -198,9 +229,19 @@ export function E40Planning() {
     setScheduledTasks(sched)
     setUnscheduled(unsched)
     setPicker(null)
+    setPickerSelectedId(null)
+    if (taskId === pendingTaskId) {
+      selectTask(null)
+    }
+  }
+
+  function closePicker() {
+    setPicker(null)
+    setPickerSelectedId(null)
   }
 
   const isToday = displayDate === todayStr()
+  const pendingTask = picker?.mode === 'assign' ? unscheduled.find((t) => t.id === pendingTaskId) ?? null : null
 
   return (
     <main style={pageStyle}>
@@ -280,32 +321,54 @@ export function E40Planning() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ margin: 0, fontWeight: 600 }}>
                 {picker.mode === 'assign'
-                  ? `Placer à ${String(picker.hour).padStart(2, '0')}h00`
+                  ? pendingTask
+                    ? `Placer « ${pendingTask.title} » à ${String(picker.hour).padStart(2, '0')}h00`
+                    : `Placer à ${String(picker.hour).padStart(2, '0')}h00`
                   : `Déplacer « ${picker.task.title} »`}
               </p>
-              <button style={closeStyle} onClick={() => setPicker(null)} aria-label="Fermer">
+              <button style={closeStyle} onClick={closePicker} aria-label="Fermer">
                 ✕
               </button>
             </div>
 
             {picker.mode === 'assign' && (
-              <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {unscheduled.length === 0 ? (
-                  <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-                    Aucune tâche à planifier. Ajoutez une tâche et choisissez "Planifier".
-                  </p>
+              <>
+                {pendingTask ? (
+                  <button style={validateBtnStyle} onClick={() => handleAssign(pendingTask.id, picker.hour)}>
+                    Valider
+                  </button>
                 ) : (
-                  unscheduled.map((task) => (
-                    <button
-                      key={task.id}
-                      style={pickerItemStyle}
-                      onClick={() => handleAssign(task.id, picker.hour)}
-                    >
-                      {task.title}
-                    </button>
-                  ))
+                  <>
+                    <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                      {unscheduled.length === 0 ? (
+                        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+                          Aucune tâche à planifier. Ajoutez une tâche et choisissez "Planifier".
+                        </p>
+                      ) : (
+                        unscheduled.map((task) => (
+                          <button
+                            key={task.id}
+                            style={pickerItemSelectedStyle(pickerSelectedId === task.id)}
+                            aria-pressed={pickerSelectedId === task.id}
+                            onClick={() => setPickerSelectedId(task.id)}
+                          >
+                            {task.title}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                    {unscheduled.length > 0 && (
+                      <button
+                        style={pickerSelectedId ? validateBtnStyle : validateBtnDisabledStyle}
+                        disabled={!pickerSelectedId}
+                        onClick={() => pickerSelectedId && handleAssign(pickerSelectedId, picker.hour)}
+                      >
+                        Valider
+                      </button>
+                    )}
+                  </>
                 )}
-              </div>
+              </>
             )}
 
             {picker.mode === 'move' && (

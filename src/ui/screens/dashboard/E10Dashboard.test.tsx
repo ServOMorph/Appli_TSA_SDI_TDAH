@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
@@ -283,7 +283,8 @@ describe('E10Dashboard', () => {
     it('navigue vers planning via la nav segmentée', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+      const group = screen.getByRole('group', { name: 'Listes de tâches' })
+      await userEvent.click(within(group).getByRole('button', { name: 'Planning' }))
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 
@@ -297,7 +298,8 @@ describe('E10Dashboard', () => {
     it('navigue vers planning au clic sur l\'icône agenda', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Planning' }))
+      const header = screen.getByRole('banner')
+      await userEvent.click(within(header).getByRole('button', { name: 'Planning' }))
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
   })

@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E20Inbox } from './E20Inbox'
 import type { Task } from '@/domain/entities/task'
@@ -119,12 +119,13 @@ describe('E20Inbox', () => {
   })
 
   describe('planifier et mettre dans une liste', () => {
-    it('planifier une tâche appelle planTodoTask puis navigue vers planning', async () => {
+    it('planifier une tâche appelle planTodoTask, sélectionne la nouvelle tâche puis navigue vers planning', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const ctx = makeAppContext({ inboxTasks: [task] })
+      const ctx = makeAppContext({ inboxTasks: [task], planTodoTask: vi.fn().mockResolvedValue('tv2-1') })
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByLabelText('Planifier Lire livre'))
       expect(ctx.planTodoTask).toHaveBeenCalledWith('abc')
+      expect(ctx.selectTask).toHaveBeenCalledWith('tv2-1')
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 

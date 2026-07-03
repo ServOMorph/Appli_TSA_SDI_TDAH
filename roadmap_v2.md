@@ -152,6 +152,7 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [x] **[2026-07-02]** Fonctionnalité Routines (V2-8) retirée intégralement — non demandée par Marie (voir Phase V2-8 ci-dessus)
 - [x] **[2026-07-02]** Collision de nommage V1/V2 "plus tard" résolue — système V1 `later` retiré, `to_plan` (V2) seul mécanisme de report
 - [x] **[2026-07-02]** Écran Todo enrichi : actions "Planifier" et "Liste" par tâche (conversion à l'action vers `TaskV2`/`ListItem`), bug orphelin corrigé (destination "Todo" de `E21CreateTaskV2` créait des `TaskV2` jamais affichées), bug `deleteAllData` (tasksV2 non vidé) corrigé
+- [x] **[2026-07-03]** Écran Planning (`E40Planning`) revu suite à retour utilisateur direct : bouton "Valider" explicite (fin du "un clic = validation"), transport de la tâche active via `selectedTaskId` pour confirmer sa planification sans lister tout le backlog. Bouton "Planifier" du dashboard renommé "Planning". 348/348 tests unitaires, `tsc -b` clean ; **e2e non rejoués** (voir signals.md action P3)
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
 - [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD

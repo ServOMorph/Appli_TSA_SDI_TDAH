@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes. Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). V2-10 (consolidation) en cours : dead code nettoyé, couverture ≥85 % atteinte. Fonctionnalité Routines (V2-8) retirée — non demandée par Marie. Collision de nommage V1/V2 "plus tard" résolue (système V1 retiré). Écran Todo enrichi (actions Planifier/Liste par tâche). Reste : doc V2 (README/schéma/ADR), déploiement Netlify (bascule `main`), sessions test 2-5 avec Marie. Tests unitaires 345/345, e2e 42/45 (3 échecs préexistants sans lien).
+V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes. Tag `v1.0-mvp` posé, `dist_v1/` archivé (rollback V1 opérationnel). V2-10 (consolidation) en cours : dead code nettoyé, couverture ≥85 % atteinte. Fonctionnalité Routines (V2-8) retirée — non demandée par Marie. Collision de nommage V1/V2 "plus tard" résolue (système V1 retiré). Écran Todo enrichi (actions Planifier/Liste par tâche). Écran Planning revu (bouton Valider explicite, confirmation directe de la tâche choisie sans lister tout le backlog) ; bouton dashboard "Planifier" renommé "Planning". Reste : doc V2 (README/schéma/ADR), déploiement Netlify (bascule `main`), sessions test 2-5 avec Marie, e2e à rejouer. Tests unitaires 348/348, e2e non rejoués cette session (dernier état connu 42/45, 3 échecs préexistants sans lien).
 
 ## Stack
 

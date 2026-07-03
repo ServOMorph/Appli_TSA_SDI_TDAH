@@ -420,7 +420,7 @@ export function E10Dashboard() {
             Aujourd'hui
           </button>
           <button onClick={() => goTo('planning')} style={segmentStyle(true)}>
-            Planifier
+            Planning
           </button>
           <button onClick={() => goTo('lists')} style={segmentStyle(true)}>
             Listes

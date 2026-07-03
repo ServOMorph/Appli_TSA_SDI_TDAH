@@ -1,3 +1,12 @@
+## v0.35 — 2026-07-03
+
+### Modifié
+- Écran Planning (`E40Planning`) : ajout d'un bouton "Valider" explicite — un clic sur une tâche ne valide plus immédiatement le placement (retour utilisateur : comportement non intuitif).
+- Flux "Planifier" (Todo ou création directe) transporte désormais l'id de la tâche créée jusqu'à Planning : taper un créneau vide affiche directement la confirmation de placement de cette tâche, sans lister toutes les tâches non planifiées.
+- Bouton "Planifier" de la nav segmentée du dashboard renommé "Planning".
+
+---
+
 ## v0.34 — 2026-07-02
 
 ### Ajouté

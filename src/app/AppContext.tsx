@@ -70,10 +70,10 @@ interface AppContextValue {
   skipTodayEnergy: () => Promise<void>
   addTask: (title: string) => Promise<void>
   createTaskInbox: (title: string) => Promise<void>
-  planTodoTask: (taskId: string) => Promise<void>
+  planTodoTask: (taskId: string) => Promise<string | null>
   moveTodoTaskToList: (taskId: string, listId: string) => Promise<void>
   toPlanTasks: TaskV2[]
-  createTaskV2Dest: (title: string, status: TaskStatusV2) => Promise<void>
+  createTaskV2Dest: (title: string, status: TaskStatusV2) => Promise<string>
   scheduleV2Task: (taskId: string, date: string, start: string, end: string) => Promise<void>
   getPlannedTasksForDate: (date: string) => Promise<TaskV2[]>
   getUnscheduledPlannedTasks: () => Promise<TaskV2[]>
@@ -256,10 +256,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodayTasks((prev) => [...prev, task])
   }
 
-  async function createTaskV2Dest(title: string, status: TaskStatusV2) {
+  async function createTaskV2Dest(title: string, status: TaskStatusV2): Promise<string> {
     const now = new Date().toISOString()
     const task = createTaskV2Rule(newId(), title, status, false, now)
     await taskV2Repo.create(task)
+    return task.id
   }
 
   async function scheduleV2Task(taskId: string, date: string, start: string, end: string) {
@@ -294,9 +295,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setInboxTasks((prev) => [...prev, task])
   }
 
-  async function planTodoTask(taskId: string) {
+  async function planTodoTask(taskId: string): Promise<string | null> {
     const task = await taskRepo.getById(taskId)
-    if (!task) return
+    if (!task) return null
     const now = new Date().toISOString()
     const planned = createTaskV2Rule(newId(), task.title, 'planned', false, now)
     await taskV2Repo.create(planned)
@@ -304,6 +305,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await Promise.all(subs.map((st) => subTaskRepo.delete(st.id)))
     await taskRepo.delete(taskId)
     await loadAll()
+    return planned.id
   }
 
   async function moveTodoTaskToList(taskId: string, listId: string) {

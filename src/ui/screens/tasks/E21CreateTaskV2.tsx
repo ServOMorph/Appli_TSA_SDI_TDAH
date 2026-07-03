@@ -57,7 +57,7 @@ function destinationBtnStyle(selected: boolean): React.CSSProperties {
 }
 
 export function E21CreateTaskV2() {
-  const { createTaskV2Dest, createTaskInbox, goTo } = useApp()
+  const { createTaskV2Dest, createTaskInbox, goTo, selectTask } = useApp()
   const [title, setTitle] = useState('')
   const [destination, setDestination] = useState<TaskStatusV2 | null>(null)
 
@@ -70,8 +70,9 @@ export function E21CreateTaskV2() {
       goTo('inbox')
       return
     }
-    await createTaskV2Dest(trimmed, destination)
+    const newTaskId = await createTaskV2Dest(trimmed, destination)
     if (destination === 'planned') {
+      selectTask(newTaskId)
       goTo('planning')
     } else {
       goTo('inbox')

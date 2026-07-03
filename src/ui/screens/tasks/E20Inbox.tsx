@@ -68,7 +68,8 @@ export function E20Inbox() {
   }
 
   async function handlePlan(taskId: string) {
-    await planTodoTask(taskId)
+    const newTaskId = await planTodoTask(taskId)
+    selectTask(newTaskId)
     goTo('planning')
   }
 

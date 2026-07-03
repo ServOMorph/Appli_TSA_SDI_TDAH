@@ -1,5 +1,9 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-06-30 (archivé depuis contexte.md 2026-07-03)
+- V2-5 close — file "À planifier" séquentielle (E50ToPlanQueue, pastille rouge dashboard, toPlanTasks dans AppContext) + 336/336 tests.
+- Dette e2e V1→V2 soldée — 46/46 passent (vocabulaire + revert E20Inbox vers flux V1 cohérent avec inboxTasks).
+
 ## 2026-06-30 (archivé depuis contexte.md 2026-07-02)
 - V2-3 close — flux d'ajout refondu (E21CreateTaskV2, 3 destinations obligatoires, createTaskV2Dest) + 313/313 tests.
 - V2-4 close — vue Planning (E40Planning : grille 6h–22h, scroll auto heure courante, nav jour, picker placement/déplacement) + 324/324 tests.

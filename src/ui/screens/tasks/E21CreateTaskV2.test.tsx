@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E21CreateTaskV2 } from './E21CreateTaskV2'
 
@@ -49,13 +49,14 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it('chemin Planifier : crée avec status planned et navigue vers planning', async () => {
-    const ctx = makeAppContext()
+  it('chemin Planifier : crée avec status planned, sélectionne la tâche et navigue vers planning', async () => {
+    const ctx = makeAppContext({ createTaskV2Dest: vi.fn().mockResolvedValue('tv2-1') })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche planifiée')
     await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     expect(ctx.createTaskV2Dest).toHaveBeenCalledWith('Tâche planifiée', 'planned')
+    expect(ctx.selectTask).toHaveBeenCalledWith('tv2-1')
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 

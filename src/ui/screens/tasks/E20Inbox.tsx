@@ -48,7 +48,17 @@ const modalBox: React.CSSProperties = {
 }
 
 export function E20Inbox() {
-  const { inboxTasks, todayTasks, lists, selectTask, goTo, moveTask, planTodoTask, moveTodoTaskToList } = useApp()
+  const {
+    inboxTasks,
+    inboxSubTasksMap,
+    todayTasks,
+    lists,
+    selectTask,
+    goTo,
+    moveTask,
+    planTodoTask,
+    moveTodoTaskToList,
+  } = useApp()
   const [pendingMoveId, setPendingMoveId] = useState<string | null>(null)
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
 
@@ -96,7 +106,11 @@ export function E20Inbox() {
         <p aria-live="polite">Aucune tâche enregistrée.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-          {inboxTasks.map((task) => (
+          {inboxTasks.map((task) => {
+            const subs = inboxSubTasksMap[task.id] ?? []
+            const done = subs.filter((s) => s.is_completed).length
+            const total = subs.length
+            return (
             <Card key={task.id} style={{ padding: 'var(--spacing-md)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
                 <button
@@ -105,6 +119,14 @@ export function E20Inbox() {
                 >
                   {task.title}
                 </button>
+                {total > 0 && (
+                  <span
+                    aria-label={`${done} sur ${total} étapes`}
+                    style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', flexShrink: 0 }}
+                  >
+                    {done}/{total}
+                  </span>
+                )}
                 <div style={{ display: 'flex', gap: 'var(--spacing-xs)', flexWrap: 'wrap' }}>
                   <button
                     aria-label={`Déplacer ${task.title} vers Aujourd'hui`}
@@ -130,7 +152,8 @@ export function E20Inbox() {
                 </div>
               </div>
             </Card>
-          ))}
+            )
+          })}
         </div>
       )}
 

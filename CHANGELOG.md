@@ -1,3 +1,17 @@
+## v0.36 — 2026-07-03
+
+### Corrigé
+- Bug racine SubTask : `toggleSubTask` n'était appelée nulle part dans l'UI — aucune sous-tâche ne pouvait jamais être marquée terminée, ce qui bloquait le badge "X/Y" du Dashboard à "0/Y" et empêchait "Prochaine étape" d'avancer. Checkbox fonctionnelle ajoutée dans `E22TaskDetail`/`E23Decompose`.
+
+### Ajouté
+- Badge de progression "X/Y" des sous-tâches sur `E20Inbox` (Todo) et `E24Today` (Aujourd'hui), en plus du Dashboard.
+- "Prochaine étape : {titre}" affichée sur `E24Today`, comme sur le Dashboard.
+
+### Modifié
+- `E24Today` : bouton "Voir le Todo" retiré.
+
+---
+
 ## v0.35 — 2026-07-03
 
 ### Modifié

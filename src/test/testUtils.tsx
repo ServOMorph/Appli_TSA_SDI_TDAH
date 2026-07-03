@@ -12,6 +12,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     todayTasks: [],
     todaySubTasksMap: {},
     inboxTasks: [],
+    inboxSubTasksMap: {},
     todayEnergy: null,
     todayEnergyStatus: null,
     settings: null,

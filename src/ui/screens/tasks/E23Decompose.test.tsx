@@ -95,6 +95,25 @@ describe('E23Decompose', () => {
     })
   })
 
+  it('coche une sous-étape et recharge la liste', async () => {
+    const task = makeTask()
+    const st = makeSubTask()
+    const done = makeSubTask({ is_completed: true })
+    const getSubTasks = vi.fn().mockResolvedValueOnce([st]).mockResolvedValueOnce([done])
+    const ctx = makeAppContext({
+      selectedTaskId: 'task-1',
+      inboxTasks: [task],
+      getSubTasks,
+    })
+    renderWithApp(<E23Decompose />, ctx)
+    await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
+    await userEvent.click(screen.getByLabelText('Marquer terminée : Prendre le téléphone'))
+    expect(ctx.toggleSubTask).toHaveBeenCalledWith(st)
+    await waitFor(() => {
+      expect(screen.getByLabelText('Marquer non terminée : Prendre le téléphone')).toBeDefined()
+    })
+  })
+
   it('le bouton Ajouter est désactivé si le champ est vide', async () => {
     const task = makeTask()
     const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })

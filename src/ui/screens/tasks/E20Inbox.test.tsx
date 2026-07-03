@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E20Inbox } from './E20Inbox'
 import type { Task } from '@/domain/entities/task'
+import type { SubTask } from '@/domain/entities/subTask'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
   return {
@@ -45,6 +46,24 @@ describe('E20Inbox', () => {
       await userEvent.click(screen.getByText('Lire livre'))
       expect(ctx.selectTask).toHaveBeenCalledWith('abc')
       expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
+    })
+
+    it('affiche la progression des sous-étapes', () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const subs: SubTask[] = [
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
+        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1 },
+      ]
+      const ctx = makeAppContext({ inboxTasks: [task], inboxSubTasksMap: { abc: subs } })
+      renderWithApp(<E20Inbox />, ctx)
+      expect(screen.getByLabelText('1 sur 2 étapes')).toBeDefined()
+    })
+
+    it('n\'affiche pas de progression sans sous-étape', () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const ctx = makeAppContext({ inboxTasks: [task] })
+      renderWithApp(<E20Inbox />, ctx)
+      expect(screen.queryByLabelText(/sur .* étapes/)).toBeNull()
     })
 
     it('déplace vers Aujourd\'hui si moins de 3 tâches', async () => {

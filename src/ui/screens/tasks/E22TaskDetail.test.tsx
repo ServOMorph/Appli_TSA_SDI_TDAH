@@ -108,6 +108,42 @@ describe('E22TaskDetail', () => {
     })
   })
 
+  describe('progression des sous-étapes', () => {
+    it('coche une sous-étape et recharge la liste', async () => {
+      const task = makeTask()
+      const st = makeSubTask()
+      const done = makeSubTask({ is_completed: true })
+      const getSubTasks = vi.fn().mockResolvedValueOnce([st]).mockResolvedValueOnce([done])
+      const ctx = makeAppContext({
+        selectedTaskId: 'task-1',
+        inboxTasks: [task],
+        getSubTasks,
+      })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
+      await userEvent.click(screen.getByLabelText('Marquer terminée : Prendre le téléphone'))
+      expect(ctx.toggleSubTask).toHaveBeenCalledWith(st)
+      await waitFor(() => {
+        expect(screen.getByLabelText('Marquer non terminée : Prendre le téléphone')).toBeDefined()
+      })
+    })
+
+    it('affiche une sous-étape terminée comme barrée', async () => {
+      const task = makeTask()
+      const done = makeSubTask({ is_completed: true })
+      const ctx = makeAppContext({
+        selectedTaskId: 'task-1',
+        inboxTasks: [task],
+        getSubTasks: vi.fn().mockResolvedValue([done]),
+      })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await waitFor(() => {
+        const checkbox = screen.getByLabelText('Marquer non terminée : Prendre le téléphone') as HTMLInputElement
+        expect(checkbox.checked).toBe(true)
+      })
+    })
+  })
+
   describe('navigation retour selon statut', () => {
     it('retour vers inbox pour tâche inbox', async () => {
       const task = makeTask({ status: 'inbox' })

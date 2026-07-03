@@ -54,6 +54,7 @@ interface AppContextValue {
   todayTasks: Task[]
   todaySubTasksMap: Record<string, SubTask[]>
   inboxTasks: Task[]
+  inboxSubTasksMap: Record<string, SubTask[]>
   todayEnergy: number | null
   todayEnergyStatus: 'filled' | 'skipped' | null
   overloadMode: boolean
@@ -136,6 +137,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [todayTasks, setTodayTasks] = useState<Task[]>([])
   const [todaySubTasksMap, setTodaySubTasksMap] = useState<Record<string, SubTask[]>>({})
   const [inboxTasks, setInboxTasks] = useState<Task[]>([])
+  const [inboxSubTasksMap, setInboxSubTasksMap] = useState<Record<string, SubTask[]>>({})
   const [todayEnergy, setTodayEnergy] = useState<number | null>(null)
   const [todayEnergyStatus, setTodayEnergyStatus] = useState<'filled' | 'skipped' | null>(null)
   const [overloadMode, setOverloadModeState] = useState(false)
@@ -186,7 +188,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     today.forEach((t, i) => {
       subTasksMap[t.id] = subTaskArrays[i]
     })
+    const inboxSubTaskArrays = await Promise.all(inbox.map((t) => subTaskRepo.getByTaskId(t.id)))
+    const inboxSubTasksMapNext: Record<string, SubTask[]> = {}
+    inbox.forEach((t, i) => {
+      inboxSubTasksMapNext[t.id] = inboxSubTaskArrays[i]
+    })
     setInboxTasks(inbox)
+    setInboxSubTasksMap(inboxSubTasksMapNext)
     setTodayTasks(today)
     setTodaySubTasksMap(subTasksMap)
     setTodayEnergy(entry?.value ?? null)
@@ -362,6 +370,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   async function toggleSubTask(subTask: SubTask) {
     await subTaskRepo.update({ ...subTask, is_completed: !subTask.is_completed })
+    await loadAll()
   }
 
   async function reorderSubTasks(_taskId: string, ids: string[]) {
@@ -503,6 +512,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         todayTasks,
         todaySubTasksMap,
         inboxTasks,
+        inboxSubTasksMap,
         todayEnergy,
         todayEnergyStatus,
         overloadMode,

@@ -22,10 +22,10 @@
   - constat : `planTodoTask`/`moveTodoTaskToList` (`AppContext.tsx`) suppriment les `SubTask` liées sans les recréer côté `TaskV2`/`ListItem` (pas de mécanisme cross-modèle). Cas rare mais silencieux — pas de confirmation utilisateur avant perte.
   - fait quand: décision produit prise (avertir l'utilisateur avant conversion si sous-tâches existent, ou accepter la perte silencieuse comme comportement définitif)
   - réf: `src/app/AppContext.tsx` fonctions `planTodoTask`/`moveTodoTaskToList`
-- [P3|ouvert] e2e non relancés après les changements de flux Planning (bouton Valider, transport de tâche via `selectedTaskId`, libellé "Planning")
-  - constat : aucun `.spec.ts` ne référence les libellés "Planifier"/"Placer à" (vérifié par recherche), mais le flux réel n'a pas été rejoué en e2e — seuls les tests unitaires (348/348) ont validé le nouveau comportement.
+- [P2|ouvert] e2e non relancés après les changements de flux Planning ET après les correctifs SubTask de cette session
+  - constat : aucun `.spec.ts` ne référence les libellés "Planifier"/"Placer à" (vérifié par recherche), mais le flux réel n'a pas été rejoué en e2e — seuls les tests unitaires (356/356) ont validé le nouveau comportement. S'ajoute désormais la suppression du bouton "Voir le Todo" sur `E24Today` et les nouvelles checkbox de sous-tâches.
   - fait quand: `npx playwright test` relancé et 42/45 (ou mieux) confirmé après ces changements
-  - réf: `e2e/*.spec.ts`, `src/ui/screens/planning/E40Planning.tsx`
+  - réf: `e2e/*.spec.ts`, `src/ui/screens/planning/E40Planning.tsx`, `src/ui/screens/tasks/E24Today.tsx`
 
 ## Questions ouvertes
 
@@ -36,6 +36,9 @@ Aucun.
 
 ## Contexte chaud
 - Branche `v2` active ; tag `v1.0-mvp` posé ; `dist_v1/` archivé (rollback V1 opérationnel)
+- **Bug racine SubTask corrigé** : `toggleSubTask` (AppContext.tsx) existait mais n'était appelée nulle part dans l'UI — aucune sous-tâche ne pouvait jamais être marquée terminée. Conséquence en cascade : le badge "X/Y" du Dashboard restait bloqué à "0/Y" et "Prochaine étape" n'avançait jamais. Corrigé par ajout d'une checkbox fonctionnelle dans `E22TaskDetail`/`E23Decompose` (relié à `toggleSubTask`, qui appelle désormais `loadAll()` pour propager la mise à jour).
+- **Cohérence d'affichage des sous-tâches entre écrans** : badge "X/Y" désormais présent sur `E20Inbox` (nouveau, via `inboxSubTasksMap`) et `E24Today` (nouveau, via `todaySubTasksMap` déjà existant), en plus du Dashboard. `E24Today` affiche aussi "Prochaine étape : {titre}" comme le Dashboard.
+- **`E24Today`** : bouton "Voir le Todo" retiré (demande explicite utilisateur) — l'accès à Todo reste disponible via la nav dashboard.
 - **Flux de planification revu (retour utilisateur direct sur capture d'écran)** : l'ancien comportement où taper un créneau vide affichait la liste de toutes les tâches non planifiées, et cliquer sur une tâche validait immédiatement, n'était pas intuitif. Nouveau flux :
   - `planTodoTask` (Todo → Planifier) et `createTaskV2Dest` (création directe, destination "Planifier") retournent désormais l'id de la `TaskV2` créée.
   - `E20Inbox`/`E21CreateTaskV2` appellent `selectTask(id)` avant `goTo('planning')` pour porter cette tâche comme "tâche en attente" (`selectedTaskId` du contexte).
@@ -46,30 +49,31 @@ Aucun.
 - **Collision de nommage V1/V2 "plus tard" résolue** (session 2026-07-02) : seul `to_plan` (V2, pastille rouge, `E50ToPlanQueue`) subsiste comme mécanisme de report.
 - **Écran Todo (`E20Inbox`) enrichi** : 3 actions par tâche — "Aujourd'hui" (V1), "Planifier" (convertit en `TaskV2` statut `planned`, transporte l'id vers Planning), "Liste" (crée un `ListItem`).
 - Nav segmentée dashboard actuelle : 4 boutons (Todo/Aujourd'hui/Planning/Listes)
-- 348/348 tests unitaires, `tsc -b` passent (build complet et e2e non relancés cette session, voir action P3 ci-dessus)
+- 356/356 tests unitaires, `tsc -b` passent (e2e non relancés cette session, voir action P2 ci-dessus)
 - `npm run test` sous `--pool=vmThreads --poolOptions.vmThreads.maxThreads=1` fait échouer les tests liés à `crypto.subtle` (faux négatif d'environnement documenté) — utiliser le pool par défaut (`npx vitest run`)
 
 ## Dernière session (2026-07-03)
 
 ## Décisions prises
-- Écran Planning (`E40Planning`) : ajout d'un bouton "Valider" explicite — un clic sur une tâche ne valide plus immédiatement le placement (retour utilisateur : comportement non intuitif)
-- Flux "Planifier" (depuis Todo ou création directe) transporte désormais l'id de la tâche créée jusqu'à l'écran Planning, pour afficher directement la confirmation de placement de cette tâche précise, sans lister toutes les tâches non planifiées
-- Bouton "Planifier" de la nav segmentée du dashboard renommé en "Planning"
+- Sous-tâches (`SubTask`, V1) : rendre `toggleSubTask` réellement actionnable dans l'UI (checkbox), corrigeant un bug racine où aucune sous-tâche ne pouvait être marquée terminée
+- Harmoniser l'affichage de la progression des sous-tâches ("X/Y", "Prochaine étape") entre Dashboard, Todo (`E20Inbox`) et Aujourd'hui (`E24Today`)
+- `E24Today` : retirer le bouton "Voir le Todo" (demande explicite utilisateur)
 
 ## Livrables produits ou modifiés
-- `AppContext.tsx` : `planTodoTask` et `createTaskV2Dest` retournent désormais l'id de la tâche créée
-- `E20Inbox.tsx` / `E21CreateTaskV2.tsx` : appel `selectTask(id)` avant `goTo('planning')`
-- `E40Planning.tsx` : bouton Valider (liste classique) + flux "tâche en attente" (confirmation directe sans liste)
-- `E10Dashboard.tsx` : libellé "Planifier" → "Planning" (nav segmentée)
-- Tests mis à jour/ajoutés : `E20Inbox.test.tsx`, `E21CreateTaskV2.test.tsx`, `E40Planning.test.tsx`, `E10Dashboard.test.tsx`
+- `AppContext.tsx` : `toggleSubTask` appelle désormais `loadAll()` ; nouvel état `inboxSubTasksMap` (chargé dans `loadAll`)
+- `E22TaskDetail.tsx` / `E23Decompose.tsx` : checkbox par sous-tâche reliée à `toggleSubTask`, style barré si terminée
+- `E20Inbox.tsx` : badge "X/Y" de progression par tâche (nouveau)
+- `E24Today.tsx` : badge "X/Y" + "Prochaine étape : {titre}" par tâche (nouveau) ; bouton "Voir le Todo" retiré
+- `src/test/testUtils.tsx` : ajout de `inboxSubTasksMap` au mock de contexte
+- Tests mis à jour/ajoutés : `E22TaskDetail.test.tsx`, `E23Decompose.test.tsx`, `E20Inbox.test.tsx`, `E24Today.test.tsx` (356/356 au total)
 
 ## Hypothèses validées / invalidées
-- VALIDE : le flux "un clic = validation" du picker Planning n'était pas intuitif (constat direct sur capture d'écran utilisateur) → ajout d'un bouton Valider explicite
-- VALIDE : afficher toutes les tâches non planifiées dans la modale de confirmation créait de la confusion quand une tâche précise venait d'être choisie pour être planifiée → transport de l'id via `selectedTaskId` existant (réutilisé, pas de nouveau champ)
-- EN ATTENTE : e2e non rejoués après ces changements (aucun `.spec.ts` ne référence les libellés impactés, mais à confirmer par exécution réelle)
+- VALIDE : l'incohérence signalée par l'utilisateur ("affichage des sous-tâches pas cohérent") avait une cause racine unique — `toggleSubTask` jamais appelée dans l'UI, rendant le badge de progression et "Prochaine étape" non fonctionnels partout, pas seulement incohérents visuellement
+- VALIDE : une fois la checkbox ajoutée, propager la même logique d'affichage (badge + prochaine étape) sur Todo et Aujourd'hui suffit à obtenir une cohérence complète entre écrans, sans modèle de données supplémentaire
+- EN ATTENTE : e2e non rejoués après ces changements (aucun `.spec.ts` ne référence les libellés/comportements impactés, mais à confirmer par exécution réelle)
 
 ## Prochaine étape exacte
-Relancer `npx playwright test` pour confirmer l'absence de régression e2e sur le nouveau flux Planning, puis poursuivre V2-10 : doc V2, build + déploiement Netlify, sessions test 2-5 avec Marie.
+Relancer `npx playwright test` pour confirmer l'absence de régression e2e (flux Planning + correctifs SubTask de cette session), puis poursuivre V2-10 : doc V2, build + déploiement Netlify, sessions test 2-5 avec Marie.
 
 ## Question bloquante pour la session suivante
 Aucune.

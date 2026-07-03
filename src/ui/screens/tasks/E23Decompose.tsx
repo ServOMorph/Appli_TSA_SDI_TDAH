@@ -56,9 +56,10 @@ const inputStyle: React.CSSProperties = {
 interface SortableSubTaskItemProps {
   subTask: SubTask
   onDelete: (id: string) => void
+  onToggle: (subTask: SubTask) => void
 }
 
-function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
+function SortableSubTaskItem({ subTask, onDelete, onToggle }: SortableSubTaskItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: subTask.id,
   })
@@ -96,7 +97,22 @@ function SortableSubTaskItem({ subTask, onDelete }: SortableSubTaskItemProps) {
           >
             ⠿
           </span>
-          <span style={{ color: 'var(--color-text)', flex: 1 }}>{subTask.title}</span>
+          <input
+            type="checkbox"
+            checked={subTask.is_completed}
+            aria-label={`${subTask.is_completed ? 'Marquer non terminée' : 'Marquer terminée'} : ${subTask.title}`}
+            onClick={(e) => e.stopPropagation()}
+            onChange={() => onToggle(subTask)}
+          />
+          <span
+            style={{
+              color: subTask.is_completed ? 'var(--color-text-muted)' : 'var(--color-text)',
+              textDecoration: subTask.is_completed ? 'line-through' : 'none',
+              flex: 1,
+            }}
+          >
+            {subTask.title}
+          </span>
           <button
             aria-label={`Supprimer ${subTask.title}`}
             style={{
@@ -128,6 +144,7 @@ export function E23Decompose() {
     getSubTasks,
     addSubTask,
     deleteSubTask,
+    toggleSubTask,
     reorderSubTasks,
     goTo,
   } = useApp()
@@ -184,6 +201,14 @@ export function E23Decompose() {
     }
   }
 
+  async function handleToggle(subTask: SubTask) {
+    await toggleSubTask(subTask)
+    if (selectedTaskId) {
+      const updated = await getSubTasks(selectedTaskId)
+      setSubTasks(updated)
+    }
+  }
+
   return (
     <main style={pageStyle}>
       <button style={backBtnStyle} onClick={() => goTo('task-detail')} aria-label="Retour">
@@ -203,7 +228,12 @@ export function E23Decompose() {
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               {subTasks.map((st) => (
-                <SortableSubTaskItem key={st.id} subTask={st} onDelete={handleDelete} />
+                <SortableSubTaskItem
+                  key={st.id}
+                  subTask={st}
+                  onDelete={handleDelete}
+                  onToggle={handleToggle}
+                />
               ))}
             </div>
           </SortableContext>

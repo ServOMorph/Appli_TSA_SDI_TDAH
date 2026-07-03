@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E24Today } from './E24Today'
 import type { Task } from '@/domain/entities/task'
+import type { SubTask } from '@/domain/entities/subTask'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
   return {
@@ -52,6 +53,45 @@ describe('E24Today', () => {
       expect(screen.getByText('Faire la vaisselle')).toBeDefined()
     })
 
+    it('affiche la progression des sous-étapes', () => {
+      const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
+      const subs: SubTask[] = [
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
+        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1 },
+      ]
+      const ctx = makeAppContext({ todayTasks: [task], todaySubTasksMap: { abc: subs } })
+      renderWithApp(<E24Today />, ctx)
+      expect(screen.getByLabelText('1 sur 2 étapes')).toBeDefined()
+    })
+
+    it('n\'affiche pas de progression sans sous-étape', () => {
+      const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
+      const ctx = makeAppContext({ todayTasks: [task] })
+      renderWithApp(<E24Today />, ctx)
+      expect(screen.queryByLabelText(/sur .* étapes/)).toBeNull()
+    })
+
+    it('affiche la prochaine sous-étape non terminée', () => {
+      const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
+      const subs: SubTask[] = [
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
+        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1 },
+      ]
+      const ctx = makeAppContext({ todayTasks: [task], todaySubTasksMap: { abc: subs } })
+      renderWithApp(<E24Today />, ctx)
+      expect(screen.getByText('Prochaine étape : Étape 2')).toBeDefined()
+    })
+
+    it('n\'affiche pas de prochaine étape si toutes les sous-étapes sont terminées', () => {
+      const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
+      const subs: SubTask[] = [
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
+      ]
+      const ctx = makeAppContext({ todayTasks: [task], todaySubTasksMap: { abc: subs } })
+      renderWithApp(<E24Today />, ctx)
+      expect(screen.queryByText(/Prochaine étape/)).toBeNull()
+    })
+
     it('Terminer appelle completeTask', async () => {
       const task = makeTask({ id: 'abc', title: 'Faire la vaisselle' })
       const ctx = makeAppContext({ todayTasks: [task] })
@@ -84,13 +124,6 @@ describe('E24Today', () => {
       renderWithApp(<E24Today />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
       expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
-    })
-
-    it("Voir le Todo navigue vers inbox", async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E24Today />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: "Voir le Todo" }))
-      expect(ctx.goTo).toHaveBeenCalledWith('inbox')
     })
   })
 })

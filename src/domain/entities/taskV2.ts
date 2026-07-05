@@ -1,4 +1,4 @@
-export type TaskStatusV2 = 'todo' | 'planned' | 'to_plan' | 'completed'
+export type TaskStatusV2 = 'todo' | 'planned' | 'completed'
 
 export interface TaskV2 {
   id: string

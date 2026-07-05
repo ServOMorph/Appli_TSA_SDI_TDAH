@@ -57,17 +57,6 @@ export function scheduleTaskV2(
   }
 }
 
-export function moveTaskToLaterV2(task: TaskV2, now: string): TaskV2 {
-  return {
-    ...task,
-    status: 'to_plan',
-    scheduled_date: null,
-    scheduled_start: null,
-    scheduled_end: null,
-    updated_at: now,
-  }
-}
-
 export function toggleEssentialV2(task: TaskV2, now: string): TaskV2 {
   return {
     ...task,

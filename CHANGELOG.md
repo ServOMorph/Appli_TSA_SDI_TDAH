@@ -1,3 +1,16 @@
+## v0.37 — 2026-07-05
+
+### Modifié
+- Écran de création de tâche (`E21CreateTaskV2`) : destination "À planifier plus tard" remplacée par "Mettre dans une liste" (ouvre un sélecteur de liste, crée un `ListItem`).
+
+### Ajouté
+- Écran de création de tâche : destination "Aujourd'hui" (crée directement une tâche du jour, avec la même règle de remplacement à 3 tâches que sur l'écran Todo).
+
+### Corrigé
+- Statut `to_plan` (TaskV2) retiré du domaine — il n'avait plus aucune voie de création après le point ci-dessus, ce qui rendait mort l'écran `E50ToPlanQueue`, la pastille "Tâches à planifier" du dashboard et `moveTaskToLaterV2`. Tout retiré proprement (décision de nettoyage validée).
+
+---
+
 ## v0.36 — 2026-07-03
 
 ### Corrigé

@@ -72,13 +72,15 @@ Fondation des phases suivantes. Aucune UI ici, domaine + data. Schéma réécrit
 
 ## Phase V2-3 — Flux d'ajout de tâche refondu
 
-- [x] Écran ajout : nom + **choix obligatoire** entre 3 destinations (Todo / Planifier / À planifier plus tard)
+- [x] Écran ajout : nom + **choix obligatoire** entre destinations (Todo / Planifier / À planifier plus tard)
 - [x] Pas de destination par défaut (validation bloquée tant que non choisie)
 - [x] "Planifier" → crée status 'planned' (navigue inbox, placeholder jusqu'à V2-4)
 - [x] "À planifier plus tard" → crée status 'to_plan'
-- [ ] Option : associer la tâche à une liste (reporté V2-7)
+- [x] Option : associer la tâche à une liste (livrée V2-7, câblée dans l'écran de création 2026-07-05)
 - [x] **Tests** + **Test manuel** : 3 chemins (313/313 — TM-01 à TM-12 validés)
 - [x] **Sortie** : plus de tâche perdue dans un inbox ambigu
+
+> **[2026-07-05] Destinations revues** — "À planifier plus tard" (`to_plan`) remplacée par "Mettre dans une liste" (crée un `ListItem` directement, réutilise le sélecteur de liste de V2-7) ; ajout d'une destination "Aujourd'hui" (crée une `Task` V1 en `today`, avec la même règle de remplacement à 3 tâches que sur l'écran Todo). Le statut `to_plan` étant devenu inatteignable (aucune autre voie de création), il est retiré du domaine — voir note Phase V2-5.
 
 ## Phase V2-4 — Vue Planning (calendrier en cases)
 
@@ -92,13 +94,15 @@ Maquette : capture 183750 (cases AUJOURD'HUI) + capture 184709 (planning hebdo r
 - [x] **Tests** : 11 tests (324/324 total) · **Test manuel** : validé
 - [x] **Sortie** : planning visuel utilisable (2026-06-30)
 
-## Phase V2-5 — File "À planifier" séquentielle
+## Phase V2-5 — File "À planifier" séquentielle — RETIRÉE
 
 - [x] Pastille rouge sur le tableau de bord si ≥ 1 tâche en attente (signal visuel, sans nombre)
 - [x] Au clic : affichage de la 1re tâche → choix date/heure → tâche suivante
 - [x] Arrêt possible à tout moment ; reste de la file conservé
 - [x] **Tests** : 12 tests (336/336 total) · **Test manuel** : 7/7 TM validés
 - [x] **Sortie** : traitement fluide du backlog de planification (2026-06-30)
+
+**[2026-07-05] Retirée** — la destination "À planifier plus tard" a été remplacée par "Mettre dans une liste" sur l'écran de création (demande utilisateur). Le statut `to_plan` n'avait aucune autre voie de création (`moveTaskToLaterV2` jamais câblée à l'UI) ; il devenait donc totalement inatteignable. Code retiré : écran `E50ToPlanQueue`, bouton pastille du dashboard, statut `to_plan` (`TaskStatusV2`), fonction `moveTaskToLaterV2`, `getToPlantasks` (repository). 343/343 tests, build OK.
 
 ## Phase V2-6 — Mode surcharge repensé
 

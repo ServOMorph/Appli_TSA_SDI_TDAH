@@ -3,6 +3,8 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import type { TaskStatusV2 } from '@/domain/entities/taskV2'
 
+type Destination = TaskStatusV2 | 'list' | 'today'
+
 const pageStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -35,11 +37,35 @@ const inputStyle: React.CSSProperties = {
   boxSizing: 'border-box',
 }
 
-const DESTINATIONS: { value: TaskStatusV2; label: string }[] = [
+const DESTINATIONS: { value: Destination; label: string }[] = [
   { value: 'todo', label: 'Todo' },
+  { value: 'today', label: "Aujourd'hui" },
   { value: 'planned', label: 'Planifier' },
-  { value: 'to_plan', label: 'A planifier plus tard' },
+  { value: 'list', label: 'Mettre dans une liste' },
 ]
+
+const modalOverlay: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  backgroundColor: 'rgba(0,0,0,0.75)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+}
+
+const modalBox: React.CSSProperties = {
+  backgroundColor: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
+  boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+  borderRadius: 'var(--radius-lg)',
+  padding: 'var(--spacing-xl)',
+  maxWidth: '360px',
+  width: '90%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--spacing-md)',
+}
 
 function destinationBtnStyle(selected: boolean): React.CSSProperties {
   return {
@@ -57,9 +83,12 @@ function destinationBtnStyle(selected: boolean): React.CSSProperties {
 }
 
 export function E21CreateTaskV2() {
-  const { createTaskV2Dest, createTaskInbox, goTo, selectTask } = useApp()
+  const { createTaskV2Dest, createTaskInbox, goTo, selectTask, lists, addListItem, todayTasks, addTask, moveTask } =
+    useApp()
   const [title, setTitle] = useState('')
-  const [destination, setDestination] = useState<TaskStatusV2 | null>(null)
+  const [destination, setDestination] = useState<Destination | null>(null)
+  const [showListPicker, setShowListPicker] = useState(false)
+  const [showTodayReplace, setShowTodayReplace] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -70,6 +99,19 @@ export function E21CreateTaskV2() {
       goTo('inbox')
       return
     }
+    if (destination === 'list') {
+      setShowListPicker(true)
+      return
+    }
+    if (destination === 'today') {
+      if (todayTasks.length >= 3) {
+        setShowTodayReplace(true)
+        return
+      }
+      await addTask(trimmed)
+      goTo('today')
+      return
+    }
     const newTaskId = await createTaskV2Dest(trimmed, destination)
     if (destination === 'planned') {
       selectTask(newTaskId)
@@ -77,6 +119,23 @@ export function E21CreateTaskV2() {
     } else {
       goTo('inbox')
     }
+  }
+
+  async function handleChooseList(listId: string) {
+    const trimmed = title.trim()
+    if (!trimmed) return
+    await addListItem(listId, trimmed)
+    setShowListPicker(false)
+    goTo('lists')
+  }
+
+  async function handleReplaceToday(replacedId: string) {
+    const trimmed = title.trim()
+    if (!trimmed) return
+    await moveTask(replacedId, 'inbox')
+    await addTask(trimmed)
+    setShowTodayReplace(false)
+    goTo('today')
   }
 
   return (
@@ -128,6 +187,64 @@ export function E21CreateTaskV2() {
           Annuler
         </Button>
       </form>
+
+      {showListPicker && (
+        <div role="dialog" aria-modal="true" aria-label="Choisir une liste" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Ajouter à une liste</h2>
+            {lists.length === 0 ? (
+              <>
+                <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
+                <Button fullWidth onClick={() => goTo('lists')}>
+                  Créer une liste
+                </Button>
+              </>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                {lists.map((l) => (
+                  <button
+                    key={l.id}
+                    aria-label={`Ajouter à ${l.name}`}
+                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
+                    onClick={() => handleChooseList(l.id)}
+                  >
+                    {l.name}
+                  </button>
+                ))}
+              </div>
+            )}
+            <Button variant="secondary" fullWidth onClick={() => setShowListPicker(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {showTodayReplace && (
+        <div role="dialog" aria-modal="true" aria-label="Remplacer une tâche" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Choisir la tâche à remplacer</h2>
+            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+              Vous avez déjà 3 tâches aujourd'hui. Sélectionnez celle à déplacer vers le Todo :
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+              {todayTasks.map((t) => (
+                <button
+                  key={t.id}
+                  aria-label={`Remplacer par ${t.title}`}
+                  style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
+                  onClick={() => handleReplaceToday(t.id)}
+                >
+                  {t.title}
+                </button>
+              ))}
+            </div>
+            <Button variant="secondary" fullWidth onClick={() => setShowTodayReplace(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

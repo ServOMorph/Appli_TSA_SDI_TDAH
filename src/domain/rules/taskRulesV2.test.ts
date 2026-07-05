@@ -3,7 +3,6 @@ import {
   createTaskV2,
   completeTaskV2,
   scheduleTaskV2,
-  moveTaskToLaterV2,
   toggleEssentialV2,
   sortByPosition,
   nextPosition,
@@ -84,31 +83,6 @@ describe('taskRulesV2', () => {
       expect(scheduled.scheduled_date).toBe('2026-06-30')
       expect(scheduled.scheduled_start).toBe('10:00')
       expect(scheduled.scheduled_end).toBe('11:00')
-    })
-  })
-
-  describe('moveTaskToLaterV2', () => {
-    it('moves task to to_plan status', () => {
-      const task: TaskV2 = {
-        id: 'id-1',
-        title: 'My task',
-        status: 'planned',
-        essential: true,
-        position: 0,
-        scheduled_date: '2026-06-30',
-        scheduled_start: '10:00',
-        scheduled_end: '11:00',
-        created_at: now,
-        updated_at: now,
-        completed_at: null,
-      }
-
-      const later = moveTaskToLaterV2(task, now)
-
-      expect(later.status).toBe('to_plan')
-      expect(later.scheduled_date).toBeNull()
-      expect(later.scheduled_start).toBeNull()
-      expect(later.scheduled_end).toBeNull()
     })
   })
 

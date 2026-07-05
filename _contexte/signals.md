@@ -1,4 +1,4 @@
-# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-03)
+# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-05)
 
 ## Actions ouvertes
 
@@ -13,7 +13,7 @@
   - réf: `roadmap_v2.md` Phase V2-10
 - [P3|ouvert] Trou fonctionnel TaskV2 : aucune interaction UI pour compléter/toggle `essential` une tâche planifiée
   - fait quand: décision produit prise (implémenter ou explicitement abandonner) sur `completeTaskV2`/`toggleEssentialV2` (`src/domain/rules/taskRulesV2.ts`), actuellement non appelées nulle part dans l'UI.
-  - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`
+  - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`. Note 2026-07-05 : `moveTaskToLaterV2` (même trou fonctionnel) a été retiré entièrement suite à la suppression du statut `to_plan`, ne concerne plus que ces deux fonctions.
 - [P2|ouvert] e2e T40/T44/T45 (`05-overload.spec.ts`) cassés — décalage test/UI préexistant
   - constat : les tests attendent un `heading` "Mode surcharge" sur le dashboard ; le bandeau surcharge est un `<p>` depuis la refonte V2-6 (toggle inline sans navigation).
   - fait quand: soit le bandeau devient un `<h2>`/`<h3>`, soit les 3 tests sont réécrits pour matcher le texte réel ("Mode surcharge actif")
@@ -22,10 +22,10 @@
   - constat : `planTodoTask`/`moveTodoTaskToList` (`AppContext.tsx`) suppriment les `SubTask` liées sans les recréer côté `TaskV2`/`ListItem` (pas de mécanisme cross-modèle). Cas rare mais silencieux — pas de confirmation utilisateur avant perte.
   - fait quand: décision produit prise (avertir l'utilisateur avant conversion si sous-tâches existent, ou accepter la perte silencieuse comme comportement définitif)
   - réf: `src/app/AppContext.tsx` fonctions `planTodoTask`/`moveTodoTaskToList`
-- [P2|ouvert] e2e non relancés après les changements de flux Planning ET après les correctifs SubTask de cette session
-  - constat : aucun `.spec.ts` ne référence les libellés "Planifier"/"Placer à" (vérifié par recherche), mais le flux réel n'a pas été rejoué en e2e — seuls les tests unitaires (356/356) ont validé le nouveau comportement. S'ajoute désormais la suppression du bouton "Voir le Todo" sur `E24Today` et les nouvelles checkbox de sous-tâches.
-  - fait quand: `npx playwright test` relancé et 42/45 (ou mieux) confirmé après ces changements
-  - réf: `e2e/*.spec.ts`, `src/ui/screens/planning/E40Planning.tsx`, `src/ui/screens/tasks/E24Today.tsx`
+- [P2|ouvert] e2e non relancés depuis plusieurs sessions (flux Planning, correctifs SubTask, et désormais refonte des destinations de création de tâche)
+  - constat : aucun `.spec.ts` ne référence les libellés "Planifier"/"Placer à"/"Mettre dans une liste"/"Aujourd'hui" (vérifié par recherche), mais le flux réel n'a pas été rejoué en e2e — seuls les tests unitaires (345/345) ont validé le nouveau comportement. S'accumulent désormais : suppression du bouton "Voir le Todo" sur `E24Today`, checkbox de sous-tâches, suppression de la destination `to_plan` (et de l'écran `E50ToPlanQueue`), ajout de la destination "Aujourd'hui" sur l'écran de création.
+  - fait quand: `npx playwright test` relancé et confirmé (attention : les tests qui référençaient `to-plan-queue` ou l'ancienne destination "À planifier plus tard" doivent être adaptés/retirés en plus des 3 échecs `05-overload` déjà connus)
+  - réf: `e2e/*.spec.ts`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`, `src/ui/screens/planning/E40Planning.tsx`, `src/ui/screens/tasks/E24Today.tsx`
 
 ## Questions ouvertes
 
@@ -36,6 +36,8 @@ Aucun.
 
 ## Contexte chaud
 - Branche `v2` active ; tag `v1.0-mvp` posé ; `dist_v1/` archivé (rollback V1 opérationnel)
+- **Écran de création de tâche (`E21CreateTaskV2`) revu (2026-07-05)** : 4 destinations désormais — Todo / Aujourd'hui (nouveau, crée une `Task` V1 en `today`, modal de remplacement si déjà 3 tâches, même règle que `E20Inbox`) / Planifier / Mettre dans une liste (remplace "À planifier plus tard", ouvre un modal de sélection de liste, crée un `ListItem` via `addListItem`).
+- **Statut `to_plan` (TaskV2) supprimé du domaine** : plus aucune voie de création ne l'utilisait (`moveTaskToLaterV2` jamais câblée à l'UI). Retirés en conséquence : `E50ToPlanQueue` (écran + test), bouton pastille "Tâches à planifier" du dashboard, `moveTaskToLaterV2` (`taskRulesV2.ts`), `getToPlantasks` (`taskV2Repository.ts`), état `toPlanTasks`/route `to-plan-queue` (`AppContext.tsx`, `App.tsx`). `TaskStatusV2` est désormais `'todo' | 'planned' | 'completed'`.
 - **Bug racine SubTask corrigé** : `toggleSubTask` (AppContext.tsx) existait mais n'était appelée nulle part dans l'UI — aucune sous-tâche ne pouvait jamais être marquée terminée. Conséquence en cascade : le badge "X/Y" du Dashboard restait bloqué à "0/Y" et "Prochaine étape" n'avançait jamais. Corrigé par ajout d'une checkbox fonctionnelle dans `E22TaskDetail`/`E23Decompose` (relié à `toggleSubTask`, qui appelle désormais `loadAll()` pour propager la mise à jour).
 - **Cohérence d'affichage des sous-tâches entre écrans** : badge "X/Y" désormais présent sur `E20Inbox` (nouveau, via `inboxSubTasksMap`) et `E24Today` (nouveau, via `todaySubTasksMap` déjà existant), en plus du Dashboard. `E24Today` affiche aussi "Prochaine étape : {titre}" comme le Dashboard.
 - **`E24Today`** : bouton "Voir le Todo" retiré (demande explicite utilisateur) — l'accès à Todo reste disponible via la nav dashboard.
@@ -49,31 +51,31 @@ Aucun.
 - **Collision de nommage V1/V2 "plus tard" résolue** (session 2026-07-02) : seul `to_plan` (V2, pastille rouge, `E50ToPlanQueue`) subsiste comme mécanisme de report.
 - **Écran Todo (`E20Inbox`) enrichi** : 3 actions par tâche — "Aujourd'hui" (V1), "Planifier" (convertit en `TaskV2` statut `planned`, transporte l'id vers Planning), "Liste" (crée un `ListItem`).
 - Nav segmentée dashboard actuelle : 4 boutons (Todo/Aujourd'hui/Planning/Listes)
-- 356/356 tests unitaires, `tsc -b` passent (e2e non relancés cette session, voir action P2 ci-dessus)
+- 345/345 tests unitaires, `tsc -b` passent (e2e non relancés cette session, voir action P2 ci-dessus)
 - `npm run test` sous `--pool=vmThreads --poolOptions.vmThreads.maxThreads=1` fait échouer les tests liés à `crypto.subtle` (faux négatif d'environnement documenté) — utiliser le pool par défaut (`npx vitest run`)
 
-## Dernière session (2026-07-03)
+## Dernière session (2026-07-05)
 
 ## Décisions prises
-- Sous-tâches (`SubTask`, V1) : rendre `toggleSubTask` réellement actionnable dans l'UI (checkbox), corrigeant un bug racine où aucune sous-tâche ne pouvait être marquée terminée
-- Harmoniser l'affichage de la progression des sous-tâches ("X/Y", "Prochaine étape") entre Dashboard, Todo (`E20Inbox`) et Aujourd'hui (`E24Today`)
-- `E24Today` : retirer le bouton "Voir le Todo" (demande explicite utilisateur)
+- Écran de création de tâche (`E21CreateTaskV2`) : destination "À planifier plus tard" remplacée par "Mettre dans une liste" (demande utilisateur)
+- Suite au constat que le statut `to_plan` devenait totalement inatteignable (aucune autre voie de création), nettoyage complet validé avec l'utilisateur : `E50ToPlanQueue`, pastille dashboard, `moveTaskToLaterV2`, `getToPlantasks` retirés
+- Ajout d'une 4e destination "Aujourd'hui" sur l'écran de création (demande utilisateur), avec la même règle de remplacement à 3 tâches que sur l'écran Todo
 
 ## Livrables produits ou modifiés
-- `AppContext.tsx` : `toggleSubTask` appelle désormais `loadAll()` ; nouvel état `inboxSubTasksMap` (chargé dans `loadAll`)
-- `E22TaskDetail.tsx` / `E23Decompose.tsx` : checkbox par sous-tâche reliée à `toggleSubTask`, style barré si terminée
-- `E20Inbox.tsx` : badge "X/Y" de progression par tâche (nouveau)
-- `E24Today.tsx` : badge "X/Y" + "Prochaine étape : {titre}" par tâche (nouveau) ; bouton "Voir le Todo" retiré
-- `src/test/testUtils.tsx` : ajout de `inboxSubTasksMap` au mock de contexte
-- Tests mis à jour/ajoutés : `E22TaskDetail.test.tsx`, `E23Decompose.test.tsx`, `E20Inbox.test.tsx`, `E24Today.test.tsx` (356/356 au total)
+- `E21CreateTaskV2.tsx`/`.test.tsx` : 4 destinations (Todo/Aujourd'hui/Planifier/Liste), modal sélection de liste, modal remplacement "Aujourd'hui" à la limite de 3
+- `E10Dashboard.tsx` : bouton pastille "Tâches à planifier" retiré
+- `App.tsx`, `AppContext.tsx` : route/état `to-plan-queue`/`toPlanTasks` retirés
+- `taskV2.ts` (`TaskStatusV2` sans `to_plan`), `taskRulesV2.ts`/`.test.ts` (`moveTaskToLaterV2` retiré), `taskV2Repository.ts` (`getToPlantasks` retiré)
+- `E50ToPlanQueue.tsx`/`.test.tsx` : supprimés
+- `testUtils.tsx`, `DevResetButton.tsx` : nettoyage des références `to_plan`/`to-plan-queue`
+- `roadmap_v2.md` : Phase V2-5 marquée RETIRÉE, Phase V2-3 mise à jour (destinations)
 
 ## Hypothèses validées / invalidées
-- VALIDE : l'incohérence signalée par l'utilisateur ("affichage des sous-tâches pas cohérent") avait une cause racine unique — `toggleSubTask` jamais appelée dans l'UI, rendant le badge de progression et "Prochaine étape" non fonctionnels partout, pas seulement incohérents visuellement
-- VALIDE : une fois la checkbox ajoutée, propager la même logique d'affichage (badge + prochaine étape) sur Todo et Aujourd'hui suffit à obtenir une cohérence complète entre écrans, sans modèle de données supplémentaire
-- EN ATTENTE : e2e non rejoués après ces changements (aucun `.spec.ts` ne référence les libellés/comportements impactés, mais à confirmer par exécution réelle)
+- VALIDE : le statut `to_plan` n'avait strictement aucune voie de création alternative à l'écran de création de tâche — suppression complète sans perte fonctionnelle réelle (fonctionnalité jamais atteignable autrement)
+- EN ATTENTE : e2e non rejoués depuis plusieurs sessions, s'accumulent désormais les changements Planning + SubTask + destinations de création (voir action P2)
 
 ## Prochaine étape exacte
-Relancer `npx playwright test` pour confirmer l'absence de régression e2e (flux Planning + correctifs SubTask de cette session), puis poursuivre V2-10 : doc V2, build + déploiement Netlify, sessions test 2-5 avec Marie.
+Relancer `npx playwright test` pour confirmer l'absence de régression (accumulation de plusieurs sessions de changements non testés en e2e), puis poursuivre V2-10 : doc V2, build + déploiement Netlify, sessions test 2-5 avec Marie.
 
 ## Question bloquante pour la session suivante
 Aucune.

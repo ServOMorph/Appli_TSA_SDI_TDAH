@@ -10,7 +10,6 @@ const SCREEN_CODES: Record<Screen, string> = {
   inbox: 'E20',
   'task-create-v2': 'E21v2',
   planning: 'E40',
-  'to-plan-queue': 'E50',
   'task-detail': 'E22',
   'task-decompose': 'E23',
   today: 'E24',

@@ -78,10 +78,6 @@ export class TaskV2Repository {
     return this.getByStatus('planned')
   }
 
-  async getToPlantasks(): Promise<TaskV2[]> {
-    return this.getByStatus('to_plan')
-  }
-
   async getEssentialTasks(): Promise<TaskV2[]> {
     const tasks = await this.db.tasksV2.toArray()
     const essential = tasks.filter((t) => t.essential)

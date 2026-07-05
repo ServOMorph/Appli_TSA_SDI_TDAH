@@ -32,7 +32,6 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     createTaskInbox: vi.fn().mockResolvedValue(undefined),
     planTodoTask: vi.fn().mockResolvedValue(undefined),
     moveTodoTaskToList: vi.fn().mockResolvedValue(undefined),
-    toPlanTasks: [],
     createTaskV2Dest: vi.fn().mockResolvedValue(undefined),
     scheduleV2Task: vi.fn().mockResolvedValue(undefined),
     getPlannedTasksForDate: vi.fn().mockResolvedValue([]),

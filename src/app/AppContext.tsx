@@ -28,7 +28,6 @@ export type Screen =
   | 'today'
   | 'task-create-v2'
   | 'planning'
-  | 'to-plan-queue'
   | 'task-detail'
   | 'task-decompose'
   | 'energy-view'
@@ -73,7 +72,6 @@ interface AppContextValue {
   createTaskInbox: (title: string) => Promise<void>
   planTodoTask: (taskId: string) => Promise<string | null>
   moveTodoTaskToList: (taskId: string, listId: string) => Promise<void>
-  toPlanTasks: TaskV2[]
   createTaskV2Dest: (title: string, status: TaskStatusV2) => Promise<string>
   scheduleV2Task: (taskId: string, date: string, start: string, end: string) => Promise<void>
   getPlannedTasksForDate: (date: string) => Promise<TaskV2[]>
@@ -143,7 +141,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [overloadMode, setOverloadModeState] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [taskDetailOrigin, setTaskDetailOrigin] = useState<Screen | null>(null)
-  const [toPlanTasks, setToPlanTasks] = useState<TaskV2[]>([])
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
 
@@ -176,11 +173,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [settings])
 
   async function loadAll() {
-    const [inbox, today, entry, toPlan, listsData] = await Promise.all([
+    const [inbox, today, entry, listsData] = await Promise.all([
       taskRepo.getByStatus('inbox'),
       taskRepo.getTodayTasks(),
       energyRepo.getByDate(todayDate()),
-      taskV2Repo.getToPlantasks(),
       listRepo.getAll(),
     ])
     const subTaskArrays = await Promise.all(today.map((t) => subTaskRepo.getByTaskId(t.id)))
@@ -199,7 +195,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodaySubTasksMap(subTasksMap)
     setTodayEnergy(entry?.value ?? null)
     setTodayEnergyStatus(entry?.status ?? null)
-    setToPlanTasks(toPlan)
     setLists(listsData)
   }
 
@@ -276,7 +271,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!task) return
     const updated = scheduleTaskV2Rule(task, date, start, end, new Date().toISOString())
     await taskV2Repo.update(updated)
-    setToPlanTasks((prev) => prev.filter((t) => t.id !== taskId))
   }
 
   async function getPlannedTasksForDate(date: string): Promise<TaskV2[]> {
@@ -497,7 +491,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSelectedTaskId(null)
     setLists([])
     setSelectedListId(null)
-    setToPlanTasks([])
     setScreen('welcome')
   }
 
@@ -531,7 +524,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         createTaskInbox,
         planTodoTask,
         moveTodoTaskToList,
-        toPlanTasks,
         createTaskV2Dest,
         scheduleV2Task,
         getPlannedTasksForDate,

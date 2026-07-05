@@ -24,7 +24,6 @@ export default defineConfig({
         'src/ui/components/DevResetButton.tsx',
         '**/*.config.*',
         'dist/**',
-        'dist_v1/**',
         'e2e/**',
       ],
     },

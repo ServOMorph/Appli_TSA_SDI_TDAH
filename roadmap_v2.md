@@ -42,9 +42,11 @@ Ce document redéfinit les termes par rapport à `roadmap.md` :
 - [x] Créer `Archives/` à la racine
 - [x] Déplacer `roadmap.md` → `Archives/roadmap_v1.md`
 - [x] Tag `v1.0-mvp` sur le commit actuel
-- [x] Archive du `dist/` V1 (dossier `dist_v1/`)
+- [x] Archive du `dist/` V1 (dossier `dist/v1/`)
 - [x] Branche `v2` créée depuis `main`
-- [x] **Sortie** : V1 restaurable en une commande (`git checkout v1.0-mvp` + redéploiement `dist_v1/`)
+- [x] **Sortie** : V1 restaurable en une commande (`git checkout v1.0-mvp` + redéploiement `dist/v1/`)
+
+> **[2026-07-05] Réorganisation** : `dist_v1/` déplacé vers `dist/v1/` (regroupement des builds sous un seul dossier racine). `dist/v2/` (build V2, régénérable via `npm run build`) reste ignoré Git ; `dist/v1/` reste versionné.
 
 ## Phase V2-1 — Vocabulaire & quick wins
 
@@ -151,13 +153,14 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 
 ## Phase V2-10 — Consolidation V2 & 2e vague de tests
 
-- [x] Refacto d'architecture, dead code, couverture globale ≥ 85 % — config coverage corrigée (exclusion `dist_v1`/`e2e`), couverture réelle 95.48% (mesure 2026-07-01) ; `TASK_TODAY_MAX`/`canAddToToday` (V1) supprimés. `completeTaskV2`/`toggleEssentialV2` (V2) conservés : trou fonctionnel (non code mort), décision produit différée (signals.md)
+- [x] Refacto d'architecture, dead code, couverture globale ≥ 85 % — config coverage corrigée (exclusion `dist`/`e2e`), couverture réelle 95.48% (mesure 2026-07-01) ; `TASK_TODAY_MAX`/`canAddToToday` (V1) supprimés. `completeTaskV2`/`toggleEssentialV2` (V2) conservés : trou fonctionnel (non code mort), décision produit différée (signals.md)
 - [x] E2E Playwright mis à jour (flux V2) — 42/45 passent (2026-07-02, après retrait Routines/Later et adaptation du flux de création) ; 3 échecs préexistants sans lien (`05-overload.spec.ts`, voir signals.md)
 - [x] **[2026-07-02]** Fonctionnalité Routines (V2-8) retirée intégralement — non demandée par Marie (voir Phase V2-8 ci-dessus)
 - [x] **[2026-07-02]** Collision de nommage V1/V2 "plus tard" résolue — système V1 `later` retiré, `to_plan` (V2) seul mécanisme de report
 - [x] **[2026-07-02]** Écran Todo enrichi : actions "Planifier" et "Liste" par tâche (conversion à l'action vers `TaskV2`/`ListItem`), bug orphelin corrigé (destination "Todo" de `E21CreateTaskV2` créait des `TaskV2` jamais affichées), bug `deleteAllData` (tasksV2 non vidé) corrigé
 - [x] **[2026-07-03]** Écran Planning (`E40Planning`) revu suite à retour utilisateur direct : bouton "Valider" explicite (fin du "un clic = validation"), transport de la tâche active via `selectedTaskId` pour confirmer sa planification sans lister tout le backlog. Bouton "Planifier" du dashboard renommé "Planning". 348/348 tests unitaires, `tsc -b` clean ; **e2e non rejoués** (voir signals.md action P2)
-- [x] **[2026-07-03]** Bug racine SubTask corrigé : `toggleSubTask` n'était appelée nulle part dans l'UI (aucune sous-tâche jamais marquable terminée). Checkbox ajoutée dans `E22TaskDetail`/`E23Decompose` ; badge "X/Y" harmonisé sur Dashboard/`E20Inbox`/`E24Today` ; "Prochaine étape" ajoutée sur `E24Today` ; bouton "Voir le Todo" retiré de `E24Today`. 356/356 tests unitaires, `tsc -b` clean ; **e2e non rejoués** (voir signals.md action P2)
+- [x] **[2026-07-03]** Bug racine SubTask corrigé : `toggleSubTask` n'était appelée nulle part dans l'UI (aucune sous-tâche jamais marquable terminée). Checkbox ajoutée dans `E22TaskDetail`/`E23Decompose` ; badge "X/Y" harmonisé sur Dashboard/`E20Inbox`/`E24Today` ; "Prochaine étape" ajoutée sur `E24Today` ; bouton "Voir le Todo" retiré de `E24Today`. 356/356 tests unitaires, `tsc -b` clean
+- [x] **[2026-07-05]** E2E relancés (`npx playwright test`) après accumulation de plusieurs sessions de changements non testés (Planning, SubTask, destinations de création, retrait `to_plan`) — **45/45 passent**, aucune régression. Les 3 échecs préexistants (`05-overload.spec.ts` T40/T44/T45, décalage heading/`<p>`) corrigés en réécrivant les assertions pour matcher le texte réel ("Mode surcharge actif")
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
 - [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD

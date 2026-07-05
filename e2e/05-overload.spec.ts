@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 
 test('T40 — Activer le mode surcharge depuis dashboard', async ({ page }) => {
   await page.getByRole('button', { name: 'Activer le mode surcharge' }).click()
-  await expect(page.getByRole('heading', { name: 'Mode surcharge' })).toBeVisible()
+  await expect(page.getByText('Mode surcharge actif')).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/40-overload-active.png' })
 })
 
@@ -35,17 +35,17 @@ test('T43 — Centre récupération → Désactiver → dashboard', async ({ pag
 
 test('T44 — Désactiver surcharge depuis écran Mode surcharge', async ({ page }) => {
   await page.getByRole('button', { name: 'Activer le mode surcharge' }).click()
-  await expect(page.getByRole('heading', { name: 'Mode surcharge' })).toBeVisible()
+  await expect(page.getByText('Mode surcharge actif')).toBeVisible()
   await page.getByRole('button', { name: 'Désactiver le mode surcharge' }).click()
   await expect(page.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeVisible()
 })
 
 test('T45 — Surcharge persistée après rechargement page', async ({ page }) => {
   await page.getByRole('button', { name: 'Activer le mode surcharge' }).click()
-  await expect(page.getByRole('heading', { name: 'Mode surcharge' })).toBeVisible()
+  await expect(page.getByText('Mode surcharge actif')).toBeVisible()
   await page.waitForLoadState('networkidle')
   await page.reload()
   await page.waitForSelector('h1')
-  await expect(page.getByRole('heading', { name: 'Mode surcharge' })).toBeVisible()
+  await expect(page.getByText('Mode surcharge actif')).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/45-overload-persisted.png' })
 })

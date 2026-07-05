@@ -1,3 +1,13 @@
+## v0.38 — 2026-07-05
+
+### Corrigé
+- E2E `05-overload.spec.ts` (T40/T44/T45) : assertions réécrites pour matcher le bandeau surcharge réel (`<p>Mode surcharge actif</p>`) au lieu d'un `heading` inexistant. 45/45 e2e passent désormais, aucune régression sur les changements récents.
+
+### Modifié
+- Réorganisation des dossiers de build à la racine : `dist_v1/` fusionné dans `dist/` — `dist/v1/` (versionné, rollback V1) et `dist/v2/` (ignoré Git, régénérable via `npm run build`).
+
+---
+
 ## v0.37 — 2026-07-05
 
 ### Modifié

@@ -318,17 +318,17 @@ describe('E10Dashboard', () => {
       expect(await screen.findByText(/RDV médecin/)).toBeDefined()
     })
 
-    it('masque une tâche non essentielle en mode surcharge', async () => {
+    it('masque la section Planning du jour en mode surcharge', async () => {
       const ctx = makeAppContext({
         overloadMode: true,
         getPlannedTasksForDate: async () => [
-          makeTaskV2({ id: 'a', title: 'Tâche essentielle', essential: true }),
-          makeTaskV2({ id: 'b', title: 'Tâche non essentielle', essential: false }),
+          makeTaskV2({ id: 'a', title: 'Tâche planifiée', essential: false }),
         ],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByText(/Tâche essentielle/)).toBeDefined()
-      expect(screen.queryByText(/Tâche non essentielle/)).toBeNull()
+      expect(screen.queryByRole('region', { name: 'Planning du jour' })).toBeNull()
+      expect(screen.queryByText('Planning du jour')).toBeNull()
+      expect(screen.queryByText(/Tâche planifiée/)).toBeNull()
     })
   })
 

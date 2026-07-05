@@ -1,4 +1,4 @@
-# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-05, session 2)
+# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-05, session 3)
 
 ## Actions ouvertes
 
@@ -14,7 +14,7 @@
   - réf: `roadmap_v2.md` Phase V2-10
 - [P3|ouvert] Trou fonctionnel TaskV2 : aucune interaction UI pour compléter/toggle `essential` une tâche planifiée
   - fait quand: décision produit prise (implémenter ou explicitement abandonner) sur `completeTaskV2`/`toggleEssentialV2` (`src/domain/rules/taskRulesV2.ts`), actuellement non appelées nulle part dans l'UI.
-  - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`. Note 2026-07-05 : `moveTaskToLaterV2` (même trou fonctionnel) a été retiré entièrement suite à la suppression du statut `to_plan`, ne concerne plus que ces deux fonctions.
+  - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`. Note 2026-07-05 (session 3) : le filtre `essential` sur le Dashboard en mode surcharge a été retiré (mort — jamais atteignable) plutôt que câblé ; ce trou fonctionnel reste donc entier et sans usage identifié pour l'instant.
 - [P3|ouvert] Sous-tâches perdues silencieusement lors de conversion Todo → Planifier/Liste
   - constat : `planTodoTask`/`moveTodoTaskToList` (`AppContext.tsx`) suppriment les `SubTask` liées sans les recréer côté `TaskV2`/`ListItem` (pas de mécanisme cross-modèle). Cas rare mais silencieux — pas de confirmation utilisateur avant perte.
   - fait quand: décision produit prise (avertir l'utilisateur avant conversion si sous-tâches existent, ou accepter la perte silencieuse comme comportement définitif)
@@ -28,6 +28,7 @@
 Aucun.
 
 ## Contexte chaud
+- **Mode surcharge du Dashboard rendu minimaliste (2026-07-05, session 3)** : en `overloadMode`, sont désormais masqués — dans la `TopBar` : icônes Planning/Ressources/Paramètres + chip énergie (`overloadActive`) ; dans `E10Dashboard` : bouton "Ajouter une tâche", nav segmentée (Todo/Aujourd'hui/Planning/Listes), section "Planning du jour", section "Tâches du jour". Un bouton "Sortir du mode surcharge" est ajouté en pied de page (même style `--color-warning` que le bouton actif en haut). Restent visibles : titre, bouton "Mode surcharge", bandeau "Mode surcharge actif" + Centre récupération, "Que faire maintenant ?" (action immédiate). Le filtre `todayPlanned.filter(t => overloadMode ? t.essential : true)` a été supprimé (mort : `essential` toujours `false` à la création, jamais câblé à l'UI — cf. action ouverte P3).
 - Branche `v2` active ; tag `v1.0-mvp` posé ; `dist_v1/` déplacé vers `dist/v1/` (2026-07-05, regroupement des builds : `dist/v1/` versionné/rollback, `dist/v2/` ignoré Git/régénérable via `npm run build`)
 - **Écran de création de tâche (`E21CreateTaskV2`) revu (2026-07-05)** : 4 destinations désormais — Todo / Aujourd'hui (nouveau, crée une `Task` V1 en `today`, modal de remplacement si déjà 3 tâches, même règle que `E20Inbox`) / Planifier / Mettre dans une liste (remplace "À planifier plus tard", ouvre un modal de sélection de liste, crée un `ListItem` via `addListItem`).
 - **Statut `to_plan` (TaskV2) supprimé du domaine** : plus aucune voie de création ne l'utilisait (`moveTaskToLaterV2` jamais câblée à l'UI). Retirés en conséquence : `E50ToPlanQueue` (écran + test), bouton pastille "Tâches à planifier" du dashboard, `moveTaskToLaterV2` (`taskRulesV2.ts`), `getToPlantasks` (`taskV2Repository.ts`), état `toPlanTasks`/route `to-plan-queue` (`AppContext.tsx`, `App.tsx`). `TaskStatusV2` est désormais `'todo' | 'planned' | 'completed'`.
@@ -44,24 +45,24 @@ Aucun.
 - **Collision de nommage V1/V2 "plus tard" résolue** (session 2026-07-02) : seul `to_plan` (V2, pastille rouge, `E50ToPlanQueue`) subsiste comme mécanisme de report.
 - **Écran Todo (`E20Inbox`) enrichi** : 3 actions par tâche — "Aujourd'hui" (V1), "Planifier" (convertit en `TaskV2` statut `planned`, transporte l'id vers Planning), "Liste" (crée un `ListItem`).
 - Nav segmentée dashboard actuelle : 4 boutons (Todo/Aujourd'hui/Planning/Listes)
-- 345/345 tests unitaires, `tsc -b` passent ; **45/45 e2e passent** (relancés et confirmés 2026-07-05, aucune régression sur les changements récents Planning/SubTask/destinations de création ; T40/T44/T45 corrigés)
+- 345/345 tests unitaires (E10Dashboard.test.tsx : 36/36 après ajustement du test mode surcharge), `tsc -b` passent ; e2e non relancés cette session (dernière confirmation 45/45 le 2026-07-05, session 2)
 - `npm run test` sous `--pool=vmThreads --poolOptions.vmThreads.maxThreads=1` fait échouer les tests liés à `crypto.subtle` (faux négatif d'environnement documenté) — utiliser le pool par défaut (`npx vitest run`)
 
-## Dernière session (2026-07-05, session 2)
+## Dernière session (2026-07-05, session 3)
 
 ## Décisions prises
-- E2E cassés (T40/T44/T45, `05-overload.spec.ts`) corrigés en réécrivant les assertions pour matcher le markup réel (bandeau `<p>`), plutôt qu'en modifiant l'UI applicative
-- Réorganisation des builds : `dist_v1/` fusionné dans `dist/` — `dist/v1/` (versionné, rollback) et `dist/v2/` (ignoré Git, régénérable) — pour réduire le nombre de dossiers à la racine
+- Mode surcharge du Dashboard rendu minimaliste : masquage de toutes les sections non essentielles plutôt que de câbler le filtre `essential` (jamais accessible depuis l'UI)
+- Ajout d'un bouton "Sortir du mode surcharge" en pied de page, même couleur (`--color-warning`) que le bouton actif en haut
 
 ## Livrables produits ou modifiés
-- `e2e/05-overload.spec.ts` : 3 tests réécrits (`getByRole('heading', ...)` → `getByText('Mode surcharge actif')`)
-- `.gitignore` : `dist/` → `dist/v2/` (seul le build V2 reste ignoré)
-- `vitest.config.ts` : exclusion `dist_v1/**` retirée (redondante avec `dist/**`)
-- `dist_v1/*` → `dist/v1/*` : déplacement physique (robocopy, verrou Windows sur `mv`/`git mv`), staged comme renommage Git (historique préservé)
-- `README.md`, `roadmap_v2.md`, `_contexte/contexte.md`, `_contexte/signals.md` : références `dist_v1/` mises à jour
+- `src/ui/components/TopBar.tsx` : icônes Planning/Ressources/Paramètres + chip énergie masqués si `overloadActive`
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : bouton "Ajouter une tâche", nav segmentée, sections "Planning du jour" et "Tâches du jour" masquées en surcharge ; filtre mort `essential` supprimé ; bouton "Sortir du mode surcharge" ajouté en pied de page
+- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : test obsolète (filtre essential sur tâche planifiée) remplacé par un test de masquage de la section "Planning du jour"
+- `roadmap_v2.md` Phase V2-6 : item "masquer essential=false" clos avec la solution retenue (masquage de sections, pas filtre par tâche)
 
 ## Hypothèses validées / invalidées
-- VALIDE : aucune régression sur les changements accumulés (Planning, SubTask, destinations de création) — confirmé par 45/45 e2e après correction
+- VALIDE : 36/36 tests Dashboard passent, `tsc -b` clean après chaque étape
+- EN ATTENTE : e2e non relancés cette session (dernière confirmation 45/45 le 2026-07-05, session 2) — à revalider avant prochain déploiement
 - EN ATTENTE : build V2 (`dist/v2/`) toujours périmé (généré le 2026-07-02) — à régénérer via `npm run build` avant tout déploiement Netlify
 
 ## Prochaine étape exacte

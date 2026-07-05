@@ -191,8 +191,7 @@ export function E10Dashboard() {
     goTo('task-detail')
   }
 
-  const visiblePlannedTasks = todayPlanned.filter((t) => overloadMode ? t.essential : true)
-  const hasPlanningToday = visiblePlannedTasks.length > 0
+  const hasPlanningToday = todayPlanned.length > 0
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -310,11 +309,12 @@ export function E10Dashboard() {
         </Card>
       </section>
 
+      {!overloadMode && (
       <section aria-label="Planning du jour">
         <h2>Planning du jour</h2>
         {hasPlanningToday ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-            {visiblePlannedTasks.map((task) => (
+            {todayPlanned.map((task) => (
               <button
                 key={task.id}
                 style={planningChipStyle(task.essential)}
@@ -329,8 +329,9 @@ export function E10Dashboard() {
           <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Rien de planifié aujourd'hui.</p>
         )}
       </section>
+      )}
 
-      {!isEmpty ? (
+      {!isEmpty && !overloadMode ? (
         <section aria-label="Tâches du jour">
           <h2>Tâches du jour</h2>
           <DndContext
@@ -366,33 +367,55 @@ export function E10Dashboard() {
           marginTop: 'auto',
         }}
       >
-        <Button fullWidth onClick={() => goTo('task-create-v2')}>
-          Ajouter une tâche
-        </Button>
-        <div
-          role="group"
-          aria-label="Listes de tâches"
-          style={{
-            display: 'flex',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            overflow: 'hidden',
-          }}
-        >
-          <button onClick={() => goTo('inbox')} style={segmentStyle(false)}>
-            Todo
-            {inboxTasks.length > 0 && <span aria-hidden style={segmentPastilleStyle} />}
+        {!overloadMode && (
+          <Button fullWidth onClick={() => goTo('task-create-v2')}>
+            Ajouter une tâche
+          </Button>
+        )}
+        {!overloadMode && (
+          <div
+            role="group"
+            aria-label="Listes de tâches"
+            style={{
+              display: 'flex',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              overflow: 'hidden',
+            }}
+          >
+            <button onClick={() => goTo('inbox')} style={segmentStyle(false)}>
+              Todo
+              {inboxTasks.length > 0 && <span aria-hidden style={segmentPastilleStyle} />}
+            </button>
+            <button onClick={() => goTo('today')} style={segmentStyle(true)}>
+              Aujourd'hui
+            </button>
+            <button onClick={() => goTo('planning')} style={segmentStyle(true)}>
+              Planning
+            </button>
+            <button onClick={() => goTo('lists')} style={segmentStyle(true)}>
+              Listes
+            </button>
+          </div>
+        )}
+        {overloadMode && (
+          <button
+            onClick={() => setOverloadMode(false)}
+            style={{
+              backgroundColor: 'var(--color-warning)',
+              border: '2px solid var(--color-warning)',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px',
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: '#fff',
+              cursor: 'pointer',
+              width: '100%',
+            }}
+          >
+            Sortir du mode surcharge
           </button>
-          <button onClick={() => goTo('today')} style={segmentStyle(true)}>
-            Aujourd'hui
-          </button>
-          <button onClick={() => goTo('planning')} style={segmentStyle(true)}>
-            Planning
-          </button>
-          <button onClick={() => goTo('lists')} style={segmentStyle(true)}>
-            Listes
-          </button>
-        </div>
+        )}
       </nav>
     </main>
   )

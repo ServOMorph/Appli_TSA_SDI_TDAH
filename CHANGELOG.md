@@ -1,3 +1,16 @@
+## v0.39 — 2026-07-05
+
+### Modifié
+- Mode surcharge du Dashboard rendu minimaliste : masquage des icônes TopBar (Planning/Ressources/Paramètres), du chip énergie, du bouton "Ajouter une tâche", de la nav segmentée et des sections "Planning du jour"/"Tâches du jour" quand le mode surcharge est actif.
+
+### Ajouté
+- Bouton "Sortir du mode surcharge" en pied de page du Dashboard, même style que le bouton actif en haut.
+
+### Corrigé
+- Filtre mort `essential` sur le planning du jour supprimé (il n'était jamais atteignable, `toggleEssentialV2` n'étant câblée nulle part dans l'UI).
+
+---
+
 ## v0.38 — 2026-07-05
 
 ### Corrigé

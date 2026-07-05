@@ -112,9 +112,9 @@ En attente : Marie doit décrire son ressenti de surcharge (question ouverte) po
 
 - [x] Bouton **isolé en haut** de la TopBar, séparé du chip énergie, état visuel actif/inactif (aria-pressed)
 - [x] Toggle **instantané** de l'interface (même page, pas de navigation) : bandeau "Mode surcharge actif" + accès Centre récupération
-- [ ] En surcharge : masquer les tâches `essential = false` — **bloqué** : `todayTasks` (dashboard) est composé d'entités `Task` V1 qui n'ont pas de champ `essential` (seul `TaskV2` l'a, cf. V2-2). Aucune tâche `essential=false` n'atteint le dashboard aujourd'hui. Ce point sera traité avec le branchement `TaskV2` au dashboard (V2-9).
-- [x] **Tests** : 337/337 (E10Dashboard.test.tsx mis à jour)
-- [x] **Sortie** : mode surcharge reconnaissable et actionnable en un geste (mécanique livrée 2026-06-30 ; masquage réel différé à V2-9)
+- [x] En surcharge : masquer les sections non essentielles du Dashboard — **[2026-07-05] résolu différemment** que prévu : plutôt que de filtrer sur `essential` (jamais câblé à l'UI, cf. trou fonctionnel `toggleEssentialV2` toujours ouvert), masquage direct des sections entières en mode surcharge (icônes TopBar Planning/Ressources/Paramètres, chip énergie, bouton "Ajouter une tâche", nav segmentée, "Planning du jour", "Tâches du jour"). Ajout d'un bouton "Sortir du mode surcharge" en bas de page (même couleur que le bouton actif en haut).
+- [x] **Tests** : 36/36 (E10Dashboard.test.tsx mis à jour)
+- [x] **Sortie** : mode surcharge minimaliste — ne reste que le bandeau d'état, le Centre récupération, l'action immédiate, et la sortie du mode (2026-07-05)
 
 ## Phase V2-7 — Listes (référentiel personnel)
 

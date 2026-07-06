@@ -1,3 +1,11 @@
+## v3.1 — 2026-07-06
+
+### Ajouté
+- Phase V3-0 (refacto préalable) close : constantes/schéma énergie (`ENERGY_MIN`/`ENERGY_MAX`, Dexie v3 `energy_cost`/`ambiance_color`/`energy_max`), composant `EnergyDisplay`, extraction `AppShell`/`BottomNav`, sélecteur pur `isOverloaded`. Aucun changement de comportement visible, validé par test manuel utilisateur. 353/353 tests verts, `tsc -b` clean.
+
+### Modifié
+- Commande `/analyse_visio` : ajoute un rappel de bascule sur le modèle Opus avant toute phase de refacto générée dans une roadmap (dont la phase 0).
+
 ## v3.0 — 2026-07-06
 
 ### Contexte

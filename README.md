@@ -25,9 +25,9 @@ npm run format     # Prettier
 
 V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : mode offline (13.2), doc V2, déploiement Netlify. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
 
-Visio testeur (Marie) du 2026-07-06 analysée via la commande `/analyse_visio` : roadmap V3 (`Note de réunion/2026-06-07/roadmap_v3.md`), 7 phases (V3-0 à V3-6). Cœur de la V3 : coût d'énergie par tâche (échelle 1-12, "cuillères"), tâches obligatoires (câble enfin le champ `essential`), mode surcharge automatique dérivé de l'énergie du jour vs coûts planifiés, nettoyage dashboard/planning/listes, navigation persistante. Aucune phase démarrée — décisions à valider avec Marie au préalable (limite 3 tâches/jour, sort du segment "Aujourd'hui", stratégie de reset des données V2).
+Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6). **Phase V3-0 (refacto préalable) close** : constantes/schéma énergie (Dexie v3), composant `EnergyDisplay`, extraction `AppShell`/`BottomNav`, sélecteur pur `isOverloaded` — aucun changement de comportement visible, validé par test manuel utilisateur. Prochaine étape : Phase V3-1 (bugs + nettoyage UI).
 
-Tests unitaires 339/339, `tsc -b` clean.
+Tests unitaires 353/353, `tsc -b` clean.
 
 ## Stack
 
@@ -58,7 +58,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Valider avec Marie les décisions en attente (`Note de réunion/2026-06-07/roadmap_v3.md`), puis démarrer la Phase V3-0 (refacto préalable). En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
+Démarrer la Phase V3-1 (bugs + nettoyage UI) sur la branche `v3`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

@@ -1,5 +1,14 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-05 (archivé depuis contexte.md 2026-07-06 close)
+- Écran de création de tâche (E21CreateTaskV2) revu à la demande de l'utilisateur — destination "À planifier plus tard" (`to_plan`) remplacée par "Mettre dans une liste" (modal de sélection de liste, création directe d'un `ListItem`) ; ajout d'une destination "Aujourd'hui" (création directe d'une `Task` V1 `today`, avec la même règle de remplacement à 3 tâches que sur l'écran Todo). Le statut `to_plan` n'ayant plus aucune voie de création (`moveTaskToLaterV2` jamais câblée à l'UI), il est retiré intégralement du domaine avec l'écran `E50ToPlanQueue` et la pastille dashboard associée (décision de nettoyage validée avec l'utilisateur plutôt que de laisser du code mort).
+
+## 2026-07-05 (archivé depuis contexte.md 2026-07-06 close)
+- E2E relancés après accumulation de plusieurs sessions non testées — 45/45 passent, aucune régression. Les 3 échecs préexistants (`05-overload.spec.ts` T40/T44/T45) corrigés en réécrivant les assertions (texte réel "Mode surcharge actif" au lieu d'un `heading` inexistant).
+
+## 2026-07-05 (archivé depuis contexte.md 2026-07-06 close)
+- Réorganisation des dossiers de build — `dist_v1/` fusionné dans `dist/` (`dist/v1/` versionné pour rollback, `dist/v2/` ignoré Git et régénérable via `npm run build`), pour réduire le nombre de dossiers à la racine.
+
 ## 2026-07-03 (archivé depuis contexte.md 2026-07-06 close)
 - Bug racine SubTask corrigé — `toggleSubTask` (AppContext.tsx) existait mais n'était appelée nulle part dans l'UI, donc aucune sous-tâche ne pouvait jamais être marquée terminée : badge "X/Y" bloqué à "0/Y", "Prochaine étape" jamais mise à jour. Corrigé par une checkbox fonctionnelle dans E22TaskDetail/E23Decompose ; badge étendu à E20Inbox/E24Today.
 

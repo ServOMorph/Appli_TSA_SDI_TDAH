@@ -5,6 +5,7 @@ export interface TaskV2 {
   title: string
   status: TaskStatusV2
   essential: boolean
+  energy_cost?: number | null
   position: number
   scheduled_date: string | null
   scheduled_start: string | null

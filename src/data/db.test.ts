@@ -21,7 +21,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(2)
+    expect(db.verno).toBe(3)
   })
 
   it('creates and retrieves users', async () => {

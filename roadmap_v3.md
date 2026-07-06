@@ -27,14 +27,13 @@ V3-6 Nav persistante (N1)     en dernier
 
 Aucun changement de comportement visible.
 
-- [ ] R1 — Constantes d'échelle d'énergie `ENERGY_MIN=1`, `ENERGY_MAX=12` + helper de barème (domaine)
-- [ ] R2 — Schéma Dexie v3 : `TaskV2.energy_cost: number | null`, `Settings.ambiance_color?`, `Settings.energy_max?` défaut 12 (`taskV2.ts`, `settings.ts`, `db.ts`)
-- [ ] R3 — Composant `EnergyDisplay` réutilisable, dé-duplique le rendu énergie (`E10Dashboard.tsx`)
-- [ ] R4 — Extraire layout/nav partagé `AppShell` + `BottomNav` depuis la nav locale du dashboard, sans le rendre persistant (`E10Dashboard.tsx`, `App.tsx`)
-- [ ] R5 — Sélecteur pur `isOverloaded(energieDuJour, tachesPlanifiees)` + tests, non branché à l'UI
-- [x] Stratégie reset/migration TRANCHÉE (2026-07-06) : Marie accepte le reset, pas de migration des données V2
+- [x] R1 — Constantes d'échelle d'énergie `ENERGY_MIN=1`, `ENERGY_MAX=12` + helper de barème (domaine) — `energyRules.ts` : `isValidEnergyValue`, `getEnergyLabel`
+- [x] R2 — Schéma Dexie v3 : `TaskV2.energy_cost?: number | null`, `Settings.ambiance_color?`, `Settings.energy_max?` (`taskV2.ts`, `settings.ts`, `db.ts` version 3)
+- [x] R3 — Composant `EnergyDisplay` réutilisable, dé-duplique le rendu énergie (label/aria-label centralisés dans `energyRules.ts`, utilisés par `TopBar` via `EnergyDisplay.tsx`)
+- [x] R4 — Extraction `AppShell` (`src/ui/components/AppShell.tsx`) + `BottomNav` (`src/ui/components/BottomNav.tsx`) depuis `E10Dashboard.tsx`, non montés ailleurs (pas persistants)
+- [x] R5 — Sélecteur pur `isOverloaded(energyToday, plannedCost)` + tests (`energyRules.ts`), non branché à l'UI
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : `tsc -b` clean, schéma v3 en place, comportement identique V2
+Gate : [x] tests verts (353/353) · [ ] test manuel (à valider par l'utilisateur) · [ ] doc · [x] sortie : `tsc -b` clean, schéma v3 en place, comportement identique V2
 
 ---
 

@@ -38,6 +38,16 @@ export class AppDatabase extends Dexie {
       energyEntries: 'id, entry_date',
       settings: 'id, user_id',
     })
+    this.version(3).stores({
+      users: 'id',
+      tasks: 'id, status, position',
+      subTasks: 'id, task_id, position',
+      tasksV2: 'id, status, position, scheduled_date, essential',
+      lists: 'id',
+      listItems: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+    })
   }
 }
 

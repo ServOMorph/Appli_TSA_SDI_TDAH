@@ -5,6 +5,8 @@ import type { TaskV2 } from '@/domain/entities/taskV2'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
+import { AppShell } from '@/ui/components/AppShell'
+import { BottomNav } from '@/ui/components/BottomNav'
 import { getActionImmediate } from '@/domain/rules/actionImmediateRules'
 import {
   DndContext,
@@ -42,31 +44,6 @@ function planningChipStyle(essential: boolean): React.CSSProperties {
     fontFamily: 'var(--font-body)',
     width: '100%',
   }
-}
-
-function segmentStyle(withDivider: boolean): React.CSSProperties {
-  return {
-    flex: 1,
-    position: 'relative',
-    padding: '12px 8px',
-    background: 'transparent',
-    border: 'none',
-    borderLeft: withDivider ? '1px solid var(--color-border)' : 'none',
-    color: 'var(--color-secondary)',
-    fontSize: '0.9375rem',
-    fontFamily: 'var(--font-body)',
-    cursor: 'pointer',
-  }
-}
-
-const segmentPastilleStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: 6,
-  right: 6,
-  width: 8,
-  height: 8,
-  borderRadius: '50%',
-  background: '#d32f2f',
 }
 
 interface SortableTaskItemProps {
@@ -217,36 +194,12 @@ export function E10Dashboard() {
   const action = getActionImmediate([...visibleOrder, ...todayTasks.slice(3)], todaySubTasksMap)
   const isEmpty = todayTasks.length === 0
 
-  const energyLabel =
-    todayEnergyStatus === 'filled' && todayEnergy !== null
-      ? `${todayEnergy} énergie`
-      : todayEnergyStatus === 'skipped'
-        ? 'Énergie ignorée'
-        : 'Mon énergie'
-  const energyAriaLabel =
-    todayEnergyStatus === 'filled' && todayEnergy !== null
-      ? `${todayEnergy} énergie aujourd'hui`
-      : todayEnergyStatus === 'skipped'
-        ? "Énergie ignorée aujourd'hui"
-        : 'Renseigner mon énergie'
-
   return (
-    <main
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        padding: 'var(--spacing-xl)',
-        gap: 'var(--spacing-lg)',
-        maxWidth: '480px',
-        margin: '0 auto',
-        minHeight: '100svh',
-        backgroundColor: overloadMode ? 'var(--color-surface)' : undefined,
-      }}
-    >
+    <AppShell overloadMode={overloadMode}>
       <TopBar
         title="Appli pour AuDHD"
-        energyLabel={energyLabel}
-        energyAriaLabel={energyAriaLabel}
+        energyStatus={todayEnergyStatus}
+        energyValue={todayEnergy}
         onEnergyClick={() => goTo('energy-view')}
         overloadActive={overloadMode}
         onOverloadClick={() => setOverloadMode(!overloadMode)}
@@ -382,65 +335,16 @@ export function E10Dashboard() {
         </section>
       ) : null}
 
-      <nav
-        aria-label="Navigation principale"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--spacing-sm)',
-          marginTop: 'auto',
-        }}
-      >
-        {!overloadMode && (
-          <Button fullWidth onClick={() => goTo('task-create-v2')}>
-            Ajouter une tâche
-          </Button>
-        )}
-        {!overloadMode && (
-          <div
-            role="group"
-            aria-label="Listes de tâches"
-            style={{
-              display: 'flex',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              overflow: 'hidden',
-            }}
-          >
-            <button onClick={() => goTo('inbox')} style={segmentStyle(false)}>
-              Todo
-              {inboxTasks.length > 0 && <span aria-hidden style={segmentPastilleStyle} />}
-            </button>
-            <button onClick={() => goTo('today')} style={segmentStyle(true)}>
-              Aujourd'hui
-            </button>
-            <button onClick={() => goTo('planning')} style={segmentStyle(true)}>
-              Planning
-            </button>
-            <button onClick={() => goTo('lists')} style={segmentStyle(true)}>
-              Listes
-            </button>
-          </div>
-        )}
-        {overloadMode && (
-          <button
-            onClick={() => setOverloadMode(false)}
-            style={{
-              backgroundColor: 'var(--color-warning)',
-              border: '2px solid var(--color-warning)',
-              borderRadius: 'var(--radius-md)',
-              padding: '12px',
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: '#fff',
-              cursor: 'pointer',
-              width: '100%',
-            }}
-          >
-            Sortir du mode surcharge
-          </button>
-        )}
-      </nav>
-    </main>
+      <BottomNav
+        overloadMode={overloadMode}
+        inboxHasTasks={inboxTasks.length > 0}
+        onAddTask={() => goTo('task-create-v2')}
+        onGoTodo={() => goTo('inbox')}
+        onGoToday={() => goTo('today')}
+        onGoPlanning={() => goTo('planning')}
+        onGoLists={() => goTo('lists')}
+        onExitOverload={() => setOverloadMode(false)}
+      />
+    </AppShell>
   )
 }

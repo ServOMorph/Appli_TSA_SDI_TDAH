@@ -8,4 +8,6 @@ export interface Settings {
   reduced_motion: boolean
   overload_mode: boolean
   local_encryption: boolean
+  ambiance_color?: string
+  energy_max?: number
 }

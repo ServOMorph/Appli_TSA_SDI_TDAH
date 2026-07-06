@@ -1,22 +1,15 @@
+import { EnergyDisplay } from '@/ui/components/EnergyDisplay'
+import type { EnergyStatus } from '@/domain/entities/energyEntry'
+
 interface TopBarProps {
   title: string
-  energyLabel: string
-  energyAriaLabel: string
+  energyStatus: EnergyStatus | null
+  energyValue: number | null
   onEnergyClick: () => void
   overloadActive: boolean
   onOverloadClick: () => void
   onResourcesClick: () => void
   onSettingsClick: () => void
-}
-
-const chipStyle: React.CSSProperties = {
-  backgroundColor: 'var(--color-surface)',
-  border: '1px solid var(--color-border)',
-  borderRadius: 'var(--radius-md)',
-  padding: '6px 12px',
-  fontSize: '0.875rem',
-  color: 'var(--color-text-muted)',
-  cursor: 'pointer',
 }
 
 function overloadButtonStyle(active: boolean): React.CSSProperties {
@@ -35,8 +28,8 @@ function overloadButtonStyle(active: boolean): React.CSSProperties {
 
 export function TopBar({
   title,
-  energyLabel,
-  energyAriaLabel,
+  energyStatus,
+  energyValue,
   onEnergyClick,
   overloadActive,
   onOverloadClick,
@@ -132,9 +125,7 @@ export function TopBar({
       </div>
       {!overloadActive && (
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
-          <button onClick={onEnergyClick} aria-label={energyAriaLabel} style={chipStyle}>
-            {energyLabel}
-          </button>
+          <EnergyDisplay status={energyStatus} value={energyValue} onClick={onEnergyClick} />
         </div>
       )}
     </header>

@@ -23,7 +23,11 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes ; V2-5 retirée le 2026-07-05. Tag `v1.0-mvp` posé, `dist/v1/` archivé (rollback V1 opérationnel), `dist/v2/` régénéré et à jour (`vite.config.ts` : `build.outDir: 'dist/v2'`). V2-10 (consolidation) quasi close. E2e relancés (45/45). Bug export JSON corrigé (tables V2 manquantes) et export iOS validé. Planning : créneaux passés d'1h à 30 min. Décision profil actée (`E111Profile` reste en lecture seule) ; décision énergie remontée à Marie, en attente. Restent des chantiers de fond reportés (planification indépendante des sous-tâches, champ nom de profil onboarding). Reste avant déploiement : retester le mode offline (13.2), doc V2, déploiement Netlify, sessions test 2-5 avec Marie. Tests unitaires 339/339, `tsc -b` clean.
+V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : mode offline (13.2), doc V2, déploiement Netlify. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
+
+Visio testeur (Marie) du 2026-07-06 analysée via la nouvelle commande `/analyse_visio` : roadmap V3 créée (`Note de réunion/2026-06-07/roadmap_v3.md`), 10 phases (V3-0 à V3-9). Cœur de la V3 : coût d'énergie par tâche (échelle 1-12, "cuillères"), tâches obligatoires (câble enfin le champ `essential`), mode surcharge automatique dérivé de l'énergie du jour vs coûts planifiés, nettoyage dashboard/planning/listes, navigation persistante. Aucune phase démarrée — décisions à valider avec Marie au préalable (limite 3 tâches/jour, sort du segment "Aujourd'hui", stratégie de reset des données V2).
+
+Tests unitaires 339/339, `tsc -b` clean.
 
 ## Stack
 
@@ -49,11 +53,12 @@ _contexte/   — Contexte de session (protocole vibecoding)
 roadmap_v2.md    — Roadmap V2 (11 phases, pilotée par tests utilisateurs)
 plan_test_manuel_v2.md — Plan de test manuel V2 (pré-déploiement)
 Archives/        — Roadmap V1 archivée
+Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse générés (`/analyse_visio`)
 ```
 
 ## Prochaine étape
 
-Phase V2-10 — Retester le mode offline (13.2), rédiger la doc V2, déployer sur Netlify, sessions test 2-5 avec Marie. Reste à trancher : usage de l'énergie (retour Marie attendu, voir `roadmap_v2.md`).
+Valider avec Marie les décisions en attente (`Note de réunion/2026-06-07/roadmap_v3.md`), puis démarrer la Phase V3-0 (refacto préalable). En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

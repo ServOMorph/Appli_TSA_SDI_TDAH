@@ -1,3 +1,9 @@
+## v0.45 — 2026-07-06
+
+### Ajouté
+- Commande `/analyse_visio <dossier-réunion>` (`.claude/commands/analyse_visio.md`) : automatise l'analyse d'une visio testeur (transcription + captures + code) et génère constats, analyse de code, plan d'implémentation et roadmap versionnée (bump auto du numéro de version, format à cases à cocher).
+- Roadmap V3 (`Note de réunion/2026-06-07/roadmap_v3.md`) créée à partir de la visio Marie du 2026-07-06 : refonte énergie (coût par tâche, "cuillères"), tâches obligatoires, surcharge automatique, nettoyage dashboard/planning/listes, navigation persistante. 10 phases, aucune démarrée.
+
 ## v0.44 — 2026-07-06
 
 ### Corrigé

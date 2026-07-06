@@ -7,26 +7,28 @@
   - fait quand: 5 à 10 sessions réalisées, retours consolidés dans fichier dédié
   - réf: `Note de réunion/2026-06-29/synthese_reunion_marie_2026-06-29.md` + `Note de réunion/2026-06-29/analyse_conduite_visio_marie.md`
 
-### V2 — En cours
-- [P1|ouvert] Phase V2-10 (Consolidation V2 & 2e vague de tests) — EN COURS
-  - Décisions profil/énergie traitées, e2e relancés (45/45), export JSON corrigé et testé, créneaux Planning en demi-heure faits, `dist/v2/` à jour. Reste : mode offline (13.2), doc V2, déploiement Netlify, sessions test 2-5.
-  - fait quand: mode offline retesté, doc V2 rédigée, déployé sur Netlify, 5-10 sessions test réalisées
+### V2 — En cours (clôture)
+- [P2|ouvert] Phase V2-10 (Consolidation V2 & 2e vague de tests) — reste : mode offline (13.2), doc V2, déploiement Netlify
+  - fait quand: mode offline retesté, doc V2 rédigée, déployé sur Netlify
   - réf: `roadmap_v2.md` Phase V2-10 et § "Constats test manuel V2-10 (session 2026-07-06)"
-- [P2|ouvert] Décision produit énergie : usage réel de l'énergie dans l'appli (actuellement affichage seul, une valeur/jour écrasée, sans autre effet dans l'app) — question remontée à Marie pour la prochaine réunion, décision en attente de son retour
-  - fait quand: retour de Marie obtenu et décision actée (implémentée si nécessaire)
-  - réf: `Note de réunion/a traiter prochaine reunion.txt`
+- [P3|ouvert] Ajouter un champ nom de profil à l'onboarding (`E02Profile` : choix de type de profil seulement, aucune saisie de nom)
+  - fait quand: décision produit prise (implémenter ou explicitement abandonner)
+  - réf: `roadmap_v2.md` § "Constats test manuel V2-10" sous-section "Fonctionnalités manquantes / à implémenter"
+
+### V3 — Démarrage (post-visio Marie 2026-07-06)
+- [P1|ouvert] Roadmap V3 créée (`Note de réunion/2026-06-07/roadmap_v3.md`), aucune phase démarrée
+  - Contenu : refonte énergie/cuillères + tâches obligatoires + surcharge automatique (câble enfin `essential`, ferme le trou fonctionnel `toggleEssentialV2`), bugs planning, nettoyage dashboard/listes, nav persistante. Détail complet dans `constats_2026-07-06.md`, `analyse_code_2026-07-06.md`, `plan_implementation_2026-07-06.md` (même dossier).
+  - fait quand: Phase V3-0 (refacto préalable) démarrée
+  - réf: `Note de réunion/2026-06-07/roadmap_v3.md`
+- [P1|ouvert] Décisions produit à valider avec Marie avant d'implémenter V3-1 : Q1 (limite 3 tâches/jour) et surtout Q2 (ambiguïté "Aujourd'hui" vs "Tâche du jour" — transcription contradictoire, bloque D3/D4)
+  - fait quand: réponses de Marie obtenues et actées dans `roadmap_v3.md`
+  - réf: `Note de réunion/2026-06-07/constats_2026-07-06.md` § 7
+- [P2|ouvert] Confirmer la stratégie de reset/migration des données V2 existantes de Marie avant le bump Dexie v3
+  - fait quand: stratégie actée (reset accepté ou migration) et consignée dans `roadmap_v3.md` Phase V3-0
+  - réf: `analyse_code_2026-07-06.md` § 5
 - [P3|ouvert] Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — décision explicitement reportée
   - fait quand: décision produit prise sur l'implémentation (piste retenue si besoin confirmé : chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id` optionnel)
   - réf: `roadmap_v2.md` § "Fonctionnalité reportée (décision 2026-07-06)"
-- [P2|ouvert] Ajouter un champ nom de profil à l'onboarding (`E02Profile` : choix de type de profil seulement, aucune saisie de nom)
-  - fait quand: décision produit prise (implémenter ou explicitement abandonner)
-  - réf: `roadmap_v2.md` § "Constats test manuel V2-10" sous-section "Fonctionnalités manquantes / à implémenter"
-- [P2|ouvert] Points à (re)tester avant déploiement, restants : mode offline (test manuel 13.2). Export iOS (11.5) validé ; bug export JSON incomplet (tables V2 manquantes) trouvé et corrigé le 2026-07-06.
-  - fait quand: chaque point retesté et résultat consigné dans `plan_test_manuel_v2.md`
-  - réf: `roadmap_v2.md` § "À (re)tester avant déploiement"
-- [P3|ouvert] Trou fonctionnel TaskV2 : aucune interaction UI pour toggle `essential` une tâche planifiée (le "Terminer" ajouté session précédente couvre la complétion, pas le statut essentiel)
-  - fait quand: décision produit prise (implémenter ou explicitement abandonner) sur `toggleEssentialV2` (`src/domain/rules/taskRulesV2.ts`)
-  - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`
 
 ## Questions ouvertes
 
@@ -36,33 +38,32 @@
 Aucun.
 
 ## Contexte chaud
-- Décision profil actée (lecture seule) ; décision énergie remontée à Marie, contexte consigné dans `Note de réunion/a traiter prochaine reunion.txt`
-- `dist/v2/` à jour (export corrigé + créneaux 30 min inclus) ; `vite.config.ts` fixe désormais `build.outDir: 'dist/v2'` — `npm run build` régénère directement au bon endroit
-- Serveur de test téléphone : `npx vite preview --host --outDir dist/v2`, adresse réseau `http://192.168.1.180:4173` (même Wi-Fi). Penser à vider le cache du site / désinstaller la PWA sur le téléphone après chaque nouveau build (service worker sert l'ancienne version sinon)
-- 339/339 tests unitaires, `tsc -b` clean après tous les changements de la session
-- `npm run test` sous `--pool=vmThreads --poolOptions.vmThreads.maxThreads=1` fait échouer les tests liés à `crypto.subtle` (faux négatif d'environnement documenté) — utiliser le pool par défaut (`npx vitest run`)
+- Décision énergie obtenue de Marie lors de la visio du 2026-07-06 : usage réel = coût d'énergie par tâche (1-12, "cuillères"), tâches obligatoires (`essential`), surcharge automatique dérivée de l'énergie du jour vs coûts planifiés. Détaillé et planifié dans `roadmap_v3.md`.
+- Nouvelle commande `/analyse_visio <dossier-réunion>` créée (`.claude/commands/analyse_visio.md`) : automatise transcription + captures + code → constats/analyse_code/plan/roadmap versionnée (bump auto du numéro de version). Nécessite Opus (vérifié en étape 0).
+- `dist/v2/` à jour (export corrigé + créneaux 30 min inclus) ; `vite.config.ts` fixe désormais `build.outDir: 'dist/v2'`
+- Serveur de test téléphone : `npx vite preview --host --outDir dist/v2`, adresse réseau `http://192.168.1.180:4173` (même Wi-Fi). Penser à vider le cache du site / désinstaller la PWA sur le téléphone après chaque nouveau build
+- 339/339 tests unitaires, `tsc -b` clean (aucun changement de code cette session, uniquement docs + commande)
 
 ## Dernière session (2026-07-06)
 
 ## Décisions prises
-- Bug export JSON confirmé et corrigé — `exportData` (AppContext.tsx) omettait les tables V2 (`tasksV2`, `lists`, `listItems`), en contradiction avec la mention RGPD "intégralité de vos données".
-- Planning : granularité des créneaux passée d'1h à 30 min (demande utilisateur), durée par défaut à l'assignation ramenée à 30 min.
+- Commande `/analyse_visio` créée pour automatiser l'analyse des futures visios testeurs (transcription + code + captures → constats/plan/roadmap).
+- Roadmap V3 créée et priorisée à partir de la visio Marie du 2026-07-06 : succède à `roadmap_v2.md`, ordonnée pour que chaque phase soit testable sans dépendre d'une phase future.
 
 ## Livrables produits ou modifiés
-- `src/app/AppContext.tsx` : `exportData` inclut désormais `tasksV2`/`lists`/`listItems`, version export passée à `2.0`
-- `src/ui/screens/planning/E40Planning.tsx` + test : 48 créneaux de 30 min (au lieu de 24 d'1h)
-- `vite.config.ts` : `build.outDir` fixé à `dist/v2`
-- `roadmap_v2.md` : e2e relancés (45/45), export iOS validé, bug export corrigé, créneaux demi-heure faits
+- `.claude/commands/analyse_visio.md` : nouvelle commande (analyse transcription + code, bump auto de version, roadmap à cases à cocher)
+- `Note de réunion/2026-06-07/constats_2026-07-06.md` : constats détaillés de la visio (bugs, refonte énergie, nettoyage UI, décisions à trancher)
+- `Note de réunion/2026-06-07/analyse_code_2026-07-06.md` : état du code impacté, dettes techniques, refacto préalable proposée
+- `Note de réunion/2026-06-07/plan_implementation_2026-07-06.md` : ordre d'implémentation justifié
+- `Note de réunion/2026-06-07/roadmap_v3.md` : roadmap V3, 10 phases (V3-0 à V3-9), gate commun par phase
 
 ## Hypothèses validées / invalidées
-- VALIDE : e2e 45/45 après changements onboarding, aucune régression
-- VALIDE : export iOS (test manuel 11.5) fonctionne
-- INVALIDE : export JSON complet → corrigé (tables V2 manquantes)
-- VALIDE : "groseille"/"pasteque" dans le picker Planning n'étaient pas un bug — données de test résiduelles, confirmées absentes après reset de l'app
-- EN ATTENTE : mode offline (test manuel 13.2)
+- VALIDE : le check-in énergie à chaque connexion n'existe pas dans le code (`init()` route directement vers le dashboard) — à construire en V3-4
+- VALIDE : le champ `essential` (`TaskV2`) existe mais n'est câblé à aucune UI — correspond exactement au "obligatoire" demandé par Marie, réutilisable en V3-3
+- EN ATTENTE : Q2 (ambiguïté "Aujourd'hui" vs "Tâche du jour") à trancher avec Marie avant V3-1
 
 ## Prochaine étape exacte
-Retester le mode offline (13.2), rédiger la doc V2, déployer sur Netlify.
+Valider Q1/Q2/stratégie de reset avec Marie, puis démarrer Phase V3-0 (refacto préalable) de `roadmap_v3.md`.
 
 ## Question bloquante pour la session suivante
-Aucune.
+Q2 : faut-il retirer le segment de nav "Aujourd'hui" du dashboard ET renommer la destination de création en "Tâche du jour" ? La transcription se contredit (l.254-273 vs l.383-397) — à confirmer explicitement avec Marie avant d'implémenter D3/D4.

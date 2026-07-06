@@ -1,0 +1,655 @@
+Raphael : Ok, bon je suis prêt, j'ai l'appli sous les yeux, j'ai des questions.
+Raphael : J'ai l'enregistrement qui tourne. Ok, bon mais c'est bon.
+Raphael : Ok, donc du coup tu as eu le temps de l'essayer ?
+Interlocuteur : Ouais, ouais, ouais, ouais, j'ai eu le temps d'essayer.
+Raphael : D'accord. Et comment ça s'est passé ?
+Interlocuteur : Ça, comment ça s'est passé ? Par exemple, c'est pas la meilleure...
+Interlocuteur : Tu peux lire avant de finir dans ta tête.
+Interlocuteur : peut-être, oui. Bon, du coup...
+Raphael : Non j'ai pas lu, j'ai envoyé comme ça.
+Interlocuteur : Alors, déjà, quand on se connecte, il y a un truc que... Attends, j'ai déjà...
+Interlocuteur : parce que dès que je t'aurai dit un truc, il faut que je l'aie sur lui. Attends.
+Interlocuteur : Oui.
+Interlocuteur : Du coup, quand on se connecte, ça demande l'énergie d'aujourd'hui.
+Interlocuteur : Alors après, c'est ce truc à quoi ça sert mon atout, c'est du goût.
+Raphael : C'est une bonne question. C'est une question que je voulais te poser.
+Raphael : en fait ça c'était j'avais vu ça dans les dans les recherches
+Interlocuteur : Ouais, ok, donc on est d'accord que tu...
+Raphael : Par rapport au TSA et TDAH, tu vois que c'était intéressant de mesurer l'énergie.
+Interlocuteur : tu n'as rien mis en place, en fuite par rapport à ce truc, on est d'accord ? Ok, alors, moi ce que je vais...
+Raphael : Si on n'a rien mis en place, en plus par rapport à ce qu'on a dit. Oui, on est d'accord.
+Interlocuteur : bien, c'est qu'en gros, quand on va ajouter un truc dans le planime...
+Interlocuteur : Donc quand on ajoute une tâche qu'on planifie, ce qui serait bien, c'est que ça demande
+Interlocuteur : Combien on attribue, il faudrait trouver un nom, je ne sais pas comment on peut l'appeler et ce que l'on peut trouver.
+Interlocuteur : un truc un peu ludique pour un symbole, quelque chose, genre pas des fleurs, des machins.
+Raphael : pour un symbole de quelque chose de l'actualité de la chambre.
+Interlocuteur : Et du coup, l'idée, ce serait que, à mon avis, 10, c'est...
+Interlocuteur : faudrait voir, faudrait réfléchir après combien on joue sur les chiffres mais l'idée ce serait de pouvoir écriver
+Interlocuteur : à 10, c'est bien, ou 12, jusqu'à 12 est la limite que, en fait, on puisse évaluer du coup sur...
+Interlocuteur : 12, combien d'énergie ça nous coûte ? Bon, pas sur 12, mais 1, 2, 3, 4...
+Interlocuteur : et en fait l'idée c'est que du coup quand on rentre un truc dans le planning on met à côté combien
+Interlocuteur : d'énergie on pense que ça va nous prendre et du coup l'idée c'est que tous les jours quand on se connecte sur la pli à chaque fois
+Interlocuteur : sur l'appli, à chaque fois qu'on se connecte, enfin, à chaque fois qu'on n'est pas conçus connecte, mais qu'on va sur l'application. C'est vrai que ça demande...
+Interlocuteur : ou alors chaque jour où je ne sais pas, il faudrait trouver, mais que ça demande à combien on y est d'énergie, parce que c'est quelque chose qui...
+Interlocuteur : varier et que du coup ce qui peut être intéressant c'est que selon ce niveau d'énigme
+Interlocuteur : du coup c'est pas et ce serait sur 12 si par exemple on est à la personne elle est à 8
+Interlocuteur : et que dans sa journée à la planifiée 7, eh bien chez Pai, il pourrait y avoir un petit truc qui s'affiche en mug.
+Interlocuteur : il reste une énergie aujourd'hui si t'as envie de faire un truc et tout, ou alors juste pour que t'aides pas dans le bon sens.
+Interlocuteur : Je parle en tous les sens. Surtout pour que du coup...
+Raphael : non c'est pas grave, vas-y
+Interlocuteur : si jamais, mettons un jour, t'es à 4 d'énergie, ça ne va pas. Du coup, ce que t'as prévu dans ta journée.
+Interlocuteur : l'idée ce serait que ça se grise par exemple en mode bon c'est bon ça t'as pas à le faire en fait il faudrait que ça se mette en mode
+Interlocuteur : En fait ton mode sur charge, il faudrait qu'il s'active automatiquement.
+Interlocuteur : Quand en fait, le niveau du coup d'énergie des choses qu'on a planifié dans la journée.
+Interlocuteur : Par exemple, tu as planifié des trucs, et puis t'es à 4, 2, 1, ça fait, je sais pas, plus 2, 1 truc.
+Interlocuteur : et que ça dépasse l'énergie que tu as à l'heure actuelle, ce qu'il te reste à faire, eh bien ça se met en...
+Interlocuteur : tu vois en mode tu sais que t'as à le faire ça ne disparaît pas tu le vois quand même mais c'est
+Interlocuteur : ou ça s'atténue, histoire qu'en mode, tu vois, c'est pas à faire parce que voilà, et partout.
+Interlocuteur : Là où c'est intéressant, c'est que quand le mode du coup sur charge est activé et bien nous quand on
+Interlocuteur : planifient des tâches en amont et il faudrait qu'en fait on mette...
+Interlocuteur : Si jamais il faudrait qu'on met la possibilité de cocher par exemple une case si c'est
+Interlocuteur : une tâche obligatoire. C'est-à-dire qu'en gros, le jour où tu l'avais, il faut vraiment le faire parce que je ne sais pas...
+Interlocuteur : de l'œil, enfin peu importe, mais il y a des fois des trucs que tu peux pas repousser, même si c'était pas bien, on peut bouger, enfin, en tout cas, voilà. Et ce qu'il faut de vrai, c'est...
+Interlocuteur : du coup, si c'est des trucs obligatoires, genre McDo, là, tu mets en obligatoire, parce qu'en
+Interlocuteur : surcharge, ma idée c'est que ça m'enlève si par exemple j'ai envie d'aller faire les boutiques, voilà, tu vois ce que je veux dire.
+Raphael : Je vais faire les boutiques, si j'ai tout choisi ce que je veux dire. Oui.
+Interlocuteur : Peu qu'il y a du coup.
+Raphael : Oui, oui. Donc pour voir que c'est bien compris, un mode obligatoire quand tu mets.
+Raphael : tâche, tu vois, tu as jusqu'en tu remplis la tâche, tu as un petit bouton où tu mets obligatoire.
+Interlocuteur : Merci.
+Raphael : Et donc ça, que ce soit ton énergie, que tu l'es ou tu l'es pas, l'énergie doit le faire, il faut le faire.
+Raphael : et puis peut-être que tu... on peut rajouter un petit bouton pour noter le nombre d'énergie que ça te prend
+Interlocuteur : C'est ça, c'est qu'en fait quand t'as ajouté une tâche et que tu la planifies, il y a une autre page ensuite.
+Raphael : Au revoir.
+Interlocuteur : qui s'affiche et qui dit ça, enfin qui dit...
+Interlocuteur : qu'il y a un truc où ça s'affiche une petite fenêtre qui s'affiche, tu vois, et il y a ici un nombre d'énergie.
+Interlocuteur : tu mets un nom, entre 1 et 12, et à la limite, quand ça s'affiche, c'est pas toi qui doit le ta...
+Interlocuteur : ça s'affiche les numéros à le 1, le 2, le 3, le 4 jusqu'à 12 qui s'affichent c'est comme quand tu te
+Interlocuteur : connecte sur le téléphone, sur la société générale et tu tapes ton code, tu vois et toi tu sélectionnes.
+Raphael : Oui, oui
+Interlocuteur : voilà et ensuite à côté il a écrit obligatoire et c'est une
+Interlocuteur : que tu as la possibilité de cocher ou pas cocher. Voilà et ensuite du coup c'est
+Raphael : D'accord.
+Interlocuteur : Merci d'avoir regardé cette vidéo.
+Raphael : Donc en fait, le bouton obligatoire sera en premier, obligatoire ou pas, et si c'est pas obligatoire...
+Interlocuteur : Comment ?
+Raphael : à ce moment là, ça passe sur l'affichage de l'énergie de 1 à 12.
+Interlocuteur : Oui.
+Raphael : dans un premier temps quand tu rentres ton activité d'abord ça va demander
+Raphael : si c'est obligatoire ou pas parce que si c'est obligatoire il n'y a pas besoin de mettre de l'énergie dessus
+Interlocuteur : Bah si parce que mal d'au moins il faut que je mette combien d'énergie ça va me prendre pour savoir pour le reste je veux avoir
+Raphael : Merci, parce que...
+Interlocuteur : qu'il va me rester, mais en fait...
+Raphael : Ah oui, d'accord, donc il faut juste qu'il y ait les deux, il faut qu'il y ait obligatoires et les chiffres de 1 à 12.
+Interlocuteur : Il y a une fenêtre qui peut s'afficher, moi je vois bien comme ça avec un truc assez symétrique.
+Raphael : Ok.
+Interlocuteur : fenêtre avec juste deux petits carrés comme ça il y en a un c'est quand on clique dessus il faut qu'on rentre un chiffre c'est pour
+Interlocuteur : le nombre d'énergie que ça demande et le deuxième c'est obligatoire et ça c'est une classe
+Interlocuteur : On peut cliquer dessus ou pas, comme on veut. Euh ouais.
+Raphael : T'as de quoi écrire pour me faire un petit dessin ?
+Interlocuteur : Oui.
+Interlocuteur : Allez, c'est qu'il n'y a rien à faire.
+Raphael : Ok, recule un petit peu.
+Interlocuteur : ça on s'en fout
+Raphael : Attends, je le fais bien.
+Interlocuteur : Sous-titrage ST' 501
+Raphael : ah oui on s'en fout d'accord ok c'est bon je te remercie
+Interlocuteur : Oui du coup en gros là ça c'est le nombre d'énergie quand on clique sur ça il y a les numéros
+Interlocuteur : qui s'affiche bon j'ai pas tout écrit ni jusqu'à 12 et tu sélectionnes celui que tu veux et ici soit en coche
+Interlocuteur : sans cliquer dessus sa coche, soit ça on laisse et on coche pas et après on lui valider et hop ça le programme et
+Raphael : D'accord.
+Interlocuteur : Et quand ça s'affiche, quand tu programme, ça serait sympa que ce soit affiché du coup sur planning aussi le nombre d'énergie.
+Interlocuteur : genre avec des paillons, des petites étoiles ou un truc comme ça, trois étoiles, deux étoiles ou quoi. Ça tu peux voir avec le...
+Raphael : 3 étoiles, 2 étoiles
+Interlocuteur : Je laisse ce livre au cours à ton imagination pour essayer d'être ça en...
+Interlocuteur : Moi, je devais juste les idées pure et dure pour... Euh... voilà !
+Raphael : D'accord.
+Interlocuteur : Alors attends, faut que du coup... Attends...
+Interlocuteur : Alors ça...
+Interlocuteur : C'est bon ?
+Interlocuteur : Comme vous pouvez l'appliquer 15 à coucher
+Interlocuteur : c'est obligatoire pour le mettre sur charge. C'est que du coup, quand on passe en mode sur charge...
+Interlocuteur : Et bien les seules choses qui vont s'afficher, enfin, celles qui vont s'afficher en normal, ça va être ce qu'on a mis qui était obligatoire.
+Interlocuteur : autres, elles seront en grisée. Après, si c'est par exemple quelque chose qu'on estime qui nous fait du bien aussi, on peut...
+Interlocuteur : D'accord ?
+Raphael : Oui, et par rapport à la surcha...
+Raphael : justement comment tu le sens est ce que tu as remarqué des choses par rapport à ça
+Interlocuteur : Non parce que là j'ai pas été trop surchargée ces derniers temps.
+Interlocuteur : La dernière fois, j'ai mis 7, j'ai mis 8 à mon énergie.
+Raphael : D'accord. Mais ce ne sera pas...
+Interlocuteur : aujourd'hui, quand je me connecte, non j'ai pas eu encore trop...
+Raphael : Ok, bon, ce sera intéressant que tu puisses...
+Interlocuteur : Alors, hop, attends, il y a un autre truc qu'il faut...
+Raphael : pour faire un retour par rapport à sa surcharge, qu'est ce que tu as... vas-y
+Interlocuteur : attribuer un nombre d'énergie à chaque tâche, pourquoi dépasser, s'acheter 10 tâches, 300 tâches, ok.
+Interlocuteur : Donc ça, est-ce que tu as d'autres questions par rapport à ça ?
+Interlocuteur : Par exemple, quand on doit choisir l'énergie qu'on a, il peut s'afficher 12 étoiles et nous on doit accrocher...
+Raphael : non
+Interlocuteur : par exemple, on appuie sur la septième, sur la septétoile, par exemple, un truc un peu ludique, ou alors tu laisses comme ça chez Bob. Non, parce que...
+Interlocuteur : ça ressemble trop à... pas des étoiles, je trouvais autre chose en fait. Je trouve un truc de trompe
+Raphael : D'accord.
+Interlocuteur : Je te laisse t'occuper de l'aspect, mais en même temps que ça garde l'effet sobre que tu as.
+Raphael : Ok, je regarderai.
+Interlocuteur : bien le côté vraiment sobre et écrit vraiment ça fait pas enfantin tu vois ça fait
+Interlocuteur : très propre, très clean, j'aime beaucoup, c'est très simple, c'est très long.
+Raphael : d'accord
+Interlocuteur : voilà ensuite on peut passer enfin je peux te dire la suite
+Raphael : Vas-y, vas-y.
+Interlocuteur : Ensuite, du coup, quand on se connecte, après que ça nous demande quelle est notre énergie...
+Interlocuteur : Ça nous demande qu'est-ce qu'on a à faire aujourd'hui ?
+Interlocuteur : ou la chose la plus importante à faire aujourd'hui. Ça, tu peux l'enlever. C'est pas pertinent parce que...
+Raphael : ou la chose la plus importante, ça tu peux l'enlever
+Interlocuteur : Les deux fois où je l'ai fait, j'étais en mode, déjà, c'était un moment où j'avais fait tout ce que j'avais à faire dans ma journée.
+Interlocuteur : donc en soi je n'étend pas à rien et puis surtout en plus je trouve que c'est très difficile de savoir c'est quoi le plus important ?
+Raphael : et puis je trouve en plus très difficile de savoir c'est quoi D'accord
+Interlocuteur : Donc, en fait, ce n'est pas pertinent, donc ça, tu peux juste l'enlever et donc ensuite, quand on est sur la paix...
+Interlocuteur : page d'accueil, il y a écrit que faire maintenant l'appareil, il y a un petit truc au dé.
+Interlocuteur : Au-dessus de aujourd'hui, là, il y a des tâches d'aujourd'hui, il y a un truc au-dessus, tu vois.
+Raphael : Oui
+Interlocuteur : Là tu peux l'enlever aussi, ça sert à rien, je pense, je pense vraiment parce que...
+Raphael : D'accord
+Interlocuteur : c'est... c'est... c'est redondant. Laissez cette information là, on l'a ailleurs, on l'a juste en dessous en fait. Y'a pas besoin...
+Raphael : C'est redondant. Ok.
+Interlocuteur : parce que c'est ce qu'on va avoir planifié avant aussi, tu vois. Et si on veut ajouter quelque chose à aujourd'hui,
+Interlocuteur : de la tâche, et on fait planifier, et on a planifié aujourd'hui. Tu vois ?
+Raphael : Donc parce que quand tu fais planifier, ils te demandent des dates.
+Raphael : des heures tu vois donc ça veut dire qu'à chaque fois il va falloir que tu le mettes
+Interlocuteur : Ah ouais toi tu veux dire...
+Raphael : dans le planning en fonction des horaires, c'est ça ?
+Interlocuteur : Au revoir.
+Raphael : avec aujourd'hui, c'était quand tu choisis une tâche et que tu la mets à aujourd'hui, elle est juste mise à aujourd'hui.
+Interlocuteur : Ah oui, il n'y a pas d'heures, il n'y en a rien.
+Raphael : mais elle est pas planifiée en termes de temps
+Raphael : Et il y a une limite de 3 tâches max que tu peux mettre aujourd'hui.
+Interlocuteur : ok du coup il faudrait l'appeler faut pas écrire je sais plus comment tu l'as
+Interlocuteur : tu l'as écrit comment déjà ? Tu l'as sous les yeux ? C'est comment ? T'as écrit ?
+Raphael : Ouais, je vais à compris de quoi tu parles.
+Interlocuteur : Comment tu l'as écrit ? Comment se présenter sur l'application, ce truc en haut ?
+Raphael : Comment tu l'as écrit ? Comment c'est présenté sur l'application ? Tu peux pas le regarder en même temps ?
+Raphael : Comme ça tu vas mieux pouvoir me guider
+Interlocuteur : Qu'est-ce qu'il faut faire maintenant ?
+Raphael : Oui c'est ça
+Interlocuteur : Donc, ce n'est pas que faire maintenant, c'est que c'est mal comment ?
+Raphael : Et là, si par exemple tu mets une tâche à aujourd'hui...
+Raphael : Elle va s'afficher tant qu'au fer maintenant.
+Interlocuteur : Bon, j'ai écrit dans mon auto-com, il se pourrait essayer.
+Interlocuteur : terminer ou retirer, ok, manger. Donc il ne faudrait pas que t'écrives que faire déjà.
+Interlocuteur : Enlève par contre ce que je t'ai dit au début de enlever la question, enlève-la parce que dans tous les cas on peut le faire après.
+Raphael : question
+Interlocuteur : Donc ça ne sert à rien quand tu connectes, ça n'a pas trop d'intérêt.
+Raphael : Oui. Oui, c'est noté.
+Interlocuteur : oui mais parce que dans tous les cas ça c'est limite faudrait qu'à chaque fois qu'on se connecte en fait ça nous demande
+Raphael : D'accord.
+Raphael : ou il y a chaque fois que tu te connectes, on demande l'énergie, ça marche.
+Raphael : et donc j'enlèverai que faire maintenant.
+Raphael : et à la limite je mets tâche du jour quoi ou quelque chose de sottage
+Interlocuteur : Ouais et du coup
+Raphael : là à la place il y a déjà tâche du jour ok
+Interlocuteur : mais au étage du jour, c'est très bien.
+Raphael : Sous-titres réalisés par la communauté d'Amara.org
+Interlocuteur : ou attend
+Interlocuteur : ou affaire aujourd'hui et en dessous planning du jour.
+Raphael : Okay
+Interlocuteur : Et après, c'est certain de l'extrême ?
+Raphael : D'accord, à faire aujourd'hui, et en dessous, planning du jour. Il y a déjà marqué tâche du jour, donc je peux mettre...
+Raphael : Pour l'étage du jour, je renomme affaire aujourd'hui.
+Raphael : Et puis en dessous, je mets planning du jour à ce moment-là.
+Raphael : ça tu vas comme ça ?
+Interlocuteur : Oui.
+Raphael : D'accord.
+Interlocuteur : Ok, alors attends.
+Interlocuteur : mais du coup
+Interlocuteur : Mais en fait, tu vois, la case, on va...
+Interlocuteur : Aujourd'hui là, est-ce que tu peux l'enlever ou pas ? Ouais.
+Raphael : Oui, oui, bien sûr.
+Interlocuteur : parce que ça sert à rien si c'est sur la page d'accueil, ça rajoute une information alors qu'elle est déjà sur la page d'accueil.
+Interlocuteur : Non? Tu vois?
+Raphael : Ou est-ce que tu es raisant ? Oui, oui carrément.
+Interlocuteur : Voilà, mais alors du coup...
+Interlocuteur : dérange c'est que là maintenant sur l'appli comme ça s'affiche j'ai que faire maintenant
+Interlocuteur : manger, en dessous planil du jour et en dessous tâche du jour, manger.
+Interlocuteur : Il faut que tu enlèves le tâche du jour, manger en bas, ça sert à rien, pareil, si on l'a en haut, c'est en deux fois.
+Raphael : Oui mais l'idée comme tu m'avais dit tout à l'heure c'est d'enlever la partie en haut que faire maintenant. Qu'on garde juste à ce du jeu.
+Interlocuteur : Ah oui, d'accord, mais alors du coup, plutôt mette-t-âche du jour au-dessus.
+Raphael : Oui, d'accord.
+Interlocuteur : Voilà
+Raphael : du jour au dessus et il y aura ensuite planning du jour en dessous.
+Interlocuteur : Exactement. Par contre, du coup, j'aimerais bien que, ouh là, tu gâches...
+Interlocuteur : de l'affichage, le truc comme ça s'affiche, tu n'auras rien de tu gardes cette taille là, pas celle-ci.
+Raphael : tu gardes cette taille là, pas celle-ci
+Interlocuteur : manger ici
+Raphael : Tu voudrais que ce qui est marqué dans le tâche du jour soit plus gros, c'est trop...
+Interlocuteur : C'est la même taille que celui-là, pas celle-ci.
+Raphael : C'est la même taille que ce qu'il a marqué, donc que faire maintenant ?
+Interlocuteur : Voilà ensuite
+Raphael : Actuellement. D'accord.
+Interlocuteur : je verrai bien par contre les petits points que t'as mis là tu vois ici ça j'aime
+Raphael : Oui
+Interlocuteur : Le limite. C'est simple.
+Raphael : D'accord, en fait si tu ajoutes une autre tâche, tu vas...
+Interlocuteur : Ouais, c'est trop bien. Ok, j'aime beaucoup.
+Raphael : C'est à dire que tu peux les déplacer.
+Interlocuteur : Tu peux les déplacer en trail, c'est ça ? Parfait, ouais.
+Raphael : Super. Oui.
+Interlocuteur : Après mettre un max de 3, je pense que je ne suis pas sûre que ce soit nécessaire.
+Interlocuteur : Parce que des fois ça peut être des toutes petites choses si c'est un coutil à passer.
+Raphael : D'accord, pourquoi tu penses que c'est pas nécessaire ?
+Interlocuteur : 5 minutes, si c'est, tu vois, donc 3, des fois je pense à peut-être ne pas suffire.
+Interlocuteur : parce que s'il y a des personnes qui, dans tâches du jour, ont besoin de mettre tout ce qu'elles ont à faire, genre en détail, sortir la poubelle, donner un geochat, ça va être pareil.
+Interlocuteur : Je ne sais pas comment les gens vont l'utiliser, mais ce genre de choses qui durent près cinq minutes justement, mais en fait il y en a beaucoup des fois.
+Interlocuteur : J'en ai peut-être pas beaucoup, mais je pense qu'il y en a qui peuvent beaucoup noter justement, beaucoup détailler.
+Raphael : D'accord
+Raphael : Est-ce que du coup, comme tu parles de noter, est-ce que ça serait plus pratique pour toi d'avoir un petit bouton ?
+Raphael : sur lequel t'appuies pour dicter plutôt que d'écrire.
+Interlocuteur : Moi, alors, tu peux l'ajouter si on veut, moi non.
+Interlocuteur : Mais si ça peut être intéressant peut-être pour certaines personnes.
+Raphael : Bon, on verra ça plus tard.
+Interlocuteur : mais il se soit possible après de parler, ok.
+Raphael : C'est important, c'est pour toi. On s'entraise sur toi pour l'utilisation de l'appli dans un premier.
+Interlocuteur : Donc ça, à la fin !
+Raphael : donc
+Interlocuteur : Ok
+Interlocuteur : ...
+Interlocuteur : Hum, ça c'est bon.
+Interlocuteur : Ok, ensuite, du coup je t'ai dit tout à l'heure que tu pouvais enlever le truc aujourd'hui en bas.
+Raphael : Oui
+Interlocuteur : En fait, tu pourrais le remplacer par Aplanifier, parce que tu n'as pas une...
+Raphael : Non, du coup, j'avais pris le parti de laisser dans tout doux.
+Raphael : Je compte par exemple, tu ajoutes une tâche dans tout doux.
+Interlocuteur : Merci.
+Raphael : Tu as une petite pastille rouge, comme on avait dit, qui s'affiche sur Tudou.
+Interlocuteur : Ah oui, dans tout d'où, on peut faire...
+Raphael : Oh merde !
+Interlocuteur : aujourd'hui planifié ou liste si jamais.
+Interlocuteur : Oui mais ça me dérange parce que dans tout d'où...
+Interlocuteur : Si moi je m'évoque sans moune en jambes les machins, tu vois, eh ben, c'est pas pareil.
+Interlocuteur : les choses à planifier. Non mais pour moi en planifié direct, c'est bon on oublie ça en bas juste sur
+Interlocuteur : aujourd'hui ouais tu laisses tu laisses tout ça
+Raphael : Et je laisse tout de haut, planning et liste.
+Interlocuteur : oublie tout ce que je viens de dire à partir du moment où j'ai arrêté de surlinier ma feuille.
+Interlocuteur : Ensuite, on a paniqué plus tard, je te l'ai dit.
+Raphael : juste pour que je comprenne bien
+Interlocuteur : Voilà
+Raphael : On enlève juste aujourd'hui, on laisse tout doux comme c'est, planning et list, dans les choix qui sont en bas de l'appli, dans le tableau de bord.
+Interlocuteur : Ouais, on touche à rien.
+Raphael : Ok, ça va.
+Interlocuteur : Ok.
+Interlocuteur : dans les listes. Ça s'affiche avec des petites cases comme ça qui apparaissent.
+Raphael : Oui, oui
+Interlocuteur : Juste les seules pour être. Là je suis dans une liste.
+Raphael : Tu vois le bouton renommé sur les listes, excuse-moi, je n'ai pas bien vu, tu peux ramener ton appareil.
+Interlocuteur : à l'intérieur d'une liste que j'ai nommée habille, juste à l'intérieur de ces listes,
+Raphael : Ah, t'es dans une liste, d'accord, ouais, ouais, ok.
+Interlocuteur : bien que ce soit les plus fins que les les choses qu'on ajoute là les deux petites cases qu'il y a ici
+Interlocuteur : et soit juste plus fine. Oui.
+Raphael : Tu parles du petit rectangle qui entoure la liste des tâches.
+Interlocuteur : C'est ça, la case qui entoure les tâches dans la loose.
+Raphael : qui sont dans la liste. C'est ça.
+Interlocuteur : Qui soit... Qui soit... Voilà.
+Raphael : voilà le rectangle qui entoure l'étage dans la liste plus serré sur le titre
+Interlocuteur : Donc ça passe plus liste parce que là du coup il y a un seul tout petit défaut c'est que
+Raphael : sur le titre des tâches. Ok. Oui.
+Interlocuteur : tout se ressemble un petit peu. On est un peu perdu dans où est-ce qu'on est, je trouve.
+Raphael : Ah c'est intéressant.
+Interlocuteur : Par exemple, quand je vais cliquer, ça peut être intéressant pour à l'intérieur, parce que quand je vais dans liste...
+Raphael : Je ne peux pas mettre de... Vas-y, vas-y, pardon.
+Interlocuteur : Je vais arriver sur toutes mes listes, donc on est sur des grosses cases. Et ensuite, si je clique sur une liste, c'est pour ça que je...
+Interlocuteur : de la faire plus fine, comme ça là on va être sur des plus fines cases et on va comprendre que là on est vraiment dans l'intérieur de la liste avec les...
+Raphael : C'est une gas, il m'a tout...
+Interlocuteur : on va mettre beaucoup plus de choses, soit on va mettre des choses dans les listes. Donc c'est plus intéressant que là en plus ce soit plus resserré.
+Interlocuteur : aussi, parce que là moi si je commence à mettre mes listes là dedans, je vais faire défiler longtemps.
+Raphael : Parce que là moi aussi je commence à me la doudant et faire défilé longtemps. Oui, peut-être...
+Interlocuteur : bien c'est ce que j'étais en train de me dire après moi j'aime bien ce côté vrai
+Raphael : Peut-être il n'y a pas besoin d'entourer en fait par ce petit rectangle, il a juste besoin d'avoir...
+Interlocuteur : individualiser de chaque chose après, enfin de chaque tâche, j'aime bien, mais du coup elle peut être en plus
+Interlocuteur : ou vraiment beaucoup plus, tu vois, simplifié, mais en tout cas différent, un petit peu.
+Interlocuteur : du reste pour qu'on voit qu'on est sur une page différente dans la sous-page, tu vois.
+Interlocuteur : voilà donc ça c'est en plus
+Raphael : D'accord.
+Interlocuteur : Je n'avais pas noté. Ok, ensuite, quand on met dans le calendrier,
+Raphael : Oui
+Interlocuteur : quelque chose dans le planning, il faudrait que ce soit écrit plus gros et limite, enfin centré quoi.
+Raphael : Oui
+Interlocuteur : Parce que là, tu l'as mis, je suppose pour qu'on puisse ajouter des plusieurs choses en même temps ou pas.
+Raphael : Allons-y !
+Interlocuteur : Non, ouais, bah donc...
+Raphael : Euh non, non, non, on peut mettre qu'une seule chose à chaque fois.
+Interlocuteur : Ouais, franchement il faudrait juste que la police soit plus grosse, centrée dans la case, tu vois.
+Interlocuteur : Et moi je verrai bien que quand on a ajouté une tâche, la case devienne colorée.
+Interlocuteur : je vois pour que visuellement il est blanc et coloré c'est clair mais dans une couleur
+Raphael : D'accord
+Interlocuteur : pastel est très claire tu vois vraiment juste une petite pointe de couleur
+Interlocuteur : pourquoi ça se voye mais pas très intensifié parce que du coup l'intérêt ce serait qu'en fait on puisse
+Interlocuteur : tuer quand on est dans aujourd'hui, quand ça s'affiche sur l'écran d'accueil aujourd'hui.
+Interlocuteur : Et bien, ce qui serait bien, c'est qu'en fait, dans les tâches, du coup, qui auraient, enfin, dans le planning.
+Interlocuteur : Alors moi j'aime bien le fait que là il n'y ait pas de cales, mais...
+Raphael : Oui.
+Interlocuteur : Du coup, ce qui serait bien, c'est que quand on clique, par exemple, sur terminer,
+Interlocuteur : ça se crée en case de couleurs et de couleurs foncées, non.
+Interlocuteur : Attends, je reviens un peu en arrière, que le planning du jour, en fait, il faut...
+Interlocuteur : qui s'affiche comme pareil avec des cases en fait.
+Interlocuteur : On voit là qu'on a dit que...
+Raphael : ça j'ai pas très bien compris
+Interlocuteur : en haut, au lieu de mettre que faire maintenant, on va mettre tâche du jour, ce qui est en bas on le met en haut. Avec la taille d'épaisseur
+Interlocuteur : de la case, vous avez d'accord ? Et ensuite en dessous il y a plein d'eux du jour, eh eh ben t'as mis, euh...
+Interlocuteur : Quand on entre des trucs, ça s'affiche mais sans casse de saurien avec juste écrit terminer sur le côté.
+Raphael : Il s'affiche qu'on s'en casse le sourire avec juste écrits thermothéoriques.
+Interlocuteur : Qu'est-ce que c'est que ça ? Oui c'est ça.
+Raphael : Je peux me montrer ta version ? Recue.
+Interlocuteur : Voilà.
+Raphael : Ah oui, c'est parce que tu es en mode clair et en mode sombre, en fait tu as les cases, d'accord.
+Raphael : Donc en mode clair il faut rajouter, il faut qu'on voit mieux c'est casse, d'accord.
+Interlocuteur : Sous-titres réalisés par la communauté d'Amara.org
+Raphael : Toi tu la regardes dans mode clair, donc...
+Interlocuteur : Mais comment on fait avec votre chambre de son ?
+Raphael : Il faut que je la voie en mode clair moi aussi. Pour passer en mode sombre, tu vas dans...
+Interlocuteur : Non, c'est pareil.
+Raphael : Tu vas pas à paramètre, tu vois ?
+Interlocuteur : C'est juste...
+Raphael : Attends, recule un petit peu pour... Euh... Ok...
+Raphael : Ah ouais, sur le téléphone, il n'y a pas le cadre. Ok, c'est noté, je regarderai. Ça marche.
+Interlocuteur : Donc en fait il faudrait du coup, il s'affiche pour le planning des cases comme en haut ici.
+Raphael : Il s'affiche pour le plan d'ennemi ?
+Interlocuteur : sauf qu'elle serait colorée du coup en la couleur pastel que t'as définie par contre là il n'y a pas les casses blanches entre
+Raphael : oui
+Interlocuteur : Il n'y a que les choses qu'on a à faire, tu vois.
+Raphael : Oui oui, mais reviens sur la couleur pastel, c'est...
+Interlocuteur : Et bien du coup, les cases dans planime du jour, elles s'afficheraient comme dans tâche du jour au-dessus.
+Raphael : Ssssssssssssssssssss
+Interlocuteur : de la même taille et tout, mais de couleur pastel. La couleur pastel on pourrait la définir justement
+Interlocuteur : dans les paramètres où vous pourrez modifier l'ambiance trouveux, la couleur trouveux de l'application, et du coup, ça s'afficherait de la couleur.
+Interlocuteur : que la personne n'a la choisie dans les paramètres, non.
+Raphael : Et ça affiche cette couleur que quand c'est terminé ou pas ?
+Interlocuteur : Quand on a ajouté une tâche, du coup, dans planning, elle apparaît plus blanche, elle apparaît...
+Raphael : planning
+Interlocuteur : de cette couleur pastel. Et quand on est sur l'écran d'accueil, c'est juste la case avec l'attache à faire.
+Raphael : Oui. Oui.
+Interlocuteur : les cases avec les tâches à faire qui s'affichent de la couleur pastel et au moment, il y aurait une petite case en dessous.
+Raphael : Sous-titres réalisés par la communauté d'Amara.org
+Interlocuteur : Le truc terminé, moi j'aime bien. Tu peux laisser terminer ou cocher ou un truc comme ça. Et par contre, quand on clique dessus, là...
+Interlocuteur : Et bien la couleur, elle devient plus flashy, la même, mais en flashy. En mode c'est bon, c'est fait.
+Raphael : donc tu
+Interlocuteur : C'est ça, de la même couleur mais en plus flashy qui est vraiment...
+Raphael : que ça ressort plus les tâches qui sont terminées.
+Interlocuteur : une différence et de la couleur que la personne allera choisir l'ambiance de l'application dans les paramètres.
+Raphael : D'accord, ça marche.
+Interlocuteur : Et pourquoi pas aussi quand la personne se connecte, proposer la couleur qu'elle veut.
+Raphael : D'accord
+Interlocuteur : Voilà.
+Interlocuteur : Ok. Ensuite, on peut continuer.
+Interlocuteur : Quand on fait, ajoutez une tâche. Je vais le faire en même temps, manger, je...
+Raphael : Ouais, vas-y.
+Interlocuteur : c'est planifié
+Interlocuteur : Alors attend du coup là je suis en train d'ajouter une nouvelle tâche mais du coup au lieu de aujourd'hui
+Raphael : Là, je suis en train d'ajouter une nouvelle tâche, mais du coup, au lieu de aujourd'hui...
+Interlocuteur : il faudrait que tu mettes ce qu'on m'a dit tâche du jour.
+Raphael : On a dit qu'on enlevait juste la...
+Interlocuteur : Oui, le bouton qui est tout en bas.
+Raphael : tu parles du bouton qui est tout en bas
+Interlocuteur : Mais du coup, dans les trucs, à des moments, on peut...
+Raphael : Aujourd'hui il n'y sera plus, il n'y aura que Tudu, Planning et liste.
+Interlocuteur : Est-ce qu'on pourra le mettre dans tâches du jour quand nous, on veut ajouter une tâche, est-ce qu'on pourra le mettre dans tâches du jour ?
+Raphael : Abonnez-vous
+Raphael : Quand on va sur le tableau de bord, on clique sur rajouter une tâche, et là à ce moment-là t'as plus...
+Raphael : d'autres options à Tudou, aujourd'hui planifié, mettre dans une liste.
+Interlocuteur : Oui, et bien, à la place d'aujourd'hui, vu qu'on va l'enlever, il faut que tu mettes tâche du jour, tu vois ce que je vais dire ?
+Raphael : d'accord donc il faudra que quand on met une nouvelle tâche à la place d'aujourd'hui on est marqué tâche du jour
+Interlocuteur : C'est ça pour que du coup on puisse le mettre dans tâche du jour parce que sinon on n'a aucun moyen de le mettre dans tâche du jour si on ne peut pas faire ça. Parce que là, quand on mettait dans haut...
+Interlocuteur : aujourd'hui ça allait dans tâche du jour du coup faut juste que tu changes les noms en fait parce qu'on va enlever la truc aujourd'hui
+Raphael : ça allait dont t'as du souffle ouai
+Raphael : Attends, je le fais pour voir. Oui, ok.
+Raphael : du jour, tâche du jour. En fait, tâche du jour, ça se voit toujours, parce que là on a deux termes aujourd'hui et tâche...
+Interlocuteur : Voilà et du coup
+Raphael : du jour qu'ils sont pour la même chose, d'accord ?
+Interlocuteur : par rapport au fait que la couleur elle s'intensifie quand la tâche est faite l'idée c'est que du coup j'ai remarqué
+Interlocuteur : que quand on fait terminer sur une tâche, elle s'enlève. Mais là, l'idée, c'est du coup, elle reste affichée pour qu'il y ait de la satisfaction de voir l'état.
+Interlocuteur : que l'on a faite aussi tu vois. Voilà, ça...
+Raphael : Ok, ça marche.
+Interlocuteur : Et ensuite, dernier petit truc, quand on va sur planning, ce qui serait bien, c'est que...
+Raphael : Oui
+Interlocuteur : Là, tu vois, quand je clique sur une case vide, ça me dit placer GH.
+Interlocuteur : j'ai à 19h30 pourquoi ? Pourquoi il veut que je mette ça à 19h30 ? Attends je regarde.
+Raphael : en fait c'est parce que c'est une action
+Interlocuteur : Mais elle est où cette action ? Elle est où ?
+Raphael : que tu as fait et que tu n'as pas planifié, qui te propose de la planifier par lui-même.
+Raphael : Tu as dû la rentrer dans une détache. Tu peux regarder dans tout doux.
+Interlocuteur : Ben j'ai regardé mais non, non, ben.
+Raphael : ou là aujourd'hui. Ok, ben c'est un bug alors.
+Interlocuteur : Ok, bon bah donc là je vais faire oui. Bon voilà sinon il n'a écrit aucune tâche à pleines.
+Raphael : Donc ça veut dire qu'il faut attendre, je reprends pour le...
+Interlocuteur : Ah mais je pense que c'est un truc que j'ai pas terminé, que j'ai dû abandonner, que j'ai écrite.
+Raphael : Pour noter le bug, excuse-moi, il faut juste marquer...
+Interlocuteur : à l'heure que j'ai abandonné, mais lui, parce que là, je l'ai fait, je l'ai planifié le truc.
+Raphael : Ah
+Interlocuteur : j'ai cliqué sur une autre case et il y a écrit « Aucune tâche à planifier ». Donc il faut que tu fasses un truc en mode si la personne au final elle arrête.
+Raphael : Oui.
+Interlocuteur : Il ne faut pas qu'elle reste à planifier le truc.
+Raphael : D'accord. Quand elle planifie que si elle arrête, faut pas que ça.
+Interlocuteur : Voilà et du coup moi ce que je voulais te dire c'est que quand on clique sur une case du coup la samedi ça samedi
+Raphael : Ah, faut pas que ça se sauvegarde quoi. Ok, ça marche.
+Interlocuteur : aucune tâche à planifier, et bien là ce qui serait bien c'est que ça me propose d'ajouter une tâche.
+Raphael : Ok, donc quand tu cliques dans...
+Interlocuteur : Voilà, au lieu que j'ai écrit...
+Raphael : planing, ça te propose d'ajouter une tâche. Et cette tâche, elle va directement en planifier.
+Interlocuteur : Oui, tu n'as pas besoin de choisir là. Ah oui, à des moments aussi, mais ça, il faudra...
+Raphael : Oui, ça marche.
+Interlocuteur : tu le vois toi parce que je ne sais plus exactement quand tu feras des tests ou sinon moi je pourrais te le redire exactement.
+Interlocuteur : si ça y est encore, mais à des moments quand, par exemple, je vais dans tout d'où, je crois.
+Raphael : Sous-titres réalisés par la communauté d'Amara.org
+Interlocuteur : Et que je fais dans tout d'où, ça me propose ajouter une tâche. Donc je fais ajouter une tâche et en...
+Raphael : C'est le meilleur biteur de l'histoire de ce qu'on veut faire.
+Interlocuteur : En fait, quand je fais ajouter une tâche, ça ne me propose que de faire cette tâche. Mais en fait, je suis déjà allée dans tout...
+Raphael : C'est pour vous? Qu'est-ce que vous faites? Je vais poser la création de tout le monde.
+Interlocuteur : Donc il ne faut pas que ça me le propose, il faut juste que ça l'ajoute dans tous les... Tu vois ? Il faudra juste que tu vérifies parce qu'il me semble qu'il y a un...
+Raphael : Ok, ça marche, ouais.
+Interlocuteur : un autre, je sais plus où c'est que les vues, mais quand tu reçeras de toute façon si ça marchera, tu feras juste gaffe à ça.
+Interlocuteur : et ensuite autre chose
+Raphael : Oui. Ok.
+Interlocuteur : Moi, par exemple, si j'ai envie de planifier le Macdo,
+Interlocuteur : j'aimerais bien pouvoir, quand je fais ajouter une tâche, bla bla bla, je vais planifier.
+Interlocuteur : et là je sélectionne le créneau auquel je veux l'ajouter, on est d'accord. Je le sélectionne, je fais val...
+Interlocuteur : l'idée. Et là, il y a toujours le planime qui s'affiche. Et ben, en fait...
+Interlocuteur : ce qui serait bien, c'est que tant que je ne suis pas revenu en arrière, voilà, donc là, je n'ai pas bougé, que si je change de joue...
+Interlocuteur : par exemple, le mardi, mais avec que je clique sur une case, ça me le remette en fait, tant que j'ai pas fait la petite...
+Raphael : Si, il y a une méchantine qui casse, c'est le mieux l'eau qu'on m'a dit. Oh.
+Interlocuteur : flèche en arrière parce que là en fait je suis dans le planning mais pas dans le planning dans bas dans le planning de je veux planifier ma thème
+Raphael : Sous-titres réalisés par l'Amara.org
+Interlocuteur : Donc tant que je ne sors pas de ce planning-là, et bien dès que je clique sur une case, je peux continuer d'ajouter la tâche.
+Interlocuteur : Parce que, par exemple, si moi je mette maque de tous les jours, à chaque fois, je dois revenir en arrière pour...
+Interlocuteur : vous retapez le même truc, exactement.
+Raphael : D'accord, c'est pour mettre les tâches récurrentes que tu puisses faire facilement, clac, clac, clac.
+Interlocuteur : c'est ça et qu'à la limite
+Raphael : collect collect
+Interlocuteur : comment une fois que tu as posé du coup une tâche si jamais il faudrait qu'en fait automatiquement
+Interlocuteur : dès qu'on pose une tâche, ce soit le jour suivant qui s'affiche, parce que comme ça, si c'est pas une tâche récurrente, que c'est culturel, du coup, bah...
+Interlocuteur : qu'on s'en fout parce que tu reviens d'arrives, tu sors industrieux qu'on s'en fout et si tu n'as pas planifié...
+Interlocuteur : la même tâche, le même jour, deux fois tu vois. Et donc du coup, si c'est un truc récurrent, moi, t'es direct sur la page d'après, t'as pas besoin de faire...
+Interlocuteur : à la flèche.
+Raphael : D'accord, ok
+Interlocuteur : C'est encore tourné dans plein niveau, ok ça c'est bon.
+Interlocuteur : C'est bon.
+Interlocuteur : Voilà, je crois que je t'ai fait toutes mes réflexions, essayez d'organiser pour que ce soit...
+Raphael : C'est quoi, là ?
+Interlocuteur : vraiment clair à la limite par exemple pourquoi pas du coup dans le truc des listes que je te disais tout à l'heure quand c'est toutes les listes
+Interlocuteur : qui s'affiche, c'est un gros encadrement. Quand on rentre dans une liste et que là c'est chaque tâche qui s'affiche, c'est des petits, enfin des étroits...
+Interlocuteur : encadrement mais ce qui sera intéressant c'est que du coup l'encadrement de la liste commençait à présenter ce soir
+Interlocuteur : le même présentement quand il a écrit Abdi en haut, le titre de la liste en fait. Tu vois parce que là, il y a la flèche...
+Interlocuteur : pour revenir en arrière, et à côté il y a juste écrit « Abou ». Ce serait bien que l'enquennrement soit le même pour que ça garde la cohérence.
+Raphael : Non, c'est pas ça. Non, c'est pas ça.
+Interlocuteur : Et de la même manière...
+Raphael : C'est vraiment du titre, tu parles, que le titre soit encadré.
+Interlocuteur : Donc il est encadré quand il s'affiche dans toutes les listes qu'on a.
+Raphael : Ah d'accord ça marche
+Interlocuteur : pareil pour d'autres choses en fait que tu essaies de garder cette cohérence-là parce que comme ça, au moins ça va à rendre plus fluide que d'autres.
+Raphael : On sait où est-ce qu'on a une cohérence graphique pour savoir.
+Interlocuteur : ou est-ce qu'on en est, c'est ça? Après, j'ai pas vu, par exemple, pourquoi pas quand...
+Raphael : mieux où est-ce qu'on est ?
+Interlocuteur : également quand on est dans Tudu par exemple
+Interlocuteur : Moi, ce que je verrai bien, en fait, c'est que les quatre bars d'en bas, elles disparaissent pas, qu'elles soient là sur...
+Interlocuteur : toutes les pages, et que ça fasse un peu comme sur Snapchat, je sais pas si tu vois, mais que quand on clique sur Tudu, il y a les quatre barres en bas et t'as...
+Interlocuteur : tout doux qui est en une couleur par exemple ou un peu comme un peu tamis pour les cases.
+Raphael : D'accord, comme a mené une navigation, d'accord.
+Interlocuteur : qui ressort comme sur snap, tu sais, comme ça, c'est plus facile pour switcher, à voir.
+Raphael : Quoi ?
+Interlocuteur : Si ça, je ne sais pas si ça se fait automatiquement ou si c'est toi qui doit le programmer, mais sur iPhone, tu sais, on peut quand il y a des...
+Interlocuteur : sur snap, on peut faire comme ça glisser avec le doigt.
+Raphael : D'accord, et ça fait quoi quand tu glisses avec le doigt ?
+Interlocuteur : Bon là, c'est... Attends. Je vais te montrer sur snap parce que vu que toi, c'est pas effectif. Là, par exemple, je suis sur l'appareil photo, soit...
+Interlocuteur : je peux aller dans le chat en cliquant sur les mots de Tico d'en bas, soit je peux faire glisser comme ça.
+Raphael : Ok
+Interlocuteur : Et c'est vachement plus pratique que d'aller. Moi, quand je vais dans mes chats, honnêtement, je pense que...
+Raphael : Je vais voir, c'est pas sûr que je puisse le faire.
+Interlocuteur : Ouais, c'est peut-être, mais franchement c'est souvent que... Voilà.
+Raphael : Ok, je regarderai. C'est pas sûr parce que...
+Raphael : Comme là, c'est la version web que tu affiches sur ton téléphone. C'est pas la version téléphone que tu as, tu vois ?
+Interlocuteur : Après ça, au pire, c'est pas la main sans fouin, mais du coup voilà que dans tout d'où il y ait le p'tit...
+Raphael : Non mais c'est bien que tu me le dis hein
+Interlocuteur : Le petit point rouge, ça me plaît bien, des listes, tac-tac-tac.
+Interlocuteur : Ok.
+Interlocuteur : Et que du coup voilà comme ça
+Interlocuteur : Et qu'en fait, l'idée, ce serait qu'on n'ait pas l'impression de changer de page quand on clique sur Tudou, tu vois que tu...
+Interlocuteur : Il garde vraiment le même truc, juste que ça bouge, mais au moins tu vois voilà ça.
+Interlocuteur : ce sera plus fluide, ça va moins embrouiller.
+Raphael : D'accord, ok
+Interlocuteur : Voilà, est-ce que j'ai autre chose à dire ?
+Interlocuteur : Donc voilà le mode surcharge du coup à la limite du coup ce qui peut être intéressant
+Interlocuteur : c'est que là, en haut, il y a écrit mode surcharge. Mais qu'en fait, quand on clique dessus, ça n'active pas.
+Raphael : En haut, il y a eu mon surcharge, mais en fait, comme pour le dessus, ça ne l'active pas.
+Interlocuteur : ce soit juste des informations entre guillemets, je recommence à marche, mais qu'en fait ils s'activent du coup, quand...
+Interlocuteur : vu qu'à chaque fois qu'on va se connecter ça va nous demander l'énergie qui nous reste
+Interlocuteur : Et du coup, ça va être à nous de répondre en fonction de… En fait, c'est chacun d'eux de faire son propre bâton.
+Raphael : ...
+Interlocuteur : Donc, on met de 1 à 12, mais chacun va se dire si pour quelqu'un un truc...
+Raphael : Sous-titres réalisés par la communauté d'Amara.org
+Interlocuteur : ça correspond à 3 et que quand il rentre chez lui il n'est pas capable de le faire, bon bah ça veut dire qu'il est à jour 1 d'énergie, tu vois.
+Interlocuteur : à chacun on a son propre barème et du coup l'idée c'est qu'à chaque fois qu'on se connecte elle nous demande et du coup en fonction de ce qui nous reste à faire
+Interlocuteur : et ben... et ben du coup si on a... si ça dépasse l'énergie qui nous reste...
+Interlocuteur : il faut que ça se mette en grisée, par exemple, et après...
+Interlocuteur : quand même qu'on le voit parce que si par exemple je ne sais pas c'est une soirée et qu'on va se forcer à y aller parce que de toute façon on n'a réservé ou je ne sais rien et que d'un à un.
+Raphael : C'est une soirée, on va voir ce que vous allez aller, parce que vous ne pouvez pas réserver, vous n'avez rien à voir.
+Interlocuteur : il faut qu'on le voit quand même, tu vois, mais en mode, bon, ce serait bien que tu ne le fasses pas, en fait, ça va aider à prendre assez...
+Interlocuteur : parce que c'est toi qui te fixe ton propre barème, c'est pas l'application, c'est toi-même qui va noter...
+Raphael : D'accord, oui carrément c'est une bonne idée.
+Interlocuteur : l'événement combien il te demande d'énergie et toi combien tu es d'énergie. Donc en plus ça va amener à se poser beaucoup de questions.
+Interlocuteur : aussi du coup. À se rendre compte, ça me demande vachement plus. Autant tu vas prévoir un truc, deux énergies, tu vas te rendre compte.
+Interlocuteur : en fait et du coup tu vas dire peut-être en fait peut-être le maître à trois ou quatre quand même et du coup la fois d'après il me laissait
+Interlocuteur : d'énergie ? Ouais non, il est tombé. Donc ça peut être intéressant du coup que ce
+Raphael : D'accord
+Interlocuteur : charge, ils s'activent automatiquement et que quand on clique dessus, par contre, il y aurait un truc explicatif
+Raphael : sur charge plus active automatiquement et que quand on pique par contre, il y aurait un truc explicatif
+Interlocuteur : mode surcharge et que, si on veut, on peut activer le mode surcharge manuellement.
+Interlocuteur : Et on se voit, ça ne sert à rien parce qu'en fait, l'idée du mode surcharge, c'est vraiment si c'est pas quand t'es fatiguée.
+Interlocuteur : C'est pas que quand t'es fatiguée, c'est quand tout ce que t'as à faire.
+Raphael : C'est ou la domme? C'est ou la domme? C'est ou la domme?
+Interlocuteur : C'est trop élevé par rapport à ce que tu peux donner en fait, parce qu'en soit, si t'es fatiguée...
+Raphael : N'y a-t-il pas plus l'air avec l'alarmée ? N'y a-t-il pas plus l'air avec l'alarmée ?
+Interlocuteur : tu n'as rien à faire, vas-tu raison pour lui ? Voilà, donc il n'y a pas besoin du mode surcharge, tu vois, donc il n'y a même pas besoin de... Après, on peut peut-être le...
+Interlocuteur : de faire la limite, mais franchement je pense que ça sert à rien de le mettre.
+Raphael : Donc en fait, pour résumer ce que tu as dit, le moteur...
+Raphael : pas besoin de le faire, il faut qu'en fait, en fonction de l'énergie que tu as...
+Raphael : les actions que tu dois faire ce grise par exemple c'est ça
+Interlocuteur : Oui, voilà.
+Raphael : mais pour qu'il faut que ça soit expliqué peut-être pour qu'on comprenne
+Interlocuteur : c'est ce que je te dis c'est qu'en fait du coup le bouton en haut quand on est sur
+Raphael : Mais c'est ce que je t'ai dit, c'est quoi ? En fait, du coup, le bouton est en haut, faut tourner sur...
+Interlocuteur : Quand on est en haut, ici, le mode surcharge, ce petit bouton, tu le laisses, mais pas pour activer le mode surcharge.
+Raphael : Si tu l'as mis, je le laisse, mais pas pour activer le bâtu de charme.
+Interlocuteur : là où il y a le descriptif juste de ce que c'est le voiture charge.
+Raphael : et il peut s'afficher en couleur
+Interlocuteur : Et quand on passe en mode surcharge, il s'affiche en couleur.
+Raphael : si on est en surcharge justement, c'est à dire que s'il y a...
+Interlocuteur : Et du coup, et si jamais quand on... si il...
+Raphael : Oui, mais comme c'est un mode automatique, voilà, ok.
+Interlocuteur : Il peut y avoir écrit, par exemple, quand on clique du coup sur ma surcharge, il y a le descriptif et il peut y avoir une casse.
+Raphael : Il peut y avoir de l'argent, par exemple, mais ça veut dire que je charge des dispositifs et il peut y avoir de l'argent.
+Interlocuteur : en bas avec écrit désactivé mais on peut pas
+Raphael : D'accord.
+Interlocuteur : le limite, tu peux cliquer dessus si tu veux l'activer, mais ça sert à rien du tout. C'est pas en surcharge donc, il faut pas pouvoir l'activer, c'est automatique.
+Interlocuteur : Donc c'est sans automatique, c'est pas toi qui décide en fait, parce que c'est toi qui doit donner ton énergie et sinon ça va biaiser le truc, tu vois.
+Raphael : Ok.
+Interlocuteur : Faut pas pouvoir l'enlever, faut pas pouvoir le mettre. C'est après toi, si tu décides de quand même faire un truc et qu'il n'y a plus assez d'énergie, bah après...
+Raphael : Et après toi, si tu décides comment faire un truc qui peut vous donner de l'énergie, t'as plus.
+Interlocuteur : c'est toi qui vois après c'est tu penses que c'est toi qui a mal estimé le truc et tout bon voilà à tout cas c'est tu vois
+Interlocuteur : Du coup, juste que quand on clique dessus, voilà, il y a écrit désactivé une case grisée, écrit désactivé.
+Raphael : Allez, je vous parle de la question. Désactivé. Qu'est-ce que c'est? Désactivé.
+Interlocuteur : et que quand il est activé, pareil, il y a pareil l'explication et en dessous il y a la case par contre en couleur
+Interlocuteur : avec écrit activé et du coup
+Raphael : Ok, ça marche.
+Interlocuteur : quand ils s'activent, dans ces cas-là, dans le planime du jour, que faire maintenant ?
+Interlocuteur : ça s'affiche, mais par contre il y a une casque qui peut s'afficher un petit peu...
+Raphael : C'est un petit peu aboile
+Interlocuteur : ou il peut y avoir écrit, reportez.
+Raphael : d'accord quand on est en mode
+Interlocuteur : Voilà et là c'est nous qui décidons si on veut le reporter ou pas ça c'est pour
+Raphael : surcharge
+Interlocuteur : ce qu'il y a écrit dans le tâche du jour et pour ce qu'il y a écrit dans le planning du jour et là par contre
+Interlocuteur : ne vont s'afficher en couleur pastel comme on a dit clair que l'étage qu'on a noté comme.
+Interlocuteur : obligatoires, et les autres ont grisé en neutre.
+Raphael : D'accord.
+Interlocuteur : En mode, c'est là, mais pour que tu me saches, mais t'as pas à le faire parce que t'es en charge.
+Raphael : Ok
+Interlocuteur : Et du coup, ça paraît, c'est toi qui l'auras évalué auparavant ?
+Raphael : Et du coup s'appelait-t-il et c'est à quoi tu es ou par là ? Et выпêche qu'à chaque fois que tu...
+Interlocuteur : Et donc, en gros, l'idée, c'est qu'en fait c'est quand...
+Raphael : entre une tâche, tu mets la quantité d'énergie que ça va te demander.
+Interlocuteur : regardes ton planil, tu vas regarder si c'est en couleur ou pas parce que si c'est en couleur, ça veut dire c'est ok vas-y tu peux, ça a de l'énergie, c'est ok donc ça
+Interlocuteur : ça va peut-être te faire relâcher ton cerveau, tu es en mode ok je suis pas dans ma limite là c'est bon et par contre quand c'est pas en couleur
+Raphael : Je vais donc s'assurer que les beauté sont vraiment limites. Et par contre, ce que j'ai... C'est... C'est une frère que...
+Interlocuteur : Alors soit tu vas revoir toute l'évaluation à toi de ta propre énergie, soit tu vas voir...
+Interlocuteur : l'énergie des autres, l'énergie de ce que ça va de ton...
+Interlocuteur : l'activité, comment tu l'as évaluée ou alors tu vas le faire alors que tu sais que tu ne dois pas.
+Interlocuteur : des fois il y en a obligé aussi, c'est bien de le savoir, de se dire ok est-ce que vraiment j'ai le choix ou pas ?
+Raphael : Mais pour dire, le mec il veut dépenser 3 000 euros. Mais c'est bien de le savoir. Il n'y a pas de dépense. Ok, c'est pas mal, j'ai le choix ou quoi ?
+Interlocuteur : Et c'est vraiment bon, tu n'as pas le choix, mais bon, si tu n'as pas le choix, tu mets un obligatoire en fait, de toute façon. Tu vois ?
+Raphael : Mais oui c'est toi qui te définis en fait.
+Interlocuteur : Et c'est toi qui l'as défini. Donc en fait, quelque chose que tu sais que tu ne peux pas amuler, genre le macdo, moi je vais le mettre en obligatoire, mais pas la salle.
+Interlocuteur : Si je me réveille et que je suis à deux énergies, la salle sera sautée. Et en plus du coup, ça va permettre de rester en pris.
+Raphael : Oui. Oui.
+Interlocuteur : dans le plein niveau aussi tu vois. Parce que si j'ai ça et avoir des voups, les deux ils vont s'empêcher, ça va être obligatoire.
+Raphael : Oui
+Interlocuteur : Mais le reste, ça me rend vite.
+Raphael : ok bon mais c'est parfait
+Interlocuteur : Et moi comme ça, ça peut me permettre de planifier mon piano, ma musique, mon symbole. Le fait que tu es fait avec les demi-heures aussi, je...
+Raphael : Faisons pas ça, avec les deux mires aussi.
+Interlocuteur : ça va vraiment pas mal. Et aussi, attends, parce que je suis en train de capter un truc depuis tout à l'heure, je t'ai dit 12 et je suis partie...
+Raphael : D'accord
+Interlocuteur : sur ça, mais j'aimerais bien, dans la BD, le nombre d'énergie
+Raphael : Pour l'énergie, oui.
+Interlocuteur : et s'en parlent les petites cuillères, c'est ça.
+Raphael : Non, c'est pas bon. C'est pas bon, j'ai des cartes. Good !
+Interlocuteur : Elle a après ingéré son réservoir d'énergie, notamment grâce à la théorie des petits cuillères de Christine.
+Interlocuteur : mais mis et rendis nous selon cette théorie une personne en situation de handicap
+Raphael : Il n'a qu'à arrêter ça, s'il vous plaît.
+Interlocuteur : et où atteintes de maladies chroniques disposent d'un stock limité de petites cuillères égales d'énergie.
+Raphael : Ah, au-delà, je suis venu, et j'en ai un délirement, c'est un de la fête aux petits que je fais sur vous.
+Interlocuteur : Pour réaliser toute l'étage du quotidien, elle doit avec seulement douze cuillères faire ce que les autres font avec un stock de cuillères.
+Interlocuteur : illimiter, établir son propre barème lui a permis de mieux visualiser et gérer sa fatigabilité.
+Interlocuteur : exemple, discuter cinq minutes avec mon voisin sur le plat de la porte, une cuillère, prendre les transports en commun, deux cuillères.
+Interlocuteur : Faire réconse au supermarché, 2 cuillères, elle est dans la merde, elle a pas le droit de faire beaucoup de choses en scène.
+Interlocuteur : Moi, tu vois, prendre le but, je vais pas le noter. Mais peut-être qu'il y en a qui le notent.
+Raphael : Oui Oui ça dépend de chacun
+Interlocuteur : Voilà et à la limite pourquoi pas dans les paramètres, la personne peut avoir la possibilité de...
+Interlocuteur : J'ai pas à mettre 20 cunières si jamais il fin. Je sais pas. Ça on verra plus tard. Ça faudrait...
+Raphael : Oui, je suis d'accord, on verra plus tard.
+Interlocuteur : Et sûrement, ça sera plus, peut-être tu vois, la vie du psychologue, tu vois, par exemple. Le psychologue pourra plus nous dire ça.
+Raphael : Oui.
+Interlocuteur : tout le temps, tout le temps, tout le temps, tout le temps.
+Raphael : oui parce que l'idée c'est d'arriver à faire une application qui soit fonctionnelle pour toi
+Raphael : et puis ensuite vous trouvez un psychologue ou trouvez une autre personne pour tester et de voir quelles sont les paramètres
+Interlocuteur : Sous-titres réalisés par la communauté d'Amara.org
+Raphael : que tu vas pouvoir modifier toi pour adapter l'application le plus proche de tes besoins.
+Interlocuteur : Non mais franchement, c'est pas mal ce que t'as fait, l'idée est bonne et surtout que...
+Raphael : mais qui reste dans un cadre précis.
+Interlocuteur : Du coup t'as vu comme ça l'inspire ? Donc ouais non c'est...
+Raphael : Ouais bah je vois, bah tant mieux, tant mieux, c'est chouette.
+Interlocuteur : Franchement, je t'ai dit, là, je suis avec mes trucs, mes calendriers, mes machins. J'ai 50 petits trucs, j'ai incarné.
+Interlocuteur : j'ai des feuilles volantes organisées, plus en agenda.
+Interlocuteur : Donc là tu vois si j'ai tout dans mon téléphone
+Raphael : mais après mais c'est ça on va voir après comment
+Interlocuteur : En tout cas, c'est un registre.
+Raphael : sa tête ou pas ? On va voir si ça peut te permettre d'être plus trop.
+Interlocuteur : Je pense que c'est pour ça que l'on va pouvoir y aller.
+Raphael : tranquille ou non on va voir ça ok je pense qu'on a fait le tour moi est ce que j'avais
+Interlocuteur : C'est super
+Raphael : questions non on t'a abordé toutes les questions que je voulais te poser
+Raphael : Ok, bon j'espère que l'enregistrement a bien fonctionné parce que j'ai pris aucune note là.

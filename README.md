@@ -25,7 +25,7 @@ npm run format     # Prettier
 
 V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : mode offline (13.2), doc V2, déploiement Netlify. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
 
-Visio testeur (Marie) du 2026-07-06 analysée via la nouvelle commande `/analyse_visio` : roadmap V3 créée (`Note de réunion/2026-06-07/roadmap_v3.md`), 10 phases (V3-0 à V3-9). Cœur de la V3 : coût d'énergie par tâche (échelle 1-12, "cuillères"), tâches obligatoires (câble enfin le champ `essential`), mode surcharge automatique dérivé de l'énergie du jour vs coûts planifiés, nettoyage dashboard/planning/listes, navigation persistante. Aucune phase démarrée — décisions à valider avec Marie au préalable (limite 3 tâches/jour, sort du segment "Aujourd'hui", stratégie de reset des données V2).
+Visio testeur (Marie) du 2026-07-06 analysée via la commande `/analyse_visio` : roadmap V3 (`Note de réunion/2026-06-07/roadmap_v3.md`), 7 phases (V3-0 à V3-6). Cœur de la V3 : coût d'énergie par tâche (échelle 1-12, "cuillères"), tâches obligatoires (câble enfin le champ `essential`), mode surcharge automatique dérivé de l'énergie du jour vs coûts planifiés, nettoyage dashboard/planning/listes, navigation persistante. Aucune phase démarrée — décisions à valider avec Marie au préalable (limite 3 tâches/jour, sort du segment "Aujourd'hui", stratégie de reset des données V2).
 
 Tests unitaires 339/339, `tsc -b` clean.
 

@@ -13,8 +13,9 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 
 ## État actuel (réécrit intégralement à chaque /close)
 V2 quasi close sur branche `v2` (Phases V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : mode offline (13.2), doc V2, déploiement Netlify. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
-Visio testeur (Marie) du 2026-07-06 analysée : roadmap V3 créée (`Note de réunion/2026-06-07/roadmap_v3.md`), succède à V2, aucune phase démarrée. Cœur de la V3 : coût d'énergie par tâche (1-12, "cuillères"), tâches obligatoires (câble enfin `essential`), mode surcharge automatique dérivé, nettoyage dashboard/planning/listes, nav persistante.
-Nouvelle commande `/analyse_visio <dossier-réunion>` créée pour automatiser ce type d'analyse (transcription + code + captures → constats/plan/roadmap versionnée, bump auto de version).
+Roadmap V3 (`Note de réunion/2026-06-07/roadmap_v3.md`) régénérée au format compact (7 phases V3-0 à V3-6, gate en une ligne par phase), aucune phase démarrée. Cœur de la V3 : coût d'énergie par tâche (1-12, "cuillères"), tâches obligatoires (câble enfin `essential`), mode surcharge automatique dérivé, nettoyage dashboard/planning/listes, nav persistante.
+Commande `/analyse_visio <dossier-réunion>` réécrite : produit désormais 2 fichiers (constats + roadmap) au lieu de 4, règle de non-duplication (analyse code portée directement sur les items de roadmap plutôt qu'en fichier séparé).
+`analyse_code_2026-07-06.md` et `plan_implementation_2026-07-06.md` obsolètes (contenu absorbé dans la nouvelle roadmap) — suppression à confirmer.
 Décisions à valider avec Marie avant V3-1 : Q1 (limite 3 tâches/jour), Q2 (ambiguïté "Aujourd'hui"/"Tâche du jour", transcription contradictoire), stratégie de reset des données V2 existantes.
 Tests 339/339 unitaires, `tsc -b` clean (aucun changement de code cette session, uniquement documents et commande).
 

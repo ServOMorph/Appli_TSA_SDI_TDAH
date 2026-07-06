@@ -1,3 +1,9 @@
+## v2.1 — 2026-07-06
+
+### Modifié
+- Commande `/analyse_visio` réécrite : 2 fichiers de sortie (constats + roadmap) au lieu de 4, règle de non-duplication (analyse code portée sur les items de roadmap plutôt qu'en fichier séparé), gate compact en une ligne par phase.
+- `roadmap_v3.md` régénérée au nouveau format : 7 phases (V3-0 à V3-6) au lieu de 10, contenu identique.
+
 ## v2.0 — 2026-07-06
 
 ### Contexte

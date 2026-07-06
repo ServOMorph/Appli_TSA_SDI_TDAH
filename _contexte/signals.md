@@ -5,10 +5,11 @@
 ## Actions ouvertes
 
 ### V3 — Démarrage (branche `v3`, post-visio Marie 2026-07-06)
-- [P1|ouvert] Démarrer Phase V3-0 (refacto préalable) — toutes les décisions bloquantes sont levées (Q1, Q2, reset données)
-  - Contenu V3-0 : constantes/schéma énergie (Dexie v3), composant `EnergyDisplay`, extraction `AppShell`/`BottomNav`, sélecteur `isOverloaded` pur. Détail complet dans `roadmap_v3.md`.
-  - fait quand: Phase V3-0 démarrée (au moins R1 en cours)
-  - réf: `roadmap_v3.md` Phase V3-0
+- [P1|ouvert] Valider par test manuel la Phase V3-0 (refacto préalable) — code fait (R1-R5), reste le test manuel utilisateur
+  - fait quand: test manuel confirmé (aucune régression visible), Phase V3-0 clôturée
+  - réf: `roadmap_v3.md` Phase V3-0, commit `32c7939`
+- [P1|ouvert] Démarrer Phase V3-1 (bugs + nettoyage UI) après validation V3-0
+  - réf: `roadmap_v3.md` Phase V3-1
 - [P3|ouvert] Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — décision explicitement reportée
   - fait quand: décision produit prise sur l'implémentation (piste retenue si besoin confirmé : chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id` optionnel)
   - réf: `Archives/roadmap_v2.md` § "Fonctionnalité reportée (décision 2026-07-06)"

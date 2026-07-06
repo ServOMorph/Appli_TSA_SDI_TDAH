@@ -32,7 +32,7 @@ Aucun changement de comportement visible.
 - [ ] R3 — Composant `EnergyDisplay` réutilisable, dé-duplique le rendu énergie (`E10Dashboard.tsx`)
 - [ ] R4 — Extraire layout/nav partagé `AppShell` + `BottomNav` depuis la nav locale du dashboard, sans le rendre persistant (`E10Dashboard.tsx`, `App.tsx`)
 - [ ] R5 — Sélecteur pur `isOverloaded(energieDuJour, tachesPlanifiees)` + tests, non branché à l'UI
-- [ ] Confirmer la stratégie reset/migration des données V2 de Marie avant déploiement
+- [x] Stratégie reset/migration TRANCHÉE (2026-07-06) : Marie accepte le reset, pas de migration des données V2
 
 Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : `tsc -b` clean, schéma v3 en place, comportement identique V2
 
@@ -46,9 +46,11 @@ Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : `tsc -b` cl
 - [ ] D1 — Supprimer le bloc « Que faire maintenant ? » (`E10Dashboard.tsx`)
 - [ ] D2 — Supprimer la question « chose la plus importante » à la connexion (`E04FirstTask.tsx`, `actionImmediateRules.ts`)
 - [ ] D3 — « Tâche du jour » (renommé) au-dessus, « Planning du jour » en dessous, police agrandie (`E10Dashboard.tsx`)
-- [ ] D4 — Supprimer le segment de nav « Aujourd'hui » du dashboard — ⚠ après validation Q2 (`E10Dashboard.tsx`)
+- [ ] D4 — Supprimer le segment de nav « Aujourd'hui » du dashboard, sans remplacement (`E10Dashboard.tsx`)
+- [ ] D4b — Renommer la destination de création « Aujourd'hui » en « Tâche du jour » (même comportement, statut `today`) (`E21CreateTaskV2.tsx`, `E20Inbox.tsx`, `E22TaskDetail.tsx`)
 - [ ] P4a — Tâche terminée reste affichée (`E40Planning.tsx`, `E10Dashboard.tsx`)
 - [ ] P5 — Case vide du planning → proposer d'ajouter une tâche directement planifiée à ce créneau (`E40Planning.tsx`)
+- [ ] Q1 — Supprimer la limite de 3 tâches du jour (garde-fou, modale M04, messages associés) : `E10Dashboard.tsx`, `E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx`, `E24Today.tsx`
 
 Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : app nettoyée, planning sans état fantôme
 
@@ -113,8 +115,8 @@ Gate : [ ] tests verts · [ ] test manuel : parcourir tous les écrans, nav touj
 
 ## Q à trancher
 
-- [ ] Q2 — « Aujourd'hui » vs « Tâche du jour » (nav vs création) — **bloque D3/D4 (V3-1)**
-- [ ] Q1 — Limite de 3 tâches du jour : garder / augmenter / configurable — peut s'insérer en V3-1 si tranchée
+- [x] Q2 — TRANCHÉ (transcription l.202-274 + l.383-398) : retirer le segment nav « Aujourd'hui » sans remplacement (Todo/Planning/Listes inchangés) ET renommer l'option de création « Aujourd'hui » en « Tâche du jour » (même statut `today`, cohérence avec la section renommée en D3)
+- [x] Q1 — Limite de 3 tâches du jour : TRANCHÉ — supprimer la limite (2026-07-06)
 - [ ] Q3 — Choix de couleur à la connexion — à confirmer
 - [ ] Reset données — stratégie au bump Dexie v3 (Marie a des données V2) — bloque le déploiement de V3-0
 

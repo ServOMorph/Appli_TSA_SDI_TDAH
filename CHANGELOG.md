@@ -1,3 +1,13 @@
+## v3.0 — 2026-07-06
+
+### Contexte
+- Bascule vers la roadmap V3 (`roadmap_v3.md`, racine) — succède à `roadmap_v2.md` (archivée dans `Archives/`). Branche git `v3` créée à partir de `v2`.
+
+### Décidé
+- Q1 tranché avec Marie : suppression de la limite de 3 tâches/jour.
+- Q2 tranché : retirer le segment nav "Aujourd'hui" du dashboard sans remplacement, et renommer l'option de création "Aujourd'hui" en "Tâche du jour".
+- Stratégie de reset des données V2 tranchée : Marie accepte le reset, pas de migration nécessaire au bump Dexie v3.
+
 ## v2.1 — 2026-07-06
 
 ### Modifié

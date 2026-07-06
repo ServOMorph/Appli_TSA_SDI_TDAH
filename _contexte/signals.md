@@ -4,19 +4,6 @@
 
 ## Actions ouvertes
 
-### Phase 7 — Tests utilisateurs (1/5–10 sessions)
-- [P2|ouvert] Sessions test 2 à 5+ avec Marie et autres testeurs AuDHD
-  - fait quand: 5 à 10 sessions réalisées, retours consolidés dans fichier dédié
-  - réf: `Note de réunion/2026-06-29/synthese_reunion_marie_2026-06-29.md` + `Note de réunion/2026-06-29/analyse_conduite_visio_marie.md`
-
-### V2 — En cours (clôture, branche `v2`)
-- [P2|ouvert] Phase V2-10 (Consolidation V2 & 2e vague de tests) — reste : mode offline (13.2), doc V2, déploiement Netlify
-  - fait quand: mode offline retesté, doc V2 rédigée, déployé sur Netlify
-  - réf: `Archives/roadmap_v2.md` Phase V2-10 et § "Constats test manuel V2-10 (session 2026-07-06)"
-- [P3|ouvert] Ajouter un champ nom de profil à l'onboarding (`E02Profile` : choix de type de profil seulement, aucune saisie de nom)
-  - fait quand: décision produit prise (implémenter ou explicitement abandonner)
-  - réf: `Archives/roadmap_v2.md` § "Constats test manuel V2-10" sous-section "Fonctionnalités manquantes / à implémenter"
-
 ### V3 — Démarrage (branche `v3`, post-visio Marie 2026-07-06)
 - [P1|ouvert] Démarrer Phase V3-0 (refacto préalable) — toutes les décisions bloquantes sont levées (Q1, Q2, reset données)
   - Contenu V3-0 : constantes/schéma énergie (Dexie v3), composant `EnergyDisplay`, extraction `AppShell`/`BottomNav`, sélecteur `isOverloaded` pur. Détail complet dans `roadmap_v3.md`.

@@ -22,7 +22,7 @@ describe('E04FirstTask', () => {
     await userEvent.type(screen.getByRole('textbox', { name: 'Titre de la tâche' }), 'Appeler le médecin')
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
     expect(ctx.addTask).toHaveBeenCalledWith('Appeler le médecin')
-    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+    expect(ctx.completeOnboarding).toHaveBeenCalled()
   })
 
   it('navigue vers dashboard sans tâche si champ vide', async () => {
@@ -30,7 +30,7 @@ describe('E04FirstTask', () => {
     renderWithApp(<E04FirstTask />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
     expect(ctx.addTask).not.toHaveBeenCalled()
-    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+    expect(ctx.completeOnboarding).toHaveBeenCalled()
   })
 
   it('navigue vers dashboard via Ignorer', async () => {
@@ -38,7 +38,7 @@ describe('E04FirstTask', () => {
     renderWithApp(<E04FirstTask />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Ignorer' }))
     expect(ctx.addTask).not.toHaveBeenCalled()
-    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+    expect(ctx.completeOnboarding).toHaveBeenCalled()
   })
 
   it('soumet la tâche avec la touche Entrée', async () => {
@@ -47,6 +47,6 @@ describe('E04FirstTask', () => {
     const input = screen.getByRole('textbox', { name: 'Titre de la tâche' })
     await userEvent.type(input, 'Faire la vaisselle{Enter}')
     expect(ctx.addTask).toHaveBeenCalledWith('Faire la vaisselle')
-    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+    expect(ctx.completeOnboarding).toHaveBeenCalled()
   })
 })

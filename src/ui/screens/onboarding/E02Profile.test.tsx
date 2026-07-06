@@ -15,9 +15,9 @@ describe('E02Profile', () => {
     expect(screen.queryByText('26–40 ans')).toBeNull()
   })
 
-  it('affiche le bouton Ignorer', () => {
+  it('n\'affiche pas de bouton Ignorer', () => {
     renderWithApp(<E02Profile />)
-    expect(screen.getByRole('button', { name: 'Ignorer' })).toBeDefined()
+    expect(screen.queryByRole('button', { name: 'Ignorer' })).toBeNull()
   })
 
   it('crée un utilisateur et navigue vers energy au clic sur un profil', async () => {
@@ -25,14 +25,6 @@ describe('E02Profile', () => {
     renderWithApp(<E02Profile />, ctx)
     await userEvent.click(screen.getByText('Étudiant'))
     expect(ctx.createUser).toHaveBeenCalledWith('student')
-    expect(ctx.goTo).toHaveBeenCalledWith('energy')
-  })
-
-  it('navigue vers energy via Ignorer avec profil adult par défaut', async () => {
-    const ctx = makeAppContext()
-    renderWithApp(<E02Profile />, ctx)
-    await userEvent.click(screen.getByRole('button', { name: 'Ignorer' }))
-    expect(ctx.createUser).toHaveBeenCalledWith('adult')
     expect(ctx.goTo).toHaveBeenCalledWith('energy')
   })
 })

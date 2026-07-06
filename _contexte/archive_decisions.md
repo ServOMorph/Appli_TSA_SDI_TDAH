@@ -1,5 +1,11 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-01 (archivé depuis contexte.md 2026-07-06)
+- V2-10 démarrée (chantier dead code/couverture) — suppression `TASK_TODAY_MAX`/`canAddToToday` (V1, jamais appliqués) ; config coverage corrigée (exclusion `dist`/`e2e`), couverture réelle 95.48% (seuil 85% dépassé) ; `completeTaskV2`/`moveTaskToLaterV2`/`toggleEssentialV2` (V2) conservés mais identifiés comme trou fonctionnel non câblé à l'UI, décision produit différée.
+
+## 2026-07-02 (archivé depuis contexte.md 2026-07-06)
+- Fonctionnalité Routines (V2-8) retirée intégralement — Marie n'avait jamais demandé d'onglet dédié (maquette dessinée = nav Todo/Planifier/Listes ; ses notes citent "routines" comme contenu de liste, pas une entité séparée). Code, tests, tables Dexie supprimés.
+
 ## 2026-07-01 (archivé depuis contexte.md 2026-07-05 session 3)
 - V2-9 close (mécanique + TM-01 à TM-06) — icône agenda (TopBar) + bouton "Planifier"/"Listes" sur le dashboard, bouton d'ajout repointé vers `task-create-v2` (navigation orpheline résolue, zéro e2e cassé) ; section "Planning du jour" (mini, TaskV2+Routine) avec masquage `essential=false` en surcharge, sans migrer `todayTasks` V1 + 396/396 tests. Déblocage en cascade : V2-7 (12 TM) et V2-8 (TM-07/08) validés dans la foulée.
 

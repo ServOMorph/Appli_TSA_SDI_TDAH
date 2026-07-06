@@ -1,3 +1,17 @@
+## v0.40 — 2026-07-06
+
+### Modifié
+- Onboarding : un utilisateur qui quitte l'app avant d'atteindre le dashboard repart de zéro à la prochaine ouverture (`User.onboarding_completed`, `completeOnboarding`) au lieu de reprendre directement sur le dashboard.
+- Écran de choix de profil (`E02Profile`) : bouton "Ignorer" retiré, sélection d'un profil désormais obligatoire.
+
+### Ajouté
+- Plan de test manuel V2 (`plan_test_manuel_v2.md`) : 13 sections, ~65 cas, basé sur les écrans réellement implémentés.
+
+### Corrigé
+- Écarts constatés lors du passage du plan de test consolidés dans `roadmap_v2.md` § "Constats test manuel V2-10" : 4 bugs confirmés (tri "Planning du jour", rattachement de tâche à la création de liste, absence de détection de conflit de créneau, perte de sous-tâches à la conversion Todo→Planifier/Liste), 2 décisions produit à prendre, 4 fonctionnalités manquantes, 2 demandes de nettoyage UI, 10 points à retester.
+
+---
+
 ## v0.39 — 2026-07-05
 
 ### Modifié

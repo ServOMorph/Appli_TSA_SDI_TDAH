@@ -29,6 +29,7 @@ describe('E111Profile', () => {
       currentUser: {
         id: '1',
         profile_type: 'audhd',
+        onboarding_completed: true,
         created_at: '',
         updated_at: '',
       },

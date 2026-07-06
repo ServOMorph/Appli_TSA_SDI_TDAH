@@ -11,11 +11,14 @@ function ScreenIndicator() {
 }
 
 function CreateUserButton() {
-  const { createUser, goTo } = useApp()
+  const { createUser, goTo, completeOnboarding } = useApp()
   return (
-    <button onClick={async () => { await createUser('student'); goTo('energy') }}>
-      créer
-    </button>
+    <>
+      <button onClick={async () => { await createUser('student'); goTo('energy') }}>
+        créer
+      </button>
+      <button onClick={() => completeOnboarding()}>finir onboarding</button>
+    </>
   )
 }
 
@@ -96,6 +99,7 @@ describe('AppProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('screen').textContent).toBe('energy')
     })
+    await userEvent.click(screen.getByRole('button', { name: 'finir onboarding' }))
   })
 
   it('saveTodayEnergy enregistre l\'énergie sans erreur', async () => {
@@ -159,6 +163,7 @@ describe('AppProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('overload').textContent).toBe('false')
     })
+    await userEvent.click(screen.getByRole('button', { name: 'finir onboarding' }))
   })
 
   it('refreshDashboard s\'exécute sans erreur', async () => {

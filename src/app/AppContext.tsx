@@ -66,6 +66,7 @@ interface AppContextValue {
   taskDetailOrigin: Screen | null
   setTaskDetailOrigin: (s: Screen) => void
   createUser: (profile: ProfileType) => Promise<void>
+  completeOnboarding: () => Promise<void>
   saveTodayEnergy: (value: number) => Promise<void>
   skipTodayEnergy: () => Promise<void>
   addTask: (title: string) => Promise<void>
@@ -148,6 +149,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     async function init() {
       const user = await userRepo.getFirst()
       if (user) {
+        if (!user.onboarding_completed) {
+          await wipeAllData()
+          setLoading(false)
+          return
+        }
         setCurrentUser(user)
         const s = await settingsRepo.getByUserId(user.id)
         if (s) {
@@ -204,6 +210,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const user: User = {
       id: userId,
       profile_type: profile,
+      onboarding_completed: false,
       created_at: now,
       updated_at: now,
     }
@@ -470,7 +477,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     URL.revokeObjectURL(url)
   }
 
-  async function deleteAllData() {
+  async function wipeAllData() {
     await Promise.all([
       db.users.clear(),
       db.tasks.clear(),
@@ -492,6 +499,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLists([])
     setSelectedListId(null)
     setScreen('welcome')
+  }
+
+  async function deleteAllData() {
+    await wipeAllData()
+  }
+
+  async function completeOnboarding() {
+    if (!currentUser) return
+    const updated: User = { ...currentUser, onboarding_completed: true, updated_at: new Date().toISOString() }
+    await userRepo.update(updated)
+    setCurrentUser(updated)
+    setScreen('dashboard')
   }
 
   return (
@@ -518,6 +537,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         taskDetailOrigin,
         setTaskDetailOrigin,
         createUser,
+        completeOnboarding,
         saveTodayEnergy,
         skipTodayEnergy,
         addTask,

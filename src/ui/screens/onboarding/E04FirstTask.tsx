@@ -3,18 +3,18 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 
 export function E04FirstTask() {
-  const { addTask, goTo } = useApp()
+  const { addTask, completeOnboarding } = useApp()
   const [title, setTitle] = useState('')
 
   async function submit() {
     if (title.trim()) {
       await addTask(title.trim())
     }
-    goTo('dashboard')
+    await completeOnboarding()
   }
 
-  function skip() {
-    goTo('dashboard')
+  async function skip() {
+    await completeOnboarding()
   }
 
   return (

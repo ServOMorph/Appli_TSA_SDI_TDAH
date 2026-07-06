@@ -28,6 +28,7 @@ describe('AppDatabase', () => {
     const user = {
       id: 'user-1',
       profile_type: 'adult' as const,
+      onboarding_completed: true,
       created_at: '2026-06-24T00:00:00Z',
       updated_at: '2026-06-24T00:00:00Z',
     }

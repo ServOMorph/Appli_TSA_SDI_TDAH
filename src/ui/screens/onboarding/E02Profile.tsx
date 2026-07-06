@@ -1,5 +1,4 @@
 import { useApp } from '@/app/AppContext'
-import { Button } from '@/ui/components/Button'
 import type { ProfileType } from '@/domain/entities/user'
 
 const profiles: { value: ProfileType; label: string }[] = [
@@ -56,9 +55,6 @@ export function E02Profile() {
           </button>
         ))}
       </div>
-      <Button variant="secondary" onClick={() => { createUser('adult').then(() => goTo('energy')) }}>
-        Ignorer
-      </Button>
     </main>
   )
 }

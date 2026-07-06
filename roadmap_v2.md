@@ -161,6 +161,9 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [x] **[2026-07-03]** Écran Planning (`E40Planning`) revu suite à retour utilisateur direct : bouton "Valider" explicite (fin du "un clic = validation"), transport de la tâche active via `selectedTaskId` pour confirmer sa planification sans lister tout le backlog. Bouton "Planifier" du dashboard renommé "Planning". 348/348 tests unitaires, `tsc -b` clean ; **e2e non rejoués** (voir signals.md action P2)
 - [x] **[2026-07-03]** Bug racine SubTask corrigé : `toggleSubTask` n'était appelée nulle part dans l'UI (aucune sous-tâche jamais marquable terminée). Checkbox ajoutée dans `E22TaskDetail`/`E23Decompose` ; badge "X/Y" harmonisé sur Dashboard/`E20Inbox`/`E24Today` ; "Prochaine étape" ajoutée sur `E24Today` ; bouton "Voir le Todo" retiré de `E24Today`. 356/356 tests unitaires, `tsc -b` clean
 - [x] **[2026-07-05]** E2E relancés (`npx playwright test`) après accumulation de plusieurs sessions de changements non testés (Planning, SubTask, destinations de création, retrait `to_plan`) — **45/45 passent**, aucune régression. Les 3 échecs préexistants (`05-overload.spec.ts` T40/T44/T45, décalage heading/`<p>`) corrigés en réécrivant les assertions pour matcher le texte réel ("Mode surcharge actif")
+- [x] **[2026-07-06]** Comportement onboarding corrigé (reprise interrompue) : `User.onboarding_completed` ajouté, `completeOnboarding` (`AppContext.tsx`) appelée en fin d'onboarding ; un utilisateur incomplet au démarrage entraîne un reset complet vers `welcome`. Bouton "Ignorer" retiré de l'écran choix de profil (`E02Profile`) : sélection obligatoire. 345/345 tests unitaires, `tsc -b` clean.
+- [x] **[2026-07-06]** Plan de test manuel V2 (`plan_test_manuel_v2.md`) rédigé et passé intégralement — écarts consolidés ci-dessus (§ "Constats test manuel V2-10")
+- [ ] Corriger les bugs confirmés et trancher les décisions produit issus du test manuel (voir § "Constats test manuel V2-10" ci-dessus) avant déploiement
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
 - [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD
@@ -169,6 +172,47 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [ ] **Sortie** : V2 stable, couverte, validée par tests utilisateurs ; V1 toujours restaurable
 
 ---
+
+## Constats test manuel V2-10 (session 2026-07-06)
+
+Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploiement. Classés par nature d'action.
+
+### Bugs confirmés à corriger
+
+- Section "Planning du jour" du Dashboard (`E10Dashboard.tsx`, `todayPlanned.map`) n'est pas triée par heure (`scheduled_start`) — constat sur capture d'écran (ordre observé 15h/17h/16h au lieu de 15h/16h/17h). À corriger : trier `todayPlanned` par `scheduled_start` avant affichage.
+- Action "Liste" sans liste existante (tests manuels 4.3 et 5.7) → le bouton "Créer une liste" du sélecteur (modal "Choisir une liste") ne fait que naviguer vers l'écran Listes (`goTo('lists')`) sans conserver la tâche sélectionnée ; une fois la liste créée, la tâche n'y est jamais ajoutée. Concerne les deux points d'entrée : `E20Inbox.tsx` (action "Liste" sur une tâche Todo) et `E21CreateTaskV2.tsx` (destination "Mettre dans une liste"). À corriger : rattacher la tâche à la liste nouvellement créée (conserver la tâche en attente à travers la navigation ou proposer la création de liste directement dans la modale).
+- Aucune détection de conflit de créneau dans Planning (test manuel 6.8) — `scheduleTaskV2` (`taskRulesV2.ts`) et `E40Planning.tsx` ne vérifient pas si un créneau est déjà occupé par une autre tâche avant placement (superposition silencieuse constatée). À corriger : décider du comportement voulu (refus, remplacement avec confirmation, ou autoriser la superposition explicitement) puis l'implémenter.
+- Sous-tâches perdues lors d'une conversion Todo → Planifier/Liste (test manuel 4.6, confirmé) — `planTodoTask`/`moveTodoTaskToList` (`AppContext.tsx`) suppriment les `SubTask` liées à la `Task` V1 sans les recréer côté `TaskV2`/`ListItem`, sans confirmation ni avertissement utilisateur avant la perte.
+
+### Décisions produit à prendre
+
+- Revoir à quoi sert l'énergie dans l'appli (test manuel 10.2) — actuellement une seule valeur par jour (`todayEnergy`/`todayEnergyStatus`), écrasée à chaque nouvelle saisie (`saveTodayEnergy`, `AppContext.tsx`), sans historique ni lien réel avec le mode surcharge au-delà du filtrage `essential` jamais câblé (cf. trou fonctionnel taskV2 déjà noté). Clarifier l'usage voulu avant de définir le comportement attendu pour plusieurs check-in le même jour.
+- Planning : que faire de l'écran quand aucune tâche n'est planifiable (test manuel 6.3, constat sur capture d'écran) — cliquer sur un créneau vide affiche "Placer à Xh00" + "Aucune tâche à planifier. Ajoutez une tâche et choisissez 'Planifier'." Garder tel quel, reformuler, ou proposer une action directe (raccourci vers la création de tâche) ?
+
+### Fonctionnalités manquantes / à implémenter
+
+- Ajouter un champ nom de profil à l'onboarding — l'écran `E02Profile` ne propose actuellement qu'un choix de type de profil (Adolescent/Étudiant/Adulte), aucune saisie de nom.
+- Écran détail tâche (`E22TaskDetail`, actions Décomposer/Terminer/Supprimer) : ajouter la possibilité de planifier la tâche (la sortir d'Aujourd'hui) ou de l'ajouter à une liste, directement depuis cet écran (constat sur capture d'écran).
+- Suppression d'une liste entière (test manuel 9.5) — `deleteList` (`AppContext.tsx`) existe mais n'est câblée dans aucun écran (`E60Lists.tsx`/`E61ListDetail.tsx`), donc aucune confirmation possible. Décision produit : ajouter la suppression de liste (avec confirmation si elle contient des éléments) ou accepter l'absence de cette fonctionnalité.
+- Modification du profil (test manuel 11.1) — l'écran Profil des paramètres (`E111Profile.tsx`) est en lecture seule. Décision produit : ajouter la modification, ou accepter que cet écran reste informatif. Note annexe : les libellés affichés (`profileLabels` : audhd/asd/adhd) ne correspondent pas aux valeurs réelles de `ProfileType` (teenager/student/adult) — le profil affiche systématiquement la valeur brute non traduite.
+
+### Nettoyage UI demandé
+
+- Supprimer la section "Organisation" des Paramètres (`E110Settings.tsx` entrée "Organisation", écran `E114Organisation.tsx`).
+- Supprimer l'icône agenda (Planning) de la `TopBar` (`TopBar.tsx`, `aria-label="Planning"`, `onPlanningClick`) — redondante avec le bouton "Planning" de la nav segmentée du Dashboard.
+
+### À (re)tester avant déploiement
+
+- Test manuel 2.4 : badge "X/Y" du Dashboard sur une tâche décomposée en sous-tâches — compteur correspondant au nombre réel de sous-tâches cochées.
+- Test manuel 2.6 : Dashboard sans aucune tâche — état vide clair, sans section cassée.
+- Test manuel 6.7 : ouverture du Planning à l'heure courante — scroll positionné sur l'heure actuelle.
+- Test manuel 6.10 : placer une tâche à un horaire limite (00h00, 23h00) — affichage correct, sans créneau hors grille.
+- Test manuel 7.3 : écran Aujourd'hui (`E24Today`) sans aucune tâche prévue — état vide clair.
+- Mode sombre de l'UI (`settings.dark_mode`, activable via `E112Accessibility.tsx`) — lisibilité et contraste sur tous les écrans.
+- Test manuel 11.2 : modification des réglages d'accessibilité (`E112Accessibility`) et de stimulation (`E113Stimulation`) — effet visible immédiatement dans l'UI.
+- Test manuel 11.5 : export des données (`E117Export.tsx`) sur iPhone — comportement du téléchargement/partage en environnement iOS (Safari/PWA).
+- Viabilité du fichier JSON généré par l'export de données (`E117Export.tsx`/`exportData`) — JSON valide, structure cohérente avec les données réelles.
+- Test manuel 13.2 : utilisation de l'app en coupant la connexion réseau — fonctionnement normal (offline-first).
 
 ## Reporté après V2
 

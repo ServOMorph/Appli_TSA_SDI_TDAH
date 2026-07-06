@@ -5,19 +5,19 @@ import { Button } from '@/ui/components/Button'
 const SPOON_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 export function E03Energy() {
-  const { saveTodayEnergy, skipTodayEnergy, goTo } = useApp()
+  const { saveTodayEnergy, skipTodayEnergy, completeOnboarding } = useApp()
   const [selected, setSelected] = useState<number | null>(null)
 
   async function confirm() {
     if (selected !== null) {
       await saveTodayEnergy(selected)
     }
-    goTo('first-task')
+    await completeOnboarding()
   }
 
   async function skip() {
     await skipTodayEnergy()
-    goTo('first-task')
+    await completeOnboarding()
   }
 
   return (

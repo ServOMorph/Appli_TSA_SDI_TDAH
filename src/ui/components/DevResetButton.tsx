@@ -5,7 +5,6 @@ const SCREEN_CODES: Record<Screen, string> = {
   welcome: 'E01',
   profile: 'E02',
   energy: 'E03',
-  'first-task': 'E04',
   dashboard: 'E10',
   inbox: 'E20',
   'task-create-v2': 'E21v2',

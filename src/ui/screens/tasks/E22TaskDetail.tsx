@@ -166,14 +166,13 @@ export function E22TaskDetail() {
     taskDetailOrigin,
     goTo,
     moveTask,
-    planTodoTask,
+    startPlanTask,
     moveTodoTaskToList,
     createList,
   } = useApp()
 
   const [subTasks, setSubTasks] = useState<SubTask[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [showReplaceModal, setShowReplaceModal] = useState(false)
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
   const [subtaskWarningAction, setSubtaskWarningAction] = useState<'plan' | 'list' | null>(null)
@@ -242,24 +241,12 @@ export function E22TaskDetail() {
 
   async function handleMoveToToday() {
     if (!selectedTaskId) return
-    if (todayTasks.length >= 3) {
-      setShowReplaceModal(true)
-    } else {
-      await moveTask(selectedTaskId, 'today')
-    }
-  }
-
-  async function handleReplace(replacedId: string) {
-    if (!selectedTaskId) return
-    await moveTask(replacedId, 'inbox')
     await moveTask(selectedTaskId, 'today')
-    setShowReplaceModal(false)
   }
 
-  async function handlePlan() {
-    if (!selectedTaskId) return
-    const newTaskId = await planTodoTask(selectedTaskId)
-    selectTask(newTaskId)
+  function handlePlan() {
+    if (!selectedTaskId || !task) return
+    startPlanTask(task.title, selectedTaskId)
     goTo('planning')
   }
 
@@ -361,7 +348,7 @@ export function E22TaskDetail() {
         </Button>
         {task.status !== 'today' && (
           <Button fullWidth onClick={handleMoveToToday}>
-            Aujourd'hui
+            Tâche du jour
           </Button>
         )}
         <Button fullWidth onClick={handleClickPlan}>
@@ -448,32 +435,6 @@ export function E22TaskDetail() {
               Continuer
             </Button>
             <Button variant="secondary" fullWidth onClick={() => setSubtaskWarningAction(null)}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {showReplaceModal && (
-        <div role="dialog" aria-modal="true" aria-label="Remplacer une tâche" style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Choisir la tâche à remplacer</h2>
-            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-              Vous avez déjà 3 tâches aujourd'hui. Sélectionnez celle à déplacer vers le Todo :
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-              {todayTasks.map((t) => (
-                <button
-                  key={t.id}
-                  aria-label={`Remplacer par ${t.title}`}
-                  style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
-                  onClick={() => handleReplace(t.id)}
-                >
-                  {t.title}
-                </button>
-              ))}
-            </div>
-            <Button variant="secondary" fullWidth onClick={() => setShowReplaceModal(false)}>
               Annuler
             </Button>
           </div>

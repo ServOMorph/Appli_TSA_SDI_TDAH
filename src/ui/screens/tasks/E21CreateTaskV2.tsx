@@ -39,7 +39,7 @@ const inputStyle: React.CSSProperties = {
 
 const DESTINATIONS: { value: Destination; label: string }[] = [
   { value: 'todo', label: 'Todo' },
-  { value: 'today', label: "Aujourd'hui" },
+  { value: 'today', label: 'Tâche du jour' },
   { value: 'planned', label: 'Planifier' },
   { value: 'list', label: 'Mettre dans une liste' },
 ]
@@ -87,19 +87,16 @@ export function E21CreateTaskV2() {
     createTaskV2Dest,
     createTaskInbox,
     goTo,
-    selectTask,
     lists,
     addListItem,
-    todayTasks,
     addTask,
-    moveTask,
     createList,
     selectList,
+    startPlanTask,
   } = useApp()
   const [title, setTitle] = useState('')
   const [destination, setDestination] = useState<Destination | null>(null)
   const [showListPicker, setShowListPicker] = useState(false)
-  const [showTodayReplace, setShowTodayReplace] = useState(false)
   const [newListName, setNewListName] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
@@ -116,21 +113,17 @@ export function E21CreateTaskV2() {
       return
     }
     if (destination === 'today') {
-      if (todayTasks.length >= 3) {
-        setShowTodayReplace(true)
-        return
-      }
       await addTask(trimmed)
       goTo('today')
       return
     }
-    const newTaskId = await createTaskV2Dest(trimmed, destination)
     if (destination === 'planned') {
-      selectTask(newTaskId)
+      startPlanTask(trimmed)
       goTo('planning')
-    } else {
-      goTo('inbox')
+      return
     }
+    await createTaskV2Dest(trimmed, destination)
+    goTo('inbox')
   }
 
   async function handleChooseList(listId: string) {
@@ -151,15 +144,6 @@ export function E21CreateTaskV2() {
     setShowListPicker(false)
     selectList(listId)
     goTo('list-detail')
-  }
-
-  async function handleReplaceToday(replacedId: string) {
-    const trimmed = title.trim()
-    if (!trimmed) return
-    await moveTask(replacedId, 'inbox')
-    await addTask(trimmed)
-    setShowTodayReplace(false)
-    goTo('today')
   }
 
   return (
@@ -252,31 +236,6 @@ export function E21CreateTaskV2() {
         </div>
       )}
 
-      {showTodayReplace && (
-        <div role="dialog" aria-modal="true" aria-label="Remplacer une tâche" style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Choisir la tâche à remplacer</h2>
-            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-              Vous avez déjà 3 tâches aujourd'hui. Sélectionnez celle à déplacer vers le Todo :
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-              {todayTasks.map((t) => (
-                <button
-                  key={t.id}
-                  aria-label={`Remplacer par ${t.title}`}
-                  style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
-                  onClick={() => handleReplaceToday(t.id)}
-                >
-                  {t.title}
-                </button>
-              ))}
-            </div>
-            <Button variant="secondary" fullWidth onClick={() => setShowTodayReplace(false)}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
     </main>
   )
 }

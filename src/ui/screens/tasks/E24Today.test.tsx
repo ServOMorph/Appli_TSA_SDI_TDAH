@@ -25,24 +25,21 @@ describe('E24Today', () => {
       renderWithApp(<E24Today />)
       expect(screen.getByText("Aucune tâche sélectionnée aujourd'hui.")).toBeDefined()
     })
-
-    it('n\'affiche pas le message limite', () => {
-      renderWithApp(<E24Today />)
-      expect(screen.queryByText(/3 tâches aujourd'hui/)).toBeNull()
-    })
   })
 
-  describe('état limite (D24B)', () => {
-    it('affiche le message limite quand 3 tâches', () => {
+  describe('sans limite de nombre (Q1)', () => {
+    it("n'affiche pas de message de limite même avec plus de 3 tâches", () => {
       const ctx = makeAppContext({
         todayTasks: [
           makeTask({ id: '1', title: 'T1' }),
           makeTask({ id: '2', title: 'T2' }),
           makeTask({ id: '3', title: 'T3' }),
+          makeTask({ id: '4', title: 'T4' }),
         ],
       })
       renderWithApp(<E24Today />, ctx)
-      expect(screen.getByText("Vous avez déjà 3 tâches aujourd'hui.")).toBeDefined()
+      expect(screen.queryByText(/3 tâches aujourd'hui/)).toBeNull()
+      expect(screen.getByText('T4')).toBeDefined()
     })
   })
 

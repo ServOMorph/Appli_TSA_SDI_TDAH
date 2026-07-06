@@ -25,8 +25,6 @@ const backBtnStyle: React.CSSProperties = {
 export function E24Today() {
   const { todayTasks, todaySubTasksMap, selectTask, goTo, moveTask, completeTask } = useApp()
 
-  const isLimit = todayTasks.length >= 3
-
   function openDetail(taskId: string) {
     selectTask(taskId)
     goTo('task-detail')
@@ -39,15 +37,6 @@ export function E24Today() {
       </button>
 
       <h1 style={{ margin: 0 }}>Aujourd'hui</h1>
-
-      {isLimit && (
-        <p
-          role="status"
-          style={{ color: 'var(--color-text-muted)', margin: 0, fontSize: '0.875rem' }}
-        >
-          Vous avez déjà 3 tâches aujourd'hui.
-        </p>
-      )}
 
       {todayTasks.length === 0 ? (
         <p aria-live="polite">Aucune tâche sélectionnée aujourd'hui.</p>

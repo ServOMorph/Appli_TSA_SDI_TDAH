@@ -2,7 +2,6 @@ import { AppProvider, useApp } from '@/app/AppContext'
 import { E01Welcome } from '@/ui/screens/onboarding/E01Welcome'
 import { E02Profile } from '@/ui/screens/onboarding/E02Profile'
 import { E03Energy } from '@/ui/screens/onboarding/E03Energy'
-import { E04FirstTask } from '@/ui/screens/onboarding/E04FirstTask'
 import { E10Dashboard } from '@/ui/screens/dashboard/E10Dashboard'
 import { E20Inbox } from '@/ui/screens/tasks/E20Inbox'
 import { E21CreateTaskV2 } from '@/ui/screens/tasks/E21CreateTaskV2'
@@ -52,8 +51,6 @@ function AppScreens() {
         return <E02Profile />
       case 'energy':
         return <E03Energy />
-      case 'first-task':
-        return <E04FirstTask />
       case 'dashboard':
         return <E10Dashboard />
       case 'inbox':

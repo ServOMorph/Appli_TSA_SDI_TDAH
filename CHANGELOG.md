@@ -1,3 +1,15 @@
+## v3.2 — 2026-07-06
+
+### Ajouté
+- Phase V3-1 (bugs + nettoyage UI) codée intégralement : B1 (plus de tâche `planned` fantôme non schedulée en cas d'abandon de la planification), B2 (contraste des cases du Planning en thème clair), B3 (vérifié non reproductible), D1 (bloc "Que faire maintenant ?" retiré), D2 (question "chose la plus importante" retirée de l'onboarding), D3 (section "Tâche du jour" réordonnée au-dessus de "Planning du jour", police agrandie), D4/D4b (segment de nav "Aujourd'hui" retiré, destination de création renommée "Tâche du jour"), P4a (tâche planifiée terminée reste affichée), P5 (case vide du Planning propose d'ajouter une tâche directement plutôt qu'une liste de backlog), Q1 (limite de 3 tâches du jour et modale associée retirées). 330/330 tests unitaires, `tsc -b` clean, `eslint` 0 erreur.
+- `plan_test_manuel_v3-1.md` : plan de test manuel dédié à la Phase V3-1 (27 cas).
+
+### Modifié
+- `AppContext.tsx` : `pendingPlanTask`/`startPlanTask`/`clearPendingPlanTask`/`schedulePendingTask` remplacent `planTodoTask`/`getUnscheduledPlannedTasks` — une tâche en cours de planification n'est plus persistée avant qu'un créneau soit validé (fix B1).
+
+### Retiré
+- Écran `E04FirstTask` et `actionImmediateRules.ts` (devenus morts après D1/D2).
+
 ## v3.1 — 2026-07-06
 
 ### Ajouté

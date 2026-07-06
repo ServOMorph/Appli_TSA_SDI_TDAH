@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E21CreateTaskV2 } from './E21CreateTaskV2'
 
@@ -13,7 +13,7 @@ describe('E21CreateTaskV2', () => {
   it('affiche les 4 destinations', () => {
     renderWithApp(<E21CreateTaskV2 />)
     expect(screen.getByRole('button', { name: 'Todo' })).toBeDefined()
-    expect(screen.getByRole('button', { name: "Aujourd'hui" })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Tâche du jour' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Planifier' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Mettre dans une liste' })).toBeDefined()
   })
@@ -50,14 +50,14 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it('chemin Planifier : crée avec status planned, sélectionne la tâche et navigue vers planning', async () => {
-    const ctx = makeAppContext({ createTaskV2Dest: vi.fn().mockResolvedValue('tv2-1') })
+  it('chemin Planifier : place la tâche en attente (sans la persister) et navigue vers planning', async () => {
+    const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche planifiée')
     await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.createTaskV2Dest).toHaveBeenCalledWith('Tâche planifiée', 'planned')
-    expect(ctx.selectTask).toHaveBeenCalledWith('tv2-1')
+    expect(ctx.startPlanTask).toHaveBeenCalledWith('Tâche planifiée')
+    expect(ctx.createTaskV2Dest).not.toHaveBeenCalled()
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
@@ -75,31 +75,12 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
   })
 
-  it("chemin Aujourd'hui : crée directement la tâche today et navigue vers today", async () => {
+  it("chemin Tâche du jour : crée directement la tâche today et navigue vers today", async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche du jour')
-    await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
+    await userEvent.click(screen.getByRole('button', { name: 'Tâche du jour' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.addTask).toHaveBeenCalledWith('Tâche du jour')
-    expect(ctx.goTo).toHaveBeenCalledWith('today')
-  })
-
-  it("chemin Aujourd'hui à la limite : propose un remplacement avant de créer", async () => {
-    const ctx = makeAppContext({
-      todayTasks: [
-        { id: 't1', title: 'Tâche 1', status: 'today', position: 0, created_at: '', updated_at: '', completed_at: null },
-        { id: 't2', title: 'Tâche 2', status: 'today', position: 1, created_at: '', updated_at: '', completed_at: null },
-        { id: 't3', title: 'Tâche 3', status: 'today', position: 2, created_at: '', updated_at: '', completed_at: null },
-      ],
-    })
-    renderWithApp(<E21CreateTaskV2 />, ctx)
-    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche du jour')
-    await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
-    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.addTask).not.toHaveBeenCalled()
-    await userEvent.click(screen.getByRole('button', { name: 'Remplacer par Tâche 2' }))
-    expect(ctx.moveTask).toHaveBeenCalledWith('t2', 'inbox')
     expect(ctx.addTask).toHaveBeenCalledWith('Tâche du jour')
     expect(ctx.goTo).toHaveBeenCalledWith('today')
   })

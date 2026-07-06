@@ -41,19 +41,21 @@ Gate : [x] tests verts (353/353) · [ ] test manuel (à valider par l'utilisateu
 
 ## Phase V3-1 — Bugs + nettoyage UI
 
-- [ ] B1 — Abandonner la planification ne persiste plus de tâche `planned` non schedulée : créer la tâche au moment de l'assignation (`AppContext.tsx`, `E21CreateTaskV2.tsx`, `E40Planning.tsx`)
-- [ ] B2 — Cases du planning visibles en mode clair mobile : contraste/bordure (`E40Planning.tsx`)
-- [ ] B3 — Reproduire « ajouter depuis Todo re-propose de faire la tâche » ; corriger si confirmé (`E20Inbox.tsx`, `E21CreateTaskV2.tsx`)
-- [ ] D1 — Supprimer le bloc « Que faire maintenant ? » (`E10Dashboard.tsx`)
-- [ ] D2 — Supprimer la question « chose la plus importante » à la connexion (`E04FirstTask.tsx`, `actionImmediateRules.ts`)
-- [ ] D3 — « Tâche du jour » (renommé) au-dessus, « Planning du jour » en dessous, police agrandie (`E10Dashboard.tsx`)
-- [ ] D4 — Supprimer le segment de nav « Aujourd'hui » du dashboard, sans remplacement (`E10Dashboard.tsx`)
-- [ ] D4b — Renommer la destination de création « Aujourd'hui » en « Tâche du jour » (même comportement, statut `today`) (`E21CreateTaskV2.tsx`, `E20Inbox.tsx`, `E22TaskDetail.tsx`)
-- [ ] P4a — Tâche terminée reste affichée (`E40Planning.tsx`, `E10Dashboard.tsx`)
-- [ ] P5 — Case vide du planning → proposer d'ajouter une tâche directement planifiée à ce créneau (`E40Planning.tsx`)
-- [ ] Q1 — Supprimer la limite de 3 tâches du jour (garde-fou, modale M04, messages associés) : `E10Dashboard.tsx`, `E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx`, `E24Today.tsx`
+- [x] B1 — Abandonner la planification ne persiste plus de tâche `planned` non schedulée : créer la tâche au moment de l'assignation (`AppContext.tsx`, `E21CreateTaskV2.tsx`, `E40Planning.tsx`) — refonte : la tâche en attente (`pendingPlanTask`) n'est plus écrite en base tant que l'utilisateur n'a pas choisi un créneau (`schedulePendingTask`) ; retour arrière = `clearPendingPlanTask`
+- [x] B2 — Cases du planning visibles en mode clair mobile : contraste/bordure (`E40Planning.tsx`) — bordures des créneaux passées de `--color-border` à `--color-text-muted` (contraste insuffisant en clair)
+- [x] B3 — Reproduire « ajouter depuis Todo re-propose de faire la tâche » ; corriger si confirmé (`E20Inbox.tsx`, `E21CreateTaskV2.tsx`) — non reproduit : le flux de création propose déjà les 4 destinations (dont Todo) sans imposer « faire la tâche », aucun changement nécessaire
+- [x] D1 — Supprimer le bloc « Que faire maintenant ? » (`E10Dashboard.tsx`) — supprimé avec `actionImmediateRules.ts` (devenu mort, seul appelant)
+- [x] D2 — Supprimer la question « chose la plus importante » à la connexion (`E04FirstTask.tsx`, `actionImmediateRules.ts`) — écran `E04FirstTask` retiré, `E03Energy` termine directement l'onboarding
+- [x] D3 — « Tâche du jour » (renommé) au-dessus, « Planning du jour » en dessous, police agrandie (`E10Dashboard.tsx`)
+- [x] D4 — Supprimer le segment de nav « Aujourd'hui » du dashboard, sans remplacement (`E10Dashboard.tsx`, `BottomNav.tsx`)
+- [x] D4b — Renommer la destination de création « Aujourd'hui » en « Tâche du jour » (même comportement, statut `today`) (`E21CreateTaskV2.tsx`, `E20Inbox.tsx`, `E22TaskDetail.tsx`)
+- [x] P4a — Tâche terminée reste affichée (`E40Planning.tsx`, `E10Dashboard.tsx`) — `getPlannedTasksForDate` n'exclut plus les tâches `completed`
+- [x] P5 — Case vide du planning → proposer d'ajouter une tâche directement planifiée à ce créneau (`E40Planning.tsx`)
+- [x] Q1 — Supprimer la limite de 3 tâches du jour (garde-fou, modale M04, messages associés) : `E10Dashboard.tsx`, `E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx`, `E24Today.tsx`
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : app nettoyée, planning sans état fantôme
+Gate : [x] tests verts (330/330) · [ ] test manuel (à valider par l'utilisateur) · [ ] doc · [x] sortie : app nettoyée, planning sans état fantôme
+
+> **Effet de bord D1 :** en mode surcharge, le dashboard n'affichait déjà plus la section « Tâches du jour », mais gardait le bloc « Que faire maintenant ? » comme seule tâche visible (décision du 2026-07-05). En supprimant ce bloc sans condition (D1, demande explicite Marie du 2026-07-06), le mode surcharge n'affiche plus aucune tâche — seuls restent le bandeau d'état et le Centre récupération. À valider avec l'utilisateur lors du test manuel.
 
 ---
 

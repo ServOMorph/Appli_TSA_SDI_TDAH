@@ -7,7 +7,6 @@ import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
 import { BottomNav } from '@/ui/components/BottomNav'
-import { getActionImmediate } from '@/domain/rules/actionImmediateRules'
 import {
   DndContext,
   PointerSensor,
@@ -31,10 +30,15 @@ function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-function planningChipStyle(essential: boolean): React.CSSProperties {
+function planningChipStyle(essential: boolean, completed: boolean): React.CSSProperties {
   return {
-    background: essential ? 'var(--color-primary)' : 'color-mix(in srgb, var(--color-primary) 18%, transparent)',
-    color: essential ? '#fff' : 'var(--color-text)',
+    background: completed
+      ? 'color-mix(in srgb, var(--color-success) 25%, transparent)'
+      : essential
+        ? 'var(--color-primary)'
+        : 'color-mix(in srgb, var(--color-primary) 18%, transparent)',
+    color: completed ? 'var(--color-text-muted)' : essential ? '#fff' : 'var(--color-text)',
+    textDecoration: completed ? 'line-through' : 'none',
     border: 'none',
     borderRadius: 'var(--radius-sm)',
     padding: '6px 10px',
@@ -72,19 +76,19 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
         cursor: 'grab',
       }}
     >
-      <Card style={{ padding: 'var(--spacing-xs)' }}>
+      <Card style={{ padding: 'var(--spacing-12)' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: 'var(--spacing-xs)',
+            gap: 'var(--spacing-sm)',
           }}
         >
           <span
             aria-hidden
             style={{
-              fontSize: '0.75rem',
+              fontSize: '0.9rem',
               color: 'var(--color-text-muted)',
               flexShrink: 0,
               lineHeight: 1,
@@ -102,7 +106,8 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
               border: 'none',
               cursor: 'pointer',
               color: 'var(--color-text)',
-              fontSize: '0.75rem',
+              fontSize: '1.1rem',
+              fontWeight: 600,
               padding: 0,
               textAlign: 'left',
               flex: 1,
@@ -113,7 +118,7 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
           {total > 0 && (
             <span
               aria-label={`${done} sur ${total} étapes`}
-              style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', flexShrink: 0 }}
+              style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', flexShrink: 0 }}
             >
               {done}/{total}
             </span>
@@ -141,11 +146,11 @@ export function E10Dashboard() {
     completeV2Task,
   } = useApp()
 
-  const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks.slice(0, 3))
+  const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks)
   const [todayPlanned, setTodayPlanned] = useState<TaskV2[]>([])
 
   useEffect(() => {
-    setVisibleOrder(todayTasks.slice(0, 3))
+    setVisibleOrder(todayTasks)
   }, [todayTasks])
 
   useEffect(() => {
@@ -188,10 +193,9 @@ export function E10Dashboard() {
       position: i,
     }))
     setVisibleOrder(newVisible)
-    reorderTodayTasks([...newVisible, ...todayTasks.slice(3)].map((t) => t.id))
+    reorderTodayTasks(newVisible.map((t) => t.id))
   }
 
-  const action = getActionImmediate([...visibleOrder, ...todayTasks.slice(3)], todaySubTasksMap)
   const isEmpty = todayTasks.length === 0
 
   return (
@@ -226,81 +230,74 @@ export function E10Dashboard() {
         </Card>
       )}
 
-      <section aria-label="Action immédiate">
-        <h2>Que faire maintenant ?</h2>
-        <Card style={{ padding: 'var(--spacing-12)' }}>
-          {action.type === 'task' && action.task ? (
-            <button
-              onClick={() => openDetail(action.task!.id)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                textAlign: 'left',
-                width: '100%',
-              }}
-            >
-              <p
-                style={{
-                  fontWeight: 600,
-                  color: 'var(--color-text)',
-                  fontSize: '1.1rem',
-                  margin: 0,
-                }}
-              >
-                {action.task.title}
-              </p>
-              {action.nextSubTask && (
-                <p
-                  style={{
-                    margin: '6px 0 0',
-                    fontSize: '0.875rem',
-                    color: 'var(--color-text-muted)',
-                  }}
-                >
-                  Prochaine étape : {action.nextSubTask.title}
-                </p>
-              )}
-            </button>
+      {!overloadMode && (
+        <section aria-label="Tâche du jour">
+          <h2 style={{ fontSize: '1.1rem' }}>Tâche du jour</h2>
+          {isEmpty ? (
+            <p>Rien à faire aujourd'hui</p>
           ) : (
-            <p>{isEmpty ? 'Rien à faire aujourd\'hui' : 'Que souhaitez-vous ajouter ?'}</p>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={visibleOrder.map((t) => t.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                  {visibleOrder.map((task) => (
+                    <SortableTaskItem
+                      key={task.id}
+                      task={task}
+                      subs={todaySubTasksMap[task.id] ?? []}
+                      onOpen={openDetail}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
-        </Card>
-      </section>
+        </section>
+      )}
 
       {!overloadMode && (
       <section aria-label="Planning du jour">
         <h2>Planning du jour</h2>
         {hasPlanningToday ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-            {todayPlanned.map((task) => (
+            {todayPlanned.map((task) => {
+              const completed = task.status === 'completed'
+              return (
               <div key={task.id} style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
                 <button
-                  style={{ ...planningChipStyle(task.essential), flex: 1 }}
+                  style={{ ...planningChipStyle(task.essential, completed), flex: 1 }}
                   onClick={() => goTo('planning')}
                   aria-label={`${task.title} — voir dans le planning`}
                 >
                   {task.scheduled_start} · {task.title}
                 </button>
-                <button
-                  aria-label={`Terminer ${task.title}`}
-                  onClick={() => handleCompletePlanned(task.id)}
-                  style={{
-                    background: 'none',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    padding: '6px 10px',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem',
-                    color: 'var(--color-text-muted)',
-                    flexShrink: 0,
-                  }}
-                >
-                  Terminer
-                </button>
+                {!completed && (
+                  <button
+                    aria-label={`Terminer ${task.title}`}
+                    onClick={() => handleCompletePlanned(task.id)}
+                    style={{
+                      background: 'none',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '6px 10px',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      color: 'var(--color-text-muted)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    Terminer
+                  </button>
+                )}
               </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Rien de planifié aujourd'hui.</p>
@@ -308,39 +305,11 @@ export function E10Dashboard() {
       </section>
       )}
 
-      {!isEmpty && !overloadMode ? (
-        <section aria-label="Tâches du jour">
-          <h2>Tâches du jour</h2>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={visibleOrder.map((t) => t.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {visibleOrder.map((task) => (
-                  <SortableTaskItem
-                    key={task.id}
-                    task={task}
-                    subs={todaySubTasksMap[task.id] ?? []}
-                    onOpen={openDetail}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        </section>
-      ) : null}
-
       <BottomNav
         overloadMode={overloadMode}
         inboxHasTasks={inboxTasks.length > 0}
         onAddTask={() => goTo('task-create-v2')}
         onGoTodo={() => goTo('inbox')}
-        onGoToday={() => goTo('today')}
         onGoPlanning={() => goTo('planning')}
         onGoLists={() => goTo('lists')}
         onExitOverload={() => setOverloadMode(false)}

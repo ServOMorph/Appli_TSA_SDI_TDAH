@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
@@ -66,58 +66,17 @@ describe('E20Inbox', () => {
       expect(screen.queryByLabelText(/sur .* étapes/)).toBeNull()
     })
 
-    it('déplace vers Aujourd\'hui si moins de 3 tâches', async () => {
+    it("déplace vers Tâche du jour sans limite de nombre", async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const ctx = makeAppContext({ inboxTasks: [task], todayTasks: [] })
+      const todayTasks = [
+        makeTask({ id: 't1', title: 'T1', status: 'today' }),
+        makeTask({ id: 't2', title: 'T2', status: 'today' }),
+        makeTask({ id: 't3', title: 'T3', status: 'today' }),
+      ]
+      const ctx = makeAppContext({ inboxTasks: [task], todayTasks })
       renderWithApp(<E20Inbox />, ctx)
-      await userEvent.click(screen.getByLabelText("Déplacer Lire livre vers Aujourd'hui"))
+      await userEvent.click(screen.getByLabelText('Déplacer Lire livre vers Tâche du jour'))
       expect(ctx.moveTask).toHaveBeenCalledWith('abc', 'today')
-    })
-  })
-
-  describe('modale M04 (limite 3 tâches)', () => {
-    it('affiche la modale M04 si aujourd\'hui a déjà 3 tâches', async () => {
-      const inboxTask = makeTask({ id: 'new', title: 'Nouvelle tâche' })
-      const todayTasks = [
-        makeTask({ id: 't1', title: 'T1', status: 'today' }),
-        makeTask({ id: 't2', title: 'T2', status: 'today' }),
-        makeTask({ id: 't3', title: 'T3', status: 'today' }),
-      ]
-      const ctx = makeAppContext({ inboxTasks: [inboxTask], todayTasks })
-      renderWithApp(<E20Inbox />, ctx)
-      await userEvent.click(screen.getByLabelText("Déplacer Nouvelle tâche vers Aujourd'hui"))
-      expect(screen.getByRole('dialog', { name: 'Remplacer une tâche' })).toBeDefined()
-    })
-
-    it('annuler la modale M04 ferme la modale', async () => {
-      const inboxTask = makeTask({ id: 'new', title: 'Nouvelle tâche' })
-      const todayTasks = [
-        makeTask({ id: 't1', title: 'T1', status: 'today' }),
-        makeTask({ id: 't2', title: 'T2', status: 'today' }),
-        makeTask({ id: 't3', title: 'T3', status: 'today' }),
-      ]
-      const ctx = makeAppContext({ inboxTasks: [inboxTask], todayTasks })
-      renderWithApp(<E20Inbox />, ctx)
-      await userEvent.click(screen.getByLabelText("Déplacer Nouvelle tâche vers Aujourd'hui"))
-      await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
-      expect(screen.queryByRole('dialog')).toBeNull()
-    })
-
-    it('choisir une tâche à remplacer appelle moveTask deux fois', async () => {
-      const inboxTask = makeTask({ id: 'new', title: 'Nouvelle tâche' })
-      const todayTasks = [
-        makeTask({ id: 't1', title: 'T1', status: 'today' }),
-        makeTask({ id: 't2', title: 'T2', status: 'today' }),
-        makeTask({ id: 't3', title: 'T3', status: 'today' }),
-      ]
-      const ctx = makeAppContext({ inboxTasks: [inboxTask], todayTasks })
-      renderWithApp(<E20Inbox />, ctx)
-      await userEvent.click(screen.getByLabelText("Déplacer Nouvelle tâche vers Aujourd'hui"))
-      await userEvent.click(screen.getByLabelText('Remplacer par T1'))
-      await waitFor(() => {
-        expect(ctx.moveTask).toHaveBeenCalledWith('t1', 'inbox')
-        expect(ctx.moveTask).toHaveBeenCalledWith('new', 'today')
-      })
     })
   })
 
@@ -138,13 +97,12 @@ describe('E20Inbox', () => {
   })
 
   describe('planifier et mettre dans une liste', () => {
-    it('planifier une tâche appelle planTodoTask, sélectionne la nouvelle tâche puis navigue vers planning', async () => {
+    it('planifier une tâche place la tâche en attente (sans la persister) puis navigue vers planning', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const ctx = makeAppContext({ inboxTasks: [task], planTodoTask: vi.fn().mockResolvedValue('tv2-1') })
+      const ctx = makeAppContext({ inboxTasks: [task] })
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByLabelText('Planifier Lire livre'))
-      expect(ctx.planTodoTask).toHaveBeenCalledWith('abc')
-      expect(ctx.selectTask).toHaveBeenCalledWith('tv2-1')
+      expect(ctx.startPlanTask).toHaveBeenCalledWith('Lire livre', 'abc')
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 
@@ -208,14 +166,13 @@ describe('E20Inbox', () => {
       const ctx = makeAppContext({
         inboxTasks: [task],
         inboxSubTasksMap: { abc: [sub] },
-        planTodoTask: vi.fn().mockResolvedValue('tv2-1'),
       })
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByLabelText('Planifier Lire livre'))
       expect(screen.getByRole('dialog', { name: 'Sous-tâches perdues' })).toBeDefined()
-      expect(ctx.planTodoTask).not.toHaveBeenCalled()
+      expect(ctx.startPlanTask).not.toHaveBeenCalled()
       await userEvent.click(screen.getByRole('button', { name: 'Continuer' }))
-      expect(ctx.planTodoTask).toHaveBeenCalledWith('abc')
+      expect(ctx.startPlanTask).toHaveBeenCalledWith('Lire livre', 'abc')
     })
 
     it('avertit avant de mettre dans une liste une tâche ayant des sous-tâches', async () => {

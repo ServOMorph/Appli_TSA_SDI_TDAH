@@ -30,7 +30,6 @@ interface BottomNavProps {
   inboxHasTasks: boolean
   onAddTask: () => void
   onGoTodo: () => void
-  onGoToday: () => void
   onGoPlanning: () => void
   onGoLists: () => void
   onExitOverload: () => void
@@ -41,7 +40,6 @@ export function BottomNav({
   inboxHasTasks,
   onAddTask,
   onGoTodo,
-  onGoToday,
   onGoPlanning,
   onGoLists,
   onExitOverload,
@@ -75,9 +73,6 @@ export function BottomNav({
           <button onClick={onGoTodo} style={segmentStyle(false)}>
             Todo
             {inboxHasTasks && <span aria-hidden style={segmentPastilleStyle} />}
-          </button>
-          <button onClick={onGoToday} style={segmentStyle(true)}>
-            Aujourd'hui
           </button>
           <button onClick={onGoPlanning} style={segmentStyle(true)}>
             Planning

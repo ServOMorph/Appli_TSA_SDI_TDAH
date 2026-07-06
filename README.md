@@ -25,9 +25,9 @@ npm run format     # Prettier
 
 V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : mode offline (13.2), doc V2, déploiement Netlify. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
 
-Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6). **Phase V3-0 (refacto préalable) close** : constantes/schéma énergie (Dexie v3), composant `EnergyDisplay`, extraction `AppShell`/`BottomNav`, sélecteur pur `isOverloaded` — aucun changement de comportement visible, validé par test manuel utilisateur. Prochaine étape : Phase V3-1 (bugs + nettoyage UI).
+Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6). **Phase V3-0 close** (refacto préalable) et **Phase V3-1 codée** (bugs B1-B3, nettoyage UI D1-D4b/P4a/P5/Q1) — en attente du test manuel utilisateur (`plan_test_manuel_v3-1.md`, 27 cas) avant de clore le gate.
 
-Tests unitaires 353/353, `tsc -b` clean.
+Tests unitaires 330/330, `tsc -b` clean, `eslint` 0 erreur.
 
 ## Stack
 
@@ -58,7 +58,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Démarrer la Phase V3-1 (bugs + nettoyage UI) sur la branche `v3`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
+Passer le test manuel de la Phase V3-1 (`plan_test_manuel_v3-1.md`), trancher le point ouvert sur le mode surcharge, puis démarrer la Phase V3-2 (énergie : domaine + saisie) sur la branche `v3`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

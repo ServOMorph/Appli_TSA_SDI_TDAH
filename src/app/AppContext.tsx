@@ -22,7 +22,6 @@ export type Screen =
   | 'welcome'
   | 'profile'
   | 'energy'
-  | 'first-task'
   | 'dashboard'
   | 'inbox'
   | 'today'
@@ -69,12 +68,14 @@ interface AppContextValue {
   skipTodayEnergy: () => Promise<void>
   addTask: (title: string) => Promise<void>
   createTaskInbox: (title: string) => Promise<void>
-  planTodoTask: (taskId: string) => Promise<string | null>
   moveTodoTaskToList: (taskId: string, listId: string) => Promise<void>
   createTaskV2Dest: (title: string, status: TaskStatusV2) => Promise<string>
   scheduleV2Task: (taskId: string, date: string, start: string, end: string) => Promise<void>
   getPlannedTasksForDate: (date: string) => Promise<TaskV2[]>
-  getUnscheduledPlannedTasks: () => Promise<TaskV2[]>
+  pendingPlanTask: PendingPlanTask | null
+  startPlanTask: (title: string, sourceTaskId?: string) => void
+  clearPendingPlanTask: () => void
+  schedulePendingTask: (title: string, date: string, start: string, end: string, sourceTaskId?: string) => Promise<void>
   moveTask: (id: string, status: TaskStatus) => Promise<void>
   completeTask: (id: string) => Promise<void>
   deleteTask: (id: string) => Promise<void>
@@ -96,6 +97,11 @@ interface AppContextValue {
   getListItems: (listId: string) => Promise<ListItem[]>
   addListItem: (listId: string, title: string) => Promise<void>
   deleteListItem: (id: string) => Promise<void>
+}
+
+export interface PendingPlanTask {
+  title: string
+  sourceTaskId?: string
 }
 
 export const AppContext = createContext<AppContextValue | null>(null)
@@ -144,6 +150,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [taskDetailOrigin, setTaskDetailOrigin] = useState<Screen | null>(null)
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
+  const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -280,9 +287,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   async function getPlannedTasksForDate(date: string): Promise<TaskV2[]> {
     const tasks = await taskV2Repo.getByDate(date)
-    return tasks
-      .filter((t) => t.status !== 'completed')
-      .sort((a, b) => (a.scheduled_start ?? '').localeCompare(b.scheduled_start ?? ''))
+    return tasks.sort((a, b) => (a.scheduled_start ?? '').localeCompare(b.scheduled_start ?? ''))
   }
 
   async function completeV2Task(taskId: string) {
@@ -292,9 +297,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await taskV2Repo.update(updated)
   }
 
-  async function getUnscheduledPlannedTasks(): Promise<TaskV2[]> {
-    const planned = await taskV2Repo.getPlannedTasks()
-    return planned.filter((t) => t.scheduled_date === null)
+  function startPlanTask(title: string, sourceTaskId?: string) {
+    setPendingPlanTask({ title, sourceTaskId })
+  }
+
+  function clearPendingPlanTask() {
+    setPendingPlanTask(null)
+  }
+
+  async function schedulePendingTask(
+    title: string,
+    date: string,
+    start: string,
+    end: string,
+    sourceTaskId?: string,
+  ) {
+    const now = new Date().toISOString()
+    const base = createTaskV2Rule(newId(), title, 'planned', false, now)
+    const scheduled = scheduleTaskV2Rule(base, date, start, end, now)
+    await taskV2Repo.create(scheduled)
+    if (sourceTaskId) {
+      const subs = await subTaskRepo.getByTaskId(sourceTaskId)
+      await Promise.all(subs.map((st) => subTaskRepo.delete(st.id)))
+      await taskRepo.delete(sourceTaskId)
+      await loadAll()
+    }
+    setPendingPlanTask(null)
   }
 
   async function createTaskInbox(title: string) {
@@ -310,19 +338,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
     await taskRepo.create(task)
     setInboxTasks((prev) => [...prev, task])
-  }
-
-  async function planTodoTask(taskId: string): Promise<string | null> {
-    const task = await taskRepo.getById(taskId)
-    if (!task) return null
-    const now = new Date().toISOString()
-    const planned = createTaskV2Rule(newId(), task.title, 'planned', false, now)
-    await taskV2Repo.create(planned)
-    const subs = await subTaskRepo.getByTaskId(taskId)
-    await Promise.all(subs.map((st) => subTaskRepo.delete(st.id)))
-    await taskRepo.delete(taskId)
-    await loadAll()
-    return planned.id
   }
 
   async function moveTodoTaskToList(taskId: string, listId: string) {
@@ -565,12 +580,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         skipTodayEnergy,
         addTask,
         createTaskInbox,
-        planTodoTask,
         moveTodoTaskToList,
         createTaskV2Dest,
         scheduleV2Task,
         getPlannedTasksForDate,
-        getUnscheduledPlannedTasks,
+        pendingPlanTask,
+        startPlanTask,
+        clearPendingPlanTask,
+        schedulePendingTask,
         completeV2Task,
         moveTask,
         completeTask,

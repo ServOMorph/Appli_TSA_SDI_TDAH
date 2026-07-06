@@ -51,39 +51,25 @@ export function E20Inbox() {
   const {
     inboxTasks,
     inboxSubTasksMap,
-    todayTasks,
     lists,
     selectTask,
     selectList,
     goTo,
     moveTask,
-    planTodoTask,
+    startPlanTask,
     moveTodoTaskToList,
     createList,
   } = useApp()
-  const [pendingMoveId, setPendingMoveId] = useState<string | null>(null)
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
   const [newListName, setNewListName] = useState('')
   const [subtaskWarning, setSubtaskWarning] = useState<{ task: Task; action: 'plan' | 'list' } | null>(null)
 
   async function handleMoveToToday(taskId: string) {
-    if (todayTasks.length >= 3) {
-      setPendingMoveId(taskId)
-    } else {
-      await moveTask(taskId, 'today')
-    }
+    await moveTask(taskId, 'today')
   }
 
-  async function handleM04Replace(replacedId: string) {
-    if (!pendingMoveId) return
-    await moveTask(replacedId, 'inbox')
-    await moveTask(pendingMoveId, 'today')
-    setPendingMoveId(null)
-  }
-
-  async function handlePlan(taskId: string) {
-    const newTaskId = await planTodoTask(taskId)
-    selectTask(newTaskId)
+  function handlePlan(task: Task) {
+    startPlanTask(task.title, task.id)
     goTo('planning')
   }
 
@@ -110,7 +96,7 @@ export function E20Inbox() {
     if (subs.length > 0) {
       setSubtaskWarning({ task, action: 'plan' })
     } else {
-      handlePlan(task.id)
+      handlePlan(task)
     }
   }
 
@@ -128,7 +114,7 @@ export function E20Inbox() {
     const { task, action } = subtaskWarning
     setSubtaskWarning(null)
     if (action === 'plan') {
-      handlePlan(task.id)
+      handlePlan(task)
     } else {
       setListPickerTask(task)
     }
@@ -174,11 +160,11 @@ export function E20Inbox() {
                 )}
                 <div style={{ display: 'flex', gap: 'var(--spacing-xs)', flexWrap: 'wrap' }}>
                   <button
-                    aria-label={`Déplacer ${task.title} vers Aujourd'hui`}
+                    aria-label={`Déplacer ${task.title} vers Tâche du jour`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
                     onClick={() => handleMoveToToday(task.id)}
                   >
-                    Aujourd'hui
+                    Tâche du jour
                   </button>
                   <button
                     aria-label={`Planifier ${task.title}`}
@@ -262,32 +248,6 @@ export function E20Inbox() {
               Continuer
             </Button>
             <Button variant="secondary" fullWidth onClick={() => setSubtaskWarning(null)}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {pendingMoveId && (
-        <div role="dialog" aria-modal="true" aria-label="Remplacer une tâche" style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Choisir la tâche à remplacer</h2>
-            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-              Vous avez déjà 3 tâches aujourd'hui. Sélectionnez celle à déplacer vers le Todo :
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-              {todayTasks.map((t) => (
-                <button
-                  key={t.id}
-                  aria-label={`Remplacer par ${t.title}`}
-                  style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
-                  onClick={() => handleM04Replace(t.id)}
-                >
-                  {t.title}
-                </button>
-              ))}
-            </div>
-            <Button variant="secondary" fullWidth onClick={() => setPendingMoveId(null)}>
               Annuler
             </Button>
           </div>

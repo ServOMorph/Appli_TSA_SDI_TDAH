@@ -31,14 +31,14 @@ describe('E03Energy', () => {
     expect(valider.disabled).toBe(false)
     await userEvent.click(valider)
     expect(ctx.saveTodayEnergy).toHaveBeenCalledWith(5)
-    expect(ctx.goTo).toHaveBeenCalledWith('first-task')
+    expect(ctx.completeOnboarding).toHaveBeenCalled()
   })
 
-  it('navigue vers first-task en ignorant', async () => {
+  it('termine l\'onboarding en ignorant', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E03Energy />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Ignorer' }))
     expect(ctx.skipTodayEnergy).toHaveBeenCalled()
-    expect(ctx.goTo).toHaveBeenCalledWith('first-task')
+    expect(ctx.completeOnboarding).toHaveBeenCalled()
   })
 })

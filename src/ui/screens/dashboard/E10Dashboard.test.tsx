@@ -52,7 +52,7 @@ describe('E10Dashboard', () => {
   describe('état vide (D10A)', () => {
     it('affiche le message Rien à faire aujourd\'hui', () => {
       renderWithApp(<E10Dashboard />)
-      expect(screen.getAllByText('Rien à faire aujourd\'hui').length).toBeGreaterThan(0)
+      expect(screen.getByText('Rien à faire aujourd\'hui')).toBeDefined()
     })
 
     it('affiche le bouton Ajouter une tâche', () => {
@@ -68,38 +68,8 @@ describe('E10Dashboard', () => {
     })
   })
 
-  describe('avec tâches', () => {
-    it("affiche l'action immédiate (première tâche)", () => {
-      const ctx = makeAppContext({
-        todayTasks: [makeTask({ title: 'Appeler le médecin' })],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getAllByText('Appeler le médecin').length).toBeGreaterThan(0)
-    })
-
-    it('affiche les tâches du jour', () => {
-      const ctx = makeAppContext({
-        todayTasks: [
-          makeTask({ id: '1', title: 'Tâche A', position: 0 }),
-          makeTask({ id: '2', title: 'Tâche B', position: 1 }),
-        ],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getAllByText('Tâche A').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Tâche B').length).toBeGreaterThan(0)
-    })
-
-    it('affiche l\'énergie si énergie renseignée', () => {
-      const ctx = makeAppContext({
-        todayEnergy: 7,
-        todayEnergyStatus: 'filled',
-        todayTasks: [makeTask()],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByLabelText(/7 énergie/i)).toBeDefined()
-    })
-
-    it("limite l'affichage à 3 tâches", () => {
+  describe('avec tâches (Tâche du jour)', () => {
+    it('affiche les tâches du jour sans limite de nombre (Q1)', () => {
       const ctx = makeAppContext({
         todayTasks: [
           makeTask({ id: '1', title: 'T1', position: 0 }),
@@ -109,7 +79,18 @@ describe('E10Dashboard', () => {
         ],
       })
       const { container } = renderWithApp(<E10Dashboard />, ctx)
-      expect(container.querySelectorAll('[aria-label="Tâches du jour"] > div > *').length).toBe(3)
+      expect(screen.getByText('T4')).toBeDefined()
+      expect(container.querySelectorAll('[aria-label="Tâche du jour"] > div > *').length).toBe(4)
+    })
+
+    it("affiche l'énergie si énergie renseignée", () => {
+      const ctx = makeAppContext({
+        todayEnergy: 7,
+        todayEnergyStatus: 'filled',
+        todayTasks: [makeTask()],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(screen.getByLabelText(/7 énergie/i)).toBeDefined()
     })
   })
 
@@ -119,56 +100,13 @@ describe('E10Dashboard', () => {
         todayTasks: [makeTask({ id: 'task-1', title: 'Appeler le médecin' })],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      const buttons = screen.getAllByRole('button', { name: 'Appeler le médecin' })
-      await userEvent.click(buttons[0])
-      expect(ctx.selectTask).toHaveBeenCalledWith('task-1')
-      expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
-    })
-
-    it("clic sur l'action immédiate ouvre E22", async () => {
-      const ctx = makeAppContext({
-        todayTasks: [makeTask({ id: 'task-1', title: 'Appeler le médecin' })],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      const buttons = screen.getAllByRole('button', { name: /Appeler le médecin/i })
-      await userEvent.click(buttons[0])
+      await userEvent.click(screen.getByText('Appeler le médecin'))
       expect(ctx.selectTask).toHaveBeenCalledWith('task-1')
       expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
     })
   })
 
-  describe('sous-tâches (Prop 1 + Prop 2)', () => {
-    it("affiche la prochaine sous-tâche dans l'action immédiate", () => {
-      const task = makeTask({ id: 'task-1', title: 'Rédiger rapport' })
-      const ctx = makeAppContext({
-        todayTasks: [task],
-        todaySubTasksMap: {
-          'task-1': [
-            makeSubTask({
-              id: 'st-1',
-              title: 'Ouvrir le template',
-              position: 0,
-              is_completed: false,
-            }),
-          ],
-        },
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByText('Prochaine étape : Ouvrir le template')).toBeDefined()
-    })
-
-    it("n'affiche pas de sous-tâche si toutes complétées", () => {
-      const task = makeTask({ id: 'task-1' })
-      const ctx = makeAppContext({
-        todayTasks: [task],
-        todaySubTasksMap: {
-          'task-1': [makeSubTask({ is_completed: true })],
-        },
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.queryByText(/Prochaine étape/)).toBeNull()
-    })
-
+  describe('sous-tâches', () => {
     it('affiche le badge de progression dans la liste du jour', () => {
       const task = makeTask({ id: 'task-1', title: 'Rédiger rapport' })
       const ctx = makeAppContext({
@@ -257,13 +195,17 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('resources')
     })
 
-    it('navigue vers inbox / today via la nav segmentée', async () => {
+    it('navigue vers inbox via la nav segmentée', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
       expect(ctx.goTo).toHaveBeenCalledWith('inbox')
-      await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
-      expect(ctx.goTo).toHaveBeenCalledWith('today')
+    })
+
+    it("n'affiche plus de segment Aujourd'hui (D4)", () => {
+      renderWithApp(<E10Dashboard />)
+      const group = screen.getByRole('group', { name: 'Listes de tâches' })
+      expect(within(group).queryByRole('button', { name: "Aujourd'hui" })).toBeNull()
     })
 
     it('affiche une pastille sur Todo si des tâches sont en attente', () => {
@@ -316,6 +258,15 @@ describe('E10Dashboard', () => {
       expect(await screen.findByText(/RDV médecin/)).toBeDefined()
     })
 
+    it('affiche une tâche planifiée terminée sans bouton Terminer (P4a)', async () => {
+      const ctx = makeAppContext({
+        getPlannedTasksForDate: async () => [makeTaskV2({ title: 'RDV médecin', status: 'completed' })],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(await screen.findByText(/RDV médecin/)).toBeDefined()
+      expect(screen.queryByLabelText(/Terminer RDV médecin/)).toBeNull()
+    })
+
     it('masque la section Planning du jour en mode surcharge', async () => {
       const ctx = makeAppContext({
         overloadMode: true,
@@ -358,13 +309,13 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('overload-recovery')
     })
 
-    it("affiche l'action immédiate et les tâches du jour en mode surcharge", () => {
+    it('masque la section Tâche du jour en mode surcharge', () => {
       const ctx = makeAppContext({
         overloadMode: true,
         todayTasks: [makeTask({ title: 'Tâche urgente' })],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getAllByText('Tâche urgente').length).toBeGreaterThan(0)
+      expect(screen.queryByText('Tâche urgente')).toBeNull()
     })
   })
 })

@@ -84,7 +84,7 @@ const guide = [
   },
   {
     title: 'Retrouver ses réglages et ses données',
-    text: 'La roue des paramètres permet d’ajuster l’accessibilité, la stimulation, l’organisation, la confidentialité et l’export des données.',
+    text: 'La roue des paramètres permet d’ajuster l’accessibilité, la confidentialité et l’export des données.',
   },
 ]
 

@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes ; V2-5 retirée le 2026-07-05. Tag `v1.0-mvp` posé, `dist/v1/` archivé (rollback V1 opérationnel), `dist/v2/` régénérable via `npm run build` (périmé, daté du 2026-07-02). V2-10 (consolidation) en cours. Plan de test manuel V2 passé intégralement le 2026-07-06 ; tous les bugs confirmés corrigés et retestés en app réelle (13 points de confirmation validés) : conflit de créneau Planning (modale de refus), actions Aujourd'hui/Planifier/Liste depuis le détail tâche, navigation directe vers le détail de liste après ajout, bouton "Ajouter une tâche" sur Aujourd'hui, bouton "Terminer" sur Planning du jour (Dashboard), retrait icône Planning TopBar, grille Planning 24h (0h-23h), message "Rien à faire aujourd'hui", renommer/supprimer une liste, section Organisation supprimée, bug libellé profil corrigé. Restent 2 décisions produit ouvertes (usage de l'énergie, modification du profil) et 2 chantiers reportés (planification indépendante des sous-tâches, créneaux Planning en demi-heure). Reste avant déploiement : trancher les décisions restantes, relancer les e2e, régénérer `dist/v2/`, doc V2, déploiement Netlify, sessions test 2-5 avec Marie. Tests unitaires 344/344, `tsc -b` clean.
+V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes ; V2-5 retirée le 2026-07-05. Tag `v1.0-mvp` posé, `dist/v1/` archivé (rollback V1 opérationnel), `dist/v2/` régénérable via `npm run build` (périmé, daté du 2026-07-02). V2-10 (consolidation) en cours. Décision profil actée (`E111Profile` reste en lecture seule) ; décision énergie remontée à Marie pour la prochaine réunion, en attente de son retour. Tests manuels 2.4, 2.6, 6.7, 6.10, 7.3, mode sombre et 11.2 validés le 2026-07-06. Section "Stimulation cognitive" des Paramètres supprimée intégralement. Restent des chantiers de fond reportés (planification indépendante des sous-tâches, créneaux Planning en demi-heure, champ nom de profil onboarding). Reste avant déploiement : relancer les e2e, régénérer `dist/v2/`, doc V2, déploiement Netlify, sessions test 2-5 avec Marie, retester export iOS/JSON/offline. Tests unitaires 339/339, `tsc -b` clean.
 
 ## Stack
 
@@ -53,7 +53,7 @@ Archives/        — Roadmap V1 archivée
 
 ## Prochaine étape
 
-Phase V2-10 — Trancher les décisions produit restantes (usage énergie, modification du profil — voir `roadmap_v2.md`), relancer les e2e, puis doc V2, déploiement Netlify, sessions test 2-5 avec Marie.
+Phase V2-10 — Relancer les e2e, régénérer `dist/v2/`, rédiger la doc V2, déployer sur Netlify, sessions test 2-5 avec Marie. Reste à trancher : usage de l'énergie (retour Marie attendu, voir `roadmap_v2.md`).
 
 ## Licence
 

@@ -16,7 +16,6 @@ describe('SettingsRepository', () => {
   const mockSettings = (overrides?: Partial<Settings>): Settings => ({
     id: 'settings-1',
     user_id: 'user-1',
-    stimulation_mode: 'standard',
     dark_mode: true,
     font_size: 'medium',
     reduced_motion: false,
@@ -35,11 +34,10 @@ describe('SettingsRepository', () => {
   it('updates settings', async () => {
     const settings = mockSettings()
     await repo.create(settings)
-    const updated = mockSettings({ dark_mode: false, stimulation_mode: 'calm' })
+    const updated = mockSettings({ dark_mode: false })
     await repo.update(updated)
     const retrieved = await repo.getById(settings.id)
     expect(retrieved?.dark_mode).toBe(false)
-    expect(retrieved?.stimulation_mode).toBe('calm')
   })
 
   it('deletes settings', async () => {

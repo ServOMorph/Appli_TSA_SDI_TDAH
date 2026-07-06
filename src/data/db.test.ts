@@ -85,7 +85,6 @@ describe('AppDatabase', () => {
     const settings = {
       id: 'settings-1',
       user_id: 'user-1',
-      stimulation_mode: 'standard' as const,
       dark_mode: true,
       font_size: 'medium' as const,
       reduced_motion: false,

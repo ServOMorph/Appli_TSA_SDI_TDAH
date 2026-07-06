@@ -19,11 +19,10 @@ describe('E110Settings', () => {
     expect(screen.getByText('Paramètres')).toBeInTheDocument()
   })
 
-  it('affiche les 5 sections', () => {
+  it('affiche les 4 sections', () => {
     renderE110()
     expect(screen.getByText('Profil')).toBeInTheDocument()
     expect(screen.getByText('Accessibilité')).toBeInTheDocument()
-    expect(screen.getByText('Stimulation cognitive')).toBeInTheDocument()
     expect(screen.getByText('Confidentialité')).toBeInTheDocument()
     expect(screen.getByText('Export')).toBeInTheDocument()
   })

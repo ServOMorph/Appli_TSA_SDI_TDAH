@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-03 (archivé depuis contexte.md 2026-07-06 session suivante)
+- Écran Planning (E40Planning) revu suite à retour utilisateur direct (capture d'écran) — l'ancien flux (taper un créneau vide affichait toutes les tâches non planifiées, un clic validait immédiatement) jugé non intuitif. Nouveau flux : bouton "Valider" explicite dans tous les cas ; si une tâche vient d'être choisie via "Planifier" (Todo ou création directe), son id est transporté via `selectedTaskId` (champ existant, réutilisé) jusqu'à Planning, qui affiche directement la confirmation de placement pour cette tâche précise sans lister le reste du backlog. Bouton "Planifier" de la nav segmentée dashboard renommé "Planning" (à ne pas confondre avec l'icône agenda TopBar, `aria-label="Planning"` déjà existant).
+
 ## 2026-07-02 (archivé depuis contexte.md 2026-07-06 session suite)
 - Décision d'architecture — le système V1 `Task` reste le moteur du dashboard, non unifié sur `TaskV2`. Écran Todo enrichi d'actions "Planifier"/"Liste" (conversion à l'action). Corrige un bug orphelin (`E21CreateTaskV2` destination "Todo" créait des `TaskV2` jamais affichées) et un bug de reset (`deleteAllData` ne vidait pas `tasksV2`).
 

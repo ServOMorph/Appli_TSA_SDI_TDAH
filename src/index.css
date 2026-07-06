@@ -74,17 +74,6 @@ html.reduce-motion, html.reduce-motion * {
   transition-duration: 0ms !important;
 }
 
-html[data-stimulation="calm"] {
-  --color-primary: #4a8a80;
-  --color-primary-hover: #3a7a70;
-  --color-background: #f0f5f4;
-}
-
-html[data-stimulation="dynamic"] {
-  --color-primary: #6a4cb3;
-  --color-primary-hover: #5a3ca3;
-}
-
 * {
   box-sizing: border-box;
 }

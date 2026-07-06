@@ -37,7 +37,6 @@ export type Screen =
   | 'settings'
   | 'settings-profile'
   | 'settings-accessibility'
-  | 'settings-stimulation'
   | 'settings-privacy'
   | 'settings-export'
   | 'lists'
@@ -176,7 +175,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     root.style.fontSize = fontSizes[settings.font_size] ?? '16px'
     root.classList.toggle('dark-mode', settings.dark_mode)
     root.classList.toggle('reduce-motion', settings.reduced_motion)
-    root.dataset.stimulation = settings.stimulation_mode
   }, [settings])
 
   async function loadAll() {
@@ -218,7 +216,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const defaultSettings: Settings = {
       id: newId(),
       user_id: userId,
-      stimulation_mode: 'standard',
       dark_mode: false,
       font_size: 'medium',
       reduced_motion: false,

@@ -1,3 +1,18 @@
+## v0.43 — 2026-07-06
+
+### Ajouté
+- Contexte complet de la question énergie consigné pour la prochaine réunion Marie (`Note de réunion/a traiter prochaine reunion.txt`).
+
+### Modifié
+- Tests manuels 2.4, 2.6, 6.7, 6.10, 7.3, mode sombre et 11.2 validés (`roadmap_v2.md`).
+
+### Décidé
+- Profil (`E111Profile`) : reste en lecture seule, aucune modification à implémenter.
+- Énergie : décision non tranchée en interne, remontée à Marie pour retour.
+
+### Supprimé
+- Section "Stimulation cognitive" des Paramètres retirée intégralement (écran `E113Stimulation`, entrée menu, champ `Settings.stimulation_mode`, CSS `data-stimulation`).
+
 ## v0.42 — 2026-07-06
 
 ### Corrigé

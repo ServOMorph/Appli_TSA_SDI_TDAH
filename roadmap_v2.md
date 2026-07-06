@@ -165,7 +165,7 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [x] **[2026-07-06]** Plan de test manuel V2 (`plan_test_manuel_v2.md`) rédigé et passé intégralement — écarts consolidés ci-dessus (§ "Constats test manuel V2-10")
 - [x] Corriger les 4 bugs confirmés issus du test manuel (2026-07-06) : tri "Planning du jour" par `scheduled_start` (`AppContext.getPlannedTasksForDate`) ; rattachement de la tâche à une liste créée à la volée (`createList` retourne l'id, création inline dans le sélecteur `E20Inbox`/`E21CreateTaskV2`) ; détection de conflit de créneau dans Planning (`E40Planning.handleAssign` refuse + message, décision produit actée : refuser plutôt que remplacer ou superposer) ; avertissement avant perte de sous-tâches lors de conversion Todo → Planifier/Liste (modale de confirmation `E20Inbox`, pas de migration du modèle de données — item séparé ajouté ci-dessous pour la planification indépendante des sous-tâches). 346/346 tests unitaires, `tsc -b` clean.
 - [x] **[2026-07-06]** Retest manuel intégral des corrections et ajouts de la session (13 points) : modale de conflit de créneau, navigation directe vers le détail de liste après ajout (Todo/création/détail tâche), bouton "Ajouter une tâche" sur Aujourd'hui, bouton "Terminer" sur Planning du jour (Dashboard), retrait icône Planning TopBar, grille Planning 0h-23h, message "Rien à faire aujourd'hui", renommer/supprimer une liste, section Organisation retirée, libellé profil corrigé — tous validés par l'utilisateur
-- [ ] Trancher les décisions produit restantes (usage énergie ; modification du profil) avant déploiement
+- [x] **[2026-07-06]** Décision profil actée : `E111Profile` reste en lecture seule. Décision énergie remontée à Marie (`Note de réunion/a traiter prochaine reunion.txt`), en attente de son retour.
 - [ ] Planning : gérer les créneaux par demi-heure plutôt que par heure pleine (grille horaire `E40Planning.tsx`, actuellement 1 créneau = 1 heure)
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
@@ -189,7 +189,7 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 
 ### Décisions produit à prendre
 
-- Revoir à quoi sert l'énergie dans l'appli (test manuel 10.2) — actuellement une seule valeur par jour (`todayEnergy`/`todayEnergyStatus`), écrasée à chaque nouvelle saisie (`saveTodayEnergy`, `AppContext.tsx`), affichée uniquement dans le chip de la TopBar, sans historique ni aucun autre effet dans l'app (pas de lien avec le mode surcharge, pas de filtrage). Toujours en attente d'une décision sur l'usage voulu avant de définir le comportement pour plusieurs check-in le même jour.
+- Revoir à quoi sert l'énergie dans l'appli (test manuel 10.2) — actuellement une seule valeur par jour (`todayEnergy`/`todayEnergyStatus`), écrasée à chaque nouvelle saisie (`saveTodayEnergy`, `AppContext.tsx`), affichée uniquement dans le chip de la TopBar, sans historique ni aucun autre effet dans l'app (pas de lien avec le mode surcharge, pas de filtrage). **[2026-07-06]** Question posée à Marie pour la prochaine réunion (contexte consigné dans `Note de réunion/a traiter prochaine reunion.txt`) — décision toujours en attente de son retour.
 - [x] **[2026-07-06]** Planning sans tâche planifiable (test manuel 6.3) — décision actée : garder le comportement actuel tel quel ("Placer à Xh00" + "Aucune tâche à planifier. Ajoutez une tâche et choisissez 'Planifier'.").
 
 ### Fonctionnalités manquantes / à implémenter
@@ -197,7 +197,7 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 - Ajouter un champ nom de profil à l'onboarding — l'écran `E02Profile` ne propose actuellement qu'un choix de type de profil (Adolescent/Étudiant/Adulte), aucune saisie de nom.
 - [x] **[2026-07-06]** Écran détail tâche (`E22TaskDetail`) : actions "Aujourd'hui" (masquée si déjà aujourd'hui, avec règle de remplacement à 3 tâches), "Planifier" et "Liste" (avec avertissement de perte de sous-tâches) ajoutées, cohérentes avec l'écran Todo.
 - [x] **[2026-07-06]** Suppression d'une liste entière — `deleteList` câblée dans `E60Lists.tsx` avec confirmation modale. Renommage d'une liste également ajouté (`renameList`, nouveau dans `AppContext.tsx`).
-- Modification du profil (test manuel 11.1) — décision produit toujours ouverte : ajouter la modification ou garder l'écran informatif. Bug de libellé corrigé dans tous les cas **[2026-07-06]** (`profileLabels` alignés sur les vraies valeurs `ProfileType` : teenager/student/adult).
+- [x] **[2026-07-06]** Modification du profil (test manuel 11.1) — décision actée : `E111Profile` reste en lecture seule (écran informatif), aucune modification à implémenter. Bug de libellé corrigé dans tous les cas (`profileLabels` alignés sur les vraies valeurs `ProfileType` : teenager/student/adult).
 - [x] **[2026-07-06]** Ajout d'une liste depuis une tâche (Todo, création, détail tâche) : navigue désormais directement vers le détail de la liste après validation, au lieu de rester sur l'écran d'origine.
 - [x] **[2026-07-06]** Écran Aujourd'hui (`E24Today`) : bouton "Ajouter une tâche" ajouté (absent auparavant, seul point d'entrée manquant pour créer une tâche depuis cet écran).
 - [x] **[2026-07-06]** Dashboard, section "Planning du jour" : bouton "Terminer" par tâche ajouté (`completeV2Task`, nouveau dans `AppContext.tsx`) — la tâche terminée sort de la liste (`getPlannedTasksForDate` exclut désormais les tâches `completed`).
@@ -212,13 +212,13 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 
 ### À (re)tester avant déploiement
 
-- Test manuel 2.4 : badge "X/Y" du Dashboard sur une tâche décomposée en sous-tâches — compteur correspondant au nombre réel de sous-tâches cochées.
-- Test manuel 2.6 : Dashboard sans aucune tâche — état vide clair, sans section cassée.
-- Test manuel 6.7 : ouverture du Planning à l'heure courante — scroll positionné sur l'heure actuelle.
-- Test manuel 6.10 : placer une tâche à un horaire limite (00h00, 23h00) — affichage correct, sans créneau hors grille.
-- Test manuel 7.3 : écran Aujourd'hui (`E24Today`) sans aucune tâche prévue — état vide clair.
-- Mode sombre de l'UI (`settings.dark_mode`, activable via `E112Accessibility.tsx`) — lisibilité et contraste sur tous les écrans.
-- Test manuel 11.2 : modification des réglages d'accessibilité (`E112Accessibility`) et de stimulation (`E113Stimulation`) — effet visible immédiatement dans l'UI.
+- [x] **[2026-07-06]** Test manuel 2.4 : badge "X/Y" du Dashboard sur une tâche décomposée en sous-tâches — validé.
+- [x] **[2026-07-06]** Test manuel 2.6 : Dashboard sans aucune tâche — validé.
+- [x] **[2026-07-06]** Test manuel 6.7 : ouverture du Planning à l'heure courante — validé.
+- [x] **[2026-07-06]** Test manuel 6.10 : placer une tâche à un horaire limite (00h00, 23h00) — validé.
+- [x] **[2026-07-06]** Test manuel 7.3 : écran Aujourd'hui (`E24Today`) sans aucune tâche prévue — validé.
+- [x] **[2026-07-06]** Mode sombre de l'UI (`settings.dark_mode`, activable via `E112Accessibility.tsx`) — validé.
+- [x] **[2026-07-06]** Test manuel 11.2 : réglages d'accessibilité (`E112Accessibility`) — validé. Section "Stimulation cognitive" (`E113Stimulation`) supprimée intégralement des Paramètres (décision utilisateur) : écran, entrée menu, champ `Settings.stimulation_mode`, CSS `data-stimulation` retirés du code (339/339 tests, `tsc -b` clean).
 - Test manuel 11.5 : export des données (`E117Export.tsx`) sur iPhone — comportement du téléchargement/partage en environnement iOS (Safari/PWA).
 - Viabilité du fichier JSON généré par l'export de données (`E117Export.tsx`/`exportData`) — JSON valide, structure cohérente avec les données réelles.
 - Test manuel 13.2 : utilisation de l'app en coupant la connexion réseau — fonctionnement normal (offline-first).

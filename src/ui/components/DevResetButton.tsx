@@ -20,7 +20,6 @@ const SCREEN_CODES: Record<Screen, string> = {
   settings: 'E110',
   'settings-profile': 'E111',
   'settings-accessibility': 'E112',
-  'settings-stimulation': 'E113',
   'settings-privacy': 'E116',
   'settings-export': 'E117',
   lists: 'E60',

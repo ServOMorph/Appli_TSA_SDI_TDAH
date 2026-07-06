@@ -8,7 +8,6 @@ import type { Settings } from '@/domain/entities/settings'
 const defaultSettings: Settings = {
   id: 's1',
   user_id: 'u1',
-  stimulation_mode: 'standard',
   dark_mode: false,
   font_size: 'medium',
   reduced_motion: false,

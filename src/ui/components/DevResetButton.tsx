@@ -21,7 +21,6 @@ const SCREEN_CODES: Record<Screen, string> = {
   'settings-profile': 'E111',
   'settings-accessibility': 'E112',
   'settings-stimulation': 'E113',
-  'settings-organisation': 'E114',
   'settings-privacy': 'E116',
   'settings-export': 'E117',
   lists: 'E60',

@@ -94,6 +94,7 @@ export function E21CreateTaskV2() {
     addTask,
     moveTask,
     createList,
+    selectList,
   } = useApp()
   const [title, setTitle] = useState('')
   const [destination, setDestination] = useState<Destination | null>(null)
@@ -137,7 +138,8 @@ export function E21CreateTaskV2() {
     if (!trimmed) return
     await addListItem(listId, trimmed)
     setShowListPicker(false)
-    goTo('lists')
+    selectList(listId)
+    goTo('list-detail')
   }
 
   async function handleCreateList() {
@@ -147,7 +149,8 @@ export function E21CreateTaskV2() {
     await addListItem(listId, trimmed)
     setNewListName('')
     setShowListPicker(false)
-    goTo('lists')
+    selectList(listId)
+    goTo('list-detail')
   }
 
   async function handleReplaceToday(replacedId: string) {

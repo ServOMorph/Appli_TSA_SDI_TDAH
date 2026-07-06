@@ -61,7 +61,7 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
-  it('chemin liste : ouvre le sélecteur, crée un ListItem dans la liste choisie et navigue vers lists', async () => {
+  it('chemin liste : ouvre le sélecteur, crée un ListItem dans la liste choisie et navigue vers le détail de la liste', async () => {
     const ctx = makeAppContext({
       lists: [{ id: 'list-1', name: 'Courses', created_at: '2026-07-05', updated_at: '2026-07-05' }],
     })
@@ -71,7 +71,8 @@ describe('E21CreateTaskV2', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter à Courses' }))
     expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Tâche liste')
-    expect(ctx.goTo).toHaveBeenCalledWith('lists')
+    expect(ctx.selectList).toHaveBeenCalledWith('list-1')
+    expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
   })
 
   it("chemin Aujourd'hui : crée directement la tâche today et navigue vers today", async () => {

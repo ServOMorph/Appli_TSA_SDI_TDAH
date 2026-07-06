@@ -22,7 +22,6 @@ const entries: SettingsEntry[] = [
   { label: 'Profil', description: 'Type de profil et informations', screen: 'settings-profile' },
   { label: 'Accessibilité', description: 'Taille texte, contraste, animations', screen: 'settings-accessibility' },
   { label: 'Stimulation cognitive', description: 'Calme, standard ou dynamique', screen: 'settings-stimulation' },
-  { label: 'Organisation', description: 'Modules et affichage', screen: 'settings-organisation' },
   { label: 'Confidentialité', description: 'Gestion des données et consentements', screen: 'settings-privacy' },
   { label: 'Export', description: 'Exporter ou supprimer vos données', screen: 'settings-export' },
 ]

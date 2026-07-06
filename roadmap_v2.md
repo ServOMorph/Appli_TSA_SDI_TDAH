@@ -164,7 +164,9 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [x] **[2026-07-06]** Comportement onboarding corrigé (reprise interrompue) : `User.onboarding_completed` ajouté, `completeOnboarding` (`AppContext.tsx`) appelée en fin d'onboarding ; un utilisateur incomplet au démarrage entraîne un reset complet vers `welcome`. Bouton "Ignorer" retiré de l'écran choix de profil (`E02Profile`) : sélection obligatoire. 345/345 tests unitaires, `tsc -b` clean.
 - [x] **[2026-07-06]** Plan de test manuel V2 (`plan_test_manuel_v2.md`) rédigé et passé intégralement — écarts consolidés ci-dessus (§ "Constats test manuel V2-10")
 - [x] Corriger les 4 bugs confirmés issus du test manuel (2026-07-06) : tri "Planning du jour" par `scheduled_start` (`AppContext.getPlannedTasksForDate`) ; rattachement de la tâche à une liste créée à la volée (`createList` retourne l'id, création inline dans le sélecteur `E20Inbox`/`E21CreateTaskV2`) ; détection de conflit de créneau dans Planning (`E40Planning.handleAssign` refuse + message, décision produit actée : refuser plutôt que remplacer ou superposer) ; avertissement avant perte de sous-tâches lors de conversion Todo → Planifier/Liste (modale de confirmation `E20Inbox`, pas de migration du modèle de données — item séparé ajouté ci-dessous pour la planification indépendante des sous-tâches). 346/346 tests unitaires, `tsc -b` clean.
-- [ ] Trancher les décisions produit restantes (usage énergie, écran Planning vide) avant déploiement
+- [x] **[2026-07-06]** Retest manuel intégral des corrections et ajouts de la session (13 points) : modale de conflit de créneau, navigation directe vers le détail de liste après ajout (Todo/création/détail tâche), bouton "Ajouter une tâche" sur Aujourd'hui, bouton "Terminer" sur Planning du jour (Dashboard), retrait icône Planning TopBar, grille Planning 0h-23h, message "Rien à faire aujourd'hui", renommer/supprimer une liste, section Organisation retirée, libellé profil corrigé — tous validés par l'utilisateur
+- [ ] Trancher les décisions produit restantes (usage énergie ; modification du profil) avant déploiement
+- [ ] Planning : gérer les créneaux par demi-heure plutôt que par heure pleine (grille horaire `E40Planning.tsx`, actuellement 1 créneau = 1 heure)
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
 - [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD
@@ -178,29 +180,35 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 
 Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploiement. Classés par nature d'action.
 
-### Bugs confirmés à corriger
+### Bugs confirmés à corriger — tous corrigés et retestés (2026-07-06)
 
-- Section "Planning du jour" du Dashboard (`E10Dashboard.tsx`, `todayPlanned.map`) n'est pas triée par heure (`scheduled_start`) — constat sur capture d'écran (ordre observé 15h/17h/16h au lieu de 15h/16h/17h). À corriger : trier `todayPlanned` par `scheduled_start` avant affichage.
-- Action "Liste" sans liste existante (tests manuels 4.3 et 5.7) → le bouton "Créer une liste" du sélecteur (modal "Choisir une liste") ne fait que naviguer vers l'écran Listes (`goTo('lists')`) sans conserver la tâche sélectionnée ; une fois la liste créée, la tâche n'y est jamais ajoutée. Concerne les deux points d'entrée : `E20Inbox.tsx` (action "Liste" sur une tâche Todo) et `E21CreateTaskV2.tsx` (destination "Mettre dans une liste"). À corriger : rattacher la tâche à la liste nouvellement créée (conserver la tâche en attente à travers la navigation ou proposer la création de liste directement dans la modale).
-- Aucune détection de conflit de créneau dans Planning (test manuel 6.8) — `scheduleTaskV2` (`taskRulesV2.ts`) et `E40Planning.tsx` ne vérifient pas si un créneau est déjà occupé par une autre tâche avant placement (superposition silencieuse constatée). À corriger : décider du comportement voulu (refus, remplacement avec confirmation, ou autoriser la superposition explicitement) puis l'implémenter.
-- Sous-tâches perdues lors d'une conversion Todo → Planifier/Liste (test manuel 4.6, confirmé) — `planTodoTask`/`moveTodoTaskToList` (`AppContext.tsx`) suppriment les `SubTask` liées à la `Task` V1 sans les recréer côté `TaskV2`/`ListItem`, sans confirmation ni avertissement utilisateur avant la perte.
+- [x] Section "Planning du jour" du Dashboard non triée par heure — corrigé (`getPlannedTasksForDate`), retesté OK.
+- [x] Action "Liste" sans liste existante (4.3/4.5) — corrigé (rattachement à la liste créée), retesté OK.
+- [x] Sous-tâches perdues lors d'une conversion Todo → Planifier/Liste (4.6) — corrigé (avertissement de confirmation), retesté OK.
+- [x] Conflit de créneau dans Planning (6.8) — corrigé une 2e fois (le clic sur un créneau occupé ouvrait le déplacement de l'autre tâche au lieu de refuser ; modale de refus ajoutée), retesté OK.
 
 ### Décisions produit à prendre
 
-- Revoir à quoi sert l'énergie dans l'appli (test manuel 10.2) — actuellement une seule valeur par jour (`todayEnergy`/`todayEnergyStatus`), écrasée à chaque nouvelle saisie (`saveTodayEnergy`, `AppContext.tsx`), sans historique ni lien réel avec le mode surcharge au-delà du filtrage `essential` jamais câblé (cf. trou fonctionnel taskV2 déjà noté). Clarifier l'usage voulu avant de définir le comportement attendu pour plusieurs check-in le même jour.
-- Planning : que faire de l'écran quand aucune tâche n'est planifiable (test manuel 6.3, constat sur capture d'écran) — cliquer sur un créneau vide affiche "Placer à Xh00" + "Aucune tâche à planifier. Ajoutez une tâche et choisissez 'Planifier'." Garder tel quel, reformuler, ou proposer une action directe (raccourci vers la création de tâche) ?
+- Revoir à quoi sert l'énergie dans l'appli (test manuel 10.2) — actuellement une seule valeur par jour (`todayEnergy`/`todayEnergyStatus`), écrasée à chaque nouvelle saisie (`saveTodayEnergy`, `AppContext.tsx`), affichée uniquement dans le chip de la TopBar, sans historique ni aucun autre effet dans l'app (pas de lien avec le mode surcharge, pas de filtrage). Toujours en attente d'une décision sur l'usage voulu avant de définir le comportement pour plusieurs check-in le même jour.
+- [x] **[2026-07-06]** Planning sans tâche planifiable (test manuel 6.3) — décision actée : garder le comportement actuel tel quel ("Placer à Xh00" + "Aucune tâche à planifier. Ajoutez une tâche et choisissez 'Planifier'.").
 
 ### Fonctionnalités manquantes / à implémenter
 
 - Ajouter un champ nom de profil à l'onboarding — l'écran `E02Profile` ne propose actuellement qu'un choix de type de profil (Adolescent/Étudiant/Adulte), aucune saisie de nom.
-- Écran détail tâche (`E22TaskDetail`, actions Décomposer/Terminer/Supprimer) : ajouter la possibilité de planifier la tâche (la sortir d'Aujourd'hui) ou de l'ajouter à une liste, directement depuis cet écran (constat sur capture d'écran).
-- Suppression d'une liste entière (test manuel 9.5) — `deleteList` (`AppContext.tsx`) existe mais n'est câblée dans aucun écran (`E60Lists.tsx`/`E61ListDetail.tsx`), donc aucune confirmation possible. Décision produit : ajouter la suppression de liste (avec confirmation si elle contient des éléments) ou accepter l'absence de cette fonctionnalité.
-- Modification du profil (test manuel 11.1) — l'écran Profil des paramètres (`E111Profile.tsx`) est en lecture seule. Décision produit : ajouter la modification, ou accepter que cet écran reste informatif. Note annexe : les libellés affichés (`profileLabels` : audhd/asd/adhd) ne correspondent pas aux valeurs réelles de `ProfileType` (teenager/student/adult) — le profil affiche systématiquement la valeur brute non traduite.
+- [x] **[2026-07-06]** Écran détail tâche (`E22TaskDetail`) : actions "Aujourd'hui" (masquée si déjà aujourd'hui, avec règle de remplacement à 3 tâches), "Planifier" et "Liste" (avec avertissement de perte de sous-tâches) ajoutées, cohérentes avec l'écran Todo.
+- [x] **[2026-07-06]** Suppression d'une liste entière — `deleteList` câblée dans `E60Lists.tsx` avec confirmation modale. Renommage d'une liste également ajouté (`renameList`, nouveau dans `AppContext.tsx`).
+- Modification du profil (test manuel 11.1) — décision produit toujours ouverte : ajouter la modification ou garder l'écran informatif. Bug de libellé corrigé dans tous les cas **[2026-07-06]** (`profileLabels` alignés sur les vraies valeurs `ProfileType` : teenager/student/adult).
+- [x] **[2026-07-06]** Ajout d'une liste depuis une tâche (Todo, création, détail tâche) : navigue désormais directement vers le détail de la liste après validation, au lieu de rester sur l'écran d'origine.
+- [x] **[2026-07-06]** Écran Aujourd'hui (`E24Today`) : bouton "Ajouter une tâche" ajouté (absent auparavant, seul point d'entrée manquant pour créer une tâche depuis cet écran).
+- [x] **[2026-07-06]** Dashboard, section "Planning du jour" : bouton "Terminer" par tâche ajouté (`completeV2Task`, nouveau dans `AppContext.tsx`) — la tâche terminée sort de la liste (`getPlannedTasksForDate` exclut désormais les tâches `completed`).
+- [ ] Planning : gérer les créneaux par demi-heure plutôt que par heure pleine (ajouté 2026-07-06)
 
 ### Nettoyage UI demandé
 
-- Supprimer la section "Organisation" des Paramètres (`E110Settings.tsx` entrée "Organisation", écran `E114Organisation.tsx`).
-- Supprimer l'icône agenda (Planning) de la `TopBar` (`TopBar.tsx`, `aria-label="Planning"`, `onPlanningClick`) — redondante avec le bouton "Planning" de la nav segmentée du Dashboard.
+- [x] **[2026-07-06]** Section "Organisation" supprimée des Paramètres (`E110Settings.tsx`, écran `E114Organisation.tsx` retiré intégralement du code).
+- [x] **[2026-07-06]** Icône agenda (Planning) supprimée de la `TopBar` — redondante avec le bouton "Planning" de la nav segmentée du Dashboard.
+- [x] **[2026-07-06]** Dashboard : message d'état vide de l'action immédiate remplacé par "Rien à faire aujourd'hui" quand Aujourd'hui est vide (au lieu de "Que souhaitez-vous ajouter ?").
+- [x] **[2026-07-06]** Planning : grille horaire étendue de 6h-22h à 0h-23h (24h complètes).
 
 ### À (re)tester avant déploiement
 

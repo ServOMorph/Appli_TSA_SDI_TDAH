@@ -153,20 +153,30 @@ export function E22TaskDetail() {
     selectedTaskId,
     inboxTasks,
     todayTasks,
+    lists,
     getSubTasks,
     deleteSubTask,
     toggleSubTask,
     completeTask,
     deleteTask,
     selectTask,
+    selectList,
     reorderSubTasks,
     refreshDashboard,
     taskDetailOrigin,
     goTo,
+    moveTask,
+    planTodoTask,
+    moveTodoTaskToList,
+    createList,
   } = useApp()
 
   const [subTasks, setSubTasks] = useState<SubTask[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showReplaceModal, setShowReplaceModal] = useState(false)
+  const [showListPicker, setShowListPicker] = useState(false)
+  const [newListName, setNewListName] = useState('')
+  const [subtaskWarningAction, setSubtaskWarningAction] = useState<'plan' | 'list' | null>(null)
 
   const task = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
 
@@ -230,6 +240,73 @@ export function E22TaskDetail() {
     goTo(task ? backScreenForTask(task) : 'inbox')
   }
 
+  async function handleMoveToToday() {
+    if (!selectedTaskId) return
+    if (todayTasks.length >= 3) {
+      setShowReplaceModal(true)
+    } else {
+      await moveTask(selectedTaskId, 'today')
+    }
+  }
+
+  async function handleReplace(replacedId: string) {
+    if (!selectedTaskId) return
+    await moveTask(replacedId, 'inbox')
+    await moveTask(selectedTaskId, 'today')
+    setShowReplaceModal(false)
+  }
+
+  async function handlePlan() {
+    if (!selectedTaskId) return
+    const newTaskId = await planTodoTask(selectedTaskId)
+    selectTask(newTaskId)
+    goTo('planning')
+  }
+
+  async function handleChooseList(listId: string) {
+    if (!selectedTaskId) return
+    await moveTodoTaskToList(selectedTaskId, listId)
+    selectTask(null)
+    selectList(listId)
+    goTo('list-detail')
+  }
+
+  async function handleCreateList() {
+    if (!selectedTaskId || !newListName.trim()) return
+    const listId = await createList(newListName.trim())
+    await moveTodoTaskToList(selectedTaskId, listId)
+    setNewListName('')
+    selectTask(null)
+    selectList(listId)
+    goTo('list-detail')
+  }
+
+  function handleClickPlan() {
+    if (subTasks.length > 0) {
+      setSubtaskWarningAction('plan')
+    } else {
+      handlePlan()
+    }
+  }
+
+  function handleClickList() {
+    if (subTasks.length > 0) {
+      setSubtaskWarningAction('list')
+    } else {
+      setShowListPicker(true)
+    }
+  }
+
+  function confirmSubtaskWarning() {
+    const action = subtaskWarningAction
+    setSubtaskWarningAction(null)
+    if (action === 'plan') {
+      handlePlan()
+    } else if (action === 'list') {
+      setShowListPicker(true)
+    }
+  }
+
   if (!task) {
     return (
       <main style={pageStyle}>
@@ -282,6 +359,17 @@ export function E22TaskDetail() {
         <Button fullWidth onClick={() => goTo('task-decompose')}>
           Décomposer
         </Button>
+        {task.status !== 'today' && (
+          <Button fullWidth onClick={handleMoveToToday}>
+            Aujourd'hui
+          </Button>
+        )}
+        <Button fullWidth onClick={handleClickPlan}>
+          Planifier
+        </Button>
+        <Button fullWidth onClick={handleClickList}>
+          Liste
+        </Button>
         <Button fullWidth onClick={handleComplete}>
           Terminer
         </Button>
@@ -301,6 +389,91 @@ export function E22TaskDetail() {
               Supprimer
             </Button>
             <Button variant="secondary" fullWidth onClick={() => setShowDeleteConfirm(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {showListPicker && (
+        <div role="dialog" aria-modal="true" aria-label="Choisir une liste" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Ajouter à une liste</h2>
+            {lists.length === 0 ? (
+              <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                {lists.map((l) => (
+                  <button
+                    key={l.id}
+                    aria-label={`Ajouter à ${l.name}`}
+                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
+                    onClick={() => handleChooseList(l.id)}
+                  >
+                    {l.name}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="text"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                placeholder="Nouvelle liste"
+                aria-label="Nom de la nouvelle liste"
+                style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
+              />
+              <Button onClick={handleCreateList} disabled={!newListName.trim()}>
+                Créer
+              </Button>
+            </div>
+            <Button variant="secondary" fullWidth onClick={() => setShowListPicker(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {subtaskWarningAction && (
+        <div role="dialog" aria-modal="true" aria-label="Sous-tâches perdues" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Sous-tâches non conservées</h2>
+            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+              {`« ${task.title} » a ${subTasks.length} sous-tâche${subTasks.length > 1 ? 's' : ''}. ${
+                subTasks.length > 1 ? 'Elles seront' : 'Elle sera'
+              } supprimée${subTasks.length > 1 ? 's' : ''} et ne sera pas reportée sur la nouvelle destination. Continuer ?`}
+            </p>
+            <Button fullWidth onClick={confirmSubtaskWarning}>
+              Continuer
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setSubtaskWarningAction(null)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {showReplaceModal && (
+        <div role="dialog" aria-modal="true" aria-label="Remplacer une tâche" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Choisir la tâche à remplacer</h2>
+            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+              Vous avez déjà 3 tâches aujourd'hui. Sélectionnez celle à déplacer vers le Todo :
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+              {todayTasks.map((t) => (
+                <button
+                  key={t.id}
+                  aria-label={`Remplacer par ${t.title}`}
+                  style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
+                  onClick={() => handleReplace(t.id)}
+                >
+                  {t.title}
+                </button>
+              ))}
+            </div>
+            <Button variant="secondary" fullWidth onClick={() => setShowReplaceModal(false)}>
               Annuler
             </Button>
           </div>

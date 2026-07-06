@@ -54,6 +54,7 @@ export function E20Inbox() {
     todayTasks,
     lists,
     selectTask,
+    selectList,
     goTo,
     moveTask,
     planTodoTask,
@@ -90,6 +91,8 @@ export function E20Inbox() {
     if (!listPickerTask) return
     await moveTodoTaskToList(listPickerTask.id, listId)
     setListPickerTask(null)
+    selectList(listId)
+    goTo('list-detail')
   }
 
   async function handleCreateList() {
@@ -98,6 +101,8 @@ export function E20Inbox() {
     await moveTodoTaskToList(listPickerTask.id, listId)
     setNewListName('')
     setListPickerTask(null)
+    selectList(listId)
+    goTo('list-detail')
   }
 
   function handleClickPlan(task: Task) {

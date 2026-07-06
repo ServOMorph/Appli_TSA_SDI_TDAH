@@ -24,17 +24,17 @@ describe('E111Profile', () => {
     expect(screen.getByLabelText('type de profil')).toHaveTextContent('Non défini')
   })
 
-  it('affiche le label du profil AuDHD', () => {
+  it('affiche le label du profil', () => {
     renderE111({
       currentUser: {
         id: '1',
-        profile_type: 'audhd',
+        profile_type: 'teenager',
         onboarding_completed: true,
         created_at: '',
         updated_at: '',
       },
     })
-    expect(screen.getByLabelText('type de profil')).toHaveTextContent('AuDHD (TSA + TDAH)')
+    expect(screen.getByLabelText('type de profil')).toHaveTextContent('Adolescent')
   })
 
   it('navigue vers settings via Retour', () => {

@@ -50,9 +50,9 @@ function makeSubTask(overrides: Partial<SubTask> = {}): SubTask {
 
 describe('E10Dashboard', () => {
   describe('état vide (D10A)', () => {
-    it('affiche le message Que souhaitez-vous ajouter', () => {
+    it('affiche le message Rien à faire aujourd\'hui', () => {
       renderWithApp(<E10Dashboard />)
-      expect(screen.getAllByText('Que souhaitez-vous ajouter ?').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Rien à faire aujourd\'hui').length).toBeGreaterThan(0)
     })
 
     it('affiche le bouton Ajouter une tâche', () => {
@@ -295,12 +295,10 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('lists')
     })
 
-    it('navigue vers planning au clic sur l\'icône agenda', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
+    it('n\'affiche pas d\'icône Planning dans la TopBar', () => {
+      renderWithApp(<E10Dashboard />)
       const header = screen.getByRole('banner')
-      await userEvent.click(within(header).getByRole('button', { name: 'Planning' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+      expect(within(header).queryByRole('button', { name: 'Planning' })).toBeNull()
     })
   })
 

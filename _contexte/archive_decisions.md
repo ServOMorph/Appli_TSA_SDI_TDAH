@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-02 (archivé depuis contexte.md 2026-07-06 session suite)
+- Décision d'architecture — le système V1 `Task` reste le moteur du dashboard, non unifié sur `TaskV2`. Écran Todo enrichi d'actions "Planifier"/"Liste" (conversion à l'action). Corrige un bug orphelin (`E21CreateTaskV2` destination "Todo" créait des `TaskV2` jamais affichées) et un bug de reset (`deleteAllData` ne vidait pas `tasksV2`).
+
 ## 2026-07-01 (archivé depuis contexte.md 2026-07-06)
 - V2-10 démarrée (chantier dead code/couverture) — suppression `TASK_TODAY_MAX`/`canAddToToday` (V1, jamais appliqués) ; config coverage corrigée (exclusion `dist`/`e2e`), couverture réelle 95.48% (seuil 85% dépassé) ; `completeTaskV2`/`moveTaskToLaterV2`/`toggleEssentialV2` (V2) conservés mais identifiés comme trou fonctionnel non câblé à l'UI, décision produit différée.
 

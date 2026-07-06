@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
 
-const HOURS = Array.from({ length: 17 }, (_, i) => i + 6)
+const HOURS = Array.from({ length: 24 }, (_, i) => i)
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
@@ -296,7 +296,14 @@ export function E40Planning() {
               <div
                 role="gridcell"
                 style={slotCellStyle}
-                onClick={() => tasksInSlot.length === 0 && setPicker({ mode: 'assign', hour })}
+                onClick={() => {
+                  if (tasksInSlot.length === 0) {
+                    setConflictError(null)
+                    setPicker({ mode: 'assign', hour })
+                  } else if (pendingTaskId) {
+                    handleAssign(pendingTaskId, hour)
+                  }
+                }}
                 aria-label={`Créneau ${hour}h`}
               >
                 {tasksInSlot.map((task) => (
@@ -305,7 +312,11 @@ export function E40Planning() {
                     style={taskChipStyle(task.essential)}
                     onClick={(e) => {
                       e.stopPropagation()
-                      setPicker({ mode: 'move', task, hour })
+                      if (pendingTaskId) {
+                        handleAssign(pendingTaskId, hour)
+                      } else {
+                        setPicker({ mode: 'move', task, hour })
+                      }
                     }}
                     aria-label={`${task.title} — déplacer`}
                   >
@@ -400,6 +411,19 @@ export function E40Planning() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {conflictError && picker === null && (
+        <div style={overlayStyle} role="dialog" aria-modal aria-label="Créneau occupé">
+          <div style={sheetStyle}>
+            <p role="alert" style={{ margin: 0, color: 'var(--color-error, #c0392b)' }}>
+              {conflictError}
+            </p>
+            <button style={validateBtnStyle} onClick={() => setConflictError(null)}>
+              Fermer
+            </button>
           </div>
         </div>
       )}

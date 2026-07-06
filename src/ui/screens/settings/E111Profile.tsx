@@ -12,9 +12,9 @@ const backBtnStyle: React.CSSProperties = {
 }
 
 const profileLabels: Record<string, string> = {
-  audhd: 'AuDHD (TSA + TDAH)',
-  asd: 'TSA sans TDAH',
-  adhd: 'TDAH sans TSA',
+  teenager: 'Adolescent',
+  student: 'Étudiant',
+  adult: 'Adulte',
 }
 
 export function E111Profile() {

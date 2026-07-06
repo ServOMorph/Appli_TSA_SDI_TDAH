@@ -161,6 +161,7 @@ export function E10Dashboard() {
     reorderTodayTasks,
     inboxTasks,
     getPlannedTasksForDate,
+    completeV2Task,
   } = useApp()
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks.slice(0, 3))
@@ -192,6 +193,13 @@ export function E10Dashboard() {
   }
 
   const hasPlanningToday = todayPlanned.length > 0
+
+  async function handleCompletePlanned(taskId: string) {
+    await completeV2Task(taskId)
+    const date = todayStr()
+    const planned = await getPlannedTasksForDate(date)
+    setTodayPlanned(planned)
+  }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
@@ -242,7 +250,6 @@ export function E10Dashboard() {
         onEnergyClick={() => goTo('energy-view')}
         overloadActive={overloadMode}
         onOverloadClick={() => setOverloadMode(!overloadMode)}
-        onPlanningClick={() => goTo('planning')}
         onResourcesClick={() => goTo('resources')}
         onSettingsClick={() => goTo('settings')}
       />
@@ -304,7 +311,7 @@ export function E10Dashboard() {
               )}
             </button>
           ) : (
-            <p>Que souhaitez-vous ajouter ?</p>
+            <p>{isEmpty ? 'Rien à faire aujourd\'hui' : 'Que souhaitez-vous ajouter ?'}</p>
           )}
         </Card>
       </section>
@@ -315,14 +322,31 @@ export function E10Dashboard() {
         {hasPlanningToday ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
             {todayPlanned.map((task) => (
-              <button
-                key={task.id}
-                style={planningChipStyle(task.essential)}
-                onClick={() => goTo('planning')}
-                aria-label={`${task.title} — voir dans le planning`}
-              >
-                {task.scheduled_start} · {task.title}
-              </button>
+              <div key={task.id} style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
+                <button
+                  style={{ ...planningChipStyle(task.essential), flex: 1 }}
+                  onClick={() => goTo('planning')}
+                  aria-label={`${task.title} — voir dans le planning`}
+                >
+                  {task.scheduled_start} · {task.title}
+                </button>
+                <button
+                  aria-label={`Terminer ${task.title}`}
+                  onClick={() => handleCompletePlanned(task.id)}
+                  style={{
+                    background: 'none',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '6px 10px',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    color: 'var(--color-text-muted)',
+                    flexShrink: 0,
+                  }}
+                >
+                  Terminer
+                </button>
+              </div>
             ))}
           </div>
         ) : (

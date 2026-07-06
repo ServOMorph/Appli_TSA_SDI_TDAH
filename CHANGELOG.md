@@ -1,3 +1,26 @@
+## v0.42 — 2026-07-06
+
+### Corrigé
+- Conflit de créneau dans Planning : le clic sur un créneau déjà occupé ouvrait à tort le déplacement de l'autre tâche au lieu de refuser la tâche en attente ; message de refus affiché en modale plutôt qu'en bannière.
+- Libellés du profil (`E111Profile`) : correspondaient à d'anciennes valeurs (`audhd`/`asd`/`adhd`) au lieu des vraies valeurs `ProfileType` (`teenager`/`student`/`adult`), affichant une valeur brute non traduite.
+
+### Ajouté
+- Écran détail tâche (`E22TaskDetail`) : actions "Aujourd'hui", "Planifier" et "Liste", cohérentes avec l'écran Todo.
+- Navigation directe vers le détail de la liste après y avoir ajouté une tâche (Todo, création de tâche, détail tâche).
+- Écran Aujourd'hui : bouton "Ajouter une tâche".
+- Dashboard, section "Planning du jour" : bouton "Terminer" par tâche (la tâche terminée sort de la liste).
+- Listes : renommage et suppression (avec confirmation).
+- Planning : grille horaire étendue à 24h (0h-23h) au lieu de 6h-22h.
+
+### Modifié
+- Dashboard : message d'état vide de l'action immédiate remplacé par "Rien à faire aujourd'hui" quand Aujourd'hui est vide.
+
+### Supprimé
+- Section "Organisation" des Paramètres et écran `E114Organisation` retirés intégralement.
+- Icône Planning de la TopBar retirée (redondante avec la nav segmentée du Dashboard).
+
+---
+
 ## v0.41 — 2026-07-06
 
 ### Corrigé

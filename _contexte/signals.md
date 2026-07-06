@@ -9,34 +9,27 @@
 
 ### V2 — En cours
 - [P1|ouvert] Phase V2-10 (Consolidation V2 & 2e vague de tests) — EN COURS
-  - Les 4 bugs confirmés du plan de test manuel sont corrigés (voir ci-dessous). Reste : retest manuel de ces 4 corrections, décisions produit restantes, relance e2e, build V2, doc V2, déploiement Netlify, sessions test 2-5.
-  - fait quand: bugs retestés, décisions produit tranchées, doc V2 rédigée, `dist/v2/` régénéré et déployé sur Netlify, 5-10 sessions test réalisées
+  - Tous les bugs confirmés du plan de test manuel sont corrigés et retestés en app réelle (13 points de confirmation validés par l'utilisateur le 2026-07-06). Reste : 2 décisions produit, relance e2e, build V2, doc V2, déploiement Netlify, sessions test 2-5.
+  - fait quand: décisions produit tranchées, e2e relancés, doc V2 rédigée, `dist/v2/` régénéré et déployé sur Netlify, 5-10 sessions test réalisées
   - réf: `roadmap_v2.md` Phase V2-10 et § "Constats test manuel V2-10 (session 2026-07-06)"
-- [P2|ouvert] Retest manuel des 4 bugs corrigés (2026-07-06) :
-  - tri "Planning du jour" (Dashboard) par `scheduled_start` — corrigé (`AppContext.getPlannedTasksForDate`)
-  - rattachement de la tâche à une liste créée à la volée — corrigé (`createList` retourne l'id, création inline dans `E20Inbox`/`E21CreateTaskV2`)
-  - détection de conflit de créneau dans Planning — corrigé, décision produit actée avec l'utilisateur : refus + message (pas de remplacement ni de superposition) dans `E40Planning`
-  - perte de sous-tâches lors de conversion Todo → Planifier/Liste — corrigé par avertissement de confirmation avant conversion (pas de migration du modèle de données)
-  - fait quand: chaque bug retesté manuellement dans l'app (346/346 tests unitaires + `tsc -b` clean déjà validés côté code)
-  - réf: `roadmap_v2.md` Phase V2-10, sous-section "Bugs confirmés à corriger" (statut mis à jour)
-- [P3|ouvert] Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — décision explicitement reportée, non traitée par le fix minimal ci-dessus
+- [P2|ouvert] Décisions produit restantes : usage réel de l'énergie dans l'appli (actuellement affichage seul, une valeur/jour écrasée, sans autre effet dans l'app — aucune décision prise) ; modification du profil après onboarding (`E111Profile` toujours en lecture seule — décision non prise, seul le bug de libellé a été corrigé)
+  - fait quand: décisions actées et implémentées si nécessaire
+  - réf: `roadmap_v2.md` § "Constats test manuel V2-10" sous-sections "Décisions produit à prendre" et "Fonctionnalités manquantes / à implémenter"
+- [P3|ouvert] Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — décision explicitement reportée
   - fait quand: décision produit prise sur l'implémentation (piste retenue si besoin confirmé : chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id` optionnel)
   - réf: `roadmap_v2.md` § "Fonctionnalité reportée (décision 2026-07-06)"
-- [P2|ouvert] Décisions produit à prendre (2026-07-06) : usage réel de l'énergie dans l'appli (une seule valeur/jour, pas d'historique) ; comportement de l'écran Planning quand aucune tâche n'est planifiable
-  - fait quand: décisions actées et implémentées si nécessaire
-  - réf: `roadmap_v2.md` § "Constats test manuel V2-10 (session 2026-07-06)" sous-section "Décisions produit à prendre"
-- [P2|ouvert] Fonctionnalités manquantes identifiées (2026-07-06) : nom de profil à l'onboarding, actions Planifier/Liste depuis `E22TaskDetail`, suppression de liste (`deleteList` non câblée), modification du profil (`E111Profile` lecture seule, + libellés `profileLabels` ne correspondant pas à `ProfileType`)
-  - fait quand: décision produit prise pour chaque point (implémenter ou explicitement abandonner)
-  - réf: `roadmap_v2.md` § "Constats test manuel V2-10 (session 2026-07-06)" sous-section "Fonctionnalités manquantes / à implémenter"
-- [P3|ouvert] Nettoyage UI demandé (2026-07-06) : supprimer la section "Organisation" des Paramètres, supprimer l'icône agenda de la TopBar
-  - fait quand: les deux éléments retirés du code
-  - réf: `roadmap_v2.md` § "Constats test manuel V2-10 (session 2026-07-06)" sous-section "Nettoyage UI demandé"
-- [P2|ouvert] Points à (re)tester avant déploiement (2026-07-06) : badge X/Y Dashboard, Dashboard vide, scroll Planning à l'heure courante, horaires limites Planning, état vide Aujourd'hui, mode sombre, accessibilité/stimulation, export iOS + viabilité JSON, mode offline
+- [P2|ouvert] Ajouter un champ nom de profil à l'onboarding (`E02Profile` : choix de type de profil seulement, aucune saisie de nom)
+  - fait quand: décision produit prise (implémenter ou explicitement abandonner)
+  - réf: `roadmap_v2.md` § "Constats test manuel V2-10" sous-section "Fonctionnalités manquantes / à implémenter"
+- [P3|ouvert] Planning : gérer les créneaux par demi-heure plutôt que par heure pleine (demande utilisateur 2026-07-06, grille actuelle 24 créneaux d'1h dans `E40Planning.tsx`)
+  - fait quand: grille Planning affiche des créneaux de 30 min
+  - réf: `roadmap_v2.md` Phase V2-10
+- [P2|ouvert] Points à (re)tester avant déploiement, non couverts par les 13 tests de cette session : badge X/Y Dashboard, Dashboard vide, scroll Planning à l'heure courante, horaires limites Planning (00h/23h — durée du dernier créneau à vérifier), état vide Aujourd'hui, mode sombre, accessibilité/stimulation, export iOS + viabilité JSON, mode offline
   - fait quand: chaque point retesté et résultat consigné dans `plan_test_manuel_v2.md`
-  - réf: `plan_test_manuel_v2.md` (lignes annotées "à tester"/"à retester") et `roadmap_v2.md` § "Constats test manuel V2-10 (session 2026-07-06)" sous-section "À (re)tester avant déploiement"
-- [P3|ouvert] Trou fonctionnel TaskV2 : aucune interaction UI pour compléter/toggle `essential` une tâche planifiée
-  - fait quand: décision produit prise (implémenter ou explicitement abandonner) sur `completeTaskV2`/`toggleEssentialV2` (`src/domain/rules/taskRulesV2.ts`), actuellement non appelées nulle part dans l'UI.
-  - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`. Toujours sans usage identifié après la revue du 2026-07-06.
+  - réf: `plan_test_manuel_v2.md` (lignes annotées "à tester"/"à retester")
+- [P3|ouvert] Trou fonctionnel TaskV2 : aucune interaction UI pour toggle `essential` une tâche planifiée (le "Terminer" ajouté cette session couvre la complétion, pas le statut essentiel)
+  - fait quand: décision produit prise (implémenter ou explicitement abandonner) sur `toggleEssentialV2` (`src/domain/rules/taskRulesV2.ts`)
+  - réf: constat session V2-10 2026-07-01, vérifié dans `E10Dashboard.tsx` et `E40Planning.tsx`
 
 ## Questions ouvertes
 
@@ -46,35 +39,43 @@
 Aucun.
 
 ## Contexte chaud
-- **4 bugs confirmés du test manuel corrigés (2026-07-06)** : voir action "Retest manuel des 4 bugs corrigés" ci-dessus pour le détail technique et les fichiers touchés.
-- **Décision produit actée (2026-07-06)** : en cas de conflit de créneau dans Planning, comportement = refus + message (pas de remplacement avec confirmation, pas de superposition autorisée).
-- **Décision produit actée (2026-07-06)** : le fix "sous-tâches perdues" reste minimal (avertissement avant conversion) ; la planification indépendante des sous-tâches (chaque `SubTask` avec son propre horaire) est un chantier de fond reporté, piste retenue = chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id`.
-- Branche `v2` active ; tag `v1.0-mvp` posé ; `dist/v1/` versionné pour rollback, `dist/v2/` ignoré Git/régénérable via `npm run build`
-- 346/346 tests unitaires, `tsc -b` clean après les 4 corrections de bugs ; e2e non relancés cette session (dernière confirmation 45/45 le 2026-07-05, avant les changements onboarding du 2026-07-06 — toujours à revalider)
+- **Tous les bugs et demandes de la session sont corrigés, testés et confirmés par l'utilisateur (2026-07-06)** : conflit de créneau (2e correctif, clic sur créneau occupé), actions Aujourd'hui/Planifier/Liste sur `E22TaskDetail`, navigation directe vers le détail de liste après ajout, bouton "Ajouter une tâche" sur Aujourd'hui, bouton "Terminer" sur Planning du jour (Dashboard), retrait icône Planning TopBar, grille Planning 0h-23h, message "Rien à faire aujourd'hui", renommer/supprimer une liste, section Organisation supprimée, libellé profil corrigé.
+- Branche `v2` active ; tag `v1.0-mvp` posé ; `dist/v1/` versionné pour rollback, `dist/v2/` ignoré Git/régénérable via `npm run build` (toujours périmé, généré le 2026-07-02)
+- 344/344 tests unitaires, `tsc -b` clean après tous les changements de la session
+- e2e non relancés depuis les changements onboarding du 2026-07-06 (dernière confirmation 45/45 le 2026-07-05) — à revalider avant déploiement
 - `npm run test` sous `--pool=vmThreads --poolOptions.vmThreads.maxThreads=1` fait échouer les tests liés à `crypto.subtle` (faux négatif d'environnement documenté) — utiliser le pool par défaut (`npx vitest run`)
 
 ## Dernière session (2026-07-06)
 
 ## Décisions prises
-- Conflit de créneau dans Planning : comportement = refus + message (tranché avec l'utilisateur parmi 3 options).
-- Sous-tâches perdues à la conversion Todo → Planifier/Liste : fix minimal = avertissement de confirmation avant conversion, sans migrer le modèle de données ; la planification indépendante des sous-tâches est reportée comme chantier séparé.
+- Conflit de créneau Planning : bug persistant corrigé (le clic sur un créneau occupé ouvrait à tort le déplacement de l'autre tâche au lieu de refuser) ; message de refus affiché en modale plutôt qu'en bannière discrète.
+- Planning sans tâche planifiable : garder le comportement actuel tel quel (décision actée).
+- Ajout d'une tâche à une liste (Todo, création, détail tâche) : naviguer directement vers le détail de la liste après validation.
+- Listes : ajouter le renommage et la suppression (avec confirmation).
+- Section "Organisation" des Paramètres supprimée intégralement (code mort retiré, pas seulement masquée).
+- Icône Planning de la TopBar supprimée (redondante avec la nav segmentée du Dashboard).
 
 ## Livrables produits ou modifiés
-- `src/app/AppContext.tsx` : `getPlannedTasksForDate` trie désormais par `scheduled_start` ; `createList` retourne l'id de la liste créée
-- `src/ui/screens/tasks/E20Inbox.tsx` : création de liste inline dans le sélecteur "Ajouter à une liste" (rattache la tâche à la liste créée) ; modale d'avertissement avant perte de sous-tâches sur "Planifier"/"Liste"
-- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : création de liste inline dans le sélecteur, même correctif que E20Inbox
-- `src/ui/screens/planning/E40Planning.tsx` : détection de conflit de créneau (refus + message) sur placement et déplacement de tâche
-- `src/test/testUtils.tsx`, `src/ui/screens/tasks/E20Inbox.test.tsx` : mocks et tests mis à jour/ajoutés pour les nouveaux comportements
-- `roadmap_v2.md` : 4 bugs confirmés marqués corrigés, section "Fonctionnalité reportée (décision 2026-07-06)" ajoutée
+- `src/ui/screens/tasks/E22TaskDetail.tsx` : actions "Aujourd'hui", "Planifier", "Liste" ajoutées (cohérentes avec Todo)
+- `src/ui/screens/planning/E40Planning.tsx` : conflit de créneau corrigé avec modale de refus ; grille horaire étendue à 24h (0h-23h)
+- `src/ui/screens/lists/E60Lists.tsx` : renommer/supprimer une liste (avec confirmation)
+- `src/ui/screens/tasks/E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx` : navigation vers le détail de liste après ajout d'une tâche
+- `src/ui/screens/tasks/E24Today.tsx` : bouton "Ajouter une tâche" ajouté
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : bouton "Terminer" sur Planning du jour, message "Rien à faire aujourd'hui" si Aujourd'hui vide
+- `src/ui/components/TopBar.tsx`, `DevResetButton.tsx`, `src/App.tsx`, `src/app/AppContext.tsx` : retrait icône Planning, ajout `renameList`/`completeV2Task`, filtrage des tâches `completed` dans `getPlannedTasksForDate`
+- `src/ui/screens/settings/E111Profile.tsx` : bug de libellés profil corrigé (teenager/student/adult)
+- `src/ui/screens/settings/E114Organisation.tsx` + test : supprimés intégralement
+- `roadmap_v2.md` : tous les points ci-dessus marqués corrigés/retestés
 
 ## Hypothèses validées / invalidées
-- VALIDE : 346/346 tests unitaires, `tsc -b` clean après les 4 corrections de bugs
-- EN ATTENTE : retest manuel des 4 corrections dans l'app réelle (non fait cette session, code + tests unitaires seulement)
-- EN ATTENTE : e2e non relancés après ces changements (dernière confirmation 45/45 le 2026-07-05, avant les changements onboarding du 2026-07-06)
-- EN ATTENTE : build V2 (`dist/v2/`) toujours périmé (généré le 2026-07-02)
+- VALIDE : 344/344 tests unitaires, `tsc -b` clean après tous les changements
+- VALIDE : 13 tests manuels de confirmation tous passés par l'utilisateur en app réelle
+- EN ATTENTE : décision usage énergie, décision modification profil
+- EN ATTENTE : e2e non relancés depuis les changements onboarding du 2026-07-06
+- EN ATTENTE : build `dist/v2/` toujours périmé (généré le 2026-07-02)
 
 ## Prochaine étape exacte
-Retester manuellement les 4 corrections, trancher les 2 décisions produit restantes (énergie, écran Planning vide), relancer les e2e, puis reprendre V2-10 : build `dist/v2/`, doc V2, déploiement Netlify.
+Trancher les 2 décisions produit restantes (énergie, modification du profil), relancer les e2e, puis reprendre V2-10 : build `dist/v2/`, doc V2, déploiement Netlify.
 
 ## Question bloquante pour la session suivante
 Aucune.

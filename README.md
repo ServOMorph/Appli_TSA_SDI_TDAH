@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes ; V2-5 (file "À planifier") retirée le 2026-07-05. Tag `v1.0-mvp` posé, `dist/v1/` archivé (rollback V1 opérationnel), `dist/v2/` régénérable via `npm run build`. V2-10 (consolidation) en cours. Plan de test manuel V2 (`plan_test_manuel_v2.md`) rédigé et passé intégralement le 2026-07-06 ; les 4 bugs confirmés sont corrigés (tri "Planning du jour" par `scheduled_start`, rattachement de tâche à une liste créée à la volée, détection de conflit de créneau dans Planning avec refus + message, avertissement avant perte de sous-tâches à la conversion Todo→Planifier/Liste — retest manuel restant). La planification indépendante des sous-tâches est explicitement reportée en chantier séparé. Reste consolidé dans `roadmap_v2.md` : 2 décisions produit (usage de l'énergie, écran Planning sans tâche planifiable), 4 fonctionnalités manquantes, 2 demandes de nettoyage UI, 10 points à retester. Comportement onboarding corrigé (2026-07-06) : quitter avant d'atteindre le dashboard entraîne un redémarrage complet plutôt qu'une reprise directe sur le dashboard ; bouton "Ignorer" retiré de l'écran choix de profil (sélection obligatoire). Reste : retester les 4 corrections, trancher les décisions produit restantes, régénérer `dist/v2/` à jour, doc V2 (README/schéma/ADR), déploiement Netlify, sessions test 2-5 avec Marie. Tests unitaires 346/346, `tsc -b` clean ; e2e à revalider (dernière confirmation 45/45 le 2026-07-05, avant les changements onboarding).
+V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes ; V2-5 retirée le 2026-07-05. Tag `v1.0-mvp` posé, `dist/v1/` archivé (rollback V1 opérationnel), `dist/v2/` régénérable via `npm run build` (périmé, daté du 2026-07-02). V2-10 (consolidation) en cours. Plan de test manuel V2 passé intégralement le 2026-07-06 ; tous les bugs confirmés corrigés et retestés en app réelle (13 points de confirmation validés) : conflit de créneau Planning (modale de refus), actions Aujourd'hui/Planifier/Liste depuis le détail tâche, navigation directe vers le détail de liste après ajout, bouton "Ajouter une tâche" sur Aujourd'hui, bouton "Terminer" sur Planning du jour (Dashboard), retrait icône Planning TopBar, grille Planning 24h (0h-23h), message "Rien à faire aujourd'hui", renommer/supprimer une liste, section Organisation supprimée, bug libellé profil corrigé. Restent 2 décisions produit ouvertes (usage de l'énergie, modification du profil) et 2 chantiers reportés (planification indépendante des sous-tâches, créneaux Planning en demi-heure). Reste avant déploiement : trancher les décisions restantes, relancer les e2e, régénérer `dist/v2/`, doc V2, déploiement Netlify, sessions test 2-5 avec Marie. Tests unitaires 344/344, `tsc -b` clean.
 
 ## Stack
 
@@ -53,7 +53,7 @@ Archives/        — Roadmap V1 archivée
 
 ## Prochaine étape
 
-Phase V2-10 — Retester manuellement les 4 corrections de bugs, trancher les décisions produit restantes issues du plan de test manuel (voir `roadmap_v2.md`), puis doc V2, déploiement Netlify, sessions test 2-5 avec Marie.
+Phase V2-10 — Trancher les décisions produit restantes (usage énergie, modification du profil — voir `roadmap_v2.md`), relancer les e2e, puis doc V2, déploiement Netlify, sessions test 2-5 avec Marie.
 
 ## Licence
 

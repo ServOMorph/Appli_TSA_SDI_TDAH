@@ -1,5 +1,6 @@
 import { useApp } from '@/app/AppContext'
 import { Card } from '@/ui/components/Card'
+import { Button } from '@/ui/components/Button'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -105,6 +106,10 @@ export function E24Today() {
           })}
         </div>
       )}
+
+      <Button fullWidth onClick={() => goTo('task-create-v2')}>
+        Ajouter une tâche
+      </Button>
     </main>
   )
 }

@@ -8,7 +8,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule } from '@/domain/rules/taskRulesV2'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
@@ -38,7 +38,6 @@ export type Screen =
   | 'settings-profile'
   | 'settings-accessibility'
   | 'settings-stimulation'
-  | 'settings-organisation'
   | 'settings-privacy'
   | 'settings-export'
   | 'lists'
@@ -92,7 +91,9 @@ interface AppContextValue {
   selectedListId: string | null
   selectList: (id: string | null) => void
   createList: (name: string) => Promise<string>
+  renameList: (id: string, name: string) => Promise<void>
   deleteList: (id: string) => Promise<void>
+  completeV2Task: (taskId: string) => Promise<void>
   getListItems: (listId: string) => Promise<ListItem[]>
   addListItem: (listId: string, title: string) => Promise<void>
   deleteListItem: (id: string) => Promise<void>
@@ -282,7 +283,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   async function getPlannedTasksForDate(date: string): Promise<TaskV2[]> {
     const tasks = await taskV2Repo.getByDate(date)
-    return tasks.slice().sort((a, b) => (a.scheduled_start ?? '').localeCompare(b.scheduled_start ?? ''))
+    return tasks
+      .filter((t) => t.status !== 'completed')
+      .sort((a, b) => (a.scheduled_start ?? '').localeCompare(b.scheduled_start ?? ''))
+  }
+
+  async function completeV2Task(taskId: string) {
+    const task = await taskV2Repo.getById(taskId)
+    if (!task) return
+    const updated = completeTaskV2Rule(task, new Date().toISOString())
+    await taskV2Repo.update(updated)
   }
 
   async function getUnscheduledPlannedTasks(): Promise<TaskV2[]> {
@@ -406,6 +416,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await listRepo.create(list)
     setLists((prev) => [...prev, list])
     return list.id
+  }
+
+  async function renameList(id: string, name: string) {
+    const list = lists.find((l) => l.id === id)
+    if (!list) return
+    const updated = { ...list, name, updated_at: new Date().toISOString() }
+    await listRepo.update(updated)
+    setLists((prev) => prev.map((l) => (l.id === id ? updated : l)))
   }
 
   async function deleteList(id: string) {
@@ -550,6 +568,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         scheduleV2Task,
         getPlannedTasksForDate,
         getUnscheduledPlannedTasks,
+        completeV2Task,
         moveTask,
         completeTask,
         deleteTask,
@@ -565,6 +584,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         selectedListId,
         selectList: setSelectedListId,
         createList,
+        renameList,
         deleteList,
         getListItems,
         addListItem,

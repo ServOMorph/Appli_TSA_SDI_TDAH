@@ -27,12 +27,12 @@ describe('E40Planning', () => {
     vi.setSystemTime(new Date('2026-06-30T14:30:00'))
   })
 
-  it('affiche les créneaux horaires de 6h à 22h', async () => {
+  it('affiche les créneaux horaires de 0h à 23h', async () => {
     renderWithApp(<E40Planning />)
     await waitFor(() => {
-      expect(screen.getByText('6h')).toBeInTheDocument()
+      expect(screen.getByText('0h')).toBeInTheDocument()
     })
-    expect(screen.getByText('22h')).toBeInTheDocument()
+    expect(screen.getByText('23h')).toBeInTheDocument()
     expect(screen.getByText('14h')).toBeInTheDocument()
   })
 
@@ -217,6 +217,28 @@ describe('E40Planning', () => {
     await userEvent.click(screen.getByRole('button', { name: /valider/i }))
 
     expect(selectTask).toHaveBeenCalledWith(null)
+  })
+
+  it('avec une tâche en attente, cliquer sur un créneau déjà occupé refuse et affiche un message (pas de déplacement de l\'autre tâche)', async () => {
+    const scheduleV2Task = vi.fn().mockResolvedValue(undefined)
+    const occupying = makeTaskV2({ id: 't1', title: 'Médecin', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    const pending = makeTaskV2({ id: 'u1', title: 'Laver machine', scheduled_date: null })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        scheduleV2Task,
+        selectedTaskId: 'u1',
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([occupying]),
+        getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([pending]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('button', { name: /médecin — déplacer/i }))
+
+    expect(screen.queryByText(/déplacer « médecin »/i)).not.toBeInTheDocument()
+    expect(scheduleV2Task).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert')).toHaveTextContent(/déjà occupé/i)
   })
 
   it('fermer le picker ferme le dialogue', async () => {

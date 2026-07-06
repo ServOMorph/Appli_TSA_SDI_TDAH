@@ -18,7 +18,6 @@ import { E110Settings } from '@/ui/screens/settings/E110Settings'
 import { E111Profile } from '@/ui/screens/settings/E111Profile'
 import { E112Accessibility } from '@/ui/screens/settings/E112Accessibility'
 import { E113Stimulation } from '@/ui/screens/settings/E113Stimulation'
-import { E114Organisation } from '@/ui/screens/settings/E114Organisation'
 import { E116Privacy } from '@/ui/screens/settings/E116Privacy'
 import { E117Export } from '@/ui/screens/settings/E117Export'
 import { E60Lists } from '@/ui/screens/lists/E60Lists'
@@ -86,8 +85,6 @@ function AppScreens() {
         return <E112Accessibility />
       case 'settings-stimulation':
         return <E113Stimulation />
-      case 'settings-organisation':
-        return <E114Organisation />
       case 'settings-privacy':
         return <E116Privacy />
       case 'settings-export':

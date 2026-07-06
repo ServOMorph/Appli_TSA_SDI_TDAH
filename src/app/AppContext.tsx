@@ -91,7 +91,7 @@ interface AppContextValue {
   lists: List[]
   selectedListId: string | null
   selectList: (id: string | null) => void
-  createList: (name: string) => Promise<void>
+  createList: (name: string) => Promise<string>
   deleteList: (id: string) => Promise<void>
   getListItems: (listId: string) => Promise<ListItem[]>
   addListItem: (listId: string, title: string) => Promise<void>
@@ -281,7 +281,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function getPlannedTasksForDate(date: string): Promise<TaskV2[]> {
-    return taskV2Repo.getByDate(date)
+    const tasks = await taskV2Repo.getByDate(date)
+    return tasks.slice().sort((a, b) => (a.scheduled_start ?? '').localeCompare(b.scheduled_start ?? ''))
   }
 
   async function getUnscheduledPlannedTasks(): Promise<TaskV2[]> {
@@ -399,11 +400,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await loadAll()
   }
 
-  async function createList(name: string) {
+  async function createList(name: string): Promise<string> {
     const now = new Date().toISOString()
     const list = createListRule(newId(), name, now)
     await listRepo.create(list)
     setLists((prev) => [...prev, list])
+    return list.id
   }
 
   async function deleteList(id: string) {

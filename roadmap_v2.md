@@ -163,7 +163,8 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [x] **[2026-07-05]** E2E relancés (`npx playwright test`) après accumulation de plusieurs sessions de changements non testés (Planning, SubTask, destinations de création, retrait `to_plan`) — **45/45 passent**, aucune régression. Les 3 échecs préexistants (`05-overload.spec.ts` T40/T44/T45, décalage heading/`<p>`) corrigés en réécrivant les assertions pour matcher le texte réel ("Mode surcharge actif")
 - [x] **[2026-07-06]** Comportement onboarding corrigé (reprise interrompue) : `User.onboarding_completed` ajouté, `completeOnboarding` (`AppContext.tsx`) appelée en fin d'onboarding ; un utilisateur incomplet au démarrage entraîne un reset complet vers `welcome`. Bouton "Ignorer" retiré de l'écran choix de profil (`E02Profile`) : sélection obligatoire. 345/345 tests unitaires, `tsc -b` clean.
 - [x] **[2026-07-06]** Plan de test manuel V2 (`plan_test_manuel_v2.md`) rédigé et passé intégralement — écarts consolidés ci-dessus (§ "Constats test manuel V2-10")
-- [ ] Corriger les bugs confirmés et trancher les décisions produit issus du test manuel (voir § "Constats test manuel V2-10" ci-dessus) avant déploiement
+- [x] Corriger les 4 bugs confirmés issus du test manuel (2026-07-06) : tri "Planning du jour" par `scheduled_start` (`AppContext.getPlannedTasksForDate`) ; rattachement de la tâche à une liste créée à la volée (`createList` retourne l'id, création inline dans le sélecteur `E20Inbox`/`E21CreateTaskV2`) ; détection de conflit de créneau dans Planning (`E40Planning.handleAssign` refuse + message, décision produit actée : refuser plutôt que remplacer ou superposer) ; avertissement avant perte de sous-tâches lors de conversion Todo → Planifier/Liste (modale de confirmation `E20Inbox`, pas de migration du modèle de données — item séparé ajouté ci-dessous pour la planification indépendante des sous-tâches). 346/346 tests unitaires, `tsc -b` clean.
+- [ ] Trancher les décisions produit restantes (usage énergie, écran Planning vide) avant déploiement
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
 - [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD
@@ -213,6 +214,10 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 - Test manuel 11.5 : export des données (`E117Export.tsx`) sur iPhone — comportement du téléchargement/partage en environnement iOS (Safari/PWA).
 - Viabilité du fichier JSON généré par l'export de données (`E117Export.tsx`/`exportData`) — JSON valide, structure cohérente avec les données réelles.
 - Test manuel 13.2 : utilisation de l'app en coupant la connexion réseau — fonctionnement normal (offline-first).
+
+## Fonctionnalité reportée (décision 2026-07-06)
+
+- Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — non traitée dans le fix immédiat du bug "sous-tâches perdues" (qui se limite à un avertissement avant conversion). Piste retenue si le besoin se confirme : chaque sous-tâche devient sa propre `TaskV2` (statut `planned`) avec un `parent_task_id` optionnel pour le regroupement visuel, plutôt que d'étendre `SubTask` avec ses propres champs de planification (évite de dupliquer la logique déjà présente sur `TaskV2`/Planning).
 
 ## Reporté après V2
 

@@ -51,7 +51,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     lists: [],
     selectedListId: null,
     selectList: vi.fn(),
-    createList: vi.fn().mockResolvedValue(undefined),
+    createList: vi.fn().mockResolvedValue('list-1'),
     deleteList: vi.fn().mockResolvedValue(undefined),
     getListItems: vi.fn().mockResolvedValue([]),
     addListItem: vi.fn().mockResolvedValue(undefined),

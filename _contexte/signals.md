@@ -9,16 +9,19 @@
 
 ### V2 — En cours
 - [P1|ouvert] Phase V2-10 (Consolidation V2 & 2e vague de tests) — EN COURS
-  - Plan de test manuel V2 (`plan_test_manuel_v2.md`) rédigé et passé intégralement le 2026-07-06 ; les écarts constatés sont consolidés dans `roadmap_v2.md` § "Constats test manuel V2-10". Reste : corriger les bugs confirmés, trancher les décisions produit, puis build V2 à jour, doc V2, déploiement Netlify, sessions test 2-5.
-  - fait quand: bugs confirmés corrigés, décisions produit tranchées, doc V2 rédigée, `dist/v2/` régénéré et déployé sur Netlify, 5-10 sessions test réalisées
+  - Les 4 bugs confirmés du plan de test manuel sont corrigés (voir ci-dessous). Reste : retest manuel de ces 4 corrections, décisions produit restantes, relance e2e, build V2, doc V2, déploiement Netlify, sessions test 2-5.
+  - fait quand: bugs retestés, décisions produit tranchées, doc V2 rédigée, `dist/v2/` régénéré et déployé sur Netlify, 5-10 sessions test réalisées
   - réf: `roadmap_v2.md` Phase V2-10 et § "Constats test manuel V2-10 (session 2026-07-06)"
-- [P1|ouvert] Bugs confirmés lors du passage du plan de test manuel (2026-07-06), à corriger avant déploiement :
-  - tri incorrect de "Planning du jour" (Dashboard) par `scheduled_start`
-  - création de liste depuis le sélecteur "Ajouter à une liste" (Todo et création de tâche) ne rattache jamais la tâche à la liste nouvellement créée
-  - aucune détection de conflit de créneau dans Planning
-  - sous-tâches perdues silencieusement lors de conversion Todo → Planifier/Liste (confirmé, remplace l'ancienne action P3 équivalente)
-  - fait quand: chaque bug corrigé et retesté manuellement
-  - réf: `roadmap_v2.md` § "Constats test manuel V2-10 (session 2026-07-06)" sous-section "Bugs confirmés à corriger"
+- [P2|ouvert] Retest manuel des 4 bugs corrigés (2026-07-06) :
+  - tri "Planning du jour" (Dashboard) par `scheduled_start` — corrigé (`AppContext.getPlannedTasksForDate`)
+  - rattachement de la tâche à une liste créée à la volée — corrigé (`createList` retourne l'id, création inline dans `E20Inbox`/`E21CreateTaskV2`)
+  - détection de conflit de créneau dans Planning — corrigé, décision produit actée avec l'utilisateur : refus + message (pas de remplacement ni de superposition) dans `E40Planning`
+  - perte de sous-tâches lors de conversion Todo → Planifier/Liste — corrigé par avertissement de confirmation avant conversion (pas de migration du modèle de données)
+  - fait quand: chaque bug retesté manuellement dans l'app (346/346 tests unitaires + `tsc -b` clean déjà validés côté code)
+  - réf: `roadmap_v2.md` Phase V2-10, sous-section "Bugs confirmés à corriger" (statut mis à jour)
+- [P3|ouvert] Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — décision explicitement reportée, non traitée par le fix minimal ci-dessus
+  - fait quand: décision produit prise sur l'implémentation (piste retenue si besoin confirmé : chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id` optionnel)
+  - réf: `roadmap_v2.md` § "Fonctionnalité reportée (décision 2026-07-06)"
 - [P2|ouvert] Décisions produit à prendre (2026-07-06) : usage réel de l'énergie dans l'appli (une seule valeur/jour, pas d'historique) ; comportement de l'écran Planning quand aucune tâche n'est planifiable
   - fait quand: décisions actées et implémentées si nécessaire
   - réf: `roadmap_v2.md` § "Constats test manuel V2-10 (session 2026-07-06)" sous-section "Décisions produit à prendre"
@@ -43,38 +46,35 @@
 Aucun.
 
 ## Contexte chaud
-- **Onboarding : comportement de reprise changé (2026-07-06)** : `User.onboarding_completed: boolean` ajouté (`user.ts`). `createUser` l'initialise à `false`. Nouvelle fonction `completeOnboarding` (`AppContext.tsx`) marque l'onboarding terminé et navigue vers le dashboard — appelée par `E04FirstTask` (submit et ignorer). Au démarrage, si un utilisateur existe mais `onboarding_completed` est `false`, toutes les données sont effacées et l'app repart sur `welcome` (au lieu de sauter directement au dashboard comme avant).
-- **Écran choix de profil (`E02Profile`) simplifié (2026-07-06)** : bouton "Ignorer" retiré — la sélection d'un des 3 profils (Adolescent/Étudiant/Adulte) est désormais obligatoire pour avancer, aucun moyen de contourner ce choix.
-- **Plan de test manuel V2 créé et passé (2026-07-06)** : `plan_test_manuel_v2.md` (13 sections, ~65 cas), scope basé sur les écrans réellement implémentés. Passage complet effectué le 2026-07-06 ; tous les cas non annotés sont validés. Les écarts (4 bugs confirmés, 2 décisions produit, 4 fonctionnalités manquantes, 2 demandes de nettoyage UI, 10 points à re-tester) sont consolidés dans `roadmap_v2.md`.
+- **4 bugs confirmés du test manuel corrigés (2026-07-06)** : voir action "Retest manuel des 4 bugs corrigés" ci-dessus pour le détail technique et les fichiers touchés.
+- **Décision produit actée (2026-07-06)** : en cas de conflit de créneau dans Planning, comportement = refus + message (pas de remplacement avec confirmation, pas de superposition autorisée).
+- **Décision produit actée (2026-07-06)** : le fix "sous-tâches perdues" reste minimal (avertissement avant conversion) ; la planification indépendante des sous-tâches (chaque `SubTask` avec son propre horaire) est un chantier de fond reporté, piste retenue = chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id`.
 - Branche `v2` active ; tag `v1.0-mvp` posé ; `dist/v1/` versionné pour rollback, `dist/v2/` ignoré Git/régénérable via `npm run build`
-- 345/345 tests unitaires, `tsc -b` passent après les changements onboarding/E02Profile ; e2e non relancés cette session (dernière confirmation 45/45 le 2026-07-05, session 2) — le helper e2e `completeFastOnboarding` clique déjà "Étudiant" puis "Ignorer" sur l'étape Aujourd'hui (pas sur le profil), donc a priori non impacté par le retrait du bouton Ignorer profil, mais non revérifié en e2e réel.
+- 346/346 tests unitaires, `tsc -b` clean après les 4 corrections de bugs ; e2e non relancés cette session (dernière confirmation 45/45 le 2026-07-05, avant les changements onboarding du 2026-07-06 — toujours à revalider)
 - `npm run test` sous `--pool=vmThreads --poolOptions.vmThreads.maxThreads=1` fait échouer les tests liés à `crypto.subtle` (faux négatif d'environnement documenté) — utiliser le pool par défaut (`npx vitest run`)
 
 ## Dernière session (2026-07-06)
 
 ## Décisions prises
-- Un utilisateur qui quitte l'app avant d'atteindre le dashboard (onboarding incomplet) repart de zéro à la prochaine ouverture, plutôt que de reprendre directement sur le dashboard.
-- Le bouton "Ignorer" de l'écran de choix de profil est retiré : la sélection d'un profil est obligatoire.
-- Plan de test manuel V2 complet rédigé et exécuté ; tous les écarts documentés et consolidés dans la roadmap plutôt que corrigés à la volée (décision de les traiter comme un lot dédié).
+- Conflit de créneau dans Planning : comportement = refus + message (tranché avec l'utilisateur parmi 3 options).
+- Sous-tâches perdues à la conversion Todo → Planifier/Liste : fix minimal = avertissement de confirmation avant conversion, sans migrer le modèle de données ; la planification indépendante des sous-tâches est reportée comme chantier séparé.
 
 ## Livrables produits ou modifiés
-- `src/domain/entities/user.ts` : ajout `onboarding_completed: boolean`
-- `src/app/AppContext.tsx` : `completeOnboarding`, `wipeAllData` (extrait de `deleteAllData`), logique `init()` revue
-- `src/ui/screens/onboarding/E04FirstTask.tsx` : appelle `completeOnboarding` au lieu de `goTo('dashboard')`
-- `src/ui/screens/onboarding/E02Profile.tsx` : bouton "Ignorer" retiré
-- Tests ajustés : `E04FirstTask.test.tsx`, `E02Profile.test.tsx`, `AppContext.test.tsx`, `db.test.ts`, `userRepository.test.ts`, `E111Profile.test.tsx`, `src/test/testUtils.tsx`
-- `plan_test_manuel_v2.md` (nouveau) : plan de test manuel complet, passé et annoté
-- `roadmap_v2.md` : nouvelle section "Constats test manuel V2-10 (session 2026-07-06)" (bugs, décisions produit, fonctionnalités manquantes, nettoyage UI, à re-tester)
+- `src/app/AppContext.tsx` : `getPlannedTasksForDate` trie désormais par `scheduled_start` ; `createList` retourne l'id de la liste créée
+- `src/ui/screens/tasks/E20Inbox.tsx` : création de liste inline dans le sélecteur "Ajouter à une liste" (rattache la tâche à la liste créée) ; modale d'avertissement avant perte de sous-tâches sur "Planifier"/"Liste"
+- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : création de liste inline dans le sélecteur, même correctif que E20Inbox
+- `src/ui/screens/planning/E40Planning.tsx` : détection de conflit de créneau (refus + message) sur placement et déplacement de tâche
+- `src/test/testUtils.tsx`, `src/ui/screens/tasks/E20Inbox.test.tsx` : mocks et tests mis à jour/ajoutés pour les nouveaux comportements
+- `roadmap_v2.md` : 4 bugs confirmés marqués corrigés, section "Fonctionnalité reportée (décision 2026-07-06)" ajoutée
 
 ## Hypothèses validées / invalidées
-- VALIDE : 345/345 tests unitaires, `tsc -b` clean après le changement de comportement onboarding
-- VALIDE : passage complet du plan de test manuel — cas non mentionnés dans la session déclarés OK par l'utilisateur
-- INVALIDE : plusieurs comportements supposés acquis ne le sont pas (tri planning, rattachement liste à la création, conflit de créneau, suppression de liste, modification de profil) → pivot : consignés comme actions à traiter avant déploiement plutôt que suppositions validées
-- EN ATTENTE : e2e non relancés après les changements onboarding/E02Profile (dernière confirmation 45/45 le 2026-07-05)
+- VALIDE : 346/346 tests unitaires, `tsc -b` clean après les 4 corrections de bugs
+- EN ATTENTE : retest manuel des 4 corrections dans l'app réelle (non fait cette session, code + tests unitaires seulement)
+- EN ATTENTE : e2e non relancés après ces changements (dernière confirmation 45/45 le 2026-07-05, avant les changements onboarding du 2026-07-06)
 - EN ATTENTE : build V2 (`dist/v2/`) toujours périmé (généré le 2026-07-02)
 
 ## Prochaine étape exacte
-Corriger les bugs confirmés (tri Planning du jour, rattachement liste à la création, conflit de créneau Planning, perte de sous-tâches), trancher les décisions produit (énergie, écran Planning vide), relancer les e2e, puis reprendre V2-10 : build `dist/v2/`, doc V2, déploiement Netlify.
+Retester manuellement les 4 corrections, trancher les 2 décisions produit restantes (énergie, écran Planning vide), relancer les e2e, puis reprendre V2-10 : build `dist/v2/`, doc V2, déploiement Netlify.
 
 ## Question bloquante pour la session suivante
 Aucune.

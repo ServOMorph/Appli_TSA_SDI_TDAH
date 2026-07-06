@@ -83,12 +83,23 @@ function destinationBtnStyle(selected: boolean): React.CSSProperties {
 }
 
 export function E21CreateTaskV2() {
-  const { createTaskV2Dest, createTaskInbox, goTo, selectTask, lists, addListItem, todayTasks, addTask, moveTask } =
-    useApp()
+  const {
+    createTaskV2Dest,
+    createTaskInbox,
+    goTo,
+    selectTask,
+    lists,
+    addListItem,
+    todayTasks,
+    addTask,
+    moveTask,
+    createList,
+  } = useApp()
   const [title, setTitle] = useState('')
   const [destination, setDestination] = useState<Destination | null>(null)
   const [showListPicker, setShowListPicker] = useState(false)
   const [showTodayReplace, setShowTodayReplace] = useState(false)
+  const [newListName, setNewListName] = useState('')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -125,6 +136,16 @@ export function E21CreateTaskV2() {
     const trimmed = title.trim()
     if (!trimmed) return
     await addListItem(listId, trimmed)
+    setShowListPicker(false)
+    goTo('lists')
+  }
+
+  async function handleCreateList() {
+    const trimmed = title.trim()
+    if (!trimmed || !newListName.trim()) return
+    const listId = await createList(newListName.trim())
+    await addListItem(listId, trimmed)
+    setNewListName('')
     setShowListPicker(false)
     goTo('lists')
   }
@@ -193,12 +214,7 @@ export function E21CreateTaskV2() {
           <div style={modalBox}>
             <h2 style={{ margin: 0 }}>Ajouter à une liste</h2>
             {lists.length === 0 ? (
-              <>
-                <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
-                <Button fullWidth onClick={() => goTo('lists')}>
-                  Créer une liste
-                </Button>
-              </>
+              <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                 {lists.map((l) => (
@@ -213,6 +229,19 @@ export function E21CreateTaskV2() {
                 ))}
               </div>
             )}
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="text"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                placeholder="Nouvelle liste"
+                aria-label="Nom de la nouvelle liste"
+                style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
+              />
+              <Button onClick={handleCreateList} disabled={!newListName.trim()}>
+                Créer
+              </Button>
+            </div>
             <Button variant="secondary" fullWidth onClick={() => setShowListPicker(false)}>
               Annuler
             </Button>

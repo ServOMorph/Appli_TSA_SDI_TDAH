@@ -6,6 +6,9 @@
 ## 2026-07-02 (archivé depuis contexte.md 2026-07-06)
 - Fonctionnalité Routines (V2-8) retirée intégralement — Marie n'avait jamais demandé d'onglet dédié (maquette dessinée = nav Todo/Planifier/Listes ; ses notes citent "routines" comme contenu de liste, pas une entité séparée). Code, tests, tables Dexie supprimés.
 
+## 2026-07-02 (archivé depuis contexte.md 2026-07-06 session suivante)
+- Collision de nommage V1/V2 "plus tard" résolue par suppression du système V1 (`Task.later`, `E25Later`) — seul `to_plan` (V2, pastille rouge, E50ToPlanQueue) subsiste comme mécanisme de report.
+
 ## 2026-07-01 (archivé depuis contexte.md 2026-07-05 session 3)
 - V2-9 close (mécanique + TM-01 à TM-06) — icône agenda (TopBar) + bouton "Planifier"/"Listes" sur le dashboard, bouton d'ajout repointé vers `task-create-v2` (navigation orpheline résolue, zéro e2e cassé) ; section "Planning du jour" (mini, TaskV2+Routine) avec masquage `essential=false` en surcharge, sans migrer `todayTasks` V1 + 396/396 tests. Déblocage en cascade : V2-7 (12 TM) et V2-8 (TM-07/08) validés dans la foulée.
 

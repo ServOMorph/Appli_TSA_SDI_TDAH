@@ -1,3 +1,16 @@
+## v0.41 — 2026-07-06
+
+### Corrigé
+- Tri de la section "Planning du jour" (Dashboard) par `scheduled_start`.
+- Création de liste depuis le sélecteur "Ajouter à une liste" (Todo et création de tâche) : la tâche est désormais rattachée à la liste nouvellement créée, directement dans la modale.
+- Détection de conflit de créneau dans Planning : placement/déplacement d'une tâche sur un créneau déjà occupé refusé avec message explicite (décision produit actée).
+- Perte silencieuse des sous-tâches lors de la conversion Todo → Planifier/Liste : avertissement de confirmation ajouté avant la conversion.
+
+### Ajouté
+- Roadmap : section "Fonctionnalité reportée" pour la planification indépendante des sous-tâches, décision explicitement différée.
+
+---
+
 ## v0.40 — 2026-07-06
 
 ### Modifié

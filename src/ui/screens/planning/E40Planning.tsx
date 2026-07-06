@@ -196,6 +196,7 @@ export function E40Planning() {
   const [unscheduled, setUnscheduled] = useState<TaskV2[]>([])
   const [picker, setPicker] = useState<Picker>(null)
   const [pickerSelectedId, setPickerSelectedId] = useState<string | null>(null)
+  const [conflictError, setConflictError] = useState<string | null>(null)
 
   const currentHour = new Date().getHours()
   const currentSlotRef = useRef<HTMLDivElement | null>(null)
@@ -219,6 +220,12 @@ export function E40Planning() {
   }, [])
 
   async function handleAssign(taskId: string, hour: number) {
+    const conflict = scheduledTasks.some((t) => t.id !== taskId && taskHour(t) === hour)
+    if (conflict) {
+      setConflictError(`Ce créneau (${String(hour).padStart(2, '0')}h00) est déjà occupé par une autre tâche.`)
+      return
+    }
+    setConflictError(null)
     const start = `${String(hour).padStart(2, '0')}:00`
     const end = `${String(Math.min(hour + 1, 23)).padStart(2, '0')}:00`
     await scheduleV2Task(taskId, displayDate, start, end)
@@ -238,6 +245,7 @@ export function E40Planning() {
   function closePicker() {
     setPicker(null)
     setPickerSelectedId(null)
+    setConflictError(null)
   }
 
   const isToday = displayDate === todayStr()
@@ -371,9 +379,17 @@ export function E40Planning() {
               </>
             )}
 
+            {conflictError && (
+              <p role="alert" style={{ color: 'var(--color-error, #c0392b)', margin: 0 }}>
+                {conflictError}
+              </p>
+            )}
+
             {picker.mode === 'move' && (
               <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {HOURS.filter((h) => h !== picker.hour).map((h) => (
+                {HOURS.filter(
+                  (h) => h !== picker.hour && !scheduledTasks.some((t) => t.id !== picker.task.id && taskHour(t) === h),
+                ).map((h) => (
                   <button
                     key={h}
                     style={pickerItemStyle}

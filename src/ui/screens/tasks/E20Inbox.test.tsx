@@ -173,14 +173,21 @@ describe('E20Inbox', () => {
       expect(screen.queryByRole('dialog')).toBeNull()
     })
 
-    it('affiche un message si aucune liste et propose de créer', async () => {
+    it('affiche un message si aucune liste et permet d\'en créer une rattachée à la tâche', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const ctx = makeAppContext({ inboxTasks: [task], lists: [] })
+      const ctx = makeAppContext({
+        inboxTasks: [task],
+        lists: [],
+        createList: vi.fn().mockResolvedValue('new-list-1'),
+      })
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
       expect(screen.getByText("Aucune liste pour l'instant.")).toBeDefined()
-      await userEvent.click(screen.getByRole('button', { name: 'Créer une liste' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('lists')
+      await userEvent.type(screen.getByLabelText('Nom de la nouvelle liste'), 'Livres')
+      await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
+      expect(ctx.createList).toHaveBeenCalledWith('Livres')
+      expect(ctx.moveTodoTaskToList).toHaveBeenCalledWith('abc', 'new-list-1')
+      expect(screen.queryByRole('dialog')).toBeNull()
     })
 
     it('annuler le sélecteur de liste ferme la modale', async () => {
@@ -193,6 +200,37 @@ describe('E20Inbox', () => {
       await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
       await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
       expect(screen.queryByRole('dialog')).toBeNull()
+    })
+
+    it('avertit avant de planifier une tâche ayant des sous-tâches', async () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0 }
+      const ctx = makeAppContext({
+        inboxTasks: [task],
+        inboxSubTasksMap: { abc: [sub] },
+        planTodoTask: vi.fn().mockResolvedValue('tv2-1'),
+      })
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByLabelText('Planifier Lire livre'))
+      expect(screen.getByRole('dialog', { name: 'Sous-tâches perdues' })).toBeDefined()
+      expect(ctx.planTodoTask).not.toHaveBeenCalled()
+      await userEvent.click(screen.getByRole('button', { name: 'Continuer' }))
+      expect(ctx.planTodoTask).toHaveBeenCalledWith('abc')
+    })
+
+    it('avertit avant de mettre dans une liste une tâche ayant des sous-tâches', async () => {
+      const task = makeTask({ id: 'abc', title: 'Lire livre' })
+      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0 }
+      const ctx = makeAppContext({
+        inboxTasks: [task],
+        inboxSubTasksMap: { abc: [sub] },
+        lists: [{ id: 'l1', name: 'Livres', created_at: '', updated_at: '' }],
+      })
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
+      expect(screen.getByRole('dialog', { name: 'Sous-tâches perdues' })).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Continuer' }))
+      expect(screen.getByRole('dialog', { name: 'Choisir une liste' })).toBeDefined()
     })
   })
 })

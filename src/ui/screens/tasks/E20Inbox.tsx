@@ -58,9 +58,12 @@ export function E20Inbox() {
     moveTask,
     planTodoTask,
     moveTodoTaskToList,
+    createList,
   } = useApp()
   const [pendingMoveId, setPendingMoveId] = useState<string | null>(null)
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
+  const [newListName, setNewListName] = useState('')
+  const [subtaskWarning, setSubtaskWarning] = useState<{ task: Task; action: 'plan' | 'list' } | null>(null)
 
   async function handleMoveToToday(taskId: string) {
     if (todayTasks.length >= 3) {
@@ -87,6 +90,43 @@ export function E20Inbox() {
     if (!listPickerTask) return
     await moveTodoTaskToList(listPickerTask.id, listId)
     setListPickerTask(null)
+  }
+
+  async function handleCreateList() {
+    if (!listPickerTask || !newListName.trim()) return
+    const listId = await createList(newListName.trim())
+    await moveTodoTaskToList(listPickerTask.id, listId)
+    setNewListName('')
+    setListPickerTask(null)
+  }
+
+  function handleClickPlan(task: Task) {
+    const subs = inboxSubTasksMap[task.id] ?? []
+    if (subs.length > 0) {
+      setSubtaskWarning({ task, action: 'plan' })
+    } else {
+      handlePlan(task.id)
+    }
+  }
+
+  function handleClickList(task: Task) {
+    const subs = inboxSubTasksMap[task.id] ?? []
+    if (subs.length > 0) {
+      setSubtaskWarning({ task, action: 'list' })
+    } else {
+      setListPickerTask(task)
+    }
+  }
+
+  function confirmSubtaskWarning() {
+    if (!subtaskWarning) return
+    const { task, action } = subtaskWarning
+    setSubtaskWarning(null)
+    if (action === 'plan') {
+      handlePlan(task.id)
+    } else {
+      setListPickerTask(task)
+    }
   }
 
   function openDetail(task: Task) {
@@ -138,14 +178,14 @@ export function E20Inbox() {
                   <button
                     aria-label={`Planifier ${task.title}`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
-                    onClick={() => handlePlan(task.id)}
+                    onClick={() => handleClickPlan(task)}
                   >
                     Planifier
                   </button>
                   <button
                     aria-label={`Ajouter ${task.title} à une liste`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
-                    onClick={() => setListPickerTask(task)}
+                    onClick={() => handleClickList(task)}
                   >
                     Liste
                   </button>
@@ -166,12 +206,7 @@ export function E20Inbox() {
           <div style={modalBox}>
             <h2 style={{ margin: 0 }}>Ajouter à une liste</h2>
             {lists.length === 0 ? (
-              <>
-                <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
-                <Button fullWidth onClick={() => goTo('lists')}>
-                  Créer une liste
-                </Button>
-              </>
+              <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                 {lists.map((l) => (
@@ -186,7 +221,42 @@ export function E20Inbox() {
                 ))}
               </div>
             )}
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="text"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+                placeholder="Nouvelle liste"
+                aria-label="Nom de la nouvelle liste"
+                style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
+              />
+              <Button onClick={handleCreateList} disabled={!newListName.trim()}>
+                Créer
+              </Button>
+            </div>
             <Button variant="secondary" fullWidth onClick={() => setListPickerTask(null)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {subtaskWarning && (
+        <div role="dialog" aria-modal="true" aria-label="Sous-tâches perdues" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Sous-tâches non conservées</h2>
+            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+              {(() => {
+                const count = (inboxSubTasksMap[subtaskWarning.task.id] ?? []).length
+                return `« ${subtaskWarning.task.title} » a ${count} sous-tâche${count > 1 ? 's' : ''}. ${
+                  count > 1 ? 'Elles seront' : 'Elle sera'
+                } supprimée${count > 1 ? 's' : ''} et ne sera pas reportée sur la nouvelle destination. Continuer ?`
+              })()}
+            </p>
+            <Button fullWidth onClick={confirmSubtaskWarning}>
+              Continuer
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setSubtaskWarning(null)}>
               Annuler
             </Button>
           </div>

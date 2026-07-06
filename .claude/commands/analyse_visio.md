@@ -56,6 +56,7 @@ Chaque information n'est écrite qu'**une seule fois** :
 
    **Phases** — contraintes :
    - Phase 0 = refacto préalable issue de l'étape 6, sans changement de comportement visible.
+   - Toute phase de refacto (dont la phase 0) commence par la ligne : `> Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase.`
    - Ordre respectant les dépendances ET la contrainte : chaque phase testable manuellement dès qu'elle est finie, sans dépendre d'une phase future.
    - Regrouper : viser ≤ 7 phases ; une phase de moins de 3 items fusionne avec une voisine compatible.
    - Chaque item : `- [ ] <ID> — action concrète (fichiers cibles)`. Pas de re-description du constat.

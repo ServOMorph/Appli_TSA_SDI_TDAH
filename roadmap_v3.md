@@ -25,6 +25,8 @@ V3-6 Nav persistante (N1)     en dernier
 
 ## Phase V3-0 — Refacto préalable
 
+> Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase.
+
 Aucun changement de comportement visible.
 
 - [x] R1 — Constantes d'échelle d'énergie `ENERGY_MIN=1`, `ENERGY_MAX=12` + helper de barème (domaine) — `energyRules.ts` : `isValidEnergyValue`, `getEnergyLabel`

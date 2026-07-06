@@ -469,19 +469,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   async function exportData() {
     if (!currentUser) return
-    const [user, tasks, subTasks, energyEntries, settingsData] = await Promise.all([
+    const [user, tasks, subTasks, tasksV2, lists, listItems, energyEntries, settingsData] = await Promise.all([
       userRepo.getFirst(),
       db.tasks.toArray(),
       db.subTasks.toArray(),
+      db.tasksV2.toArray(),
+      db.lists.toArray(),
+      db.listItems.toArray(),
       db.energyEntries.toArray(),
       settingsRepo.getByUserId(currentUser.id),
     ])
     const payload = {
       export_date: new Date().toISOString(),
-      version: '1.0',
+      version: '2.0',
       user,
       tasks,
       sub_tasks: subTasks,
+      tasks_v2: tasksV2,
+      lists,
+      list_items: listItems,
       energy_entries: energyEntries,
       settings: settingsData,
     }

@@ -1,3 +1,16 @@
+## v0.44 — 2026-07-06
+
+### Corrigé
+- Export JSON (RGPD) incomplet — `exportData` omettait les tables V2 (`tasksV2`, `lists`, `listItems`), en contradiction avec la mention "intégralité de vos données". Corrigé, version export passée à `2.0`.
+
+### Modifié
+- Planning : granularité des créneaux passée d'1h à 30 min (48 créneaux) ; durée par défaut à l'assignation ramenée à 30 min.
+- `vite.config.ts` : `build.outDir` fixé à `dist/v2` (au lieu de sortir dans `dist/` racine).
+
+### Validé
+- E2e relancés après les changements onboarding : 45/45, aucune régression.
+- Test manuel 11.5 (export des données sur iPhone) validé.
+
 ## v0.43 — 2026-07-06
 
 ### Ajouté

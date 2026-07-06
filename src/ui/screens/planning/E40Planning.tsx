@@ -2,7 +2,19 @@ import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i)
+const SLOTS = Array.from({ length: 48 }, (_, i) => i)
+
+function slotTime(slot: number): string {
+  const hour = Math.floor(slot / 2)
+  const minute = slot % 2 === 0 ? '00' : '30'
+  return `${String(hour).padStart(2, '0')}:${minute}`
+}
+
+function slotLabel(slot: number): string {
+  const hour = Math.floor(slot / 2)
+  const minute = slot % 2 === 0 ? '00' : '30'
+  return `${hour}h${minute}`
+}
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
@@ -22,14 +34,15 @@ function formatDate(date: string): string {
   })
 }
 
-function taskHour(task: TaskV2): number | null {
+function taskSlot(task: TaskV2): number | null {
   if (!task.scheduled_start) return null
-  return parseInt(task.scheduled_start.slice(0, 2), 10)
+  const [h, m] = task.scheduled_start.split(':').map(Number)
+  return h * 2 + (m >= 30 ? 1 : 0)
 }
 
 type Picker =
-  | { mode: 'assign'; hour: number }
-  | { mode: 'move'; task: TaskV2; hour: number }
+  | { mode: 'assign'; slot: number }
+  | { mode: 'move'; task: TaskV2; slot: number }
   | null
 
 const pageStyle: React.CSSProperties = {
@@ -198,7 +211,8 @@ export function E40Planning() {
   const [pickerSelectedId, setPickerSelectedId] = useState<string | null>(null)
   const [conflictError, setConflictError] = useState<string | null>(null)
 
-  const currentHour = new Date().getHours()
+  const now = new Date()
+  const currentSlot = now.getHours() * 2 + (now.getMinutes() >= 30 ? 1 : 0)
   const currentSlotRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -219,15 +233,15 @@ export function E40Planning() {
     }
   }, [])
 
-  async function handleAssign(taskId: string, hour: number) {
-    const conflict = scheduledTasks.some((t) => t.id !== taskId && taskHour(t) === hour)
+  async function handleAssign(taskId: string, slot: number) {
+    const conflict = scheduledTasks.some((t) => t.id !== taskId && taskSlot(t) === slot)
     if (conflict) {
-      setConflictError(`Ce créneau (${String(hour).padStart(2, '0')}h00) est déjà occupé par une autre tâche.`)
+      setConflictError(`Ce créneau (${slotLabel(slot)}) est déjà occupé par une autre tâche.`)
       return
     }
     setConflictError(null)
-    const start = `${String(hour).padStart(2, '0')}:00`
-    const end = `${String(Math.min(hour + 1, 23)).padStart(2, '0')}:00`
+    const start = slotTime(slot)
+    const end = slotTime(Math.min(slot + 1, 47))
     await scheduleV2Task(taskId, displayDate, start, end)
     const [sched, unsched] = await Promise.all([
       getPlannedTasksForDate(displayDate),
@@ -279,19 +293,19 @@ export function E40Planning() {
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto' }} role="grid" aria-label="Planning de la journée">
-        {HOURS.map((hour) => {
-          const isNow = isToday && hour === currentHour
-          const tasksInSlot = scheduledTasks.filter((t) => taskHour(t) === hour)
+        {SLOTS.map((slot) => {
+          const isNow = isToday && slot === currentSlot
+          const tasksInSlot = scheduledTasks.filter((t) => taskSlot(t) === slot)
 
           return (
             <div
-              key={hour}
+              key={slot}
               ref={isNow ? currentSlotRef : null}
               role="row"
               style={slotRowStyle(isNow)}
             >
               <div style={hourLabelStyle} aria-hidden>
-                {hour}h
+                {slotLabel(slot)}
               </div>
               <div
                 role="gridcell"
@@ -299,12 +313,12 @@ export function E40Planning() {
                 onClick={() => {
                   if (tasksInSlot.length === 0) {
                     setConflictError(null)
-                    setPicker({ mode: 'assign', hour })
+                    setPicker({ mode: 'assign', slot })
                   } else if (pendingTaskId) {
-                    handleAssign(pendingTaskId, hour)
+                    handleAssign(pendingTaskId, slot)
                   }
                 }}
-                aria-label={`Créneau ${hour}h`}
+                aria-label={`Créneau ${slotLabel(slot)}`}
               >
                 {tasksInSlot.map((task) => (
                   <button
@@ -313,9 +327,9 @@ export function E40Planning() {
                     onClick={(e) => {
                       e.stopPropagation()
                       if (pendingTaskId) {
-                        handleAssign(pendingTaskId, hour)
+                        handleAssign(pendingTaskId, slot)
                       } else {
-                        setPicker({ mode: 'move', task, hour })
+                        setPicker({ mode: 'move', task, slot })
                       }
                     }}
                     aria-label={`${task.title} — déplacer`}
@@ -341,8 +355,8 @@ export function E40Planning() {
               <p style={{ margin: 0, fontWeight: 600 }}>
                 {picker.mode === 'assign'
                   ? pendingTask
-                    ? `Placer « ${pendingTask.title} » à ${String(picker.hour).padStart(2, '0')}h00`
-                    : `Placer à ${String(picker.hour).padStart(2, '0')}h00`
+                    ? `Placer « ${pendingTask.title} » à ${slotLabel(picker.slot)}`
+                    : `Placer à ${slotLabel(picker.slot)}`
                   : `Déplacer « ${picker.task.title} »`}
               </p>
               <button style={closeStyle} onClick={closePicker} aria-label="Fermer">
@@ -353,7 +367,7 @@ export function E40Planning() {
             {picker.mode === 'assign' && (
               <>
                 {pendingTask ? (
-                  <button style={validateBtnStyle} onClick={() => handleAssign(pendingTask.id, picker.hour)}>
+                  <button style={validateBtnStyle} onClick={() => handleAssign(pendingTask.id, picker.slot)}>
                     Valider
                   </button>
                 ) : (
@@ -380,7 +394,7 @@ export function E40Planning() {
                       <button
                         style={pickerSelectedId ? validateBtnStyle : validateBtnDisabledStyle}
                         disabled={!pickerSelectedId}
-                        onClick={() => pickerSelectedId && handleAssign(pickerSelectedId, picker.hour)}
+                        onClick={() => pickerSelectedId && handleAssign(pickerSelectedId, picker.slot)}
                       >
                         Valider
                       </button>
@@ -398,15 +412,15 @@ export function E40Planning() {
 
             {picker.mode === 'move' && (
               <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {HOURS.filter(
-                  (h) => h !== picker.hour && !scheduledTasks.some((t) => t.id !== picker.task.id && taskHour(t) === h),
-                ).map((h) => (
+                {SLOTS.filter(
+                  (s) => s !== picker.slot && !scheduledTasks.some((t) => t.id !== picker.task.id && taskSlot(t) === s),
+                ).map((s) => (
                   <button
-                    key={h}
+                    key={s}
                     style={pickerItemStyle}
-                    onClick={() => handleAssign(picker.task.id, h)}
+                    onClick={() => handleAssign(picker.task.id, s)}
                   >
-                    {String(h).padStart(2, '0')}h00
+                    {slotLabel(s)}
                   </button>
                 ))}
               </div>

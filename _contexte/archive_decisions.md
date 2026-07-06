@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-03 (archivé depuis contexte.md 2026-07-06 close)
+- Bug racine SubTask corrigé — `toggleSubTask` (AppContext.tsx) existait mais n'était appelée nulle part dans l'UI, donc aucune sous-tâche ne pouvait jamais être marquée terminée : badge "X/Y" bloqué à "0/Y", "Prochaine étape" jamais mise à jour. Corrigé par une checkbox fonctionnelle dans E22TaskDetail/E23Decompose ; badge étendu à E20Inbox/E24Today.
+
 ## 2026-07-03 (archivé depuis contexte.md 2026-07-06 session suivante)
 - Écran Planning (E40Planning) revu suite à retour utilisateur direct (capture d'écran) — l'ancien flux (taper un créneau vide affichait toutes les tâches non planifiées, un clic validait immédiatement) jugé non intuitif. Nouveau flux : bouton "Valider" explicite dans tous les cas ; si une tâche vient d'être choisie via "Planifier" (Todo ou création directe), son id est transporté via `selectedTaskId` (champ existant, réutilisé) jusqu'à Planning, qui affiche directement la confirmation de placement pour cette tâche précise sans lister le reste du backlog. Bouton "Planifier" de la nav segmentée dashboard renommé "Planning" (à ne pas confondre avec l'icône agenda TopBar, `aria-label="Planning"` déjà existant).
 

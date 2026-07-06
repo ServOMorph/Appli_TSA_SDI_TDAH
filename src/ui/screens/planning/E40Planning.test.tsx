@@ -27,13 +27,15 @@ describe('E40Planning', () => {
     vi.setSystemTime(new Date('2026-06-30T14:30:00'))
   })
 
-  it('affiche les créneaux horaires de 0h à 23h', async () => {
+  it('affiche les créneaux par demi-heure de 0h00 à 23h30', async () => {
     renderWithApp(<E40Planning />)
     await waitFor(() => {
-      expect(screen.getByText('0h')).toBeInTheDocument()
+      expect(screen.getByText('0h00')).toBeInTheDocument()
     })
-    expect(screen.getByText('23h')).toBeInTheDocument()
-    expect(screen.getByText('14h')).toBeInTheDocument()
+    expect(screen.getByText('0h30')).toBeInTheDocument()
+    expect(screen.getByText('23h30')).toBeInTheDocument()
+    expect(screen.getByText('14h00')).toBeInTheDocument()
+    expect(screen.getByText('14h30')).toBeInTheDocument()
   })
 
   it('retour navigue vers dashboard', async () => {
@@ -82,9 +84,9 @@ describe('E40Planning', () => {
         getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task]),
       }),
     )
-    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByText('Appel dentiste')).toBeInTheDocument()
   })
@@ -97,9 +99,9 @@ describe('E40Planning', () => {
         getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([]),
       }),
     )
-    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     expect(screen.getByText(/aucune tâche à planifier/i)).toBeInTheDocument()
   })
 
@@ -114,13 +116,13 @@ describe('E40Planning', () => {
         getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task]),
       }),
     )
-    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     await userEvent.click(screen.getByRole('button', { name: 'Appel dentiste' }))
     await userEvent.click(screen.getByRole('button', { name: /valider/i }))
 
-    expect(scheduleV2Task).toHaveBeenCalledWith('u1', '2026-06-30', '10:00', '11:00')
+    expect(scheduleV2Task).toHaveBeenCalledWith('u1', '2026-06-30', '10:00', '10:30')
   })
 
   it('le bouton valider est désactivé tant qu\'aucune tâche n\'est sélectionnée', async () => {
@@ -132,9 +134,9 @@ describe('E40Planning', () => {
         getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task]),
       }),
     )
-    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     expect(screen.getByRole('button', { name: /valider/i })).toBeDisabled()
 
     await userEvent.click(screen.getByRole('button', { name: 'Appel dentiste' }))
@@ -173,7 +175,7 @@ describe('E40Planning', () => {
     await userEvent.click(screen.getByRole('button', { name: /médecin — déplacer/i }))
     await userEvent.click(screen.getByRole('button', { name: '14h00' }))
 
-    expect(scheduleV2Task).toHaveBeenCalledWith('t1', '2026-06-30', '14:00', '15:00')
+    expect(scheduleV2Task).toHaveBeenCalledWith('t1', '2026-06-30', '14:00', '14:30')
   })
 
   it('avec une tâche en attente (selectedTaskId), le tap sur un créneau vide affiche directement la confirmation sans liste', async () => {
@@ -189,14 +191,14 @@ describe('E40Planning', () => {
         getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task, otherTask]),
       }),
     )
-    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     expect(screen.getByText(/placer « laver machine » à 10h00/i)).toBeInTheDocument()
     expect(screen.queryByText('Truc planifier')).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /valider/i }))
-    expect(scheduleV2Task).toHaveBeenCalledWith('u1', '2026-06-30', '10:00', '11:00')
+    expect(scheduleV2Task).toHaveBeenCalledWith('u1', '2026-06-30', '10:00', '10:30')
   })
 
   it('valide la tâche en attente et désélectionne la tâche après planification', async () => {
@@ -211,9 +213,9 @@ describe('E40Planning', () => {
         getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task]),
       }),
     )
-    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     await userEvent.click(screen.getByRole('button', { name: /valider/i }))
 
     expect(selectTask).toHaveBeenCalledWith(null)
@@ -250,9 +252,9 @@ describe('E40Planning', () => {
         getUnscheduledPlannedTasks: vi.fn().mockResolvedValue([task]),
       }),
     )
-    await waitFor(() => expect(screen.getByText('10h')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('gridcell', { name: /créneau 10h/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /fermer/i }))

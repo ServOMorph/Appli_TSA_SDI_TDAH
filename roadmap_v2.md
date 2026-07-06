@@ -166,7 +166,8 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [x] Corriger les 4 bugs confirmés issus du test manuel (2026-07-06) : tri "Planning du jour" par `scheduled_start` (`AppContext.getPlannedTasksForDate`) ; rattachement de la tâche à une liste créée à la volée (`createList` retourne l'id, création inline dans le sélecteur `E20Inbox`/`E21CreateTaskV2`) ; détection de conflit de créneau dans Planning (`E40Planning.handleAssign` refuse + message, décision produit actée : refuser plutôt que remplacer ou superposer) ; avertissement avant perte de sous-tâches lors de conversion Todo → Planifier/Liste (modale de confirmation `E20Inbox`, pas de migration du modèle de données — item séparé ajouté ci-dessous pour la planification indépendante des sous-tâches). 346/346 tests unitaires, `tsc -b` clean.
 - [x] **[2026-07-06]** Retest manuel intégral des corrections et ajouts de la session (13 points) : modale de conflit de créneau, navigation directe vers le détail de liste après ajout (Todo/création/détail tâche), bouton "Ajouter une tâche" sur Aujourd'hui, bouton "Terminer" sur Planning du jour (Dashboard), retrait icône Planning TopBar, grille Planning 0h-23h, message "Rien à faire aujourd'hui", renommer/supprimer une liste, section Organisation retirée, libellé profil corrigé — tous validés par l'utilisateur
 - [x] **[2026-07-06]** Décision profil actée : `E111Profile` reste en lecture seule. Décision énergie remontée à Marie (`Note de réunion/a traiter prochaine reunion.txt`), en attente de son retour.
-- [ ] Planning : gérer les créneaux par demi-heure plutôt que par heure pleine (grille horaire `E40Planning.tsx`, actuellement 1 créneau = 1 heure)
+- [x] **[2026-07-06]** E2E relancés après les changements onboarding du jour — 45/45 passent, aucune régression.
+- [x] **[2026-07-06]** Planning : créneaux par demi-heure (`E40Planning.tsx`, 48 créneaux de 30 min au lieu de 24 créneaux d'1h). Durée par défaut à l'assignation ramenée à 30 min (cohérent avec la granularité). 339/339 tests, `tsc -b` clean.
 - [ ] Doc V2 : README, schéma données v2, ADR migration
 - [ ] Build + déploiement Netlify V2 ; bascule `main`
 - [ ] **Sessions test 2 à 5** avec Marie et autres testeurs AuDHD
@@ -201,7 +202,7 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 - [x] **[2026-07-06]** Ajout d'une liste depuis une tâche (Todo, création, détail tâche) : navigue désormais directement vers le détail de la liste après validation, au lieu de rester sur l'écran d'origine.
 - [x] **[2026-07-06]** Écran Aujourd'hui (`E24Today`) : bouton "Ajouter une tâche" ajouté (absent auparavant, seul point d'entrée manquant pour créer une tâche depuis cet écran).
 - [x] **[2026-07-06]** Dashboard, section "Planning du jour" : bouton "Terminer" par tâche ajouté (`completeV2Task`, nouveau dans `AppContext.tsx`) — la tâche terminée sort de la liste (`getPlannedTasksForDate` exclut désormais les tâches `completed`).
-- [ ] Planning : gérer les créneaux par demi-heure plutôt que par heure pleine (ajouté 2026-07-06)
+- [x] **[2026-07-06]** Planning : gérer les créneaux par demi-heure plutôt que par heure pleine — fait (détail Phase V2-10 ci-dessus)
 
 ### Nettoyage UI demandé
 
@@ -219,8 +220,8 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 - [x] **[2026-07-06]** Test manuel 7.3 : écran Aujourd'hui (`E24Today`) sans aucune tâche prévue — validé.
 - [x] **[2026-07-06]** Mode sombre de l'UI (`settings.dark_mode`, activable via `E112Accessibility.tsx`) — validé.
 - [x] **[2026-07-06]** Test manuel 11.2 : réglages d'accessibilité (`E112Accessibility`) — validé. Section "Stimulation cognitive" (`E113Stimulation`) supprimée intégralement des Paramètres (décision utilisateur) : écran, entrée menu, champ `Settings.stimulation_mode`, CSS `data-stimulation` retirés du code (339/339 tests, `tsc -b` clean).
-- Test manuel 11.5 : export des données (`E117Export.tsx`) sur iPhone — comportement du téléchargement/partage en environnement iOS (Safari/PWA).
-- Viabilité du fichier JSON généré par l'export de données (`E117Export.tsx`/`exportData`) — JSON valide, structure cohérente avec les données réelles.
+- [x] **[2026-07-06]** Test manuel 11.5 : export des données (`E117Export.tsx`) sur iPhone — validé, comportement du téléchargement/partage OK en environnement iOS (Safari/PWA).
+- [x] **[2026-07-06]** Viabilité du fichier JSON généré par l'export de données — bug confirmé et corrigé : `exportData` (`AppContext.tsx`) n'exportait que les tables V1 (`tasks`, `subTasks`, `energyEntries`, `settings`, `user`), omettant entièrement les tables V2 (`tasksV2`, `lists`, `listItems`) alors que le flux de création principal est désormais V2 — contradiction avec la mention RGPD "intégralité de vos données" affichée sur `E117Export.tsx`. Corrigé : `tasksV2`/`lists`/`listItems` ajoutés au payload (`tasks_v2`, `lists`, `list_items`), version export passée à `2.0`. 339/339 tests, `tsc -b` clean.
 - Test manuel 13.2 : utilisation de l'app en coupant la connexion réseau — fonctionnement normal (offline-first).
 
 ## Fonctionnalité reportée (décision 2026-07-06)

@@ -23,7 +23,7 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes ; V2-5 retirée le 2026-07-05. Tag `v1.0-mvp` posé, `dist/v1/` archivé (rollback V1 opérationnel), `dist/v2/` régénérable via `npm run build` (périmé, daté du 2026-07-02). V2-10 (consolidation) en cours. Décision profil actée (`E111Profile` reste en lecture seule) ; décision énergie remontée à Marie pour la prochaine réunion, en attente de son retour. Tests manuels 2.4, 2.6, 6.7, 6.10, 7.3, mode sombre et 11.2 validés le 2026-07-06. Section "Stimulation cognitive" des Paramètres supprimée intégralement. Restent des chantiers de fond reportés (planification indépendante des sous-tâches, créneaux Planning en demi-heure, champ nom de profil onboarding). Reste avant déploiement : relancer les e2e, régénérer `dist/v2/`, doc V2, déploiement Netlify, sessions test 2-5 avec Marie, retester export iOS/JSON/offline. Tests unitaires 339/339, `tsc -b` clean.
+V2 en cours sur branche `v2` — Phases V2-0 à V2-9 closes ; V2-5 retirée le 2026-07-05. Tag `v1.0-mvp` posé, `dist/v1/` archivé (rollback V1 opérationnel), `dist/v2/` régénéré et à jour (`vite.config.ts` : `build.outDir: 'dist/v2'`). V2-10 (consolidation) quasi close. E2e relancés (45/45). Bug export JSON corrigé (tables V2 manquantes) et export iOS validé. Planning : créneaux passés d'1h à 30 min. Décision profil actée (`E111Profile` reste en lecture seule) ; décision énergie remontée à Marie, en attente. Restent des chantiers de fond reportés (planification indépendante des sous-tâches, champ nom de profil onboarding). Reste avant déploiement : retester le mode offline (13.2), doc V2, déploiement Netlify, sessions test 2-5 avec Marie. Tests unitaires 339/339, `tsc -b` clean.
 
 ## Stack
 
@@ -53,7 +53,7 @@ Archives/        — Roadmap V1 archivée
 
 ## Prochaine étape
 
-Phase V2-10 — Relancer les e2e, régénérer `dist/v2/`, rédiger la doc V2, déployer sur Netlify, sessions test 2-5 avec Marie. Reste à trancher : usage de l'énergie (retour Marie attendu, voir `roadmap_v2.md`).
+Phase V2-10 — Retester le mode offline (13.2), rédiger la doc V2, déployer sur Netlify, sessions test 2-5 avec Marie. Reste à trancher : usage de l'énergie (retour Marie attendu, voir `roadmap_v2.md`).
 
 ## Licence
 

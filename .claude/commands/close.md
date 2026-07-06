@@ -73,12 +73,12 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    - Ne pas modifier les sections stables (objectif, stack, structure) sauf changement explicite.
    - Si le README n'existe pas encore : ne pas le créer sans demander.
 
-8. Bumper la version dans `CHANGELOG.md` :
-   - Lire la dernière entrée de `CHANGELOG.md` pour extraire la version actuelle (ex: `v2.2`).
-   - Déterminer le type de bump à partir de la synthèse de l'étape 3 :
-     - **major** si : structure de `_contexte/` modifiée, placeholder renommé ou supprimé, commande supprimée
-     - **minor** dans tous les autres cas
-   - Calculer la prochaine version : minor → incrémenter le chiffre après le point ; major → incrémenter le chiffre avant le point et remettre le minor à 0.
+8. Bumper la version dans `CHANGELOG.md` — alignée sur la version produit (roadmap), pas un compteur indépendant :
+   - Déterminer le **major** (X) : le numéro du `roadmap_v<N>.md` actif à la racine du projet (le plus élevé présent hors `Archives/`). Ex : `roadmap_v2.md` présent → major = 2.
+   - Lire la dernière entrée de `CHANGELOG.md` pour extraire le major et le minor précédents.
+   - Déterminer le **minor** (Y) :
+     - Si le major n'a pas changé depuis la dernière entrée : incrémenter le minor précédent de 1.
+     - Si le major a changé (nouvelle roadmap majeure devenue active) : minor = 0, et ajouter une ligne "### Contexte" en tête de l'entrée expliquant le changement de version majeure (ex : "Bascule vers roadmap V3 — voir `roadmap_v3.md`").
    - Ajouter en tête de `CHANGELOG.md` une nouvelle entrée :
      ```
      ## vX.Y — AAAA-MM-JJ

@@ -1,4 +1,7 @@
-## v0.45 — 2026-07-06
+## v2.0 — 2026-07-06
+
+### Contexte
+- Versioning du CHANGELOG réaligné sur la version produit (roadmap) au lieu d'un compteur `v0.x` indépendant qui prêtait à confusion avec V1/V2/V3. Major = numéro de la roadmap active à la racine (`roadmap_v2.md` → major 2) ; minor incrémenté à chaque `/close`, remis à 0 au passage à une roadmap majeure suivante (V3). Les entrées `v0.x` ci-dessous restent inchangées (historique non réécrit).
 
 ### Ajouté
 - Commande `/analyse_visio <dossier-réunion>` (`.claude/commands/analyse_visio.md`) : automatise l'analyse d'une visio testeur (transcription + captures + code) et génère constats, analyse de code, plan d'implémentation et roadmap versionnée (bump auto du numéro de version, format à cases à cocher).

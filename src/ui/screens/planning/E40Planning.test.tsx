@@ -271,7 +271,7 @@ describe('E40Planning', () => {
       }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
-    expect(screen.getByLabelText("7 cuillères d'énergie")).toBeInTheDocument()
+    expect(screen.getByLabelText('7 énergie')).toBeInTheDocument()
   })
 
   it('affiche le bouton Reporter sur une tâche non-obligatoire du jour en surcharge', async () => {

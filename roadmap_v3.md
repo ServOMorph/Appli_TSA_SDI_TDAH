@@ -130,7 +130,8 @@ Gate : [x] tests verts (374/374 : `BottomNav.test.tsx` et `App.test.tsx` créés
 
 ## Notes diverses
 
-- [ ] Titre affiché dans le Dashboard : renommer "Appli pour AuDHD" en "AuDHD" (`E10Dashboard.tsx:204`)
+- [x] Titre affiché dans le Dashboard : renommer "Appli pour AuDHD" en "AuDHD" (`E10Dashboard.tsx`) — 374/374 tests verts, `tsc -b` clean (2026-07-07)
+- [x] Symbole d'énergie : cuillères (`SpoonIcon`/`SpoonCost`) remplacées par une icône batterie (`BatteryIcon`/`BatteryCost`), moins connotée spoon theory — câblée sur le Dashboard, le Planning et les 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) (2026-07-07)
 - [x] Afficher les valeurs d'énergie (1-12) sur deux lignes fixes de 6 (`E31EnergyCheckIn.tsx`, `E03Energy.tsx`) — 367/367 tests verts, `tsc -b` clean, test manuel OK (2026-07-07)
 - [x] Bug : `E03Energy.tsx` (onboarding) échelle 1-10 corrigée en 1-12 via `ENERGY_MIN`/`ENERGY_MAX` (`energyRules.ts`), cohérent avec `E31EnergyCheckIn.tsx` — test manuel OK (2026-07-07)
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { BatteryIcon } from '@/ui/components/BatteryIcon'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 
 const backBtnStyle: React.CSSProperties = {
@@ -50,7 +51,10 @@ export function E31EnergyCheckIn() {
       </button>
 
       <div>
-        <h1>Mon énergie aujourd'hui</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+          <BatteryIcon size={24} />
+          Mon énergie aujourd'hui
+        </h1>
         <p>Combien d'énergie avez-vous aujourd'hui ?</p>
       </div>
       <div

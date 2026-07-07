@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { BatteryIcon } from '@/ui/components/BatteryIcon'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 
 const SPOON_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
@@ -36,7 +37,10 @@ export function E03Energy() {
       }}
     >
       <div>
-        <h1>Votre énergie aujourd'hui</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+          <BatteryIcon size={24} />
+          Votre énergie aujourd'hui
+        </h1>
         <p>Combien d'énergie avez-vous aujourd'hui ?</p>
       </div>
       <div

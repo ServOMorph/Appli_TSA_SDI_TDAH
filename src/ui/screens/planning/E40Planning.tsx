@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
 import { ENERGY_MIN, ENERGY_MAX, isValidEnergyValue } from '@/domain/rules/energyRules'
-import { SpoonCost } from '@/ui/components/SpoonCost'
+import { BatteryCost } from '@/ui/components/BatteryCost'
 import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
 
 const SLOTS = Array.from({ length: 48 }, (_, i) => i)
@@ -474,7 +474,7 @@ export function E40Planning() {
                         aria-label={`${task.title} — déplacer`}
                       >
                         {task.title}
-                        {task.energy_cost != null && <SpoonCost cost={task.energy_cost} />}
+                        {task.energy_cost != null && <BatteryCost cost={task.energy_cost} />}
                       </button>
                       {!completed && (
                         <button

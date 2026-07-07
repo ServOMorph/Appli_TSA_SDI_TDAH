@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-06 (archivé depuis contexte.md 2026-07-07 suite, icône batterie)
+- Phase V3-0 (refacto préalable) codée et close — `ENERGY_MIN`/`ENERGY_MAX`/`isValidEnergyValue`/`getEnergyLabel`/`isOverloaded` (domaine, purs), schéma Dexie v3 (`TaskV2.energy_cost`, `Settings.ambiance_color`/`energy_max`, champs optionnels pour zéro migration), composants `EnergyDisplay`/`AppShell`/`BottomNav` extraits de `E10Dashboard.tsx`. 353/353 tests verts, `tsc -b` clean, validée par test manuel utilisateur (aucune régression). Nouvelle règle process actée : basculer sur le modèle Opus avant toute phase de refacto — intégrée à `/analyse_visio` (génération future) et ajoutée rétroactivement à `roadmap_v3.md` Phase V3-0.
+
 ## 2026-07-06 (archivé depuis contexte.md 2026-07-07 close V3-6)
 - Relecture complète de la transcription de la visio Marie pour lever les points bloquants avant V3-0. Q1 tranché : suppression de la limite de 3 tâches/jour (jugée non nécessaire par Marie). Q2 tranché : la transcription n'était pas contradictoire mais complémentaire — retirer le segment nav "Aujourd'hui" du dashboard sans remplacement (D4), et renommer l'option de création "Aujourd'hui" en "Tâche du jour" pour conserver un moyen de créer une tâche dans cette section (D4b). Reset données V2 tranché : Marie accepte le reset, pas de migration au bump Dexie v3. Branche `v3` créée à partir de `v2` (commit de réorganisation des dossiers de notes de réunion au préalable).
 

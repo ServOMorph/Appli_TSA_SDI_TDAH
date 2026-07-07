@@ -159,9 +159,9 @@ describe('E10Dashboard', () => {
   })
 
   describe('navigation top bar', () => {
-    it('affiche le titre Appli pour AuDHD', () => {
+    it('affiche le titre AuDHD', () => {
       renderWithApp(<E10Dashboard />)
-      expect(screen.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeDefined()
+      expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     })
 
     it('navigue vers settings au clic sur la roue', async () => {
@@ -285,7 +285,7 @@ describe('E10Dashboard', () => {
       const ctx = makeAppContext({ overloadMode: true })
       renderWithApp(<E10Dashboard />, ctx)
       expect(screen.getByText('Mode surcharge actif', { selector: 'p' })).toBeDefined()
-      expect(screen.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeDefined()
+      expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     })
 
     it('affiche le bouton Mode surcharge actif et cliquable', () => {

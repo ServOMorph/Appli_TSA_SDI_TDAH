@@ -7,7 +7,7 @@ import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
-import { SpoonCost } from '@/ui/components/SpoonCost'
+import { BatteryCost } from '@/ui/components/BatteryCost'
 import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
 import {
   DndContext,
@@ -244,7 +244,7 @@ export function E10Dashboard() {
   return (
     <AppShell overloadMode={overloadMode}>
       <TopBar
-        title="Appli pour AuDHD"
+        title="AuDHD"
         energyStatus={todayEnergyStatus}
         energyValue={todayEnergy}
         onEnergyClick={() => goTo('energy-view')}
@@ -326,7 +326,7 @@ export function E10Dashboard() {
                     aria-label={`${task.title} — voir dans le planning`}
                   >
                     {task.scheduled_start} · {task.title}
-                    {task.energy_cost != null && <SpoonCost cost={task.energy_cost} />}
+                    {task.energy_cost != null && <BatteryCost cost={task.energy_cost} />}
                   </button>
                   {!completed && (
                     <button

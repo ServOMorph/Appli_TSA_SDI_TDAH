@@ -1,6 +1,7 @@
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+import { BatteryIcon } from '@/ui/components/BatteryIcon'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -21,8 +22,18 @@ export function E30EnergyView() {
         <Card style={{ textAlign: 'center' }}>
           <p
             aria-label={`${todayEnergy} énergie aujourd'hui`}
-            style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--spacing-sm)',
+              fontSize: '2rem',
+              fontWeight: 700,
+              color: 'var(--color-primary)',
+              margin: 0,
+            }}
           >
+            <BatteryIcon size={32} />
             {todayEnergy}
           </p>
           <p style={{ color: 'var(--color-text-muted)', margin: '4px 0 0' }}>énergie aujourd'hui</p>

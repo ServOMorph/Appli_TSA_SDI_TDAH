@@ -1,3 +1,12 @@
+## v3.11 — 2026-07-07
+
+### Modifié
+- Titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" (`E10Dashboard.tsx`).
+- Symbole d'énergie changé de cuillères à batterie à la demande de l'utilisateur (moins connoté spoon theory) : `SpoonIcon`/`SpoonCost` supprimés, remplacés par `BatteryIcon`/`BatteryCost` (`src/ui/components/`). Câblé sur le Dashboard et le Planning (remplacement direct), et ajouté aux 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) qui n'affichaient aucun symbole auparavant.
+
+### Validé
+- 374/374 tests unitaires verts, `tsc -b` clean. Changement visuel mineur hors gate de phase (roadmap V3 déjà close) — pas de test manuel dédié.
+
 ## v3.10 — 2026-07-07
 
 ### Ajouté

@@ -151,10 +151,9 @@ describe('E10Dashboard', () => {
   })
 
   describe('activation surcharge (D10C)', () => {
-    it('affiche le bouton Mode surcharge désactivé et non cliquable en mode normal', () => {
+    it("n'affiche pas le bouton Mode surcharge en mode normal", () => {
       renderWithApp(<E10Dashboard />)
-      const btn = screen.getByRole('button', { name: 'Mode surcharge désactivé' }) as HTMLButtonElement
-      expect(btn.disabled).toBe(true)
+      expect(screen.queryByRole('button', { name: /Mode surcharge/ })).toBeNull()
     })
   })
 

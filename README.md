@@ -33,7 +33,7 @@ Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-
 
 **Phase V3-6 close** (nav persistante, N1) : `BottomNav` monté une seule fois dans `App.tsx` en position fixe (bottom), affiché sur tous les écrans sauf l'onboarding et le check-in énergie quotidien — onglet actif mis en valeur, pastille rouge Todo conservée, 4ᵉ onglet « Accueil » ajouté pour revenir au Dashboard depuis n'importe quel écran. Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-6.md`).
 
-**Itérations UI hors phase** (roadmap V3 close) : titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" ; symbole d'énergie changé de cuillères à batterie (`BatteryIcon`/`BatteryCost`, remplace `SpoonIcon`/`SpoonCost`), affiché sur le Dashboard, le Planning, et désormais aussi sur les 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) ; espacement des créneaux du Planning rendu symétrique (haut/bas égaux autour de la case de tâche), créneaux vides alignés sur la même hauteur qu'un créneau occupé.
+**Itérations UI hors phase** (roadmap V3 close) : titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" ; symbole d'énergie changé de cuillères à batterie (`BatteryIcon`/`BatteryCost`, remplace `SpoonIcon`/`SpoonCost`), affiché sur le Dashboard, le Planning, et désormais aussi sur les 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) ; espacement des créneaux du Planning rendu symétrique (haut/bas égaux autour de la case de tâche), créneaux vides alignés sur la même hauteur qu'un créneau occupé ; bouton « Mode surcharge » de la TopBar désormais masqué (au lieu de grisé) hors surcharge — écart avec une demande explicite antérieure de Marie, à reconfirmer.
 
 Tests unitaires 374/374, `tsc -b` clean, `eslint` 0 erreur.
 
@@ -66,7 +66,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Roadmap V3 close. Deux fronts en parallèle : reconfirmer avec Marie le comportement de l'action « Reporter », la fréquence du check-in énergie (une fois par jour vs à chaque ouverture) et le rythme du bouton « Répéter demain » — voir `Note de réunion/a demander a Marie.md` et `_contexte/signals.md` — et finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
+Roadmap V3 close. Deux fronts en parallèle : reconfirmer avec Marie le comportement de l'action « Reporter », la fréquence du check-in énergie (une fois par jour vs à chaque ouverture), le rythme du bouton « Répéter demain », et le masquage du bouton « Mode surcharge » hors surcharge — voir `Note de réunion/a demander a Marie.md` et `_contexte/signals.md` — et finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

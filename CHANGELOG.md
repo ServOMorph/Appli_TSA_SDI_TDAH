@@ -1,3 +1,11 @@
+## v3.13 — 2026-07-07
+
+### Modifié
+- Bouton « Mode surcharge désactivé » de la TopBar retiré hors surcharge (`TopBar.tsx`) — n'apparaît plus que quand la surcharge est active. Écart assumé avec une demande explicite antérieure de Marie (bouton visible, grisé, informatif hors surcharge) ; point ajouté à `Note de réunion/a demander a Marie.md` pour reconfirmation.
+
+### Validé
+- 29/29 tests (`E10Dashboard.test.tsx`) verts, `tsc -b` clean.
+
 ## v3.12 — 2026-07-07
 
 ### Corrigé

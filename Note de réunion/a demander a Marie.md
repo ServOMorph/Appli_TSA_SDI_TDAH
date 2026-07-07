@@ -12,6 +12,14 @@
 
 **Statut :** implémenté à titre provisoire (2026-07-07) selon la piste « replanifier au lendemain, même créneau » — faute de précision de Marie sur le mécanisme exact, c'est la seule option qui ne casse rien techniquement (pas de nouveau statut, pas d'orphelin). Reste à confirmer avec elle : si elle attend un autre comportement (choix du jour, liste dédiée...), il faudra ajuster. Bloque toujours la clôture définitive du gate de la Phase V3-3 (test manuel + doc restants) ; le reste du développement (V3-4, V3-5) peut continuer sans attendre cette confirmation.
 
+## Bouton « Mode surcharge désactivé » masqué hors surcharge (TopBar)
+
+**Contexte :** Marie avait explicitement demandé que ce bouton reste visible, grisé et informatif quand l'app n'est pas en surcharge (voir `roadmap_v3.md` § Notes diverses). Le 2026-07-07, sur demande de l'utilisateur (pas Marie), le bouton a été retiré de la TopBar hors surcharge (`TopBar.tsx`) — il ne s'affiche plus que quand la surcharge est active.
+
+**Écart assumé :** contredit la demande initiale de Marie. À valider avec elle si ce masquage lui convient, ou si le bouton informatif grisé doit être réintroduit.
+
+**Statut :** implémenté (2026-07-07), tests et `tsc -b` verts. À confirmer avec Marie.
+
 ## Fréquence du check-in énergie : à chaque ouverture de l'app, ou une fois par jour ? (E4)
 
 **Contexte :** Marie a dit à plusieurs reprises vouloir que l'app redemande l'énergie « à chaque fois qu'on se connecte » (transcription l.31-33, 519, 525), mais elle hésite elle-même dans le même passage : « ou alors chaque jour, je ne sais pas, il faudrait trouver » (l.33) — elle n'a jamais tranché explicitement entre ces deux options.

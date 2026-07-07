@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-07 (archivé depuis contexte.md 2026-07-07 suite 3, masquage bouton surcharge)
+- Test manuel de la Phase V3-1 passé intégralement (27/27 cas OK), gate de phase clos. Point mode surcharge sans tâche visible (effet de bord D1) explicitement reporté par l'utilisateur à la Phase V3-3 (travail spécifique sur la surcharge automatique), plutôt que tranché maintenant.
+
 ## 2026-07-06 (archivé depuis contexte.md 2026-07-07 suite, icône batterie)
 - Phase V3-0 (refacto préalable) codée et close — `ENERGY_MIN`/`ENERGY_MAX`/`isValidEnergyValue`/`getEnergyLabel`/`isOverloaded` (domaine, purs), schéma Dexie v3 (`TaskV2.energy_cost`, `Settings.ambiance_color`/`energy_max`, champs optionnels pour zéro migration), composants `EnergyDisplay`/`AppShell`/`BottomNav` extraits de `E10Dashboard.tsx`. 353/353 tests verts, `tsc -b` clean, validée par test manuel utilisateur (aucune régression). Nouvelle règle process actée : basculer sur le modèle Opus avant toute phase de refacto — intégrée à `/analyse_visio` (génération future) et ajoutée rétroactivement à `roadmap_v3.md` Phase V3-0.
 

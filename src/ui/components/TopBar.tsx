@@ -53,15 +53,16 @@ export function TopBar({
         <div
           style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', flexShrink: 0 }}
         >
-          <button
-            onClick={() => overloadActive && setShowOverloadInfo((v) => !v)}
-            disabled={!overloadActive}
-            aria-expanded={overloadActive ? showOverloadInfo : undefined}
-            aria-label={overloadActive ? 'Détail du mode surcharge' : 'Mode surcharge désactivé'}
-            style={overloadButtonStyle(overloadActive)}
-          >
-            Mode surcharge {overloadActive ? 'actif' : 'désactivé'}
-          </button>
+          {overloadActive && (
+            <button
+              onClick={() => setShowOverloadInfo((v) => !v)}
+              aria-expanded={showOverloadInfo}
+              aria-label="Détail du mode surcharge"
+              style={overloadButtonStyle(overloadActive)}
+            >
+              Mode surcharge actif
+            </button>
+          )}
           {!overloadActive && (
             <>
               <button

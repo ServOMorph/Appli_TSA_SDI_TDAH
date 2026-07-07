@@ -67,7 +67,7 @@ Gate : [x] tests verts (330/330) · [x] test manuel (27/27 cas OK, 2026-07-07) �
 - [x] E2 — Câbler `essential` via `toggleEssentialV2` existant (ferme le trou fonctionnel V2-10) — `schedulePendingTask` (AppContext) applique `toggleEssentialV2Rule` si la case est cochée
 - [x] Affichage minimal du coût/obligatoire sur la tâche planifiée (habillage cuillères en V3-4) — coût affiché en texte (` · {n}`) sur la case du planning et sur « Planning du jour » du dashboard
 
-Gate : [x] tests verts (342/342) · [ ] test manuel · [ ] doc · [x] sortie : coût et obligatoire saisissables et persistés
+Gate : [x] tests verts (342/342) · [x] test manuel (2026-07-07, tous cas OK) · [x] doc · [x] sortie : coût et obligatoire saisissables et persistés
 
 ---
 

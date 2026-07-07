@@ -1,3 +1,8 @@
+## v3.5 — 2026-07-07
+
+### Validé
+- Test manuel de la Phase V3-2 passé intégralement (tous cas OK) — gate de phase clos.
+
 ## v3.4 — 2026-07-07
 
 ### Ajouté

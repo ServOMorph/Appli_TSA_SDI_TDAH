@@ -20,7 +20,7 @@
 Aucun.
 
 ## Contexte chaud
-- Phase V3-2 (énergie : domaine + saisie) codée : `getRemainingPlannedCost`/`setEnergyCostV2` (`taskRulesV2.ts`), fenêtre à deux carrés (coût 1-12 + case obligatoire) dans `E40Planning.tsx` au moment de l'assignation à un créneau, `schedulePendingTask` (AppContext) étendu pour persister coût et obligatoire (câble `toggleEssentialV2` existant). Affichage minimal du coût sur les cases Planning et Dashboard. 342/342 tests verts, `tsc -b` clean, `eslint` 0 erreur. Plan de test manuel créé (`plan_test_manuel_v3-2.md`), pas encore passé.
+- Phase V3-2 (énergie : domaine + saisie) close : gate intégralement validé (tests 342/342, test manuel tous cas OK le 2026-07-07, doc à jour, sortie). `getRemainingPlannedCost`/`setEnergyCostV2` (`taskRulesV2.ts`), fenêtre à deux carrés (coût 1-12 + case obligatoire) dans `E40Planning.tsx` au moment de l'assignation à un créneau, `schedulePendingTask` (AppContext) étendu pour persister coût et obligatoire (câble `toggleEssentialV2` existant). Affichage minimal du coût sur les cases Planning et Dashboard.
 - Phase V3-1 (bugs + nettoyage UI) close : gate intégralement validé (tests 330/330, test manuel 27/27 OK, doc à jour, sortie).
 - B1 a nécessité une refonte de la persistance du Planning : `pendingPlanTask`/`startPlanTask`/`clearPendingPlanTask`/`schedulePendingTask` (AppContext) remplacent `planTodoTask`/`getUnscheduledPlannedTasks` — une tâche en cours de planification n'est plus écrite en base tant qu'un créneau n'est pas validé.
 - B3 non reproduit dans le code actuel (flux de création déjà correct) — aucun changement fait, à confirmer si le testeur reproduit encore le symptôme.
@@ -72,10 +72,10 @@ Mettre la doc à jour pour clore formellement le gate de la Phase V3-1, puis dé
 
 ## Hypothèses validées / invalidées
 - VALIDE : réutilisation de `isValidEnergyValue` (existant, V3-0) suffit pour E3 — pas besoin d'une nouvelle règle de barème dédiée.
-- EN ATTENTE : test manuel utilisateur de la Phase V3-2 (`plan_test_manuel_v3-2.md`) pas encore passé.
+- VALIDE : test manuel utilisateur de la Phase V3-2 passé intégralement (2026-07-07), tous cas OK.
 
 ## Prochaine étape exacte
-Passer le test manuel V3-2, clore le gate (doc), puis démarrer la Phase V3-3 (check-in + surcharge automatique).
+Démarrer la Phase V3-3 (check-in + surcharge automatique).
 
 ## Question bloquante pour la session suivante
 Aucune.

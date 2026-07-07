@@ -23,6 +23,7 @@ export function E90OverloadRecovery() {
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',
+        paddingBottom: 'var(--bottomnav-h)',
       }}
     >
       <h1>Mode surcharge actif</h1>

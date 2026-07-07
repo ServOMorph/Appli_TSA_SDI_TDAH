@@ -7,7 +7,6 @@ import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
-import { BottomNav } from '@/ui/components/BottomNav'
 import { SpoonCost } from '@/ui/components/SpoonCost'
 import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
 import {
@@ -161,7 +160,6 @@ export function E10Dashboard() {
     selectTask,
     setTaskDetailOrigin,
     reorderTodayTasks,
-    inboxTasks,
     getPlannedTasksForDate,
     completeV2Task,
     postponeTask,
@@ -391,15 +389,6 @@ export function E10Dashboard() {
           <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Rien de planifié aujourd'hui.</p>
         )}
       </section>
-
-      <BottomNav
-        overloadMode={overloadMode}
-        inboxHasTasks={inboxTasks.length > 0}
-        onAddTask={() => goTo('task-create-v2')}
-        onGoTodo={() => goTo('inbox')}
-        onGoPlanning={() => goTo('planning')}
-        onGoLists={() => goTo('lists')}
-      />
     </AppShell>
   )
 }

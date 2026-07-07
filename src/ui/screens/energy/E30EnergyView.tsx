@@ -53,6 +53,7 @@ export function E30EnergyView() {
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',
+        paddingBottom: 'var(--bottomnav-h)',
       }}
     >
       <button style={backBtnStyle} onClick={() => goTo('dashboard')} aria-label="Retour">

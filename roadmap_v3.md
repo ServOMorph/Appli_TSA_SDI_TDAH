@@ -118,10 +118,13 @@ Gate : [x] tests verts (367/367) · [x] test manuel OK (2026-07-07) · [x] doc (
 
 ## Phase V3-6 — Navigation persistante (N1)
 
-- [ ] N1 — `BottomNav` (extrait en R4) persistant sur tous les écrans, onglet actif mis en valeur, pastille rouge Todo conservée (`App.tsx`, tous les écrans)
-- [ ] Vérifier qu'aucun écran ne perd son point d'entrée
+- [x] N1 — `BottomNav` (extrait en R4) rendu en position fixe, monté une seule fois dans `App.tsx` (plus dans `E10Dashboard.tsx`) et affiché sur tous les écrans sauf l'onboarding (`welcome`/`profile`/`energy`) et le check-in énergie quotidien (`energy-checkin`) — onglet actif mis en valeur (`activeTabFor`), pastille rouge Todo conservée, 4ᵉ onglet « Accueil » ajouté pour revenir au Dashboard depuis n'importe quel écran
+- [x] Chaque écran réserve `padding-bottom: var(--bottomnav-h)` pour ne rien cacher derrière la nav fixe (`index.css`, 17 écrans concernés)
+- [x] Vérifier qu'aucun écran ne perd son point d'entrée — onglet « Accueil » + boutons « ← Retour » existants sur chaque écran
 
-Gate : [ ] tests verts · [ ] test manuel : parcourir tous les écrans, nav toujours présente · [ ] doc · [ ] sortie : navigation unifiée façon app native
+Gate : [x] tests verts (374/374 : `BottomNav.test.tsx` et `App.test.tsx` créés, tests obsolètes de `E10Dashboard.test.tsx` migrés) · [x] test manuel (`plan_test_manuel_v3-6.md`, passé intégralement le 2026-07-07) · [x] doc (`README.md` mis à jour) · [x] sortie : navigation unifiée façon app native
+
+**PHASE V3-6 CLOSE (2026-07-07). Toutes les phases de la roadmap V3 (V3-0 à V3-6) sont closes.**
 
 ---
 
@@ -144,6 +147,6 @@ Gate : [ ] tests verts · [ ] test manuel : parcourir tous les écrans, nav touj
 
 ## Sortie V3
 
-- [ ] V3 stable, tests verts, validée par test manuel complet
-- [ ] Session test suivante avec Marie sur énergie/surcharge
+- [x] V3 stable, tests verts, validée par test manuel complet (7 phases V3-0 à V3-6 closes, 374/374 tests unitaires)
+- [ ] Session test suivante avec Marie sur énergie/surcharge (reconfirmer « Reporter », fréquence check-in, rythme « Répéter demain » — voir `Note de réunion/a demander a Marie.md`)
 - [ ] V2 toujours restaurable (stratégie de rollback inchangée)

@@ -25,13 +25,15 @@ npm run format     # Prettier
 
 V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : mode offline (13.2), doc V2, déploiement Netlify. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
 
-Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6). **Phases V3-0, V3-1, V3-2 et V3-3 closes.** V3-3 (check-in + surcharge automatique) : surcharge dérivée de l'énergie du jour vs coût planifié restant (plus de toggle manuel), action « Reporter » sur les tâches non-obligatoires grisées implémentée (replanification automatique au lendemain, même créneau — décision provisoire non validée par Marie, voir `Note de réunion/a demander a Marie.md`), navigation restreinte au Dashboard et au Centre récupération en surcharge (confirmé intentionnel en test manuel). Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-3.md`).
+Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6) — **toutes closes.** V3-3 (check-in + surcharge automatique) : surcharge dérivée de l'énergie du jour vs coût planifié restant (plus de toggle manuel), action « Reporter » sur les tâches non-obligatoires grisées implémentée (replanification automatique au lendemain, même créneau — décision provisoire non validée par Marie, voir `Note de réunion/a demander a Marie.md`), navigation restreinte au Dashboard et au Centre récupération en surcharge (confirmé intentionnel en test manuel).
 
-**Phase V3-4 close** (Planning : cuillères, couleurs, récurrence) : composant cuillères sobre (`SpoonIcon`/`SpoonCost`), coût affiché en cuillères sur le planning, cases pastel (couleur d'ambiance configurable dans Accessibilité, `Settings.ambiance_color`) devenant flashy une fois la tâche terminée, bouton « Terminer » ajouté au planning (déjà présent au dashboard), « Planning du jour » du dashboard en cartes pastel comme « Tâche du jour », et récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée, qui la duplique au lendemain au même créneau et ouvre directement le jour du duplicata (Planning ou, depuis le Dashboard, navigation vers le Planning sur ce jour). Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-4.md`).
+**Phase V3-4** (Planning : cuillères, couleurs, récurrence) : composant cuillères sobre (`SpoonIcon`/`SpoonCost`), coût affiché en cuillères sur le planning, cases pastel (couleur d'ambiance configurable dans Accessibilité, `Settings.ambiance_color`) devenant flashy une fois la tâche terminée, bouton « Terminer » ajouté au planning (déjà présent au dashboard), « Planning du jour » du dashboard en cartes pastel comme « Tâche du jour », et récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée, qui la duplique au lendemain au même créneau et ouvre directement le jour du duplicata.
 
-**Phase V3-5 close** (Listes) : hiérarchie visuelle entre la vue globale des listes (grosses cases, `E60Lists.tsx` inchangé) et l'intérieur d'une liste (`E61ListDetail.tsx`) — éléments encadrés plus fin/serré (padding `--spacing-xs`, radius `--radius-sm`), titre de la liste encadré du même style que les listes en vue globale. Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-5.md`).
+**Phase V3-5** (Listes) : hiérarchie visuelle entre la vue globale des listes (grosses cases, `E60Lists.tsx` inchangé) et l'intérieur d'une liste (`E61ListDetail.tsx`) — éléments encadrés plus fin/serré (padding `--spacing-xs`, radius `--radius-sm`), titre de la liste encadré du même style que les listes en vue globale.
 
-Tests unitaires 367/367, `tsc -b` clean, `eslint` 0 erreur.
+**Phase V3-6 close** (nav persistante, N1) : `BottomNav` monté une seule fois dans `App.tsx` en position fixe (bottom), affiché sur tous les écrans sauf l'onboarding et le check-in énergie quotidien — onglet actif mis en valeur, pastille rouge Todo conservée, 4ᵉ onglet « Accueil » ajouté pour revenir au Dashboard depuis n'importe quel écran. Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-6.md`).
+
+Tests unitaires 374/374, `tsc -b` clean, `eslint` 0 erreur.
 
 ## Stack
 
@@ -62,7 +64,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Phase V3-6 (nav persistante). Reste à reconfirmer avec Marie : le comportement de l'action « Reporter », la fréquence du check-in énergie (une fois par jour vs à chaque ouverture) et le rythme du bouton « Répéter demain » — voir `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
+Roadmap V3 close. Deux fronts en parallèle : reconfirmer avec Marie le comportement de l'action « Reporter », la fréquence du check-in énergie (une fois par jour vs à chaque ouverture) et le rythme du bouton « Répéter demain » — voir `Note de réunion/a demander a Marie.md` et `_contexte/signals.md` — et finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

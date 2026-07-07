@@ -55,6 +55,7 @@ const pageStyle: React.CSSProperties = {
   maxWidth: '480px',
   margin: '0 auto',
   minHeight: '100svh',
+  paddingBottom: 'var(--bottomnav-h)',
   position: 'relative',
 }
 

@@ -1,6 +1,8 @@
 import { Button } from '@/ui/components/Button'
 
-function segmentStyle(withDivider: boolean): React.CSSProperties {
+export type BottomNavTab = 'dashboard' | 'inbox' | 'planning' | 'lists'
+
+function segmentStyle(withDivider: boolean, active: boolean): React.CSSProperties {
   return {
     flex: 1,
     position: 'relative',
@@ -8,7 +10,8 @@ function segmentStyle(withDivider: boolean): React.CSSProperties {
     background: 'transparent',
     border: 'none',
     borderLeft: withDivider ? '1px solid var(--color-border)' : 'none',
-    color: 'var(--color-secondary)',
+    color: active ? 'var(--color-primary)' : 'var(--color-secondary)',
+    fontWeight: active ? 700 : 400,
     fontSize: '0.9375rem',
     fontFamily: 'var(--font-body)',
     cursor: 'pointer',
@@ -25,61 +28,92 @@ const segmentPastilleStyle: React.CSSProperties = {
   background: '#d32f2f',
 }
 
+const navContainerStyle: React.CSSProperties = {
+  position: 'fixed',
+  left: 0,
+  right: 0,
+  bottom: 0,
+  zIndex: 40,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--spacing-sm)',
+  maxWidth: '480px',
+  margin: '0 auto',
+  padding: 'var(--spacing-sm) var(--spacing-xl) calc(var(--spacing-sm) + env(safe-area-inset-bottom))',
+  background: 'var(--color-background)',
+  borderTop: '1px solid var(--color-border)',
+}
+
 interface BottomNavProps {
+  activeTab: BottomNavTab | null
   overloadMode: boolean
   inboxHasTasks: boolean
   onAddTask: () => void
+  onGoDashboard: () => void
   onGoTodo: () => void
   onGoPlanning: () => void
   onGoLists: () => void
 }
 
 export function BottomNav({
+  activeTab,
   overloadMode,
   inboxHasTasks,
   onAddTask,
+  onGoDashboard,
   onGoTodo,
   onGoPlanning,
   onGoLists,
 }: BottomNavProps) {
+  if (overloadMode) {
+    return <nav aria-label="Navigation principale" style={navContainerStyle} />
+  }
+
   return (
-    <nav
-      aria-label="Navigation principale"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 'var(--spacing-sm)',
-        marginTop: 'auto',
-      }}
-    >
-      {!overloadMode && (
-        <Button fullWidth onClick={onAddTask}>
-          Ajouter une tâche
-        </Button>
-      )}
-      {!overloadMode && (
-        <div
-          role="group"
-          aria-label="Listes de tâches"
-          style={{
-            display: 'flex',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            overflow: 'hidden',
-          }}
+    <nav aria-label="Navigation principale" style={navContainerStyle}>
+      <Button fullWidth onClick={onAddTask}>
+        Ajouter une tâche
+      </Button>
+      <div
+        role="group"
+        aria-label="Navigation"
+        style={{
+          display: 'flex',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          overflow: 'hidden',
+        }}
+      >
+        <button
+          onClick={onGoDashboard}
+          aria-current={activeTab === 'dashboard' ? 'page' : undefined}
+          style={segmentStyle(false, activeTab === 'dashboard')}
         >
-          <button onClick={onGoTodo} style={segmentStyle(false)}>
-            Todo
-            {inboxHasTasks && <span aria-hidden style={segmentPastilleStyle} />}
-          </button>
-          <button onClick={onGoPlanning} style={segmentStyle(true)}>
-            Planning
-          </button>
-          <button onClick={onGoLists} style={segmentStyle(true)}>
-            Listes
-          </button>
-        </div>
-      )}
+          Accueil
+        </button>
+        <button
+          onClick={onGoTodo}
+          aria-current={activeTab === 'inbox' ? 'page' : undefined}
+          style={segmentStyle(true, activeTab === 'inbox')}
+        >
+          Todo
+          {inboxHasTasks && <span aria-hidden style={segmentPastilleStyle} />}
+        </button>
+        <button
+          onClick={onGoPlanning}
+          aria-current={activeTab === 'planning' ? 'page' : undefined}
+          style={segmentStyle(true, activeTab === 'planning')}
+        >
+          Planning
+        </button>
+        <button
+          onClick={onGoLists}
+          aria-current={activeTab === 'lists' ? 'page' : undefined}
+          style={segmentStyle(true, activeTab === 'lists')}
+        >
+          Listes
+        </button>
+      </div>
     </nav>
   )
 }

@@ -45,6 +45,7 @@ export function E61ListDetail() {
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',
+        paddingBottom: 'var(--bottomnav-h)',
       }}
     >
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>

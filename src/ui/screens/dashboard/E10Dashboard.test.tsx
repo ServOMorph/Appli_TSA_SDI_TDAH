@@ -55,17 +55,6 @@ describe('E10Dashboard', () => {
       expect(screen.getByText('Rien à faire aujourd\'hui')).toBeDefined()
     })
 
-    it('affiche le bouton Ajouter une tâche', () => {
-      renderWithApp(<E10Dashboard />)
-      expect(screen.getByRole('button', { name: 'Ajouter une tâche' })).toBeDefined()
-    })
-
-    it('navigue vers task-create-v2 au clic sur Ajouter une tâche', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('task-create-v2')
-    })
   })
 
   describe('avec tâches (Tâche du jour)', () => {
@@ -187,48 +176,6 @@ describe('E10Dashboard', () => {
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Ressources' }))
       expect(ctx.goTo).toHaveBeenCalledWith('resources')
-    })
-
-    it('navigue vers inbox via la nav segmentée', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('inbox')
-    })
-
-    it("n'affiche plus de segment Aujourd'hui (D4)", () => {
-      renderWithApp(<E10Dashboard />)
-      const group = screen.getByRole('group', { name: 'Listes de tâches' })
-      expect(within(group).queryByRole('button', { name: "Aujourd'hui" })).toBeNull()
-    })
-
-    it('affiche une pastille sur Todo si des tâches sont en attente', () => {
-      const ctx = makeAppContext({ inboxTasks: [makeTask({ id: 'i1' })] })
-      renderWithApp(<E10Dashboard />, ctx)
-      const todoButton = screen.getByRole('button', { name: 'Todo' })
-      expect(todoButton.querySelector('[aria-hidden="true"]')).not.toBeNull()
-    })
-
-    it("n'affiche pas de pastille sur Todo si aucune tâche en attente", () => {
-      const ctx = makeAppContext({ inboxTasks: [] })
-      renderWithApp(<E10Dashboard />, ctx)
-      const todoButton = screen.getByRole('button', { name: 'Todo' })
-      expect(todoButton.querySelector('[aria-hidden="true"]')).toBeNull()
-    })
-
-    it('navigue vers planning via la nav segmentée', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      const group = screen.getByRole('group', { name: 'Listes de tâches' })
-      await userEvent.click(within(group).getByRole('button', { name: 'Planning' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('planning')
-    })
-
-    it('navigue vers lists via la nav segmentée', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Listes' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('lists')
     })
 
     it('n\'affiche pas d\'icône Planning dans la TopBar', () => {

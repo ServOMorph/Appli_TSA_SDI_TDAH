@@ -1,3 +1,22 @@
+## v3.10 — 2026-07-07
+
+### Ajouté
+- Phase V3-6 (nav persistante, N1) codée intégralement : `BottomNav` monté une seule fois dans `App.tsx` en position fixe (bottom), affiché sur tous les écrans sauf l'onboarding (`welcome`/`profile`/`energy`) et le check-in énergie quotidien (`energy-checkin`) ; onglet actif mis en valeur (`activeTabFor`), pastille rouge Todo conservée, 4ᵉ onglet « Accueil » ajouté pour revenir au Dashboard depuis n'importe quel écran.
+- `--bottomnav-h` (`index.css`) et `padding-bottom` réservé sur 17 écrans pour qu'aucun contenu ne soit caché derrière la nav fixe.
+- `plan_test_manuel_v3-6.md` : plan de test manuel (5 sections), passé intégralement le 2026-07-07.
+- `src/ui/components/BottomNav.test.tsx` et `src/App.test.tsx` : nouveaux tests (nav directe sur le composant, mapping écran → onglet, montage global).
+
+### Modifié
+- `E10Dashboard.tsx` : retrait du montage local de `BottomNav` (désormais global).
+- Tests de nav obsolètes de `E10Dashboard.test.tsx` migrés vers `BottomNav.test.tsx`/`App.test.tsx`.
+
+### Validé
+- **Phase V3-6 close, roadmap V3 (7 phases, V3-0 à V3-6) intégralement close** : gate intégral (374/374 tests, `tsc -b` clean, eslint 0 erreur, test manuel, doc).
+
+### Reporté
+- Comportement de l'action « Reporter », fréquence du check-in énergie et rythme du bouton « Répéter demain » : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
+- V2-10 (mode offline, doc V2, déploiement Netlify) : reste en suspens sur la branche `v2`.
+
 ## v3.9 — 2026-07-07
 
 ### Ajouté

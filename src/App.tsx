@@ -21,9 +21,29 @@ import { E117Export } from '@/ui/screens/settings/E117Export'
 import { E60Lists } from '@/ui/screens/lists/E60Lists'
 import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
 import { DevResetButton } from '@/ui/components/DevResetButton'
+import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
+import type { Screen } from '@/app/AppContext'
 
-function AppScreens() {
-  const { screen, loading } = useApp()
+export const NO_NAV_SCREENS: Screen[] = ['welcome', 'profile', 'energy', 'energy-checkin']
+
+export function activeTabFor(screen: Screen): BottomNavTab | null {
+  switch (screen) {
+    case 'dashboard':
+      return 'dashboard'
+    case 'inbox':
+      return 'inbox'
+    case 'planning':
+      return 'planning'
+    case 'lists':
+    case 'list-detail':
+      return 'lists'
+    default:
+      return null
+  }
+}
+
+export function AppScreens() {
+  const { screen, loading, overloadMode, inboxTasks, goTo } = useApp()
 
   if (loading) {
     return (
@@ -90,10 +110,24 @@ function AppScreens() {
     }
   }
 
+  const showNav = !NO_NAV_SCREENS.includes(screen)
+
   return (
     <>
       <DevResetButton />
       {renderScreen()}
+      {showNav && (
+        <BottomNav
+          activeTab={activeTabFor(screen)}
+          overloadMode={overloadMode}
+          inboxHasTasks={inboxTasks.length > 0}
+          onAddTask={() => goTo('task-create-v2')}
+          onGoDashboard={() => goTo('dashboard')}
+          onGoTodo={() => goTo('inbox')}
+          onGoPlanning={() => goTo('planning')}
+          onGoLists={() => goTo('lists')}
+        />
+      )}
     </>
   )
 }

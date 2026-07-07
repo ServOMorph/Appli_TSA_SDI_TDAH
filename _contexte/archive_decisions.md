@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-06 (archivé depuis contexte.md 2026-07-07 close V3-6)
+- Relecture complète de la transcription de la visio Marie pour lever les points bloquants avant V3-0. Q1 tranché : suppression de la limite de 3 tâches/jour (jugée non nécessaire par Marie). Q2 tranché : la transcription n'était pas contradictoire mais complémentaire — retirer le segment nav "Aujourd'hui" du dashboard sans remplacement (D4), et renommer l'option de création "Aujourd'hui" en "Tâche du jour" pour conserver un moyen de créer une tâche dans cette section (D4b). Reset données V2 tranché : Marie accepte le reset, pas de migration au bump Dexie v3. Branche `v3` créée à partir de `v2` (commit de réorganisation des dossiers de notes de réunion au préalable).
+
 ## 2026-07-06 (archivé depuis contexte.md 2026-07-07 close V3-5)
 - Commande `/analyse_visio <dossier-réunion>` créée (`.claude/commands/analyse_visio.md`) pour automatiser l'analyse des visios testeurs — lit la transcription et les captures du dossier, analyse le code impacté, propose une refacto préalable, et génère une roadmap versionnée (bump auto du numéro à partir des `roadmap_v*.md` existants) au format à cases à cocher. Appliquée à la visio Marie du 2026-07-06 : roadmap V3 créée, cœur de la demande = coût d'énergie par tâche (échelle 1-12, "cuillères"), tâches obligatoires (réutilise le champ `essential` de `TaskV2`, jamais câblé jusqu'ici), mode surcharge automatique dérivé de l'énergie du jour vs coûts planifiés (remplace le toggle manuel actuel).
 

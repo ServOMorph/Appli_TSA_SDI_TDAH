@@ -156,6 +156,7 @@ export function E10Dashboard() {
     inboxTasks,
     getPlannedTasksForDate,
     completeV2Task,
+    postponeTask,
   } = useApp()
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks)
@@ -190,6 +191,13 @@ export function E10Dashboard() {
 
   async function handleCompletePlanned(taskId: string) {
     await completeV2Task(taskId)
+    const date = todayStr()
+    const planned = await getPlannedTasksForDate(date)
+    setTodayPlanned(planned)
+  }
+
+  async function handlePostponePlanned(taskId: string) {
+    await postponeTask(taskId)
     const date = todayStr()
     const planned = await getPlannedTasksForDate(date)
     setTodayPlanned(planned)
@@ -305,6 +313,24 @@ export function E10Dashboard() {
                     }}
                   >
                     Terminer
+                  </button>
+                )}
+                {!completed && overloadMode && !task.essential && (
+                  <button
+                    aria-label={`Reporter ${task.title} à demain`}
+                    onClick={() => handlePostponePlanned(task.id)}
+                    style={{
+                      background: 'none',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: '6px 10px',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      color: 'var(--color-text-muted)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    Reporter
                   </button>
                 )}
               </div>

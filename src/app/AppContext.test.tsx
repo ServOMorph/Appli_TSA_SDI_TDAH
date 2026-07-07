@@ -43,7 +43,7 @@ function TaskButton() {
 }
 
 function OverloadWorkflow() {
-  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeV2Task } = useApp()
+  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeV2Task, postponeTask } = useApp()
   const [taskId, setTaskId] = useState<string | null>(null)
   const today = new Date().toISOString().slice(0, 10)
   return (
@@ -54,12 +54,14 @@ function OverloadWorkflow() {
         onClick={async () => {
           await schedulePendingTask('Tâche coûteuse', today, '09:00', '09:30', undefined, 5, false)
           const planned = await getPlannedTasksForDate(today)
-          setTaskId(planned[0]?.id ?? null)
+          const target = planned.find((t) => t.title === 'Tâche coûteuse' && t.status === 'planned')
+          setTaskId(target?.id ?? null)
         }}
       >
         planifier tâche coûteuse
       </button>
       <button onClick={() => taskId && completeV2Task(taskId)}>terminer tâche</button>
+      <button onClick={() => taskId && postponeTask(taskId)}>reporter tâche</button>
     </>
   )
 }
@@ -172,6 +174,29 @@ describe('AppProvider', () => {
       expect(screen.getByTestId('overload').textContent).toBe('true')
     })
     await userEvent.click(screen.getByRole('button', { name: 'terminer tâche' }))
+    await waitFor(() => {
+      expect(screen.getByTestId('overload').textContent).toBe('false')
+    })
+    await userEvent.click(screen.getByRole('button', { name: 'finir onboarding' }))
+  })
+
+  it('reporter une tâche non-obligatoire en surcharge la sort du planning du jour (E6)', async () => {
+    render(
+      <AppProvider>
+        <ScreenIndicator />
+        <CreateUserButton />
+        <OverloadWorkflow />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'créer' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy'))
+    await userEvent.click(screen.getByRole('button', { name: 'énergie basse' }))
+    await userEvent.click(screen.getByRole('button', { name: 'planifier tâche coûteuse' }))
+    await waitFor(() => {
+      expect(screen.getByTestId('overload').textContent).toBe('true')
+    })
+    await userEvent.click(screen.getByRole('button', { name: 'reporter tâche' }))
     await waitFor(() => {
       expect(screen.getByTestId('overload').textContent).toBe('false')
     })

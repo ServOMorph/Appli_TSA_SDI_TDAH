@@ -262,6 +262,90 @@ describe('E40Planning', () => {
     await waitFor(() => expect(screen.getByText(/Médecin.*7/)).toBeInTheDocument())
   })
 
+  it('affiche le bouton Reporter sur une tâche non-obligatoire du jour en surcharge', async () => {
+    const task = makeTaskV2({
+      title: 'Shopping',
+      essential: false,
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+    })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        overloadMode: true,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    expect(await screen.findByLabelText(/Reporter Shopping/)).toBeInTheDocument()
+  })
+
+  it("n'affiche pas le bouton Reporter sur une tâche obligatoire en surcharge", async () => {
+    const task = makeTaskV2({
+      title: 'McDo',
+      essential: true,
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+    })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        overloadMode: true,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('McDo')).toBeInTheDocument())
+    expect(screen.queryByLabelText(/Reporter McDo/)).toBeNull()
+  })
+
+  it("n'affiche pas le bouton Reporter hors surcharge", async () => {
+    const task = makeTaskV2({
+      title: 'Shopping',
+      essential: false,
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+    })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        overloadMode: false,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('Shopping')).toBeInTheDocument())
+    expect(screen.queryByLabelText(/Reporter Shopping/)).toBeNull()
+  })
+
+  it('reporte la tâche au lendemain au clic sur Reporter et recharge le planning', async () => {
+    const postponeTask = vi.fn().mockResolvedValue(undefined)
+    const getPlannedTasksForDate = vi
+      .fn()
+      .mockResolvedValueOnce([
+        makeTaskV2({
+          id: 't1',
+          title: 'Shopping',
+          essential: false,
+          scheduled_date: '2026-06-30',
+          scheduled_start: '09:00',
+          scheduled_end: '10:00',
+        }),
+      ])
+      .mockResolvedValue([])
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        overloadMode: true,
+        postponeTask,
+        getPlannedTasksForDate,
+      }),
+    )
+    const btn = await screen.findByLabelText(/Reporter Shopping/)
+    await userEvent.click(btn)
+    expect(postponeTask).toHaveBeenCalledWith('t1')
+  })
+
   it('fermer le picker ferme le dialogue', async () => {
     renderWithApp(
       <E40Planning />,

@@ -252,6 +252,7 @@ export function E40Planning() {
     pendingPlanTask,
     clearPendingPlanTask,
     schedulePendingTask,
+    postponeTask,
     overloadMode,
   } = useApp()
 
@@ -284,6 +285,11 @@ export function E40Planning() {
   async function reload() {
     const sched = await getPlannedTasksForDate(displayDate)
     setScheduledTasks(sched)
+  }
+
+  async function handlePostpone(taskId: string) {
+    await postponeTask(taskId)
+    await reload()
   }
 
   async function handleMove(taskId: string, slot: number) {
@@ -406,24 +412,50 @@ export function E40Planning() {
                 }}
                 aria-label={`Créneau ${slotLabel(slot)}`}
               >
-                {tasksInSlot.map((task) => (
-                  <button
-                    key={task.id}
-                    style={taskChipStyle(task.essential, task.status === 'completed', isToday && overloadMode)}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (pendingPlanTask) {
-                        handleConfirmPending(slot)
-                      } else {
-                        setPicker({ mode: 'move', task, slot })
-                      }
-                    }}
-                    aria-label={`${task.title} — déplacer`}
-                  >
-                    {task.title}
-                    {task.energy_cost != null ? ` · ${task.energy_cost}` : ''}
-                  </button>
-                ))}
+                {tasksInSlot.map((task) => {
+                  const completed = task.status === 'completed'
+                  const canPostpone = isToday && overloadMode && !task.essential && !completed
+                  return (
+                    <div key={task.id} style={{ display: 'flex', gap: '4px', alignItems: 'stretch' }}>
+                      <button
+                        style={{ ...taskChipStyle(task.essential, completed, isToday && overloadMode), flex: 1 }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (pendingPlanTask) {
+                            handleConfirmPending(slot)
+                          } else {
+                            setPicker({ mode: 'move', task, slot })
+                          }
+                        }}
+                        aria-label={`${task.title} — déplacer`}
+                      >
+                        {task.title}
+                        {task.energy_cost != null ? ` · ${task.energy_cost}` : ''}
+                      </button>
+                      {canPostpone && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handlePostpone(task.id)
+                          }}
+                          aria-label={`Reporter ${task.title} à demain`}
+                          style={{
+                            background: 'none',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: 'var(--radius-sm)',
+                            padding: '4px 8px',
+                            cursor: 'pointer',
+                            fontSize: '0.75rem',
+                            color: 'var(--color-text-muted)',
+                            flexShrink: 0,
+                          }}
+                        >
+                          Reporter
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )

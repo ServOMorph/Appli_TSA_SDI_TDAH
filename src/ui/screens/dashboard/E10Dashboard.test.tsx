@@ -271,6 +271,54 @@ describe('E10Dashboard', () => {
       renderWithApp(<E10Dashboard />, ctx)
       expect(await screen.findByText(/Tâche planifiée/)).toBeDefined()
     })
+
+    it('affiche le bouton Reporter sur une tâche non-obligatoire grisée en surcharge', async () => {
+      const ctx = makeAppContext({
+        overloadMode: true,
+        getPlannedTasksForDate: async () => [
+          makeTaskV2({ id: 'a', title: 'Tâche non essentielle', essential: false }),
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(await screen.findByLabelText(/Reporter Tâche non essentielle/)).toBeDefined()
+    })
+
+    it("n'affiche pas le bouton Reporter sur une tâche obligatoire en surcharge", async () => {
+      const ctx = makeAppContext({
+        overloadMode: true,
+        getPlannedTasksForDate: async () => [
+          makeTaskV2({ id: 'a', title: 'Tâche obligatoire', essential: true }),
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      await screen.findByText(/Tâche obligatoire/)
+      expect(screen.queryByLabelText(/Reporter Tâche obligatoire/)).toBeNull()
+    })
+
+    it("n'affiche pas le bouton Reporter hors surcharge", async () => {
+      const ctx = makeAppContext({
+        overloadMode: false,
+        getPlannedTasksForDate: async () => [
+          makeTaskV2({ id: 'a', title: 'Tâche planifiée', essential: false }),
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      await screen.findByText(/Tâche planifiée/)
+      expect(screen.queryByLabelText(/Reporter Tâche planifiée/)).toBeNull()
+    })
+
+    it('reporte la tâche au lendemain au clic sur Reporter', async () => {
+      const ctx = makeAppContext({
+        overloadMode: true,
+        getPlannedTasksForDate: async () => [
+          makeTaskV2({ id: 'a', title: 'Tâche non essentielle', essential: false }),
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const btn = await screen.findByLabelText(/Reporter Tâche non essentielle/)
+      await userEvent.click(btn)
+      expect(ctx.postponeTask).toHaveBeenCalledWith('a')
+    })
   })
 
   describe('mode surcharge (D10B)', () => {

@@ -77,10 +77,13 @@ Gate : [x] tests verts (342/342) · [x] test manuel (2026-07-07, tous cas OK) ·
 - [x] E5 — Surcharge dérivée : `overloadMode` calculé en direct via `isOverloaded(todayEnergy, getRemainingPlannedCost(todayPlannedTasks))` (`AppContext.tsx`), recalculé après chaque mutation de planning (`refreshTodayPlanned`) ; `Settings.overload_mode` et `setOverloadMode` retirés intégralement (champ mort supprimé, pas masqué)
 - [x] E5 — Bouton TopBar informatif (`TopBar.tsx`) : désactivé (grisé, non cliquable) quand pas de surcharge ; actif (coloré, cliquable) affiche au clic le détail chiffré (« X énergie planifiée pour Y disponible aujourd'hui ») — décision actée avec l'utilisateur
 - [x] E6 — En surcharge : « Planning du jour » reste visible (Dashboard et Planning du jour courant uniquement) avec obligatoires en pastel et non-obligatoires grisées (`E40Planning.tsx`, `E10Dashboard.tsx`) — résout l'effet de bord D1 (voir Phase V3-1)
-- [ ] E6 — Action « Reporter » sur les tâches non-obligatoires grisées : **non implémentée, décision explicitement reportée** (l'utilisateur souhaite y réfléchir). Piste écartée : renvoyer au statut `todo` (aucun écran n'affiche ce statut aujourd'hui, créerait un orphelin comme B1). Piste envisagée non actée : replanifier au lendemain même créneau.
-- [x] `E90OverloadRecovery.tsx` : bouton « Désactiver le mode surcharge » (devenu invalide, la surcharge n'est plus désactivable manuellement) remplacé par « Retour au tableau de bord » ; `BottomNav.tsx` : bouton « Sortir du mode surcharge » retiré (même raison), navigation habituelle inchangée en surcharge (hors périmètre E6)
+- [x] E6 — Action « Reporter » sur les tâches non-obligatoires grisées : implémentée comme **replanification automatique au lendemain, même créneau horaire** (`postponeTaskV2` dans `taskRulesV2.ts`, `postponeTask` dans `AppContext.tsx`, bouton « Reporter » dans `E10Dashboard.tsx` et `E40Planning.tsx`, visible uniquement en surcharge sur les tâches non-obligatoires du jour non terminées). Piste écartée : renvoyer au statut `todo` (aucun écran n'affiche ce statut aujourd'hui, créerait un orphelin comme B1). **Décision provisoire, non validée explicitement par Marie pour ce cas précis** — à reconfirmer avec elle (note dans `Note de réunion/a demander a Marie.md`).
+- [x] `E90OverloadRecovery.tsx` : bouton « Désactiver le mode surcharge » (devenu invalide, la surcharge n'est plus désactivable manuellement) remplacé par « Retour au tableau de bord » ; `BottomNav.tsx` : bouton « Sortir du mode surcharge » retiré (même raison)
+- [x] Navigation en surcharge : `BottomNav.tsx:55,60` masque le bouton « Ajouter une tâche » et le groupe segmenté Todo/Planning/Listes en surcharge — **confirmé intentionnel par l'utilisateur lors du test manuel (2026-07-07)**, pas un bug. En surcharge, seuls le Dashboard et le Centre récupération restent accessibles, cohérent avec l'objectif de simplification de l'UI en cas de surcharge.
 
-Gate : [x] tests verts (341/341) · [ ] test manuel : énergie basse + tâches coûteuses → surcharge auto, obligatoires en pastel · [ ] doc · [~] sortie : surcharge pilotée par l'énergie, plus de toggle manuel — action « Reporter » restant à trancher avant clôture complète du gate
+Gate : [x] tests verts (353/353) · [x] test manuel : énergie basse + tâches coûteuses → surcharge auto, obligatoires en pastel, Reporter fonctionne, navigation restreinte en surcharge validée (2026-07-07) · [x] doc (`README.md` mis à jour) · [x] sortie : surcharge pilotée par l'énergie, plus de toggle manuel, action « Reporter » codée sous réserve de confirmation Marie
+
+**PHASE V3-3 CLOSE (2026-07-07).**
 
 ---
 
@@ -121,6 +124,8 @@ Gate : [ ] tests verts · [ ] test manuel : parcourir tous les écrans, nav touj
 ## Notes diverses
 
 - [ ] Titre affiché dans le Dashboard : renommer "Appli pour AuDHD" en "AuDHD" (`E10Dashboard.tsx:204`)
+- [ ] Afficher les valeurs d'énergie (1-12) sur deux lignes fixes de 6 : 1 à 6 sur la première ligne, 7 à 12 sur la seconde (actuellement en `flexWrap` libre, retour à la ligne dépendant de la largeur d'écran) — concerne `E31EnergyCheckIn.tsx` et `E03Energy.tsx` (onboarding, qui utilise encore une échelle 1-10 à corriger en 1-12 au passage, voir écart déjà relevé)
+- [ ] Bug : après un Reset DB, l'écran de saisie d'énergie affiché à l'onboarding (`E03Energy.tsx`, `SPOON_OPTIONS`) ne propose que 10 valeurs (1 à 10) au lieu de 12 — contrairement à `E31EnergyCheckIn.tsx` déjà corrigé à 1-12. Remplacer par `ENERGY_MIN`/`ENERGY_MAX` (`energyRules.ts`) comme dans E31, pour une échelle cohérente partout
 
 ## Q à trancher
 

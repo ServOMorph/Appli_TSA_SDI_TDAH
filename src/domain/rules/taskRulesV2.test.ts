@@ -5,6 +5,7 @@ import {
   scheduleTaskV2,
   toggleEssentialV2,
   setEnergyCostV2,
+  postponeTaskV2,
   getRemainingPlannedCost,
   sortByPosition,
   nextPosition,
@@ -163,6 +164,41 @@ describe('taskRulesV2', () => {
     it('ignores a non-integer value', () => {
       const updated = setEnergyCostV2(baseTask, 3.5, now)
       expect(updated.energy_cost).toBeUndefined()
+    })
+  })
+
+  describe('postponeTaskV2', () => {
+    const scheduledTask: TaskV2 = {
+      id: 'id-1',
+      title: 'My task',
+      status: 'planned',
+      essential: false,
+      position: 0,
+      scheduled_date: '2026-07-07',
+      scheduled_start: '10:00',
+      scheduled_end: '11:00',
+      created_at: now,
+      updated_at: now,
+      completed_at: null,
+    }
+
+    it('moves the task to the next day, keeping the same time slot', () => {
+      const postponed = postponeTaskV2(scheduledTask, now)
+      expect(postponed.scheduled_date).toBe('2026-07-08')
+      expect(postponed.scheduled_start).toBe('10:00')
+      expect(postponed.scheduled_end).toBe('11:00')
+      expect(postponed.updated_at).toBe(now)
+    })
+
+    it('rolls over to the next month correctly', () => {
+      const postponed = postponeTaskV2({ ...scheduledTask, scheduled_date: '2026-07-31' }, now)
+      expect(postponed.scheduled_date).toBe('2026-08-01')
+    })
+
+    it('does nothing to an unscheduled task', () => {
+      const unscheduled = { ...scheduledTask, scheduled_date: null, scheduled_start: null, scheduled_end: null }
+      const result = postponeTaskV2(unscheduled, now)
+      expect(result).toBe(unscheduled)
     })
   })
 

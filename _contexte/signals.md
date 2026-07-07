@@ -4,10 +4,22 @@
 
 ## Actions ouvertes
 
-### V3 — En cours (branche `v3`, post-visio Marie 2026-07-06)
-- [P1|ouvert] Trancher le comportement de l'action « Reporter » sur les tâches non-obligatoires grisées en mode surcharge (E6) — décision explicitement reportée par l'utilisateur en fin de session V3-3
-  - fait quand: décision actée avec l'utilisateur, action implémentée, testée
-  - réf: `roadmap_v3.md` Phase V3-3, note E6 ; piste « statut todo » écartée (aucun écran ne l'affiche, créerait un orphelin comme B1) ; piste « replanifier au lendemain même créneau » envisagée non actée
+### V3 — En cours (branche `v3`)
+- [P2|ouvert] Reconfirmer avec Marie le comportement de l'action « Reporter » (E6) — implémenté à titre provisoire (replanification au lendemain, même créneau), non validée par elle sur ce mécanisme précis
+  - fait quand: réponse de Marie obtenue et, si besoin, comportement ajusté en conséquence
+  - réf: `Note de réunion/a demander a Marie.md` ; `postponeTaskV2` (`taskRulesV2.ts`), `postponeTask` (`AppContext.tsx`)
+- [P2|ouvert] Reconfirmer avec Marie la fréquence du check-in énergie (une fois/jour vs à chaque ouverture de l'app) — Marie a dit « à chaque connexion » mais hésite elle-même dans la transcription
+  - fait quand: réponse de Marie obtenue, comportement ajusté si besoin (actuellement : une fois par jour calendaire, re-saisie libre via bouton "Modifier")
+  - réf: `Note de réunion/a demander a Marie.md` ; `AppContext.tsx` `init()`, `todayDate()`
+- [P3|ouvert] Bug mineur : `E03Energy.tsx` (onboarding) utilise encore une échelle d'énergie 1-10 au lieu de 1-12 (contrairement à `E31EnergyCheckIn.tsx` déjà corrigé)
+  - fait quand: `SPOON_OPTIONS` remplacé par `ENERGY_MIN`/`ENERGY_MAX` (`energyRules.ts`) dans `E03Energy.tsx`
+  - réf: `roadmap_v3.md` § Notes diverses
+- [P3|ouvert] Afficher les valeurs d'énergie (1-12) sur deux lignes fixes de 6 (1-6 puis 7-12) au lieu du `flexWrap` actuel
+  - fait quand: mise en page appliquée dans `E31EnergyCheckIn.tsx` et `E03Energy.tsx`
+  - réf: `roadmap_v3.md` § Notes diverses
+- [P3|ouvert] Décider s'il faut supprimer le bouton « Mode surcharge désactivé » de la TopBar hors surcharge — **attention, contredit la demande explicite de Marie** (elle voulait ce bouton visible, grisé, informatif hors surcharge)
+  - fait quand: décision actée avec Marie ou assumée explicitement comme écart
+  - réf: `roadmap_v3.md` § Notes diverses ; `TopBar.tsx`
 - [P3|ouvert] Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — décision explicitement reportée
   - fait quand: décision produit prise sur l'implémentation (piste retenue si besoin confirmé : chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id` optionnel)
   - réf: `Archives/roadmap_v2.md` § "Fonctionnalité reportée (décision 2026-07-06)"
@@ -20,43 +32,42 @@
 Aucun.
 
 ## Contexte chaud
-- Phase V3-3 (check-in + surcharge automatique) codée hors action « Reporter » : gate non clos (tests 341/341 verts, `tsc -b` clean, eslint 0 erreur, mais test manuel et doc restants, et l'action « Reporter » non implémentée).
-- `overloadMode` (AppContext) est désormais 100% dérivé : `isOverloaded(todayEnergy, getRemainingPlannedCost(todayPlannedTasks))`, recalculé via `refreshTodayPlanned()` après chaque mutation de planning. `Settings.overload_mode`/`setOverloadMode` supprimés du code (champ mort retiré).
-- Check-in énergie routé automatiquement à l'ouverture (`init()` → `energy-checkin`) si aucune saisie du jour ; re-saisie libre via bouton "Modifier" (`E30EnergyView.tsx`). Échelle corrigée 1-10 → 1-12 dans `E31EnergyCheckIn.tsx`.
-- Effet de bord D1 (mode surcharge sans tâche visible, en attente depuis V3-1) résolu par E6 : "Planning du jour" reste visible en surcharge, obligatoires en pastel / non-obligatoires grisées (`E10Dashboard.tsx`, `E40Planning.tsx` — jour courant uniquement pour le Planning).
-- Phase V3-2 (énergie : domaine + saisie) close : gate intégralement validé (tests 342/342, test manuel tous cas OK le 2026-07-07, doc à jour, sortie).
-- Phase V3-1 (bugs + nettoyage UI) close : gate intégralement validé (tests 330/330, test manuel 27/27 OK, doc à jour, sortie).
+- **Phase V3-3 CLOSE (2026-07-07)** : gate intégral (tests 353/353, `tsc -b` clean, eslint 0 erreur, test manuel `plan_test_manuel_v3-3.md` passé intégralement, doc `README.md` à jour).
+- Action « Reporter » (E6) : implémentée comme replanification automatique au lendemain, même créneau (`postponeTaskV2`/`postponeTask`), bouton visible sur tâches non-obligatoires du jour, non terminées, en surcharge — **décision provisoire**, voir actions ouvertes.
+- Navigation en surcharge : `BottomNav.tsx` masque intentionnellement Todo/Planning/Listes/Ajouter une tâche (seuls Dashboard et Centre récupération restent accessibles) — confirmé voulu par l'utilisateur en test manuel, pas un bug (une hypothèse de bug avait été soulevée à tort avant vérification).
+- `overloadMode` (AppContext) 100% dérivé : `isOverloaded(todayEnergy, getRemainingPlannedCost(todayPlannedTasks))`, recalculé via `refreshTodayPlanned()` après chaque mutation de planning. Mathématiquement, la surcharge ne peut jamais s'activer sans au moins une tâche planifiée coûteuse (coût 0 ne peut pas dépasser une énergie ≥ 1).
+- Check-in énergie routé automatiquement à l'ouverture (`init()` → `energy-checkin`) si aucune entrée pour la date du jour — y compris si l'entrée du jour est seulement "ignorée" (skip), le check-in ne se redemande pas avant le lendemain.
+- `dev_fake_date` (localStorage, bouton dev rouge "Reset DB") permet de simuler une autre date pour retester le check-in sans reset complet de la base.
+- `plan_test_manuel_v3-1.md` et `plan_test_manuel_v3-2.md` supprimés (nettoyage intentionnel, confirmé par l'utilisateur) ; seul `plan_test_manuel_v3-3.md` reste sur le disque parmi les plans V3.
 - `dist/v2/` à jour (export corrigé + créneaux 30 min inclus) ; `vite.config.ts` fixe `build.outDir: 'dist/v2'` — reste sur la branche `v2`.
 - Serveur de test téléphone (dev V3) : `npm run dev -- --host`, adresse réseau affichée dans le terminal (même Wi-Fi). Bouton "Reset DB" (dev) pour repartir d'une base propre avant test.
 
-## Dernière session (2026-07-07, close V3-3)
+## Dernière session (2026-07-07, close V3-3 suite — clôture de phase)
 
 ## Décisions prises
-- E4 : re-saisie de l'énergie autorisée à tout moment dans la journée (bouton "Modifier" existant conservé).
-- E5 : surcharge entièrement automatique (`isOverloaded` sur énergie vs coût planifié restant) — `overload_mode`/`setOverloadMode` supprimés, plus de toggle manuel.
-- E5 : bouton TopBar devient informatif (grisé/non cliquable si inactif, coloré/cliquable pour afficher le détail chiffré si actif).
-- E6 : "Planning du jour" reste visible en surcharge (Dashboard + jour courant du Planning), obligatoires en pastel, non-obligatoires grisées — résout l'effet de bord D1/P2 en attente depuis V3-1.
-- Action "Reporter" (E6) : décision explicitement reportée à la demande de l'utilisateur, à trancher en session suivante.
+- Action « Reporter » (E6) implémentée : replanification automatique au lendemain, même créneau horaire — seule piste ne créant ni nouveau statut ni orphelin ; provisoire, à reconfirmer avec Marie.
+- Fréquence du check-in énergie maintenue à une fois par jour (pas à chaque ouverture) — écart assumé avec la demande littérale de Marie, pour limiter la charge mentale ; à reconfirmer avec elle.
+- Navigation restreinte (Todo/Planning/Listes masqués) en mode surcharge : confirmée intentionnelle par l'utilisateur après vérification — pas un bug.
+- Phase V3-3 close : gate intégralement validé.
 
 ## Livrables produits ou modifiés
-- `src/app/AppContext.tsx` : `overloadMode` dérivé (`todayPlannedTasks` + `refreshTodayPlanned`), `init()` route vers `energy-checkin` si pas de saisie du jour, `setOverloadMode`/`overload_mode` retirés
-- `src/domain/entities/settings.ts` : champ `overload_mode` retiré (mort)
-- `src/ui/components/TopBar.tsx` : bouton surcharge informatif (détail chiffré au clic)
-- `src/ui/components/BottomNav.tsx` : bouton "Sortir du mode surcharge" retiré (devenu invalide)
-- `src/ui/screens/dashboard/E10Dashboard.tsx`, `src/ui/screens/planning/E40Planning.tsx` : styles pastel/grisé en surcharge sur les tâches essentielles/non-essentielles
-- `src/ui/screens/energy/E31EnergyCheckIn.tsx` : échelle corrigée 1-10 → 1-12
-- `src/ui/screens/overload/E90OverloadRecovery.tsx` : bouton "Désactiver" → "Retour au tableau de bord"
-- Tests associés mis à jour (`AppContext.test.tsx`, `E10Dashboard.test.tsx`, `E90OverloadRecovery.test.tsx`, `E31EnergyCheckIn.test.tsx`, `testUtils.tsx`, `db.test.ts`, `settingsRepository.test.ts`, `E112Accessibility.test.tsx`)
-- `roadmap_v3.md` : Phase V3-3 cochée (E4, E5, E6 visuel) hors action "Reporter", test manuel et doc
-- 341/341 tests unitaires, `tsc -b` clean, `eslint` 0 erreur
+- `src/domain/rules/taskRulesV2.ts` : `postponeTaskV2` (+ helper `addOneDay`)
+- `src/app/AppContext.tsx` : `postponeTask`
+- `src/ui/screens/dashboard/E10Dashboard.tsx`, `src/ui/screens/planning/E40Planning.tsx` : bouton « Reporter »
+- Tests : `taskRulesV2.test.ts`, `AppContext.test.tsx`, `E10Dashboard.test.tsx`, `E40Planning.test.tsx`, `src/test/testUtils.tsx` — 353/353 verts
+- `plan_test_manuel_v3-3.md` : créé (5 sections), passé intégralement le 2026-07-07
+- `roadmap_v3.md` : Phase V3-3 close (gate complet) ; notes ajoutées (bouton surcharge à discuter, échelle énergie onboarding, affichage 2x6)
+- `README.md` : état actuel et prochaine étape mis à jour
+- `Note de réunion/a demander a Marie.md` : créé, 2 questions consignées (Reporter, fréquence check-in)
+- `plan_test_manuel_v3-1.md`, `plan_test_manuel_v3-2.md` : supprimés (nettoyage intentionnel)
 
 ## Hypothèses validées / invalidées
-- VALIDE : le statut `todo` de `TaskV2` n'est affiché nulle part dans l'UI — y renvoyer une tâche créerait un orphelin (même classe de bug que B1) ; écarté comme piste pour "Reporter".
-- EN ATTENTE : test manuel utilisateur de la Phase V3-3 pas encore passé.
-- EN ATTENTE : décision sur le comportement de l'action "Reporter" en surcharge.
+- VALIDE : navigation restreinte en surcharge est un choix intentionnel de l'utilisateur, pas un bug.
+- INVALIDE : hypothèse initiale que ce masquage de nav violait le gate "aucun écran ne perd son point d'entrée" -> pivot vers "comportement voulu", roadmap et plan de test corrigés en conséquence.
+- EN ATTENTE : confirmation de Marie sur le mécanisme de « Reporter » et sur la fréquence du check-in énergie.
 
 ## Prochaine étape exacte
-Trancher le comportement de l'action "Reporter" (E6) avec l'utilisateur, l'implémenter, puis passer le test manuel de la Phase V3-3 pour clore le gate.
+Démarrer la Phase V3-4 (cuillères, couleurs, récurrence planning) ou V3-5 (Listes), indépendantes de V3-3 — au choix de l'utilisateur en début de prochaine session.
 
 ## Question bloquante pour la session suivante
-Aucune (point à trancher identifié, pas bloquant pour démarrer la discussion).
+Aucune.

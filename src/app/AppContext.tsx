@@ -8,7 +8,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
@@ -103,6 +103,7 @@ interface AppContextValue {
   renameList: (id: string, name: string) => Promise<void>
   deleteList: (id: string) => Promise<void>
   completeV2Task: (taskId: string) => Promise<void>
+  postponeTask: (taskId: string) => Promise<void>
   getListItems: (listId: string) => Promise<ListItem[]>
   addListItem: (listId: string, title: string) => Promise<void>
   deleteListItem: (id: string) => Promise<void>
@@ -311,6 +312,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const task = await taskV2Repo.getById(taskId)
     if (!task) return
     const updated = completeTaskV2Rule(task, new Date().toISOString())
+    await taskV2Repo.update(updated)
+    await refreshTodayPlanned()
+  }
+
+  async function postponeTask(taskId: string) {
+    const task = await taskV2Repo.getById(taskId)
+    if (!task) return
+    const updated = postponeTaskV2Rule(task, new Date().toISOString())
     await taskV2Repo.update(updated)
     await refreshTodayPlanned()
   }
@@ -599,6 +608,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         clearPendingPlanTask,
         schedulePendingTask,
         completeV2Task,
+        postponeTask,
         moveTask,
         completeTask,
         deleteTask,

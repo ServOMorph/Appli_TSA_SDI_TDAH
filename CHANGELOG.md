@@ -1,3 +1,18 @@
+## v3.7 — 2026-07-07
+
+### Ajouté
+- Action « Reporter » (Phase V3-3, E6) : `postponeTaskV2` (`taskRulesV2.ts`) et `postponeTask` (`AppContext.tsx`) replanifient automatiquement une tâche non-obligatoire grisée au lendemain, même créneau horaire ; bouton « Reporter » dans `E10Dashboard.tsx` et `E40Planning.tsx`. Décision provisoire, non validée par Marie sur ce mécanisme précis.
+- `plan_test_manuel_v3-3.md` : plan de test manuel (5 sections), passé intégralement le 2026-07-07.
+
+### Validé
+- **Phase V3-3 close** : gate intégral (353/353 tests, `tsc -b` clean, eslint 0 erreur, test manuel, doc). Navigation restreinte au Dashboard/Centre récupération en mode surcharge confirmée intentionnelle par l'utilisateur (initialement suspectée à tort comme un bug bloquant, vérifiée puis levée).
+
+### Reporté
+- Comportement de l'action « Reporter » et fréquence du check-in énergie (une fois/jour vs chaque ouverture) : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md`.
+
+### Supprimé
+- `plan_test_manuel_v3-1.md`, `plan_test_manuel_v3-2.md` (nettoyage intentionnel, phases déjà closes).
+
 ## v3.6 — 2026-07-07
 
 ### Ajouté

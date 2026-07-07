@@ -21,6 +21,5 @@ export async function completeFastOnboarding(page: Page) {
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await page.getByRole('button', { name: '5' }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
-  await page.getByRole('button', { name: 'Ignorer' }).click()
-  await page.waitForSelector('h1:has-text("Appli pour AuDHD")')
+  await page.waitForSelector('h1:has-text("AuDHD")')
 }

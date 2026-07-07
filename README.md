@@ -35,7 +35,7 @@ Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-
 
 **Itérations UI hors phase** (roadmap V3 close) : titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" ; symbole d'énergie changé de cuillères à batterie (`BatteryIcon`/`BatteryCost`, remplace `SpoonIcon`/`SpoonCost`), affiché sur le Dashboard, le Planning, et désormais aussi sur les 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) ; espacement des créneaux du Planning rendu symétrique (haut/bas égaux autour de la case de tâche), créneaux vides alignés sur la même hauteur qu'un créneau occupé ; bouton « Mode surcharge » de la TopBar désormais masqué (au lieu de grisé) hors surcharge — écart avec une demande explicite antérieure de Marie, à reconfirmer.
 
-Tests unitaires 374/374, `tsc -b` clean, `eslint` 0 erreur.
+Tests unitaires 374/374, `tsc -b` clean, `eslint` 0 erreur. Tests e2e Playwright remis en état après dérive accumulée (titre, écran onboarding supprimé, surcharge devenue automatique) : 44/45 verts, T19 restant à supprimer (teste une fonctionnalité intentionnellement retirée en V3-1).
 
 ## Stack
 

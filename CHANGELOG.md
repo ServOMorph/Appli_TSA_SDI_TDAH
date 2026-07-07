@@ -1,3 +1,11 @@
+## v3.14 — 2026-07-07
+
+### Corrigé
+- Tests e2e Playwright remis en état (`e2e/`) : cause élargie au-delà du signal initial (écran `E04FirstTask` supprimé depuis V3-1) à 4 dérives cumulées — titre Dashboard obsolète (`Appli pour AuDHD` → `AuDHD`, 6 fichiers), bouton « Ajouter une tâche » dupliqué (BottomNav persistante V3-6 + bouton propre à `E20Inbox.tsx`) causant des violations de mode strict Playwright, `aria-label` de déplacement passé de « Aujourd'hui » à « Tâche du jour » (V3-1), mode surcharge devenu 100% automatique depuis V3-3 (plus de bouton manuel). `e2e/05-overload.spec.ts` réécrit intégralement pour déclencher/désactiver la surcharge via le mécanisme automatique réel. Corrigé côté tests uniquement, aucun changement de code applicatif.
+
+### Validé
+- 44/45 tests e2e verts. T19 (`02-tasks.spec.ts`) reste en échec sciemment : teste la limite « 3 tâches/jour » retirée intentionnellement en V3-1 (décision Q1, confirmée via `_contexte/archive_decisions.md`) — suppression du test à faire en session suivante, pas une régression.
+
 ## v3.13 — 2026-07-07
 
 ### Modifié

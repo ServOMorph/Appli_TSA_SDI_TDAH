@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-07 (archivé depuis contexte.md 2026-07-07 e2e, session tests e2e)
+- Phase V3-2 codée intégralement. `getRemainingPlannedCost` (`taskRulesV2.ts`) : helper pur, somme `energy_cost` des tâches `planned` non `completed`, préparatoire à la surcharge V3-3, non branché à l'UI. `setEnergyCostV2` : setter pur validant 1-12 via `isValidEnergyValue` (réutilisation directe de la règle existante, pas de nouvelle règle de barème créée — E3 satisfait par réutilisation). E1/E2 : fenêtre à deux carrés (sélecteur d'énergie 1-12 + case obligatoire) implémentée dans `E40Planning.tsx` uniquement, au moment de l'assignation à un créneau (seul point où une tâche `planned` est réellement persistée) — écart assumé par rapport au fichier `E21CreateTaskV2.tsx` cité dans la roadmap initiale, ce dernier ne faisant qu'amorcer le flux via `startPlanTask`. `schedulePendingTask` (AppContext) étend sa signature (`energyCost`, `essential`) et câble `toggleEssentialV2` existant (trou fonctionnel V2-10 fermé). Affichage minimal du coût en texte sur les cases Planning et Dashboard. 342/342 tests unitaires, `tsc -b` clean, `eslint` 0 erreur.
+
 ## 2026-07-07 (archivé depuis contexte.md 2026-07-07 suite 3, masquage bouton surcharge)
 - Test manuel de la Phase V3-1 passé intégralement (27/27 cas OK), gate de phase clos. Point mode surcharge sans tâche visible (effet de bord D1) explicitement reporté par l'utilisateur à la Phase V3-3 (travail spécifique sur la surcharge automatique), plutôt que tranché maintenant.
 

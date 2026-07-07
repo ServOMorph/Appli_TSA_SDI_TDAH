@@ -23,40 +23,42 @@ test('T03 — Sélectionner profil Étudiant → écran Énergie', async ({ page
   await page.screenshot({ path: 'e2e/screenshots/03-energy.png' })
 })
 
-test('T04 — Saisir énergie et valider → écran Première tâche', async ({ page }) => {
+test('T04 — Saisir énergie et valider → Dashboard', async ({ page }) => {
   await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await page.getByRole('button', { name: '7' }).click()
   await expect(page.getByRole('button', { name: '7' })).toHaveAttribute('aria-pressed', 'true')
   await page.getByRole('button', { name: 'Valider' }).click()
-  await expect(page.getByRole('heading', { name: 'Votre première tâche' })).toBeVisible()
-  await page.screenshot({ path: 'e2e/screenshots/04-first-task.png' })
+  await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
+  await page.screenshot({ path: 'e2e/screenshots/04-dashboard.png' })
 })
 
-test('T05 — Ignorer énergie → écran Première tâche', async ({ page }) => {
+test('T05 — Ignorer énergie → Dashboard', async ({ page }) => {
   await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
-  await expect(page.getByRole('heading', { name: 'Votre première tâche' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 })
 
-test('T06 — Créer première tâche → Dashboard avec tâche visible', async ({ page }) => {
+test('T06 — Ajouter une tâche depuis Dashboard vide → visible sur Dashboard', async ({ page }) => {
   await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Adulte' }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
+  await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche onboarding test')
-  await page.getByRole('button', { name: 'Ajouter' }).click()
-  await expect(page.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeVisible()
+  await page.getByRole('button', { name: 'Tâche du jour' }).click()
+  await page.getByRole('button', { name: 'Valider' }).click()
+  await page.getByRole('button', { name: 'Accueil' }).click()
+  await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
   await expect(page.getByText('Tâche onboarding test').first()).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/06-dashboard-with-task.png' })
 })
 
-test('T07 — Ignorer première tâche → Dashboard vide', async ({ page }) => {
+test('T07 — Dashboard vide après onboarding sans tâche', async ({ page }) => {
   await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Adulte' }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
-  await page.getByRole('button', { name: 'Ignorer' }).click()
-  await expect(page.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeVisible()
-  await expect(page.getByText('Que souhaitez-vous ajouter ?')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
+  await expect(page.getByText('Rien à faire aujourd\'hui')).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/07-dashboard-empty.png' })
 })

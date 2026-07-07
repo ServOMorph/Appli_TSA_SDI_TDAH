@@ -1,3 +1,11 @@
+## v3.12 — 2026-07-07
+
+### Corrigé
+- Espacement des créneaux du Planning (`E40Planning.tsx`) rendu symétrique : suppression du `minHeight` fixe (64px) qui créait un espace plus grand en bas qu'en haut autour de la case de tâche. Les créneaux occupés s'ajustent désormais à leur contenu réel, les créneaux vides sont alignés sur la même hauteur via un placeholder invisible (`emptySlotPlaceholderStyle`) plutôt qu'une valeur en dur.
+
+### Validé
+- 29/29 tests (`E40Planning.test.tsx`) verts, `tsc -b` clean. Changement visuel mineur hors gate de phase — pas de test manuel dédié.
+
 ## v3.11 — 2026-07-07
 
 ### Modifié

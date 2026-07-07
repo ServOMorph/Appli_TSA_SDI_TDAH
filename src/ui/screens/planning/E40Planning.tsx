@@ -86,10 +86,17 @@ function slotRowStyle(isNow: boolean): React.CSSProperties {
   return {
     display: 'flex',
     alignItems: 'stretch',
-    minHeight: '64px',
     borderBottom: '1px solid var(--color-text-muted)',
     background: isNow ? 'color-mix(in srgb, var(--color-primary) 6%, transparent)' : 'transparent',
   }
+}
+
+const emptySlotPlaceholderStyle: React.CSSProperties = {
+  visibility: 'hidden',
+  padding: '8px 10px',
+  fontSize: '0.9375rem',
+  fontWeight: 600,
+  fontFamily: 'var(--font-body)',
 }
 
 const hourLabelStyle: React.CSSProperties = {
@@ -449,6 +456,11 @@ export function E40Planning() {
                 }}
                 aria-label={`Créneau ${slotLabel(slot)}`}
               >
+                {tasksInSlot.length === 0 && (
+                  <span style={emptySlotPlaceholderStyle} aria-hidden>
+                    _
+                  </span>
+                )}
                 {tasksInSlot.map((task) => {
                   const completed = task.status === 'completed'
                   const canPostpone = isToday && overloadMode && !task.essential && !completed

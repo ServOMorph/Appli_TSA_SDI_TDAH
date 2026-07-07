@@ -1,4 +1,4 @@
-# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-07 suite)
+# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-07 suite 2)
 
 
 
@@ -35,31 +35,26 @@ Aucun.
 - **Roadmap V3 intégralement close (2026-07-07)** : 7 phases (V3-0 à V3-6) closes, gate complet sur chacune. Reste uniquement la validation par Marie de 3 mécanismes implémentés à titre provisoire (Reporter, fréquence check-in, rythme récurrence — voir Actions ouvertes).
 - Symbole d'énergie : cuillères (`SpoonIcon`/`SpoonCost`) remplacées par une icône batterie (`BatteryIcon`/`BatteryCost`, `src/ui/components/`) — moins connotée spoon theory (communauté maladies chroniques, pas spécifiquement AuDHD). Câblée sur le Dashboard, le Planning, et affichée en plus sur les 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`), qui n'avaient auparavant aucun symbole.
 - Titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" (`E10Dashboard.tsx`).
+- Planning (`E40Planning.tsx`) : hauteur des créneaux (`slotRowStyle`) ne repose plus sur un `minHeight` fixe de 64px. Les créneaux occupés s'ajustent à leur contenu réel ; les créneaux vides reçoivent un placeholder invisible (`emptySlotPlaceholderStyle`, même padding/police que la case de tâche) pour réserver exactement la même hauteur — objectif : espace haut/bas symétrique autour de chaque case, cohérence visuelle uniforme du planning.
 - Nav persistante (Phase V3-6) : `BottomNav` monté une seule fois dans `App.tsx` (position fixe), affiché sur tous les écrans sauf onboarding (`welcome`/`profile`/`energy`) et check-in énergie (`energy-checkin`) ; 4 onglets (Accueil/Todo/Planning/Listes), onglet actif mis en valeur, pastille Todo conservée. Chaque écran réserve `padding-bottom: var(--bottomnav-h)` (CSS var définie dans `index.css`) pour ne rien cacher derrière la nav fixe.
 - Couleur d'ambiance configurable (`Settings.ambiance_color`, sélecteur dans Accessibilité) : pilote la couleur pastel (case placée) et flashy (case terminée) du planning et du dashboard — `src/ui/styles/ambiance.ts` (`pastelBackground`/`mutedBackground`/`flashyBackground`, défaut `DEFAULT_AMBIANCE_COLOR`).
 - Navigation en surcharge : `BottomNav.tsx` masque intentionnellement Todo/Planning/Listes/Ajouter une tâche (seuls Dashboard et Centre récupération restent accessibles) — confirmé voulu par l'utilisateur, pas un bug.
 - Tests e2e Playwright (`e2e/01-onboarding.spec.ts` et suivants) cassés indépendamment des sessions récentes : ils attendent un écran « Première tâche » (`E04FirstTask`) supprimé depuis la Phase V3-1 (2026-07-06) — à corriger ou retirer avant de s'y fier à nouveau.
 - Serveur de test téléphone (dev V3) : `npm run dev -- --host`, adresse réseau affichée dans le terminal (même Wi-Fi). Bouton "Reset DB" (dev) pour repartir d'une base propre avant test.
 
-## Dernière session (2026-07-07 suite, roadmap V3 close — itérations UI hors phase : titre Dashboard, symbole batterie)
+## Dernière session (2026-07-07 suite 2, roadmap V3 close — retouches UI hors phase : espacement des créneaux Planning)
 
 ## Décisions prises
-- Titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" (item roadmap "Notes diverses" clos).
-- Symbole d'énergie changé de cuillères à batterie, à la demande de l'utilisateur (moins connoté spoon theory), et étendu aux 3 écrans de check énergie qui n'avaient aucun symbole auparavant.
+- Espacement haut/bas des créneaux du Planning rendu symétrique : suppression du `minHeight` fixe (64px) qui créait un espace bas plus grand que l'espace haut autour de la case de tâche (déduit d'un screenshot fourni par l'utilisateur, confirmé par reformulation avant codage).
+- Créneaux vides alignés sur la même hauteur qu'un créneau occupé (via placeholder invisible mimant la case de tâche), plutôt qu'une hauteur arbitraire de 64px.
 
 ## Livrables produits ou modifiés
-- `src/ui/screens/dashboard/E10Dashboard.tsx`(+`.test.tsx`) : titre "AuDHD"
-- `src/ui/components/SpoonIcon.tsx`/`SpoonCost.tsx` : supprimés
-- `src/ui/components/BatteryIcon.tsx`/`BatteryCost.tsx` : créés (remplacent les cuillères)
-- `src/ui/screens/dashboard/E10Dashboard.tsx`, `src/ui/screens/planning/E40Planning.tsx`(+`.test.tsx`) : `SpoonCost` → `BatteryCost`
-- `src/ui/screens/onboarding/E03Energy.tsx`, `src/ui/screens/energy/E31EnergyCheckIn.tsx` : `BatteryIcon` ajouté à côté du titre
-- `src/ui/screens/energy/E30EnergyView.tsx` : `BatteryIcon` ajouté à côté du score du jour
-- `roadmap_v3.md` : items "Notes diverses" (titre Dashboard, symbole énergie) clos
-- Tests : 374/374 verts (aucun test nouveau, libellés aria mis à jour), `tsc -b` clean
+- `src/ui/screens/planning/E40Planning.tsx` : `slotRowStyle` sans `minHeight` fixe, ajout `emptySlotPlaceholderStyle` (span invisible, `aria-hidden`) rendu dans les créneaux sans tâche
+- Tests : 29/29 (`E40Planning.test.tsx`) verts, `tsc -b` clean
 
 ## Hypothèses validées / invalidées
-- VALIDE : icône batterie sur Dashboard/Planning/3 écrans de check énergie, `tsc -b` clean, tests verts — pas encore de test manuel utilisateur sur ce point précis (changement visuel mineur, hors gate de phase).
-- EN ATTENTE : confirmation de Marie sur le mécanisme de « Reporter », la fréquence du check-in énergie, et le rythme du bouton « Répéter demain » (inchangé depuis V3-3/V3-4).
+- VALIDE : symétrie haut/bas obtenue en supprimant le `minHeight` forcé plutôt qu'en centrant le contenu (qui aurait changé la valeur de référence du haut) ; créneaux vides et occupés de même hauteur via placeholder invisible plutôt que valeur en dur.
+- EN ATTENTE : confirmation de Marie sur le mécanisme de « Reporter », la fréquence du check-in énergie, et le rythme du bouton « Répéter demain » (inchangé depuis V3-3/V3-4) — pas de retour visuel utilisateur (hors screenshots) sur ce changement d'espacement.
 
 ## Prochaine étape exacte
 Roadmap V3 close, aucune phase active. Deux fronts en parallèle, aucun ne dépend de code immédiat côté Claude : (1) attendre la session test avec Marie pour trancher les 3 points en attente, (2) reprendre V2-10 (mode offline 13.2, doc V2, déploiement Netlify) resté en suspens sur la branche `v2`.

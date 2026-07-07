@@ -29,6 +29,8 @@ Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-
 
 **Phase V3-4 close** (Planning : cuillères, couleurs, récurrence) : composant cuillères sobre (`SpoonIcon`/`SpoonCost`), coût affiché en cuillères sur le planning, cases pastel (couleur d'ambiance configurable dans Accessibilité, `Settings.ambiance_color`) devenant flashy une fois la tâche terminée, bouton « Terminer » ajouté au planning (déjà présent au dashboard), « Planning du jour » du dashboard en cartes pastel comme « Tâche du jour », et récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée, qui la duplique au lendemain au même créneau et ouvre directement le jour du duplicata (Planning ou, depuis le Dashboard, navigation vers le Planning sur ce jour). Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-4.md`).
 
+**Phase V3-5 close** (Listes) : hiérarchie visuelle entre la vue globale des listes (grosses cases, `E60Lists.tsx` inchangé) et l'intérieur d'une liste (`E61ListDetail.tsx`) — éléments encadrés plus fin/serré (padding `--spacing-xs`, radius `--radius-sm`), titre de la liste encadré du même style que les listes en vue globale. Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-5.md`).
+
 Tests unitaires 367/367, `tsc -b` clean, `eslint` 0 erreur.
 
 ## Stack
@@ -60,7 +62,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Phase V3-5 (Listes) ou V3-6 (nav persistante), indépendantes entre elles. Reste à reconfirmer avec Marie : le comportement de l'action « Reporter » et la fréquence du check-in énergie (une fois par jour vs à chaque ouverture) — voir `Note de réunion/a demander a Marie.md`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
+Phase V3-6 (nav persistante). Reste à reconfirmer avec Marie : le comportement de l'action « Reporter », la fréquence du check-in énergie (une fois par jour vs à chaque ouverture) et le rythme du bouton « Répéter demain » — voir `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

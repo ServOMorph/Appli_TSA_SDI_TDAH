@@ -106,11 +106,13 @@ Gate : [x] tests verts (367/367) · [x] test manuel (tous cas OK, 2026-07-07, `p
 
 ## Phase V3-5 — Listes (L1, L2, L3)
 
-- [ ] L1 — Encadrement des éléments d'une liste plus fin/serré (`E61ListDetail.tsx`)
-- [ ] L2 — Différencier « toutes les listes » (grosses cases) vs intérieur d'une liste (cases fines) (`E60Lists.tsx`, `E61ListDetail.tsx`)
-- [ ] L3 — Encadrement du titre de liste identique à celui des listes en vue globale (`E61ListDetail.tsx`)
+- [x] L1 — Encadrement des éléments d'une liste plus fin/serré (`E61ListDetail.tsx`) — padding `--spacing-xs` (était `--spacing-md`), radius `--radius-sm` (était `--radius-md`), gap entre éléments `--spacing-xs`
+- [x] L2 — Différencier « toutes les listes » (grosses cases, `E60Lists.tsx` inchangé) vs intérieur d'une liste (cases fines, `E61ListDetail.tsx`)
+- [x] L3 — Encadrement du titre de liste identique à celui des listes en vue globale (`E61ListDetail.tsx`) — `h1` encadré (padding `--spacing-md`, border, radius `--radius-md`), même style que les lignes de `E60Lists.tsx`
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : hiérarchie visuelle des listes lisible
+Gate : [x] tests verts (367/367) · [x] test manuel OK (2026-07-07) · [x] doc (`README.md` mis à jour) · [x] sortie : hiérarchie visuelle des listes lisible
+
+**PHASE V3-5 CLOSE (2026-07-07).**
 
 ---
 
@@ -126,8 +128,8 @@ Gate : [ ] tests verts · [ ] test manuel : parcourir tous les écrans, nav touj
 ## Notes diverses
 
 - [ ] Titre affiché dans le Dashboard : renommer "Appli pour AuDHD" en "AuDHD" (`E10Dashboard.tsx:204`)
-- [ ] Afficher les valeurs d'énergie (1-12) sur deux lignes fixes de 6 : 1 à 6 sur la première ligne, 7 à 12 sur la seconde (actuellement en `flexWrap` libre, retour à la ligne dépendant de la largeur d'écran) — concerne `E31EnergyCheckIn.tsx` et `E03Energy.tsx` (onboarding, qui utilise encore une échelle 1-10 à corriger en 1-12 au passage, voir écart déjà relevé)
-- [ ] Bug : après un Reset DB, l'écran de saisie d'énergie affiché à l'onboarding (`E03Energy.tsx`, `SPOON_OPTIONS`) ne propose que 10 valeurs (1 à 10) au lieu de 12 — contrairement à `E31EnergyCheckIn.tsx` déjà corrigé à 1-12. Remplacer par `ENERGY_MIN`/`ENERGY_MAX` (`energyRules.ts`) comme dans E31, pour une échelle cohérente partout
+- [x] Afficher les valeurs d'énergie (1-12) sur deux lignes fixes de 6 (`E31EnergyCheckIn.tsx`, `E03Energy.tsx`) — 367/367 tests verts, `tsc -b` clean, test manuel OK (2026-07-07)
+- [x] Bug : `E03Energy.tsx` (onboarding) échelle 1-10 corrigée en 1-12 via `ENERGY_MIN`/`ENERGY_MAX` (`energyRules.ts`), cohérent avec `E31EnergyCheckIn.tsx` — test manuel OK (2026-07-07)
 
 ## Q à trancher
 

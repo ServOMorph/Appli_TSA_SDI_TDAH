@@ -14,12 +14,6 @@
 - [P2|ouvert] Reconfirmer avec Marie le mécanisme de récurrence (P6, « Répéter demain ») — implémenté comme bouton explicite (1 clic = 1 jour dupliqué), écart assumé par rapport à la lecture littérale de la transcription qui décrivait un flux plus rapide (« clac, clac, clac » sur plusieurs jours d'affilée sans clic dédié). Le premier essai (avance automatique de jour après chaque tâche planifiée, sans bouton) a été testé et rejeté (masquait la tâche qu'on venait de placer).
   - fait quand: réponse de Marie obtenue sur si le rythme « 1 clic par jour » lui convient pour les tâches récurrentes, ou si un flux plus rapide est nécessaire
   - réf: `Note de réunion/2026-06-07/input_2026-07-06_2043.txt` l.448-467 ; `duplicateTaskV2ToNextDay` (`taskRulesV2.ts`), `repeatTaskTomorrow` (`AppContext.tsx`)
-- [P3|ouvert] Bug mineur : `E03Energy.tsx` (onboarding) utilise encore une échelle d'énergie 1-10 au lieu de 1-12 (contrairement à `E31EnergyCheckIn.tsx` déjà corrigé)
-  - fait quand: `SPOON_OPTIONS` remplacé par `ENERGY_MIN`/`ENERGY_MAX` (`energyRules.ts`) dans `E03Energy.tsx`
-  - réf: `roadmap_v3.md` § Notes diverses
-- [P3|ouvert] Afficher les valeurs d'énergie (1-12) sur deux lignes fixes de 6 (1-6 puis 7-12) au lieu du `flexWrap` actuel
-  - fait quand: mise en page appliquée dans `E31EnergyCheckIn.tsx` et `E03Energy.tsx`
-  - réf: `roadmap_v3.md` § Notes diverses
 - [P3|ouvert] Décider s'il faut supprimer le bouton « Mode surcharge désactivé » de la TopBar hors surcharge — **attention, contredit la demande explicite de Marie** (elle voulait ce bouton visible, grisé, informatif hors surcharge)
   - fait quand: décision actée avec Marie ou assumée explicitement comme écart
   - réf: `roadmap_v3.md` § Notes diverses ; `TopBar.tsx`
@@ -35,40 +29,39 @@
 Aucun.
 
 ## Contexte chaud
-- **Phase V3-4 CLOSE (2026-07-07)** : gate intégral (tests 367/367, `tsc -b` clean, eslint 0 erreur, test manuel `plan_test_manuel_v3-4.md` passé intégralement, doc `README.md` à jour).
+- **Phase V3-5 CLOSE (2026-07-07)** : gate intégral (tests 367/367, `tsc -b` clean, eslint 0 erreur, test manuel `plan_test_manuel_v3-5.md` passé intégralement, doc `README.md` à jour).
+- Listes : hiérarchie visuelle entre vue globale (`E60Lists.tsx`, grosses cases, inchangé) et intérieur d'une liste (`E61ListDetail.tsx`, cases fines — padding `--spacing-xs`, radius `--radius-sm`) ; titre de liste encadré du même style que les listes en vue globale (L3).
+- Bugs P3 corrigés (hors phase, avant V3-5) : `E03Energy.tsx` (onboarding) passé à l'échelle 1-12 (au lieu de 1-10) ; affichage des valeurs d'énergie sur deux lignes fixes de 6 dans `E03Energy.tsx` et `E31EnergyCheckIn.tsx` (au lieu du `flexWrap` libre).
+- Seule Phase V3-6 (nav persistante) reste à coder sur la roadmap V3 — dernière phase.
 - Couleur d'ambiance configurable (`Settings.ambiance_color`, sélecteur dans Accessibilité) : pilote la couleur pastel (case placée) et flashy (case terminée) du planning et du dashboard — `src/ui/styles/ambiance.ts` (`pastelBackground`/`mutedBackground`/`flashyBackground`, défaut `DEFAULT_AMBIANCE_COLOR`).
-- Récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée (Planning + Dashboard), duplique la tâche au lendemain même créneau et ouvre directement le jour du duplicata (`planningTargetDate`/`setPlanningTargetDate` dans `AppContext`, consommé puis réinitialisé par `E40Planning.tsx`). Voir action ouverte P2 ci-dessus pour la reconfirmation avec Marie.
 - Navigation en surcharge : `BottomNav.tsx` masque intentionnellement Todo/Planning/Listes/Ajouter une tâche (seuls Dashboard et Centre récupération restent accessibles) — confirmé voulu par l'utilisateur, pas un bug.
-- `plan_test_manuel_v3-3.md` supprimé (nettoyage, phase close) ; seul `plan_test_manuel_v3-4.md` reste sur le disque parmi les plans V3.
+- `plan_test_manuel_v3-4.md` supprimé (nettoyage, phase close) ; seul `plan_test_manuel_v3-5.md` reste sur le disque parmi les plans V3.
 - Serveur de test téléphone (dev V3) : `npm run dev -- --host`, adresse réseau affichée dans le terminal (même Wi-Fi). Bouton "Reset DB" (dev) pour repartir d'une base propre avant test.
 
-## Dernière session (2026-07-07, Phase V3-4 — codée, testée, close)
+## Dernière session (2026-07-07, bugs P3 corrigés + Phase V3-5 — codée, testée, close)
 
 ## Décisions prises
-- Phase V3-4 codée intégralement (E7, E8, P1-P4b, D5, P6) : cuillères (`SpoonIcon`/`SpoonCost`), couleur d'ambiance configurable (pastel/flashy), bouton « Terminer » ajouté au Planning, cartes pastel sur « Planning du jour » du Dashboard.
-- P6 (récurrence) : l'avance automatique au jour suivant après chaque tâche planifiée a été codée puis **rejetée après test manuel** (elle masquait la tâche qu'on venait de placer, lue comme un bug) — remplacée par un bouton explicite « Répéter demain » qui duplique la tâche au lendemain et ouvre directement ce jour-là (Planning : avance sur place ; Dashboard : navigue vers Planning sur ce jour).
-- Phase V3-4 close : gate intégralement validé (test manuel confirmé "tout ok" par l'utilisateur).
+- Bugs P3 corrigés : échelle d'énergie 1-12 dans `E03Energy.tsx` (était 1-10) ; affichage des valeurs d'énergie sur deux lignes fixes de 6 dans `E03Energy.tsx` et `E31EnergyCheckIn.tsx` (était `flexWrap` libre).
+- Phase V3-5 (Listes) codée intégralement (L1, L2, L3) : éléments d'une liste resserrés (`E61ListDetail.tsx`, padding `--spacing-xs`, radius `--radius-sm`, après un premier resserrement jugé insuffisant et resserré une seconde fois à la demande de l'utilisateur), vue globale des listes inchangée (`E60Lists.tsx`, grosses cases), titre de liste encadré du même style que les lignes de la vue globale.
+- Phase V3-5 close : gate intégralement validé (test manuel confirmé "ok" par l'utilisateur).
 
 ## Livrables produits ou modifiés
-- `src/ui/components/SpoonIcon.tsx`, `SpoonCost.tsx` : composant cuillères (créés)
-- `src/ui/styles/ambiance.ts` : helpers couleur pastel/flashy (créé)
-- `src/domain/rules/taskRulesV2.ts` : `duplicateTaskV2ToNextDay`
-- `src/app/AppContext.tsx` : `repeatTaskTomorrow`, `planningTargetDate`/`setPlanningTargetDate`
-- `src/ui/screens/planning/E40Planning.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx` : cuillères, pastel/flashy, boutons Terminer + Répéter demain
-- `src/ui/screens/settings/E112Accessibility.tsx` : sélecteur couleur d'ambiance
-- Tests : `taskRulesV2.test.ts`, `E40Planning.test.tsx`, `E10Dashboard.test.tsx`, `E112Accessibility.test.tsx`, `src/test/testUtils.tsx` — 367/367 verts
-- `plan_test_manuel_v3-4.md` : créé (5 sections), passé intégralement le 2026-07-07
-- `roadmap_v3.md` : Phase V3-4 close (gate complet)
-- `README.md` : état actuel et prochaine étape mis à jour
-- `plan_test_manuel_v3-3.md` : supprimé (nettoyage, phase close)
+- `src/ui/screens/onboarding/E03Energy.tsx` : échelle 1-12 (`ENERGY_MIN`/`ENERGY_MAX`), affichage sur deux lignes fixes de 6
+- `src/ui/screens/energy/E31EnergyCheckIn.tsx` : affichage sur deux lignes fixes de 6
+- `src/ui/screens/lists/E61ListDetail.tsx` : éléments resserrés (padding `--spacing-xs`, radius `--radius-sm`), titre encadré (padding `--spacing-md`, border, radius `--radius-md`)
+- Tests : 367/367 verts (aucun test nouveau, changements purement visuels/CSS)
+- `plan_test_manuel_v3-5.md` : créé (3 sections), passé intégralement le 2026-07-07
+- `roadmap_v3.md` : items P3 (Notes diverses) clos ; Phase V3-5 close (gate complet)
+- `README.md` : état actuel et prochaine étape mis à jour (V3-6 seule restante)
+- `plan_test_manuel_v3-4.md` : supprimé (nettoyage, phase close)
 
 ## Hypothèses validées / invalidées
-- VALIDE : cuillères, couleur d'ambiance pastel/flashy, bouton Terminer sur le Planning — conformes au test manuel, aucun ajustement nécessaire.
-- INVALIDE : avance automatique au jour suivant après chaque tâche planifiée (lecture littérale de la transcription) -> pivot vers bouton explicite « Répéter demain » avec ouverture directe du jour du duplicata.
-- EN ATTENTE : confirmation de Marie sur le rythme « 1 clic par jour » du bouton « Répéter demain » (voir action ouverte P2), sur le mécanisme de « Reporter » (V3-3) et sur la fréquence du check-in énergie (V3-3).
+- VALIDE : échelle d'énergie 1-12 et affichage deux lignes (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`) — conformes au test manuel.
+- VALIDE : hiérarchie visuelle Listes (grosses cases vs cases fines, titre encadré) — conforme au test manuel, aucun ajustement supplémentaire demandé après le second resserrement.
+- EN ATTENTE : confirmation de Marie sur le mécanisme de « Reporter », la fréquence du check-in énergie, et le rythme du bouton « Répéter demain » (inchangé depuis V3-3/V3-4).
 
 ## Prochaine étape exacte
-Démarrer la Phase V3-5 (Listes) ou V3-6 (nav persistante), indépendantes entre elles — au choix de l'utilisateur en début de prochaine session.
+Démarrer la Phase V3-6 (nav persistante, N1) — dernière phase de la roadmap V3 : `BottomNav` persistant sur tous les écrans, onglet actif mis en valeur, vérifier qu'aucun écran ne perd son point d'entrée.
 
 ## Question bloquante pour la session suivante
 Aucune.

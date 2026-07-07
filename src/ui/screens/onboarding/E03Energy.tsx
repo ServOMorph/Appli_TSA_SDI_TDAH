@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 
-const SPOON_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const SPOON_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
+const SPOON_ROWS = [SPOON_OPTIONS.slice(0, 6), SPOON_OPTIONS.slice(6)]
 
 export function E03Energy() {
   const { saveTodayEnergy, skipTodayEnergy, completeOnboarding } = useApp()
@@ -40,31 +42,35 @@ export function E03Energy() {
       <div
         style={{
           display: 'flex',
-          flexWrap: 'wrap',
+          flexDirection: 'column',
           gap: 'var(--spacing-sm)',
         }}
       >
-        {SPOON_OPTIONS.map((n) => (
-          <button
-            key={n}
-            aria-pressed={selected === n}
-            onClick={() => setSelected(n)}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 'var(--radius-md)',
-              border: selected === n
-                ? '2px solid var(--color-primary)'
-                : '1px solid var(--color-border)',
-              backgroundColor: selected === n ? 'var(--color-primary)' : 'var(--color-surface)',
-              color: selected === n ? '#ffffff' : 'var(--color-text)',
-              fontSize: '1rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            {n}
-          </button>
+        {SPOON_ROWS.map((row, i) => (
+          <div key={i} style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+            {row.map((n) => (
+              <button
+                key={n}
+                aria-pressed={selected === n}
+                onClick={() => setSelected(n)}
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 'var(--radius-md)',
+                  border: selected === n
+                    ? '2px solid var(--color-primary)'
+                    : '1px solid var(--color-border)',
+                  backgroundColor: selected === n ? 'var(--color-primary)' : 'var(--color-surface)',
+                  color: selected === n ? '#ffffff' : 'var(--color-text)',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
         ))}
       </div>
       <Button fullWidth onClick={confirm} disabled={selected === null}>

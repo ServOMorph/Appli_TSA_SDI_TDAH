@@ -62,7 +62,18 @@ export function E61ListDetail() {
         >
           ←
         </button>
-        <h1 style={{ margin: 0, fontSize: '1.25rem' }}>{list?.name ?? 'Liste'}</h1>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: '1.25rem',
+            flex: 1,
+            padding: 'var(--spacing-md)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          {list?.name ?? 'Liste'}
+        </h1>
       </header>
 
       {items.length === 0 && !showAddForm && (
@@ -78,7 +89,7 @@ export function E61ListDetail() {
           margin: 0,
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--spacing-sm)',
+          gap: 'var(--spacing-xs)',
         }}
       >
         {items.map((item) => (
@@ -90,8 +101,8 @@ export function E61ListDetail() {
               alignItems: 'center',
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              padding: 'var(--spacing-md)',
+              borderRadius: 'var(--radius-sm)',
+              padding: 'var(--spacing-xs)',
             }}
           >
             <span>{item.title}</span>

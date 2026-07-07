@@ -1,3 +1,22 @@
+## v3.9 — 2026-07-07
+
+### Ajouté
+- Phase V3-5 (Listes) codée intégralement : hiérarchie visuelle entre la vue globale des listes (`E60Lists.tsx`, grosses cases, inchangée) et l'intérieur d'une liste (`E61ListDetail.tsx`, cases resserrées — padding `--spacing-xs`, radius `--radius-sm`) (L1, L2) ; titre de la liste encadré du même style que les lignes de la vue globale (L3).
+- `plan_test_manuel_v3-5.md` : plan de test manuel (3 sections), passé intégralement le 2026-07-07.
+
+### Corrigé
+- `E03Energy.tsx` (onboarding) : échelle d'énergie corrigée de 1-10 à 1-12 (`ENERGY_MIN`/`ENERGY_MAX`), cohérente avec `E31EnergyCheckIn.tsx`.
+- Affichage des valeurs d'énergie sur deux lignes fixes de 6 dans `E03Energy.tsx` et `E31EnergyCheckIn.tsx` (au lieu du `flexWrap` libre dépendant de la largeur d'écran).
+
+### Validé
+- **Phase V3-5 close** : gate intégral (367/367 tests, `tsc -b` clean, eslint 0 erreur, test manuel, doc).
+
+### Reporté
+- Rythme du bouton « Répéter demain », comportement de l'action « Reporter » et fréquence du check-in énergie : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
+
+### Supprimé
+- `plan_test_manuel_v3-4.md` (nettoyage intentionnel, phase déjà close).
+
 ## v3.8 — 2026-07-07
 
 ### Ajouté

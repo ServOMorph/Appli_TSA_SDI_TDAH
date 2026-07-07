@@ -2,6 +2,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import type { FontSize } from '@/domain/entities/settings'
+import { DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -25,6 +26,7 @@ export function E112Accessibility() {
   const fontSize: FontSize = settings?.font_size ?? 'medium'
   const reducedMotion = settings?.reduced_motion ?? false
   const darkMode = settings?.dark_mode ?? false
+  const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
 
   return (
     <main
@@ -88,6 +90,21 @@ export function E112Accessibility() {
             onChange={(e) => updateSettings({ dark_mode: e.target.checked })}
             aria-label="Mode sombre"
             style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+          />
+        </label>
+      </Card>
+
+      <Card>
+        <label
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+        >
+          <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>Couleur d'ambiance</span>
+          <input
+            type="color"
+            value={ambianceColor}
+            onChange={(e) => updateSettings({ ambiance_color: e.target.value })}
+            aria-label="Couleur d'ambiance"
+            style={{ width: '40px', height: '32px', cursor: 'pointer', border: 'none', padding: 0 }}
           />
         </label>
       </Card>

@@ -8,6 +8,8 @@ import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
 import { BottomNav } from '@/ui/components/BottomNav'
+import { SpoonCost } from '@/ui/components/SpoonCost'
+import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
 import {
   DndContext,
   PointerSensor,
@@ -31,20 +33,25 @@ function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-function planningChipStyle(essential: boolean, completed: boolean, overloadMode: boolean): React.CSSProperties {
+function planningChipStyle(
+  essential: boolean,
+  completed: boolean,
+  overloadMode: boolean,
+  ambianceColor: string,
+): React.CSSProperties {
   const background = completed
-    ? 'color-mix(in srgb, var(--color-success) 25%, transparent)'
+    ? flashyBackground(ambianceColor)
     : essential
       ? overloadMode
-        ? 'color-mix(in srgb, var(--color-primary) 30%, var(--color-surface))'
-        : 'var(--color-primary)'
+        ? pastelBackground(ambianceColor)
+        : mutedBackground(ambianceColor)
       : overloadMode
         ? 'var(--color-surface)'
-        : 'color-mix(in srgb, var(--color-primary) 18%, transparent)'
+        : pastelBackground(ambianceColor)
   return {
     background,
     color: completed
-      ? 'var(--color-text-muted)'
+      ? '#fff'
       : essential && !overloadMode
         ? '#fff'
         : overloadMode && !essential
@@ -52,11 +59,12 @@ function planningChipStyle(essential: boolean, completed: boolean, overloadMode:
           : 'var(--color-text)',
     textDecoration: completed ? 'line-through' : 'none',
     border: overloadMode && !essential && !completed ? '1px solid var(--color-border)' : 'none',
-    borderRadius: 'var(--radius-sm)',
-    padding: '6px 10px',
-    fontSize: '0.8125rem',
+    borderRadius: 'var(--radius-md)',
+    padding: '10px 12px',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
     cursor: 'pointer',
-    textAlign: 'left',
+    textAlign: 'center',
     fontFamily: 'var(--font-body)',
     width: '100%',
   }
@@ -157,7 +165,12 @@ export function E10Dashboard() {
     getPlannedTasksForDate,
     completeV2Task,
     postponeTask,
+    repeatTaskTomorrow,
+    setPlanningTargetDate,
+    settings,
   } = useApp()
+
+  const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks)
   const [todayPlanned, setTodayPlanned] = useState<TaskV2[]>([])
@@ -201,6 +214,18 @@ export function E10Dashboard() {
     const date = todayStr()
     const planned = await getPlannedTasksForDate(date)
     setTodayPlanned(planned)
+  }
+
+  async function handleRepeatTomorrowPlanned(taskId: string) {
+    const nextDate = await repeatTaskTomorrow(taskId)
+    if (nextDate) {
+      setPlanningTargetDate(nextDate)
+      goTo('planning')
+    } else {
+      const date = todayStr()
+      const planned = await getPlannedTasksForDate(date)
+      setTodayPlanned(planned)
+    }
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -284,23 +309,66 @@ export function E10Dashboard() {
       <section aria-label="Planning du jour">
         <h2>Planning du jour</h2>
         {hasPlanningToday ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
             {todayPlanned.map((task) => {
               const completed = task.status === 'completed'
               return (
-              <div key={task.id} style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
-                <button
-                  style={{ ...planningChipStyle(task.essential, completed, overloadMode), flex: 1 }}
-                  onClick={() => goTo('planning')}
-                  aria-label={`${task.title} — voir dans le planning`}
-                >
-                  {task.scheduled_start} · {task.title}
-                  {task.energy_cost != null ? ` · ${task.energy_cost}` : ''}
-                </button>
-                {!completed && (
+              <Card key={task.id} style={{ padding: 'var(--spacing-sm)' }}>
+                <div style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
                   <button
-                    aria-label={`Terminer ${task.title}`}
-                    onClick={() => handleCompletePlanned(task.id)}
+                    style={{
+                      ...planningChipStyle(task.essential, completed, overloadMode, ambianceColor),
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                    }}
+                    onClick={() => goTo('planning')}
+                    aria-label={`${task.title} — voir dans le planning`}
+                  >
+                    {task.scheduled_start} · {task.title}
+                    {task.energy_cost != null && <SpoonCost cost={task.energy_cost} />}
+                  </button>
+                  {!completed && (
+                    <button
+                      aria-label={`Terminer ${task.title}`}
+                      onClick={() => handleCompletePlanned(task.id)}
+                      style={{
+                        background: 'none',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '6px 10px',
+                        cursor: 'pointer',
+                        fontSize: '0.75rem',
+                        color: 'var(--color-text-muted)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      Terminer
+                    </button>
+                  )}
+                  {!completed && overloadMode && !task.essential && (
+                    <button
+                      aria-label={`Reporter ${task.title} à demain`}
+                      onClick={() => handlePostponePlanned(task.id)}
+                      style={{
+                        background: 'none',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '6px 10px',
+                        cursor: 'pointer',
+                        fontSize: '0.75rem',
+                        color: 'var(--color-text-muted)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      Reporter
+                    </button>
+                  )}
+                  <button
+                    aria-label={`Répéter ${task.title} demain`}
+                    onClick={() => handleRepeatTomorrowPlanned(task.id)}
                     style={{
                       background: 'none',
                       border: '1px solid var(--color-border)',
@@ -312,28 +380,10 @@ export function E10Dashboard() {
                       flexShrink: 0,
                     }}
                   >
-                    Terminer
+                    Répéter demain
                   </button>
-                )}
-                {!completed && overloadMode && !task.essential && (
-                  <button
-                    aria-label={`Reporter ${task.title} à demain`}
-                    onClick={() => handlePostponePlanned(task.id)}
-                    style={{
-                      background: 'none',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      padding: '6px 10px',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
-                      color: 'var(--color-text-muted)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    Reporter
-                  </button>
-                )}
-              </div>
+                </div>
+              </Card>
               )
             })}
           </div>

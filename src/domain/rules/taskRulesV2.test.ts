@@ -6,6 +6,7 @@ import {
   toggleEssentialV2,
   setEnergyCostV2,
   postponeTaskV2,
+  duplicateTaskV2ToNextDay,
   getRemainingPlannedCost,
   sortByPosition,
   nextPosition,
@@ -199,6 +200,51 @@ describe('taskRulesV2', () => {
       const unscheduled = { ...scheduledTask, scheduled_date: null, scheduled_start: null, scheduled_end: null }
       const result = postponeTaskV2(unscheduled, now)
       expect(result).toBe(unscheduled)
+    })
+  })
+
+  describe('duplicateTaskV2ToNextDay', () => {
+    const scheduledTask: TaskV2 = {
+      id: 'id-1',
+      title: 'McDo',
+      status: 'planned',
+      essential: false,
+      energy_cost: 5,
+      position: 0,
+      scheduled_date: '2026-07-07',
+      scheduled_start: '10:00',
+      scheduled_end: '11:00',
+      created_at: now,
+      updated_at: now,
+      completed_at: null,
+    }
+
+    it('creates a new planned task on the next day, same slot and title', () => {
+      const duplicate = duplicateTaskV2ToNextDay(scheduledTask, 'id-2', now)
+      expect(duplicate).not.toBeNull()
+      expect(duplicate?.id).toBe('id-2')
+      expect(duplicate?.title).toBe('McDo')
+      expect(duplicate?.energy_cost).toBe(5)
+      expect(duplicate?.status).toBe('planned')
+      expect(duplicate?.scheduled_date).toBe('2026-07-08')
+      expect(duplicate?.scheduled_start).toBe('10:00')
+      expect(duplicate?.scheduled_end).toBe('11:00')
+      expect(duplicate?.completed_at).toBeNull()
+    })
+
+    it('duplicates a completed task as not completed', () => {
+      const duplicate = duplicateTaskV2ToNextDay(
+        { ...scheduledTask, status: 'completed', completed_at: now },
+        'id-2',
+        now,
+      )
+      expect(duplicate?.status).toBe('planned')
+      expect(duplicate?.completed_at).toBeNull()
+    })
+
+    it('returns null for an unscheduled task', () => {
+      const unscheduled = { ...scheduledTask, scheduled_date: null }
+      expect(duplicateTaskV2ToNextDay(unscheduled, 'id-2', now)).toBeNull()
     })
   })
 

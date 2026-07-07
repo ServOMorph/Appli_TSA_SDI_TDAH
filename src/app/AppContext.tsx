@@ -8,7 +8,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, duplicateTaskV2ToNextDay as duplicateTaskV2ToNextDayRule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
@@ -104,6 +104,9 @@ interface AppContextValue {
   deleteList: (id: string) => Promise<void>
   completeV2Task: (taskId: string) => Promise<void>
   postponeTask: (taskId: string) => Promise<void>
+  repeatTaskTomorrow: (taskId: string) => Promise<string | null>
+  planningTargetDate: string | null
+  setPlanningTargetDate: (date: string | null) => void
   getListItems: (listId: string) => Promise<ListItem[]>
   addListItem: (listId: string, title: string) => Promise<void>
   deleteListItem: (id: string) => Promise<void>
@@ -162,6 +165,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
   const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
+  const [planningTargetDate, setPlanningTargetDate] = useState<string | null>(null)
 
   useEffect(() => {
     async function init() {
@@ -322,6 +326,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = postponeTaskV2Rule(task, new Date().toISOString())
     await taskV2Repo.update(updated)
     await refreshTodayPlanned()
+  }
+
+  async function repeatTaskTomorrow(taskId: string): Promise<string | null> {
+    const task = await taskV2Repo.getById(taskId)
+    if (!task) return null
+    const duplicate = duplicateTaskV2ToNextDayRule(task, newId(), new Date().toISOString())
+    if (!duplicate) return null
+    await taskV2Repo.create(duplicate)
+    await refreshTodayPlanned()
+    return duplicate.scheduled_date
   }
 
   function startPlanTask(title: string, sourceTaskId?: string) {
@@ -609,6 +623,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         schedulePendingTask,
         completeV2Task,
         postponeTask,
+        repeatTaskTomorrow,
+        planningTargetDate,
+        setPlanningTargetDate,
         moveTask,
         completeTask,
         deleteTask,

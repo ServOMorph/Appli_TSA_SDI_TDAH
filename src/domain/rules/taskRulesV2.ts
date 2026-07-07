@@ -95,3 +95,16 @@ export function postponeTaskV2(task: TaskV2, now: string): TaskV2 {
     updated_at: now,
   }
 }
+
+export function duplicateTaskV2ToNextDay(task: TaskV2, id: string, now: string): TaskV2 | null {
+  if (!task.scheduled_date) return null
+  return {
+    ...task,
+    id,
+    status: 'planned',
+    scheduled_date: addOneDay(task.scheduled_date),
+    created_at: now,
+    updated_at: now,
+    completed_at: null,
+  }
+}

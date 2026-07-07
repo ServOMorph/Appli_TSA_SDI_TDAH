@@ -1,3 +1,22 @@
+## v3.8 — 2026-07-07
+
+### Ajouté
+- Phase V3-4 (Planning : cuillères, couleurs, récurrence) codée intégralement : composant cuillères sobre (`SpoonIcon.tsx`, `SpoonCost.tsx`), coût affiché en cuillères sur le planning (E7/E8) ; texte des cases agrandi et centré (P1) ; bouton « Terminer » ajouté au Planning, cases pastel quand une tâche est placée (P2) ; couleur d'ambiance configurable (`Settings.ambiance_color`, sélecteur dans Accessibilité, `src/ui/styles/ambiance.ts`) pilotant les teintes pastel/flashy (P3) ; tâche terminée en version flashy de la couleur d'ambiance (P4b) ; « Planning du jour » du Dashboard en cartes pastel comme « Tâche du jour » (D5).
+- Récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée (Planning et Dashboard) — `duplicateTaskV2ToNextDay` (`taskRulesV2.ts`), `repeatTaskTomorrow` (`AppContext.tsx`). Duplique la tâche au lendemain, même créneau, et ouvre directement le jour du duplicata (`planningTargetDate`/`setPlanningTargetDate`, AppContext).
+- `plan_test_manuel_v3-4.md` : plan de test manuel (5 sections), passé intégralement le 2026-07-07.
+
+### Validé
+- **Phase V3-4 close** : gate intégral (367/367 tests, `tsc -b` clean, eslint 0 erreur, test manuel, doc).
+
+### Corrigé
+- P6 : une première version (avance automatique au jour suivant après chaque tâche planifiée, sans bouton dédié) a été testée manuellement et invalidée — elle masquait la tâche qu'on venait de placer, lue comme un bug. Remplacée par le bouton explicite « Répéter demain » ci-dessus.
+
+### Reporté
+- Rythme du bouton « Répéter demain » (1 clic par jour), comportement de l'action « Reporter » et fréquence du check-in énergie : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
+
+### Supprimé
+- `plan_test_manuel_v3-3.md` (nettoyage intentionnel, phase déjà close).
+
 ## v3.7 — 2026-07-07
 
 ### Ajouté

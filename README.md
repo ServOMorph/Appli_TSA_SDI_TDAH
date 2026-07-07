@@ -27,7 +27,9 @@ V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur 
 
 Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6). **Phases V3-0, V3-1, V3-2 et V3-3 closes.** V3-3 (check-in + surcharge automatique) : surcharge dérivée de l'énergie du jour vs coût planifié restant (plus de toggle manuel), action « Reporter » sur les tâches non-obligatoires grisées implémentée (replanification automatique au lendemain, même créneau — décision provisoire non validée par Marie, voir `Note de réunion/a demander a Marie.md`), navigation restreinte au Dashboard et au Centre récupération en surcharge (confirmé intentionnel en test manuel). Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-3.md`).
 
-Tests unitaires 353/353, `tsc -b` clean, `eslint` 0 erreur.
+**Phase V3-4 close** (Planning : cuillères, couleurs, récurrence) : composant cuillères sobre (`SpoonIcon`/`SpoonCost`), coût affiché en cuillères sur le planning, cases pastel (couleur d'ambiance configurable dans Accessibilité, `Settings.ambiance_color`) devenant flashy une fois la tâche terminée, bouton « Terminer » ajouté au planning (déjà présent au dashboard), « Planning du jour » du dashboard en cartes pastel comme « Tâche du jour », et récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée, qui la duplique au lendemain au même créneau et ouvre directement le jour du duplicata (Planning ou, depuis le Dashboard, navigation vers le Planning sur ce jour). Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-4.md`).
+
+Tests unitaires 367/367, `tsc -b` clean, `eslint` 0 erreur.
 
 ## Stack
 
@@ -58,7 +60,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Phase V3-4 (Planning : cuillères, couleurs, récurrence) ou V3-5 (Listes), indépendantes de V3-3. Reste à reconfirmer avec Marie : le comportement de l'action « Reporter » et la fréquence du check-in énergie (une fois par jour vs à chaque ouverture) — voir `Note de réunion/a demander a Marie.md`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
+Phase V3-5 (Listes) ou V3-6 (nav persistante), indépendantes entre elles. Reste à reconfirmer avec Marie : le comportement de l'action « Reporter » et la fréquence du check-in énergie (une fois par jour vs à chaque ouverture) — voir `Note de réunion/a demander a Marie.md`. En parallèle, finaliser V2-10 : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

@@ -89,16 +89,18 @@ Gate : [x] tests verts (353/353) · [x] test manuel : énergie basse + tâches c
 
 ## Phase V3-4 — Planning : cuillères, couleurs, récurrence (E7, E8, P1-P4, P6, D5)
 
-- [ ] E7 — Composant cuillères réutilisable, sobre/clean, pas d'étoiles ni style enfantin
-- [ ] E8 — Coût d'énergie (cuillères) affiché sur les cases du planning (`E40Planning.tsx`)
-- [ ] P1 — Texte des cases plus gros et centré (`E40Planning.tsx`)
-- [ ] P2 — Case pastel claire quand une tâche est placée + case « Terminé » (`E40Planning.tsx`)
-- [ ] P3 — Couleur pastel configurable (`Settings.ambiance_color`, écran paramètres)
-- [ ] P4b — Tâche terminée : même teinte en version flashy (`E40Planning.tsx`)
-- [ ] D5 — « Planning du jour » du dashboard en cases pastel comme « Tâche du jour » (`E10Dashboard.tsx`)
-- [ ] P6 — Rester dans le planning après validation : re-proposer la même tâche sur clic d'une autre case + passage auto au jour suivant (`E40Planning.tsx`, `AppContext.tsx`)
+- [x] E7 — Composant cuillères réutilisable, sobre/clean, pas d'étoiles ni style enfantin — `SpoonIcon.tsx` (SVG trait, style cohérent avec les icônes existantes de `TopBar.tsx`), `SpoonCost.tsx`
+- [x] E8 — Coût d'énergie (cuillères) affiché sur les cases du planning (`E40Planning.tsx`) — remplace l'affichage textuel ` · n` par `SpoonCost`
+- [x] P1 — Texte des cases plus gros et centré (`E40Planning.tsx`) — `taskChipStyle` : `0.9375rem`, `fontWeight: 600`, `textAlign: center`
+- [x] P2 — Case pastel claire quand une tâche est placée + case « Terminé » (`E40Planning.tsx`) — bouton « Terminer » ajouté sur le planning (déjà présent sur le dashboard), fond pastel via `pastelBackground`
+- [x] P3 — Couleur pastel configurable (`Settings.ambiance_color`, écran paramètres) — sélecteur `<input type="color">` ajouté dans `E112Accessibility.tsx`, défaut `DEFAULT_AMBIANCE_COLOR` (`src/ui/styles/ambiance.ts`)
+- [x] P4b — Tâche terminée : même teinte en version flashy (`E40Planning.tsx`) — `flashyBackground` (couleur d'ambiance pleine, remplace l'ancien vert `--color-success`)
+- [x] D5 — « Planning du jour » du dashboard en cases pastel comme « Tâche du jour » (`E10Dashboard.tsx`) — chaque tâche planifiée enveloppée dans un `Card`, même logique de couleur que `E40Planning.tsx`
+- [x] P6 — Bouton « Répéter demain » sur une tâche planifiée (`E40Planning.tsx`, `E10Dashboard.tsx`, `AppContext.tsx`) — l'avance automatique au jour suivant après chaque planification (interprétation initiale de la transcription l.448-467) a été testée manuellement et **écartée** : elle masquait la tâche qu'on venait de planifier (elle disparaissait de la vue), lu comme un bug par le testeur. Remplacée par un bouton explicite « Répéter demain » sur chaque tâche planifiée, qui duplique la tâche (même titre/coût/obligatoire/créneau) au lendemain — `duplicateTaskV2ToNextDay` (`taskRulesV2.ts`), `repeatTaskTomorrow` (`AppContext.tsx`). Second ajustement (test manuel) : le clic sur « Répéter demain » ouvre désormais directement le jour où la copie a été créée (dans le Planning : avance sur place ; depuis le Dashboard : navigue vers le Planning sur ce jour via `planningTargetDate`/`setPlanningTargetDate`, AppContext)
 
-Gate : [ ] tests verts · [ ] test manuel : planifier → cuillères + pastel, terminer → flashy, changer couleur, poser une récurrence sur plusieurs jours · [ ] doc · [ ] sortie : planning conforme au retour Marie
+Gate : [x] tests verts (367/367) · [x] test manuel (tous cas OK, 2026-07-07, `plan_test_manuel_v3-4.md`) · [x] doc (`README.md` mis à jour) · [x] sortie : planning conforme au retour Marie
+
+**PHASE V3-4 CLOSE (2026-07-07).**
 
 ---
 

@@ -47,6 +47,17 @@ describe('E40Planning', () => {
     expect(goTo).toHaveBeenCalledWith('dashboard')
   })
 
+  it('ouvre directement sur planningTargetDate si fourni, puis le réinitialise', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    const setPlanningTargetDate = vi.fn()
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ planningTargetDate: '2026-07-01', setPlanningTargetDate, getPlannedTasksForDate }),
+    )
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
+    expect(setPlanningTargetDate).toHaveBeenCalledWith(null)
+  })
+
   it('navigation précédent charge le jour précédent', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderWithApp(<E40Planning />, makeAppContext({ getPlannedTasksForDate }))
@@ -259,7 +270,8 @@ describe('E40Planning', () => {
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
       }),
     )
-    await waitFor(() => expect(screen.getByText(/Médecin.*7/)).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    expect(screen.getByLabelText("7 cuillères d'énergie")).toBeInTheDocument()
   })
 
   it('affiche le bouton Reporter sur une tâche non-obligatoire du jour en surcharge', async () => {
@@ -344,6 +356,97 @@ describe('E40Planning', () => {
     const btn = await screen.findByLabelText(/Reporter Shopping/)
     await userEvent.click(btn)
     expect(postponeTask).toHaveBeenCalledWith('t1')
+  })
+
+  it('affiche le bouton Terminer sur une tâche planifiée non terminée (P2)', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    expect(screen.getByLabelText('Terminer Médecin')).toBeInTheDocument()
+  })
+
+  it('clic sur Terminer appelle completeV2Task et recharge le planning', async () => {
+    const completeV2Task = vi.fn().mockResolvedValue(undefined)
+    const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ completeV2Task, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    await userEvent.click(screen.getByLabelText('Terminer Médecin'))
+    expect(completeV2Task).toHaveBeenCalledWith('t1')
+  })
+
+  it("n'affiche pas le bouton Terminer sur une tâche déjà terminée", async () => {
+    const task = makeTaskV2({
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+      status: 'completed',
+    })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    expect(screen.queryByLabelText('Terminer Médecin')).toBeNull()
+  })
+
+  it('après avoir planifié une tâche, le jour affiché ne change pas (P6)', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ schedulePendingTask: vi.fn().mockResolvedValue(undefined), getPlannedTasksForDate }),
+    )
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
+    await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'McDo')
+    await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+
+    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-01')
+  })
+
+  it('affiche le bouton Répéter demain sur une tâche planifiée (P6)', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    expect(screen.getByLabelText('Répéter Médecin demain')).toBeInTheDocument()
+  })
+
+  it('clic sur Répéter demain appelle repeatTaskTomorrow et recharge le planning (P6)', async () => {
+    const repeatTaskTomorrow = vi.fn().mockResolvedValue(undefined)
+    const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ repeatTaskTomorrow, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    await userEvent.click(screen.getByLabelText('Répéter Médecin demain'))
+    expect(repeatTaskTomorrow).toHaveBeenCalledWith('t1')
+  })
+
+  it('après Répéter demain, le planning affiche directement le jour du duplicata (P6)', async () => {
+    const repeatTaskTomorrow = vi.fn().mockResolvedValue('2026-07-01')
+    const getPlannedTasksForDate = vi
+      .fn()
+      .mockResolvedValueOnce([
+        makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' }),
+      ])
+      .mockResolvedValue([])
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({ repeatTaskTomorrow, getPlannedTasksForDate }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    await userEvent.click(screen.getByLabelText('Répéter Médecin demain'))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
   })
 
   it('fermer le picker ferme le dialogue', async () => {

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
 import { ENERGY_MIN, ENERGY_MAX, isValidEnergyValue } from '@/domain/rules/energyRules'
+import { SpoonCost } from '@/ui/components/SpoonCost'
+import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
 
 const SLOTS = Array.from({ length: 48 }, (_, i) => i)
 const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
@@ -109,20 +111,25 @@ const slotCellStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-function taskChipStyle(essential: boolean, completed: boolean, overloadMode: boolean): React.CSSProperties {
+function taskChipStyle(
+  essential: boolean,
+  completed: boolean,
+  overloadMode: boolean,
+  ambianceColor: string,
+): React.CSSProperties {
   const background = completed
-    ? 'color-mix(in srgb, var(--color-success) 25%, transparent)'
+    ? flashyBackground(ambianceColor)
     : essential
       ? overloadMode
-        ? 'color-mix(in srgb, var(--color-primary) 30%, var(--color-surface))'
-        : 'var(--color-primary)'
+        ? pastelBackground(ambianceColor)
+        : mutedBackground(ambianceColor)
       : overloadMode
         ? 'var(--color-surface)'
-        : 'color-mix(in srgb, var(--color-primary) 18%, transparent)'
+        : pastelBackground(ambianceColor)
   return {
     background,
     color: completed
-      ? 'var(--color-text-muted)'
+      ? '#fff'
       : essential && !overloadMode
         ? '#fff'
         : overloadMode && !essential
@@ -131,10 +138,11 @@ function taskChipStyle(essential: boolean, completed: boolean, overloadMode: boo
     textDecoration: completed ? 'line-through' : 'none',
     border: overloadMode && !essential && !completed ? '1px solid var(--color-border)' : 'none',
     borderRadius: 'var(--radius-sm)',
-    padding: '4px 8px',
-    fontSize: '0.8125rem',
+    padding: '8px 10px',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
     cursor: 'pointer',
-    textAlign: 'left',
+    textAlign: 'center',
     fontFamily: 'var(--font-body)',
     width: '100%',
   }
@@ -252,11 +260,18 @@ export function E40Planning() {
     pendingPlanTask,
     clearPendingPlanTask,
     schedulePendingTask,
+    completeV2Task,
     postponeTask,
+    repeatTaskTomorrow,
+    planningTargetDate,
+    setPlanningTargetDate,
     overloadMode,
+    settings,
   } = useApp()
 
-  const [displayDate, setDisplayDate] = useState(todayStr)
+  const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
+
+  const [displayDate, setDisplayDate] = useState(() => planningTargetDate ?? todayStr())
   const [scheduledTasks, setScheduledTasks] = useState<TaskV2[]>([])
   const [picker, setPicker] = useState<Picker>(null)
   const [newTaskTitle, setNewTaskTitle] = useState('')
@@ -267,6 +282,13 @@ export function E40Planning() {
   const now = new Date()
   const currentSlot = now.getHours() * 2 + (now.getMinutes() >= 30 ? 1 : 0)
   const currentSlotRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (planningTargetDate) {
+      setPlanningTargetDate(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -290,6 +312,20 @@ export function E40Planning() {
   async function handlePostpone(taskId: string) {
     await postponeTask(taskId)
     await reload()
+  }
+
+  async function handleComplete(taskId: string) {
+    await completeV2Task(taskId)
+    await reload()
+  }
+
+  async function handleRepeatTomorrow(taskId: string) {
+    const nextDate = await repeatTaskTomorrow(taskId)
+    if (nextDate) {
+      setDisplayDate(nextDate)
+    } else {
+      await reload()
+    }
   }
 
   async function handleMove(taskId: string, slot: number) {
@@ -418,7 +454,14 @@ export function E40Planning() {
                   return (
                     <div key={task.id} style={{ display: 'flex', gap: '4px', alignItems: 'stretch' }}>
                       <button
-                        style={{ ...taskChipStyle(task.essential, completed, isToday && overloadMode), flex: 1 }}
+                        style={{
+                          ...taskChipStyle(task.essential, completed, isToday && overloadMode, ambianceColor),
+                          flex: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                        }}
                         onClick={(e) => {
                           e.stopPropagation()
                           if (pendingPlanTask) {
@@ -430,8 +473,29 @@ export function E40Planning() {
                         aria-label={`${task.title} — déplacer`}
                       >
                         {task.title}
-                        {task.energy_cost != null ? ` · ${task.energy_cost}` : ''}
+                        {task.energy_cost != null && <SpoonCost cost={task.energy_cost} />}
                       </button>
+                      {!completed && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleComplete(task.id)
+                          }}
+                          aria-label={`Terminer ${task.title}`}
+                          style={{
+                            background: 'none',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: 'var(--radius-sm)',
+                            padding: '4px 8px',
+                            cursor: 'pointer',
+                            fontSize: '0.75rem',
+                            color: 'var(--color-text-muted)',
+                            flexShrink: 0,
+                          }}
+                        >
+                          Terminer
+                        </button>
+                      )}
                       {canPostpone && (
                         <button
                           onClick={(e) => {
@@ -453,6 +517,25 @@ export function E40Planning() {
                           Reporter
                         </button>
                       )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleRepeatTomorrow(task.id)
+                        }}
+                        aria-label={`Répéter ${task.title} demain`}
+                        style={{
+                          background: 'none',
+                          border: '1px solid var(--color-border)',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: '4px 8px',
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          color: 'var(--color-text-muted)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        Répéter demain
+                      </button>
                     </div>
                   )
                 })}

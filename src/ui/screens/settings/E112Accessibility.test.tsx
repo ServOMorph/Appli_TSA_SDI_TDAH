@@ -63,4 +63,16 @@ describe('E112Accessibility', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(goTo).toHaveBeenCalledWith('settings')
   })
+
+  it('appelle updateSettings avec ambiance_color au changement de couleur (P3)', () => {
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE112({ updateSettings })
+    fireEvent.change(screen.getByLabelText("Couleur d'ambiance"), { target: { value: '#ff8800' } })
+    expect(updateSettings).toHaveBeenCalledWith({ ambiance_color: '#ff8800' })
+  })
+
+  it('affiche la couleur par défaut si ambiance_color non défini', () => {
+    renderE112()
+    expect(screen.getByLabelText("Couleur d'ambiance")).toHaveValue('#4a7c99')
+  })
 })

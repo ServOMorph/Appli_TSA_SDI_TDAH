@@ -319,6 +319,18 @@ describe('E10Dashboard', () => {
       await userEvent.click(btn)
       expect(ctx.postponeTask).toHaveBeenCalledWith('a')
     })
+
+    it('clic sur Répéter demain ouvre le Planning au jour du duplicata (P6)', async () => {
+      const ctx = makeAppContext({
+        repeatTaskTomorrow: async () => '2026-07-08',
+        getPlannedTasksForDate: async () => [makeTaskV2({ id: 'a', title: 'RDV médecin' })],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const btn = await screen.findByLabelText(/Répéter RDV médecin demain/)
+      await userEvent.click(btn)
+      expect(ctx.setPlanningTargetDate).toHaveBeenCalledWith('2026-07-08')
+      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    })
   })
 
   describe('mode surcharge (D10B)', () => {

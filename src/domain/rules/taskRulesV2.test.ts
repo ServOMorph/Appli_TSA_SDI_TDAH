@@ -4,6 +4,8 @@ import {
   completeTaskV2,
   scheduleTaskV2,
   toggleEssentialV2,
+  setEnergyCostV2,
+  getRemainingPlannedCost,
   sortByPosition,
   nextPosition,
 } from './taskRulesV2'
@@ -125,6 +127,85 @@ describe('taskRulesV2', () => {
       const toggled = toggleEssentialV2(task, now)
 
       expect(toggled.essential).toBe(true)
+    })
+  })
+
+  describe('setEnergyCostV2', () => {
+    const baseTask: TaskV2 = {
+      id: 'id-1',
+      title: 'My task',
+      status: 'todo',
+      essential: false,
+      position: 0,
+      scheduled_date: null,
+      scheduled_start: null,
+      scheduled_end: null,
+      created_at: now,
+      updated_at: now,
+      completed_at: null,
+    }
+
+    it('sets a valid cost within 1-12', () => {
+      const updated = setEnergyCostV2(baseTask, 5, now)
+      expect(updated.energy_cost).toBe(5)
+    })
+
+    it('accepts null (aucune valeur imposée)', () => {
+      const updated = setEnergyCostV2({ ...baseTask, energy_cost: 5 }, null, now)
+      expect(updated.energy_cost).toBeNull()
+    })
+
+    it('ignores an out-of-range value', () => {
+      const updated = setEnergyCostV2(baseTask, 13, now)
+      expect(updated.energy_cost).toBeUndefined()
+    })
+
+    it('ignores a non-integer value', () => {
+      const updated = setEnergyCostV2(baseTask, 3.5, now)
+      expect(updated.energy_cost).toBeUndefined()
+    })
+  })
+
+  describe('getRemainingPlannedCost', () => {
+    function task(overrides: Partial<TaskV2>): TaskV2 {
+      return {
+        id: 'id',
+        title: 't',
+        status: 'planned',
+        essential: false,
+        position: 0,
+        scheduled_date: null,
+        scheduled_start: null,
+        scheduled_end: null,
+        created_at: now,
+        updated_at: now,
+        completed_at: null,
+        ...overrides,
+      }
+    }
+
+    it('sums energy_cost of planned tasks', () => {
+      const tasks = [task({ energy_cost: 3 }), task({ energy_cost: 5 })]
+      expect(getRemainingPlannedCost(tasks)).toBe(8)
+    })
+
+    it('excludes completed tasks', () => {
+      const tasks = [task({ energy_cost: 3 }), task({ energy_cost: 5, status: 'completed' })]
+      expect(getRemainingPlannedCost(tasks)).toBe(3)
+    })
+
+    it('excludes todo tasks', () => {
+      const tasks = [task({ energy_cost: 3 }), task({ energy_cost: 5, status: 'todo' })]
+      expect(getRemainingPlannedCost(tasks)).toBe(3)
+    })
+
+    it('treats missing energy_cost as 0', () => {
+      const tasks = [task({ energy_cost: null }), task({ energy_cost: 4 })]
+      expect(getRemainingPlannedCost(tasks)).toBe(4)
+    })
+
+    it('returns 0 for empty array', () => {
+      expect(getRemainingPlannedCost([])).toBe(0)
     })
   })
 

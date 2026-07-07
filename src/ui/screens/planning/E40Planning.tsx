@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
+import { ENERGY_MIN, ENERGY_MAX, isValidEnergyValue } from '@/domain/rules/energyRules'
 
 const SLOTS = Array.from({ length: 48 }, (_, i) => i)
+const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
 
 function slotTime(slot: number): string {
   const hour = Math.floor(slot / 2)
@@ -127,6 +129,34 @@ function taskChipStyle(essential: boolean, completed: boolean): React.CSSPropert
   }
 }
 
+const energyEssentialRowStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 'var(--spacing-sm)',
+}
+
+function paramSquareStyle(active: boolean): React.CSSProperties {
+  return {
+    flex: 1,
+    border: active ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+    borderRadius: 'var(--radius-md)',
+    padding: 'var(--spacing-sm)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--spacing-xs)',
+    backgroundColor: 'var(--color-surface)',
+  }
+}
+
+const energySelectStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text)',
+  fontFamily: 'var(--font-body)',
+}
+
 const overlayStyle: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
@@ -218,6 +248,8 @@ export function E40Planning() {
   const [picker, setPicker] = useState<Picker>(null)
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [conflictError, setConflictError] = useState<string | null>(null)
+  const [energyCost, setEnergyCost] = useState<number | null>(null)
+  const [essential, setEssential] = useState(false)
 
   const now = new Date()
   const currentSlot = now.getHours() * 2 + (now.getMinutes() >= 30 ? 1 : 0)
@@ -266,7 +298,15 @@ export function E40Planning() {
     setConflictError(null)
     const start = slotTime(slot)
     const end = slotTime(Math.min(slot + 1, 47))
-    await schedulePendingTask(pendingPlanTask.title, displayDate, start, end, pendingPlanTask.sourceTaskId)
+    await schedulePendingTask(
+      pendingPlanTask.title,
+      displayDate,
+      start,
+      end,
+      pendingPlanTask.sourceTaskId,
+      energyCost,
+      essential,
+    )
     await reload()
     setPicker(null)
   }
@@ -276,7 +316,7 @@ export function E40Planning() {
     if (!trimmed) return
     const start = slotTime(slot)
     const end = slotTime(Math.min(slot + 1, 47))
-    await schedulePendingTask(trimmed, displayDate, start, end, undefined)
+    await schedulePendingTask(trimmed, displayDate, start, end, undefined, energyCost, essential)
     setNewTaskTitle('')
     await reload()
     setPicker(null)
@@ -286,6 +326,8 @@ export function E40Planning() {
     setPicker(null)
     setNewTaskTitle('')
     setConflictError(null)
+    setEnergyCost(null)
+    setEssential(false)
   }
 
   function handleBack() {
@@ -343,6 +385,8 @@ export function E40Planning() {
                 onClick={() => {
                   if (tasksInSlot.length === 0) {
                     setConflictError(null)
+                    setEnergyCost(null)
+                    setEssential(false)
                     setPicker({ mode: 'assign', slot })
                   } else if (pendingPlanTask) {
                     handleConfirmPending(slot)
@@ -365,6 +409,7 @@ export function E40Planning() {
                     aria-label={`${task.title} — déplacer`}
                   >
                     {task.title}
+                    {task.energy_cost != null ? ` · ${task.energy_cost}` : ''}
                   </button>
                 ))}
               </div>
@@ -396,29 +441,76 @@ export function E40Planning() {
 
             {picker.mode === 'assign' && (
               <>
+                {!pendingPlanTask && (
+                  <input
+                    type="text"
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    placeholder="Nom de la tâche"
+                    aria-label="Nom de la tâche"
+                    autoFocus
+                    style={newTaskInputStyle}
+                  />
+                )}
+
+                <div style={energyEssentialRowStyle}>
+                  <div style={paramSquareStyle(energyCost !== null)}>
+                    <label htmlFor="energy-cost-select" style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                      Coût en énergie
+                    </label>
+                    <select
+                      id="energy-cost-select"
+                      aria-label="Coût en énergie"
+                      style={energySelectStyle}
+                      value={energyCost ?? ''}
+                      onChange={(e) => {
+                        const raw = e.target.value
+                        if (raw === '') {
+                          setEnergyCost(null)
+                          return
+                        }
+                        const value = Number(raw)
+                        setEnergyCost(isValidEnergyValue(value) ? value : null)
+                      }}
+                    >
+                      <option value="">Non défini</option>
+                      {ENERGY_OPTIONS.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div style={paramSquareStyle(essential)}>
+                    <label
+                      htmlFor="essential-checkbox"
+                      style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}
+                    >
+                      Obligatoire
+                    </label>
+                    <input
+                      id="essential-checkbox"
+                      type="checkbox"
+                      aria-label="Tâche obligatoire"
+                      checked={essential}
+                      onChange={(e) => setEssential(e.target.checked)}
+                    />
+                  </div>
+                </div>
+
                 {pendingPlanTask ? (
                   <button style={validateBtnStyle} onClick={() => handleConfirmPending(picker.slot)}>
                     Valider
                   </button>
                 ) : (
-                  <>
-                    <input
-                      type="text"
-                      value={newTaskTitle}
-                      onChange={(e) => setNewTaskTitle(e.target.value)}
-                      placeholder="Nom de la tâche"
-                      aria-label="Nom de la tâche"
-                      autoFocus
-                      style={newTaskInputStyle}
-                    />
-                    <button
-                      style={newTaskTitle.trim() ? validateBtnStyle : validateBtnDisabledStyle}
-                      disabled={!newTaskTitle.trim()}
-                      onClick={() => handleCreateAndAssign(picker.slot)}
-                    >
-                      Planifier
-                    </button>
-                  </>
+                  <button
+                    style={newTaskTitle.trim() ? validateBtnStyle : validateBtnDisabledStyle}
+                    disabled={!newTaskTitle.trim()}
+                    onClick={() => handleCreateAndAssign(picker.slot)}
+                  >
+                    Planifier
+                  </button>
                 )}
               </>
             )}

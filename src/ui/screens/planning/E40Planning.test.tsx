@@ -121,7 +121,7 @@ describe('E40Planning', () => {
     await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'Appel dentiste')
     await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
 
-    expect(schedulePendingTask).toHaveBeenCalledWith('Appel dentiste', '2026-06-30', '10:00', '10:30', undefined)
+    expect(schedulePendingTask).toHaveBeenCalledWith('Appel dentiste', '2026-06-30', '10:00', '10:30', undefined, null, false)
   })
 
   it('le bouton Planifier est désactivé tant qu\'aucun titre n\'est saisi', async () => {
@@ -190,7 +190,7 @@ describe('E40Planning', () => {
     expect(screen.queryByLabelText('Nom de la tâche')).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /valider/i }))
-    expect(schedulePendingTask).toHaveBeenCalledWith('Laver machine', '2026-06-30', '10:00', '10:30', 'abc')
+    expect(schedulePendingTask).toHaveBeenCalledWith('Laver machine', '2026-06-30', '10:00', '10:30', 'abc', null, false)
   })
 
   it('avec une tâche en attente, cliquer sur un créneau déjà occupé refuse et affiche un message (pas de déplacement de l\'autre tâche)', async () => {
@@ -211,6 +211,55 @@ describe('E40Planning', () => {
     expect(screen.queryByText(/déplacer « médecin »/i)).not.toBeInTheDocument()
     expect(schedulePendingTask).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent(/déjà occupé/i)
+  })
+
+  it('sélectionner un coût en énergie et cocher obligatoire les transmet à schedulePendingTask (E1/E2)', async () => {
+    const schedulePendingTask = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        schedulePendingTask,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
+    await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'Appel dentiste')
+    await userEvent.selectOptions(screen.getByLabelText('Coût en énergie'), '5')
+    await userEvent.click(screen.getByLabelText('Tâche obligatoire'))
+    await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+
+    expect(schedulePendingTask).toHaveBeenCalledWith('Appel dentiste', '2026-06-30', '10:00', '10:30', undefined, 5, true)
+  })
+
+  it('coût énergie non défini par défaut (E3, aucune valeur imposée)', async () => {
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
+    expect(screen.getByLabelText('Coût en énergie')).toHaveValue('')
+  })
+
+  it('affiche le coût énergie sur la case du planning', async () => {
+    const task = makeTaskV2({
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+      energy_cost: 7,
+    })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText(/Médecin.*7/)).toBeInTheDocument())
   })
 
   it('fermer le picker ferme le dialogue', async () => {

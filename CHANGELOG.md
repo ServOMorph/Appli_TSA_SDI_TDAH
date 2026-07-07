@@ -1,3 +1,12 @@
+## v3.4 — 2026-07-07
+
+### Ajouté
+- Phase V3-2 (énergie : domaine + saisie) codée intégralement : `getRemainingPlannedCost` et `setEnergyCostV2` (`taskRulesV2.ts`, purs), fenêtre à deux carrés (sélecteur d'énergie 1-12 + case « obligatoire ») dans `E40Planning.tsx` au moment de l'assignation à un créneau, `essential` câblé via `toggleEssentialV2` existant (ferme le trou fonctionnel V2-10), affichage minimal du coût sur les cases du Planning et du Dashboard. 342/342 tests unitaires, `tsc -b` clean, `eslint` 0 erreur.
+- `plan_test_manuel_v3-2.md` : plan de test manuel dédié à la Phase V3-2 (4 sections).
+
+### Modifié
+- `AppContext.tsx` : `schedulePendingTask` étend sa signature (`energyCost`, `essential`) pour persister le coût en énergie et le caractère obligatoire à la création d'une tâche planifiée.
+
 ## v3.3 — 2026-07-07
 
 ### Validé

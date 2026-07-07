@@ -276,6 +276,7 @@ export function E10Dashboard() {
                   aria-label={`${task.title} — voir dans le planning`}
                 >
                   {task.scheduled_start} · {task.title}
+                  {task.energy_cost != null ? ` · ${task.energy_cost}` : ''}
                 </button>
                 {!completed && (
                   <button

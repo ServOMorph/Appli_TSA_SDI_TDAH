@@ -8,7 +8,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule } from '@/domain/rules/taskRulesV2'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
@@ -75,7 +75,15 @@ interface AppContextValue {
   pendingPlanTask: PendingPlanTask | null
   startPlanTask: (title: string, sourceTaskId?: string) => void
   clearPendingPlanTask: () => void
-  schedulePendingTask: (title: string, date: string, start: string, end: string, sourceTaskId?: string) => Promise<void>
+  schedulePendingTask: (
+    title: string,
+    date: string,
+    start: string,
+    end: string,
+    sourceTaskId?: string,
+    energyCost?: number | null,
+    essential?: boolean,
+  ) => Promise<void>
   moveTask: (id: string, status: TaskStatus) => Promise<void>
   completeTask: (id: string) => Promise<void>
   deleteTask: (id: string) => Promise<void>
@@ -311,10 +319,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     start: string,
     end: string,
     sourceTaskId?: string,
+    energyCost: number | null = null,
+    essential = false,
   ) {
     const now = new Date().toISOString()
     const base = createTaskV2Rule(newId(), title, 'planned', false, now)
-    const scheduled = scheduleTaskV2Rule(base, date, start, end, now)
+    let scheduled = scheduleTaskV2Rule(base, date, start, end, now)
+    scheduled = setEnergyCostV2Rule(scheduled, energyCost, now)
+    if (essential) scheduled = toggleEssentialV2Rule(scheduled, now)
     await taskV2Repo.create(scheduled)
     if (sourceTaskId) {
       const subs = await subTaskRepo.getByTaskId(sourceTaskId)

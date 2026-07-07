@@ -53,7 +53,7 @@ Gate : [x] tests verts (353/353) · [ ] test manuel (à valider par l'utilisateu
 - [x] P5 — Case vide du planning → proposer d'ajouter une tâche directement planifiée à ce créneau (`E40Planning.tsx`)
 - [x] Q1 — Supprimer la limite de 3 tâches du jour (garde-fou, modale M04, messages associés) : `E10Dashboard.tsx`, `E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx`, `E24Today.tsx`
 
-Gate : [x] tests verts (330/330) · [x] test manuel (27/27 cas OK, 2026-07-07) · [ ] doc · [x] sortie : app nettoyée, planning sans état fantôme
+Gate : [x] tests verts (330/330) · [x] test manuel (27/27 cas OK, 2026-07-07) · [x] doc · [x] sortie : app nettoyée, planning sans état fantôme
 
 > **Effet de bord D1 :** en mode surcharge, le dashboard n'affichait déjà plus la section « Tâches du jour », mais gardait le bloc « Que faire maintenant ? » comme seule tâche visible (décision du 2026-07-05). En supprimant ce bloc sans condition (D1, demande explicite Marie du 2026-07-06), le mode surcharge n'affiche plus aucune tâche — seuls restent le bandeau d'état et le Centre récupération. Décision reportée : à trancher pendant la Phase V3-3 (travail spécifique sur la surcharge automatique), pas avant.
 
@@ -61,13 +61,13 @@ Gate : [x] tests verts (330/330) · [x] test manuel (27/27 cas OK, 2026-07-07) �
 
 ## Phase V3-2 — Énergie : domaine + saisie (E1, E2, E3)
 
-- [ ] Helper domaine : coût total planifié restant d'une journée (somme `energy_cost` des `planned` non `completed`)
-- [ ] E3 — Règle de barème personnel : validation 1-12, aucune valeur imposée + tests unitaires purs
-- [ ] E1/E2 — Fenêtre à deux carrés à la planification : sélecteur d'énergie 1-12 + case « obligatoire » (`E21CreateTaskV2.tsx`, `E40Planning.tsx`)
-- [ ] E2 — Câbler `essential` via `toggleEssentialV2` existant (ferme le trou fonctionnel V2-10)
-- [ ] Affichage minimal du coût/obligatoire sur la tâche planifiée (habillage cuillères en V3-4)
+- [x] Helper domaine : coût total planifié restant d'une journée (somme `energy_cost` des `planned` non `completed`) — `getRemainingPlannedCost` (`taskRulesV2.ts`), pur, non branché à l'UI (préparatoire V3-3)
+- [x] E3 — Règle de barème personnel : validation 1-12, aucune valeur imposée + tests unitaires purs — réutilise `isValidEnergyValue` (existant, V3-0) via le nouveau setter pur `setEnergyCostV2` (`taskRulesV2.ts`)
+- [x] E1/E2 — Fenêtre à deux carrés à la planification : sélecteur d'énergie 1-12 + case « obligatoire » (`E40Planning.tsx`) — implémentée au moment de l'assignation à un créneau (seul point où une tâche `planned` est réellement créée/persistée), pas dans `E21CreateTaskV2.tsx` qui ne fait qu'amorcer le flux (`startPlanTask`)
+- [x] E2 — Câbler `essential` via `toggleEssentialV2` existant (ferme le trou fonctionnel V2-10) — `schedulePendingTask` (AppContext) applique `toggleEssentialV2Rule` si la case est cochée
+- [x] Affichage minimal du coût/obligatoire sur la tâche planifiée (habillage cuillères en V3-4) — coût affiché en texte (` · {n}`) sur la case du planning et sur « Planning du jour » du dashboard
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : coût et obligatoire saisissables et persistés
+Gate : [x] tests verts (342/342) · [ ] test manuel · [ ] doc · [x] sortie : coût et obligatoire saisissables et persistés
 
 ---
 

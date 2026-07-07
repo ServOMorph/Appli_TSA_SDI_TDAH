@@ -32,7 +32,6 @@ interface BottomNavProps {
   onGoTodo: () => void
   onGoPlanning: () => void
   onGoLists: () => void
-  onExitOverload: () => void
 }
 
 export function BottomNav({
@@ -42,7 +41,6 @@ export function BottomNav({
   onGoTodo,
   onGoPlanning,
   onGoLists,
-  onExitOverload,
 }: BottomNavProps) {
   return (
     <nav
@@ -81,24 +79,6 @@ export function BottomNav({
             Listes
           </button>
         </div>
-      )}
-      {overloadMode && (
-        <button
-          onClick={onExitOverload}
-          style={{
-            backgroundColor: 'var(--color-warning)',
-            border: '2px solid var(--color-warning)',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            color: '#fff',
-            cursor: 'pointer',
-            width: '100%',
-          }}
-        >
-          Sortir du mode surcharge
-        </button>
       )}
     </nav>
   )

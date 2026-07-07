@@ -8,7 +8,8 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { isOverloaded } from '@/domain/rules/energyRules'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
@@ -53,8 +54,8 @@ interface AppContextValue {
   inboxSubTasksMap: Record<string, SubTask[]>
   todayEnergy: number | null
   todayEnergyStatus: 'filled' | 'skipped' | null
+  todayPlannedTasks: TaskV2[]
   overloadMode: boolean
-  setOverloadMode: (v: boolean) => void
   updateSettings: (patch: Partial<Settings>) => Promise<void>
   exportData: () => Promise<void>
   deleteAllData: () => Promise<void>
@@ -153,7 +154,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [inboxSubTasksMap, setInboxSubTasksMap] = useState<Record<string, SubTask[]>>({})
   const [todayEnergy, setTodayEnergy] = useState<number | null>(null)
   const [todayEnergyStatus, setTodayEnergyStatus] = useState<'filled' | 'skipped' | null>(null)
-  const [overloadMode, setOverloadModeState] = useState(false)
+  const [todayPlannedTasks, setTodayPlannedTasks] = useState<TaskV2[]>([])
+  const overloadMode = isOverloaded(todayEnergy, getRemainingPlannedCost(todayPlannedTasks))
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [taskDetailOrigin, setTaskDetailOrigin] = useState<Screen | null>(null)
   const [lists, setLists] = useState<List[]>([])
@@ -173,10 +175,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const s = await settingsRepo.getByUserId(user.id)
         if (s) {
           setSettings(s)
-          if (s.overload_mode) setOverloadModeState(true)
         }
+        const entry = await energyRepo.getByDate(todayDate())
         await loadAll()
-        setScreen('dashboard')
+        setScreen(entry ? 'dashboard' : 'energy-checkin')
       }
       setLoading(false)
     }
@@ -193,11 +195,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [settings])
 
   async function loadAll() {
-    const [inbox, today, entry, listsData] = await Promise.all([
+    const [inbox, today, entry, listsData, planned] = await Promise.all([
       taskRepo.getByStatus('inbox'),
       taskRepo.getTodayTasks(),
       energyRepo.getByDate(todayDate()),
       listRepo.getAll(),
+      taskV2Repo.getByDate(todayDate()),
     ])
     const subTaskArrays = await Promise.all(today.map((t) => subTaskRepo.getByTaskId(t.id)))
     const subTasksMap: Record<string, SubTask[]> = {}
@@ -216,6 +219,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodayEnergy(entry?.value ?? null)
     setTodayEnergyStatus(entry?.status ?? null)
     setLists(listsData)
+    setTodayPlannedTasks(planned)
+  }
+
+  async function refreshTodayPlanned() {
+    const planned = await taskV2Repo.getByDate(todayDate())
+    setTodayPlannedTasks(planned)
   }
 
   async function createUser(profile: ProfileType) {
@@ -234,7 +243,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       dark_mode: false,
       font_size: 'medium',
       reduced_motion: false,
-      overload_mode: false,
       local_encryption: false,
     }
     await userRepo.create(user)
@@ -291,6 +299,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!task) return
     const updated = scheduleTaskV2Rule(task, date, start, end, new Date().toISOString())
     await taskV2Repo.update(updated)
+    await refreshTodayPlanned()
   }
 
   async function getPlannedTasksForDate(date: string): Promise<TaskV2[]> {
@@ -303,6 +312,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!task) return
     const updated = completeTaskV2Rule(task, new Date().toISOString())
     await taskV2Repo.update(updated)
+    await refreshTodayPlanned()
   }
 
   function startPlanTask(title: string, sourceTaskId?: string) {
@@ -334,6 +344,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       await taskRepo.delete(sourceTaskId)
       await loadAll()
     }
+    await refreshTodayPlanned()
     setPendingPlanTask(null)
   }
 
@@ -472,18 +483,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await listItemRepo.delete(id)
   }
 
-  async function setOverloadMode(v: boolean) {
-    setOverloadModeState(v)
-    if (currentUser) {
-      const s = await settingsRepo.getByUserId(currentUser.id)
-      if (s) {
-        const updated = { ...s, overload_mode: v }
-        await settingsRepo.update(updated)
-        setSettings(updated)
-      }
-    }
-  }
-
   async function updateSettings(patch: Partial<Settings>) {
     if (!currentUser) return
     const s = await settingsRepo.getByUserId(currentUser.id)
@@ -491,7 +490,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updated = { ...s, ...patch }
     await settingsRepo.update(updated)
     setSettings(updated)
-    if (patch.overload_mode !== undefined) setOverloadModeState(patch.overload_mode)
   }
 
   async function exportData() {
@@ -544,7 +542,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setInboxTasks([])
     setTodayEnergy(null)
     setTodayEnergyStatus(null)
-    setOverloadModeState(false)
+    setTodayPlannedTasks([])
     setSelectedTaskId(null)
     setLists([])
     setSelectedListId(null)
@@ -577,8 +575,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         inboxSubTasksMap,
         todayEnergy,
         todayEnergyStatus,
+        todayPlannedTasks,
         overloadMode,
-        setOverloadMode,
         updateSettings,
         exportData,
         deleteAllData,

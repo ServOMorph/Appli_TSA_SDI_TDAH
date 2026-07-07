@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { EnergyDisplay } from '@/ui/components/EnergyDisplay'
 import type { EnergyStatus } from '@/domain/entities/energyEntry'
 
@@ -7,7 +8,7 @@ interface TopBarProps {
   energyValue: number | null
   onEnergyClick: () => void
   overloadActive: boolean
-  onOverloadClick: () => void
+  plannedCost: number
   onResourcesClick: () => void
   onSettingsClick: () => void
 }
@@ -21,7 +22,7 @@ function overloadButtonStyle(active: boolean): React.CSSProperties {
     fontSize: '0.875rem',
     fontWeight: 600,
     color: active ? '#fff' : 'var(--color-text-muted)',
-    cursor: 'pointer',
+    cursor: active ? 'pointer' : 'default',
     flexShrink: 0,
   }
 }
@@ -32,10 +33,12 @@ export function TopBar({
   energyValue,
   onEnergyClick,
   overloadActive,
-  onOverloadClick,
+  plannedCost,
   onResourcesClick,
   onSettingsClick,
 }: TopBarProps) {
+  const [showOverloadInfo, setShowOverloadInfo] = useState(false)
+
   return (
     <header style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
       <div
@@ -51,12 +54,13 @@ export function TopBar({
           style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', flexShrink: 0 }}
         >
           <button
-            onClick={onOverloadClick}
-            aria-pressed={overloadActive}
-            aria-label={overloadActive ? 'Désactiver le mode surcharge' : 'Activer le mode surcharge'}
+            onClick={() => overloadActive && setShowOverloadInfo((v) => !v)}
+            disabled={!overloadActive}
+            aria-expanded={overloadActive ? showOverloadInfo : undefined}
+            aria-label={overloadActive ? 'Détail du mode surcharge' : 'Mode surcharge désactivé'}
             style={overloadButtonStyle(overloadActive)}
           >
-            Mode surcharge
+            Mode surcharge {overloadActive ? 'actif' : 'désactivé'}
           </button>
           {!overloadActive && (
             <>
@@ -123,6 +127,11 @@ export function TopBar({
           )}
         </div>
       </div>
+      {overloadActive && showOverloadInfo && (
+        <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+          {plannedCost} énergie planifiée pour {energyValue} disponible aujourd'hui.
+        </p>
+      )}
       {!overloadActive && (
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
           <EnergyDisplay status={energyStatus} value={energyValue} onClick={onEnergyClick} />

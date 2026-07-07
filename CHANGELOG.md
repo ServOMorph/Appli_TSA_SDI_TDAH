@@ -1,3 +1,15 @@
+## v3.6 — 2026-07-07
+
+### Ajouté
+- Phase V3-3 (check-in + surcharge automatique) codée : `overloadMode` (AppContext) désormais 100% dérivé (`isOverloaded` sur énergie du jour vs coût planifié restant, `todayPlannedTasks`/`refreshTodayPlanned`) — plus de toggle manuel. Check-in énergie routé automatiquement à l'ouverture si aucune saisie du jour, échelle corrigée 1-10 → 1-12. Bouton TopBar devenu informatif (détail chiffré au clic). "Planning du jour" reste visible en surcharge (obligatoires en pastel, non-obligatoires grisées), résout l'effet de bord D1 en attente depuis V3-1. 341/341 tests unitaires, `tsc -b` clean, `eslint` 0 erreur.
+
+### Modifié
+- `src/domain/entities/settings.ts` : champ `overload_mode` retiré (mort, remplacé par la dérivation automatique)
+- `src/ui/screens/overload/E90OverloadRecovery.tsx`, `src/ui/components/BottomNav.tsx` : boutons de désactivation manuelle devenus invalides, remplacés par une navigation retour
+
+### Reporté
+- Action « Reporter » sur les tâches non-obligatoires grisées en surcharge (E6) : décision explicitement laissée ouverte à la demande de l'utilisateur, à trancher en session suivante.
+
 ## v3.5 — 2026-07-07
 
 ### Validé

@@ -42,13 +42,24 @@ function TaskButton() {
   )
 }
 
-function OverloadButton() {
-  const { overloadMode, setOverloadMode } = useApp()
+function OverloadWorkflow() {
+  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeV2Task } = useApp()
+  const [taskId, setTaskId] = useState<string | null>(null)
+  const today = new Date().toISOString().slice(0, 10)
   return (
     <>
       <div data-testid="overload">{String(overloadMode)}</div>
-      <button onClick={() => setOverloadMode(true)}>activer surcharge</button>
-      <button onClick={() => setOverloadMode(false)}>désactiver surcharge</button>
+      <button onClick={() => saveTodayEnergy(3)}>énergie basse</button>
+      <button
+        onClick={async () => {
+          await schedulePendingTask('Tâche coûteuse', today, '09:00', '09:30', undefined, 5, false)
+          const planned = await getPlannedTasksForDate(today)
+          setTaskId(planned[0]?.id ?? null)
+        }}
+      >
+        planifier tâche coûteuse
+      </button>
+      <button onClick={() => taskId && completeV2Task(taskId)}>terminer tâche</button>
     </>
   )
 }
@@ -143,23 +154,24 @@ describe('AppProvider', () => {
     })
   })
 
-  it('setOverloadMode change l\'état de surcharge', async () => {
+  it('la surcharge se dérive automatiquement de l\'énergie vs coût planifié (E5)', async () => {
     render(
       <AppProvider>
         <ScreenIndicator />
         <CreateUserButton />
-        <OverloadButton />
+        <OverloadWorkflow />
       </AppProvider>,
     )
     await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
     await userEvent.click(screen.getByRole('button', { name: 'créer' }))
     await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy'))
     expect(screen.getByTestId('overload').textContent).toBe('false')
-    await userEvent.click(screen.getByRole('button', { name: 'activer surcharge' }))
+    await userEvent.click(screen.getByRole('button', { name: 'énergie basse' }))
+    await userEvent.click(screen.getByRole('button', { name: 'planifier tâche coûteuse' }))
     await waitFor(() => {
       expect(screen.getByTestId('overload').textContent).toBe('true')
     })
-    await userEvent.click(screen.getByRole('button', { name: 'désactiver surcharge' }))
+    await userEvent.click(screen.getByRole('button', { name: 'terminer tâche' }))
     await waitFor(() => {
       expect(screen.getByTestId('overload').textContent).toBe('false')
     })

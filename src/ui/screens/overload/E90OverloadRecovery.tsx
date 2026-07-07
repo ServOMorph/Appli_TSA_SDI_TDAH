@@ -11,12 +11,7 @@ const tips = [
 ]
 
 export function E90OverloadRecovery() {
-  const { setOverloadMode, goTo } = useApp()
-
-  async function handleDeactivate() {
-    await setOverloadMode(false)
-    goTo('dashboard')
-  }
+  const { goTo } = useApp()
 
   return (
     <main
@@ -63,8 +58,8 @@ export function E90OverloadRecovery() {
         </ul>
       </section>
 
-      <Button variant="secondary" fullWidth onClick={handleDeactivate}>
-        Désactiver le mode surcharge
+      <Button variant="secondary" fullWidth onClick={() => goTo('dashboard')}>
+        Retour au tableau de bord
       </Button>
     </main>
   )

@@ -109,16 +109,27 @@ const slotCellStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-function taskChipStyle(essential: boolean, completed: boolean): React.CSSProperties {
+function taskChipStyle(essential: boolean, completed: boolean, overloadMode: boolean): React.CSSProperties {
+  const background = completed
+    ? 'color-mix(in srgb, var(--color-success) 25%, transparent)'
+    : essential
+      ? overloadMode
+        ? 'color-mix(in srgb, var(--color-primary) 30%, var(--color-surface))'
+        : 'var(--color-primary)'
+      : overloadMode
+        ? 'var(--color-surface)'
+        : 'color-mix(in srgb, var(--color-primary) 18%, transparent)'
   return {
-    background: completed
-      ? 'color-mix(in srgb, var(--color-success) 25%, transparent)'
-      : essential
-        ? 'var(--color-primary)'
-        : 'color-mix(in srgb, var(--color-primary) 18%, transparent)',
-    color: completed ? 'var(--color-text-muted)' : essential ? '#fff' : 'var(--color-text)',
+    background,
+    color: completed
+      ? 'var(--color-text-muted)'
+      : essential && !overloadMode
+        ? '#fff'
+        : overloadMode && !essential
+          ? 'var(--color-text-muted)'
+          : 'var(--color-text)',
     textDecoration: completed ? 'line-through' : 'none',
-    border: 'none',
+    border: overloadMode && !essential && !completed ? '1px solid var(--color-border)' : 'none',
     borderRadius: 'var(--radius-sm)',
     padding: '4px 8px',
     fontSize: '0.8125rem',
@@ -241,6 +252,7 @@ export function E40Planning() {
     pendingPlanTask,
     clearPendingPlanTask,
     schedulePendingTask,
+    overloadMode,
   } = useApp()
 
   const [displayDate, setDisplayDate] = useState(todayStr)
@@ -397,7 +409,7 @@ export function E40Planning() {
                 {tasksInSlot.map((task) => (
                   <button
                     key={task.id}
-                    style={taskChipStyle(task.essential, task.status === 'completed')}
+                    style={taskChipStyle(task.essential, task.status === 'completed', isToday && overloadMode)}
                     onClick={(e) => {
                       e.stopPropagation()
                       if (pendingPlanTask) {

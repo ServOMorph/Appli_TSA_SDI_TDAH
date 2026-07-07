@@ -73,12 +73,14 @@ Gate : [x] tests verts (342/342) · [x] test manuel (2026-07-07, tous cas OK) ·
 
 ## Phase V3-3 — Check-in + surcharge automatique (E4, E5, E6)
 
-- [ ] E4 — Router le check-in énergie existant à chaque ouverture, échelle 1-12 (`AppContext.tsx` `init()`, `E31EnergyCheckIn.tsx`) ; pas de re-demande si déjà saisie le jour même (re-saisie autorisée : à décider)
-- [ ] E5 — Surcharge dérivée : brancher `isOverloaded()` sur énergie du jour vs coût planifié restant ; retirer l'ancien `overload_mode` manuel (`AppContext.tsx`)
-- [ ] E5 — Bouton TopBar informatif : descriptif au clic, case « Désactivé » grisée non activable / « Activé » colorée (`TopBar.tsx`)
-- [ ] E6 — En surcharge : non-obligatoires grisées mais visibles avec option « Reporter » ; obligatoires en couleur pastel (`E40Planning.tsx`, `E10Dashboard.tsx`)
+- [x] E4 — Check-in énergie routé à l'ouverture si aucune saisie du jour (`AppContext.tsx` `init()` → `energy-checkin`) ; échelle corrigée à 1-12 (`E31EnergyCheckIn.tsx`, était 1-10) ; re-saisie autorisée à tout moment via le bouton « Modifier » existant (`E30EnergyView.tsx`) — décision actée avec l'utilisateur
+- [x] E5 — Surcharge dérivée : `overloadMode` calculé en direct via `isOverloaded(todayEnergy, getRemainingPlannedCost(todayPlannedTasks))` (`AppContext.tsx`), recalculé après chaque mutation de planning (`refreshTodayPlanned`) ; `Settings.overload_mode` et `setOverloadMode` retirés intégralement (champ mort supprimé, pas masqué)
+- [x] E5 — Bouton TopBar informatif (`TopBar.tsx`) : désactivé (grisé, non cliquable) quand pas de surcharge ; actif (coloré, cliquable) affiche au clic le détail chiffré (« X énergie planifiée pour Y disponible aujourd'hui ») — décision actée avec l'utilisateur
+- [x] E6 — En surcharge : « Planning du jour » reste visible (Dashboard et Planning du jour courant uniquement) avec obligatoires en pastel et non-obligatoires grisées (`E40Planning.tsx`, `E10Dashboard.tsx`) — résout l'effet de bord D1 (voir Phase V3-1)
+- [ ] E6 — Action « Reporter » sur les tâches non-obligatoires grisées : **non implémentée, décision explicitement reportée** (l'utilisateur souhaite y réfléchir). Piste écartée : renvoyer au statut `todo` (aucun écran n'affiche ce statut aujourd'hui, créerait un orphelin comme B1). Piste envisagée non actée : replanifier au lendemain même créneau.
+- [x] `E90OverloadRecovery.tsx` : bouton « Désactiver le mode surcharge » (devenu invalide, la surcharge n'est plus désactivable manuellement) remplacé par « Retour au tableau de bord » ; `BottomNav.tsx` : bouton « Sortir du mode surcharge » retiré (même raison), navigation habituelle inchangée en surcharge (hors périmètre E6)
 
-Gate : [ ] tests verts · [ ] test manuel : énergie basse + tâches coûteuses → surcharge auto, obligatoires en couleur · [ ] doc · [ ] sortie : surcharge pilotée par l'énergie, plus de toggle manuel
+Gate : [x] tests verts (341/341) · [ ] test manuel : énergie basse + tâches coûteuses → surcharge auto, obligatoires en pastel · [ ] doc · [~] sortie : surcharge pilotée par l'énergie, plus de toggle manuel — action « Reporter » restant à trancher avant clôture complète du gate
 
 ---
 

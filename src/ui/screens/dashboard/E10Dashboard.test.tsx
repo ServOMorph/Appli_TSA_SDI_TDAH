@@ -162,16 +162,10 @@ describe('E10Dashboard', () => {
   })
 
   describe('activation surcharge (D10C)', () => {
-    it('affiche le bouton Mode surcharge isolé en mode normal', () => {
+    it('affiche le bouton Mode surcharge désactivé et non cliquable en mode normal', () => {
       renderWithApp(<E10Dashboard />)
-      expect(screen.getByRole('button', { name: 'Activer le mode surcharge' })).toBeDefined()
-    })
-
-    it('appelle setOverloadMode(true) au clic', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Activer le mode surcharge' }))
-      expect(ctx.setOverloadMode).toHaveBeenCalledWith(true)
+      const btn = screen.getByRole('button', { name: 'Mode surcharge désactivé' }) as HTMLButtonElement
+      expect(btn.disabled).toBe(true)
     })
   })
 
@@ -267,7 +261,7 @@ describe('E10Dashboard', () => {
       expect(screen.queryByLabelText(/Terminer RDV médecin/)).toBeNull()
     })
 
-    it('masque la section Planning du jour en mode surcharge', async () => {
+    it('affiche la section Planning du jour en mode surcharge (E6)', async () => {
       const ctx = makeAppContext({
         overloadMode: true,
         getPlannedTasksForDate: async () => [
@@ -275,9 +269,7 @@ describe('E10Dashboard', () => {
         ],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.queryByRole('region', { name: 'Planning du jour' })).toBeNull()
-      expect(screen.queryByText('Planning du jour')).toBeNull()
-      expect(screen.queryByText(/Tâche planifiée/)).toBeNull()
+      expect(await screen.findByText(/Tâche planifiée/)).toBeDefined()
     })
   })
 
@@ -285,21 +277,22 @@ describe('E10Dashboard', () => {
     it('affiche le bandeau Mode surcharge actif sans changer de page', () => {
       const ctx = makeAppContext({ overloadMode: true })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByText('Mode surcharge actif')).toBeDefined()
+      expect(screen.getByText('Mode surcharge actif', { selector: 'p' })).toBeDefined()
       expect(screen.getByRole('heading', { name: 'Appli pour AuDHD' })).toBeDefined()
     })
 
-    it('affiche le bouton Mode surcharge en état actif (aria-pressed)', () => {
+    it('affiche le bouton Mode surcharge actif et cliquable', () => {
       const ctx = makeAppContext({ overloadMode: true })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByRole('button', { name: 'Désactiver le mode surcharge' })).toBeDefined()
+      const btn = screen.getByRole('button', { name: 'Détail du mode surcharge' }) as HTMLButtonElement
+      expect(btn.disabled).toBe(false)
     })
 
-    it('appelle setOverloadMode(false) au clic sur le bouton isolé quand actif', async () => {
-      const ctx = makeAppContext({ overloadMode: true })
+    it('affiche une explication au clic sur le bouton actif', async () => {
+      const ctx = makeAppContext({ overloadMode: true, todayEnergy: 4 })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Désactiver le mode surcharge' }))
-      expect(ctx.setOverloadMode).toHaveBeenCalledWith(false)
+      await userEvent.click(screen.getByRole('button', { name: 'Détail du mode surcharge' }))
+      expect(screen.getByText(/disponible aujourd'hui/)).toBeDefined()
     })
 
     it('navigue vers le centre de récupération au clic', async () => {

@@ -5,9 +5,9 @@ import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E31EnergyCheckIn } from './E31EnergyCheckIn'
 
 describe('E31EnergyCheckIn', () => {
-  it('affiche 10 boutons de sélection (1-10)', () => {
+  it('affiche 12 boutons de sélection (1-12)', () => {
     renderWithApp(<E31EnergyCheckIn />)
-    for (let n = 1; n <= 10; n++) {
+    for (let n = 1; n <= 12; n++) {
       expect(screen.getByRole('button', { name: String(n) })).toBeDefined()
     }
   })

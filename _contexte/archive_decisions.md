@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-06 (archivé depuis contexte.md 2026-07-07 close V3-3)
+- Retest manuel en app réelle du bug conflit de créneau — comportement encore incorrect (clic sur créneau occupé ouvrait le déplacement de l'autre tâche au lieu de refuser la tâche en attente) ; corrigé avec modale de refus dédiée. Décision actée : garder tel quel l'écran Planning sans tâche planifiable. Ajout d'une tâche à une liste (Todo/création/détail tâche) : navigue désormais vers le détail de la liste plutôt que de rester sur l'écran d'origine. Listes : renommage et suppression ajoutés (`deleteList` existait sans être câblée). Section "Organisation" des Paramètres et icône Planning de la TopBar supprimées intégralement (nettoyage UI demandé, code mort retiré plutôt que masqué). Énergie confirmée comme purement décorative à cette date (aucun effet fonctionnel au-delà de l'affichage) — depuis branché sur la surcharge automatique en V3-3.
+
 ## 2026-07-06 (archivé depuis contexte.md 2026-07-07 close suite)
 - Comportement onboarding revu à la demande de l'utilisateur — un utilisateur qui quitte l'app avant d'atteindre le dashboard doit repartir de zéro (écran de bienvenue) à la prochaine ouverture, plutôt que de reprendre directement sur le dashboard (comportement précédent, jugé incorrect). Ajout de `User.onboarding_completed`, fonction `completeOnboarding` (`AppContext.tsx`) appelée en fin de `E04FirstTask` ; si un utilisateur incomplet est détecté au démarrage, toutes les données sont effacées. Bouton "Ignorer" retiré de l'écran de choix de profil (`E02Profile`) : la sélection d'un profil est désormais obligatoire (l'écran ne propose qu'un choix de type de profil, pas de saisie de nom — ajout d'un champ nom reporté après V2).
 

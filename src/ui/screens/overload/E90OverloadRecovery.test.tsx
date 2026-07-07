@@ -25,18 +25,16 @@ describe('E90OverloadRecovery', () => {
     expect(screen.getByText(/Fermez les yeux/)).toBeInTheDocument()
   })
 
-  it('affiche le bouton désactiver', () => {
+  it('affiche le bouton retour au tableau de bord', () => {
     renderE90()
-    expect(screen.getByText('Désactiver le mode surcharge')).toBeInTheDocument()
+    expect(screen.getByText('Retour au tableau de bord')).toBeInTheDocument()
   })
 
-  it('appelle setOverloadMode(false) et navigue vers dashboard au clic désactiver', async () => {
-    const setOverloadMode = vi.fn().mockResolvedValue(undefined)
+  it('navigue vers dashboard au clic sur retour', async () => {
     const goTo = vi.fn()
-    renderE90({ setOverloadMode, goTo })
-    fireEvent.click(screen.getByText('Désactiver le mode surcharge'))
+    renderE90({ goTo })
+    fireEvent.click(screen.getByText('Retour au tableau de bord'))
     await vi.waitFor(() => {
-      expect(setOverloadMode).toHaveBeenCalledWith(false)
       expect(goTo).toHaveBeenCalledWith('dashboard')
     })
   })

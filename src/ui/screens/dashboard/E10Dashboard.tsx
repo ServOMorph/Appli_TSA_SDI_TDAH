@@ -2,6 +2,7 @@ import { useApp } from '@/app/AppContext'
 import { useState, useEffect } from 'react'
 import type { Task } from '@/domain/entities/task'
 import type { TaskV2 } from '@/domain/entities/taskV2'
+import { getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
@@ -30,16 +31,27 @@ function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-function planningChipStyle(essential: boolean, completed: boolean): React.CSSProperties {
+function planningChipStyle(essential: boolean, completed: boolean, overloadMode: boolean): React.CSSProperties {
+  const background = completed
+    ? 'color-mix(in srgb, var(--color-success) 25%, transparent)'
+    : essential
+      ? overloadMode
+        ? 'color-mix(in srgb, var(--color-primary) 30%, var(--color-surface))'
+        : 'var(--color-primary)'
+      : overloadMode
+        ? 'var(--color-surface)'
+        : 'color-mix(in srgb, var(--color-primary) 18%, transparent)'
   return {
-    background: completed
-      ? 'color-mix(in srgb, var(--color-success) 25%, transparent)'
-      : essential
-        ? 'var(--color-primary)'
-        : 'color-mix(in srgb, var(--color-primary) 18%, transparent)',
-    color: completed ? 'var(--color-text-muted)' : essential ? '#fff' : 'var(--color-text)',
+    background,
+    color: completed
+      ? 'var(--color-text-muted)'
+      : essential && !overloadMode
+        ? '#fff'
+        : overloadMode && !essential
+          ? 'var(--color-text-muted)'
+          : 'var(--color-text)',
     textDecoration: completed ? 'line-through' : 'none',
-    border: 'none',
+    border: overloadMode && !essential && !completed ? '1px solid var(--color-border)' : 'none',
     borderRadius: 'var(--radius-sm)',
     padding: '6px 10px',
     fontSize: '0.8125rem',
@@ -135,8 +147,8 @@ export function E10Dashboard() {
     todaySubTasksMap,
     todayEnergy,
     todayEnergyStatus,
+    todayPlannedTasks,
     overloadMode,
-    setOverloadMode,
     goTo,
     selectTask,
     setTaskDetailOrigin,
@@ -206,7 +218,7 @@ export function E10Dashboard() {
         energyValue={todayEnergy}
         onEnergyClick={() => goTo('energy-view')}
         overloadActive={overloadMode}
-        onOverloadClick={() => setOverloadMode(!overloadMode)}
+        plannedCost={getRemainingPlannedCost(todayPlannedTasks)}
         onResourcesClick={() => goTo('resources')}
         onSettingsClick={() => goTo('settings')}
       />
@@ -261,7 +273,6 @@ export function E10Dashboard() {
         </section>
       )}
 
-      {!overloadMode && (
       <section aria-label="Planning du jour">
         <h2>Planning du jour</h2>
         {hasPlanningToday ? (
@@ -271,7 +282,7 @@ export function E10Dashboard() {
               return (
               <div key={task.id} style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
                 <button
-                  style={{ ...planningChipStyle(task.essential, completed), flex: 1 }}
+                  style={{ ...planningChipStyle(task.essential, completed, overloadMode), flex: 1 }}
                   onClick={() => goTo('planning')}
                   aria-label={`${task.title} — voir dans le planning`}
                 >
@@ -304,7 +315,6 @@ export function E10Dashboard() {
           <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Rien de planifié aujourd'hui.</p>
         )}
       </section>
-      )}
 
       <BottomNav
         overloadMode={overloadMode}
@@ -313,7 +323,6 @@ export function E10Dashboard() {
         onGoTodo={() => goTo('inbox')}
         onGoPlanning={() => goTo('planning')}
         onGoLists={() => goTo('lists')}
-        onExitOverload={() => setOverloadMode(false)}
       />
     </AppShell>
   )

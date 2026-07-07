@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -12,7 +13,7 @@ const backBtnStyle: React.CSSProperties = {
   alignSelf: 'flex-start',
 }
 
-const SPOON_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const SPOON_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
 
 export function E31EnergyCheckIn() {
   const { todayEnergy, saveTodayEnergy, skipTodayEnergy, goTo } = useApp()

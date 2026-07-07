@@ -53,9 +53,9 @@ Gate : [x] tests verts (353/353) · [ ] test manuel (à valider par l'utilisateu
 - [x] P5 — Case vide du planning → proposer d'ajouter une tâche directement planifiée à ce créneau (`E40Planning.tsx`)
 - [x] Q1 — Supprimer la limite de 3 tâches du jour (garde-fou, modale M04, messages associés) : `E10Dashboard.tsx`, `E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx`, `E24Today.tsx`
 
-Gate : [x] tests verts (330/330) · [ ] test manuel (à valider par l'utilisateur) · [ ] doc · [x] sortie : app nettoyée, planning sans état fantôme
+Gate : [x] tests verts (330/330) · [x] test manuel (27/27 cas OK, 2026-07-07) · [ ] doc · [x] sortie : app nettoyée, planning sans état fantôme
 
-> **Effet de bord D1 :** en mode surcharge, le dashboard n'affichait déjà plus la section « Tâches du jour », mais gardait le bloc « Que faire maintenant ? » comme seule tâche visible (décision du 2026-07-05). En supprimant ce bloc sans condition (D1, demande explicite Marie du 2026-07-06), le mode surcharge n'affiche plus aucune tâche — seuls restent le bandeau d'état et le Centre récupération. À valider avec l'utilisateur lors du test manuel.
+> **Effet de bord D1 :** en mode surcharge, le dashboard n'affichait déjà plus la section « Tâches du jour », mais gardait le bloc « Que faire maintenant ? » comme seule tâche visible (décision du 2026-07-05). En supprimant ce bloc sans condition (D1, demande explicite Marie du 2026-07-06), le mode surcharge n'affiche plus aucune tâche — seuls restent le bandeau d'état et le Centre récupération. Décision reportée : à trancher pendant la Phase V3-3 (travail spécifique sur la surcharge automatique), pas avant.
 
 ---
 
@@ -115,6 +115,10 @@ Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : hiérarchie
 Gate : [ ] tests verts · [ ] test manuel : parcourir tous les écrans, nav toujours présente · [ ] doc · [ ] sortie : navigation unifiée façon app native
 
 ---
+
+## Notes diverses
+
+- [ ] Titre affiché dans le Dashboard : renommer "Appli pour AuDHD" en "AuDHD" (`E10Dashboard.tsx:204`)
 
 ## Q à trancher
 

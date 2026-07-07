@@ -1,3 +1,9 @@
+## v3.3 — 2026-07-07
+
+### Validé
+- Test manuel de la Phase V3-1 passé intégralement (27/27 cas OK) — gate de phase clos.
+- Point mode surcharge sans tâche visible (effet de bord D1) explicitement reporté à la Phase V3-3.
+
 ## v3.2 — 2026-07-06
 
 ### Ajouté

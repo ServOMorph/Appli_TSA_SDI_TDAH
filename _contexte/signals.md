@@ -1,16 +1,13 @@
-# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-06)
+# Signals — Appli_TSA_SDI_TDAH   (MAJ 2026-07-07)
 
 
 
 ## Actions ouvertes
 
 ### V3 — En cours (branche `v3`, post-visio Marie 2026-07-06)
-- [P1|ouvert] Passer le test manuel de la Phase V3-1 (`plan_test_manuel_v3-1.md`, 27 cas) — Phase V3-1 codée (B1-B3, D1-D4b, P4a, P5, Q1 traités)
-  - fait quand: les 27 cas du plan sont passés (PC + téléphone pour B2), écarts consolidés, gate de phase V3-1 respecté (`roadmap_v3.md`)
-  - réf: `plan_test_manuel_v3-1.md`, `roadmap_v3.md` Phase V3-1
-- [P2|ouvert] Trancher : mode surcharge sans aucune tâche visible (effet de bord de la suppression D1 du bloc "Que faire maintenant ?") — acceptable ou faut-il réintroduire une visibilité de tâche en surcharge ?
-  - fait quand: décision actée avec l'utilisateur pendant/après le test manuel V3-1
-  - réf: `roadmap_v3.md` Phase V3-1, note "Effet de bord D1"
+- [P2|reporté] Trancher : mode surcharge sans aucune tâche visible (effet de bord de la suppression D1 du bloc "Que faire maintenant ?") — décision explicitement reportée à la Phase V3-3 (travail spécifique sur la surcharge)
+  - fait quand: décision actée avec l'utilisateur pendant la Phase V3-3
+  - réf: `roadmap_v3.md` Phase V3-1, note "Effet de bord D1" ; Phase V3-3
 - [P3|ouvert] Planification indépendante des sous-tâches (chaque `SubTask` planifiable à son propre horaire) — décision explicitement reportée
   - fait quand: décision produit prise sur l'implémentation (piste retenue si besoin confirmé : chaque sous-tâche devient sa propre `TaskV2` avec `parent_task_id` optionnel)
   - réf: `Archives/roadmap_v2.md` § "Fonctionnalité reportée (décision 2026-07-06)"
@@ -23,7 +20,7 @@
 Aucun.
 
 ## Contexte chaud
-- Phase V3-1 (bugs + nettoyage UI) codée, tests verts, en attente du test manuel utilisateur (`plan_test_manuel_v3-1.md`).
+- Phase V3-1 (bugs + nettoyage UI) codée, test manuel passé intégralement (27/27 cas OK, 2026-07-07) — gate de phase respecté (tests, sortie, test manuel), reste doc à jour.
 - B1 a nécessité une refonte de la persistance du Planning : `pendingPlanTask`/`startPlanTask`/`clearPendingPlanTask`/`schedulePendingTask` (AppContext) remplacent `planTodoTask`/`getUnscheduledPlannedTasks` — une tâche en cours de planification n'est plus écrite en base tant qu'un créneau n'est pas validé.
 - B3 non reproduit dans le code actuel (flux de création déjà correct) — aucun changement fait, à confirmer si le testeur reproduit encore le symptôme.
 - `dist/v2/` à jour (export corrigé + créneaux 30 min inclus) ; `vite.config.ts` fixe `build.outDir: 'dist/v2'` — reste sur la branche `v2`.
@@ -53,7 +50,7 @@ Aucun.
 - EN ATTENTE : acceptabilité de l'absence totale de tâche visible en mode surcharge (effet de bord de D1)
 
 ## Prochaine étape exacte
-Passer `plan_test_manuel_v3-1.md` (27 cas, PC + téléphone pour B2/10.1) en conditions réelles, trancher le point mode surcharge, puis clore le gate de la Phase V3-1 avant de démarrer V3-2 (énergie : domaine + saisie).
+Mettre la doc à jour pour clore formellement le gate de la Phase V3-1, puis démarrer la Phase V3-2 (énergie : domaine + saisie).
 
-## Question bloquante pour la session suivante
-Le mode surcharge n'affiche plus aucune tâche (conséquence de la suppression D1) — acceptable tel quel, ou faut-il réintroduire une visibilité de tâche en surcharge ?
+## Dernière session (2026-07-07)
+Test manuel V3-1 passé intégralement : 27/27 cas OK. Aucun écart consolidé. Point mode surcharge (P2) reporté à la Phase V3-3 à la demande de l'utilisateur.

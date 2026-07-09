@@ -139,8 +139,8 @@ Gate : [x] tests verts (374/374 : `BottomNav.test.tsx` et `App.test.tsx` créés
 
 - [x] Q2 — TRANCHÉ (transcription l.202-274 + l.383-398) : retirer le segment nav « Aujourd'hui » sans remplacement (Todo/Planning/Listes inchangés) ET renommer l'option de création « Aujourd'hui » en « Tâche du jour » (même statut `today`, cohérence avec la section renommée en D3)
 - [x] Q1 — Limite de 3 tâches du jour : TRANCHÉ — supprimer la limite (2026-07-06)
-- [ ] Q3 — Choix de couleur à la connexion — à confirmer
-- [ ] Reset données — stratégie au bump Dexie v3 (Marie a des données V2) — bloque le déploiement de V3-0
+- [x] Q3 — TRANCHÉ : couleur d'ambiance modifiable dans Paramètres > Accessibilité (`Settings.ambiance_color`, P3/V3-4), pas de choix à la connexion
+- [x] Reset données — TRANCHÉ : pas de migration des données V2 de Marie, reset accepté à l'usage de V3
 
 ## Reporté hors V3
 

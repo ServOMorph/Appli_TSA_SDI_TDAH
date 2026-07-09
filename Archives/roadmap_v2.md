@@ -222,7 +222,7 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 - [x] **[2026-07-06]** Test manuel 11.2 : réglages d'accessibilité (`E112Accessibility`) — validé. Section "Stimulation cognitive" (`E113Stimulation`) supprimée intégralement des Paramètres (décision utilisateur) : écran, entrée menu, champ `Settings.stimulation_mode`, CSS `data-stimulation` retirés du code (339/339 tests, `tsc -b` clean).
 - [x] **[2026-07-06]** Test manuel 11.5 : export des données (`E117Export.tsx`) sur iPhone — validé, comportement du téléchargement/partage OK en environnement iOS (Safari/PWA).
 - [x] **[2026-07-06]** Viabilité du fichier JSON généré par l'export de données — bug confirmé et corrigé : `exportData` (`AppContext.tsx`) n'exportait que les tables V1 (`tasks`, `subTasks`, `energyEntries`, `settings`, `user`), omettant entièrement les tables V2 (`tasksV2`, `lists`, `listItems`) alors que le flux de création principal est désormais V2 — contradiction avec la mention RGPD "intégralité de vos données" affichée sur `E117Export.tsx`. Corrigé : `tasksV2`/`lists`/`listItems` ajoutés au payload (`tasks_v2`, `lists`, `list_items`), version export passée à `2.0`. 339/339 tests, `tsc -b` clean.
-- Test manuel 13.2 : utilisation de l'app en coupant la connexion réseau — fonctionnement normal (offline-first).
+- [x] **[2026-07-09]** Test manuel 13.2 : utilisation de l'app en coupant la connexion réseau — fonctionnement normal (offline-first), validé sur le build `dist/v3`.
 
 ## Fonctionnalité reportée (décision 2026-07-06)
 

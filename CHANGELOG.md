@@ -1,3 +1,20 @@
+## v3.15 — 2026-07-09
+
+### Corrigé
+- Tests e2e Playwright : T19 supprimé (`e2e/02-tasks.spec.ts`) — testait la limite « 3 tâches/jour » retirée intentionnellement en V3-1, confirmé non-régression. 44/44 verts.
+
+### Ajouté
+- Icône batterie ajoutée au pill énergie du Dashboard/TopBar (`EnergyDisplay.tsx`), affichée uniquement quand une valeur d'énergie est saisie.
+
+### Modifié
+- Modale de planification (E1/E2, `E40Planning.tsx`) refondue en flux 3 étapes séquentielles : nom de la tâche (Valider) → grille de sélection d'énergie 1-12 (option Passer) → choix « Obligatoire ? » via deux boutons Oui/Non à finalisation directe (sans bouton de validation supplémentaire).
+- `vite.config.ts` : `build.outDir` basculé de `dist/v2` à `dist/v3` pour préserver le rollback V2 ; `dist/v3/` ajouté au `.gitignore` (régénérable via `npm run build`).
+- `roadmap_v3.md` : Q3 (couleur à la connexion) et « reset données » cochés — décisions déjà actées, roadmap mise à jour en conséquence.
+
+### Validé
+- Test manuel 13.2 (mode offline) validé sur le build `dist/v3`.
+- 29/29 tests `E40Planning.test.tsx`, 44/44 e2e, `tsc -b` clean.
+
 ## v3.14 — 2026-07-07
 
 ### Corrigé

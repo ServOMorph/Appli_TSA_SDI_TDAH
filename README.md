@@ -23,9 +23,11 @@ npm run format     # Prettier
 
 ## État actuel
 
-V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : mode offline (13.2), doc V2, déploiement Netlify. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
+V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : doc V2, déploiement Netlify (test 13.2 mode offline validé). Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
 
-Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6) — **toutes closes.** V3-3 (check-in + surcharge automatique) : surcharge dérivée de l'énergie du jour vs coût planifié restant (plus de toggle manuel), action « Reporter » sur les tâches non-obligatoires grisées implémentée (replanification automatique au lendemain, même créneau — décision provisoire non validée par Marie, voir `Note de réunion/a demander a Marie.md`), navigation restreinte au Dashboard et au Centre récupération en surcharge (confirmé intentionnel en test manuel).
+Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6) — **toutes closes.** Build de production basculé sur `dist/v3` (`vite.config.ts`). V3-3 (check-in + surcharge automatique) : surcharge dérivée de l'énergie du jour vs coût planifié restant (plus de toggle manuel), action « Reporter » sur les tâches non-obligatoires grisées implémentée (replanification automatique au lendemain, même créneau — décision provisoire non validée par Marie, voir `Note de réunion/a demander a Marie.md`), navigation restreinte au Dashboard et au Centre récupération en surcharge (confirmé intentionnel en test manuel).
+
+**Modale de planification (E1/E2)** refondue en flux 3 étapes séquentielles : nom de la tâche (Valider) → grille de sélection d'énergie 1-12 avec option Passer → choix « Obligatoire ? » (deux boutons Oui/Non, finalisation directe).
 
 **Phase V3-4** (Planning : couleurs, récurrence) : coût d'énergie affiché sur le planning, cases pastel (couleur d'ambiance configurable dans Accessibilité, `Settings.ambiance_color`) devenant flashy une fois la tâche terminée, bouton « Terminer » ajouté au planning (déjà présent au dashboard), « Planning du jour » du dashboard en cartes pastel comme « Tâche du jour », et récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée, qui la duplique au lendemain au même créneau et ouvre directement le jour du duplicata.
 
@@ -35,7 +37,7 @@ Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-
 
 **Itérations UI hors phase** (roadmap V3 close) : titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" ; symbole d'énergie changé de cuillères à batterie (`BatteryIcon`/`BatteryCost`, remplace `SpoonIcon`/`SpoonCost`), affiché sur le Dashboard, le Planning, et désormais aussi sur les 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) ; espacement des créneaux du Planning rendu symétrique (haut/bas égaux autour de la case de tâche), créneaux vides alignés sur la même hauteur qu'un créneau occupé ; bouton « Mode surcharge » de la TopBar désormais masqué (au lieu de grisé) hors surcharge — écart avec une demande explicite antérieure de Marie, à reconfirmer.
 
-Tests unitaires 374/374, `tsc -b` clean, `eslint` 0 erreur. Tests e2e Playwright remis en état après dérive accumulée (titre, écran onboarding supprimé, surcharge devenue automatique) : 44/45 verts, T19 restant à supprimer (teste une fonctionnalité intentionnellement retirée en V3-1).
+Tests unitaires verts (374 + ajustements E40Planning), `tsc -b` clean, `eslint` 0 erreur. Tests e2e Playwright : 44/44 verts.
 
 ## Stack
 

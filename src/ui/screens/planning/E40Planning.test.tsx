@@ -130,12 +130,14 @@ describe('E40Planning', () => {
 
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'Appel dentiste')
-    await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Passer' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Non' }))
 
     expect(schedulePendingTask).toHaveBeenCalledWith('Appel dentiste', '2026-06-30', '10:00', '10:30', undefined, null, false)
   })
 
-  it('le bouton Planifier est désactivé tant qu\'aucun titre n\'est saisi', async () => {
+  it('le bouton Valider est désactivé tant qu\'aucun titre n\'est saisi', async () => {
     renderWithApp(
       <E40Planning />,
       makeAppContext({
@@ -145,10 +147,10 @@ describe('E40Planning', () => {
     await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
-    expect(screen.getByRole('button', { name: 'Planifier' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Valider' })).toBeDisabled()
 
     await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'Appel')
-    expect(screen.getByRole('button', { name: 'Planifier' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Valider' })).toBeEnabled()
   })
 
   it('tap sur une tâche existante ouvre le picker de déplacement', async () => {
@@ -201,6 +203,8 @@ describe('E40Planning', () => {
     expect(screen.queryByLabelText('Nom de la tâche')).not.toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /valider/i }))
+    await userEvent.click(screen.getByRole('button', { name: 'Passer' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Non' }))
     expect(schedulePendingTask).toHaveBeenCalledWith('Laver machine', '2026-06-30', '10:00', '10:30', 'abc', null, false)
   })
 
@@ -224,7 +228,7 @@ describe('E40Planning', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/déjà occupé/i)
   })
 
-  it('sélectionner un coût en énergie et cocher obligatoire les transmet à schedulePendingTask (E1/E2)', async () => {
+  it('sélectionner un coût en énergie et choisir obligatoire les transmet à schedulePendingTask (E1/E2)', async () => {
     const schedulePendingTask = vi.fn().mockResolvedValue(undefined)
     renderWithApp(
       <E40Planning />,
@@ -237,9 +241,9 @@ describe('E40Planning', () => {
 
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'Appel dentiste')
-    await userEvent.selectOptions(screen.getByLabelText('Coût en énergie'), '5')
-    await userEvent.click(screen.getByLabelText('Tâche obligatoire'))
-    await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    await userEvent.click(screen.getByRole('button', { name: '5' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Oui' }))
 
     expect(schedulePendingTask).toHaveBeenCalledWith('Appel dentiste', '2026-06-30', '10:00', '10:30', undefined, 5, true)
   })
@@ -254,7 +258,11 @@ describe('E40Planning', () => {
     await waitFor(() => expect(screen.getByText('10h00')).toBeInTheDocument())
 
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
-    expect(screen.getByLabelText('Coût en énergie')).toHaveValue('')
+    await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'Appel dentiste')
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(screen.getByRole('group', { name: 'Coût en énergie' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '5' })).not.toHaveStyle({ color: '#fff' })
+    expect(screen.getByRole('button', { name: 'Passer' })).toBeInTheDocument()
   })
 
   it('affiche le coût énergie sur la case du planning', async () => {
@@ -405,7 +413,9 @@ describe('E40Planning', () => {
 
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     await userEvent.type(screen.getByLabelText('Nom de la tâche'), 'McDo')
-    await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Passer' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Non' }))
 
     expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-01')
   })

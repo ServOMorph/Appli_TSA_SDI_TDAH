@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
-import { ENERGY_MIN, ENERGY_MAX, isValidEnergyValue } from '@/domain/rules/energyRules'
+import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import { BatteryCost } from '@/ui/components/BatteryCost'
 import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
 
@@ -156,32 +156,54 @@ function taskChipStyle(
   }
 }
 
-const energyEssentialRowStyle: React.CSSProperties = {
+const energyGridStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(6, 1fr)',
+  gap: 'var(--spacing-xs)',
+}
+
+function energyGridButtonStyle(selected: boolean): React.CSSProperties {
+  return {
+    padding: '10px 0',
+    borderRadius: 'var(--radius-sm)',
+    border: 'none',
+    backgroundColor: selected ? 'var(--color-primary)' : 'var(--color-surface)',
+    color: selected ? '#fff' : 'var(--color-text)',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    fontFamily: 'var(--font-body)',
+    cursor: 'pointer',
+  }
+}
+
+const essentialChoiceRowStyle: React.CSSProperties = {
   display: 'flex',
   gap: 'var(--spacing-sm)',
 }
 
-function paramSquareStyle(active: boolean): React.CSSProperties {
-  return {
-    flex: 1,
-    border: active ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-    borderRadius: 'var(--radius-md)',
-    padding: 'var(--spacing-sm)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--spacing-xs)',
-    backgroundColor: 'var(--color-surface)',
-  }
+const essentialChoiceBtnStyle: React.CSSProperties = {
+  flex: 1,
+  padding: '12px 16px',
+  background: 'var(--color-primary)',
+  border: 'none',
+  borderRadius: 'var(--radius-md)',
+  color: '#fff',
+  fontSize: '0.9375rem',
+  fontWeight: 600,
+  fontFamily: 'var(--font-body)',
+  cursor: 'pointer',
 }
 
-const energySelectStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '8px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1px solid var(--color-border)',
-  backgroundColor: 'var(--color-surface)',
-  color: 'var(--color-text)',
+const skipStepStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  color: 'var(--color-text-muted)',
+  fontSize: '0.8125rem',
   fontFamily: 'var(--font-body)',
+  cursor: 'pointer',
+  textDecoration: 'underline',
+  padding: 0,
+  alignSelf: 'flex-start',
 }
 
 const overlayStyle: React.CSSProperties = {
@@ -286,6 +308,7 @@ export function E40Planning() {
   const [conflictError, setConflictError] = useState<string | null>(null)
   const [energyCost, setEnergyCost] = useState<number | null>(null)
   const [essential, setEssential] = useState(false)
+  const [step, setStep] = useState<'name' | 'energy' | 'essential'>('name')
 
   const now = new Date()
   const currentSlot = now.getHours() * 2 + (now.getMinutes() >= 30 ? 1 : 0)
@@ -350,7 +373,7 @@ export function E40Planning() {
     setPicker(null)
   }
 
-  async function handleConfirmPending(slot: number) {
+  async function handleConfirmPending(slot: number, essentialValue: boolean) {
     if (!pendingPlanTask) return
     const conflict = scheduledTasks.some((t) => taskSlot(t) === slot)
     if (conflict) {
@@ -367,18 +390,18 @@ export function E40Planning() {
       end,
       pendingPlanTask.sourceTaskId,
       energyCost,
-      essential,
+      essentialValue,
     )
     await reload()
     setPicker(null)
   }
 
-  async function handleCreateAndAssign(slot: number) {
+  async function handleCreateAndAssign(slot: number, essentialValue: boolean) {
     const trimmed = newTaskTitle.trim()
     if (!trimmed) return
     const start = slotTime(slot)
     const end = slotTime(Math.min(slot + 1, 47))
-    await schedulePendingTask(trimmed, displayDate, start, end, undefined, energyCost, essential)
+    await schedulePendingTask(trimmed, displayDate, start, end, undefined, energyCost, essentialValue)
     setNewTaskTitle('')
     await reload()
     setPicker(null)
@@ -390,6 +413,7 @@ export function E40Planning() {
     setConflictError(null)
     setEnergyCost(null)
     setEssential(false)
+    setStep('name')
   }
 
   function handleBack() {
@@ -449,9 +473,10 @@ export function E40Planning() {
                     setConflictError(null)
                     setEnergyCost(null)
                     setEssential(false)
+                    setStep('name')
                     setPicker({ mode: 'assign', slot })
                   } else if (pendingPlanTask) {
-                    handleConfirmPending(slot)
+                    handleConfirmPending(slot, essential)
                   }
                 }}
                 aria-label={`Créneau ${slotLabel(slot)}`}
@@ -478,7 +503,7 @@ export function E40Planning() {
                         onClick={(e) => {
                           e.stopPropagation()
                           if (pendingPlanTask) {
-                            handleConfirmPending(slot)
+                            handleConfirmPending(slot, essential)
                           } else {
                             setPicker({ mode: 'move', task, slot })
                           }
@@ -579,9 +604,11 @@ export function E40Planning() {
               </button>
             </div>
 
-            {picker.mode === 'assign' && (
+            {picker.mode === 'assign' && step === 'name' && (
               <>
-                {!pendingPlanTask && (
+                {pendingPlanTask ? (
+                  <p style={{ margin: 0, fontSize: '0.9375rem' }}>{pendingPlanTask.title}</p>
+                ) : (
                   <input
                     type="text"
                     value={newTaskTitle}
@@ -592,66 +619,74 @@ export function E40Planning() {
                     style={newTaskInputStyle}
                   />
                 )}
+                <button
+                  style={pendingPlanTask || newTaskTitle.trim() ? validateBtnStyle : validateBtnDisabledStyle}
+                  disabled={!pendingPlanTask && !newTaskTitle.trim()}
+                  onClick={() => setStep('energy')}
+                >
+                  Valider
+                </button>
+              </>
+            )}
 
-                <div style={energyEssentialRowStyle}>
-                  <div style={paramSquareStyle(energyCost !== null)}>
-                    <label htmlFor="energy-cost-select" style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                      Coût en énergie
-                    </label>
-                    <select
-                      id="energy-cost-select"
-                      aria-label="Coût en énergie"
-                      style={energySelectStyle}
-                      value={energyCost ?? ''}
-                      onChange={(e) => {
-                        const raw = e.target.value
-                        if (raw === '') {
-                          setEnergyCost(null)
-                          return
-                        }
-                        const value = Number(raw)
-                        setEnergyCost(isValidEnergyValue(value) ? value : null)
+            {picker.mode === 'assign' && step === 'energy' && (
+              <>
+                <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                  Coût en énergie
+                </p>
+                <div style={energyGridStyle} role="group" aria-label="Coût en énergie">
+                  {ENERGY_OPTIONS.map((v) => (
+                    <button
+                      key={v}
+                      style={energyGridButtonStyle(energyCost === v)}
+                      onClick={() => {
+                        setEnergyCost(v)
+                        setStep('essential')
                       }}
                     >
-                      <option value="">Non défini</option>
-                      {ENERGY_OPTIONS.map((v) => (
-                        <option key={v} value={v}>
-                          {v}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div style={paramSquareStyle(essential)}>
-                    <label
-                      htmlFor="essential-checkbox"
-                      style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}
-                    >
-                      Obligatoire
-                    </label>
-                    <input
-                      id="essential-checkbox"
-                      type="checkbox"
-                      aria-label="Tâche obligatoire"
-                      checked={essential}
-                      onChange={(e) => setEssential(e.target.checked)}
-                    />
-                  </div>
+                      {v}
+                    </button>
+                  ))}
                 </div>
+                <button style={skipStepStyle} onClick={() => { setEnergyCost(null); setStep('essential') }}>
+                  Passer
+                </button>
+              </>
+            )}
 
-                {pendingPlanTask ? (
-                  <button style={validateBtnStyle} onClick={() => handleConfirmPending(picker.slot)}>
-                    Valider
-                  </button>
-                ) : (
+            {picker.mode === 'assign' && step === 'essential' && (
+              <>
+                <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                  Obligatoire ?
+                </p>
+                <div style={essentialChoiceRowStyle}>
                   <button
-                    style={newTaskTitle.trim() ? validateBtnStyle : validateBtnDisabledStyle}
-                    disabled={!newTaskTitle.trim()}
-                    onClick={() => handleCreateAndAssign(picker.slot)}
+                    style={essentialChoiceBtnStyle}
+                    onClick={() => {
+                      setEssential(true)
+                      if (pendingPlanTask) {
+                        handleConfirmPending(picker.slot, true)
+                      } else {
+                        handleCreateAndAssign(picker.slot, true)
+                      }
+                    }}
                   >
-                    Planifier
+                    Oui
                   </button>
-                )}
+                  <button
+                    style={essentialChoiceBtnStyle}
+                    onClick={() => {
+                      setEssential(false)
+                      if (pendingPlanTask) {
+                        handleConfirmPending(picker.slot, false)
+                      } else {
+                        handleCreateAndAssign(picker.slot, false)
+                      }
+                    }}
+                  >
+                    Non
+                  </button>
+                </div>
               </>
             )}
 

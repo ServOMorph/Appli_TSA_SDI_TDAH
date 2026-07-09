@@ -101,21 +101,3 @@ test('T18 — Annuler suppression tâche', async ({ page }) => {
   await expect(page.getByRole('dialog')).not.toBeVisible()
   await expect(page.getByRole('heading', { name: 'Tâche à garder' })).toBeVisible()
 })
-
-test('T19 — Limite 3 tâches aujourd\'hui → modale de remplacement', async ({ page }) => {
-  await page.getByRole('button', { name: 'Todo' }).click()
-  for (const title of ['Tâche A', 'Tâche B', 'Tâche C', 'Tâche D']) {
-    await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
-    await page.getByLabel('Titre de la tâche').fill(title)
-    await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
-    await page.getByRole('button', { name: 'Valider' }).click()
-  }
-  await page.getByRole('button', { name: /Déplacer Tâche A vers Tâche du jour/ }).click()
-  await page.getByRole('button', { name: /Déplacer Tâche B vers Tâche du jour/ }).click()
-  await page.getByRole('button', { name: /Déplacer Tâche C vers Tâche du jour/ }).click()
-  await page.getByRole('button', { name: /Déplacer Tâche D vers Tâche du jour/ }).click()
-  await expect(page.getByRole('dialog', { name: 'Remplacer une tâche' })).toBeVisible()
-  await page.screenshot({ path: 'e2e/screenshots/19-limit-3-modal.png' })
-  await page.getByRole('button', { name: 'Annuler' }).click()
-  await expect(page.getByRole('dialog')).not.toBeVisible()
-})

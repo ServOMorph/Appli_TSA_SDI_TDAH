@@ -1,3 +1,8 @@
+## v3.16 — 2026-07-13
+
+### Ajouté
+- Analyse de la visio Marie du 2026-07-13 (écourtée) : `Note de réunion/2026-07-13/constats_2026-07-13.md` (7 constats) et `Note de réunion/2026-07-13/roadmap_v4.md` (brouillon, 4 phases) — non promue à la racine, aucun code touché.
+
 ## v3.15 — 2026-07-09
 
 ### Corrigé

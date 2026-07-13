@@ -1,0 +1,4 @@
+ToDo
+Couleur
+Déplacer aevc le doigt
+Ajout d'une tache plannifier : cliquer sur 2 cases début et fin

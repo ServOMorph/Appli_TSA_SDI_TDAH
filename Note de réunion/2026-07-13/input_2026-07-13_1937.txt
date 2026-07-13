@@ -1,0 +1,79 @@
+Interlocuteur : quand tu sais quand on change la couleur de la couleur
+Raphael : What?
+Interlocuteur : Mais le souci, c'est qu'en fait, quand je... C'est pas un souci, c'est juste que...
+Interlocuteur : ça n'a pas mis mais en fait quand il reste ajouter une tâche
+Interlocuteur : dans l'accueil et dans tout d'où, et aussi quand tu vas dans...
+Interlocuteur : liste, une nouvelle liste et bien ça ne change pas la couleur, ça garde l'ancienne couleur.
+Raphael : Ok.
+Raphael : là, tu vas me guider pour que je puisse le faire. Donc si je fais tout doux, par exemple...
+Raphael : Je fais ajouter une tâche
+Interlocuteur : Non, on s'en fout, faut pas ajouter une tâche, il n'y a pas besoin. Quand tu veux...
+Raphael : Vas-y, redis-moi alors.
+Interlocuteur : paramètres pour changer la couleur de l'application et bien la couleur de ajouter une tâche
+Raphael : Oui
+Interlocuteur : et dans l'écran d'accueil et tout d'où est le truc nouvelle liste dans le...
+Raphael : Oui
+Interlocuteur : ne change pas de couleur
+Raphael : Ok, ça marche, c'est noté. Je vais regarder ça.
+Interlocuteur : Ensuite, tout d'où, ça s'écrit, c'est majus.
+Interlocuteur : au minuscule, espace, des majuscules, au minuscule.
+Interlocuteur : Sous-titres réalisés par la communauté d'Amara.org
+Raphael : Ok, ça marche, donc tout doux, il faut l'écrire, démagiscule, haut, démagiscule.
+Raphael : j'excule haut, ok ça marche
+Interlocuteur : Quoi?
+Interlocuteur : Ensuite, oui, ce qui serait bien, c'est que quand on a dans le calendrier, on plus...
+Interlocuteur : déplacer les cases, par exemple si je mets macdo à 11h30 et au final je vais le déplacer
+Interlocuteur : que je puisse rester appuyé longuement dessus tu vois et que je puisse le déplacer sur les jours en allant à droite
+Interlocuteur : si c'est possible, ou à gauche et de haut en bas
+Raphael : D'accord.
+Raphael : Tu puisses le déplacer en allant à droite pour le mettre sur un autre jour, c'est ça.
+Interlocuteur : Oui ou alors de haut en bas si on veut le garder le même journée mais pas la même heure.
+Interlocuteur : Et dans le « y » à gauche, si on veut, on planifie pas la veille.
+Raphael : D'accord, ça marche.
+Interlocuteur : Merci d'avoir regardé cette vidéo.
+Interlocuteur : Ah oui, et en fait, ce qui sera intéressant, c'est...
+Interlocuteur : par exemple des fois il y a des tâches comme par exemple un Mac 2 ça dure plus que 30 minutes et donc du coup
+Interlocuteur : Vu que ça se met dans une case, ça ne montre pas que après c'est occupé, tu vois, ça montre que c'est vide.
+Interlocuteur : Du coup, l'idée ce serait que quand on ajoute une tâche, on fait planifier, etc. On clime sur l'hypothèse.
+Interlocuteur : Pareil, sauf que la nuance, c'est qu'on doit juste cliquer sur en fait deux cases.
+Interlocuteur : La première c'est là où on veut que ça commence et la deuxième c'est là où on veut que ça termine et si pareil
+Interlocuteur : Par exemple, c'est sur la même case que notre activité dure qu'une demi-heure. Dans ces cas-là, on clique deux fois sur la même case.
+Raphael : Ok, c'est noté.
+Interlocuteur : Voilà !
+Interlocuteur : C'est tout ce que j'avais noté.
+Interlocuteur : c'est tout après je réfléchis
+Interlocuteur : Après, je voudrais bien aussi ajouter un truc pour gérer les comptes par exemple donc un truc qui ferait un peu office de...
+Interlocuteur : le tableur Excel mais visé pour les comptes. Par exemple, il y aurait une colonne de revenus.
+Interlocuteur : une colonne dépense ça va être calculé et ensuite Wallor par exemple et après
+Interlocuteur : Non, pas tout ça, ce qu'elle fait là, ce n'est pas besoin, mais par exemple, ce qu'on prévoit à la semaine, c'est comme...
+Raphael : Mais peut-être ça pourrait être...
+Interlocuteur : comme ça, un peu chose de... Bah moi je trouverais ça...
+Raphael : Une autre appli, ça, non.
+Interlocuteur : pratiques d'avoir tourné à un endroit justement parce qu'en fait tout ce qui est organisationnel,
+Interlocuteur : j'm'en brouille parce que c'est dans tous les sens. Donc si j'ai une appui pour un truc, une appui pour un truc et tout, non. Genre, vraiment, l'idée c'est d'avoir un truc.
+Interlocuteur : je peux tout gérer en fait, gérer mon tarif.
+Raphael : D'accord, d'accord, ok.
+Interlocuteur : Je peux gérer mes comptes, je peux gérer toutes mes listes, je peux gérer...
+Interlocuteur : Qu'est-ce que j'ai raison de la gestion ? Il y a Justine qui est là. Attends deux secondes, lui ouvre.
+Raphael : Ok, escu...
+Raphael : Je peux juste me reparler des fonctionnalités du côté CONTA.
+Raphael : je ferai un G et puis une version et puis tu me diras.
+Interlocuteur : Ouais, c'est bon. Tu sais que j'ouvre avec mon téléphone.
+Interlocuteur : Voilà, je change de l'embaîchement avec mon tel.
+Interlocuteur : Ouais mais sinon c'était super bien, vraiment j'ai bien aimé tout ce que t'as fait et tout. Le fait que ce soit ici, c'est ça le plus gros de ça, j'ai pas vérifié.
+Interlocuteur : c'est tout, alors je vais aller voir, je vais pas s'occuper c'est tout
+Interlocuteur : Je vais aller voir
+Interlocuteur : Et aussi, ah oui, il faut que tu changes, il y a écrit qu'elle est...
+Interlocuteur : mon énergie aujourd'hui et quand ça demande là que ça pose les questions il faut que tu mettes mon énergie
+Raphael : D'accord
+Interlocuteur : maintenant ? Et combien d'énergie avez-vous aujourd'hui ? Faut modifier deux fois sur la même page.
+Raphael : D'accord
+Interlocuteur : Voilà
+Interlocuteur : Voilà, ici par exemple je vais dans Tramming
+Interlocuteur : On se fait ajouter une tâche.
+Interlocuteur : Oui c'est bon c'était comme ça, j'ai beaucoup aimé la présentation.
+Raphael : Excellent.
+Interlocuteur : le répéter demain je me pose la question de la pertinence parce que du coup moi ce que
+Interlocuteur : Si je t'avais dit, c'était plutôt qu'en fait à la limite, vous y rentres ? Non, je ne me tire pas, je n'ai pas. Attends.
+Interlocuteur : En gros, tu sais, quand on clique, genre...
+

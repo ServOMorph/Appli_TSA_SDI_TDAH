@@ -39,6 +39,8 @@ Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-
 
 Tests unitaires verts (374 + ajustements E40Planning), `tsc -b` clean, `eslint` 0 erreur. Tests e2e Playwright : 44/44 verts.
 
+**Visio Marie du 2026-07-13** (écourtée) : roadmap V4 brouillon produite (`Note de réunion/2026-07-13/roadmap_v4.md`) — couleur d'ambiance à propager aux boutons primaires, déplacement tactile des tâches du planning, tâches multi-créneaux. Pas encore promue à la racine ni codée, questions en attente de tranchage avec Marie.
+
 ## Stack
 
 - React + TypeScript, PWA (Vite)

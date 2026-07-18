@@ -1,3 +1,12 @@
+## v4.4 — 2026-07-19
+
+### Modifié
+- V4-3 codée : plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain » et modale énergie/obligatoire fusionnée.
+- Gates automatisés mis à jour : 386/386 tests unitaires et 47/47 e2e verts.
+
+### En attente
+- Validation manuelle V4-3 à passer avant la clôture de la phase.
+
 ## v4.3 — 2026-07-19
 
 ### Corrigé

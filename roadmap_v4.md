@@ -64,15 +64,15 @@ Gate : [x] tests verts (388/388) · [x] test manuel (validé le 2026-07-19) · [
 
 ## Phase V4-3 — Multi-créneaux et récurrence
 
-- [ ] E2a — Sélection début→fin : 1er clic = début, 2e clic = fin, même case deux fois = 1 créneau (`E40Planning.tsx:468-481,376-408`)
-- [ ] E2b — Écriture de `scheduled_end` sur l'intervalle + détection de conflit sur toute la plage (`taskRulesV2.ts:44-59`, `E40Planning.tsx:362-397`)
-- [ ] E2c — Rendu unifié : un seul rectangle couvrant la plage, nom affiché une fois, lignes intermédiaires masquées ; coût énergétique compté une seule fois par tâche (`E40Planning.tsx`, `getRemainingPlannedCost` dans `taskRulesV2.ts:78-82`)
-- [ ] E5 — La tâche saisie reste « en main » après placement : chaque clic sur une case la replace, y compris après changement de jour, jusqu'à sortie explicite (`pendingPlanTask`/`clearPendingPlanTask` dans `AppContext.tsx`, `E40Planning.tsx:376-417`)
-- [ ] D3 — Retirer le bouton « Répéter demain » et le câblage associé, une fois E5 en place (`E40Planning.tsx:353-360,558-576` ; `repeatTaskTomorrow`/`duplicateTaskV2ToNextDay` dans `AppContext.tsx`, `taskRulesV2.ts:99-110` ; retirer aussi de `E10Dashboard.tsx`)
+- [x] E2a — Sélection début→fin : 1er clic = début, 2e clic = fin, même case deux fois = 1 créneau (`E40Planning.tsx`)
+- [x] E2b — Écriture de `scheduled_end` sur l'intervalle + détection de conflit sur toute la plage (`taskRulesV2.ts`, `E40Planning.tsx`)
+- [x] E2c — Rendu unifié : un seul rectangle couvrant la plage, nom affiché une fois, lignes intermédiaires masquées ; coût énergétique compté une seule fois par tâche (`E40Planning.tsx`, `getRemainingPlannedCost` dans `taskRulesV2.ts`)
+- [x] E5 — La tâche saisie reste « en main » après placement : chaque clic sur une case la replace, y compris après changement de jour, jusqu'à sortie explicite (`pendingPlanTask`/`clearPendingPlanTask` dans `AppContext.tsx`, `E40Planning.tsx`)
+- [x] D3 — Retirer le bouton « Répéter demain » et le câblage associé, une fois E5 en place (`E40Planning.tsx`, `AppContext.tsx`, `taskRulesV2.ts`, `E10Dashboard.tsx`)
 - [ ] B2 — Vérifier le cadre « Planning du jour » de l'accueil après D3, corriger le débordement s'il subsiste (`E10Dashboard.tsx:307+`)
-- [ ] D5 — Fusionner l'étape « Obligatoire ? » avec l'étape énergie dans la modale (`E40Planning.tsx:311,632-691`)
+- [x] D5 — Fusionner l'étape « Obligatoire ? » avec l'étape énergie dans la modale (`E40Planning.tsx`)
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] e2e mis à jour (retrait « Répéter demain », flux de sélection en 2 clics) · [ ] sortie : une tâche > 30 min occupe visuellement ses créneaux en un bloc, ajout de la même tâche sur plusieurs créneaux/jours sans quitter le planning, plus de « Répéter demain », surcharge inchangée pour un coût donné
+Gate : [x] tests verts (386/386) · [ ] test manuel · [x] doc · [x] e2e mis à jour (47/47 : retrait « Répéter demain », flux de sélection en 2 clics) · [ ] sortie : une tâche > 30 min occupe visuellement ses créneaux en un bloc, ajout de la même tâche sur plusieurs créneaux/jours sans quitter le planning, plus de « Répéter demain », surcharge inchangée pour un coût donné
 
 ---
 

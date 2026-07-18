@@ -9,10 +9,11 @@ test.beforeEach(async ({ page }) => {
 async function planOverloadingTask(page: Page, title: string) {
   await page.getByRole('button', { name: 'Planning' }).click()
   await page.getByRole('gridcell', { name: 'Créneau 8h00' }).click()
+  await page.getByRole('gridcell', { name: 'Créneau 8h00' }).click()
   await page.getByLabel('Nom de la tâche').fill(title)
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.getByRole('group', { name: 'Coût en énergie' }).getByRole('button', { name: '12', exact: true }).click()
-  await page.getByRole('button', { name: 'Non' }).click()
+  await page.getByRole('button', { name: 'Placer' }).click()
   await page.getByRole('button', { name: 'Retour' }).click()
 }
 

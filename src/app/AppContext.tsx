@@ -8,7 +8,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, duplicateTaskV2ToNextDay as duplicateTaskV2ToNextDayRule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
@@ -86,7 +86,7 @@ interface AppContextValue {
     sourceTaskId?: string,
     energyCost?: number | null,
     essential?: boolean,
-  ) => Promise<void>
+  ) => Promise<string>
   moveTask: (id: string, status: TaskStatus) => Promise<void>
   completeTask: (id: string) => Promise<void>
   deleteTask: (id: string) => Promise<void>
@@ -106,7 +106,6 @@ interface AppContextValue {
   deleteList: (id: string) => Promise<void>
   completeV2Task: (taskId: string) => Promise<void>
   postponeTask: (taskId: string) => Promise<void>
-  repeatTaskTomorrow: (taskId: string) => Promise<string | null>
   planningTargetDate: string | null
   setPlanningTargetDate: (date: string | null) => void
   getListItems: (listId: string) => Promise<ListItem[]>
@@ -117,6 +116,7 @@ interface AppContextValue {
 export interface PendingPlanTask {
   title: string
   sourceTaskId?: string
+  taskId?: string
 }
 
 export const AppContext = createContext<AppContextValue | null>(null)
@@ -332,16 +332,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await refreshTodayPlanned()
   }
 
-  async function repeatTaskTomorrow(taskId: string): Promise<string | null> {
-    const task = await taskV2Repo.getById(taskId)
-    if (!task) return null
-    const duplicate = duplicateTaskV2ToNextDayRule(task, newId(), new Date().toISOString())
-    if (!duplicate) return null
-    await taskV2Repo.create(duplicate)
-    await refreshTodayPlanned()
-    return duplicate.scheduled_date
-  }
-
   function startPlanTask(title: string, sourceTaskId?: string) {
     setPendingPlanTask({ title, sourceTaskId })
   }
@@ -358,7 +348,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sourceTaskId?: string,
     energyCost: number | null = null,
     essential = false,
-  ) {
+  ): Promise<string> {
     const now = new Date().toISOString()
     const base = createTaskV2Rule(newId(), title, 'planned', false, now)
     let scheduled = scheduleTaskV2Rule(base, date, start, end, now)
@@ -372,7 +362,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       await loadAll()
     }
     await refreshTodayPlanned()
-    setPendingPlanTask(null)
+    setPendingPlanTask({ title, taskId: scheduled.id })
+    return scheduled.id
   }
 
   async function createTaskInbox(title: string) {
@@ -629,7 +620,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         schedulePendingTask,
         completeV2Task,
         postponeTask,
-        repeatTaskTomorrow,
         planningTargetDate,
         setPlanningTargetDate,
         moveTask,

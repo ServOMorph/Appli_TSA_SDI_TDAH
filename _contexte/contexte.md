@@ -12,10 +12,10 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-V2 quasi close sur branche `v2` (Phases V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : doc V2, déploiement Netlify (test 13.2 mode offline validé le 2026-07-09). Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour. `roadmap_v1.md`/`roadmap_v2.md` archivées dans `Archives/`.
-Roadmap V3 (7 phases) intégralement close, désormais archivée (`Archives/roadmap_v3.md`), code inchangé depuis le 2026-07-09.
-**Branche `v4` active.** Phases V4-0 à V4-2 closes. V4-2 est validée avec 388/388 tests unitaires, 45/45 e2e et le test manuel complet. E2, E8 et E9 sont tranchés et à implémenter dans les phases suivantes.
-Prochaine étape : démarrer V4-3. Seule E3 reste à trancher avec Marie (module budget, reporté hors V4). Finaliser V2-10 sur la branche `v2` reste possible en parallèle.
+V2 quasi close sur branche `v2` ; reste V2-10 : doc V2 et déploiement Netlify. Les roadmaps V1 à V3 sont archivées dans `Archives/`.
+**Branche `v4` active.** V4-0 à V4-2 sont closes ; V4-3 est codée et automatisée (386/386 tests, 47/47 e2e), mais sa validation manuelle est en attente.
+La prochaine étape obligatoire est le passage intégral de `validation_manuelle.md` V4-3, dont B2.
+E3 (module budget/comptes) reste le seul cadrage produit ouvert, reporté hors V4.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-07-07 (suite, hors phase) : Titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" (item roadmap "Notes diverses"). Symbole d'énergie changé de cuillères à batterie à la demande de l'utilisateur — la spoon theory vise les communautés maladies chroniques, pas spécifiquement AuDHD, et une batterie est plus universellement comprise sans ce bagage culturel ; risque identifié (association avec le % de batterie d'un appareil) mais jugé acceptable. `SpoonIcon`/`SpoonCost` supprimés, remplacés par `BatteryIcon`/`BatteryCost` (même structure : icône + nombre, pas de remplissage proportionnel). Câblé sur Dashboard et Planning (remplacement direct), et ajouté aux 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) qui n'affichaient aucun symbole auparavant. 374/374 tests verts, `tsc -b` clean. Changement visuel mineur hors gate de phase (roadmap V3 déjà close) : pas de test manuel dédié.

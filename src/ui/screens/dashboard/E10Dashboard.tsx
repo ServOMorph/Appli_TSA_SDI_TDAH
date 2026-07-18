@@ -131,8 +131,6 @@ export function E10Dashboard() {
     getPlannedTasksForDate,
     completeV2Task,
     postponeTask,
-    repeatTaskTomorrow,
-    setPlanningTargetDate,
     settings,
   } = useApp()
 
@@ -180,18 +178,6 @@ export function E10Dashboard() {
     const date = todayStr()
     const planned = await getPlannedTasksForDate(date)
     setTodayPlanned(planned)
-  }
-
-  async function handleRepeatTomorrowPlanned(taskId: string) {
-    const nextDate = await repeatTaskTomorrow(taskId)
-    if (nextDate) {
-      setPlanningTargetDate(nextDate)
-      goTo('planning')
-    } else {
-      const date = todayStr()
-      const planned = await getPlannedTasksForDate(date)
-      setTodayPlanned(planned)
-    }
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -324,22 +310,6 @@ export function E10Dashboard() {
                       Reporter
                     </button>
                   )}
-                  <button
-                    aria-label={`Répéter ${task.title} demain`}
-                    onClick={() => handleRepeatTomorrowPlanned(task.id)}
-                    style={{
-                      background: 'none',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-sm)',
-                      padding: '6px 10px',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
-                      color: 'inherit',
-                      flexShrink: 0,
-                    }}
-                  >
-                    Répéter demain
-                  </button>
                 </div>
               </Card>
               )

@@ -41,7 +41,7 @@ function formatDate(date: string): string {
 
 
 type Picker =
-  | { mode: 'assign'; slot: number }
+  | { mode: 'assign'; start: number; end: number }
   | { mode: 'move'; task: TaskV2; slot: number }
   | null
 
@@ -106,14 +106,18 @@ const hourLabelStyle: React.CSSProperties = {
   borderRight: '1px solid var(--color-text-muted)',
 }
 
-function slotCellStyle(task: TaskV2 | undefined, ambianceColor: string): React.CSSProperties {
+function slotCellStyle(task: TaskV2 | undefined, ambianceColor: string, isContinuation: boolean): React.CSSProperties {
   return {
     flex: 1,
-    padding: '4px 8px',
+    paddingTop: isContinuation ? 0 : '4px',
+    paddingRight: '8px',
+    paddingBottom: isContinuation ? 0 : '4px',
+    paddingLeft: '8px',
     display: 'flex',
     flexDirection: 'column',
     gap: '4px',
     cursor: 'pointer',
+    ...(isContinuation ? { marginTop: '-1px' } : {}),
     ...(task ? plannedTaskTintStyle(task.status === 'completed', ambianceColor) : {}),
   }
 }
@@ -166,36 +170,6 @@ function energyGridButtonStyle(selected: boolean): React.CSSProperties {
     fontFamily: 'var(--font-body)',
     cursor: 'pointer',
   }
-}
-
-const essentialChoiceRowStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: 'var(--spacing-sm)',
-}
-
-const essentialChoiceBtnStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '12px 16px',
-  background: 'var(--color-accent)',
-  border: 'none',
-  borderRadius: 'var(--radius-md)',
-  color: '#fff',
-  fontSize: '0.9375rem',
-  fontWeight: 600,
-  fontFamily: 'var(--font-body)',
-  cursor: 'pointer',
-}
-
-const skipStepStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  color: 'var(--color-text-muted)',
-  fontSize: '0.8125rem',
-  fontFamily: 'var(--font-body)',
-  cursor: 'pointer',
-  textDecoration: 'underline',
-  padding: 0,
-  alignSelf: 'flex-start',
 }
 
 const overlayStyle: React.CSSProperties = {
@@ -284,7 +258,6 @@ export function E40Planning() {
     schedulePendingTask,
     completeV2Task,
     postponeTask,
-    repeatTaskTomorrow,
     planningTargetDate,
     setPlanningTargetDate,
     overloadMode,
@@ -300,7 +273,8 @@ export function E40Planning() {
   const [conflictError, setConflictError] = useState<string | null>(null)
   const [energyCost, setEnergyCost] = useState<number | null>(null)
   const [essential, setEssential] = useState(false)
-  const [step, setStep] = useState<'name' | 'energy' | 'essential'>('name')
+  const [step, setStep] = useState<'name' | 'details'>('name')
+  const [rangeStart, setRangeStart] = useState<number | null>(null)
 
   const now = new Date()
   const currentSlot = now.getHours() * 2 + (now.getMinutes() >= 30 ? 1 : 0)
@@ -342,61 +316,79 @@ export function E40Planning() {
     await reload()
   }
 
-  async function handleRepeatTomorrow(taskId: string) {
-    const nextDate = await repeatTaskTomorrow(taskId)
-    if (nextDate) {
-      setDisplayDate(nextDate)
-    } else {
-      await reload()
-    }
-  }
-
   async function handleMove(taskId: string, slot: number) {
-    const conflict = scheduledTasks.some((t) => t.id !== taskId && taskOccupiesSlot(t, slot))
+    const task = scheduledTasks.find((item) => item.id === taskId)
+    const range = task ? taskSlotRange(task) : null
+    const length = range ? range.end - range.start + 1 : 1
+    const endSlot = slot + length - 1
+    const conflict = endSlot >= SLOTS.length || scheduledTasks.some(
+      (t) => t.id !== taskId && SLOTS.slice(slot, endSlot + 1).some((candidate) => taskOccupiesSlot(t, candidate)),
+    )
     if (conflict) {
-      setConflictError(`Ce créneau (${slotLabel(slot)}) est déjà occupé par une autre tâche.`)
+      setConflictError(`La plage à partir de ${slotLabel(slot)} est déjà occupée par une autre tâche.`)
       return
     }
     setConflictError(null)
     const start = slotTime(slot)
-    const end = slotTime(Math.min(slot + 1, 47))
+    const end = slotTime(slot + length)
     await scheduleV2Task(taskId, displayDate, start, end)
     await reload()
     setPicker(null)
   }
 
-  async function handleConfirmPending(slot: number, essentialValue: boolean) {
-    if (!pendingPlanTask) return
-    const conflict = scheduledTasks.some((t) => taskOccupiesSlot(t, slot))
-    if (conflict) {
-      setConflictError(`Ce créneau (${slotLabel(slot)}) est déjà occupé par une autre tâche.`)
+  function rangeIsAvailable(start: number, end: number): boolean {
+    return !scheduledTasks.some((task) =>
+      SLOTS.slice(start, end + 1).some((slot) => taskOccupiesSlot(task, slot)),
+    )
+  }
+
+  async function handlePlace(range: { start: number; end: number }) {
+    const trimmed = newTaskTitle.trim()
+    const title = pendingPlanTask?.title ?? trimmed
+    if (!title) return
+    const start = slotTime(range.start)
+    const end = slotTime(range.end + 1)
+    if (pendingPlanTask?.taskId) {
+      await scheduleV2Task(pendingPlanTask.taskId, displayDate, start, end)
+    } else {
+      await schedulePendingTask(title, displayDate, start, end, pendingPlanTask?.sourceTaskId, energyCost, essential)
+    }
+    setNewTaskTitle('')
+    await reload()
+    closePicker()
+  }
+
+  async function handleSlotClick(slot: number, task: TaskV2 | undefined) {
+    if (task && !pendingPlanTask) {
+      setPicker({ mode: 'move', task, slot })
+      return
+    }
+    if (task) {
+      setConflictError(`Le créneau ${slotLabel(slot)} est déjà occupé.`)
+      return
+    }
+    if (rangeStart === null) {
+      setConflictError(null)
+      setRangeStart(slot)
+      return
+    }
+
+    const start = Math.min(rangeStart, slot)
+    const end = Math.max(rangeStart, slot)
+    if (!rangeIsAvailable(start, end)) {
+      setConflictError(`Un créneau de ${slotLabel(start)} à ${slotLabel(end)} est déjà occupé.`)
       return
     }
     setConflictError(null)
-    const start = slotTime(slot)
-    const end = slotTime(Math.min(slot + 1, 47))
-    await schedulePendingTask(
-      pendingPlanTask.title,
-      displayDate,
-      start,
-      end,
-      pendingPlanTask.sourceTaskId,
-      energyCost,
-      essentialValue,
-    )
-    await reload()
-    setPicker(null)
-  }
-
-  async function handleCreateAndAssign(slot: number, essentialValue: boolean) {
-    const trimmed = newTaskTitle.trim()
-    if (!trimmed) return
-    const start = slotTime(slot)
-    const end = slotTime(Math.min(slot + 1, 47))
-    await schedulePendingTask(trimmed, displayDate, start, end, undefined, energyCost, essentialValue)
-    setNewTaskTitle('')
-    await reload()
-    setPicker(null)
+    setRangeStart(null)
+    if (pendingPlanTask?.taskId) {
+      await handlePlace({ start, end })
+      return
+    }
+    setEnergyCost(null)
+    setEssential(false)
+    setStep(pendingPlanTask ? 'details' : 'name')
+    setPicker({ mode: 'assign', start, end })
   }
 
   function closePicker() {
@@ -406,6 +398,7 @@ export function E40Planning() {
     setEnergyCost(null)
     setEssential(false)
     setStep('name')
+    setRangeStart(null)
   }
 
   function handleBack() {
@@ -443,13 +436,28 @@ export function E40Planning() {
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto' }} role="grid" aria-label="Planning de la journée">
+        {pendingPlanTask && (
+          <div style={{ padding: 'var(--spacing-sm) var(--spacing-xl)', display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+            <span aria-live="polite" style={{ flex: 1, fontSize: '0.8125rem' }}>
+              « {pendingPlanTask.title} » est en cours de planification.
+            </span>
+            <button style={taskActionStyle} onClick={clearPendingPlanTask} aria-label={`Terminer la planification de ${pendingPlanTask.title}`}>
+              Terminer
+            </button>
+          </div>
+        )}
+        {rangeStart !== null && (
+          <p style={{ margin: 'var(--spacing-sm) var(--spacing-xl)', fontSize: '0.8125rem' }} aria-live="polite">
+            Début sélectionné à {slotLabel(rangeStart)}. Choisissez la fin.
+          </p>
+        )}
         {SLOTS.map((slot) => {
           const isNow = isToday && slot === currentSlot
-          const tasksInSlot = scheduledTasks.filter((t) => taskSlotRange(t)?.start === slot)
-          const task = tasksInSlot[0]
-          const occupied = scheduledTasks.some((t) => taskOccupiesSlot(t, slot))
+          const task = scheduledTasks.find((item) => taskOccupiesSlot(item, slot))
+          const isTaskStart = task ? taskSlotRange(task)?.start === slot : false
+          const isContinuation = task !== undefined && !isTaskStart
           const completed = task?.status === 'completed'
-          const canPostpone = task !== undefined && isToday && overloadMode && !task.essential && !completed
+          const canPostpone = isTaskStart && task !== undefined && isToday && overloadMode && !task.essential && !completed
 
           return (
             <div
@@ -463,32 +471,16 @@ export function E40Planning() {
               </div>
               <div
                 role="gridcell"
-                style={slotCellStyle(task, ambianceColor)}
-                onClick={() => {
-                  if (task) {
-                    if (pendingPlanTask) {
-                      handleConfirmPending(slot, essential)
-                    } else {
-                      setPicker({ mode: 'move', task, slot })
-                    }
-                  } else if (!occupied) {
-                    setConflictError(null)
-                    setEnergyCost(null)
-                    setEssential(false)
-                    setStep('name')
-                    setPicker({ mode: 'assign', slot })
-                  } else if (pendingPlanTask) {
-                    handleConfirmPending(slot, essential)
-                  }
-                }}
-                aria-label={`Créneau ${slotLabel(slot)}${task ? ` : ${task.title}` : ''}`}
+                style={slotCellStyle(task, ambianceColor, isContinuation)}
+                onClick={() => handleSlotClick(slot, task)}
+                aria-label={`Créneau ${slotLabel(slot)}${task ? ` : ${task.title}${isContinuation ? ' (suite)' : ''}` : ''}`}
               >
                 {!task && (
                   <span style={emptySlotPlaceholderStyle} aria-hidden>
                     _
                   </span>
                 )}
-                {task && (
+                {task && isTaskStart && (
                   <>
                     <div style={plannedTaskContentStyle}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -517,16 +509,6 @@ export function E40Planning() {
                           Reporter
                         </button>
                       )}
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          handleRepeatTomorrow(task.id)
-                        }}
-                        aria-label={`Répéter ${task.title} demain`}
-                        style={taskActionStyle}
-                      >
-                        Répéter demain
-                      </button>
                     </div>
                   </>
                 )}
@@ -548,8 +530,8 @@ export function E40Planning() {
               <p style={{ margin: 0, fontWeight: 600 }}>
                 {picker.mode === 'assign'
                   ? pendingPlanTask
-                    ? `Placer « ${pendingPlanTask.title} » à ${slotLabel(picker.slot)}`
-                    : `Ajouter une tâche à ${slotLabel(picker.slot)}`
+                    ? `Placer « ${pendingPlanTask.title} » de ${slotLabel(picker.start)} à ${slotLabel(picker.end)}`
+                    : `Ajouter une tâche de ${slotLabel(picker.start)} à ${slotLabel(picker.end)}`
                   : `Déplacer « ${picker.task.title} »`}
               </p>
               <button style={closeStyle} onClick={closePicker} aria-label="Fermer">
@@ -575,71 +557,36 @@ export function E40Planning() {
                 <button
                   style={pendingPlanTask || newTaskTitle.trim() ? validateBtnStyle : validateBtnDisabledStyle}
                   disabled={!pendingPlanTask && !newTaskTitle.trim()}
-                  onClick={() => setStep('energy')}
+                  onClick={() => setStep('details')}
                 >
                   Valider
                 </button>
               </>
             )}
 
-            {picker.mode === 'assign' && step === 'energy' && (
+            {picker.mode === 'assign' && step === 'details' && (
               <>
                 <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                  Coût en énergie
+                  Coût en énergie (facultatif)
                 </p>
                 <div style={energyGridStyle} role="group" aria-label="Coût en énergie">
                   {ENERGY_OPTIONS.map((v) => (
                     <button
                       key={v}
                       style={energyGridButtonStyle(energyCost === v)}
-                      onClick={() => {
-                        setEnergyCost(v)
-                        setStep('essential')
-                      }}
+                      onClick={() => setEnergyCost((current) => (current === v ? null : v))}
                     >
                       {v}
                     </button>
                   ))}
                 </div>
-                <button style={skipStepStyle} onClick={() => { setEnergyCost(null); setStep('essential') }}>
-                  Passer
+                <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={essential} onChange={(event) => setEssential(event.target.checked)} />
+                  Obligatoire
+                </label>
+                <button style={validateBtnStyle} onClick={() => handlePlace(picker)}>
+                  Placer
                 </button>
-              </>
-            )}
-
-            {picker.mode === 'assign' && step === 'essential' && (
-              <>
-                <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                  Obligatoire ?
-                </p>
-                <div style={essentialChoiceRowStyle}>
-                  <button
-                    style={essentialChoiceBtnStyle}
-                    onClick={() => {
-                      setEssential(true)
-                      if (pendingPlanTask) {
-                        handleConfirmPending(picker.slot, true)
-                      } else {
-                        handleCreateAndAssign(picker.slot, true)
-                      }
-                    }}
-                  >
-                    Oui
-                  </button>
-                  <button
-                    style={essentialChoiceBtnStyle}
-                    onClick={() => {
-                      setEssential(false)
-                      if (pendingPlanTask) {
-                        handleConfirmPending(picker.slot, false)
-                      } else {
-                        handleCreateAndAssign(picker.slot, false)
-                      }
-                    }}
-                  >
-                    Non
-                  </button>
-                </div>
               </>
             )}
 
@@ -651,9 +598,7 @@ export function E40Planning() {
 
             {picker.mode === 'move' && (
               <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {SLOTS.filter(
-                  (s) => s !== picker.slot && !scheduledTasks.some((t) => t.id !== picker.task.id && taskOccupiesSlot(t, s)),
-                ).map((s) => (
+                {SLOTS.filter((s) => s !== picker.slot).map((s) => (
                   <button
                     key={s}
                     style={pickerItemStyle}

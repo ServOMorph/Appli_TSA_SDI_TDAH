@@ -298,16 +298,13 @@ describe('E10Dashboard', () => {
       expect(ctx.postponeTask).toHaveBeenCalledWith('a')
     })
 
-    it('clic sur Répéter demain ouvre le Planning au jour du duplicata (P6)', async () => {
+    it('n’affiche plus le bouton Répéter demain', async () => {
       const ctx = makeAppContext({
-        repeatTaskTomorrow: async () => '2026-07-08',
         getPlannedTasksForDate: async () => [makeTaskV2({ id: 'a', title: 'RDV médecin' })],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      const btn = await screen.findByLabelText(/Répéter RDV médecin demain/)
-      await userEvent.click(btn)
-      expect(ctx.setPlanningTargetDate).toHaveBeenCalledWith('2026-07-08')
-      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+      await screen.findByRole('checkbox', { name: 'Terminer RDV médecin' })
+      expect(screen.queryByRole('button', { name: /Répéter.*demain/ })).toBeNull()
     })
   })
 

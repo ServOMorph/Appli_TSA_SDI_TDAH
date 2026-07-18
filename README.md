@@ -27,11 +27,11 @@ V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur 
 
 Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Build de production sur `dist/v3` (`vite.config.ts`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
 
-**Branche `v4` créée et active.** Visio Marie du 2026-07-16 : a répondu aux 4 points V3 restés en attente depuis la visio précédente — check-in énergie confirmé à une fois par jour, bouton « Répéter demain » à retirer (remplacé par un ajout de tâche en continu sur le planning), bouton « Mode surcharge » à réintroduire visible/grisé hors surcharge (confirme la demande initiale de Marie, contredite par un retrait du 2026-07-07), sous-tâches planifiables souhaitées avec affichage hiérarchique. Roadmap V4 reconstruite sur cette base (`roadmap_v4.md`, racine, 6 phases V4-0 à V4-5) — **aucune phase codée à ce stade**.
+**Branche `v4` active.** Phase V4-0 (refacto préalable) codée et validée manuellement : occupation du planning par plage de créneaux (`taskSlotRange`/`taskOccupiesSlot`), variable CSS `--color-accent` injectée depuis `Settings.ambiance_color`. B1 tranché et codé : la couleur d'ambiance s'applique à tous les boutons utilisant le bleu clair de base (périmètre large, pas seulement les 2 boutons initialement cités). Phase V4-1 (Quick wins UI) entamée.
 
-Points marquants de la roadmap V4 : refacto préalable pour propager la couleur d'ambiance aux boutons primaires (`--color-accent`) et supporter les tâches sur plusieurs créneaux ; case de planning entièrement colorée avec case à cocher ; tâche « Reporter » repensée pour ouvrir un choix de créneau vide plutôt qu'avancer automatiquement au lendemain ; déplacement tactile (appui long + glisser) d'une tâche planifiée ; sous-tâches planifiables indépendamment tout en restant visuellement rattachées à leur parent. Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
+Points marquants restants de la roadmap V4 : case de planning entièrement colorée avec case à cocher ; tâches sur plusieurs créneaux ; tâche « Reporter » repensée pour ouvrir un choix de créneau vide plutôt qu'avancer automatiquement au lendemain ; déplacement tactile (appui long + glisser) d'une tâche planifiée ; sous-tâches planifiables indépendamment tout en restant visuellement rattachées à leur parent. Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
 
-Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 (état V3, aucun code touché en V4 pour l'instant).
+Tests unitaires verts (382), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 (état V3).
 
 ## Stack
 
@@ -62,7 +62,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Démarrer le codage de la Phase V4-0 (refacto préalable — span de créneaux, variable `--color-accent`) sur la branche `v4`, sous Opus. Cinq questions restent à trancher avec Marie, chacune bloquant sa phase respective sans bloquer le démarrage de V4-0 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
+Terminer la Phase V4-1 (Quick wins UI) : libellés « maintenant », indicateur surcharge visible/grisé hors surcharge, ne pas proposer « planifier » depuis Todo. Quatre questions restent à trancher avec Marie, chacune bloquant sa phase respective — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

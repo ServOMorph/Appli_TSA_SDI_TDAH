@@ -1,3 +1,9 @@
+## v4.1 — 2026-07-18
+
+### Ajouté
+- Phase V4-0 (refacto préalable) codée et validée manuellement (`validation_manuelle.md`, 20/20 points) : `taskSlotRange`/`taskOccupiesSlot` (`taskRulesV2.ts`) pour l'occupation du planning par plage de créneaux ; variable CSS `--color-accent` injectée depuis `Settings.ambiance_color`.
+- B1 tranché (périmètre large) et codé : la couleur d'ambiance s'applique à tous les boutons utilisant le bleu clair de base (`Button`, `BottomNav`, `E120Resources`, `E31EnergyCheckIn`, `E03Energy`, `E21CreateTaskV2`, `E40Planning`).
+
 ## v4.0 — 2026-07-18
 
 ### Contexte

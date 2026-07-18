@@ -62,9 +62,9 @@ export function E03Energy() {
                   height: 48,
                   borderRadius: 'var(--radius-md)',
                   border: selected === n
-                    ? '2px solid var(--color-primary)'
+                    ? '2px solid var(--color-accent)'
                     : '1px solid var(--color-border)',
-                  backgroundColor: selected === n ? 'var(--color-primary)' : 'var(--color-surface)',
+                  backgroundColor: selected === n ? 'var(--color-accent)' : 'var(--color-surface)',
                   color: selected === n ? '#ffffff' : 'var(--color-text)',
                   fontSize: '1rem',
                   fontWeight: 600,

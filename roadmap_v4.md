@@ -32,16 +32,16 @@ V4-5 en dernier : seul item touchant le modèle de données, à ne pas mêler au
 
 Aucun changement de comportement visible.
 
-- [ ] R1 — Helper `taskSlotRange(task)` (`scheduled_start`/`scheduled_end` → indices de slots) + rendu d'occupation par plage dans `E40Planning.tsx` (aujourd'hui `taskSlot()` ne lit que le début → rendu identique) (`src/domain/rules/taskRulesV2.ts`, `E40Planning.tsx:41-45,454-489`)
-- [ ] R2 — Injecter `--color-accent` sur `documentElement` depuis `Settings.ambiance_color` (défaut `= --color-primary`) dans le `useEffect` settings, sans changer l'apparence (`src/app/AppContext.tsx:193-200`, `src/ui/styles/ambiance.ts`)
+- [x] R1 — Helper `taskSlotRange(task)` (`scheduled_start`/`scheduled_end` → indices de slots) + rendu d'occupation par plage dans `E40Planning.tsx` (aujourd'hui `taskSlot()` ne lit que le début → rendu identique) (`src/domain/rules/taskRulesV2.ts`, `E40Planning.tsx:41-45,454-489`)
+- [x] R2 — Injecter `--color-accent` sur `documentElement` depuis `Settings.ambiance_color` (défaut `= --color-primary`) dans le `useEffect` settings, sans changer l'apparence (`src/app/AppContext.tsx:193-200`, `src/ui/styles/ambiance.ts`)
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : `tsc -b` clean, planning et boutons visuellement identiques à la V3
+Gate : [x] tests verts · [x] test manuel · [x] doc · [x] sortie : `tsc -b` clean, planning et boutons visuellement identiques à la V3
 
 ---
 
 ## Phase V4-1 — Quick wins UI
 
-- [ ] B1 — Boutons primaires sur `--color-accent` (`src/ui/components/Button.tsx:11-15` ; vérifier `BottomNav.tsx:74`, `E60Lists.tsx:231`, `E20Inbox.tsx:192`, `E24Today.tsx:100`)
+- [x] B1 — Boutons primaires sur `--color-accent` (`src/ui/components/Button.tsx:11-15` ; vérifier `BottomNav.tsx:74`, `E60Lists.tsx:231`, `E20Inbox.tsx:192`, `E24Today.tsx:100`) — périmètre tranché par Marie : tous les boutons utilisant le bleu clair de base (`Button`, `BottomNav`, `E120Resources`, `E31EnergyCheckIn`, `E03Energy`, `E21CreateTaskV2`, `E40Planning`)
 - [ ] D2 — « aujourd'hui » → « maintenant » (`E31EnergyCheckIn.tsx:56,58` ; aligner `E30EnergyView.tsx`, `E03Energy.tsx`)
 - [ ] E7 — Indicateur surcharge affiché aussi hors surcharge, grisé et cliquable (explication du mode) ; coloré quand actif (`src/ui/components/TopBar.tsx:16-28,56-65,131-135`)
 - [ ] D4 — Ne pas proposer « planifier » à l'ajout depuis Todo (`E20Inbox.tsx:192`, `E21CreateTaskV2.tsx`)
@@ -96,7 +96,6 @@ Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une sous-é
 
 ## Q à trancher
 
-- **B1** — périmètre de l'accent (tous les boutons primaires vs les deux cités) : bloque le périmètre de R2/V4-1.
 - **E2** — chevauchement de plage + comptage du coût (une fois vs par créneau) : bloque V4-3 (E2b/E2c).
 - **E8** — confirmer le passage de « report automatique au lendemain » à « choix d'un créneau vide » : bloque V4-4 (E8).
 - **E9** — sous-tâche rattachée au parent ou tâche indépendante avec `parent_task_id` : bloque V4-5 (E9a) et sa migration.

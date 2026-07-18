@@ -197,6 +197,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     root.style.fontSize = fontSizes[settings.font_size] ?? '16px'
     root.classList.toggle('dark-mode', settings.dark_mode)
     root.classList.toggle('reduce-motion', settings.reduced_motion)
+    root.style.setProperty('--color-accent', settings.ambiance_color ?? 'var(--color-primary)')
   }, [settings])
 
   async function loadAll() {

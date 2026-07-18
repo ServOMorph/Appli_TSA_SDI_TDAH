@@ -1,6 +1,7 @@
 :root {
   --color-primary: #4a7c99;
   --color-primary-hover: #3a6a85;
+  --color-accent: var(--color-primary);
   --color-secondary: #64748b;
   --color-success: #4caf7d;
   --color-warning: #d97706;

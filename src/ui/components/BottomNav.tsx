@@ -10,7 +10,7 @@ function segmentStyle(withDivider: boolean, active: boolean): React.CSSPropertie
     background: 'transparent',
     border: 'none',
     borderLeft: withDivider ? '1px solid var(--color-border)' : 'none',
-    color: active ? 'var(--color-primary)' : 'var(--color-secondary)',
+    color: active ? 'var(--color-accent)' : 'var(--color-secondary)',
     fontWeight: active ? 700 : 400,
     fontSize: '0.9375rem',
     fontFamily: 'var(--font-body)',

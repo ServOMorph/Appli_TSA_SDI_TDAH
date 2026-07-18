@@ -10,6 +10,8 @@ import {
   getRemainingPlannedCost,
   sortByPosition,
   nextPosition,
+  taskSlotRange,
+  taskOccupiesSlot,
 } from './taskRulesV2'
 import type { TaskV2 } from '@/domain/entities/taskV2'
 
@@ -39,6 +41,61 @@ describe('taskRulesV2', () => {
       const task = createTaskV2('id-1', 'Scheduled task', 'planned', false, now)
       expect(task.status).toBe('planned')
       expect(task.essential).toBe(false)
+    })
+  })
+
+  describe('taskSlotRange', () => {
+    function planned(start: string | null, end: string | null): TaskV2 {
+      return {
+        ...createTaskV2('id-1', 'T', 'planned', false, now),
+        scheduled_date: '2026-07-18',
+        scheduled_start: start,
+        scheduled_end: end,
+      }
+    }
+
+    it('retourne null si aucun début planifié', () => {
+      expect(taskSlotRange(planned(null, null))).toBeNull()
+    })
+
+    it('couvre un seul créneau pour une plage de 30 minutes', () => {
+      expect(taskSlotRange(planned('10:00', '10:30'))).toEqual({ start: 20, end: 20 })
+    })
+
+    it('couvre plusieurs créneaux pour une plage plus longue', () => {
+      expect(taskSlotRange(planned('10:00', '12:00'))).toEqual({ start: 20, end: 23 })
+    })
+
+    it('retombe sur le créneau de début si la fin est absente', () => {
+      expect(taskSlotRange(planned('08:30', null))).toEqual({ start: 17, end: 17 })
+    })
+
+    it('ne descend jamais sous le créneau de début si la fin est antérieure', () => {
+      expect(taskSlotRange(planned('10:00', '09:00'))).toEqual({ start: 20, end: 20 })
+    })
+  })
+
+  describe('taskOccupiesSlot', () => {
+    const task: TaskV2 = {
+      ...createTaskV2('id-1', 'T', 'planned', false, now),
+      scheduled_date: '2026-07-18',
+      scheduled_start: '10:00',
+      scheduled_end: '11:30',
+    }
+
+    it('occupe tous les créneaux de la plage', () => {
+      expect(taskOccupiesSlot(task, 20)).toBe(true)
+      expect(taskOccupiesSlot(task, 21)).toBe(true)
+      expect(taskOccupiesSlot(task, 22)).toBe(true)
+    })
+
+    it("n'occupe pas les créneaux hors plage", () => {
+      expect(taskOccupiesSlot(task, 19)).toBe(false)
+      expect(taskOccupiesSlot(task, 23)).toBe(false)
+    })
+
+    it('retourne false pour une tâche non planifiée', () => {
+      expect(taskOccupiesSlot(createTaskV2('id-2', 'T', 'todo', false, now), 20)).toBe(false)
     })
   })
 

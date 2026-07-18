@@ -58,6 +58,34 @@ export function scheduleTaskV2(
   }
 }
 
+export const SLOTS_PER_DAY = 48
+
+function timeToSlotIndex(time: string): number | null {
+  const [h, m] = time.split(':').map(Number)
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return null
+  return h * 2 + (m >= 30 ? 1 : 0)
+}
+
+export function taskSlotRange(task: TaskV2): { start: number; end: number } | null {
+  if (!task.scheduled_start) return null
+  const start = timeToSlotIndex(task.scheduled_start)
+  if (start === null) return null
+  let end = start
+  if (task.scheduled_end) {
+    const endIndex = timeToSlotIndex(task.scheduled_end)
+    if (endIndex !== null) {
+      end = Math.max(start, Math.min(endIndex - 1, SLOTS_PER_DAY - 1))
+    }
+  }
+  return { start, end }
+}
+
+export function taskOccupiesSlot(task: TaskV2, slot: number): boolean {
+  const range = taskSlotRange(task)
+  if (!range) return false
+  return slot >= range.start && slot <= range.end
+}
+
 export function toggleEssentialV2(task: TaskV2, now: string): TaskV2 {
   return {
     ...task,

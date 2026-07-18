@@ -4,6 +4,7 @@ import type { TaskV2 } from '@/domain/entities/taskV2'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import { BatteryCost } from '@/ui/components/BatteryCost'
 import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
+import { taskSlotRange, taskOccupiesSlot } from '@/domain/rules/taskRulesV2'
 
 const SLOTS = Array.from({ length: 48 }, (_, i) => i)
 const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
@@ -38,11 +39,6 @@ function formatDate(date: string): string {
   })
 }
 
-function taskSlot(task: TaskV2): number | null {
-  if (!task.scheduled_start) return null
-  const [h, m] = task.scheduled_start.split(':').map(Number)
-  return h * 2 + (m >= 30 ? 1 : 0)
-}
 
 type Picker =
   | { mode: 'assign'; slot: number }
@@ -167,7 +163,7 @@ function energyGridButtonStyle(selected: boolean): React.CSSProperties {
     padding: '10px 0',
     borderRadius: 'var(--radius-sm)',
     border: 'none',
-    backgroundColor: selected ? 'var(--color-primary)' : 'var(--color-surface)',
+    backgroundColor: selected ? 'var(--color-accent)' : 'var(--color-surface)',
     color: selected ? '#fff' : 'var(--color-text)',
     fontSize: '0.9375rem',
     fontWeight: 600,
@@ -184,7 +180,7 @@ const essentialChoiceRowStyle: React.CSSProperties = {
 const essentialChoiceBtnStyle: React.CSSProperties = {
   flex: 1,
   padding: '12px 16px',
-  background: 'var(--color-primary)',
+  background: 'var(--color-accent)',
   border: 'none',
   borderRadius: 'var(--radius-md)',
   color: '#fff',
@@ -264,7 +260,7 @@ const newTaskInputStyle: React.CSSProperties = {
 
 const validateBtnStyle: React.CSSProperties = {
   padding: '12px 16px',
-  background: 'var(--color-primary)',
+  background: 'var(--color-accent)',
   border: 'none',
   borderRadius: 'var(--radius-md)',
   color: '#fff',
@@ -360,7 +356,7 @@ export function E40Planning() {
   }
 
   async function handleMove(taskId: string, slot: number) {
-    const conflict = scheduledTasks.some((t) => t.id !== taskId && taskSlot(t) === slot)
+    const conflict = scheduledTasks.some((t) => t.id !== taskId && taskOccupiesSlot(t, slot))
     if (conflict) {
       setConflictError(`Ce créneau (${slotLabel(slot)}) est déjà occupé par une autre tâche.`)
       return
@@ -375,7 +371,7 @@ export function E40Planning() {
 
   async function handleConfirmPending(slot: number, essentialValue: boolean) {
     if (!pendingPlanTask) return
-    const conflict = scheduledTasks.some((t) => taskSlot(t) === slot)
+    const conflict = scheduledTasks.some((t) => taskOccupiesSlot(t, slot))
     if (conflict) {
       setConflictError(`Ce créneau (${slotLabel(slot)}) est déjà occupé par une autre tâche.`)
       return
@@ -453,7 +449,8 @@ export function E40Planning() {
       <div style={{ flex: 1, overflowY: 'auto' }} role="grid" aria-label="Planning de la journée">
         {SLOTS.map((slot) => {
           const isNow = isToday && slot === currentSlot
-          const tasksInSlot = scheduledTasks.filter((t) => taskSlot(t) === slot)
+          const tasksInSlot = scheduledTasks.filter((t) => taskSlotRange(t)?.start === slot)
+          const occupied = scheduledTasks.some((t) => taskOccupiesSlot(t, slot))
 
           return (
             <div
@@ -469,7 +466,7 @@ export function E40Planning() {
                 role="gridcell"
                 style={slotCellStyle}
                 onClick={() => {
-                  if (tasksInSlot.length === 0) {
+                  if (!occupied) {
                     setConflictError(null)
                     setEnergyCost(null)
                     setEssential(false)
@@ -481,7 +478,7 @@ export function E40Planning() {
                 }}
                 aria-label={`Créneau ${slotLabel(slot)}`}
               >
-                {tasksInSlot.length === 0 && (
+                {!occupied && (
                   <span style={emptySlotPlaceholderStyle} aria-hidden>
                     _
                   </span>
@@ -699,7 +696,7 @@ export function E40Planning() {
             {picker.mode === 'move' && (
               <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
                 {SLOTS.filter(
-                  (s) => s !== picker.slot && !scheduledTasks.some((t) => t.id !== picker.task.id && taskSlot(t) === s),
+                  (s) => s !== picker.slot && !scheduledTasks.some((t) => t.id !== picker.task.id && taskOccupiesSlot(t, s)),
                 ).map((s) => (
                   <button
                     key={s}

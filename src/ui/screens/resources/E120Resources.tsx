@@ -18,10 +18,10 @@ function tabStyle(active: boolean): React.CSSProperties {
   return {
     flex: 1,
     padding: '12px 10px',
-    border: active ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+    border: active ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
     borderRadius: 'var(--radius-md)',
     backgroundColor: 'var(--color-surface)',
-    color: active ? 'var(--color-primary)' : 'var(--color-text-muted)',
+    color: active ? 'var(--color-accent)' : 'var(--color-text-muted)',
     fontWeight: active ? 700 : 500,
     cursor: 'pointer',
     fontFamily: 'var(--font-body)',

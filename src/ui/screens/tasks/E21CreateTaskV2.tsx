@@ -72,8 +72,8 @@ function destinationBtnStyle(selected: boolean): React.CSSProperties {
   return {
     padding: '12px 16px',
     borderRadius: 'var(--radius-md)',
-    border: selected ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-    backgroundColor: selected ? 'color-mix(in srgb, var(--color-primary) 10%, transparent)' : 'var(--color-surface)',
+    border: selected ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
+    backgroundColor: selected ? 'color-mix(in srgb, var(--color-accent) 10%, transparent)' : 'var(--color-surface)',
     color: 'var(--color-text)',
     cursor: 'pointer',
     fontSize: '1rem',

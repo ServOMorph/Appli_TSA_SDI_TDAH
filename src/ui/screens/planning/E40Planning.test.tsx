@@ -85,6 +85,9 @@ describe('E40Planning', () => {
       }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    expect(screen.getByRole('gridcell', { name: 'Créneau 9h00 : Médecin' })).toHaveStyle({
+      backgroundColor: 'color-mix(in srgb, #4a7c99 22%, var(--color-surface))',
+    })
   })
 
   it('affiche une tâche terminée en gardant la case visible (P4a)', async () => {
@@ -163,7 +166,7 @@ describe('E40Planning', () => {
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('button', { name: /médecin — déplacer/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 9h00 : Médecin' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByText(/déplacer « médecin »/i)).toBeInTheDocument()
   })
@@ -180,7 +183,7 @@ describe('E40Planning', () => {
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('button', { name: /médecin — déplacer/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 9h00 : Médecin' }))
     await userEvent.click(screen.getByRole('button', { name: '14h00' }))
 
     expect(scheduleV2Task).toHaveBeenCalledWith('t1', '2026-06-30', '14:00', '14:30')
@@ -221,7 +224,7 @@ describe('E40Planning', () => {
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
 
-    await userEvent.click(screen.getByRole('button', { name: /médecin — déplacer/i }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 9h00 : Médecin' }))
 
     expect(screen.queryByText(/déplacer « médecin »/i)).not.toBeInTheDocument()
     expect(schedulePendingTask).not.toHaveBeenCalled()
@@ -366,17 +369,17 @@ describe('E40Planning', () => {
     expect(postponeTask).toHaveBeenCalledWith('t1')
   })
 
-  it('affiche le bouton Terminer sur une tâche planifiée non terminée (P2)', async () => {
+  it('affiche une case à cocher non cochée sur une tâche planifiée (P2)', async () => {
     const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     renderWithApp(
       <E40Planning />,
       makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
-    expect(screen.getByLabelText('Terminer Médecin')).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Terminer Médecin' })).not.toBeChecked()
   })
 
-  it('clic sur Terminer appelle completeV2Task et recharge le planning', async () => {
+  it('cocher une tâche appelle completeV2Task et recharge le planning', async () => {
     const completeV2Task = vi.fn().mockResolvedValue(undefined)
     const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     renderWithApp(
@@ -384,11 +387,11 @@ describe('E40Planning', () => {
       makeAppContext({ completeV2Task, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
-    await userEvent.click(screen.getByLabelText('Terminer Médecin'))
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Terminer Médecin' }))
     expect(completeV2Task).toHaveBeenCalledWith('t1')
   })
 
-  it("n'affiche pas le bouton Terminer sur une tâche déjà terminée", async () => {
+  it('affiche une case cochée et une teinte intensifiée sur une tâche déjà terminée', async () => {
     const task = makeTaskV2({
       scheduled_date: '2026-06-30',
       scheduled_start: '09:00',
@@ -400,7 +403,11 @@ describe('E40Planning', () => {
       makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
-    expect(screen.queryByLabelText('Terminer Médecin')).toBeNull()
+    expect(screen.getByRole('checkbox', { name: 'Terminer Médecin' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'Terminer Médecin' })).not.toBeDisabled()
+    expect(screen.getByRole('gridcell', { name: 'Créneau 9h00 : Médecin' })).toHaveStyle({
+      backgroundColor: '#4a7c99',
+    })
   })
 
   it('après avoir planifié une tâche, le jour affiché ne change pas (P6)', async () => {

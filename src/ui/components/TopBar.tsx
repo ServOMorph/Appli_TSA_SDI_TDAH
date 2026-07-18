@@ -13,6 +13,39 @@ interface TopBarProps {
   onSettingsClick: () => void
 }
 
+const modalOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  zIndex: 1000,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: 'var(--spacing-lg)',
+  backgroundColor: 'rgba(0, 0, 0, 0.75)',
+}
+
+const modalStyle: React.CSSProperties = {
+  width: 'min(100%, 420px)',
+  padding: 'var(--spacing-xl)',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-lg)',
+  backgroundColor: 'var(--color-surface)',
+  boxShadow: '0 24px 64px rgba(0, 0, 0, 0.6)',
+}
+
+const closeButtonStyle: React.CSSProperties = {
+  width: '100%',
+  marginTop: 'var(--spacing-lg)',
+  padding: '10px 16px',
+  border: 'none',
+  borderRadius: 'var(--radius-md)',
+  backgroundColor: 'var(--color-accent)',
+  color: '#fff',
+  fontSize: '1rem',
+  fontWeight: 600,
+  cursor: 'pointer',
+}
+
 function overloadButtonStyle(active: boolean): React.CSSProperties {
   return {
     backgroundColor: active ? 'var(--color-warning)' : 'var(--color-surface)',
@@ -54,8 +87,9 @@ export function TopBar({
           style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', flexShrink: 0 }}
         >
           <button
-            onClick={() => setShowOverloadInfo((v) => !v)}
+            onClick={() => setShowOverloadInfo(true)}
             aria-expanded={showOverloadInfo}
+            aria-haspopup="dialog"
             aria-label="Détail du mode surcharge"
             style={overloadButtonStyle(overloadActive)}
           >
@@ -127,11 +161,19 @@ export function TopBar({
         </div>
       </div>
       {showOverloadInfo && (
-        <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          {overloadActive
-            ? `${plannedCost} énergie planifiée pour ${energyValue} disponible aujourd'hui.`
-            : "Le mode surcharge s'active automatiquement quand l'énergie planifiée dépasse l'énergie disponible."}
-        </p>
+        <div style={modalOverlayStyle}>
+          <section role="dialog" aria-modal="true" aria-labelledby="overload-info-title" style={modalStyle}>
+            <h2 id="overload-info-title" style={{ margin: 0, fontSize: '1.125rem' }}>Mode surcharge</h2>
+            <p style={{ margin: 'var(--spacing-md) 0 0', color: 'var(--color-text-muted)' }}>
+              {overloadActive
+                ? `${plannedCost} énergie planifiée pour ${energyValue} disponible aujourd'hui. L'interface est simplifiée pour vous aider à vous concentrer sur l'essentiel.`
+                : "Le mode surcharge s'active automatiquement quand l'énergie planifiée dépasse l'énergie disponible. Il simplifie alors l'interface pour vous aider à vous concentrer sur l'essentiel."}
+            </p>
+            <button type="button" onClick={() => setShowOverloadInfo(false)} style={closeButtonStyle}>
+              Fermer
+            </button>
+          </section>
+        </div>
       )}
       {!overloadActive && (
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>

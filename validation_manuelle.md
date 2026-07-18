@@ -1,61 +1,45 @@
-# Validation manuelle — Phase V4-1 (Quick wins UI)
+# Validation manuelle — Phase V4-2 (Rendu du planning)
 
-Branche : `v4` — Date : 2026-07-18
+Branche : `v4` — Date : 2026-07-19
 
-Objectif de la phase : D2 (libellés « maintenant »), E7 (indicateur surcharge permanent),
-D4 (pas de « Planifier » à l'ajout depuis Todo). B1 (couleur d'ambiance sur les boutons) déjà
-validé séparément.
+Objectif de la phase : P1 (case de planning colorée), P2 (case à cocher) et P3 (tâches du
+jour terminées conservées). Les validations V4-1 restent acquises et ne sont pas à repasser.
 
 Lancer : `npm run dev` (ou `npm run dev -- --host` pour tester au téléphone).
 Repartir d'une base propre via le bouton « Reset DB » (dev) si besoin.
 
 ---
 
-## D2 — « aujourd'hui » → « maintenant »
+## P1 — Case de planning colorée
 
-- [ ] 1.1 — Check-in énergie (accueil → « Renseigner mon énergie ») : titre « Mon énergie
-      maintenant », question « Combien d'énergie avez-vous maintenant ? ».
-- [ ] 1.2 — Onboarding (base vierge) : même écran, titre « Votre énergie maintenant ».
-- [ ] 1.3 — Écran « Mon énergie » (résumé) après un check-in rempli : le libellé sous le score
-      affiche « énergie maintenant » (plus « aujourd'hui »).
-- [ ] 1.4 — Sur ce même écran, les messages « Aucun check-in aujourd'hui » et « Énergie ignorée
-      pour aujourd'hui » restent inchangés (ils décrivent le statut du jour, pas la question).
+- [x] 1.1 — Créer une tâche planifiée : sa case entière est teintée dans le Planning, avec le nom
+      de la tâche directement dans la case. Aucun chip interne distinct ne subsiste.
+- [x] 1.2 — Cliquer la case colorée ouvre toujours le dialogue de déplacement. Fermer le dialogue
+      ne déplace pas la tâche.
 
-## E7 — Indicateur mode surcharge permanent
+## P2 — Case à cocher sur les tâches planifiées
 
-- [ ] 2.1 — Hors surcharge : le bouton « Mode surcharge » est visible dans la TopBar, grisé
-      (fond neutre, texte atténué).
-- [ ] 2.2 — Clic dessus hors surcharge : affiche une explication générique du déclenchement du
-      mode (pas de chiffres d'énergie planifiée/disponible).
-- [ ] 2.3 — Provoquer une surcharge (planifier plus que l'énergie disponible) : le bouton devient
-      coloré (« Mode surcharge actif »).
-- [ ] 2.4 — Clic dessus en surcharge : affiche l'explication chiffrée (« X énergie planifiée pour
-      Y disponible aujourd'hui »).
-- [ ] 2.5 — Hors surcharge, les icônes Ressources et Paramètres restent visibles à côté du bouton.
-- [ ] 2.6 — En surcharge, seul le bouton « Mode surcharge actif » est visible (Ressources/Paramètres
-      masqués, comportement V3 inchangé).
+- [x] 2.1 — Sur le Planning, une tâche planifiée non terminée affiche une case à cocher vide et une
+      teinte claire.
+- [x] 2.2 — Cocher la tâche : elle reste visible, la case devient cochée et la teinte devient plus
+      intense.
+- [x] 2.3 — Sur le Dashboard, dans « Planning du jour », la même tâche affiche la même case cochée
+      et la même teinte intense. Le bouton « Terminer » n'est plus présent.
+- [x] 2.4 — Recliquer la coche, dans le Planning puis sur le Dashboard : elle redevient vide, la teinte
+      redevient claire et la tâche n'est plus terminée.
 
-## D4 — Pas de « Planifier » à l'ajout depuis Todo
+## P3 — Tâches du jour terminées conservées
 
-- [ ] 3.1 — Onglet Todo → « Ajouter une tâche » : l'écran de création propose seulement Todo,
-      Tâche du jour, Mettre dans une liste. Pas de « Planifier ».
-- [ ] 3.2 — Onglet Tâche du jour → « Ajouter une tâche » : les 4 destinations sont proposées,
-      « Planifier » inclus.
-- [ ] 3.3 — Bouton d'ajout de la navigation basse (accessible depuis le Dashboard) : les 4
-      destinations sont proposées, « Planifier » inclus.
-- [ ] 3.4 — Depuis Todo, ajouter une tâche puis revenir sur Todo et ajouter une seconde tâche :
-      « Planifier » reste absent (pas de fuite d'état après un premier passage).
-
-## Non-régression générale
-
-- [ ] 4.1 — Navigation basse (4 onglets) toujours présente hors onboarding/check-in.
-- [ ] 4.2 — Boutons primaires toujours sur la couleur d'ambiance (B1, non affecté par cette phase).
-- [ ] 4.3 — Aucune erreur console au chargement des écrans touchés (Dashboard, Todo, Tâche du jour,
-      création de tâche, check-in, résumé énergie).
+- [x] 3.1 — Créer une tâche « Tâche du jour », puis la terminer depuis l'écran « Aujourd'hui » : elle
+      reste affichée avec une teinte intense et le texte barré.
+- [x] 3.2 — Revenir à l'accueil : cette tâche terminée reste visible dans « Tâche du jour », avec la
+      même teinte intense et le texte barré.
+- [x] 3.3 — Recharger l'application : la tâche terminée aujourd'hui reste affichée sur « Aujourd'hui »
+      et sur l'accueil.
 
 ---
 
 ## Résultat
 
-- [ ] Tous les points passés → phase V4-1 validée, à marquer [FAIT] au `/close`.
-- [ ] Écarts constatés : _(à remplir)_
+- [x] Tous les points passés → phase V4-2 validée.
+- [x] Écarts constatés : aucun.

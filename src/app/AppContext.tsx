@@ -8,7 +8,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, completeTaskV2 as completeTaskV2Rule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, duplicateTaskV2ToNextDay as duplicateTaskV2ToNextDayRule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, duplicateTaskV2ToNextDay as duplicateTaskV2ToNextDayRule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
@@ -319,7 +319,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   async function completeV2Task(taskId: string) {
     const task = await taskV2Repo.getById(taskId)
     if (!task) return
-    const updated = completeTaskV2Rule(task, new Date().toISOString())
+    const updated = toggleTaskV2CompletionRule(task, new Date().toISOString())
     await taskV2Repo.update(updated)
     await refreshTodayPlanned()
   }

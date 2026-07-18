@@ -1,3 +1,12 @@
+## v4.3 — 2026-07-19
+
+### Corrigé
+- Phase V4-1 clôturée : retour vers l'écran d'origine après création de tâche et modale d'explication du mode surcharge.
+- Phase V4-2 clôturée : créneaux colorés, coche réversible sur les tâches planifiées et conservation des tâches terminées.
+
+### Validé
+- 388/388 tests unitaires, build TypeScript, 45/45 tests e2e et validation manuelle complète.
+
 ## v4.2 — 2026-07-19
 
 ### Ajouté

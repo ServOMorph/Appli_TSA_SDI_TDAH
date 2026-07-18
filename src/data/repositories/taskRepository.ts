@@ -62,7 +62,18 @@ export class TaskRepository {
   }
 
   async getTodayTasks(): Promise<Task[]> {
-    const tasks = await this.db.tasks.where('status').equals('today').sortBy('position')
+    const today = new Date().toISOString().slice(0, 10)
+    const [activeTasks, completedTasks] = await Promise.all([
+      this.db.tasks.where('status').equals('today').toArray(),
+      this.db.tasks.where('status').equals('completed').toArray(),
+    ])
+    const tasks = [
+      ...activeTasks,
+      ...completedTasks.filter((task) => task.completed_at?.slice(0, 10) === today),
+    ].sort((a, b) => {
+      if (a.status !== b.status) return a.status === 'completed' ? 1 : -1
+      return a.position - b.position
+    })
     return Promise.all(
       tasks.map(async (task) => ({
         ...task,

@@ -104,6 +104,10 @@ export function E21CreateTaskV2() {
     ? DESTINATIONS.filter((d) => d.value !== 'planned')
     : DESTINATIONS
 
+  function returnToOrigin() {
+    goTo(taskCreateOrigin ?? 'inbox')
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = title.trim()
@@ -153,7 +157,7 @@ export function E21CreateTaskV2() {
 
   return (
     <main style={pageStyle}>
-      <button style={backBtnStyle} onClick={() => goTo('inbox')} aria-label="Retour">
+      <button style={backBtnStyle} onClick={returnToOrigin} aria-label="Retour">
         &larr; Retour
       </button>
 

@@ -101,11 +101,18 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it('Retour navigue vers inbox', async () => {
+  it('Retour navigue vers inbox sans écran d’origine', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+  })
+
+  it("Retour navigue vers l'écran d'origine", async () => {
+    const ctx = makeAppContext({ taskCreateOrigin: 'dashboard' })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
   it('la destination sélectionnée a aria-pressed=true', async () => {

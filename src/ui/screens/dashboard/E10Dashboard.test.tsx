@@ -81,6 +81,17 @@ describe('E10Dashboard', () => {
       renderWithApp(<E10Dashboard />, ctx)
       expect(screen.getByLabelText(/7 énergie/i)).toBeDefined()
     })
+
+    it('conserve une tâche du jour terminée avec une teinte intensifiée (P3)', () => {
+      const ctx = makeAppContext({
+        todayTasks: [makeTask({ title: 'Tâche terminée', status: 'completed', completed_at: new Date().toISOString() })],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(screen.getByText('Tâche terminée', { selector: 'button' })).toHaveStyle({
+        color: '#fff',
+        textDecoration: 'line-through',
+      })
+    })
   })
 
   describe('navigation vers E22', () => {
@@ -156,10 +167,13 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('button', { name: 'Détail du mode surcharge' }).textContent).toBe('Mode surcharge')
     })
 
-    it('affiche une explication au clic sur le bouton en mode normal (E7)', async () => {
+    it('ouvre une modale explicative au clic sur le bouton en mode normal (E7)', async () => {
       renderWithApp(<E10Dashboard />)
       await userEvent.click(screen.getByRole('button', { name: 'Détail du mode surcharge' }))
-      expect(screen.getByText(/s'active automatiquement/)).toBeDefined()
+      const modal = screen.getByRole('dialog', { name: 'Mode surcharge' })
+      expect(modal).toHaveTextContent(/s'active automatiquement/)
+      await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+      expect(screen.queryByRole('dialog', { name: 'Mode surcharge' })).toBeNull()
     })
   })
 
@@ -204,13 +218,25 @@ describe('E10Dashboard', () => {
       expect(await screen.findByText(/RDV médecin/)).toBeDefined()
     })
 
-    it('affiche une tâche planifiée terminée sans bouton Terminer (P4a)', async () => {
+    it('cocher une tâche planifiée la termine', async () => {
+      const ctx = makeAppContext({
+        getPlannedTasksForDate: async () => [makeTaskV2({ title: 'RDV médecin' })],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const checkbox = await screen.findByRole('checkbox', { name: 'Terminer RDV médecin' })
+      expect(checkbox).not.toBeChecked()
+      await userEvent.click(checkbox)
+      expect(ctx.completeV2Task).toHaveBeenCalledWith('taskv2-1')
+    })
+
+    it('affiche une tâche planifiée terminée avec une case cochée (P2)', async () => {
       const ctx = makeAppContext({
         getPlannedTasksForDate: async () => [makeTaskV2({ title: 'RDV médecin', status: 'completed' })],
       })
       renderWithApp(<E10Dashboard />, ctx)
       expect(await screen.findByText(/RDV médecin/)).toBeDefined()
-      expect(screen.queryByLabelText(/Terminer RDV médecin/)).toBeNull()
+      expect(screen.getByRole('checkbox', { name: 'Terminer RDV médecin' })).toBeChecked()
+      expect(screen.getByRole('checkbox', { name: 'Terminer RDV médecin' })).not.toBeDisabled()
     })
 
     it('affiche la section Planning du jour en mode surcharge (E6)', async () => {
@@ -300,11 +326,11 @@ describe('E10Dashboard', () => {
       expect(btn.disabled).toBe(false)
     })
 
-    it('affiche une explication au clic sur le bouton actif', async () => {
+    it('ouvre une modale chiffrée au clic sur le bouton actif', async () => {
       const ctx = makeAppContext({ overloadMode: true, todayEnergy: 4 })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Détail du mode surcharge' }))
-      expect(screen.getByText(/disponible aujourd'hui/)).toBeDefined()
+      expect(screen.getByRole('dialog', { name: 'Mode surcharge' })).toHaveTextContent(/disponible aujourd'hui/)
     })
 
     it('navigue vers le centre de récupération au clic', async () => {

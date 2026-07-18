@@ -41,6 +41,18 @@ export function completeTaskV2(task: TaskV2, now: string): TaskV2 {
   }
 }
 
+export function toggleTaskV2Completion(task: TaskV2, now: string): TaskV2 {
+  if (task.status === 'completed') {
+    return {
+      ...task,
+      status: 'planned',
+      completed_at: null,
+      updated_at: now,
+    }
+  }
+  return completeTaskV2(task, now)
+}
+
 export function scheduleTaskV2(
   task: TaskV2,
   date: string,

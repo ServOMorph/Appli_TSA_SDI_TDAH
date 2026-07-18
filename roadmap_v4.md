@@ -45,20 +45,20 @@ Gate : [x] tests verts · [x] test manuel · [x] doc · [x] sortie : `tsc -b` cl
 - [x] D2 — « aujourd'hui » → « maintenant » (`E31EnergyCheckIn.tsx:56,58` ; aligné `E30EnergyView.tsx`, `E03Energy.tsx`)
 - [x] E7 — Indicateur surcharge affiché aussi hors surcharge, grisé et cliquable (explication du mode) ; coloré quand actif (`src/ui/components/TopBar.tsx`)
 - [x] D4 — Ne pas proposer « planifier » à l'ajout depuis Todo (`E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `taskCreateOrigin` dans `AppContext.tsx`)
-- [ ] B3 — Retour depuis l'écran de création de tâche (`E21CreateTaskV2.tsx`) toujours vers Todo (`inbox`) au lieu de l'écran d'origine (ex. accueil) — réutiliser `taskCreateOrigin` (ajouté pour D4) pour le bouton Retour
-- [ ] B4 — Bouton « Mode surcharge » (E7) : le clic doit ouvrir une modale d'explication détaillée avec bouton Fermer, au lieu du paragraphe inline actuel, dans les deux états (actif/inactif) (`src/ui/components/TopBar.tsx`)
+- [x] B3 — Retour depuis l'écran de création de tâche (`E21CreateTaskV2.tsx`) vers l'écran d'origine (ex. accueil) via `taskCreateOrigin`
+- [x] B4 — Bouton « Mode surcharge » (E7) : ouvre une modale d'explication détaillée avec bouton Fermer, dans les deux états (actif/inactif) (`src/ui/components/TopBar.tsx`)
 
-Gate : [x] tests verts (383/383) · [~] test manuel (D2/E7 déclenchement/D4 validés le 2026-07-19 ; B3/B4 en attente) · [ ] doc · [ ] sortie : couleur d'ambiance suivie par les boutons, indicateur surcharge présent dans les deux états
+Gate : [x] tests verts (384/384) · [x] test manuel (validé le 2026-07-19) · [x] doc · [x] sortie : couleur d'ambiance suivie par les boutons, indicateur surcharge présent dans les deux états
 
 ---
 
 ## Phase V4-2 — Rendu du planning
 
-- [ ] P1 — Couleur appliquée à toute la case du créneau, nom écrit dedans, suppression du chip interne (`E40Planning.tsx:113-157,468-515`)
-- [ ] P2 — Case à cocher sur la tâche planifiée : teinte claire par défaut, intensifiée une fois cochée ; remplace le bouton « Terminer » (`E40Planning.tsx:516-536`, `E10Dashboard.tsx` section « Planning du jour » qui réutilise le même style de chip, `ambiance.ts`)
-- [ ] P3 — Tâches du jour terminées conservées à l'écran en teinte intensifiée au lieu de disparaître (`E24Today.tsx:42-98`, `E10Dashboard.tsx` section tâches du jour, `getTodayTasks` dans `AppContext.tsx`)
+- [x] P1 — Couleur appliquée à toute la case du créneau, nom écrit dedans, suppression du chip interne (`E40Planning.tsx`)
+- [x] P2 — Case à cocher réversible sur la tâche planifiée : teinte claire par défaut, intensifiée une fois cochée ; remplace le bouton « Terminer » (`E40Planning.tsx`, `E10Dashboard.tsx`, `ambiance.ts`)
+- [x] P3 — Tâches du jour terminées conservées à l'écran en teinte intensifiée au lieu de disparaître (`E24Today.tsx`, `E10Dashboard.tsx`, `taskRepository.getTodayTasks`)
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] e2e mis à jour (chip/bouton « Terminer » remplacé) · [ ] sortie : case pleine colorée, cochage visible sur planning, dashboard et tâches du jour, aucune tâche terminée ne disparaît
+Gate : [x] tests verts (388/388) · [x] test manuel (validé le 2026-07-19) · [x] doc · [x] e2e mis à jour (45/45) · [x] sortie : case pleine colorée, cochage visible et réversible sur planning, dashboard et tâches du jour, aucune tâche terminée ne disparaît
 
 ---
 

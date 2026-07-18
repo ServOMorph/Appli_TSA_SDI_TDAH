@@ -1,6 +1,7 @@
 import { useApp } from '@/app/AppContext'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
+import { flashyBackground } from '@/ui/styles/ambiance'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -44,6 +45,7 @@ export function E24Today() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
           {todayTasks.map((task) => {
+            const completed = task.status === 'completed'
             const subs = todaySubTasksMap[task.id] ?? []
             const done = subs.filter((s) => s.is_completed).length
             const total = subs.length
@@ -51,11 +53,14 @@ export function E24Today() {
               .filter((s) => !s.is_completed)
               .sort((a, b) => a.position - b.position)[0]
             return (
-            <Card key={task.id} style={{ padding: 'var(--spacing-md)' }}>
+            <Card key={task.id} style={{
+              padding: 'var(--spacing-md)',
+              ...(completed ? { backgroundColor: flashyBackground('var(--color-accent)'), borderColor: 'var(--color-accent)', color: '#fff' } : {}),
+            }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
                   <button
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text)', fontSize: '1rem', padding: 0, textAlign: 'left', flex: 1 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: completed ? '#fff' : 'var(--color-text)', fontSize: '1rem', padding: 0, textAlign: 'left', flex: 1, textDecoration: completed ? 'line-through' : 'none' }}
                     onClick={() => openDetail(task.id)}
                   >
                     {task.title}
@@ -63,12 +68,12 @@ export function E24Today() {
                   {total > 0 && (
                     <span
                       aria-label={`${done} sur ${total} étapes`}
-                      style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', flexShrink: 0 }}
+                      style={{ fontSize: '0.75rem', color: completed ? '#fff' : 'var(--color-text-muted)', flexShrink: 0 }}
                     >
                       {done}/{total}
                     </span>
                   )}
-                  <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
+                  {!completed && <div style={{ display: 'flex', gap: 'var(--spacing-xs)' }}>
                     <button
                       aria-label={`Terminer ${task.title}`}
                       style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
@@ -83,10 +88,10 @@ export function E24Today() {
                     >
                       Retirer
                     </button>
-                  </div>
+                  </div>}
                 </div>
                 {nextSubTask && (
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: completed ? '#fff' : 'var(--color-text-muted)' }}>
                     Prochaine étape : {nextSubTask.title}
                   </p>
                 )}

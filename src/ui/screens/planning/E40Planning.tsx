@@ -3,7 +3,7 @@ import { useApp } from '@/app/AppContext'
 import type { TaskV2 } from '@/domain/entities/taskV2'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import { BatteryCost } from '@/ui/components/BatteryCost'
-import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
+import { DEFAULT_AMBIANCE_COLOR, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import { taskSlotRange, taskOccupiesSlot } from '@/domain/rules/taskRulesV2'
 
 const SLOTS = Array.from({ length: 48 }, (_, i) => i)
@@ -106,50 +106,46 @@ const hourLabelStyle: React.CSSProperties = {
   borderRight: '1px solid var(--color-text-muted)',
 }
 
-const slotCellStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '4px 8px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4px',
-  cursor: 'pointer',
+function slotCellStyle(task: TaskV2 | undefined, ambianceColor: string): React.CSSProperties {
+  return {
+    flex: 1,
+    padding: '4px 8px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    cursor: 'pointer',
+    ...(task ? plannedTaskTintStyle(task.status === 'completed', ambianceColor) : {}),
+  }
 }
 
-function taskChipStyle(
-  essential: boolean,
-  completed: boolean,
-  overloadMode: boolean,
-  ambianceColor: string,
-): React.CSSProperties {
-  const background = completed
-    ? flashyBackground(ambianceColor)
-    : essential
-      ? overloadMode
-        ? pastelBackground(ambianceColor)
-        : mutedBackground(ambianceColor)
-      : overloadMode
-        ? 'var(--color-surface)'
-        : pastelBackground(ambianceColor)
-  return {
-    background,
-    color: completed
-      ? '#fff'
-      : essential && !overloadMode
-        ? '#fff'
-        : overloadMode && !essential
-          ? 'var(--color-text-muted)'
-          : 'var(--color-text)',
-    textDecoration: completed ? 'line-through' : 'none',
-    border: overloadMode && !essential && !completed ? '1px solid var(--color-border)' : 'none',
-    borderRadius: 'var(--radius-sm)',
-    padding: '8px 10px',
-    fontSize: '0.9375rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    textAlign: 'center',
-    fontFamily: 'var(--font-body)',
-    width: '100%',
-  }
+const plannedTaskContentStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 'var(--spacing-sm)',
+  minHeight: '36px',
+  fontSize: '0.9375rem',
+  fontWeight: 600,
+}
+
+const taskCheckboxStyle: React.CSSProperties = {
+  width: '20px',
+  height: '20px',
+  margin: 0,
+  accentColor: 'var(--color-accent)',
+  cursor: 'pointer',
+  flexShrink: 0,
+}
+
+const taskActionStyle: React.CSSProperties = {
+  background: 'none',
+  border: '1px solid currentColor',
+  borderRadius: 'var(--radius-sm)',
+  padding: '4px 8px',
+  cursor: 'pointer',
+  fontSize: '0.75rem',
+  color: 'inherit',
+  flexShrink: 0,
 }
 
 const energyGridStyle: React.CSSProperties = {
@@ -450,7 +446,10 @@ export function E40Planning() {
         {SLOTS.map((slot) => {
           const isNow = isToday && slot === currentSlot
           const tasksInSlot = scheduledTasks.filter((t) => taskSlotRange(t)?.start === slot)
+          const task = tasksInSlot[0]
           const occupied = scheduledTasks.some((t) => taskOccupiesSlot(t, slot))
+          const completed = task?.status === 'completed'
+          const canPostpone = task !== undefined && isToday && overloadMode && !task.essential && !completed
 
           return (
             <div
@@ -464,9 +463,15 @@ export function E40Planning() {
               </div>
               <div
                 role="gridcell"
-                style={slotCellStyle}
+                style={slotCellStyle(task, ambianceColor)}
                 onClick={() => {
-                  if (!occupied) {
+                  if (task) {
+                    if (pendingPlanTask) {
+                      handleConfirmPending(slot, essential)
+                    } else {
+                      setPicker({ mode: 'move', task, slot })
+                    }
+                  } else if (!occupied) {
                     setConflictError(null)
                     setEnergyCost(null)
                     setEssential(false)
@@ -476,104 +481,55 @@ export function E40Planning() {
                     handleConfirmPending(slot, essential)
                   }
                 }}
-                aria-label={`Créneau ${slotLabel(slot)}`}
+                aria-label={`Créneau ${slotLabel(slot)}${task ? ` : ${task.title}` : ''}`}
               >
-                {!occupied && (
+                {!task && (
                   <span style={emptySlotPlaceholderStyle} aria-hidden>
                     _
                   </span>
                 )}
-                {tasksInSlot.map((task) => {
-                  const completed = task.status === 'completed'
-                  const canPostpone = isToday && overloadMode && !task.essential && !completed
-                  return (
-                    <div key={task.id} style={{ display: 'flex', gap: '4px', alignItems: 'stretch' }}>
-                      <button
-                        style={{
-                          ...taskChipStyle(task.essential, completed, isToday && overloadMode, ambianceColor),
-                          flex: 1,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '6px',
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          if (pendingPlanTask) {
-                            handleConfirmPending(slot, essential)
-                          } else {
-                            setPicker({ mode: 'move', task, slot })
-                          }
-                        }}
-                        aria-label={`${task.title} — déplacer`}
-                      >
+                {task && (
+                  <>
+                    <div style={plannedTaskContentStyle}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         {task.title}
                         {task.energy_cost != null && <BatteryCost cost={task.energy_cost} />}
-                      </button>
-                      {!completed && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleComplete(task.id)
-                          }}
-                          aria-label={`Terminer ${task.title}`}
-                          style={{
-                            background: 'none',
-                            border: '1px solid var(--color-border)',
-                            borderRadius: 'var(--radius-sm)',
-                            padding: '4px 8px',
-                            cursor: 'pointer',
-                            fontSize: '0.75rem',
-                            color: 'var(--color-text-muted)',
-                            flexShrink: 0,
-                          }}
-                        >
-                          Terminer
-                        </button>
-                      )}
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={completed}
+                        onClick={(event) => event.stopPropagation()}
+                        onChange={() => handleComplete(task.id)}
+                        aria-label={`Terminer ${task.title}`}
+                        style={taskCheckboxStyle}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', gap: '4px' }}>
                       {canPostpone && (
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation()
+                          onClick={(event) => {
+                            event.stopPropagation()
                             handlePostpone(task.id)
                           }}
                           aria-label={`Reporter ${task.title} à demain`}
-                          style={{
-                            background: 'none',
-                            border: '1px solid var(--color-border)',
-                            borderRadius: 'var(--radius-sm)',
-                            padding: '4px 8px',
-                            cursor: 'pointer',
-                            fontSize: '0.75rem',
-                            color: 'var(--color-text-muted)',
-                            flexShrink: 0,
-                          }}
+                          style={taskActionStyle}
                         >
                           Reporter
                         </button>
                       )}
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation()
+                        onClick={(event) => {
+                          event.stopPropagation()
                           handleRepeatTomorrow(task.id)
                         }}
                         aria-label={`Répéter ${task.title} demain`}
-                        style={{
-                          background: 'none',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: 'var(--radius-sm)',
-                          padding: '4px 8px',
-                          cursor: 'pointer',
-                          fontSize: '0.75rem',
-                          color: 'var(--color-text-muted)',
-                          flexShrink: 0,
-                        }}
+                        style={taskActionStyle}
                       >
                         Répéter demain
                       </button>
                     </div>
-                  )
-                })}
+                  </>
+                )}
               </div>
             </div>
           )

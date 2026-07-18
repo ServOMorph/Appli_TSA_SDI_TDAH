@@ -50,6 +50,16 @@ describe('E24Today', () => {
       expect(screen.getByText('Faire la vaisselle')).toBeDefined()
     })
 
+    it('conserve une tâche terminée avec une teinte intensifiée', () => {
+      const ctx = makeAppContext({
+        todayTasks: [makeTask({ title: 'Faire la vaisselle', status: 'completed', completed_at: new Date().toISOString() })],
+      })
+      renderWithApp(<E24Today />, ctx)
+      const title = screen.getByRole('button', { name: 'Faire la vaisselle' })
+      expect(title).toHaveStyle({ color: '#fff', textDecoration: 'line-through' })
+      expect(screen.queryByLabelText('Terminer Faire la vaisselle')).toBeNull()
+    })
+
     it('affiche la progression des sous-étapes', () => {
       const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
       const subs: SubTask[] = [

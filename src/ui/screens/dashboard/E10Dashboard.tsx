@@ -8,7 +8,7 @@ import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
 import { BatteryCost } from '@/ui/components/BatteryCost'
-import { DEFAULT_AMBIANCE_COLOR, pastelBackground, mutedBackground, flashyBackground } from '@/ui/styles/ambiance'
+import { DEFAULT_AMBIANCE_COLOR, flashyBackground, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import {
   DndContext,
   PointerSensor,
@@ -32,45 +32,8 @@ function todayStr(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-function planningChipStyle(
-  essential: boolean,
-  completed: boolean,
-  overloadMode: boolean,
-  ambianceColor: string,
-): React.CSSProperties {
-  const background = completed
-    ? flashyBackground(ambianceColor)
-    : essential
-      ? overloadMode
-        ? pastelBackground(ambianceColor)
-        : mutedBackground(ambianceColor)
-      : overloadMode
-        ? 'var(--color-surface)'
-        : pastelBackground(ambianceColor)
-  return {
-    background,
-    color: completed
-      ? '#fff'
-      : essential && !overloadMode
-        ? '#fff'
-        : overloadMode && !essential
-          ? 'var(--color-text-muted)'
-          : 'var(--color-text)',
-    textDecoration: completed ? 'line-through' : 'none',
-    border: overloadMode && !essential && !completed ? '1px solid var(--color-border)' : 'none',
-    borderRadius: 'var(--radius-md)',
-    padding: '10px 12px',
-    fontSize: '0.9375rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    textAlign: 'center',
-    fontFamily: 'var(--font-body)',
-    width: '100%',
-  }
-}
-
 interface SortableTaskItemProps {
-  task: { id: string; title: string }
+  task: Task
   subs: { is_completed: boolean }[]
   onOpen: (id: string) => void
 }
@@ -81,6 +44,7 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
   })
   const done = subs.filter((s) => s.is_completed).length
   const total = subs.length
+  const completed = task.status === 'completed'
 
   return (
     <div
@@ -95,7 +59,10 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
         cursor: 'grab',
       }}
     >
-      <Card style={{ padding: 'var(--spacing-12)' }}>
+      <Card style={{
+        padding: 'var(--spacing-12)',
+        ...(completed ? { backgroundColor: flashyBackground('var(--color-accent)'), borderColor: 'var(--color-accent)', color: '#fff' } : {}),
+      }}>
         <div
           style={{
             display: 'flex',
@@ -108,7 +75,7 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
             aria-hidden
             style={{
               fontSize: '0.9rem',
-              color: 'var(--color-text-muted)',
+              color: completed ? '#fff' : 'var(--color-text-muted)',
               flexShrink: 0,
               lineHeight: 1,
             }}
@@ -124,12 +91,13 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: 'var(--color-text)',
+              color: completed ? '#fff' : 'var(--color-text)',
               fontSize: '1.1rem',
               fontWeight: 600,
               padding: 0,
               textAlign: 'left',
               flex: 1,
+              textDecoration: completed ? 'line-through' : 'none',
             }}
           >
             {task.title}
@@ -137,7 +105,7 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
           {total > 0 && (
             <span
               aria-label={`${done} sur ${total} étapes`}
-              style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', flexShrink: 0 }}
+              style={{ fontSize: '0.75rem', color: completed ? '#fff' : 'var(--color-text-muted)', flexShrink: 0 }}
             >
               {done}/{total}
             </span>
@@ -311,16 +279,26 @@ export function E10Dashboard() {
             {todayPlanned.map((task) => {
               const completed = task.status === 'completed'
               return (
-              <Card key={task.id} style={{ padding: 'var(--spacing-sm)' }}>
+              <Card key={task.id} style={{ padding: 'var(--spacing-sm)', ...plannedTaskTintStyle(completed, ambianceColor) }}>
                 <div style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
+                  <input
+                    type="checkbox"
+                    checked={completed}
+                    onChange={() => handleCompletePlanned(task.id)}
+                    aria-label={`Terminer ${task.title}`}
+                    style={{ width: '20px', height: '20px', margin: 0, accentColor: 'var(--color-accent)', cursor: 'pointer', flexShrink: 0 }}
+                  />
                   <button
                     style={{
-                      ...planningChipStyle(task.essential, completed, overloadMode, ambianceColor),
                       flex: 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
+                      background: 'none',
+                      border: 'none',
+                      padding: '6px 0',
+                      color: 'inherit',
+                      textDecoration: completed ? 'line-through' : 'none',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      font: 'inherit',
                     }}
                     onClick={() => goTo('planning')}
                     aria-label={`${task.title} — voir dans le planning`}
@@ -328,24 +306,6 @@ export function E10Dashboard() {
                     {task.scheduled_start} · {task.title}
                     {task.energy_cost != null && <BatteryCost cost={task.energy_cost} />}
                   </button>
-                  {!completed && (
-                    <button
-                      aria-label={`Terminer ${task.title}`}
-                      onClick={() => handleCompletePlanned(task.id)}
-                      style={{
-                        background: 'none',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: '6px 10px',
-                        cursor: 'pointer',
-                        fontSize: '0.75rem',
-                        color: 'var(--color-text-muted)',
-                        flexShrink: 0,
-                      }}
-                    >
-                      Terminer
-                    </button>
-                  )}
                   {!completed && overloadMode && !task.essential && (
                     <button
                       aria-label={`Reporter ${task.title} à demain`}
@@ -357,7 +317,7 @@ export function E10Dashboard() {
                         padding: '6px 10px',
                         cursor: 'pointer',
                         fontSize: '0.75rem',
-                        color: 'var(--color-text-muted)',
+                        color: 'inherit',
                         flexShrink: 0,
                       }}
                     >
@@ -374,7 +334,7 @@ export function E10Dashboard() {
                       padding: '6px 10px',
                       cursor: 'pointer',
                       fontSize: '0.75rem',
-                      color: 'var(--color-text-muted)',
+                      color: 'inherit',
                       flexShrink: 0,
                     }}
                   >

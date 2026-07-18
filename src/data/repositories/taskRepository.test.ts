@@ -61,12 +61,15 @@ describe('TaskRepository', () => {
       expect(todayTasks).toHaveLength(2)
     })
 
-    it('gets today tasks', async () => {
+    it('gets active and completed tasks for today', async () => {
+      const today = new Date().toISOString()
       await repo.create(mockTask({ id: 't1', status: 'today' }))
       await repo.create(mockTask({ id: 't2', status: 'inbox' }))
+      await repo.create(mockTask({ id: 't3', status: 'completed', completed_at: today }))
+      await repo.create(mockTask({ id: 't4', status: 'completed', completed_at: '2020-01-01T12:00:00.000Z' }))
 
       const todayTasks = await repo.getTodayTasks()
-      expect(todayTasks).toHaveLength(1)
+      expect(todayTasks.map((task) => task.id)).toEqual(['t1', 't3'])
     })
 
     it('reorders tasks', async () => {

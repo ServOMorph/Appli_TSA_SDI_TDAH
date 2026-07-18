@@ -14,17 +14,17 @@ test('T20 — Dashboard → Mon énergie → écran énergie', async ({ page }) 
 
 test('T21 — Énergie déjà saisie (onboarding) affichée sur E30', async ({ page }) => {
   await page.getByRole('button', { name: "5 énergie aujourd'hui" }).click()
-  await expect(page.getByLabel('5 énergie aujourd\'hui')).toBeVisible()
+  await expect(page.getByLabel('5 énergie maintenant')).toBeVisible()
 })
 
 test('T22 — Modifier énergie via check-in', async ({ page }) => {
   await page.getByRole('button', { name: "5 énergie aujourd'hui" }).click()
   await page.getByRole('button', { name: 'Modifier' }).click()
-  await expect(page.getByRole('heading', { name: "Mon énergie aujourd'hui" })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Mon énergie maintenant' })).toBeVisible()
   await page.getByRole('button', { name: '3' }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
   await expect(page.getByRole('heading', { name: 'Mon énergie' })).toBeVisible()
-  await expect(page.getByLabel('3 énergie aujourd\'hui')).toBeVisible()
+  await expect(page.getByLabel('3 énergie maintenant')).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/22-energy-modified.png' })
 })
 

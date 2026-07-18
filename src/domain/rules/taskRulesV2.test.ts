@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   createTaskV2,
   completeTaskV2,
+  toggleTaskV2Completion,
   scheduleTaskV2,
   toggleEssentialV2,
   setEnergyCostV2,
@@ -119,6 +120,28 @@ describe('taskRulesV2', () => {
 
       expect(completed.status).toBe('completed')
       expect(completed.completed_at).toBe(now)
+    })
+  })
+
+  describe('toggleTaskV2Completion', () => {
+    it('rÃ©active une tÃ¢che terminÃ©e sans modifier son crÃ©neau', () => {
+      const task: TaskV2 = {
+        ...createTaskV2('id-1', 'My task', 'completed', false, now),
+        scheduled_date: '2026-06-30',
+        scheduled_start: '10:00',
+        scheduled_end: '10:30',
+        completed_at: now,
+      }
+
+      const reopened = toggleTaskV2Completion(task, '2026-06-30T11:00:00Z')
+
+      expect(reopened).toMatchObject({
+        status: 'planned',
+        completed_at: null,
+        scheduled_date: '2026-06-30',
+        scheduled_start: '10:00',
+        scheduled_end: '10:30',
+      })
     })
   })
 

@@ -19,7 +19,7 @@ test('T02 — Entrer → écran Profil', async ({ page }) => {
 test('T03 — Sélectionner profil Étudiant → écran Énergie', async ({ page }) => {
   await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Étudiant' }).click()
-  await expect(page.getByRole('heading', { name: "Votre énergie aujourd'hui" })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Votre énergie maintenant' })).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/03-energy.png' })
 })
 

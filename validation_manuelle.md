@@ -1,56 +1,61 @@
-# Validation manuelle — Phase V4-0 (refacto préalable)
+# Validation manuelle — Phase V4-1 (Quick wins UI)
 
 Branche : `v4` — Date : 2026-07-18
 
-Objectif de la phase : **aucun changement de comportement ni d'apparence**. Tout écart constaté
-par rapport à la V3 est une régression à signaler.
+Objectif de la phase : D2 (libellés « maintenant »), E7 (indicateur surcharge permanent),
+D4 (pas de « Planifier » à l'ajout depuis Todo). B1 (couleur d'ambiance sur les boutons) déjà
+validé séparément.
 
 Lancer : `npm run dev` (ou `npm run dev -- --host` pour tester au téléphone).
 Repartir d'une base propre via le bouton « Reset DB » (dev) si besoin.
 
 ---
 
-## R1 — Occupation du planning par plage
+## D2 — « aujourd'hui » → « maintenant »
 
-- [ ] 1.1 — Ouvrir le Planning. Les 48 créneaux s'affichent, hauteur et espacement identiques à la V3.
-- [ ] 1.2 — Créer une tâche sur un créneau vide (flux modale 3 étapes : nom → énergie → obligatoire).
-      La tâche apparaît sur **un seul** créneau, celui choisi.
-- [ ] 1.3 — Cliquer sur le créneau juste en dessous de la tâche créée : la modale de création s'ouvre
-      normalement (le créneau n'est pas considéré comme occupé).
-- [ ] 1.4 — Créer une seconde tâche sur ce créneau voisin : les deux tâches coexistent, chacune sur sa ligne.
-- [ ] 1.5 — Cliquer sur une tâche planifiée → picker de déplacement. Le créneau de l'autre tâche
-      **n'apparaît pas** dans la liste des créneaux proposés ; tous les autres créneaux y sont.
-- [ ] 1.6 — Déplacer la tâche vers un créneau libre : elle s'affiche au nouveau créneau, l'ancien
-      redevient vide et cliquable.
-- [ ] 1.7 — Depuis Todo, mettre une tâche « en main » (pendingPlanTask) puis taper un créneau
-      **déjà occupé** : le message « Ce créneau est déjà occupé par une autre tâche » s'affiche.
-- [ ] 1.8 — Les créneaux vides gardent la même hauteur que les créneaux occupés (pas d'affaissement
-      ni de décalage vertical).
-- [ ] 1.9 — Marquer une tâche planifiée comme terminée (bouton « Terminer ») : comportement V3 inchangé.
+- [ ] 1.1 — Check-in énergie (accueil → « Renseigner mon énergie ») : titre « Mon énergie
+      maintenant », question « Combien d'énergie avez-vous maintenant ? ».
+- [ ] 1.2 — Onboarding (base vierge) : même écran, titre « Votre énergie maintenant ».
+- [ ] 1.3 — Écran « Mon énergie » (résumé) après un check-in rempli : le libellé sous le score
+      affiche « énergie maintenant » (plus « aujourd'hui »).
+- [ ] 1.4 — Sur ce même écran, les messages « Aucun check-in aujourd'hui » et « Énergie ignorée
+      pour aujourd'hui » restent inchangés (ils décrivent le statut du jour, pas la question).
 
-## R2 — Variable CSS `--color-accent`
+## E7 — Indicateur mode surcharge permanent
 
-- [ ] 2.1 — Boutons primaires (« Ajouter une tâche », « Nouvelle liste », boutons de modale) :
-      couleur **identique à la V3** — la couleur d'ambiance ne doit **pas** encore les affecter.
-- [ ] 2.2 — Réglages → Accessibilité → changer la couleur d'ambiance. Les cartes pastel du Planning
-      et de l'accueil changent de teinte comme en V3 ; les boutons primaires restent inchangés.
-- [ ] 2.3 — Activer le mode sombre : les boutons primaires prennent la teinte sombre habituelle
-      (pas de couleur figée du thème clair).
-- [ ] 2.4 — Recharger l'application (F5) : aucun flash de couleur anormal au démarrage sur les boutons.
+- [ ] 2.1 — Hors surcharge : le bouton « Mode surcharge » est visible dans la TopBar, grisé
+      (fond neutre, texte atténué).
+- [ ] 2.2 — Clic dessus hors surcharge : affiche une explication générique du déclenchement du
+      mode (pas de chiffres d'énergie planifiée/disponible).
+- [ ] 2.3 — Provoquer une surcharge (planifier plus que l'énergie disponible) : le bouton devient
+      coloré (« Mode surcharge actif »).
+- [ ] 2.4 — Clic dessus en surcharge : affiche l'explication chiffrée (« X énergie planifiée pour
+      Y disponible aujourd'hui »).
+- [ ] 2.5 — Hors surcharge, les icônes Ressources et Paramètres restent visibles à côté du bouton.
+- [ ] 2.6 — En surcharge, seul le bouton « Mode surcharge actif » est visible (Ressources/Paramètres
+      masqués, comportement V3 inchangé).
+
+## D4 — Pas de « Planifier » à l'ajout depuis Todo
+
+- [ ] 3.1 — Onglet Todo → « Ajouter une tâche » : l'écran de création propose seulement Todo,
+      Tâche du jour, Mettre dans une liste. Pas de « Planifier ».
+- [ ] 3.2 — Onglet Tâche du jour → « Ajouter une tâche » : les 4 destinations sont proposées,
+      « Planifier » inclus.
+- [ ] 3.3 — Bouton d'ajout de la navigation basse (accessible depuis le Dashboard) : les 4
+      destinations sont proposées, « Planifier » inclus.
+- [ ] 3.4 — Depuis Todo, ajouter une tâche puis revenir sur Todo et ajouter une seconde tâche :
+      « Planifier » reste absent (pas de fuite d'état après un premier passage).
 
 ## Non-régression générale
 
-- [ ] 3.1 — Onboarding complet sur base vierge (accueil → profil → énergie) : aucun blocage.
-- [ ] 3.2 — Check-in énergie quotidien : s'affiche une fois, puis Dashboard.
-- [ ] 3.3 — Dashboard : section « Planning du jour » et section tâches du jour affichées normalement.
-- [ ] 3.4 — Navigation basse (4 onglets) présente sur tous les écrans hors onboarding/check-in.
-- [ ] 3.5 — Bouton « Répéter demain » : toujours fonctionnel (son retrait est prévu en V4-3, pas ici).
-- [ ] 3.6 — Mode surcharge : se déclenche automatiquement comme en V3, badge « Reporter » présent.
-- [ ] 3.7 — Listes : vue globale et détail d'une liste inchangés.
+- [ ] 4.1 — Navigation basse (4 onglets) toujours présente hors onboarding/check-in.
+- [ ] 4.2 — Boutons primaires toujours sur la couleur d'ambiance (B1, non affecté par cette phase).
+- [ ] 4.3 — Aucune erreur console au chargement des écrans touchés (Dashboard, Todo, Tâche du jour,
+      création de tâche, check-in, résumé énergie).
 
 ---
 
 ## Résultat
 
-- [ ] Tous les points passés → phase V4-0 validée, à marquer [FAIT] au `/close`.
+- [ ] Tous les points passés → phase V4-1 validée, à marquer [FAIT] au `/close`.
 - [ ] Écarts constatés : _(à remplir)_

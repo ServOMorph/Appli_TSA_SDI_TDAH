@@ -63,6 +63,8 @@ interface AppContextValue {
   selectTask: (id: string | null) => void
   taskDetailOrigin: Screen | null
   setTaskDetailOrigin: (s: Screen) => void
+  taskCreateOrigin: Screen | null
+  setTaskCreateOrigin: (s: Screen) => void
   createUser: (profile: ProfileType) => Promise<void>
   completeOnboarding: () => Promise<void>
   saveTodayEnergy: (value: number) => Promise<void>
@@ -162,6 +164,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const overloadMode = isOverloaded(todayEnergy, getRemainingPlannedCost(todayPlannedTasks))
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [taskDetailOrigin, setTaskDetailOrigin] = useState<Screen | null>(null)
+  const [taskCreateOrigin, setTaskCreateOrigin] = useState<Screen | null>(null)
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
   const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
@@ -608,6 +611,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         selectTask: setSelectedTaskId,
         taskDetailOrigin,
         setTaskDetailOrigin,
+        taskCreateOrigin,
+        setTaskCreateOrigin,
         createUser,
         completeOnboarding,
         saveTodayEnergy,

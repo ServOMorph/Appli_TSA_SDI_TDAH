@@ -1,3 +1,13 @@
+## v4.2 — 2026-07-19
+
+### Ajouté
+- Phase V4-1 (Quick wins UI) codée : D2 (libellés check-in « aujourd'hui » → « maintenant » sur `E31EnergyCheckIn.tsx`, `E03Energy.tsx`, `E30EnergyView.tsx`), E7 (bouton « Mode surcharge » de la TopBar rendu permanent, grisé hors surcharge / coloré actif, cliquable dans les deux états), D4 (l'ajout de tâche depuis Todo ne propose plus la destination « Planifier », via nouveau state `taskCreateOrigin` dans `AppContext.tsx`). 383/383 tests, `tsc -b` clean.
+- E2, E8, E9 tranchés avec l'utilisateur (chevauchement de plage bloquant, coût énergétique compté une fois par tâche, choix de créneau au lieu de report automatique, sous-tâche rattachée au parent).
+
+### Corrigé (à faire)
+- B3 : le retour depuis l'écran de création de tâche (`E21CreateTaskV2.tsx`) ramène toujours vers Todo au lieu de l'écran d'origine — ajouté à la Phase V4-1, non corrigé cette session.
+- B4 : le bouton « Mode surcharge » doit ouvrir une modale d'explication détaillée (bouton Fermer) au lieu du texte inline actuellement codé — ajouté à la Phase V4-1, non corrigé cette session.
+
 ## v4.1 — 2026-07-18
 
 ### Ajouté

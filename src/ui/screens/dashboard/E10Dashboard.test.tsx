@@ -151,9 +151,15 @@ describe('E10Dashboard', () => {
   })
 
   describe('activation surcharge (D10C)', () => {
-    it("n'affiche pas le bouton Mode surcharge en mode normal", () => {
+    it('affiche le bouton Mode surcharge grisé en mode normal (E7)', () => {
       renderWithApp(<E10Dashboard />)
-      expect(screen.queryByRole('button', { name: /Mode surcharge/ })).toBeNull()
+      expect(screen.getByRole('button', { name: 'Détail du mode surcharge' }).textContent).toBe('Mode surcharge')
+    })
+
+    it('affiche une explication au clic sur le bouton en mode normal (E7)', async () => {
+      renderWithApp(<E10Dashboard />)
+      await userEvent.click(screen.getByRole('button', { name: 'Détail du mode surcharge' }))
+      expect(screen.getByText(/s'active automatiquement/)).toBeDefined()
     })
   })
 

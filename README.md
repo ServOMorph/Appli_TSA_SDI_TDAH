@@ -27,11 +27,11 @@ V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur 
 
 Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Build de production sur `dist/v3` (`vite.config.ts`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
 
-**Branche `v4` active.** Phase V4-0 (refacto préalable) codée et validée manuellement : occupation du planning par plage de créneaux (`taskSlotRange`/`taskOccupiesSlot`), variable CSS `--color-accent` injectée depuis `Settings.ambiance_color`. B1 tranché et codé : la couleur d'ambiance s'applique à tous les boutons utilisant le bleu clair de base (périmètre large, pas seulement les 2 boutons initialement cités). Phase V4-1 (Quick wins UI) entamée.
+**Branche `v4` active.** Phase V4-0 close (occupation du planning par plage de créneaux, variable CSS `--color-accent`). B1, E2, E8, E9 tranchés. Phase V4-1 (Quick wins UI) codée intégralement (B1, D2, E7, D4) mais gate non clos : le test manuel a révélé deux écarts à corriger — B3 (le retour depuis l'écran de création de tâche ne renvoie pas toujours vers l'écran d'origine) et B4 (le bouton « Mode surcharge » doit ouvrir une modale d'explication au lieu d'un texte inline).
 
 Points marquants restants de la roadmap V4 : case de planning entièrement colorée avec case à cocher ; tâches sur plusieurs créneaux ; tâche « Reporter » repensée pour ouvrir un choix de créneau vide plutôt qu'avancer automatiquement au lendemain ; déplacement tactile (appui long + glisser) d'une tâche planifiée ; sous-tâches planifiables indépendamment tout en restant visuellement rattachées à leur parent. Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
 
-Tests unitaires verts (382), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 (état V3).
+Tests unitaires verts (383), `tsc -b` clean, e2e Playwright 44/44 (état V3, non retesté depuis les changements V4-0/V4-1).
 
 ## Stack
 
@@ -62,7 +62,7 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 
 ## Prochaine étape
 
-Terminer la Phase V4-1 (Quick wins UI) : libellés « maintenant », indicateur surcharge visible/grisé hors surcharge, ne pas proposer « planifier » depuis Todo. Quatre questions restent à trancher avec Marie, chacune bloquant sa phase respective — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
+Corriger B3 (retour depuis l'écran de création de tâche) et B4 (modale d'explication du mode surcharge), repasser le test manuel de la Phase V4-1 (`validation_manuelle.md`), puis clore le gate et démarrer la Phase V4-2. Seule E3 (module budget) reste à trancher avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

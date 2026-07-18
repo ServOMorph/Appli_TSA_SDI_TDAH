@@ -94,11 +94,15 @@ export function E21CreateTaskV2() {
     createList,
     selectList,
     startPlanTask,
+    taskCreateOrigin,
   } = useApp()
   const [title, setTitle] = useState('')
   const [destination, setDestination] = useState<Destination | null>(null)
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
+  const destinations = taskCreateOrigin === 'inbox'
+    ? DESTINATIONS.filter((d) => d.value !== 'planned')
+    : DESTINATIONS
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -176,7 +180,7 @@ export function E21CreateTaskV2() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
           <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Que faire de cette tâche ?</p>
-          {DESTINATIONS.map((d) => (
+          {destinations.map((d) => (
             <button
               key={d.value}
               type="button"

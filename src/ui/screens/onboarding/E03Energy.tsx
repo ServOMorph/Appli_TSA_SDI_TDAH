@@ -39,9 +39,9 @@ export function E03Energy() {
       <div>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
           <BatteryIcon size={24} />
-          Votre énergie aujourd'hui
+          Votre énergie maintenant
         </h1>
-        <p>Combien d'énergie avez-vous aujourd'hui ?</p>
+        <p>Combien d'énergie avez-vous maintenant ?</p>
       </div>
       <div
         style={{

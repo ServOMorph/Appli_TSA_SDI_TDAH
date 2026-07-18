@@ -60,6 +60,7 @@ export function E20Inbox() {
     startPlanTask,
     moveTodoTaskToList,
     createList,
+    setTaskCreateOrigin,
   } = useApp()
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
   const [newListName, setNewListName] = useState('')
@@ -189,7 +190,13 @@ export function E20Inbox() {
         </div>
       )}
 
-      <Button fullWidth onClick={() => goTo('task-create-v2')}>
+      <Button
+        fullWidth
+        onClick={() => {
+          setTaskCreateOrigin('inbox')
+          goTo('task-create-v2')
+        }}
+      >
         Ajouter une tâche
       </Button>
 

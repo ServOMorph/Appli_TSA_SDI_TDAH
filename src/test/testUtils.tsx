@@ -25,6 +25,8 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     selectTask: vi.fn(),
     taskDetailOrigin: null,
     setTaskDetailOrigin: vi.fn(),
+    taskCreateOrigin: null,
+    setTaskCreateOrigin: vi.fn(),
     createUser: vi.fn().mockResolvedValue(undefined),
     completeOnboarding: vi.fn().mockResolvedValue(undefined),
     saveTodayEnergy: vi.fn().mockResolvedValue(undefined),

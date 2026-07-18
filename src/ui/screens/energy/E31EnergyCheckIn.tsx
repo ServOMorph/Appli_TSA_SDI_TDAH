@@ -53,9 +53,9 @@ export function E31EnergyCheckIn() {
       <div>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
           <BatteryIcon size={24} />
-          Mon énergie aujourd'hui
+          Mon énergie maintenant
         </h1>
-        <p>Combien d'énergie avez-vous aujourd'hui ?</p>
+        <p>Combien d'énergie avez-vous maintenant ?</p>
       </div>
       <div
         style={{

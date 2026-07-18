@@ -42,11 +42,13 @@ Gate : [x] tests verts · [x] test manuel · [x] doc · [x] sortie : `tsc -b` cl
 ## Phase V4-1 — Quick wins UI
 
 - [x] B1 — Boutons primaires sur `--color-accent` (`src/ui/components/Button.tsx:11-15` ; vérifier `BottomNav.tsx:74`, `E60Lists.tsx:231`, `E20Inbox.tsx:192`, `E24Today.tsx:100`) — périmètre tranché par Marie : tous les boutons utilisant le bleu clair de base (`Button`, `BottomNav`, `E120Resources`, `E31EnergyCheckIn`, `E03Energy`, `E21CreateTaskV2`, `E40Planning`)
-- [ ] D2 — « aujourd'hui » → « maintenant » (`E31EnergyCheckIn.tsx:56,58` ; aligner `E30EnergyView.tsx`, `E03Energy.tsx`)
-- [ ] E7 — Indicateur surcharge affiché aussi hors surcharge, grisé et cliquable (explication du mode) ; coloré quand actif (`src/ui/components/TopBar.tsx:16-28,56-65,131-135`)
-- [ ] D4 — Ne pas proposer « planifier » à l'ajout depuis Todo (`E20Inbox.tsx:192`, `E21CreateTaskV2.tsx`)
+- [x] D2 — « aujourd'hui » → « maintenant » (`E31EnergyCheckIn.tsx:56,58` ; aligné `E30EnergyView.tsx`, `E03Energy.tsx`)
+- [x] E7 — Indicateur surcharge affiché aussi hors surcharge, grisé et cliquable (explication du mode) ; coloré quand actif (`src/ui/components/TopBar.tsx`)
+- [x] D4 — Ne pas proposer « planifier » à l'ajout depuis Todo (`E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `taskCreateOrigin` dans `AppContext.tsx`)
+- [ ] B3 — Retour depuis l'écran de création de tâche (`E21CreateTaskV2.tsx`) toujours vers Todo (`inbox`) au lieu de l'écran d'origine (ex. accueil) — réutiliser `taskCreateOrigin` (ajouté pour D4) pour le bouton Retour
+- [ ] B4 — Bouton « Mode surcharge » (E7) : le clic doit ouvrir une modale d'explication détaillée avec bouton Fermer, au lieu du paragraphe inline actuel, dans les deux états (actif/inactif) (`src/ui/components/TopBar.tsx`)
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : couleur d'ambiance suivie par les boutons, indicateur surcharge présent dans les deux états
+Gate : [x] tests verts (383/383) · [~] test manuel (D2/E7 déclenchement/D4 validés le 2026-07-19 ; B3/B4 en attente) · [ ] doc · [ ] sortie : couleur d'ambiance suivie par les boutons, indicateur surcharge présent dans les deux états
 
 ---
 
@@ -94,12 +96,19 @@ Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une sous-é
 
 ---
 
+## Q tranchées (2026-07-18, suite)
+
+- **E2** — chevauchement de plage : sélection bloquée si un créneau intermédiaire est déjà occupé. Coût énergétique : compté une seule fois par tâche (pas par créneau).
+- **E8** — confirmé : « Reporter » ouvre le choix d'un créneau vide dans le planning (réutilise le flux E6), remplace l'avance automatique au lendemain.
+- **E9** — sous-tâche planifiée reste rattachée au parent (une seule entité, pas de promotion en `TaskV2` indépendante avec `parent_task_id`).
+
 ## Q à trancher
 
-- **E2** — chevauchement de plage + comptage du coût (une fois vs par créneau) : bloque V4-3 (E2b/E2c).
-- **E8** — confirmer le passage de « report automatique au lendemain » à « choix d'un créneau vide » : bloque V4-4 (E8).
-- **E9** — sous-tâche rattachée au parent ou tâche indépendante avec `parent_task_id` : bloque V4-5 (E9a) et sa migration.
 - **E3** — cadrage produit complet requis : bloque toute mise en chantier.
+
+## Divers (hors phases)
+
+- [ ] Faire le ménage à la racine du projet.
 
 ## Reporté hors V4
 

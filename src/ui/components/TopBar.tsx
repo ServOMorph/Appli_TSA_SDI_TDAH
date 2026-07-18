@@ -22,7 +22,7 @@ function overloadButtonStyle(active: boolean): React.CSSProperties {
     fontSize: '0.875rem',
     fontWeight: 600,
     color: active ? '#fff' : 'var(--color-text-muted)',
-    cursor: active ? 'pointer' : 'default',
+    cursor: 'pointer',
     flexShrink: 0,
   }
 }
@@ -53,16 +53,14 @@ export function TopBar({
         <div
           style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', flexShrink: 0 }}
         >
-          {overloadActive && (
-            <button
-              onClick={() => setShowOverloadInfo((v) => !v)}
-              aria-expanded={showOverloadInfo}
-              aria-label="Détail du mode surcharge"
-              style={overloadButtonStyle(overloadActive)}
-            >
-              Mode surcharge actif
-            </button>
-          )}
+          <button
+            onClick={() => setShowOverloadInfo((v) => !v)}
+            aria-expanded={showOverloadInfo}
+            aria-label="Détail du mode surcharge"
+            style={overloadButtonStyle(overloadActive)}
+          >
+            {overloadActive ? 'Mode surcharge actif' : 'Mode surcharge'}
+          </button>
           {!overloadActive && (
             <>
               <button
@@ -128,9 +126,11 @@ export function TopBar({
           )}
         </div>
       </div>
-      {overloadActive && showOverloadInfo && (
+      {showOverloadInfo && (
         <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          {plannedCost} énergie planifiée pour {energyValue} disponible aujourd'hui.
+          {overloadActive
+            ? `${plannedCost} énergie planifiée pour ${energyValue} disponible aujourd'hui.`
+            : "Le mode surcharge s'active automatiquement quand l'énergie planifiée dépasse l'énergie disponible."}
         </p>
       )}
       {!overloadActive && (

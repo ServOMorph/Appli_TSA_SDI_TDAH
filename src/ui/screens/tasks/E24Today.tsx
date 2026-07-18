@@ -24,7 +24,7 @@ const backBtnStyle: React.CSSProperties = {
 }
 
 export function E24Today() {
-  const { todayTasks, todaySubTasksMap, selectTask, goTo, moveTask, completeTask } = useApp()
+  const { todayTasks, todaySubTasksMap, selectTask, goTo, moveTask, completeTask, setTaskCreateOrigin } = useApp()
 
   function openDetail(taskId: string) {
     selectTask(taskId)
@@ -97,7 +97,13 @@ export function E24Today() {
         </div>
       )}
 
-      <Button fullWidth onClick={() => goTo('task-create-v2')}>
+      <Button
+        fullWidth
+        onClick={() => {
+          setTaskCreateOrigin('today')
+          goTo('task-create-v2')
+        }}
+      >
         Ajouter une tâche
       </Button>
     </main>

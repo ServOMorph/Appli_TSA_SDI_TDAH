@@ -1,3 +1,13 @@
+## v4.0 — 2026-07-18
+
+### Contexte
+Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, intégralement close) archivé dans `Archives/`.
+
+### Ajouté
+- Analyse de la visio Marie du 2026-07-16 : `Note de réunion/2026-07-16/constats_2026-07-18.md` (17 constats). Répond aux 4 points V3 en attente (Reporter, fréquence check-in, bouton surcharge, sous-tâches).
+- Roadmap V4 (`roadmap_v4.md`, racine, 6 phases V4-0 à V4-5), supersédant le brouillon du 2026-07-13 — ordre des phases revu (multi-créneaux/récurrence avant interactions sur une tâche), retrait de « Répéter demain » regroupé avec son remplaçant. Aucune phase codée.
+- Branche `v4` créée depuis `v3` et activée.
+
 ## v3.16 — 2026-07-13
 
 ### Ajouté

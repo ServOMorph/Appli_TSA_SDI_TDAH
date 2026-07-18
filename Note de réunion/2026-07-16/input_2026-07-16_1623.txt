@@ -1,0 +1,399 @@
+Raphael : Voilà c'est bon ok est ce que tu peux me reparler donc ce que tu me parlais la dernière fois
+Interlocuteur : Merci
+Interlocuteur : Alors que quand on change dans les paramètres, quand on change la couleur de l'appli
+Interlocuteur : Il faut que ça change aussi dans le...
+Raphael : Oui
+Interlocuteur : Il y avait des trucs où la couleur, elle ne changeait pas. C'était pour ajouter une tâche.
+Interlocuteur : d'accueil et d'en tout doux aux nouvelles listes quand on va dans l'onglet liste
+Raphael : Oui. Oui.
+Raphael : d'accord tu voudrais que toutes ces couleurs elles changent aussi d'accord ça marche c'est noté
+Interlocuteur : après tout doux se sécrite et au plus loin des eaux
+Raphael : ça marche
+Interlocuteur : c'est bon ensuite
+Raphael : Oui
+Interlocuteur : de pouvoir déplacer manuellement les cases par exemple si
+Interlocuteur : On veut le décaler au lendemain, ou à la veille, ou non la veille du coup non mais au lendemain ou dans la journée on veut le décaler de...
+Interlocuteur : qu'on puisse y voir, rester appuyé dessus et qu'on puisse le déplacer si on le déplace.
+Raphael : Dans planning, hein, tu parles. D'accord.
+Interlocuteur : Voilà et ensuite qu'on puisse ajouter une, enfin en fait que quand on ajoute une taille
+Interlocuteur : on puisse définir aussi du couleur de faim et pour ça on cliquerait sur une première tâche.
+Interlocuteur : de quand on veut commencer donc le premier créneau si par exemple c'est de 11h à 15h on clique sur le premier créneau de 11h
+Interlocuteur : aux heures à heure et demie et ensuite on devrait devoir cliquer une deuxième fois pour sélectionner
+Interlocuteur : la fin de la tâche tu vois donc par exemple on clique sur l'heure de 14h30 à 15h et du coup
+Interlocuteur : En ce moment là, ça t'aimait de 11h00 à 15h00, toutes les cases entrent, ça t'aimait en couleur aussi.
+Interlocuteur : voilà et que si jamais par exemple on veut juste planifier de
+Raphael : D'accord, c'est noté.
+Interlocuteur : 11h à 11h30, et bien on clique du coup deux fois sur la même case, on prend
+Raphael : D'accord. D'accord.
+Interlocuteur : T'as compris ou pas ? Voilà.
+Raphael : Ouais ouais c'est bon
+Interlocuteur : J'en profite pour te dire aussi dans les casques concernant le planning, moi je dirais plutôt vraiment la case, la case entière qui de...
+Interlocuteur : de couleur et à la limite, tu l'enlèves, répétez demain, tu l'enlèves.
+Interlocuteur : Parce que tu as changé, tu sais, quand maintenant on a ajouté une tâche, quand tu fais une tâche dans le planning, il y a un premier acteur qui...
+Interlocuteur : s'affiche avec le nom de la tâche, une deuxième pour où il y a écrit terminer et une autre où il y a écrit répéter demain.
+Interlocuteur : Ben enlever répéter demain parce que c'était pas trop comme ça que je le voyais et du coup
+Interlocuteur : en sorte qu'en fait ce soit juste toute la case qui devienne colorée avec écrit à l'intérieur le nom de la tâche
+Interlocuteur : Et pour quand c'est terminé, pourquoi pas juste une petite bulle à cocher quand c'est fini. Et dans ces cas-là, une fois qu'on coche cette petite ca...
+Interlocuteur : Ça devient en couleur plus intense.
+Raphael : d'accord donc pour voir si j'ai bien compris, juste une petite code
+Raphael : à côté du nom de la tâche dans le planning et quand on appuie dessus, elle change la couleur.
+Interlocuteur : Non, non, elle est en plus claire à la base.
+Raphael : plus clair pour dire que c'est terminé.
+Interlocuteur : et elle devient plus foncée quand on la coche et du coup ce que je voulais dire aussi
+Raphael : D'accord, ça marche.
+Interlocuteur : c'était que ce soit toute la case du planning qui devienne colorée quand on ajoute une tâche pas que ce soit
+Interlocuteur : dans la case qui est un... comment... enfin faut pas que ce soit dans la...
+Interlocuteur : qui est un autre carré coloré, tu vois, c'est vraiment dans le...
+Raphael : Oui
+Interlocuteur : toute la casque qui devient en couleur. Je capte. Voilà.
+Raphael : D'accord. Oui.
+Interlocuteur : Donc ça, et du coup, pour remplacer, répéter demain.
+Interlocuteur : mon idée elle était plutôt que quand on fasse ajouter une tâche
+Interlocuteur : donc on va faire ajouter une tâche par exemple, faire du vélo juste là, et ben...
+Interlocuteur : Ça va nous proposer de cliquer sur une caisse du planning pour choisir là où on veut le planifier. On est d'accord ?
+Raphael : Oui
+Interlocuteur : Et bien dans l'idée, c'est ce que je t'avais dit la dernière fois, mais tu l'as pas fait ou peut-être t'avais pas compris de la même manière que ce que j'ai dit.
+Interlocuteur : En gros de faire en sorte que quand on n'est pas sorti de la page du planning donc on a cliqué
+Interlocuteur : une première fois sur une case, par exemple, faire du vélo, on clique sur la case 11h, 11h30. Et bien, si par exemple, on clique sur la case...
+Interlocuteur : 15h-16h, enfin 15h-15h30, ça rajoute encore la tâche faire du vélo que en fait
+Interlocuteur : à chaque fois qu'on clique sur une case, ça va ajouter la tâche qu'on est en train de ajouter au planning en fait, et comme ça c'est pareil.
+Raphael : d'accord
+Interlocuteur : je vais mettre macdo je vais juste écrire macdo et je vais aller sur le lundi je vais cocher les cases là où j'ai macdo je vais tourner
+Interlocuteur : page mardi je vais cliquer sur toutes les cases de macdo tu vois et à chaque fois dès qu'on clique sur une casse on nous demande de cliquer sur une deuxième
+Interlocuteur : pour définir la fin, pour pas être obligé de cliquer sur toutes les cases. Tu vois on sélectionne juste la première la dernière et automatiquement.
+Interlocuteur : ça les met toutes, tu comprends, à la limite ça peut...
+Raphael : Oui carrément
+Interlocuteur : Si ça prend plusieurs cases, ça les unifie de sorte à ce qu'il écrit qu'une seule fois à McDo, par exemple, et que ça fasse du...
+Raphael : Oui.
+Interlocuteur : On casse.
+Raphael : d'accord donc en fait on aurait pu on verrait plus les lignes des autres
+Interlocuteur : c'est ça
+Raphael : mais on verrait un grand rectangle coloré avec marqué Magdo par exemple.
+Interlocuteur : voilà et que du coup on puisse continuer à rajouter cette tâche à l'infini
+Raphael : Ok, ça marche, c'est noté.
+Interlocuteur : qu'on n'ait pas sorti du planning pour ajouter cette tâche justement.
+Raphael : c'est noté
+Interlocuteur : Ok ensuite donc ça c'est ce qu'on avait fait déjà la dernière fois et j'ai rajouté quelques petites choses
+Interlocuteur : qu'on n'avait pas eu le temps. Ensuite, quand on rentre dans l'application, ça nous dit combien d'énergie avez-vous aujourd'hui ?
+Interlocuteur : Et bien il faudrait remplacer le mot aujourd'hui par maintenant parce qu'en fait
+Raphael : oui d'accord
+Interlocuteur : C'est pas forcément dans la journée, c'est juste maintenant qu'on n'y avait pas d'énergie. Sinon, on pourrait prendre ça en mode...
+Raphael : d'accord
+Interlocuteur : globalement aujourd'hui vous avez combien d'énergie alors que l'idée c'est vraiment maintenant combien il t'en reste en fait
+Interlocuteur : Voilà ensuite Ah oui
+Raphael : Ok, c'est noté.
+Interlocuteur : Alors j'ai vu le mode surcharge pendant que tu l'as fait, alors c'est très, très bien. Il passe, je l'ai testé, j'ai essayé de mettre des actions.
+Interlocuteur : qui me demandait plus d'énergie qu'est ce que j'avais etc et ça marche bien et tout. J'adore l'idée et juste
+Interlocuteur : Ce qui pourrait être intéressant, c'est que quand il n'est pas activé, j'ai remarqué qu'il ne figure pas sur l'accueil, tu vois ?
+Raphael : oui
+Interlocuteur : il apparaît que quand il est activé. Moi, je verrai bien qu'il apparaît aussi sur l'accueil quand il est inactivé.
+Interlocuteur : mais du coup je crois que c'est en orange qui s'affiche quand il est activé ou un truc comme ça et ben
+Interlocuteur : qui s'affiche pas en couleur quand il n'est pas activé, mais qui soit quand même là.
+Raphael : En jaune, en jaune, ouais.
+Interlocuteur : de sorte, est-ce qu'on puisse cliquer sur ce truc et que quand on clique dessus, ça nous explique c'est quoi le mode sur...
+Interlocuteur : charge. C'est ce que je veux dire? Voilà, comme ça il est actif.
+Raphael : D'accord. Oui.
+Interlocuteur : il soit lié, on clique dessus, ça nous explique ce que c'est. Et quand il est activé, on peut toujours cliquer dessus pour les...
+Interlocuteur : voir ce que c'est mais juste il apparaît du coup en coloré et on sait qu'il a activé.
+Raphael : D'accord.
+Interlocuteur : C'est good. Ensuite, ça, c'est juste un truc...
+Raphael : c'est good
+Interlocuteur : j'ai bien aimé, c'est quand on est sur le planning, le créneau dans lequel on se situe, il apparaît en grisé.
+Interlocuteur : Et bah j'adore, voilà. Non, je le dis comme ça s'il y a un moment donné...
+Raphael : Oui. Oh bah c'est super, merci Marie.
+Interlocuteur : ça sert à rien, ben au moins tu sais que je sais pas si tu voudrais l'enlever pour exagérer que ce soit saison, mais tu sais que ça j'aime bien.
+Raphael : c'est super
+Interlocuteur : Voilà, j'aime bien ça permet de visualement très vite surporer où est-ce qu'on est.
+Raphael : Sous-titres réalisés par la communauté d'Amara.org
+Interlocuteur : à pop-up. C'est très bien. Ensuite, ah oui, j'ai remarqué aussi que quand on a...
+Interlocuteur : une tâche, et bien si on veut la modifier ou quoi après, on ne peut pas pour la supprimer ou la modifier, on ne peut plus.
+Interlocuteur : Donc du coup il faudrait par exemple pouvoir cliquer dessus et que ça nous propose par exemple
+Raphael : oui
+Interlocuteur : soit de la déplacer du coup est ce que je te disais tout à l'heure et comme ça du coup on peut déplacer les trucs soit de la supprimer
+Interlocuteur : soit de la renommée ou comme ça tu vois il pourrait y avoir des plusieurs propositions pour pouvoir modifier si on a besoin.
+Interlocuteur : ou tu vois, et carrément fort à la supprimer aussi.
+Raphael : D'accord.
+Interlocuteur : Voilà ensuite
+Raphael : OK, c'est noteux.
+Interlocuteur : Ah oui, euh... Un moment donné, il y a...
+Interlocuteur : affichage qui bug quand j'aimais un truc que j'avais ajouté une tâche dans le planning du jour et c'était sur aujourd'hui et donc
+Interlocuteur : dans la page d'accueil, ça m'a fiché ma tâche, et ça a sorti du cadre, le terminer.
+Interlocuteur : répéter à deux mains, tu sais, il y a les deux petites rétournées, mais bon là du coup tu vas changer, je pense qu'il y aura plus de soucis.
+Raphael : Oui
+Raphael : D'accord. Puisqu'on va enlever le bouton répété demain, a priori on aura plus le souci.
+Interlocuteur : Voilà ensuite pareil le fait de quand on a mis une tâche et qu'il y a l'option décomposer
+Raphael : oui
+Interlocuteur : ça me plaît bien, j'aime bien. Voilà, ça c'est un truc qui n'a pas changé justement.
+Raphael : D'accord.
+Interlocuteur : Ah oui et je me posais la question pour l'étage du jour quand elle...
+Interlocuteur : sont terminées, elles disparaissent. Est-ce qu'on ne ferait pas le même système ou du coup ça apparaît par exemple en coloré aussi quand c'est terminé?
+Raphael : Est-ce que tu peux préciser dans le tâche du jour ?
+Interlocuteur : faire le même mécanisme que pour le planning en fait par exemple ça les après ça peut être
+Interlocuteur : elle peut rester en blanc quand elle est un peu importe, on peut la mettre en rose, enfin en couleur claire.
+Interlocuteur : quand elle est planifiée, quand elle est faite, elle s'intensifie en couleur pas lourde.
+Raphael : Qu'est-ce que ça t'apporte ?
+Raphael : de voir la tâche du jour terminer.
+Interlocuteur : Bah c'est qu'en fait ça montre aussi du coup tout ce qu'il y a été fait, parce que c'est très des trucs à faire mais tu t'aimes deux trucs à faire et tu vois...
+Interlocuteur : On a déjà fait cinq ou six, c'est beaucoup plus agréable que si ça disparaît comme si ça n'avait jamais existé. Il y a moins la satisfaction.
+Raphael : Oui
+Interlocuteur : Quoi
+Raphael : C'est de la valorisation personnelle en fait. D'accord, c'est noté.
+Interlocuteur : Et puis, visuellement, ce satisfaisant est de venir cocher, et donc en fait, si ça a disparaît, il n'y a plus la satisfaction de le voir cocher.
+Interlocuteur : Je vais attendre juste une seconde.
+Raphael : Ok.
+Interlocuteur : Et voilà.
+Interlocuteur : Ah oui et quand je vais dans tout doux et que je fais ajouter une tâche
+Interlocuteur : Ça me propose de le mettre à planifier, ça me fait toutes les propositions, mais du coup il n'y a pas besoin.
+Interlocuteur : puisqu'on clique sur ajouter une dash à partir de l'onglet Tudu. Ça veut dire qu'on veut le mettre dans Tudu.
+Interlocuteur : Attends, deux secondes, il y a Kévin qui m'appelle parce qu'il m'a acheté un truc, je te mets en pause, allez.
+Raphael : Vas-y.
+Interlocuteur : Ah, bah attends, je suis revenue, mais je sais pas si c'était volontaire.
+Interlocuteur : Faut qu'il y ait une capteur plus.
+Interlocuteur : Merci Ce qui doit me dire combien je lui dois parce qu'il a besoin du virement avant
+Interlocuteur : de payer ce qu'il y a du monde.
+Interlocuteur : Bon, on va être un petit peu rapé, non ?
+Interlocuteur : Ouais du coup, c'était bon ce que j'ai dit en dernier là.
+Interlocuteur : qu'il ne faut pas que ça représente et ensuite moi je verrai bien
+Raphael : Oui
+Interlocuteur : aussi, alors avoir après, pourquoi pas par exemple, avoir
+Interlocuteur : un anglais au lieu de mettre l'anglais tout doux en bas
+Interlocuteur : Et bien, au lieu de mettre Tudou, ça pourrait s'appeler organisation ou...
+Raphael : Oui
+Interlocuteur : notre truc je sais pas si tu trouves une meilleure idée mais et que à l'intérieur par exemple il puisse y avoir des listes mais des listes spécificales
+Interlocuteur : par exemple, pas forcément du coup des listes mais par exemple pour les courses tu vois pour gérer les courses
+Interlocuteur : la liste des courses, la gestion des budgets aussi, tu vois, pour pouvoir, par exemple, moi, pour mon budget.
+Interlocuteur : je me magnifie à la semaine. Ah, attends, il y a Kirin qui me rappelle. J'arrive.
+Raphael : vas-y
+Interlocuteur : Merci beaucoup.
+Raphael : Ok.
+Interlocuteur : Oup, oup, oup, oup
+Raphael : Tu t'es en train de me dire que...
+Raphael : le tout d'où on l'a remplacé par des listes définies comme course, comme budget.
+Interlocuteur : voilà parce qu'en fait du coup moi l'idée c'est serait de faire un
+Interlocuteur : Pour mes comptes, par exemple, je planifie mes dépenses à faire au mois et mes dépenses...
+Interlocuteur : aussi par exemple par semaine, combien je me mets par semaine pour les courses, pour le ci, pour le là, tu vois, et du coup ce serait une application où ce serait pas si...
+Interlocuteur : parce que là j'utilise mes notes, parce que dans les applications c'est que des trucs trop complexes en fait et du coup il faudrait un truc juste ça.
+Raphael : Alors, est-ce que tu peux définir qu'est-ce que tu aurais besoin par rapport à...
+Interlocuteur : Eh ben alors attends, c'est quoi, j'ai carrément fondu un truc sous mes yeux.
+Raphael : cette fonction de comptabilité.
+Interlocuteur : C'est que voilà, moi, j'ai...
+Interlocuteur : j'ai un tableau, en fait j'ai deux trucs, ce que je dépense au moins
+Interlocuteur : Est-ce que je dépense à la semaine ? Ce qui pourrait être intéressant, on va voir après.
+Interlocuteur : j'ai mes dépenses au mois c'est pour le sheet je me mets un certain nombre de dépenses dans le mois
+Interlocuteur : Pourquoi pas à la semaine parce qu'en général vu que je prends pour plusieurs, enfin quand je touche c'est pas que pour une semaine.
+Interlocuteur : je peux pas me mettre des frais à la semaine, c'est trop chiant, du coup ça c'est au mois. Pareil pour la santé, je me mets 30 euros de coups.
+Interlocuteur : pour la santé soit si j'ai besoin d'acheter ma pilule soit si je dois aller chez le médecin pour je ne sais quelle raison j'y vois là je
+Interlocuteur : Je prévois aussi 30 euros pour ma box, 30 euros pour la salle et 5 euros pour mon forfey cloud.
+Interlocuteur : Donc voilà, donc l'idée, ce serait pouvoir avoir par exemple, je ne sais pas, deux parties quand je rentre dans mes comptes.
+Interlocuteur : peut avoir la partie au mois, la partie à la semaine, ça peut être déterminé par la personne, tu vois, c'est la personne qui peut choisir si elle veut me faire.
+Interlocuteur : moi à la semaine et ce que je vais faire que au moins que à la semaine et ensuite dans ma
+Interlocuteur : qu'est ce que j'ai, j'y ai courses, 60 euros je me prévois et plaisir 50 balles.
+Interlocuteur : voilà la semaine et du coup l'idée ce serait de pouvoir ajouter par exemple mais quand on fait une dépense tu vas hop sur ton application
+Interlocuteur : sur le truc d'accueil, il pourrait y avoir direct un truc en raccourci pour genre dès que tu fais une dépense, tu vois, tu cliques sur ta dépense et après ça
+Interlocuteur : te demandent mais dans quoi tu veux le prendre, est-ce que tu veux le prendre en course, que tu veux prendre en plaisir, tu vois, et comme ça, ça te le sous-strait.
+Interlocuteur : directement, ça t'affiche combien il te reste et par exemple pour créer ça, comment on fait par exemple
+Interlocuteur : tu sélectionnes est ce que tu veux le faire au mois, à la semaine, par exemple tu as un truc à cocher, tu peux en cocher plusieurs.
+Interlocuteur : peut-être à l'année, ou alors tous les jours, tous les deux jours, on ne sait rien. Peut-être des personnes qui veulent se mettre en budget par jour, peut-être.
+Interlocuteur : et du coup on sélectionne ça et après ça nous demande de rentrer des catégories
+Interlocuteur : là par exemple dans à la semaine je rentrerai course et plaisir au moins je rentrerai cheat santé et ces fermes
+Interlocuteur : et à l'alignée, ce sera intéressant. Du coup après, tous les mois, combien j'ai de salaires?
+Interlocuteur : et bien j'ai tant, et puis ensuite quand on rentre du coup par exemple si dans course je mets soit
+Interlocuteur : 60 euros de budget, ça me déduise les 60 euros de mon salaire, de ce que j'ai mis de revenus.
+Interlocuteur : pour continuer à disparaître, tu vois.
+Raphael : D'accord. Et donc toi, tu aurais besoin d'une bl...
+Interlocuteur : Non, juste par semaine et par mois.
+Raphael : d'une planification, on va dire, par jour, par semaine et par mois. C'est ça ? Pas par jour.
+Interlocuteur : Au revoir.
+Raphael : Bon, on va faire pour toi l'appli, donc on va faire par semaine et par mois.
+Raphael : on verra après pour faire des fonctionnalités plus étendues ok donc ce que j'entends c'est qu'on pour
+Interlocuteur : Oui
+Raphael : remplacer le todo qui ne sert pas actuellement par compta par exemple ou budget
+Interlocuteur : Non, l'idée c'est qu'en fait dans cette page on est à accès, ce soit une autre ouvrique qui vient...
+Interlocuteur : par exemple, parce que là on a une rublie d'organisation, de planification, tu vois.
+Raphael : Ouais
+Interlocuteur : Et on a les listes, mais les listes, c'est pas vraiment là.
+Raphael : C'est bon.
+Interlocuteur : l'organisation, les listes.
+Raphael : Et quand tu me parlais de courses, les courses elles peuvent être inclus dans les listes puisque tu crées une nouvelle.
+Interlocuteur : On fait dans l'idée
+Raphael : liste course par exemple, tu la crées et ta liste course c'est les crées tu vois.
+Interlocuteur : c'est que dans les courses, il y a deux parties en fait, j'aimerais faire une liste de courses un peu particulières. C'est pour ça que la sortie...
+Raphael : Dis-moi.
+Interlocuteur : de la liste. Mais je t'en parlerai après, on va finir d'abord sur les comptes, mais du coup, dans l'idée, ce serait que...
+Raphael : D'accord.
+Interlocuteur : A la place de Tudou, on met une autre rubrique qui pourrait être organisation ou un autre mot je ne sais pas parce qu'en soit le planning c'est aussi...
+Interlocuteur : de l'organisation. Et comme ça, dans cette rubrique, en fait tout douce, ça deviendrait une sous-partie de cette rubrique.
+Interlocuteur : c'est à dire que quand on clique du coup dans orga on va avoir tout doux donc ça c'est une liste pareil
+Interlocuteur : de choses à faire. Et là, par exemple, ça peut être uniste. On peut mettre des rappels, par exemple.
+Interlocuteur : des choses à faire. Par exemple, pour moi, quand je mets renouveler inscriptions à chien, je me mets une alerte en juin.
+Interlocuteur : Par exemple, tu vois, et au mois de juin, elle s'affichera dans mon accueil, par exemple. Par exemple, ça peut être...
+Interlocuteur : tout d'où en fait ça peut être une liste avec une date bitoire à chaque fois on met une date bitoire et c'est tout et quand on
+Interlocuteur : de la dette bitoire, elle s'approche, elle s'affiche dans la liste, genre une semaine avant, par exemple, pour montrer ça.
+Raphael : Ok, faut qu'on...
+Interlocuteur : Mais tout douce, ça va durer.
+Raphael : pour réclarifier. Le todo ça va devenir orga, par exemple.
+Interlocuteur : de venir une sous-partie de Orga.
+Raphael : D'accord, donc à la place de Tudu sur la panneau d'accueil, on aura marqué Orga.
+Raphael : On va cliquer sur Orga, on va avoir Tudu, on va avoir des listes par...
+Interlocuteur : Ben tout doux, gestion de budget et la liste particulière pour faire les contes.
+Raphael : c'est ça
+Interlocuteur : Voilà et en fait l'idée c'est que la
+Raphael : Alors on aura, ok, tout doux, budget et course.
+Interlocuteur : si par exemple j'estime le nécessaire de rajouter pour que par exemple je garde ce que j'ai fait aussi et ça pour moi en fait
+Interlocuteur : cette rubrique orga, elle servirait à mettre tout ce qui va être. Comme je t'ai dit, moi l'application je verrai vraiment en intérêt dans le fait
+Interlocuteur : elle va tout regrouper. L'idée c'est que parce que ce matin tu vois je cherchais des applis pour les comptes et machins, mais en fait je me disais même si je trouvais...
+Interlocuteur : En fait il y a avoir une appli pour les comptes, une appli pour les courses, une appli pour les planning et tu vois moi l'idée c'est vraiment de tout avoir.
+Interlocuteur : Donc là par exemple, j'ai ça ici, où je planifie mes repas, donc là moi je le fais papier, tout papier.
+Interlocuteur : Et par exemple, pourquoi pas avoir un planning des repas aussi dans cette partie ORGA pour pouvoir...
+Interlocuteur : Après, faire les courses, tu vois, et puis facilement avoir, hop, tu prévois tes repas. Ça peut être une liste des repas.
+Interlocuteur : Ça peut être plein de choses en fait, mais ça peut être des listes créées par nous-mêmes par exemple.
+Raphael : la différence entre ces listes là et les listes qui sont déjà fonctionnelles dans l'application.
+Interlocuteur : Bah c'est qu'en fait ce serait pas forcément une vraie liste mais en tout cas ce serait pas comment appeler ça.
+Interlocuteur : Mais en tout cas, ce serait une rubrique dans lequel qui serait exprès pour faire les repas. Ce serait une rubrique spécialisée en fait.
+Raphael : D'accord, c'est...
+Raphael : ce n'est pas des listes mais c'est des outils en fait donc on développerait plein d'outils dans cette
+Interlocuteur : Voilà. Et on peut l'appeler outil, alors au lieu de hors-garde.
+Raphael : dans cet orga d'accord on l'appelle outil
+Interlocuteur : Attends, deux secondes, il y a Kéline qui me rappelle, je te remets en pause deux secondes.
+Raphael : Ok vas-y
+Interlocuteur : Ouais, du coup oui on peut l'appeler aussi carrément.
+Raphael : Ok, donc on appellera outil et...
+Interlocuteur : Voilà. Et comme ça, ah oui, et dans les comptes...
+Raphael : on mettra tout ce qu'on a dit déjà.
+Interlocuteur : il faudrait aussi qu'il y ait en plus de au mois et à la semaine on pourrait avoir
+Interlocuteur : on pourrait ajouter ça ce serait personnel mais on l'ajouterait manuellement des livrets
+Interlocuteur : des trucs comme ça, moi tu vois c'est mon livret A, mon livret Épargne, mon livret jeune, et bien comme ça on pourrait, ça peut mettre, tu vois, des sous-constants.
+Interlocuteur : aussi là-dedans. Si par exemple je veux ajouter 100 euros à mon livréat, si j'ajoute 100 euros à mon livréat...
+Interlocuteur : m'enlèvera 100 euros de mon salaire parce que je le mets dans mon livretien. En fait, on va tout l'argent qu'on va mettre dans revenus.
+Interlocuteur : dès que l'on va mettre quelque part de l'argent hop ça va l'enlever et quand on va venir mettre qu'on a acheté des kinder
+Interlocuteur : parce que quand on aura dans courses, on pourra faire ajouter une dépense.
+Interlocuteur : acheter, tu mets, bah court ou alors c'est pas moi l'idle intermarché, juste pour pouvoir après se rappeler si jamais on...
+Interlocuteur : voir après si on l'a bien noté et on met combien on a dépensé et ben ça le soustrait direct.
+Interlocuteur : de voilà ici par exemple je veux prendre l'arge et que j'ai pas envie de planifier tout le monde
+Interlocuteur : de budgetiser tout mon revenu pour être large, tu vois qu'en mettant, il y a 50 euros que je suis en mode, je le garde pour si jamais, je me suis trompée dans les cales.
+Interlocuteur : ou machin, ça va continuer d'apparaître en haut. Je sais que j'ai 50 euros de rap si jamais tu vois.
+Raphael : D'accord.
+Interlocuteur : Bonne.
+Raphael : C'est noté. Est-ce que tu avais d'autres commentaires à me faire ?
+Interlocuteur : Non, pour moi c'est tout bon. Ouais.
+Raphael : Non, tu n'as pas... Ok, moi j'ai des questions à te poser.
+Raphael : Donc là c'est pour l'intelligence artificielle qui va analyser, je reviens sur les questions à poser à Marie pour la vision.
+Raphael : euh... 2026 07 13 alors euh...
+Interlocuteur : Oui
+Raphael : Il y avait des questions par rapport quand t'es en mode surcharge
+Raphael : Donc le moteur charge s'active tout seul quand l'énergie n'est pas assez forte.
+Interlocuteur : Oui
+Raphael : pour faire les tâches, il y a... j'ai codé...
+Interlocuteur : Oui, quand on passe à notre surcharge, on peut cliquer sur...
+Raphael : on peut cliquer sur remporter
+Interlocuteur : C'est bien ça.
+Raphael : Voilà, alors ça, ça te convient ?
+Interlocuteur : Ouais mais alors par contre il faudrait que l'eau reportée s'appuie en couleur aussi.
+Interlocuteur : pas la tâche à reporter juste le petit
+Raphael : D'accord, le reporté en couleur, ok.
+Interlocuteur : La petite case m'y a écrit, reportez deux. Tu vas pour le... ...en mode... ...reportes-réros.
+Raphael : D'accord
+Raphael : Ok, alors je vais regarder de mon côté.
+Raphael : D'accord, parce que là...
+Raphael : Pour l'instant, il n'y a rien marqué et reporté, si.
+Raphael : non tu l'avais le bouton reporté toi
+Interlocuteur : Oui je l'ai vu, mais il faut que tu aies une tâche d'activer.
+Interlocuteur : de... non ?
+Raphael : Bon ok parce que moi là je suis en mode sur charge
+Raphael : et je n'ai pas le reporté. J'ai répété demain, j'ai terminé et je n'ai pas le reporté.
+Interlocuteur : Toi qui a mis douche à l'eau toilette, toi qui a mis douche à l'eau toilette
+Raphael : Qu'est-ce qu'il y a ?
+Interlocuteur : C'est moi, c'est moi, c'est moi, c'est moi.
+Raphael : Dans l'appli ? Non, non, non, c'est toi, oui c'est toi.
+Interlocuteur : Ah, c'est toi, mais non, c'était Kevin, ok.
+Raphael : D'accord, ok. D'accord, donc bon, je retraillerai ça à remporter.
+Interlocuteur : Ouais Marie, ouais, et on peut le...
+Raphael : Et en fait, quand on clique sur Reporter, ça ouvre le planning, c'est ça ?
+Interlocuteur : Je vais le reporter.
+Raphael : Et tu reportes et tu replanifies. D'accord. Est-ce qu'on le remet ?
+Interlocuteur : Oui
+Raphael : Parce que l'idée du match sur charge, c'est que tu n'es pas assez de jus pour pouvoir traiter tout, tu vois.
+Raphael : Donc, est-ce qu'on le met dans une section à reprogrammer et tu reprogrammes ?
+Raphael : ou tu le reprogrammes direct.
+Interlocuteur : Mais moi...
+Interlocuteur : Je trouve que c'est intéressant en fait, de quand tu reportes quelque chose, même si tu en m'as surcharge, de te le dire.
+Interlocuteur : Ok, c'est bon, je sais quand est-ce que vous allez le faire, c'est bon, c'est planifié, ça soulage aussi, ça permet aussi d'aider à relâcher tout.
+Interlocuteur : Donc du coup, le fait de le reporter directement, je trouve que c'est bien aussi.
+Raphael : D'accord, on reste là-dessus. On fait comme ça.
+Interlocuteur : Tu vois, tu vas chercher une casse bide dans le planning.
+Raphael : Pardon ? D'accord, ça marche.
+Interlocuteur : Voilà
+Raphael : et puis on verra l'usage, ça marche. J'avais une autre question, c'était le checking energy, là pour actuellement...
+Interlocuteur : Oui
+Raphael : tous les jours ça te demande à chaque fois que tu ouvriras l'appli c'est que je l'écoute
+Interlocuteur : C'est pas à chaque fois que je me connecte
+Raphael : Coder que tous les jours. Non.
+Interlocuteur : Ouais, ouais parce que si par exemple
+Raphael : Est-ce que tu veux vraiment à chaque fois que tu ouvres l'appli ?
+Interlocuteur : Je vous l'applique.
+Interlocuteur : Par exemple, si j'ai prévu des trucs de prévues, je me lève, je suis pas hyper bien.
+Interlocuteur : Mais ça va, je mets, allez, j'ai six d'énergie, tu vois. Ben... Il... ... ... ... ... ... ... ...
+Interlocuteur : Pour l'instant, mais tout le temps, à chaque fois...
+Interlocuteur : et après on verra si je n'en vois à l'usage, on verra à l'usage.
+Raphael : d'accord
+Raphael : Pour la récurrence des tâches, donc j'avais une question mais on l'a traité puisque tu m'as répondu...
+Raphael : que quand tu voulais planifier une tâche, qu'elle reste en mémoire et que quand tu te déplaces...
+Interlocuteur : Hum
+Raphael : sur le planning, tu peux la reprogrammer à un autre endroit, c'est ça, ok?
+Raphael : Cette question tu l'as traité aussi, la question 4 vous tombe mode sur charge dans la barre du haut.
+Raphael : C'est traité et pour les sous-taches
+Raphael : Donc, les sous-tâches c'est quand tu prends une tâche et que tu l'as...
+Interlocuteur : Oui, typiquement, ça peut être annuler le garde marin.
+Raphael : que tu la décomposes
+Interlocuteur : décomposer, appeler parents, appeler qui nous gardent.
+Raphael : d'accord donc là actuellement
+Raphael : vérifier mais je crois que je vais faire une tâche, une tâche du jour je vais la décomposer pour vous
+Raphael : Voilà, ça y est, je l'ai décomposé. Pour l'instant, on ne peut pas les planifier. Les sous-étapes.
+Raphael : que tu veux que c'est sous étapes, on puisse les planifier.
+Interlocuteur : ouais ouais mais alors du coup quand on met des soucis jamais on fait décomposer qu'on met des sous étapes
+Interlocuteur : Dans ces cas-là, il faudrait que ça s'affiche de manière à ce qu'on comprenne, il faudrait que quand on l'attache, elle s'affiche.
+Interlocuteur : Par exemple, un dégâts de marins en gros et en dessous, en plus petit.
+Interlocuteur : avec un petit tiré par exemple ou quelque chose pour qu'on comprenne que c'est une sous tâche appelé parent marin et comme ça la fois d'après
+Interlocuteur : Par exemple, le lendemain, je mets « annulez garde marins » et en dessous, il y aurait écrit « appelez qui nous gardent ».
+Raphael : d'accord
+Interlocuteur : Je sais que je suis en train de travailler pour la tâche à annuler un garde-marin et je vais me focaliser sur ces parties-là.
+Raphael : Sous-titres réalisés par l'Amara.org
+Interlocuteur : Donc oui, c'est pour les planifiés, mais il faut vraiment que ça s'apparaisse en sous tâche, pas que ça apparaisse comme une tâche.
+Raphael : D'accord.
+Raphael : C'est parfait, c'est noté.
+Raphael : Du coup, des petites questions par rapport à l'usage de la version 3, quand on vient de...
+Raphael : Voilà, que tu viens de tester, quand tu planifies une tâche, tu as vu, ça se fait en trois ongles.
+Raphael : C'est à dire il y a le nom, ensuite il y a l'énergie et ensuite...
+Raphael : qu'il y a obligatoire, oui ou non ? Est-ce que ça te convient ?
+Interlocuteur : Oui, c'est bien.
+Raphael : Ok
+Interlocuteur : Après moi je l'aurais vu sinon en un seul anglais ou le deux deux et tu mets deux petites cases
+Interlocuteur : la première case c'est tu vois une seule anglais pour que ça la première case c'est pour les énergies et c'est quand
+Interlocuteur : Clique sur la case que ça fiche, comme si ça s'affichait genre un clavier, tu vois, ça s'affiche les énergies et tout sélectionner.
+Interlocuteur : celle que tu veux mettre et en dessous t'as la case obligatoire et si oui et bien tu la coche la case
+Interlocuteur : et sinon tu ne la coches pas.
+Raphael : donc on regroupe la question obligatoire avec la question de l'énergie
+Interlocuteur : Oui
+Raphael : D'accord, ensuite une autre question, tu as vu j'ai mis une icône de batterie pour l'énergie
+Interlocuteur : Oui
+Raphael : J'ai remplacé parce que c'était des cuillères au début, c'est mieux là à battre.
+Interlocuteur : Bonne journée !
+Raphael : ça va ? Ok
+Interlocuteur : Non, j'ai pas encore trop pu...
+Raphael : Et là, pour l'instant, t'as pas vraiment testé le mode sur charge, j'imagine, puisque t'as pas vraiment testé la plie à fond.
+Interlocuteur : testé mais je pense que la prochaine version les dernières modifs là c'est des des petits détails qui m'empêchent
+Interlocuteur : un peu de tester je pense mais là j'ai peut-être tout voir ouais
+Raphael : Bon, le but c'est qu'on avance tranquillement et que quand tout...
+Interlocuteur : Hum?
+Raphael : tu sens que tu peux vraiment tester l'appli, bah tu me le dises, parce qu'il va y avoir moi de mon côté
+Raphael : que tu vas vraiment l'utiliser, il va falloir que je mette en place le système de sauvegarde de tes données.
+Interlocuteur : Aller
+Raphael : un peu plus, du coup, je travaille un peu plus là-dessus, donc si, par exemple, le prochain...
+Interlocuteur : Oh
+Raphael : je vais te faire la V4, la version 4, tu la regarderas et si tu penses qu'elle est prête
+Raphael : pour être utilisé au quotidien pour toi, à ce moment-là je te ferai une version 4.1
+Raphael : avec la sauvegarde des données.
+Raphael : Ok, est-ce que tu voulais qu'on aborde autre chose par rapport à l'appli ?
+Interlocuteur : je pense que j'ai fait le tour après quand il y avait plein de choses dans ma tête mais je faut faire à mesure parce que je ne peux pas tout faire
+Interlocuteur : dire d'un coup etc donc voilà j'en ai les choses les plus les plus faciles d'accès les plus parce que même pour moi
+Interlocuteur : J'ai dit ça me donne plein plein d'idées donc c'est bien mais du coup il faut quand même que je je ne les donne pas tout d'un coup quoi.

@@ -25,21 +25,13 @@ npm run format     # Prettier
 
 V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur V2-10 : doc V2, déploiement Netlify (test 13.2 mode offline validé). Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
 
-Branche `v3` active. Roadmap V3 (`roadmap_v3.md`, racine), 7 phases (V3-0 à V3-6) — **toutes closes.** Build de production basculé sur `dist/v3` (`vite.config.ts`). V3-3 (check-in + surcharge automatique) : surcharge dérivée de l'énergie du jour vs coût planifié restant (plus de toggle manuel), action « Reporter » sur les tâches non-obligatoires grisées implémentée (replanification automatique au lendemain, même créneau — décision provisoire non validée par Marie, voir `Note de réunion/a demander a Marie.md`), navigation restreinte au Dashboard et au Centre récupération en surcharge (confirmé intentionnel en test manuel).
+Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Build de production sur `dist/v3` (`vite.config.ts`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
 
-**Modale de planification (E1/E2)** refondue en flux 3 étapes séquentielles : nom de la tâche (Valider) → grille de sélection d'énergie 1-12 avec option Passer → choix « Obligatoire ? » (deux boutons Oui/Non, finalisation directe).
+**Branche `v4` créée et active.** Visio Marie du 2026-07-16 : a répondu aux 4 points V3 restés en attente depuis la visio précédente — check-in énergie confirmé à une fois par jour, bouton « Répéter demain » à retirer (remplacé par un ajout de tâche en continu sur le planning), bouton « Mode surcharge » à réintroduire visible/grisé hors surcharge (confirme la demande initiale de Marie, contredite par un retrait du 2026-07-07), sous-tâches planifiables souhaitées avec affichage hiérarchique. Roadmap V4 reconstruite sur cette base (`roadmap_v4.md`, racine, 6 phases V4-0 à V4-5) — **aucune phase codée à ce stade**.
 
-**Phase V3-4** (Planning : couleurs, récurrence) : coût d'énergie affiché sur le planning, cases pastel (couleur d'ambiance configurable dans Accessibilité, `Settings.ambiance_color`) devenant flashy une fois la tâche terminée, bouton « Terminer » ajouté au planning (déjà présent au dashboard), « Planning du jour » du dashboard en cartes pastel comme « Tâche du jour », et récurrence (P6) : bouton « Répéter demain » sur chaque tâche planifiée, qui la duplique au lendemain au même créneau et ouvre directement le jour du duplicata.
+Points marquants de la roadmap V4 : refacto préalable pour propager la couleur d'ambiance aux boutons primaires (`--color-accent`) et supporter les tâches sur plusieurs créneaux ; case de planning entièrement colorée avec case à cocher ; tâche « Reporter » repensée pour ouvrir un choix de créneau vide plutôt qu'avancer automatiquement au lendemain ; déplacement tactile (appui long + glisser) d'une tâche planifiée ; sous-tâches planifiables indépendamment tout en restant visuellement rattachées à leur parent. Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
 
-**Phase V3-5** (Listes) : hiérarchie visuelle entre la vue globale des listes (grosses cases, `E60Lists.tsx` inchangé) et l'intérieur d'une liste (`E61ListDetail.tsx`) — éléments encadrés plus fin/serré (padding `--spacing-xs`, radius `--radius-sm`), titre de la liste encadré du même style que les listes en vue globale.
-
-**Phase V3-6 close** (nav persistante, N1) : `BottomNav` monté une seule fois dans `App.tsx` en position fixe (bottom), affiché sur tous les écrans sauf l'onboarding et le check-in énergie quotidien — onglet actif mis en valeur, pastille rouge Todo conservée, 4ᵉ onglet « Accueil » ajouté pour revenir au Dashboard depuis n'importe quel écran. Test manuel passé intégralement le 2026-07-07 (`plan_test_manuel_v3-6.md`).
-
-**Itérations UI hors phase** (roadmap V3 close) : titre du Dashboard renommé "Appli pour AuDHD" → "AuDHD" ; symbole d'énergie changé de cuillères à batterie (`BatteryIcon`/`BatteryCost`, remplace `SpoonIcon`/`SpoonCost`), affiché sur le Dashboard, le Planning, et désormais aussi sur les 3 écrans de check énergie (`E03Energy.tsx`, `E31EnergyCheckIn.tsx`, `E30EnergyView.tsx`) ; espacement des créneaux du Planning rendu symétrique (haut/bas égaux autour de la case de tâche), créneaux vides alignés sur la même hauteur qu'un créneau occupé ; bouton « Mode surcharge » de la TopBar désormais masqué (au lieu de grisé) hors surcharge — écart avec une demande explicite antérieure de Marie, à reconfirmer.
-
-Tests unitaires verts (374 + ajustements E40Planning), `tsc -b` clean, `eslint` 0 erreur. Tests e2e Playwright : 44/44 verts.
-
-**Visio Marie du 2026-07-13** (écourtée) : roadmap V4 brouillon produite (`Note de réunion/2026-07-13/roadmap_v4.md`) — couleur d'ambiance à propager aux boutons primaires, déplacement tactile des tâches du planning, tâches multi-créneaux. Pas encore promue à la racine ni codée, questions en attente de tranchage avec Marie.
+Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 (état V3, aucun code touché en V4 pour l'instant).
 
 ## Stack
 
@@ -62,15 +54,15 @@ src/
 docs/adr/    — Architecture Decision Records
 _docs/       — Documentation produit (cahier des charges + 6 docs de dev)
 _contexte/   — Contexte de session (protocole vibecoding)
-roadmap_v3.md    — Roadmap V3 active (7 phases, pilotée par tests utilisateurs)
+roadmap_v4.md    — Roadmap V4 active (6 phases, pilotée par tests utilisateurs)
 plan_test_manuel_v3-*.md — Plans de test manuel V3, un par phase
-Archives/        — Roadmaps V1 et V2 archivées
+Archives/        — Roadmaps V1, V2 et V3 archivées
 Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse générés (`/analyse_visio`)
 ```
 
 ## Prochaine étape
 
-Roadmap V3 close. Deux fronts en parallèle : reconfirmer avec Marie le comportement de l'action « Reporter », la fréquence du check-in énergie (une fois par jour vs à chaque ouverture), le rythme du bouton « Répéter demain », et le masquage du bouton « Mode surcharge » hors surcharge — voir `Note de réunion/a demander a Marie.md` et `_contexte/signals.md` — et finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
+Démarrer le codage de la Phase V4-0 (refacto préalable — span de créneaux, variable `--color-accent`) sur la branche `v4`, sous Opus. Cinq questions restent à trancher avec Marie, chacune bloquant sa phase respective sans bloquer le démarrage de V4-0 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : mode offline (13.2), doc V2, déploiement Netlify.
 
 ## Licence
 

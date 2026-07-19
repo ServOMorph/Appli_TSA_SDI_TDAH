@@ -1,0 +1,39 @@
+# Assistant AuDHD
+
+Application web progressive (PWA) et mobile neuroinclusive pour personnes AuDHD (TSA sans déficience intellectuelle + TDAH, 14–40 ans) agissant comme un système externe de fonctions exécutives pour réduire la charge mentale quotidienne.
+
+## Informations principales
+
+- **Stack** : React 19, TypeScript, Vite, Dexie.js (IndexedDB), Web Crypto API (AES-GCM, PBKDF2), Vitest, Playwright.
+- **Licence** : MIT
+- **Organisation** : ServOMorph
+
+## Architecture du projet
+
+L'application est structurée en couches étanches :
+- `src/domain/` : Logique métier pure, sans dépendance React ou base de données. Gère les entités (tasks, lists, routines) et les règles pures de gestion (`taskRulesV2.ts`, etc.).
+- `src/data/` : Couche d'infrastructure avec Dexie.js (IndexedDB) pour persister les tâches, listes, routines et check-ins d'énergie.
+- `src/crypto/` : Wrapper de sécurité pour le chiffrement des données utilisateur sensibles en local (titres des tâches, notes) via la Web Crypto API (AES-GCM, PBKDF2).
+- `src/ui/` : Interface utilisateur React stylisée avec du CSS vanilla. Comprend des optimisations cognitives pour la neurodivergence (contrastes doux, réduction de mouvements, repères d'énergie simples).
+- `src/app/` : Point d'entrée de l'application React, providers de contextes (`AppContext.tsx`) et routage.
+
+## Points d'entrée et commandes clés
+
+- **Développement** :
+  - `npm install` : Installer les dépendances.
+  - `npm run dev` / `python run_dev.py` : Lancer le serveur de développement local (Vite).
+- **Tests et Qualité** :
+  - `npm test` : Lancer la suite de tests unitaires et d'intégration (Vitest).
+  - `npm run test:coverage` : Lancer les tests avec calcul de la couverture de code (Vitest).
+  - `npm run test:e2e` : Lancer les tests E2E avec Playwright (compile l'application puis exécute les scénarios).
+  - `npm run lint` : Exécuter ESLint.
+  - `npm run format` : Formater le code avec Prettier.
+
+## Fonctionnalités majeures
+
+1. **Todo / Inbox** : Collecte brute des tâches sans contraintes de temps.
+2. **Planning quotidien** : Grille horaire sur 24h découpée en créneaux de 30 minutes permettant de positionner les tâches par sélection de plages multi-créneaux.
+3. **Gestion d'énergie** : Saisie quotidienne du niveau d'énergie (échelle 1 à 12, représentée par des batteries).
+4. **Mode Surcharge** : Activation automatique si le coût énergétique total des tâches planifiées dépasse l'énergie saisie pour la journée, limitant l'accès au tableau de bord et à un centre de récupération.
+5. **Routines** : Blocs d'étapes prédéfinis planifiables.
+6. **Listes thématiques** : Groupement de tâches hors planning temporaire.

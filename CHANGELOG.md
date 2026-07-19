@@ -1,3 +1,15 @@
+## v4.6 — 2026-07-19
+
+### Ajouté
+- Phase V4-4 codée : menu déplacer/renommer/supprimer sur une tâche planifiée (E6), glisser souris/tactile avec lecture directe de la case sous le curseur et zones de bord pour changer de jour (E1), report vers un créneau choisi (E8).
+- E6 (« Déplacer ») et E8 (« Reporter ») unifiés sur le flux « tâche en main » (bandeau, navigation libre entre les jours) au lieu d'une modale de liste de créneaux — retirée sur demande de l'utilisateur.
+
+### Corrigé
+- `E40Planning.tsx` : `reload()` rechargeait le mauvais jour après une bascule pendant un glisser en cours (closure figée dans un écouteur `window` de longue durée) — corrigé via une ref toujours à jour.
+
+### Validé
+- Tous les points de `validation_manuelle.md` V4-4 passés. 403/403 tests unitaires, `tsc -b` clean, 50/50 e2e. Phase V4-4 close ; roadmap V4 passe à la Phase V4-5.
+
 ## v4.5 — 2026-07-19
 
 ### Corrigé

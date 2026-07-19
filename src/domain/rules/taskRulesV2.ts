@@ -66,6 +66,28 @@ export function scheduleTaskV2(
     scheduled_date: date,
     scheduled_start: start,
     scheduled_end: end,
+    postponed: false,
+    updated_at: now,
+  }
+}
+
+export function reportTaskV2(
+  task: TaskV2,
+  date: string,
+  start: string,
+  end: string,
+  now: string,
+): TaskV2 {
+  return {
+    ...scheduleTaskV2(task, date, start, end, now),
+    postponed: true,
+  }
+}
+
+export function renameTaskV2(task: TaskV2, title: string, now: string): TaskV2 {
+  return {
+    ...task,
+    title,
     updated_at: now,
   }
 }
@@ -121,17 +143,3 @@ export function getRemainingPlannedCost(tasks: TaskV2[]): number {
     .reduce((sum, t) => sum + (t.energy_cost ?? 0), 0)
 }
 
-function addOneDay(date: string): string {
-  const d = new Date(date + 'T12:00:00')
-  d.setDate(d.getDate() + 1)
-  return d.toISOString().slice(0, 10)
-}
-
-export function postponeTaskV2(task: TaskV2, now: string): TaskV2 {
-  if (!task.scheduled_date) return task
-  return {
-    ...task,
-    scheduled_date: addOneDay(task.scheduled_date),
-    updated_at: now,
-  }
-}

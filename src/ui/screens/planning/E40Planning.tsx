@@ -42,8 +42,55 @@ function formatDate(date: string): string {
 
 type Picker =
   | { mode: 'assign'; start: number; end: number }
-  | { mode: 'move'; task: TaskV2; slot: number }
+  | { mode: 'menu'; task: TaskV2 }
+  | { mode: 'rename'; task: TaskV2 }
+  | { mode: 'delete'; task: TaskV2 }
   | null
+
+const REPORTED_BADGE_STYLE: React.CSSProperties = {
+  fontSize: '0.6875rem',
+  fontWeight: 700,
+  color: '#fff',
+  background: 'var(--color-warning)',
+  borderRadius: 'var(--radius-sm)',
+  padding: '2px 6px',
+  flexShrink: 0,
+}
+
+const LONG_PRESS_MS = 400
+const EDGE_DWELL_MS = 650
+
+const dragOverlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  transform: 'translate(-50%, -120%)',
+  pointerEvents: 'none',
+  zIndex: 200,
+  background: 'var(--color-accent)',
+  color: '#fff',
+  padding: '6px 12px',
+  borderRadius: 'var(--radius-md)',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '2px',
+  whiteSpace: 'nowrap',
+}
+
+function slotFromPoint(clientX: number, clientY: number): number | null {
+  let el: Element | null = null
+  try {
+    el = typeof document.elementFromPoint === 'function' ? document.elementFromPoint(clientX, clientY) : null
+  } catch {
+    return null
+  }
+  const cell = el?.closest?.('[data-slot]') as HTMLElement | null
+  if (!cell?.dataset.slot) return null
+  const slot = Number(cell.dataset.slot)
+  return Number.isInteger(slot) && slot >= 0 && slot < SLOTS.length ? slot : null
+}
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -272,7 +319,12 @@ export function E40Planning() {
     clearPendingPlanTask,
     schedulePendingTask,
     completeV2Task,
-    postponeTask,
+    renameV2Task,
+    deleteV2Task,
+    reportV2Task,
+    movingTask,
+    startMoveTask,
+    clearMoveTask,
     planningTargetDate,
     setPlanningTargetDate,
     overloadMode,
@@ -290,10 +342,25 @@ export function E40Planning() {
   const [essential, setEssential] = useState(false)
   const [step, setStep] = useState<'name' | 'details'>('name')
   const [rangeStart, setRangeStart] = useState<number | null>(null)
+  const [renameTitle, setRenameTitle] = useState('')
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOverlay, setDragOverlay] = useState<{ task: TaskV2; x: number; y: number; label: string } | null>(null)
 
   const now = new Date()
   const currentSlot = now.getHours() * 2 + (now.getMinutes() >= 30 ? 1 : 0)
   const currentSlotRef = useRef<HTMLDivElement | null>(null)
+  const gridRef = useRef<HTMLDivElement | null>(null)
+  const dragRef = useRef<{ task: TaskV2; sourceSlot: number; sourceDate: string; startX: number; startY: number } | null>(null)
+  const dragActiveRef = useRef(false)
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dwellZoneRef = useRef<'left' | 'right' | null>(null)
+  const lastPointerRef = useRef<{ x: number; y: number } | null>(null)
+  const displayDateRef = useRef(displayDate)
+
+  useEffect(() => {
+    displayDateRef.current = displayDate
+  }, [displayDate])
 
   useEffect(() => {
     if (planningTargetDate) {
@@ -303,8 +370,14 @@ export function E40Planning() {
   }, [])
 
   useEffect(() => {
+    if (movingTask?.report) {
+      setDisplayDate(addDays(todayStr(), 1))
+    }
+  }, [movingTask])
+
+  useEffect(() => {
     async function load() {
-      const sched = await getPlannedTasksForDate(displayDate)
+      const sched = await getPlannedTasksForDate(displayDateRef.current)
       setScheduledTasks(sched)
     }
     load()
@@ -317,13 +390,8 @@ export function E40Planning() {
   }, [])
 
   async function reload() {
-    const sched = await getPlannedTasksForDate(displayDate)
+    const sched = await getPlannedTasksForDate(displayDateRef.current)
     setScheduledTasks(sched)
-  }
-
-  async function handlePostpone(taskId: string) {
-    await postponeTask(taskId)
-    await reload()
   }
 
   async function handleComplete(taskId: string) {
@@ -331,24 +399,50 @@ export function E40Planning() {
     await reload()
   }
 
-  async function handleMove(taskId: string, slot: number) {
-    const task = scheduledTasks.find((item) => item.id === taskId)
+  async function handleMove(taskId: string, slot: number, targetDate: string, report: boolean): Promise<boolean> {
+    const source = movingTask?.task.id === taskId ? movingTask.task : undefined
+    const task = scheduledTasks.find((item) => item.id === taskId) ?? source
     const range = task ? taskSlotRange(task) : null
     const length = range ? range.end - range.start + 1 : 1
     const endSlot = slot + length - 1
-    const conflict = endSlot >= SLOTS.length || scheduledTasks.some(
+    const targetTasks = await getPlannedTasksForDate(targetDate)
+    const conflict = endSlot >= SLOTS.length || targetTasks.some(
       (t) => t.id !== taskId && SLOTS.slice(slot, endSlot + 1).some((candidate) => taskOccupiesSlot(t, candidate)),
     )
     if (conflict) {
       setConflictError(`La plage à partir de ${slotLabel(slot)} est déjà occupée par une autre tâche.`)
-      return
+      return false
     }
     setConflictError(null)
     const start = slotTime(slot)
     const end = slotTime(slot + length)
-    await scheduleV2Task(taskId, displayDate, start, end)
+    if (report) {
+      await reportV2Task(taskId, targetDate, start, end)
+    } else {
+      await scheduleV2Task(taskId, targetDate, start, end)
+    }
     await reload()
-    setPicker(null)
+    return true
+  }
+
+  async function handleMoveTargetClick(slot: number) {
+    if (!movingTask) return
+    const success = await handleMove(movingTask.task.id, slot, displayDate, movingTask.report)
+    if (success) clearMoveTask()
+  }
+
+  async function handleRename(taskId: string) {
+    const title = renameTitle.trim()
+    if (!title) return
+    await renameV2Task(taskId, title)
+    await reload()
+    closePicker()
+  }
+
+  async function handleDelete(taskId: string) {
+    await deleteV2Task(taskId)
+    await reload()
+    closePicker()
   }
 
   function rangeIsAvailable(start: number, end: number): boolean {
@@ -374,8 +468,12 @@ export function E40Planning() {
   }
 
   async function handleSlotClick(slot: number, task: TaskV2 | undefined) {
+    if (movingTask) {
+      await handleMoveTargetClick(slot)
+      return
+    }
     if (task && !pendingPlanTask) {
-      setPicker({ mode: 'move', task, slot })
+      setPicker({ mode: 'menu', task })
       return
     }
     if (task) {
@@ -414,12 +512,152 @@ export function E40Planning() {
     setEssential(false)
     setStep('name')
     setRangeStart(null)
+    setRenameTitle('')
   }
 
   function handleBack() {
     clearPendingPlanTask()
+    clearMoveTask()
     goTo('dashboard')
   }
+
+  function clearLongPressTimer() {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+  }
+
+  function edgeZoneAt(clientX: number): 'left' | 'right' | null {
+    const rect = gridRef.current?.getBoundingClientRect()
+    if (!rect || rect.width === 0) return null
+    if (clientX > rect.right) return 'right'
+    if (clientX < rect.left) return 'left'
+    return null
+  }
+
+  function canFlipLeft(): boolean {
+    return addDays(displayDateRef.current, -1) >= todayStr()
+  }
+
+  function dragHoverLabel(clientX: number, clientY: number): string {
+    const zone = edgeZoneAt(clientX)
+    if (zone === 'right') return `→ ${formatDate(addDays(displayDateRef.current, 1))}`
+    if (zone === 'left') {
+      return canFlipLeft() ? `→ ${formatDate(addDays(displayDateRef.current, -1))}` : 'Retour impossible'
+    }
+    const slot = slotFromPoint(clientX, clientY)
+    return slot !== null ? `→ ${slotLabel(slot)}` : ''
+  }
+
+  function clearDwell() {
+    if (dwellTimerRef.current) {
+      clearTimeout(dwellTimerRef.current)
+      dwellTimerRef.current = null
+    }
+    dwellZoneRef.current = null
+  }
+
+  function armDwell(zone: 'left' | 'right') {
+    dwellTimerRef.current = setTimeout(() => {
+      if (!dragActiveRef.current || dwellZoneRef.current !== zone) return
+      if (zone === 'right') {
+        setDisplayDate(addDays(displayDateRef.current, 1))
+      } else if (canFlipLeft()) {
+        setDisplayDate(addDays(displayDateRef.current, -1))
+      } else {
+        return
+      }
+      const info = dragRef.current
+      const pos = lastPointerRef.current
+      if (info && pos) {
+        const next = zone === 'right' ? addDays(displayDateRef.current, 1) : addDays(displayDateRef.current, -1)
+        setDragOverlay({ task: info.task, x: pos.x, y: pos.y, label: `→ ${formatDate(next)}` })
+      }
+      armDwell(zone)
+    }, EDGE_DWELL_MS)
+  }
+
+  function finishDrag(clientX: number, clientY: number) {
+    const info = dragRef.current
+    dragActiveRef.current = false
+    dragRef.current = null
+    setIsDragging(false)
+    setDragOverlay(null)
+    clearDwell()
+    if (!info) return
+    if (edgeZoneAt(clientX) !== null) return
+    const slot = slotFromPoint(clientX, clientY)
+    if (slot === null) return
+    const date = displayDateRef.current
+    if (slot === info.sourceSlot && date === info.sourceDate) return
+    handleMove(info.task.id, slot, date, false)
+  }
+
+  function handleTaskPointerDown(event: React.PointerEvent, task: TaskV2) {
+    const range = taskSlotRange(task)
+    if (!range) return
+    dragRef.current = { task, sourceSlot: range.start, sourceDate: displayDate, startX: event.clientX, startY: event.clientY }
+    clearLongPressTimer()
+    longPressTimerRef.current = setTimeout(() => {
+      dragActiveRef.current = true
+      setIsDragging(true)
+      const info = dragRef.current
+      if (info) {
+        setDragOverlay({ task: info.task, x: info.startX, y: info.startY, label: '' })
+      }
+    }, LONG_PRESS_MS)
+  }
+
+  function handleTaskPointerUp(event: React.PointerEvent, task: TaskV2) {
+    clearLongPressTimer()
+    if (dragActiveRef.current) {
+      finishDrag(event.clientX, event.clientY)
+      return
+    }
+    dragRef.current = null
+    setPicker({ mode: 'menu', task })
+  }
+
+  function handleTaskPointerCancel() {
+    clearLongPressTimer()
+    clearDwell()
+    dragActiveRef.current = false
+    dragRef.current = null
+    setIsDragging(false)
+    setDragOverlay(null)
+  }
+
+  useEffect(() => {
+    if (!isDragging) return
+    function onWindowPointerMove(event: PointerEvent) {
+      const info = dragRef.current
+      if (!info) return
+      lastPointerRef.current = { x: event.clientX, y: event.clientY }
+      const zone = edgeZoneAt(event.clientX)
+      if (zone !== dwellZoneRef.current) {
+        if (dwellTimerRef.current) {
+          clearTimeout(dwellTimerRef.current)
+          dwellTimerRef.current = null
+        }
+        dwellZoneRef.current = zone
+        if (zone) armDwell(zone)
+      }
+      setDragOverlay({ task: info.task, x: event.clientX, y: event.clientY, label: dragHoverLabel(event.clientX, event.clientY) })
+    }
+    function onWindowPointerUp(event: PointerEvent) {
+      finishDrag(event.clientX, event.clientY)
+    }
+    window.addEventListener('pointermove', onWindowPointerMove)
+    window.addEventListener('pointerup', onWindowPointerUp)
+    window.addEventListener('pointercancel', onWindowPointerUp)
+    return () => {
+      window.removeEventListener('pointermove', onWindowPointerMove)
+      window.removeEventListener('pointerup', onWindowPointerUp)
+      window.removeEventListener('pointercancel', onWindowPointerUp)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDragging])
 
   const isToday = displayDate === todayStr()
 
@@ -450,7 +688,7 @@ export function E40Planning() {
         </button>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto' }} role="grid" aria-label="Planning de la journée">
+      <div ref={gridRef} style={{ flex: 1, overflowY: 'auto' }} role="grid" aria-label="Planning de la journée">
         {rangeStart !== null && (
           <p style={{ margin: 'var(--spacing-sm) var(--spacing-xl)', fontSize: '0.8125rem' }} aria-live="polite">
             Début sélectionné à {slotLabel(rangeStart)}. Choisissez la fin.
@@ -476,8 +714,12 @@ export function E40Planning() {
               </div>
               <div
                 role="gridcell"
+                data-slot={slot}
                 style={slotCellStyle(task, ambianceColor, isContinuation)}
-                onClick={() => handleSlotClick(slot, task)}
+                onClick={movingTask || !task || pendingPlanTask ? () => handleSlotClick(slot, task) : undefined}
+                onPointerDown={task && !pendingPlanTask && !movingTask ? (event) => handleTaskPointerDown(event, task) : undefined}
+                onPointerUp={task && !pendingPlanTask && !movingTask ? (event) => handleTaskPointerUp(event, task) : undefined}
+                onPointerCancel={task && !pendingPlanTask && !movingTask ? handleTaskPointerCancel : undefined}
                 aria-label={`Créneau ${slotLabel(slot)}${task ? ` : ${task.title}${isContinuation ? ' (suite)' : ''}` : ''}`}
               >
                 {!task && (
@@ -491,11 +733,14 @@ export function E40Planning() {
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         {task.title}
                         {task.energy_cost != null && <BatteryCost cost={task.energy_cost} />}
+                        {task.postponed && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
                       </span>
                       <input
                         type="checkbox"
                         checked={completed}
                         onClick={(event) => event.stopPropagation()}
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onPointerUp={(event) => event.stopPropagation()}
                         onChange={() => handleComplete(task.id)}
                         aria-label={`Terminer ${task.title}`}
                         style={taskCheckboxStyle}
@@ -504,11 +749,13 @@ export function E40Planning() {
                     <div style={{ display: 'flex', gap: '4px' }}>
                       {canPostpone && (
                         <button
+                          onPointerDown={(event) => event.stopPropagation()}
+                          onPointerUp={(event) => event.stopPropagation()}
                           onClick={(event) => {
                             event.stopPropagation()
-                            handlePostpone(task.id)
+                            startMoveTask(task, true)
                           }}
-                          aria-label={`Reporter ${task.title} à demain`}
+                          aria-label={`Reporter ${task.title}`}
                           style={taskActionStyle}
                         >
                           Reporter
@@ -528,16 +775,26 @@ export function E40Planning() {
           style={overlayStyle}
           role="dialog"
           aria-modal
-          aria-label={picker.mode === 'assign' ? 'Choisir une tâche' : 'Déplacer la tâche'}
+          aria-label={
+            picker.mode === 'assign'
+              ? 'Choisir une tâche'
+              : picker.mode === 'menu'
+                ? 'Actions sur la tâche'
+                : picker.mode === 'rename'
+                  ? 'Renommer la tâche'
+                  : 'Supprimer la tâche'
+          }
         >
           <div style={sheetStyle}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ margin: 0, fontWeight: 600 }}>
-                {picker.mode === 'assign'
-                  ? pendingPlanTask
+                {picker.mode === 'assign' &&
+                  (pendingPlanTask
                     ? `Placer « ${pendingPlanTask.title} » de ${slotLabel(picker.start)} à ${slotLabel(picker.end)}`
-                    : `Ajouter une tâche de ${slotLabel(picker.start)} à ${slotLabel(picker.end)}`
-                  : `Déplacer « ${picker.task.title} »`}
+                    : `Ajouter une tâche de ${slotLabel(picker.start)} à ${slotLabel(picker.end)}`)}
+                {picker.mode === 'menu' && `« ${picker.task.title} »`}
+                {picker.mode === 'rename' && `Renommer « ${picker.task.title} »`}
+                {picker.mode === 'delete' && `Supprimer « ${picker.task.title} » ?`}
               </p>
               <button style={closeStyle} onClick={closePicker} aria-label="Fermer">
                 ✕
@@ -601,19 +858,61 @@ export function E40Planning() {
               </p>
             )}
 
-            {picker.mode === 'move' && (
-              <div style={{ overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {SLOTS.filter((s) => s !== picker.slot).map((s) => (
-                  <button
-                    key={s}
-                    style={pickerItemStyle}
-                    onClick={() => handleMove(picker.task.id, s)}
-                  >
-                    {slotLabel(s)}
-                  </button>
-                ))}
+            {picker.mode === 'menu' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+                <button
+                  style={pickerItemStyle}
+                  onClick={() => {
+                    startMoveTask(picker.task, false)
+                    setPicker(null)
+                  }}
+                >
+                  Déplacer
+                </button>
+                <button
+                  style={pickerItemStyle}
+                  onClick={() => {
+                    setRenameTitle(picker.task.title)
+                    setPicker({ mode: 'rename', task: picker.task })
+                  }}
+                >
+                  Renommer
+                </button>
+                <button style={pickerItemStyle} onClick={() => setPicker({ mode: 'delete', task: picker.task })}>
+                  Supprimer
+                </button>
               </div>
             )}
+
+            {picker.mode === 'rename' && (
+              <>
+                <input
+                  type="text"
+                  value={renameTitle}
+                  onChange={(e) => setRenameTitle(e.target.value)}
+                  aria-label="Nouveau nom"
+                  autoFocus
+                  style={newTaskInputStyle}
+                />
+                <button
+                  style={renameTitle.trim() ? validateBtnStyle : validateBtnDisabledStyle}
+                  disabled={!renameTitle.trim()}
+                  onClick={() => handleRename(picker.task.id)}
+                >
+                  Enregistrer
+                </button>
+              </>
+            )}
+
+            {picker.mode === 'delete' && (
+              <>
+                <p style={{ margin: 0, fontSize: '0.9375rem' }}>Cette tâche sera définitivement supprimée.</p>
+                <button style={{ ...validateBtnStyle, background: 'var(--color-error, #c0392b)' }} onClick={() => handleDelete(picker.task.id)}>
+                  Supprimer
+                </button>
+              </>
+            )}
+
           </div>
         </div>
       )}
@@ -629,6 +928,17 @@ export function E40Planning() {
         </div>
       )}
 
+      {movingTask && (
+        <div style={pendingBannerStyle}>
+          <span aria-live="polite" style={{ flex: 1, fontSize: '0.8125rem' }}>
+            « {movingTask.task.title} » est en cours de déplacement.
+          </span>
+          <button style={taskActionStyle} onClick={clearMoveTask} aria-label={`Annuler le déplacement de ${movingTask.task.title}`}>
+            Annuler
+          </button>
+        </div>
+      )}
+
       {conflictError && picker === null && (
         <div style={overlayStyle} role="dialog" aria-modal aria-label="Créneau occupé">
           <div style={sheetStyle}>
@@ -639,6 +949,13 @@ export function E40Planning() {
               Fermer
             </button>
           </div>
+        </div>
+      )}
+
+      {dragOverlay && (
+        <div style={{ ...dragOverlayStyle, left: dragOverlay.x, top: dragOverlay.y }} aria-hidden>
+          <span>{dragOverlay.task.title}</span>
+          {dragOverlay.label && <span style={{ fontSize: '0.75rem', fontWeight: 500, opacity: 0.9 }}>{dragOverlay.label}</span>}
         </div>
       )}
     </main>

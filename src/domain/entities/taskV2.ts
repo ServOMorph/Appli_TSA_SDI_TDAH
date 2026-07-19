@@ -6,6 +6,7 @@ export interface TaskV2 {
   status: TaskStatusV2
   essential: boolean
   energy_cost?: number | null
+  postponed?: boolean
   position: number
   scheduled_date: string | null
   scheduled_start: string | null

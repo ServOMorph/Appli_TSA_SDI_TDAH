@@ -130,7 +130,7 @@ export function E10Dashboard() {
     reorderTodayTasks,
     getPlannedTasksForDate,
     completeV2Task,
-    postponeTask,
+    startMoveTask,
     settings,
   } = useApp()
 
@@ -173,11 +173,9 @@ export function E10Dashboard() {
     setTodayPlanned(planned)
   }
 
-  async function handlePostponePlanned(taskId: string) {
-    await postponeTask(taskId)
-    const date = todayStr()
-    const planned = await getPlannedTasksForDate(date)
-    setTodayPlanned(planned)
+  function handleReportPlanned(task: TaskV2) {
+    startMoveTask(task, true)
+    goTo('planning')
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -297,8 +295,8 @@ export function E10Dashboard() {
                   </button>
                   {!completed && overloadMode && !task.essential && (
                     <button
-                      aria-label={`Reporter ${task.title} à demain`}
-                      onClick={() => handlePostponePlanned(task.id)}
+                      aria-label={`Reporter ${task.title}`}
+                      onClick={() => handleReportPlanned(task)}
                       style={{
                         background: 'none',
                         border: '1px solid var(--color-border)',

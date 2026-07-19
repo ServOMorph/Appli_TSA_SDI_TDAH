@@ -78,11 +78,11 @@ Gate : [x] tests verts (386/386) · [x] test manuel (validé le 2026-07-19) · [
 
 ## Phase V4-4 — Interactions sur une tâche planifiée
 
-- [ ] E6 — Clic sur une tâche → menu déplacer / renommer / supprimer (`E40Planning.tsx:494-515,699-713` ; ajouter `renameV2Task`/`deleteV2Task` dans `AppContext.tsx`)
-- [ ] E1 — Appui long + glisser (pointer events) : haut/bas = autre créneau du même jour (réutilise `handleMove`), droite = lendemain ; pas de glisser vers la veille (`E40Planning.tsx:362-374`)
-- [ ] E8 — « Reporter » ouvre le choix d'un créneau vide au lieu d'avancer au lendemain — réutilise le flux de sélection de créneau d'E6, pas un mécanisme dédié ; badge « Reporté » coloré (`E40Planning.tsx:343-346,537-557` ; revoir `postponeTaskV2` dans `taskRulesV2.ts:90-97`)
+- [x] E6 — Clic sur une tâche → menu déplacer / renommer / supprimer (`E40Planning.tsx` ; `renameV2Task`/`deleteV2Task` ajoutés dans `AppContext.tsx`)
+- [x] E1 — Appui long + glisser (pointer events) : la cible est lue **directement sous le curseur** (`document.elementFromPoint` + `data-slot`, plus de calcul par distance) ; relâcher sur un créneau pose la tâche à ce créneau du jour affiché. Zones de bord : maintenir la tâche à droite ou à gauche du planning (`EDGE_DWELL_MS` = 650 ms, répétable) fait basculer le jour affiché (suivant/précédent, jamais avant aujourd'hui) pendant que la tâche reste en main ; relâcher dans une zone de bord annule le déplacement. Overlay suivant le curseur (titre + aperçu : heure survolée ou jour cible, « Retour impossible » à gauche depuis aujourd'hui). `E40Planning.tsx`. Décisions utilisateur du 2026-07-19 (troisième itération : survol continu, remplace la bascule au relâchement).
+- [x] E6b/E8b — « Déplacer » (E6) et « Reporter » (E8) unifiés sur le flux « tâche en main » d'E5 : bandeau « "X" est en cours de déplacement. » au-dessus de « Ajouter une tâche », planning affiché en arrière-plan, navigation libre entre les jours avant de taper la case cible — remplace la modale de liste de créneaux, qui a été retirée. « Reporter » bascule automatiquement le planning sur le lendemain puis pose le badge « Reporté ». Bouton Reporter du Dashboard aligné sur le même flux. Décisions utilisateur du 2026-07-19 : libellé unique du bandeau (pas de distinction déplacement/report dans le texte), le badge « Reporté » suffit à distinguer un report. `AppContext` : `movingTask`/`startMoveTask`/`clearMoveTask` remplacent `reportPlanTask`/`startReportTask`/`clearReportPlanTask`.
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] e2e mis à jour (report automatique remplacé par choix de créneau) · [ ] sortie : déplacement au doigt fonctionnel sur mobile, tâche renommable/supprimable, report avec choix de créneau
+Gate : [x] tests verts (403/403) · [x] test manuel (validé le 2026-07-19, `validation_manuelle.md`) · [x] doc · [x] e2e mis à jour (50/50 : T48 menu E6, T49 report E8, T50 déplacement multi-jours E6) · [x] sortie : déplacement fonctionnel (glisser souris/tactile, zones de bord), tâche renommable/supprimable, report avec bandeau « tâche en main »
 
 ---
 

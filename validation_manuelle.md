@@ -1,49 +1,62 @@
-# Validation manuelle — Phase V4-3 (Multi-créneaux et récurrence)
+# Validation manuelle — Phase V4-4 (Interactions sur une tâche planifiée)
 
 Branche : `v4` — Date : 2026-07-19
 
-Objectif de la phase : E2 (plages de créneaux), E5 (tâche active), D3 (retrait de
-« Répéter demain »), B2 (cadre du Dashboard) et D5 (énergie + obligatoire regroupés).
+Objectif de la phase : E6 (menu déplacer/renommer/supprimer), E1 (appui long + glisser tactile),
+E8 (report via choix de créneau, remplace l'avance automatique au lendemain).
 
 Lancer : `npm run dev` (ou `npm run dev -- --host` pour tester au téléphone).
 Repartir d'une base propre via le bouton « Reset DB » (dev) si besoin.
 
 ---
 
-## E2 — Multi-créneaux
+## E6 — Menu sur une tâche planifiée
 
-- [x] 1.1 — Depuis le Planning, choisir une tâche à planifier. Cliquer un créneau de début puis un
-      créneau de fin : toutes les demi-heures couvertes sont colorées en un seul bloc, dont le nom
-      n'est affiché qu'une fois.
-- [x] 1.2 — Cliquer deux fois la même case : la tâche occupe exactement une demi-heure.
-- [x] 1.3 — Tenter de sélectionner une plage passant par une case déjà occupée : le placement est
-      refusé et aucune tâche existante n'est modifiée.
-- [x] 1.4 — Créer une tâche de coût énergétique 5 sur trois créneaux. Vérifier que son coût n'est
-      compté qu'une fois pour le mode surcharge.
+- [x] 1.1 — Depuis le Planning, taper sur une tâche déjà placée : un menu s'ouvre avec trois choix
+      (Déplacer, Renommer, Supprimer).
+- [x] 1.2 — « Déplacer » ferme le menu et affiche le bandeau « "X" est en cours de déplacement. »
+      au-dessus de « Ajouter une tâche » (même bandeau que E5), planning affiché en arrière-plan.
+      Naviguer entre les jours avec ‹ › puis taper une case cible déplace la tâche sans la dupliquer
+      et referme le bandeau.
+- [x] 1.3 — « Renommer » ouvre un champ pré-rempli avec le titre actuel ; enregistrer met à jour le
+      titre affiché sur le planning et sur l'accueil.
+- [x] 1.4 — « Supprimer » demande confirmation puis retire définitivement la tâche du planning.
+- [x] 1.5 — Pendant un déplacement, taper une case déjà occupée par une autre tâche affiche une
+      erreur et laisse le bandeau ouvert (la tâche déplacée n'est pas perdue).
+- [x] 1.6 — Le bouton « Annuler » du bandeau referme le déplacement sans modifier la tâche.
 
-## E5 — Tâche active
+## E1 — Glisser tactile
 
-- [x] 2.1 — Après le premier placement, le bandeau indique que la tâche est encore en cours de
-      planification. **Écart corrigé et validé** : bandeau repositionné en fixe juste au-dessus du
-      bouton « Ajouter une tâche » (`E40Planning.tsx`), espace ajouté entre le nom de la tâche et
-      l'icône batterie (`E10Dashboard.tsx`), `--bottomnav-h` désormais mesuré dynamiquement
-      (`BottomNav.tsx`) pour supprimer le résidu de grille visible sous le bandeau.
-- [x] 2.2 — Sélectionner une autre plage : la même tâche est déplacée, sans duplication. Changer de
-      jour puis la repositionner : elle reste la même tâche.
-- [x] 2.3 — Cliquer « Terminer » dans le bandeau : le mode de planification active s'arrête.
+- [x] 2.1 — À la souris sur PC : maintenir le clic enfoncé ~400 ms sans bouger sur une tâche, puis
+      glisser en gardant le bouton enfoncé. Un overlay (titre de la tâche + aperçu de la cible) suit
+      le curseur. Relâcher sur un créneau du planning pose la tâche **sous le curseur** (lecture
+      directe de la ligne survolée, plus de calcul par distance).
+- [x] 2.2 — Glisser vers le haut ou le bas : l'overlay affiche l'heure survolée (ex. « → 10h00 ») ;
+      relâcher pose la tâche à ce créneau.
+- [x] 2.3 — **Sans relâcher**, amener la tâche dans la zone à droite du planning et l'y maintenir :
+      après ~0,65 s le planning bascule sur le jour suivant (la tâche reste en main). Rester dans la
+      zone fait défiler les jours l'un après l'autre. Ramener le curseur sur la grille et relâcher
+      sur le créneau voulu pose la tâche à ce jour/créneau. Relâcher dans la zone de bord **annule**
+      le déplacement (la tâche ne bouge pas).
+- [x] 2.4 — Maintenir la tâche dans la zone à gauche quand le planning affiche aujourd'hui : aucun
+      effet ; l'overlay affiche « Retour impossible ».
+- [x] 2.5 — Depuis un jour futur, maintenir la tâche dans la zone à gauche : le planning revient au
+      jour précédent après ~0,65 s (même mécanique que 2.3), jamais avant aujourd'hui.
+- [x] 2.6 — Un appui bref (sans maintien) ouvre le menu E6 au lieu de déclencher un déplacement.
 
-## D3, B2 et D5
+## E8 — Report via choix de créneau
 
-- [x] 3.1 — « Répéter demain » n'est plus affiché ni dans le Planning ni dans « Planning du jour »
-      sur l'accueil.
-- [x] 3.2 — Créer une tâche planifiée puis vérifier le cadre « Planning du jour » sur l'accueil :
-      aucun bouton ni contenu ne déborde.
-- [x] 3.3 — Dans la modale de création, l'énergie et la case « Obligatoire » sont sur le même écran.
-      Le coût est facultatif et une tâche obligatoire peut être créée sans étape supplémentaire.
+- [x] 3.1 — En mode surcharge, le bouton « Reporter » d'une tâche non essentielle affiche directement
+      le bandeau « "X" est en cours de déplacement. » (pas de modale) et bascule automatiquement le
+      planning sur le lendemain.
+- [x] 3.2 — Taper une case sur le lendemain (ou un autre jour après navigation) déplace la tâche à cet
+      endroit, referme le bandeau, et affiche un badge « Reporté » sur la tâche.
+- [x] 3.3 — Depuis le Dashboard, le bouton « Reporter » de la carte « Planning du jour » navigue vers
+      le Planning avec le même bandeau déjà affiché et le planning déjà basculé sur le lendemain.
 
 ---
 
 ## Résultat
 
-- [x] Tous les points passés → phase V4-3 validée.
-- [x] Écarts constatés : 2.1 — corrigé et validé.
+- [x] Tous les points passés → phase V4-4 validée.
+- [x] Écarts constatés : voir note sous 1.4 (report codé, cf. `roadmap_v4.md`).

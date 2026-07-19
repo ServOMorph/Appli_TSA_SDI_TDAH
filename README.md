@@ -15,7 +15,7 @@ npm run build      # build de production
 npm run preview    # prévisualisation du build
 npm test               # tests unitaires (Vitest)
 npm run test:coverage  # couverture (seuil 85 %)
-npm run test:e2e       # tests E2E Playwright (build + 47 scénarios)
+npm run test:e2e       # tests E2E Playwright (build + 50 scénarios)
 npm run test:e2e:report  # ouvrir le rapport HTML Playwright
 npm run lint       # ESLint
 npm run format     # Prettier
@@ -27,11 +27,11 @@ V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur 
 
 Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Build de production sur `dist/v3` (`vite.config.ts`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
 
-**Branche `v4` active.** Phases V4-0 à V4-3 closes : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain » et modale énergie/obligatoire fusionnée, validation manuelle intégralement passée.
+**Branche `v4` active.** Phases V4-0 à V4-4 closes : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », validation manuelle intégralement passée.
 
-Points marquants restants de la roadmap V4 : report vers un créneau choisi, déplacement tactile et menu déplacer/renommer/supprimer (V4-4), sous-tâches planifiables rattachées à leur parent (V4-5). Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
+Point marquant restant de la roadmap V4 : sous-tâches planifiables rattachées à leur parent (V4-5). Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
 
-Tests unitaires verts (386), `tsc -b` clean, e2e Playwright 47/47.
+Tests unitaires verts (403), `tsc -b` clean, e2e Playwright 50/50.
 
 ## Stack
 
@@ -69,7 +69,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Démarrer la Phase V4-4 (`roadmap_v4.md`) : menu déplacer/renommer/supprimer, glisser tactile, report via choix de créneau. Seule E3 (module budget) reste à trancher avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : doc V2 et déploiement Netlify.
+Démarrer la Phase V4-5 (`roadmap_v4.md`) : sous-tâches planifiables (E9a/b/c). Seule E3 (module budget) reste à trancher avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : doc V2 et déploiement Netlify.
 
 ## Licence
 

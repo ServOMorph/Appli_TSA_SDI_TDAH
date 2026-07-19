@@ -8,7 +8,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
-import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, postponeTaskV2 as postponeTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, reportTaskV2 as reportTaskV2Rule, renameTaskV2 as renameTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
@@ -105,7 +105,12 @@ interface AppContextValue {
   renameList: (id: string, name: string) => Promise<void>
   deleteList: (id: string) => Promise<void>
   completeV2Task: (taskId: string) => Promise<void>
-  postponeTask: (taskId: string) => Promise<void>
+  renameV2Task: (id: string, title: string) => Promise<void>
+  deleteV2Task: (id: string) => Promise<void>
+  reportV2Task: (taskId: string, date: string, start: string, end: string) => Promise<void>
+  movingTask: { task: TaskV2; report: boolean } | null
+  startMoveTask: (task: TaskV2, report: boolean) => void
+  clearMoveTask: () => void
   planningTargetDate: string | null
   setPlanningTargetDate: (date: string | null) => void
   getListItems: (listId: string) => Promise<ListItem[]>
@@ -168,6 +173,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
   const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
+  const [movingTask, setMovingTask] = useState<{ task: TaskV2; report: boolean } | null>(null)
   const [planningTargetDate, setPlanningTargetDate] = useState<string | null>(null)
 
   useEffect(() => {
@@ -324,12 +330,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await refreshTodayPlanned()
   }
 
-  async function postponeTask(taskId: string) {
-    const task = await taskV2Repo.getById(taskId)
+  async function renameV2Task(id: string, title: string) {
+    const trimmed = title.trim()
+    if (!trimmed) return
+    const task = await taskV2Repo.getById(id)
     if (!task) return
-    const updated = postponeTaskV2Rule(task, new Date().toISOString())
+    const updated = renameTaskV2Rule(task, trimmed, new Date().toISOString())
     await taskV2Repo.update(updated)
     await refreshTodayPlanned()
+  }
+
+  async function deleteV2Task(id: string) {
+    await taskV2Repo.delete(id)
+    await refreshTodayPlanned()
+  }
+
+  async function reportV2Task(taskId: string, date: string, start: string, end: string) {
+    const task = await taskV2Repo.getById(taskId)
+    if (!task) return
+    const updated = reportTaskV2Rule(task, date, start, end, new Date().toISOString())
+    await taskV2Repo.update(updated)
+    await refreshTodayPlanned()
+  }
+
+  function startMoveTask(task: TaskV2, report: boolean) {
+    setMovingTask({ task, report })
+  }
+
+  function clearMoveTask() {
+    setMovingTask(null)
   }
 
   function startPlanTask(title: string, sourceTaskId?: string) {
@@ -619,7 +648,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         clearPendingPlanTask,
         schedulePendingTask,
         completeV2Task,
-        postponeTask,
+        renameV2Task,
+        deleteV2Task,
+        reportV2Task,
+        movingTask,
+        startMoveTask,
+        clearMoveTask,
         planningTargetDate,
         setPlanningTargetDate,
         moveTask,

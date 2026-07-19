@@ -6,7 +6,8 @@ import {
   scheduleTaskV2,
   toggleEssentialV2,
   setEnergyCostV2,
-  postponeTaskV2,
+  reportTaskV2,
+  renameTaskV2,
   getRemainingPlannedCost,
   sortByPosition,
   nextPosition,
@@ -167,6 +168,27 @@ describe('taskRulesV2', () => {
       expect(scheduled.scheduled_start).toBe('10:00')
       expect(scheduled.scheduled_end).toBe('11:00')
     })
+
+    it('clears the postponed flag', () => {
+      const task: TaskV2 = {
+        id: 'id-1',
+        title: 'My task',
+        status: 'planned',
+        essential: false,
+        postponed: true,
+        position: 0,
+        scheduled_date: '2026-06-30',
+        scheduled_start: '09:00',
+        scheduled_end: '09:30',
+        created_at: now,
+        updated_at: now,
+        completed_at: null,
+      }
+
+      const scheduled = scheduleTaskV2(task, '2026-06-30', '10:00', '11:00', now)
+
+      expect(scheduled.postponed).toBe(false)
+    })
   })
 
   describe('toggleEssentialV2', () => {
@@ -247,7 +269,7 @@ describe('taskRulesV2', () => {
     })
   })
 
-  describe('postponeTaskV2', () => {
+  describe('reportTaskV2', () => {
     const scheduledTask: TaskV2 = {
       id: 'id-1',
       title: 'My task',
@@ -262,23 +284,36 @@ describe('taskRulesV2', () => {
       completed_at: null,
     }
 
-    it('moves the task to the next day, keeping the same time slot', () => {
-      const postponed = postponeTaskV2(scheduledTask, now)
-      expect(postponed.scheduled_date).toBe('2026-07-08')
-      expect(postponed.scheduled_start).toBe('10:00')
-      expect(postponed.scheduled_end).toBe('11:00')
-      expect(postponed.updated_at).toBe(now)
+    it('reschedules the task to the chosen date and slot, marked as postponed', () => {
+      const reported = reportTaskV2(scheduledTask, '2026-07-08', '14:00', '15:00', now)
+      expect(reported.scheduled_date).toBe('2026-07-08')
+      expect(reported.scheduled_start).toBe('14:00')
+      expect(reported.scheduled_end).toBe('15:00')
+      expect(reported.postponed).toBe(true)
+      expect(reported.updated_at).toBe(now)
     })
+  })
 
-    it('rolls over to the next month correctly', () => {
-      const postponed = postponeTaskV2({ ...scheduledTask, scheduled_date: '2026-07-31' }, now)
-      expect(postponed.scheduled_date).toBe('2026-08-01')
-    })
+  describe('renameTaskV2', () => {
+    it('updates the title and updated_at', () => {
+      const task: TaskV2 = {
+        id: 'id-1',
+        title: 'Old title',
+        status: 'planned',
+        essential: false,
+        position: 0,
+        scheduled_date: null,
+        scheduled_start: null,
+        scheduled_end: null,
+        created_at: now,
+        updated_at: now,
+        completed_at: null,
+      }
 
-    it('does nothing to an unscheduled task', () => {
-      const unscheduled = { ...scheduledTask, scheduled_date: null, scheduled_start: null, scheduled_end: null }
-      const result = postponeTaskV2(unscheduled, now)
-      expect(result).toBe(unscheduled)
+      const renamed = renameTaskV2(task, 'New title', '2026-07-08T09:00:00Z')
+
+      expect(renamed.title).toBe('New title')
+      expect(renamed.updated_at).toBe('2026-07-08T09:00:00Z')
     })
   })
 

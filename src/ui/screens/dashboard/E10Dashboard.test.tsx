@@ -285,17 +285,17 @@ describe('E10Dashboard', () => {
       expect(screen.queryByLabelText(/Reporter Tâche planifiée/)).toBeNull()
     })
 
-    it('reporte la tâche au lendemain au clic sur Reporter', async () => {
+    it('déclenche le déplacement en mode report et navigue vers le planning au clic sur Reporter (E8)', async () => {
+      const task = makeTaskV2({ id: 'a', title: 'Tâche non essentielle', essential: false })
       const ctx = makeAppContext({
         overloadMode: true,
-        getPlannedTasksForDate: async () => [
-          makeTaskV2({ id: 'a', title: 'Tâche non essentielle', essential: false }),
-        ],
+        getPlannedTasksForDate: async () => [task],
       })
       renderWithApp(<E10Dashboard />, ctx)
       const btn = await screen.findByLabelText(/Reporter Tâche non essentielle/)
       await userEvent.click(btn)
-      expect(ctx.postponeTask).toHaveBeenCalledWith('a')
+      expect(ctx.startMoveTask).toHaveBeenCalledWith(task, true)
+      expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 
     it('n’affiche plus le bouton Répéter demain', async () => {

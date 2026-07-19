@@ -42,8 +42,14 @@ function TaskButton() {
   )
 }
 
+function addOneDay(date: string): string {
+  const d = new Date(date + 'T12:00:00')
+  d.setDate(d.getDate() + 1)
+  return d.toISOString().slice(0, 10)
+}
+
 function OverloadWorkflow() {
-  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeV2Task, postponeTask } = useApp()
+  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeV2Task, reportV2Task } = useApp()
   const [taskId, setTaskId] = useState<string | null>(null)
   const today = new Date().toISOString().slice(0, 10)
   return (
@@ -61,7 +67,7 @@ function OverloadWorkflow() {
         planifier tâche coûteuse
       </button>
       <button onClick={() => taskId && completeV2Task(taskId)}>terminer tâche</button>
-      <button onClick={() => taskId && postponeTask(taskId)}>reporter tâche</button>
+      <button onClick={() => taskId && reportV2Task(taskId, addOneDay(today), '09:00', '09:30')}>reporter tâche</button>
     </>
   )
 }
@@ -180,7 +186,7 @@ describe('AppProvider', () => {
     await userEvent.click(screen.getByRole('button', { name: 'finir onboarding' }))
   })
 
-  it('reporter une tâche non-obligatoire en surcharge la sort du planning du jour (E6)', async () => {
+  it('reporter une tâche non-obligatoire en surcharge la sort du planning du jour (E8)', async () => {
     render(
       <AppProvider>
         <ScreenIndicator />

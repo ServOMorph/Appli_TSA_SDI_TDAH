@@ -4,6 +4,22 @@ import userEvent from '@testing-library/user-event'
 import { E40Planning } from './E40Planning'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
 import type { TaskV2 } from '@/domain/entities/taskV2'
+import type { PlannedSubTask } from '@/app/AppContext'
+
+function makeSubTaskV2(overrides: Partial<PlannedSubTask> = {}): PlannedSubTask {
+  return {
+    id: 'sub-1',
+    task_id: 'parent-1',
+    parentTitle: 'Rangement',
+    title: 'Ranger le bureau',
+    is_completed: false,
+    position: 0,
+    scheduled_date: null,
+    scheduled_start: null,
+    scheduled_end: null,
+    ...overrides,
+  }
+}
 
 function makeTaskV2(overrides: Partial<TaskV2> = {}): TaskV2 {
   return {
@@ -142,7 +158,7 @@ describe('E40Planning', () => {
     renderWithApp(
       <E40Planning />,
       makeAppContext({
-        pendingPlanTask: { title: 'McDo', taskId: 'active-1' },
+        pendingPlanTask: { kind: 'task', title: 'McDo', taskId: 'active-1' },
         scheduleV2Task,
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       }),
@@ -264,7 +280,7 @@ describe('E40Planning', () => {
     renderWithApp(
       <E40Planning />,
       makeAppContext({
-        movingTask: { task, report: false },
+        movingTask: { kind: 'task', task, report: false },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
       }),
     )
@@ -280,7 +296,7 @@ describe('E40Planning', () => {
       makeAppContext({
         scheduleV2Task,
         clearMoveTask,
-        movingTask: { task, report: false },
+        movingTask: { kind: 'task', task, report: false },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
       }),
     )
@@ -301,7 +317,7 @@ describe('E40Planning', () => {
       makeAppContext({
         scheduleV2Task,
         clearMoveTask,
-        movingTask: { task, report: false },
+        movingTask: { kind: 'task', task, report: false },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
       }),
     )
@@ -321,7 +337,7 @@ describe('E40Planning', () => {
       makeAppContext({
         scheduleV2Task,
         clearMoveTask,
-        movingTask: { task, report: false },
+        movingTask: { kind: 'task', task, report: false },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task, other]),
       }),
     )
@@ -381,7 +397,7 @@ describe('E40Planning', () => {
       <E40Planning />,
       makeAppContext({
         schedulePendingTask,
-        pendingPlanTask: { title: 'Laver machine', sourceTaskId: 'abc' },
+        pendingPlanTask: { kind: 'task', title: 'Laver machine', sourceTaskId: 'abc' },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       }),
     )
@@ -403,7 +419,7 @@ describe('E40Planning', () => {
       <E40Planning />,
       makeAppContext({
         schedulePendingTask,
-        pendingPlanTask: { title: 'Laver machine' },
+        pendingPlanTask: { kind: 'task', title: 'Laver machine' },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([occupying]),
       }),
     )
@@ -566,7 +582,7 @@ describe('E40Planning', () => {
     renderWithApp(
       <E40Planning />,
       makeAppContext({
-        movingTask: { task, report: true },
+        movingTask: { kind: 'task', task, report: true },
         getPlannedTasksForDate,
       }),
     )
@@ -588,7 +604,7 @@ describe('E40Planning', () => {
       <E40Planning />,
       makeAppContext({
         reportV2Task,
-        movingTask: { task, report: true },
+        movingTask: { kind: 'task', task, report: true },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       }),
     )
@@ -908,5 +924,118 @@ describe('E40Planning', () => {
     await act(async () => {
       fireEvent.pointerUp(window, { clientX: 350, clientY: 100 })
     })
+  })
+})
+
+describe('E40Planning — sous-tâches planifiables (E9)', () => {
+  beforeEach(() => {
+    vi.setSystemTime(new Date('2026-06-30T14:30:00'))
+  })
+
+  afterEach(() => {
+    delete (document as unknown as { elementFromPoint?: unknown }).elementFromPoint
+  })
+
+  it('affiche une sous-tâche planifiée avec le titre du parent et son propre titre en dessous (E9b)', async () => {
+    const sub = makeSubTaskV2({
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '09:30',
+    })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getPlannedSubTasksForDate: vi.fn().mockResolvedValue([sub]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('Rangement')).toBeInTheDocument())
+    expect(screen.getByText('- Ranger le bureau')).toBeInTheDocument()
+  })
+
+  it('avec une sous-tâche en attente, choisir un créneau appelle scheduleSubTaskV2', async () => {
+    const scheduleSubTaskV2 = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        scheduleSubTaskV2,
+        pendingPlanTask: { kind: 'subtask', title: 'Ranger le bureau', subTaskId: 'sub-1' },
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getPlannedSubTasksForDate: vi.fn().mockResolvedValue([]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText(/Ranger le bureau.*cours de planification/)).toBeInTheDocument())
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
+    await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
+    expect(scheduleSubTaskV2).toHaveBeenCalledWith('sub-1', '2026-06-30', '10:00', '10:30')
+  })
+
+  it('le menu sur une sous-tâche propose Déplacer/Renommer/Supprimer et les branche sur les fonctions sous-tâche (E6)', async () => {
+    const startMoveSubTask = vi.fn()
+    const renameSubTaskV2 = vi.fn().mockResolvedValue(undefined)
+    const deleteSubTask = vi.fn().mockResolvedValue(undefined)
+    const sub = makeSubTaskV2({
+      id: 'sub-1',
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '09:30',
+    })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        startMoveSubTask,
+        renameSubTaskV2,
+        deleteSubTask,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getPlannedSubTasksForDate: vi.fn().mockResolvedValue([sub]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('Rangement')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('gridcell', { name: /Créneau 9h00/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Déplacer' }))
+    expect(startMoveSubTask).toHaveBeenCalledWith(sub, false)
+
+    await userEvent.click(screen.getByRole('gridcell', { name: /Créneau 9h00/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Renommer' }))
+    const input = screen.getByLabelText('Nouveau nom')
+    await userEvent.clear(input)
+    await userEvent.type(input, 'Trier les papiers')
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    expect(renameSubTaskV2).toHaveBeenCalledWith('sub-1', 'Trier les papiers')
+
+    await userEvent.click(screen.getByRole('gridcell', { name: /Créneau 9h00/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
+    expect(deleteSubTask).toHaveBeenCalledWith('sub-1')
+  })
+
+  it('avec une sous-tâche en cours de déplacement, le bandeau affiche parent et sous-titre (E8)', async () => {
+    const sub = makeSubTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '09:30' })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        movingTask: { kind: 'subtask', subTask: sub, report: true },
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getPlannedSubTasksForDate: vi.fn().mockResolvedValue([sub]),
+      }),
+    )
+    expect(await screen.findByText(/« rangement - ranger le bureau » est en cours de déplacement\./i)).toBeInTheDocument()
+  })
+
+  it('cocher la case d\'une sous-tâche planifiée appelle toggleSubTask', async () => {
+    const toggleSubTask = vi.fn().mockResolvedValue(undefined)
+    const sub = makeSubTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '09:30' })
+    renderWithApp(
+      <E40Planning />,
+      makeAppContext({
+        toggleSubTask,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+        getPlannedSubTasksForDate: vi.fn().mockResolvedValue([sub]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('Rangement')).toBeInTheDocument())
+    await userEvent.click(screen.getByLabelText('Terminer Rangement - Ranger le bureau'))
+    expect(toggleSubTask).toHaveBeenCalledWith(sub)
   })
 })

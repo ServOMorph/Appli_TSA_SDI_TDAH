@@ -102,3 +102,28 @@ test('T50 — Déplacer une tâche vers un autre jour via le bandeau (E6)', asyn
   await page.getByRole('button', { name: 'Jour précédent' }).click()
   await expect(page.getByRole('gridcell', { name: 'Créneau 16h00 : Courses' })).toHaveCount(0)
 })
+
+test('T51 — planifier une sous-tâche depuis Décomposer, affichage hiérarchique dans le planning (E9)', async ({ page }) => {
+  await page.getByRole('button', { name: 'Todo' }).click()
+  await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
+  await page.getByLabel('Titre de la tâche').fill('Grand ménage')
+  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('button', { name: 'Valider' }).click()
+  await page.getByText('Grand ménage').click()
+  await page.getByRole('button', { name: 'Décomposer' }).click()
+  await page.getByLabel('Nouvelle sous-étape').fill('Ranger le bureau')
+  await page.getByRole('button', { name: 'Ajouter', exact: true }).click()
+  await expect(page.getByText('Ranger le bureau')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Planifier Ranger le bureau', exact: true }).click()
+  await expect(page.getByText('« Ranger le bureau » est en cours de planification.')).toBeVisible()
+  await page.getByRole('gridcell', { name: 'Créneau 10h00' }).click()
+  await page.getByRole('gridcell', { name: 'Créneau 10h00' }).click()
+
+  await expect(page.getByText('Grand ménage', { exact: true })).toBeVisible()
+  await expect(page.getByText('- Ranger le bureau')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Accueil' }).click()
+  await expect(page.getByText(/10:00 · Grand ménage/)).toBeVisible()
+  await expect(page.getByText('- Ranger le bureau')).toBeVisible()
+})

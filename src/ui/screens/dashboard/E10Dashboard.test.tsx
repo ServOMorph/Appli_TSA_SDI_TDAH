@@ -44,6 +44,9 @@ function makeSubTask(overrides: Partial<SubTask> = {}): SubTask {
     title: 'Ouvrir le template',
     is_completed: false,
     position: 0,
+    scheduled_date: null,
+    scheduled_start: null,
+    scheduled_end: null,
     ...overrides,
   }
 }
@@ -295,6 +298,66 @@ describe('E10Dashboard', () => {
       const btn = await screen.findByLabelText(/Reporter Tâche non essentielle/)
       await userEvent.click(btn)
       expect(ctx.startMoveTask).toHaveBeenCalledWith(task, true)
+      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    })
+
+    it('affiche une sous-tâche planifiée avec le titre du parent et son propre titre (E9b)', async () => {
+      const sub = makeSubTask({
+        id: 'st-1',
+        task_id: 'parent-1',
+        title: 'Ranger le bureau',
+        scheduled_date: '2026-07-01',
+        scheduled_start: '09:00',
+        scheduled_end: '09:30',
+      })
+      const ctx = makeAppContext({
+        getPlannedTasksForDate: async () => [],
+        getPlannedSubTasksForDate: async () => [{ ...sub, parentTitle: 'Rangement' }],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(await screen.findByText(/09:00 · Rangement/)).toBeDefined()
+      expect(screen.getByText('- Ranger le bureau')).toBeDefined()
+    })
+
+    it('cocher une sous-tâche planifiée appelle toggleSubTask', async () => {
+      const sub = makeSubTask({
+        id: 'st-1',
+        task_id: 'parent-1',
+        title: 'Ranger le bureau',
+        scheduled_date: '2026-07-01',
+        scheduled_start: '09:00',
+        scheduled_end: '09:30',
+      })
+      const planned = { ...sub, parentTitle: 'Rangement' }
+      const ctx = makeAppContext({
+        getPlannedTasksForDate: async () => [],
+        getPlannedSubTasksForDate: async () => [planned],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const checkbox = await screen.findByRole('checkbox', { name: 'Terminer Rangement - Ranger le bureau' })
+      await userEvent.click(checkbox)
+      expect(ctx.toggleSubTask).toHaveBeenCalledWith(planned)
+    })
+
+    it('déclenche le report d\'une sous-tâche via startMoveSubTask en surcharge (E8)', async () => {
+      const sub = makeSubTask({
+        id: 'st-1',
+        task_id: 'parent-1',
+        title: 'Ranger le bureau',
+        scheduled_date: '2026-07-01',
+        scheduled_start: '09:00',
+        scheduled_end: '09:30',
+      })
+      const planned = { ...sub, parentTitle: 'Rangement' }
+      const ctx = makeAppContext({
+        overloadMode: true,
+        getPlannedTasksForDate: async () => [],
+        getPlannedSubTasksForDate: async () => [planned],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const btn = await screen.findByLabelText(/Reporter Rangement - Ranger le bureau/)
+      await userEvent.click(btn)
+      expect(ctx.startMoveSubTask).toHaveBeenCalledWith(planned, true)
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 

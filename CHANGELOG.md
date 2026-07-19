@@ -1,3 +1,16 @@
+## v4.7 — 2026-07-19
+
+### Ajouté
+- Phase V4-5 codée : sous-tâches planifiables (E9a modèle de données, E9b affichage hiérarchique, E9c point d'entrée « Planifier »), avec parité complète d'interactions (glisser, menu déplacer/renommer/supprimer, report) entre tâche et sous-tâche planifiées, sur demande explicite de l'utilisateur.
+- Bouton « Renommer » une sous-étape ajouté sur l'écran de détail de tâche (E22), sur retour utilisateur en cours de validation manuelle.
+
+### Modifié
+- `SubTask` reste rattachée à sa tâche parente (pas de promotion en `TaskV2` indépendante), conforme à la décision E9 du 2026-07-18 — migration Dexie v3→v4.
+- `E40Planning.tsx` réécrit autour d'un type union `PlanBlock` (tâche/sous-tâche) pour porter la parité d'interactions sans dupliquer la logique de glisser/menu/report.
+
+### Validé
+- 422/422 tests unitaires, `tsc -b` clean, eslint 0 erreur, 51/51 e2e (T51 nouveau). Validation manuelle quasi close (1.1-1.4, 2.1-2.3, 3.1-3.6 confirmés) ; point 1.5 (renommer depuis E22) en attente.
+
 ## v4.6 — 2026-07-19
 
 ### Ajouté

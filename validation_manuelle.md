@@ -1,62 +1,59 @@
-# Validation manuelle — Phase V4-4 (Interactions sur une tâche planifiée)
+# Validation manuelle — Phase V4-5 (Sous-tâches planifiables)
 
 Branche : `v4` — Date : 2026-07-19
 
-Objectif de la phase : E6 (menu déplacer/renommer/supprimer), E1 (appui long + glisser tactile),
-E8 (report via choix de créneau, remplace l'avance automatique au lendemain).
+Objectif de la phase : E9a (une sous-tâche peut se planifier à son propre créneau, rattachée à sa
+tâche parente sans devenir une tâche indépendante), E9b (affichage hiérarchique dans le planning,
+l'accueil et le report), E9c (point d'entrée « Planifier » depuis l'écran de décomposition et le
+détail de tâche). Périmètre étendu sur demande explicite de l'utilisateur : parité complète
+d'interactions avec les tâches (E1 glisser, E6 menu déplacer/renommer/supprimer, E8 reporter).
 
 Lancer : `npm run dev` (ou `npm run dev -- --host` pour tester au téléphone).
 Repartir d'une base propre via le bouton « Reset DB » (dev) si besoin.
 
 ---
 
-## E6 — Menu sur une tâche planifiée
+## E9a/E9c — Planifier une sous-tâche
 
-- [x] 1.1 — Depuis le Planning, taper sur une tâche déjà placée : un menu s'ouvre avec trois choix
-      (Déplacer, Renommer, Supprimer).
-- [x] 1.2 — « Déplacer » ferme le menu et affiche le bandeau « "X" est en cours de déplacement. »
-      au-dessus de « Ajouter une tâche » (même bandeau que E5), planning affiché en arrière-plan.
-      Naviguer entre les jours avec ‹ › puis taper une case cible déplace la tâche sans la dupliquer
-      et referme le bandeau.
-- [x] 1.3 — « Renommer » ouvre un champ pré-rempli avec le titre actuel ; enregistrer met à jour le
-      titre affiché sur le planning et sur l'accueil.
-- [x] 1.4 — « Supprimer » demande confirmation puis retire définitivement la tâche du planning.
-- [x] 1.5 — Pendant un déplacement, taper une case déjà occupée par une autre tâche affiche une
-      erreur et laisse le bandeau ouvert (la tâche déplacée n'est pas perdue).
-- [x] 1.6 — Le bouton « Annuler » du bandeau referme le déplacement sans modifier la tâche.
+- [x] 1.1 — Depuis Todo ou Tâche du jour, ouvrir une tâche ayant au moins une sous-étape (ou en
+      créer une via « Décomposer »). Chaque sous-étape affiche un bouton « Planifier » à côté de
+      « Supprimer ».
+- [x] 1.2 — Taper « Planifier » sur une sous-étape ouvre le Planning avec le bandeau
+      « "X" est en cours de planification. » (même mécanique que planifier une tâche).
+- [x] 1.3 — Taper une case vide place la sous-étape à ce créneau ; la tâche parente n'est ni
+      supprimée ni transformée — elle reste visible avec ses autres sous-étapes dans Décomposer.
+- [x] 1.4 — Le même point d'entrée « Planifier » est disponible depuis l'écran de détail de tâche
+      (pas seulement depuis Décomposer).
+- [ ] 1.5 — Depuis l'écran de détail de tâche (E22), chaque sous-étape a un bouton « Renommer » qui
+      ouvre une modale pré-remplie ; enregistrer met à jour le titre affiché.
 
-## E1 — Glisser tactile
+## E9b — Affichage hiérarchique
 
-- [x] 2.1 — À la souris sur PC : maintenir le clic enfoncé ~400 ms sans bouger sur une tâche, puis
-      glisser en gardant le bouton enfoncé. Un overlay (titre de la tâche + aperçu de la cible) suit
-      le curseur. Relâcher sur un créneau du planning pose la tâche **sous le curseur** (lecture
-      directe de la ligne survolée, plus de calcul par distance).
-- [x] 2.2 — Glisser vers le haut ou le bas : l'overlay affiche l'heure survolée (ex. « → 10h00 ») ;
-      relâcher pose la tâche à ce créneau.
-- [x] 2.3 — **Sans relâcher**, amener la tâche dans la zone à droite du planning et l'y maintenir :
-      après ~0,65 s le planning bascule sur le jour suivant (la tâche reste en main). Rester dans la
-      zone fait défiler les jours l'un après l'autre. Ramener le curseur sur la grille et relâcher
-      sur le créneau voulu pose la tâche à ce jour/créneau. Relâcher dans la zone de bord **annule**
-      le déplacement (la tâche ne bouge pas).
-- [x] 2.4 — Maintenir la tâche dans la zone à gauche quand le planning affiche aujourd'hui : aucun
-      effet ; l'overlay affiche « Retour impossible ».
-- [x] 2.5 — Depuis un jour futur, maintenir la tâche dans la zone à gauche : le planning revient au
-      jour précédent après ~0,65 s (même mécanique que 2.3), jamais avant aujourd'hui.
-- [x] 2.6 — Un appui bref (sans maintien) ouvre le menu E6 au lieu de déclencher un déplacement.
+- [x] 2.1 — Sur le Planning, la case occupée par la sous-étape affiche le titre de la tâche parente
+      en taille normale, puis le titre de la sous-étape en dessous, plus petit, précédé d'un tiret.
+- [x] 2.2 — Sur l'accueil, la carte « Planning du jour » affiche la sous-étape planifiée du jour
+      avec la même hiérarchie (parent normal / sous-étape plus petite en dessous).
+- [x] 2.3 — Cocher la case d'une sous-étape planifiée la marque terminée (teinte intensifiée), à la
+      fois sur le Planning et sur l'accueil ; décocher la réactive.
 
-## E8 — Report via choix de créneau
+## E1/E6/E8 — Parité d'interactions
 
-- [x] 3.1 — En mode surcharge, le bouton « Reporter » d'une tâche non essentielle affiche directement
-      le bandeau « "X" est en cours de déplacement. » (pas de modale) et bascule automatiquement le
-      planning sur le lendemain.
-- [x] 3.2 — Taper une case sur le lendemain (ou un autre jour après navigation) déplace la tâche à cet
-      endroit, referme le bandeau, et affiche un badge « Reporté » sur la tâche.
-- [x] 3.3 — Depuis le Dashboard, le bouton « Reporter » de la carte « Planning du jour » navigue vers
-      le Planning avec le même bandeau déjà affiché et le planning déjà basculé sur le lendemain.
+- [x] 3.1 — Taper sur une sous-étape déjà placée ouvre le même menu Déplacer/Renommer/Supprimer que
+      pour une tâche.
+- [x] 3.2 — « Renommer » ne change que le titre de la sous-étape (le titre du parent reste inchangé
+      à l'affichage).
+- [x] 3.3 — « Supprimer » retire la sous-étape (et sa planification) sans toucher à la tâche parente
+      ni aux autres sous-étapes.
+- [x] 3.4 — Appui long + glisser fonctionne sur une sous-étape planifiée exactement comme sur une
+      tâche (bascule de jour par zones de bord incluse).
+- [x] 3.5 — En mode surcharge, le bouton « Reporter » apparaît sur une sous-étape planifiée non
+      terminée et déclenche le même bandeau de déplacement basculé sur le lendemain.
+- [x] 3.6 — Une sous-étape planifiée et une tâche planifiée ne peuvent pas occuper le même créneau
+      (conflit détecté dans les deux sens).
 
 ---
 
 ## Résultat
 
-- [x] Tous les points passés → phase V4-4 validée.
-- [x] Écarts constatés : voir note sous 1.4 (report codé, cf. `roadmap_v4.md`).
+- [ ] Tous les points passés → phase V4-5 validée.
+- [ ] Écarts constatés :

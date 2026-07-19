@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-07 (suite 3, hors phase) (archivé depuis contexte.md 2026-07-19, close V4-5)
+- Bouton « Mode surcharge désactivé » de la TopBar retiré hors surcharge (`TopBar.tsx`) sur demande de l'utilisateur — ne s'affiche plus que quand la surcharge est active. **Écart assumé avec la demande explicite antérieure de Marie**, qui voulait ce bouton visible, grisé, informatif hors surcharge (consigné en son temps dans `roadmap_v3.md` § Notes diverses). Point ajouté à `Note de réunion/a demander a Marie.md` pour reconfirmation. Test `E10Dashboard.test.tsx` mis à jour (vérifie l'absence du bouton au lieu de son état désactivé). 29/29 tests du fichier verts, `tsc -b` clean.
+
 ## 2026-07-07 (suite 2, hors phase) (archivé depuis contexte.md 2026-07-19, close V4-4)
 - Espacement des créneaux du Planning (`E40Planning.tsx`) corrigé sur signalement utilisateur (screenshot) — l'espace entre le cadre d'une tâche et la ligne du créneau était asymétrique (bas plus grand que haut), causé par un `minHeight: 64px` fixe sur chaque créneau combiné à un alignement `flex-start` du contenu. Retiré ; les créneaux occupés s'ajustent désormais à leur contenu réel (espace haut = espace bas, le haut restant la référence, confirmé par reformulation avant codage). Créneaux vides alignés sur la même hauteur qu'un créneau occupé via un placeholder invisible (`emptySlotPlaceholderStyle`, mêmes padding/police que la case de tâche, `aria-hidden`) plutôt qu'une valeur en dur, pour rester robuste aux changements de thème/police. 29/29 tests (`E40Planning.test.tsx`) verts, `tsc -b` clean. Changement visuel mineur hors gate de phase : pas de test manuel dédié, pas de validation utilisateur au-delà des deux reformulations en amont.
 

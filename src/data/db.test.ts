@@ -21,7 +21,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(3)
+    expect(db.verno).toBe(4)
   })
 
   it('creates and retrieves users', async () => {
@@ -61,6 +61,9 @@ describe('AppDatabase', () => {
       title: 'Subtask',
       is_completed: false,
       position: 0,
+      scheduled_date: null,
+      scheduled_start: null,
+      scheduled_end: null,
     }
 
     await db.subTasks.add(subTask)

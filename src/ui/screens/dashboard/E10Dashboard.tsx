@@ -2,7 +2,8 @@ import { useApp } from '@/app/AppContext'
 import { useState, useEffect } from 'react'
 import type { Task } from '@/domain/entities/task'
 import type { TaskV2 } from '@/domain/entities/taskV2'
-import { getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import type { PlannedSubTask } from '@/app/AppContext'
+import { getRemainingPlannedCost, taskSlotRange } from '@/domain/rules/taskRulesV2'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
@@ -116,6 +117,18 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
   )
 }
 
+type PlanBlock =
+  | { kind: 'task'; item: TaskV2 }
+  | { kind: 'subtask'; item: PlannedSubTask }
+
+function blockCompleted(block: PlanBlock): boolean {
+  return block.kind === 'task' ? block.item.status === 'completed' : block.item.is_completed
+}
+
+function blockEssential(block: PlanBlock): boolean {
+  return block.kind === 'task' ? block.item.essential : false
+}
+
 export function E10Dashboard() {
   const {
     todayTasks,
@@ -129,8 +142,11 @@ export function E10Dashboard() {
     setTaskDetailOrigin,
     reorderTodayTasks,
     getPlannedTasksForDate,
+    getPlannedSubTasksForDate,
     completeV2Task,
+    toggleSubTask,
     startMoveTask,
+    startMoveSubTask,
     settings,
   } = useApp()
 
@@ -138,6 +154,7 @@ export function E10Dashboard() {
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks)
   const [todayPlanned, setTodayPlanned] = useState<TaskV2[]>([])
+  const [todayPlannedSubTasks, setTodayPlannedSubTasks] = useState<PlannedSubTask[]>([])
 
   useEffect(() => {
     setVisibleOrder(todayTasks)
@@ -146,11 +163,15 @@ export function E10Dashboard() {
   useEffect(() => {
     async function loadPlanningToday() {
       const date = todayStr()
-      const planned = await getPlannedTasksForDate(date)
+      const [planned, plannedSubs] = await Promise.all([
+        getPlannedTasksForDate(date),
+        getPlannedSubTasksForDate(date),
+      ])
       setTodayPlanned(planned)
+      setTodayPlannedSubTasks(plannedSubs)
     }
     loadPlanningToday()
-  }, [getPlannedTasksForDate])
+  }, [getPlannedTasksForDate, getPlannedSubTasksForDate])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -164,17 +185,32 @@ export function E10Dashboard() {
     goTo('task-detail')
   }
 
-  const hasPlanningToday = todayPlanned.length > 0
+  const planBlocks: PlanBlock[] = [
+    ...todayPlanned.map((t): PlanBlock => ({ kind: 'task', item: t })),
+    ...todayPlannedSubTasks.map((s): PlanBlock => ({ kind: 'subtask', item: s })),
+  ].sort((a, b) => (taskSlotRange(a.item)?.start ?? 0) - (taskSlotRange(b.item)?.start ?? 0))
 
-  async function handleCompletePlanned(taskId: string) {
-    await completeV2Task(taskId)
+  const hasPlanningToday = planBlocks.length > 0
+
+  async function reloadPlanned() {
     const date = todayStr()
-    const planned = await getPlannedTasksForDate(date)
+    const [planned, plannedSubs] = await Promise.all([
+      getPlannedTasksForDate(date),
+      getPlannedSubTasksForDate(date),
+    ])
     setTodayPlanned(planned)
+    setTodayPlannedSubTasks(plannedSubs)
   }
 
-  function handleReportPlanned(task: TaskV2) {
-    startMoveTask(task, true)
+  async function handleCompletePlanned(block: PlanBlock) {
+    if (block.kind === 'task') await completeV2Task(block.item.id)
+    else await toggleSubTask(block.item)
+    await reloadPlanned()
+  }
+
+  function handleReportPlanned(block: PlanBlock) {
+    if (block.kind === 'task') startMoveTask(block.item, true)
+    else startMoveSubTask(block.item, true)
     goTo('planning')
   }
 
@@ -260,21 +296,22 @@ export function E10Dashboard() {
         <h2>Planning du jour</h2>
         {hasPlanningToday ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            {todayPlanned.map((task) => {
-              const completed = task.status === 'completed'
+            {planBlocks.map((block) => {
+              const completed = blockCompleted(block)
+              const label = block.kind === 'task' ? block.item.title : `${block.item.parentTitle} - ${block.item.title}`
               return (
-              <Card key={task.id} style={{ padding: 'var(--spacing-sm)', ...plannedTaskTintStyle(completed, ambianceColor) }}>
+              <Card key={block.item.id} style={{ padding: 'var(--spacing-sm)', ...plannedTaskTintStyle(completed, ambianceColor) }}>
                 <div style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
                   <input
                     type="checkbox"
                     checked={completed}
-                    onChange={() => handleCompletePlanned(task.id)}
-                    aria-label={`Terminer ${task.title}`}
+                    onChange={() => handleCompletePlanned(block)}
+                    aria-label={`Terminer ${label}`}
                     style={{ width: '20px', height: '20px', margin: 0, accentColor: 'var(--color-accent)', cursor: 'pointer', flexShrink: 0 }}
                   />
                   <button
                     onClick={() => goTo('planning')}
-                    aria-label={`${task.title} — voir dans le planning`}
+                    aria-label={`${label} — voir dans le planning`}
                     style={{
                       flex: 1,
                       display: 'inline-flex',
@@ -290,13 +327,20 @@ export function E10Dashboard() {
                       font: 'inherit',
                     }}
                   >
-                    <span>{task.scheduled_start} · {task.title}</span>
-                    {task.energy_cost != null && <BatteryCost cost={task.energy_cost} />}
+                    {block.kind === 'task' ? (
+                      <span>{block.item.scheduled_start} · {block.item.title}</span>
+                    ) : (
+                      <span style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span>{block.item.scheduled_start} · {block.item.parentTitle}</span>
+                        <span style={{ fontSize: '0.75rem', opacity: 0.85 }}>- {block.item.title}</span>
+                      </span>
+                    )}
+                    {block.kind === 'task' && block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
                   </button>
-                  {!completed && overloadMode && !task.essential && (
+                  {!completed && overloadMode && !blockEssential(block) && (
                     <button
-                      aria-label={`Reporter ${task.title}`}
-                      onClick={() => handleReportPlanned(task)}
+                      aria-label={`Reporter ${label}`}
+                      onClick={() => handleReportPlanned(block)}
                       style={{
                         background: 'none',
                         border: '1px solid var(--color-border)',

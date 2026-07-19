@@ -100,7 +100,12 @@ function timeToSlotIndex(time: string): number | null {
   return h * 2 + (m >= 30 ? 1 : 0)
 }
 
-export function taskSlotRange(task: TaskV2): { start: number; end: number } | null {
+export interface Scheduled {
+  scheduled_start: string | null
+  scheduled_end: string | null
+}
+
+export function taskSlotRange(task: Scheduled): { start: number; end: number } | null {
   if (!task.scheduled_start) return null
   const start = timeToSlotIndex(task.scheduled_start)
   if (start === null) return null
@@ -114,7 +119,7 @@ export function taskSlotRange(task: TaskV2): { start: number; end: number } | nu
   return { start, end }
 }
 
-export function taskOccupiesSlot(task: TaskV2, slot: number): boolean {
+export function taskOccupiesSlot(task: Scheduled, slot: number): boolean {
   const range = taskSlotRange(task)
   if (!range) return false
   return slot >= range.start && slot <= range.end

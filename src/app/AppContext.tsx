@@ -9,6 +9,7 @@ import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
 import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, reportTaskV2 as reportTaskV2Rule, renameTaskV2 as renameTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { scheduleSubTask as scheduleSubTaskRule, reportSubTask as reportSubTaskRule, renameSubTask as renameSubTaskRule } from '@/domain/rules/subTaskRules'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
@@ -77,6 +78,7 @@ interface AppContextValue {
   getPlannedTasksForDate: (date: string) => Promise<TaskV2[]>
   pendingPlanTask: PendingPlanTask | null
   startPlanTask: (title: string, sourceTaskId?: string) => void
+  startPlanSubTask: (subTaskId: string, title: string) => void
   clearPendingPlanTask: () => void
   schedulePendingTask: (
     title: string,
@@ -95,6 +97,10 @@ interface AppContextValue {
   toggleSubTask: (subTask: SubTask) => Promise<void>
   reorderSubTasks: (taskId: string, ids: string[]) => Promise<void>
   getSubTasks: (taskId: string) => Promise<SubTask[]>
+  getPlannedSubTasksForDate: (date: string) => Promise<PlannedSubTask[]>
+  scheduleSubTaskV2: (subTaskId: string, date: string, start: string, end: string) => Promise<void>
+  reportSubTaskV2: (subTaskId: string, date: string, start: string, end: string) => Promise<void>
+  renameSubTaskV2: (id: string, title: string) => Promise<void>
   updateTaskTitle: (id: string, title: string) => Promise<void>
   reorderTodayTasks: (ids: string[]) => Promise<void>
   refreshDashboard: () => Promise<void>
@@ -108,8 +114,9 @@ interface AppContextValue {
   renameV2Task: (id: string, title: string) => Promise<void>
   deleteV2Task: (id: string) => Promise<void>
   reportV2Task: (taskId: string, date: string, start: string, end: string) => Promise<void>
-  movingTask: { task: TaskV2; report: boolean } | null
+  movingTask: MovingPlanItem | null
   startMoveTask: (task: TaskV2, report: boolean) => void
+  startMoveSubTask: (subTask: PlannedSubTask, report: boolean) => void
   clearMoveTask: () => void
   planningTargetDate: string | null
   setPlanningTargetDate: (date: string | null) => void
@@ -119,10 +126,20 @@ interface AppContextValue {
 }
 
 export interface PendingPlanTask {
+  kind: 'task' | 'subtask'
   title: string
   sourceTaskId?: string
   taskId?: string
+  subTaskId?: string
 }
+
+export interface PlannedSubTask extends SubTask {
+  parentTitle: string
+}
+
+export type MovingPlanItem =
+  | { kind: 'task'; task: TaskV2; report: boolean }
+  | { kind: 'subtask'; subTask: PlannedSubTask; report: boolean }
 
 export const AppContext = createContext<AppContextValue | null>(null)
 
@@ -173,7 +190,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
   const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
-  const [movingTask, setMovingTask] = useState<{ task: TaskV2; report: boolean } | null>(null)
+  const [movingTask, setMovingTask] = useState<MovingPlanItem | null>(null)
   const [planningTargetDate, setPlanningTargetDate] = useState<string | null>(null)
 
   useEffect(() => {
@@ -354,7 +371,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   function startMoveTask(task: TaskV2, report: boolean) {
-    setMovingTask({ task, report })
+    setMovingTask({ kind: 'task', task, report })
+  }
+
+  function startMoveSubTask(subTask: PlannedSubTask, report: boolean) {
+    setMovingTask({ kind: 'subtask', subTask, report })
   }
 
   function clearMoveTask() {
@@ -362,7 +383,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   function startPlanTask(title: string, sourceTaskId?: string) {
-    setPendingPlanTask({ title, sourceTaskId })
+    setPendingPlanTask({ kind: 'task', title, sourceTaskId })
+  }
+
+  function startPlanSubTask(subTaskId: string, title: string) {
+    setPendingPlanTask({ kind: 'subtask', title, subTaskId })
   }
 
   function clearPendingPlanTask() {
@@ -391,7 +416,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       await loadAll()
     }
     await refreshTodayPlanned()
-    setPendingPlanTask({ title, taskId: scheduled.id })
+    setPendingPlanTask({ kind: 'task', title, taskId: scheduled.id })
     return scheduled.id
   }
 
@@ -453,6 +478,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       title,
       is_completed: false,
       position: existing.length,
+      scheduled_date: null,
+      scheduled_start: null,
+      scheduled_end: null,
     }
     await subTaskRepo.create(subTask)
     await loadAll()
@@ -474,6 +502,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   async function getSubTasks(taskId: string): Promise<SubTask[]> {
     return subTaskRepo.getByTaskId(taskId)
+  }
+
+  async function getPlannedSubTasksForDate(date: string): Promise<PlannedSubTask[]> {
+    const subs = await subTaskRepo.getByDate(date)
+    const parents = await Promise.all(subs.map((s) => taskRepo.getById(s.task_id)))
+    return subs.map((s, i) => ({ ...s, parentTitle: parents[i]?.title ?? '' }))
+  }
+
+  async function scheduleSubTaskV2(subTaskId: string, date: string, start: string, end: string) {
+    const subTask = await subTaskRepo.getById(subTaskId)
+    if (!subTask) return
+    await subTaskRepo.update(scheduleSubTaskRule(subTask, date, start, end))
+  }
+
+  async function reportSubTaskV2(subTaskId: string, date: string, start: string, end: string) {
+    const subTask = await subTaskRepo.getById(subTaskId)
+    if (!subTask) return
+    await subTaskRepo.update(reportSubTaskRule(subTask, date, start, end))
+  }
+
+  async function renameSubTaskV2(id: string, title: string) {
+    const trimmed = title.trim()
+    if (!trimmed) return
+    const subTask = await subTaskRepo.getById(id)
+    if (!subTask) return
+    await subTaskRepo.update(renameSubTaskRule(subTask, trimmed))
   }
 
   async function updateTaskTitle(id: string, title: string) {
@@ -645,6 +699,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         getPlannedTasksForDate,
         pendingPlanTask,
         startPlanTask,
+        startPlanSubTask,
         clearPendingPlanTask,
         schedulePendingTask,
         completeV2Task,
@@ -653,6 +708,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         reportV2Task,
         movingTask,
         startMoveTask,
+        startMoveSubTask,
         clearMoveTask,
         planningTargetDate,
         setPlanningTargetDate,
@@ -664,6 +720,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         toggleSubTask,
         reorderSubTasks,
         getSubTasks,
+        getPlannedSubTasksForDate,
+        scheduleSubTaskV2,
+        reportSubTaskV2,
+        renameSubTaskV2,
         updateTaskTitle,
         reorderTodayTasks,
         refreshDashboard,

@@ -60,6 +60,16 @@ export class SubTaskRepository {
     )
   }
 
+  async getByDate(date: string): Promise<SubTask[]> {
+    const subTasks = await this.db.subTasks.where('scheduled_date').equals(date).toArray()
+    return Promise.all(
+      subTasks.map(async (st) => ({
+        ...st,
+        title: await this.decryptTitle(st.title),
+      })),
+    )
+  }
+
   async reorder(ids: string[]): Promise<void> {
     const subTasks = await Promise.all(ids.map((id) => this.db.subTasks.get(id)))
     const filtered = subTasks.filter((st): st is SubTask => st !== undefined)

@@ -51,8 +51,8 @@ describe('E20Inbox', () => {
     it('affiche la progression des sous-étapes', () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
       const subs: SubTask[] = [
-        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
-        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1 },
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null },
+        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1, scheduled_date: null, scheduled_start: null, scheduled_end: null },
       ]
       const ctx = makeAppContext({ inboxTasks: [task], inboxSubTasksMap: { abc: subs } })
       renderWithApp(<E20Inbox />, ctx)
@@ -162,7 +162,7 @@ describe('E20Inbox', () => {
 
     it('avertit avant de planifier une tâche ayant des sous-tâches', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0 }
+      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null }
       const ctx = makeAppContext({
         inboxTasks: [task],
         inboxSubTasksMap: { abc: [sub] },
@@ -177,7 +177,7 @@ describe('E20Inbox', () => {
 
     it('avertit avant de mettre dans une liste une tâche ayant des sous-tâches', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0 }
+      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null }
       const ctx = makeAppContext({
         inboxTasks: [task],
         inboxSubTasksMap: { abc: [sub] },

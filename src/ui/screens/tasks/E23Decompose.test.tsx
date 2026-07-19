@@ -26,6 +26,9 @@ function makeSubTask(overrides: Partial<SubTask> = {}): SubTask {
     title: 'Prendre le téléphone',
     is_completed: false,
     position: 0,
+    scheduled_date: null,
+    scheduled_start: null,
+    scheduled_end: null,
     ...overrides,
   }
 }
@@ -112,6 +115,21 @@ describe('E23Decompose', () => {
     await waitFor(() => {
       expect(screen.getByLabelText('Marquer non terminée : Prendre le téléphone')).toBeDefined()
     })
+  })
+
+  it('Planifier une sous-étape appelle startPlanSubTask et navigue vers planning (E9c)', async () => {
+    const task = makeTask()
+    const st = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone' })
+    const ctx = makeAppContext({
+      selectedTaskId: 'task-1',
+      inboxTasks: [task],
+      getSubTasks: vi.fn().mockResolvedValue([st]),
+    })
+    renderWithApp(<E23Decompose />, ctx)
+    await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
+    await userEvent.click(screen.getByLabelText('Planifier Prendre le téléphone'))
+    expect(ctx.startPlanSubTask).toHaveBeenCalledWith('st-1', 'Prendre le téléphone')
+    expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
   it('le bouton Ajouter est désactivé si le champ est vide', async () => {

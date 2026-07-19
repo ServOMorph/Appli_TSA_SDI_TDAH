@@ -58,9 +58,10 @@ interface SortableSubTaskItemProps {
   subTask: SubTask
   onDelete: (id: string) => void
   onToggle: (subTask: SubTask) => void
+  onPlan: (subTask: SubTask) => void
 }
 
-function SortableSubTaskItem({ subTask, onDelete, onToggle }: SortableSubTaskItemProps) {
+function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan }: SortableSubTaskItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: subTask.id,
   })
@@ -115,6 +116,24 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle }: SortableSubTaskIte
             {subTask.title}
           </span>
           <button
+            aria-label={`Planifier ${subTask.title}`}
+            style={{
+              background: 'none',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.75rem',
+              padding: '4px 8px',
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onPlan(subTask)
+            }}
+          >
+            Planifier
+          </button>
+          <button
             aria-label={`Supprimer ${subTask.title}`}
             style={{
               background: 'none',
@@ -147,6 +166,7 @@ export function E23Decompose() {
     deleteSubTask,
     toggleSubTask,
     reorderSubTasks,
+    startPlanSubTask,
     goTo,
   } = useApp()
 
@@ -210,6 +230,11 @@ export function E23Decompose() {
     }
   }
 
+  function handlePlan(subTask: SubTask) {
+    startPlanSubTask(subTask.id, subTask.title)
+    goTo('planning')
+  }
+
   return (
     <main style={pageStyle}>
       <button style={backBtnStyle} onClick={() => goTo('task-detail')} aria-label="Retour">
@@ -234,6 +259,7 @@ export function E23Decompose() {
                   subTask={st}
                   onDelete={handleDelete}
                   onToggle={handleToggle}
+                  onPlan={handlePlan}
                 />
               ))}
             </div>

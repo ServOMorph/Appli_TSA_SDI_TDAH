@@ -21,6 +21,9 @@ describe('SubTaskRepository', () => {
     title: 'Subtask',
     is_completed: false,
     position: 0,
+    scheduled_date: null,
+    scheduled_start: null,
+    scheduled_end: null,
     ...overrides,
   })
 
@@ -55,6 +58,15 @@ describe('SubTaskRepository', () => {
       await repo.create(mockSubTask({ id: 'st3', task_id: 'task-2' }))
 
       const subTasks = await repo.getByTaskId('task-1')
+      expect(subTasks).toHaveLength(2)
+    })
+
+    it('gets subtasks by scheduled date', async () => {
+      await repo.create(mockSubTask({ id: 'st1', scheduled_date: '2026-07-20' }))
+      await repo.create(mockSubTask({ id: 'st2', scheduled_date: '2026-07-20' }))
+      await repo.create(mockSubTask({ id: 'st3', scheduled_date: '2026-07-21' }))
+
+      const subTasks = await repo.getByDate('2026-07-20')
       expect(subTasks).toHaveLength(2)
     })
   })

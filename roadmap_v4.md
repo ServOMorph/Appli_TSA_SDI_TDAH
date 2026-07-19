@@ -88,11 +88,12 @@ Gate : [x] tests verts (403/403) · [x] test manuel (validé le 2026-07-19, `val
 
 ## Phase V4-5 — Sous-tâches planifiables
 
-- [ ] E9a — Rendre une sous-tâche planifiable (`src/domain/entities/taskV2.ts` : `parent_task_id` optionnel, ou promotion de `SubTask` en `TaskV2` rattachée ; migration Dexie)
-- [ ] E9b — Affichage hiérarchique dans le planning et sur l'accueil : titre parent en taille normale, sous-tâche en dessous, plus petite, préfixée d'un tiret (`E40Planning.tsx`, `E10Dashboard.tsx`, `E24Today.tsx`)
-- [ ] E9c — Point d'entrée depuis l'écran de décomposition (`E23Decompose.tsx`, `E22TaskDetail.tsx`)
+- [x] E9a — Sous-tâche planifiable : champs `scheduled_date`/`scheduled_start`/`scheduled_end`/`postponed` ajoutés à `SubTask` (reste rattachée au parent, pas de promotion en `TaskV2`), migration Dexie v3→v4 (`src/domain/entities/subTask.ts`, `src/data/db.ts`, `subTaskRepository.getByDate`)
+- [x] E9b — Affichage hiérarchique dans le planning et sur l'accueil : titre parent en taille normale, sous-tâche en dessous, plus petite, préfixée d'un tiret (`E40Planning.tsx`, `E10Dashboard.tsx`)
+- [x] E9c — Point d'entrée « Planifier » depuis l'écran de décomposition et le détail de tâche (`E23Decompose.tsx`, `E22TaskDetail.tsx`), + bouton « Renommer » une sous-étape ajouté sur E22 sur demande utilisateur en cours de validation manuelle
+- [x] Périmètre étendu sur demande explicite de l'utilisateur : parité complète d'interactions avec les tâches (E1 glisser, E6 menu déplacer/renommer/supprimer, E8 reporter) sur une sous-tâche planifiée, au-delà du minimum initial du gate
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une sous-étape se planifie à son propre créneau et reste lisible comme sous-tâche de son parent, base V3 migrée sans perte
+Gate : [x] tests verts (422/422, `tsc -b` clean, eslint 0 erreur) · [~] test manuel (1.1-1.4, 2.1-2.3, 3.1-3.6 validés ; point 1.5 « Renommer » ajouté en cours de session, validation restant à confirmer) · [x] doc (`validation_manuelle.md`) · [x] e2e (51/51, T51 nouveau) · [~] sortie : une sous-étape se planifie à son propre créneau et reste lisible comme sous-tâche de son parent — atteint en code, validation manuelle du point 1.5 à boucler avant clôture définitive
 
 ---
 

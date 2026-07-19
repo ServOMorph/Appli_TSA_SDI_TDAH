@@ -63,8 +63,8 @@ describe('E24Today', () => {
     it('affiche la progression des sous-étapes', () => {
       const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
       const subs: SubTask[] = [
-        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
-        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1 },
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null },
+        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1, scheduled_date: null, scheduled_start: null, scheduled_end: null },
       ]
       const ctx = makeAppContext({ todayTasks: [task], todaySubTasksMap: { abc: subs } })
       renderWithApp(<E24Today />, ctx)
@@ -81,8 +81,8 @@ describe('E24Today', () => {
     it('affiche la prochaine sous-étape non terminée', () => {
       const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
       const subs: SubTask[] = [
-        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
-        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1 },
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null },
+        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1, scheduled_date: null, scheduled_start: null, scheduled_end: null },
       ]
       const ctx = makeAppContext({ todayTasks: [task], todaySubTasksMap: { abc: subs } })
       renderWithApp(<E24Today />, ctx)
@@ -92,7 +92,7 @@ describe('E24Today', () => {
     it('n\'affiche pas de prochaine étape si toutes les sous-étapes sont terminées', () => {
       const task = makeTask({ id: 'abc', title: 'Appeler médecin' })
       const subs: SubTask[] = [
-        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0 },
+        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null },
       ]
       const ctx = makeAppContext({ todayTasks: [task], todaySubTasksMap: { abc: subs } })
       renderWithApp(<E24Today />, ctx)

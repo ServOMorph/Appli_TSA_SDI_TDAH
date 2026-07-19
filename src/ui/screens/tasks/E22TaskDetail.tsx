@@ -72,9 +72,11 @@ interface SortableSubTaskItemProps {
   subTask: SubTask
   onDelete: (id: string) => void
   onToggle: (subTask: SubTask) => void
+  onPlan: (subTask: SubTask) => void
+  onRename: (subTask: SubTask) => void
 }
 
-function SortableSubTaskItem({ subTask, onDelete, onToggle }: SortableSubTaskItemProps) {
+function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan, onRename }: SortableSubTaskItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: subTask.id,
   })
@@ -122,6 +124,42 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle }: SortableSubTaskIte
             {subTask.title}
           </span>
           <button
+            aria-label={`Renommer ${subTask.title}`}
+            style={{
+              background: 'none',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.75rem',
+              padding: '4px 8px',
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onRename(subTask)
+            }}
+          >
+            Renommer
+          </button>
+          <button
+            aria-label={`Planifier ${subTask.title}`}
+            style={{
+              background: 'none',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              color: 'var(--color-text-muted)',
+              fontSize: '0.75rem',
+              padding: '4px 8px',
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onPlan(subTask)
+            }}
+          >
+            Planifier
+          </button>
+          <button
             aria-label={`Supprimer ${subTask.title}`}
             style={{
               background: 'none',
@@ -158,6 +196,7 @@ export function E22TaskDetail() {
     getSubTasks,
     deleteSubTask,
     toggleSubTask,
+    renameSubTaskV2,
     completeTask,
     deleteTask,
     selectTask,
@@ -168,6 +207,7 @@ export function E22TaskDetail() {
     goTo,
     moveTask,
     startPlanTask,
+    startPlanSubTask,
     moveTodoTaskToList,
     createList,
   } = useApp()
@@ -177,6 +217,8 @@ export function E22TaskDetail() {
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
   const [subtaskWarningAction, setSubtaskWarningAction] = useState<'plan' | 'list' | null>(null)
+  const [renamingSubTask, setRenamingSubTask] = useState<SubTask | null>(null)
+  const [renameSubTaskTitle, setRenameSubTaskTitle] = useState('')
 
   const task = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
 
@@ -249,6 +291,27 @@ export function E22TaskDetail() {
     if (!selectedTaskId || !task) return
     startPlanTask(task.title, selectedTaskId)
     goTo('planning')
+  }
+
+  function handlePlanSubTask(subTask: SubTask) {
+    startPlanSubTask(subTask.id, subTask.title)
+    goTo('planning')
+  }
+
+  function handleOpenRenameSubTask(subTask: SubTask) {
+    setRenamingSubTask(subTask)
+    setRenameSubTaskTitle(subTask.title)
+  }
+
+  async function handleConfirmRenameSubTask() {
+    const trimmed = renameSubTaskTitle.trim()
+    if (!renamingSubTask || !trimmed) return
+    await renameSubTaskV2(renamingSubTask.id, trimmed)
+    setRenamingSubTask(null)
+    if (selectedTaskId) {
+      const updated = await getSubTasks(selectedTaskId)
+      setSubTasks(updated)
+    }
   }
 
   async function handleChooseList(listId: string) {
@@ -335,6 +398,8 @@ export function E22TaskDetail() {
                     subTask={st}
                     onDelete={handleDeleteSubTask}
                     onToggle={handleToggleSubTask}
+                    onPlan={handlePlanSubTask}
+                    onRename={handleOpenRenameSubTask}
                   />
                 ))}
               </div>
@@ -417,6 +482,28 @@ export function E22TaskDetail() {
               </Button>
             </div>
             <Button variant="secondary" fullWidth onClick={() => setShowListPicker(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {renamingSubTask && (
+        <div role="dialog" aria-modal="true" aria-label="Renommer la sous-étape" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Renommer la sous-étape</h2>
+            <input
+              type="text"
+              value={renameSubTaskTitle}
+              onChange={(e) => setRenameSubTaskTitle(e.target.value)}
+              aria-label="Nouveau nom"
+              autoFocus
+              style={{ padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
+            />
+            <Button fullWidth onClick={handleConfirmRenameSubTask} disabled={!renameSubTaskTitle.trim()}>
+              Enregistrer
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setRenamingSubTask(null)}>
               Annuler
             </Button>
           </div>

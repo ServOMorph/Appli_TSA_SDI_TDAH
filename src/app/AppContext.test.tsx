@@ -347,6 +347,107 @@ describe('AppProvider — sous-tâches', () => {
   })
 })
 
+describe('AppProvider — planification des sous-tâches (E9a)', () => {
+  function SubTaskPlanningPanel() {
+    const {
+      createTaskInbox,
+      inboxTasks,
+      addSubTask,
+      getSubTasks,
+      getPlannedSubTasksForDate,
+      scheduleSubTaskV2,
+      reportSubTaskV2,
+      renameSubTaskV2,
+    } = useApp()
+    const first = inboxTasks[0]
+    const [planned, setPlanned] = useState<string | null>(null)
+    const [subTaskId, setSubTaskId] = useState<string | null>(null)
+    const today = new Date().toISOString().slice(0, 10)
+
+    async function schedule() {
+      if (!first) return
+      await addSubTask(first.id, 'Sous-étape planifiable')
+      const subs = await getSubTasks(first.id)
+      const sub = subs[0]
+      setSubTaskId(sub.id)
+      await scheduleSubTaskV2(sub.id, today, '09:00', '09:30')
+      const plannedToday = await getPlannedSubTasksForDate(today)
+      const match = plannedToday.find((s) => s.id === sub.id)
+      setPlanned(match ? `${match.parentTitle}|${match.scheduled_start}|${String(match.postponed)}` : null)
+    }
+
+    async function report() {
+      if (!subTaskId) return
+      await reportSubTaskV2(subTaskId, today, '14:00', '14:30')
+      const plannedToday = await getPlannedSubTasksForDate(today)
+      const match = plannedToday.find((s) => s.id === subTaskId)
+      setPlanned(match ? `${match.parentTitle}|${match.scheduled_start}|${String(match.postponed)}` : null)
+    }
+
+    async function rename() {
+      if (!subTaskId) return
+      await renameSubTaskV2(subTaskId, 'Sous-étape renommée')
+      const plannedToday = await getPlannedSubTasksForDate(today)
+      const match = plannedToday.find((s) => s.id === subTaskId)
+      setPlanned(match ? match.title : null)
+    }
+
+    return (
+      <>
+        <button onClick={() => createTaskInbox('Tâche parente')}>créer tâche</button>
+        <button onClick={schedule} disabled={!first}>planifier sous-étape</button>
+        <button onClick={report} disabled={!subTaskId}>reporter sous-étape</button>
+        <button onClick={rename} disabled={!subTaskId}>renommer sous-étape</button>
+        <div data-testid="planned">{planned ?? 'none'}</div>
+      </>
+    )
+  }
+
+  it('scheduleSubTaskV2 planifie la sous-tâche et la rattache à sa tâche parente', async () => {
+    render(<AppProvider><SubTaskPlanningPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'planifier sous-étape' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'planifier sous-étape' }))
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId('planned').textContent).toBe('Tâche parente|09:00|false')
+    })
+  })
+
+  it('reportSubTaskV2 reprogramme la sous-tâche et la marque reportée', async () => {
+    render(<AppProvider><SubTaskPlanningPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'planifier sous-étape' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'planifier sous-étape' }))
+    })
+    await waitFor(() => expect(screen.getByRole('button', { name: 'reporter sous-étape' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'reporter sous-étape' }))
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId('planned').textContent).toBe('Tâche parente|14:00|true')
+    })
+  })
+
+  it('renameSubTaskV2 renomme uniquement la sous-tâche', async () => {
+    render(<AppProvider><SubTaskPlanningPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'planifier sous-étape' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'planifier sous-étape' }))
+    })
+    await waitFor(() => expect(screen.getByRole('button', { name: 'renommer sous-étape' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'renommer sous-étape' }))
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId('planned').textContent).toBe('Sous-étape renommée')
+    })
+  })
+})
+
 describe('AppProvider — settings et données', () => {
   function DataPanel() {
     const { createUser, goTo, settings, updateSettings, exportData, deleteAllData, screen: s } = useApp()

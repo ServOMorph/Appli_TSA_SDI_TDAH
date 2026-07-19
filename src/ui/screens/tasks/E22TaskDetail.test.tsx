@@ -26,6 +26,9 @@ function makeSubTask(overrides: Partial<SubTask> = {}): SubTask {
     title: 'Prendre le téléphone',
     is_completed: false,
     position: 0,
+    scheduled_date: null,
+    scheduled_start: null,
+    scheduled_end: null,
     ...overrides,
   }
 }
@@ -66,6 +69,46 @@ describe('E22TaskDetail', () => {
     await waitFor(() => {
       expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
     })
+  })
+
+  it('Planifier une sous-étape appelle startPlanSubTask et navigue vers planning (E9c)', async () => {
+    const task = makeTask()
+    const subTask = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone' })
+    const ctx = makeAppContext({
+      selectedTaskId: 'task-1',
+      inboxTasks: [task],
+      getSubTasks: vi.fn().mockResolvedValue([subTask]),
+    })
+    renderWithApp(<E22TaskDetail />, ctx)
+    await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
+    await userEvent.click(screen.getByLabelText('Planifier Prendre le téléphone'))
+    expect(ctx.startPlanSubTask).toHaveBeenCalledWith('st-1', 'Prendre le téléphone')
+    expect(ctx.goTo).toHaveBeenCalledWith('planning')
+  })
+
+  it('Renommer une sous-étape appelle renameSubTaskV2 et recharge la liste', async () => {
+    const task = makeTask()
+    const subTask = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone' })
+    const getSubTasks = vi.fn()
+      .mockResolvedValueOnce([subTask])
+      .mockResolvedValueOnce([{ ...subTask, title: 'Appeler le secrétariat' }])
+    const ctx = makeAppContext({
+      selectedTaskId: 'task-1',
+      inboxTasks: [task],
+      getSubTasks,
+    })
+    renderWithApp(<E22TaskDetail />, ctx)
+    await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
+    await userEvent.click(screen.getByLabelText('Renommer Prendre le téléphone'))
+    const input = screen.getByLabelText('Nouveau nom')
+    await userEvent.clear(input)
+    await userEvent.type(input, 'Appeler le secrétariat')
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    expect(ctx.renameSubTaskV2).toHaveBeenCalledWith('st-1', 'Appeler le secrétariat')
+    await waitFor(() => {
+      expect(screen.getByText('Appeler le secrétariat')).toBeDefined()
+    })
+    expect(screen.queryByRole('dialog', { name: 'Renommer la sous-étape' })).toBeNull()
   })
 
   it('Décomposer navigue vers task-decompose', async () => {

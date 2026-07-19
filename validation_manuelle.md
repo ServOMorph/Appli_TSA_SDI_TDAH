@@ -12,35 +12,38 @@ Repartir d'une base propre via le bouton « Reset DB » (dev) si besoin.
 
 ## E2 — Multi-créneaux
 
-- [ ] 1.1 — Depuis le Planning, choisir une tâche à planifier. Cliquer un créneau de début puis un
+- [x] 1.1 — Depuis le Planning, choisir une tâche à planifier. Cliquer un créneau de début puis un
       créneau de fin : toutes les demi-heures couvertes sont colorées en un seul bloc, dont le nom
       n'est affiché qu'une fois.
-- [ ] 1.2 — Cliquer deux fois la même case : la tâche occupe exactement une demi-heure.
-- [ ] 1.3 — Tenter de sélectionner une plage passant par une case déjà occupée : le placement est
+- [x] 1.2 — Cliquer deux fois la même case : la tâche occupe exactement une demi-heure.
+- [x] 1.3 — Tenter de sélectionner une plage passant par une case déjà occupée : le placement est
       refusé et aucune tâche existante n'est modifiée.
-- [ ] 1.4 — Créer une tâche de coût énergétique 5 sur trois créneaux. Vérifier que son coût n'est
+- [x] 1.4 — Créer une tâche de coût énergétique 5 sur trois créneaux. Vérifier que son coût n'est
       compté qu'une fois pour le mode surcharge.
 
 ## E5 — Tâche active
 
-- [ ] 2.1 — Après le premier placement, le bandeau indique que la tâche est encore en cours de
-      planification.
-- [ ] 2.2 — Sélectionner une autre plage : la même tâche est déplacée, sans duplication. Changer de
+- [x] 2.1 — Après le premier placement, le bandeau indique que la tâche est encore en cours de
+      planification. **Écart corrigé et validé** : bandeau repositionné en fixe juste au-dessus du
+      bouton « Ajouter une tâche » (`E40Planning.tsx`), espace ajouté entre le nom de la tâche et
+      l'icône batterie (`E10Dashboard.tsx`), `--bottomnav-h` désormais mesuré dynamiquement
+      (`BottomNav.tsx`) pour supprimer le résidu de grille visible sous le bandeau.
+- [x] 2.2 — Sélectionner une autre plage : la même tâche est déplacée, sans duplication. Changer de
       jour puis la repositionner : elle reste la même tâche.
-- [ ] 2.3 — Cliquer « Terminer » dans le bandeau : le mode de planification active s'arrête.
+- [x] 2.3 — Cliquer « Terminer » dans le bandeau : le mode de planification active s'arrête.
 
 ## D3, B2 et D5
 
-- [ ] 3.1 — « Répéter demain » n'est plus affiché ni dans le Planning ni dans « Planning du jour »
+- [x] 3.1 — « Répéter demain » n'est plus affiché ni dans le Planning ni dans « Planning du jour »
       sur l'accueil.
-- [ ] 3.2 — Créer une tâche planifiée puis vérifier le cadre « Planning du jour » sur l'accueil :
+- [x] 3.2 — Créer une tâche planifiée puis vérifier le cadre « Planning du jour » sur l'accueil :
       aucun bouton ni contenu ne déborde.
-- [ ] 3.3 — Dans la modale de création, l'énergie et la case « Obligatoire » sont sur le même écran.
+- [x] 3.3 — Dans la modale de création, l'énergie et la case « Obligatoire » sont sur le même écran.
       Le coût est facultatif et une tâche obligatoire peut être créée sans étape supplémentaire.
 
 ---
 
 ## Résultat
 
-- [ ] Tous les points passés → phase V4-3 validée.
-- [ ] Écarts constatés :
+- [x] Tous les points passés → phase V4-3 validée.
+- [x] Écarts constatés : 2.1 — corrigé et validé.

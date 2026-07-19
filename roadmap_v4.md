@@ -69,10 +69,10 @@ Gate : [x] tests verts (388/388) · [x] test manuel (validé le 2026-07-19) · [
 - [x] E2c — Rendu unifié : un seul rectangle couvrant la plage, nom affiché une fois, lignes intermédiaires masquées ; coût énergétique compté une seule fois par tâche (`E40Planning.tsx`, `getRemainingPlannedCost` dans `taskRulesV2.ts`)
 - [x] E5 — La tâche saisie reste « en main » après placement : chaque clic sur une case la replace, y compris après changement de jour, jusqu'à sortie explicite (`pendingPlanTask`/`clearPendingPlanTask` dans `AppContext.tsx`, `E40Planning.tsx`)
 - [x] D3 — Retirer le bouton « Répéter demain » et le câblage associé, une fois E5 en place (`E40Planning.tsx`, `AppContext.tsx`, `taskRulesV2.ts`, `E10Dashboard.tsx`)
-- [ ] B2 — Vérifier le cadre « Planning du jour » de l'accueil après D3, corriger le débordement s'il subsiste (`E10Dashboard.tsx:307+`)
+- [x] B2 — Vérifier le cadre « Planning du jour » de l'accueil après D3, corriger le débordement s'il subsiste (`E10Dashboard.tsx:307+`)
 - [x] D5 — Fusionner l'étape « Obligatoire ? » avec l'étape énergie dans la modale (`E40Planning.tsx`)
 
-Gate : [x] tests verts (386/386) · [ ] test manuel · [x] doc · [x] e2e mis à jour (47/47 : retrait « Répéter demain », flux de sélection en 2 clics) · [ ] sortie : une tâche > 30 min occupe visuellement ses créneaux en un bloc, ajout de la même tâche sur plusieurs créneaux/jours sans quitter le planning, plus de « Répéter demain », surcharge inchangée pour un coût donné
+Gate : [x] tests verts (386/386) · [x] test manuel (validé le 2026-07-19) · [x] doc · [x] e2e mis à jour (47/47 : retrait « Répéter demain », flux de sélection en 2 clics) · [x] sortie : une tâche > 30 min occupe visuellement ses créneaux en un bloc, ajout de la même tâche sur plusieurs créneaux/jours sans quitter le planning, plus de « Répéter demain », surcharge inchangée pour un coût donné
 
 ---
 

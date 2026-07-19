@@ -172,6 +172,21 @@ function energyGridButtonStyle(selected: boolean): React.CSSProperties {
   }
 }
 
+const pendingBannerStyle: React.CSSProperties = {
+  position: 'fixed',
+  left: 0,
+  right: 0,
+  bottom: 'var(--bottomnav-h)',
+  zIndex: 39,
+  maxWidth: '480px',
+  margin: '0 auto',
+  padding: 'var(--spacing-sm) var(--spacing-xl)',
+  display: 'flex',
+  gap: 'var(--spacing-sm)',
+  alignItems: 'center',
+  background: 'var(--color-background)',
+}
+
 const overlayStyle: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
@@ -436,16 +451,6 @@ export function E40Planning() {
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto' }} role="grid" aria-label="Planning de la journée">
-        {pendingPlanTask && (
-          <div style={{ padding: 'var(--spacing-sm) var(--spacing-xl)', display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
-            <span aria-live="polite" style={{ flex: 1, fontSize: '0.8125rem' }}>
-              « {pendingPlanTask.title} » est en cours de planification.
-            </span>
-            <button style={taskActionStyle} onClick={clearPendingPlanTask} aria-label={`Terminer la planification de ${pendingPlanTask.title}`}>
-              Terminer
-            </button>
-          </div>
-        )}
         {rangeStart !== null && (
           <p style={{ margin: 'var(--spacing-sm) var(--spacing-xl)', fontSize: '0.8125rem' }} aria-live="polite">
             Début sélectionné à {slotLabel(rangeStart)}. Choisissez la fin.
@@ -610,6 +615,17 @@ export function E40Planning() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {pendingPlanTask && (
+        <div style={pendingBannerStyle}>
+          <span aria-live="polite" style={{ flex: 1, fontSize: '0.8125rem' }}>
+            « {pendingPlanTask.title} » est en cours de planification.
+          </span>
+          <button style={taskActionStyle} onClick={clearPendingPlanTask} aria-label={`Terminer la planification de ${pendingPlanTask.title}`}>
+            Terminer
+          </button>
         </div>
       )}
 

@@ -13,8 +13,8 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 
 ## État actuel (réécrit intégralement à chaque /close)
 V2 quasi close sur branche `v2` ; reste V2-10 : doc V2 et déploiement Netlify. Les roadmaps V1 à V3 sont archivées dans `Archives/`.
-**Branche `v4` active.** V4-0 à V4-2 sont closes ; V4-3 est codée et automatisée (386/386 tests, 47/47 e2e), mais sa validation manuelle est en attente.
-La prochaine étape obligatoire est le passage intégral de `validation_manuelle.md` V4-3, dont B2.
+**Branche `v4` active.** V4-0 à V4-3 sont closes : `validation_manuelle.md` V4-3 intégralement validée (386/386 tests, 47/47 e2e).
+La prochaine étape est le démarrage de la Phase V4-4 (E6, E1, E8 — interactions sur une tâche planifiée).
 E3 (module budget/comptes) reste le seul cadrage produit ouvert, reporté hors V4.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)

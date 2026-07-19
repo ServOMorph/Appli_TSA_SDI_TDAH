@@ -275,8 +275,13 @@ export function E10Dashboard() {
                     style={{ width: '20px', height: '20px', margin: 0, accentColor: 'var(--color-accent)', cursor: 'pointer', flexShrink: 0 }}
                   />
                   <button
+                    onClick={() => goTo('planning')}
+                    aria-label={`${task.title} — voir dans le planning`}
                     style={{
                       flex: 1,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 'var(--spacing-xs)',
                       background: 'none',
                       border: 'none',
                       padding: '6px 0',
@@ -286,10 +291,8 @@ export function E10Dashboard() {
                       textAlign: 'left',
                       font: 'inherit',
                     }}
-                    onClick={() => goTo('planning')}
-                    aria-label={`${task.title} — voir dans le planning`}
                   >
-                    {task.scheduled_start} · {task.title}
+                    <span>{task.scheduled_start} · {task.title}</span>
                     {task.energy_cost != null && <BatteryCost cost={task.energy_cost} />}
                   </button>
                   {!completed && overloadMode && !task.essential && (

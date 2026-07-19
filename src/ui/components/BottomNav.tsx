@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Button } from '@/ui/components/Button'
 
 export type BottomNavTab = 'dashboard' | 'inbox' | 'planning' | 'lists'
@@ -65,12 +66,27 @@ export function BottomNav({
   onGoPlanning,
   onGoLists,
 }: BottomNavProps) {
+  const navRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    const node = navRef.current
+    if (!node || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => {
+      const height = node.offsetHeight
+      if (height > 0) {
+        document.documentElement.style.setProperty('--bottomnav-h', `${height}px`)
+      }
+    })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [overloadMode])
+
   if (overloadMode) {
-    return <nav aria-label="Navigation principale" style={navContainerStyle} />
+    return <nav ref={navRef} aria-label="Navigation principale" style={navContainerStyle} />
   }
 
   return (
-    <nav aria-label="Navigation principale" style={navContainerStyle}>
+    <nav ref={navRef} aria-label="Navigation principale" style={navContainerStyle}>
       <Button fullWidth onClick={onAddTask}>
         Ajouter une tâche
       </Button>

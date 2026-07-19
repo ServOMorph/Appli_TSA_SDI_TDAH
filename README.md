@@ -1,10 +1,10 @@
-# Appli TSA/SDI/TDAH — AuDHD
+# Assistant AuDHD — Planification et gestion d'énergie neuroinclusive (TSA / TDAH)
 
-Application neuroinclusive (web PWA + mobile) pour personnes AuDHD (TSA sans déficience intellectuelle + TDAH, 14–40 ans).
+Application web progressive (PWA) et mobile neuroinclusive conçue spécifiquement pour les personnes AuDHD (Trouble du Spectre de l'Autisme sans déficience intellectuelle et Trouble du Déficit de l'Attention avec ou sans Hyperactivité, de 14 à 40 ans).
 
 ## Objectif
 
-Agir comme un système externe de fonctions exécutives : réduire la charge mentale quotidienne, soutenir les routines, maintenir les relations sociales, gérer l'énergie. Pas un outil de productivité classique.
+Agir comme un système externe de fonctions exécutives : réduire la charge mentale quotidienne, soutenir les routines régulières, maintenir les connexions sociales et gérer l'énergie au jour le jour. Ce projet est bâti sur une stack moderne en React, TypeScript, Vite et Dexie.js (IndexedDB). Il ne s'agit pas d'un outil de productivité classique.
 
 ## Lancement local
 
@@ -27,11 +27,11 @@ V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur 
 
 Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Build de production sur `dist/v3` (`vite.config.ts`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
 
-**Branche `v4` active.** Phases V4-0 à V4-2 closes. V4-3 est codée : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain » et modale énergie/obligatoire fusionnée.
+**Branche `v4` active.** Phases V4-0 à V4-3 closes : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain » et modale énergie/obligatoire fusionnée, validation manuelle intégralement passée.
 
-Points marquants restants de la roadmap V4 : validation manuelle V4-3, report vers un créneau choisi, déplacement tactile et sous-tâches planifiables rattachées à leur parent. Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
+Points marquants restants de la roadmap V4 : report vers un créneau choisi, déplacement tactile et menu déplacer/renommer/supprimer (V4-4), sous-tâches planifiables rattachées à leur parent (V4-5). Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
 
-Tests unitaires verts (386), `tsc -b` clean, e2e Playwright 47/47 ; validation manuelle V4-3 en attente.
+Tests unitaires verts (386), `tsc -b` clean, e2e Playwright 47/47.
 
 ## Stack
 
@@ -59,10 +59,17 @@ plan_test_manuel_v3-*.md — Plans de test manuel V3, un par phase
 Archives/        — Roadmaps V1, V2 et V3 archivées
 Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse générés (`/analyse_visio`)
 ```
+## Concepts d'architecture
+
+L'application repose sur une architecture découplée stricte en couches, documentée dans les [Architecture Decision Records](docs/adr/) :
+- **Logique métier pure (`src/domain/`)** : Contient les entités et les règles de gestion (calcul de planification, seuils d'énergie, mode surcharge). Elle est totalement isolée et ne possède aucune dépendance envers le framework UI (React) ou le système de stockage (Dexie.js).
+- **Couche d'infrastructure (`src/data/`)** : Gère la persistance locale dans la base de données IndexedDB via Dexie.js et applique les migrations de schémas.
+- **Sécurité et chiffrement (`src/crypto/`)** : Implémente le chiffrement des données sensibles (titres des tâches, notes, etc.) côté client avec AES-GCM et PBKDF2 via l'API standard Web Crypto, garantissant la confidentialité des données utilisateur en local.
+- **Interface utilisateur (`src/ui/`)** : Écrans et composants React stylisés en CSS natif respectant des directives d'accessibilité cognitive pour la neurodivergence (contrastes doux, animations réduites, repères d'énergie simples via un système de "batteries").
 
 ## Prochaine étape
 
-Passer intégralement la validation manuelle V4-3 dans `validation_manuelle.md`. Seule E3 (module budget) reste à trancher avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : doc V2 et déploiement Netlify.
+Démarrer la Phase V4-4 (`roadmap_v4.md`) : menu déplacer/renommer/supprimer, glisser tactile, report via choix de créneau. Seule E3 (module budget) reste à trancher avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : doc V2 et déploiement Netlify.
 
 ## Licence
 

@@ -3,9 +3,9 @@
 ## Actions ouvertes
 
 ### V4 — Roadmap active (racine `roadmap_v4.md`)
-- [P1|ouvert] V4-3 — validation manuelle de la phase multi-créneaux et récurrence
-  - fait quand: tous les points de `validation_manuelle.md` V4-3 sont cochés, dont B2 ; les écarts sont consignés ou corrigés.
-  - réf: `validation_manuelle.md` ; `roadmap_v4.md` § Phase V4-3
+- [P1|ouvert] V4-4 — Interactions sur une tâche planifiée (E6, E1, E8)
+  - fait quand: menu déplacer/renommer/supprimer codé, glisser tactile fonctionnel, « Reporter » ouvre un choix de créneau ; gate de phase intégralement coché (tests, test manuel, doc, e2e).
+  - réf: `roadmap_v4.md` § Phase V4-4
 - [P3|ouvert] E3 — module budget/comptes + rubrique « Outil » remplaçant « Todo » : cadrage produit complet requis (gros chantier, reporté)
   - fait quand: cadrage fait avec Marie (périmètre, structure des données comptes, arborescence Outil).
   - réf: `Note de réunion/2026-07-16/constats_2026-07-18.md` E3 ; `roadmap_v4.md` § Reporté hors V4
@@ -27,27 +27,28 @@
 Aucun.
 
 ## Contexte chaud
-- **V4-3 est codée mais non close** : 386/386 tests unitaires, 47/47 e2e et build verts ; validation manuelle requise.
-- « Répéter demain » est retiré ; la tâche active est replaçable sur une plage jusqu'au bouton « Terminer ».
+- **Phase V4-3 close** : validation manuelle intégralement passée par l'utilisateur (386/386 tests, 47/47 e2e).
+- `--bottomnav-h` n'est plus une constante CSS figée : `BottomNav.tsx` la mesure via `ResizeObserver` et la publie dynamiquement sur `documentElement`. Effet de bord non vérifié visuellement : en mode surcharge la nav est vide donc plus courte, `--bottomnav-h` rétrécit en conséquence sur les 18 écrans qui en dépendent.
 - V4-4 doit remplacer le report automatique par le choix d'un créneau ; ne pas conserver le comportement actuel de `postponeTask`.
 - Nav persistante : `BottomNav` rend une nav vide quand `overloadMode` est actif, piège pour les tests e2e.
 
 ## Dernière session (2026-07-19)
 
 ## Décisions prises
-- V4-3 est livrée côté code et automatisation ; sa clôture dépend exclusivement de la validation manuelle.
+- Phase V4-3 validée et close ; roadmap V4 passe à la Phase V4-4.
 
 ## Livrables produits ou modifiés
-- `E40Planning.tsx`, `AppContext.tsx`, `E10Dashboard.tsx` : multi-créneaux, tâche active, retrait de « Répéter demain » et modale fusionnée.
-- `e2e/07-planning-v4.spec.ts`, `e2e/05-overload.spec.ts` : gates e2e V4-3 ajoutés et adaptés.
-- `validation_manuelle.md`, `roadmap_v4.md` : validation V4-3 et statut de phase mis à jour.
+- `E40Planning.tsx` : bandeau « tâche en cours de planification » sorti du flux scrollable, repositionné en fixe au-dessus du bouton « Ajouter une tâche ».
+- `E10Dashboard.tsx` : espace ajouté entre le nom de tâche et l'icône batterie sur la carte « Planning du jour ».
+- `BottomNav.tsx` : `--bottomnav-h` mesuré dynamiquement via `ResizeObserver` (corrige un interstice de grille visible sous le bandeau, causé par la constante CSS figée à 132px alors que la nav réelle fait ~118px).
+- `validation_manuelle.md`, `roadmap_v4.md` : phase V4-3 cochée intégralement (dont B2), gate clos.
 
 ## Hypothèses validées / invalidées
-- VALIDE : E2, E5, D3 et D5 passent en unitaires et e2e.
-- EN ATTENTE : rendu visuel/tactile multi-créneaux, coût compté une fois et cadre Dashboard (B2).
+- VALIDE : tous les points de `validation_manuelle.md` V4-3, y compris l'écart 2.1 une fois corrigé.
+- EN ATTENTE : comportement de `--bottomnav-h` en mode surcharge (nav vide → nav plus courte), non vérifié visuellement.
 
 ## Prochaine étape exacte
-Passer `validation_manuelle.md` pour V4-3 avant toute phase V4-4.
+Démarrer la Phase V4-4 (`roadmap_v4.md`) : E6 (menu déplacer/renommer/supprimer), E1 (glisser tactile), E8 (report via choix de créneau).
 
 ## Question bloquante pour la session suivante
 Aucune.

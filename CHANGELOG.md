@@ -1,3 +1,12 @@
+## v4.5 — 2026-07-19
+
+### Corrigé
+- Validation manuelle V4-3 close : bandeau « tâche en cours de planification » repositionné en fixe au-dessus du bouton « Ajouter une tâche » (`E40Planning.tsx`), espace ajouté entre le nom de tâche et l'icône batterie sur la carte « Planning du jour » (`E10Dashboard.tsx`).
+- `--bottomnav-h` mesuré dynamiquement via `ResizeObserver` (`BottomNav.tsx`) au lieu d'une constante CSS figée — supprime un interstice de grille de planning visible sous le bandeau.
+
+### Validé
+- Tous les points de `validation_manuelle.md` V4-3 passés, dont B2. 386/386 tests unitaires, `tsc -b` clean, 47/47 e2e. Phase V4-3 close ; roadmap V4 passe à la Phase V4-4.
+
 ## v4.4 — 2026-07-19
 
 ### Modifié

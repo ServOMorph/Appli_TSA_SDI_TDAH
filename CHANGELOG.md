@@ -1,3 +1,15 @@
+## v4.14 — 2026-07-21
+
+### Ajouté
+- Phase V4.1-2 codée : quatre entités et tables Budget, migration Dexie v4→v5, quatre repositories et règles pures pour les périodes, catégories, totaux, reste non budgétisé et soldes des livrets.
+- Tests de migration d'une base v4 existante, des repositories et des règles Budget : 27/27 verts.
+
+### Corrigé
+- `E61ListDetail` : `getListItems` stabilisé et déclaré dans les dépendances du `useEffect`, supprimant l'avertissement lint.
+
+### Validé
+- Build et lint verts. Suite complète à 454/455 avec un échec intermittent pré-existant dans `AppContext.test.tsx`, sans lien avec la Phase V4.1-2.
+
 ## v4.13 — 2026-07-21
 
 ### Ajouté

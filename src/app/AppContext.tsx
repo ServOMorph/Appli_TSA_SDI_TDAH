@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { AppDatabase } from '@/data/db'
 import { UserRepository } from '@/data/repositories/userRepository'
 import { TaskRepository } from '@/data/repositories/taskRepository'
@@ -582,9 +582,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLists((prev) => prev.map((l) => (l.id === id ? updated : l)))
   }
 
-  async function getListItems(listId: string): Promise<ListItem[]> {
+  const getListItems = useCallback(async (listId: string): Promise<ListItem[]> => {
     return listItemRepo.getByListId(listId)
-  }
+  }, [])
 
   async function addListItem(listId: string, title: string) {
     const existing = await listItemRepo.getByListId(listId)

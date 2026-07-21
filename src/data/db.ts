@@ -8,6 +8,10 @@ import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { EnergyEntry } from '@/domain/entities/energyEntry'
 import type { Settings } from '@/domain/entities/settings'
+import type { BudgetCategory } from '@/domain/entities/budgetCategory'
+import type { BudgetEntry } from '@/domain/entities/budgetEntry'
+import type { BudgetAccount } from '@/domain/entities/budgetAccount'
+import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 
 export class AppDatabase extends Dexie {
   users!: Table<User>
@@ -18,6 +22,10 @@ export class AppDatabase extends Dexie {
   listItems!: Table<ListItem>
   energyEntries!: Table<EnergyEntry>
   settings!: Table<Settings>
+  budgetCategories!: Table<BudgetCategory>
+  budgetEntries!: Table<BudgetEntry>
+  budgetAccounts!: Table<BudgetAccount>
+  budgetDeposits!: Table<BudgetDeposit>
 
   constructor(name = 'appli-tsa-sdi-tdah') {
     super(name)
@@ -57,6 +65,20 @@ export class AppDatabase extends Dexie {
       listItems: 'id, list_id, position',
       energyEntries: 'id, entry_date',
       settings: 'id, user_id',
+    })
+    this.version(5).stores({
+      users: 'id',
+      tasks: 'id, status, position',
+      subTasks: 'id, task_id, position, scheduled_date',
+      tasksV2: 'id, status, position, scheduled_date, essential',
+      lists: 'id',
+      listItems: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, kind, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
     })
   }
 }

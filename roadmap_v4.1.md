@@ -70,25 +70,25 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V4.1-2 — Modèle de données Budget [TODO]
+## Phase V4.1-2 — Modèle de données Budget [FAIT]
 
 Aucune UI dans cette phase. Fonctions pures + repos + migration, entièrement testés.
 
-- [ ] Entités (`src/domain/entities/`) :
+- [x] Entités (`src/domain/entities/`) :
   - `budgetCategory.ts` — `{ id, name, kind: 'income' | 'expense', period: 'week' | 'month', amount, position, created_at, updated_at }` (`amount` = montant budgétisé pour une dépense, montant perçu pour un revenu)
   - `budgetEntry.ts` — `{ id, category_id, amount, label?, date, created_at }` (dépense réelle datée ; `label` libre, ex. « Intermarché »)
   - `budgetAccount.ts` — `{ id, name, created_at, updated_at }` (livret)
   - `budgetDeposit.ts` — `{ id, account_id, amount, date, created_at }` (dépôt vers livret)
-- [ ] Migration Dexie v4→v5 (`src/data/db.ts`) : 4 nouvelles tables, redéclaration intégrale du `.stores({...})` (pattern existant), mise à jour `db.test.ts` (`verno` = 5, existence des tables)
-- [ ] Repositories (`src/data/repositories/`) : `budgetCategoryRepository`, `budgetEntryRepository`, `budgetAccountRepository`, `budgetDepositRepository` — CRUD + accesseurs par période/catégorie, sans chiffrement (conforme cadrage)
-- [ ] Règles pures (`src/domain/rules/budgetRules.ts`), `now` injecté en paramètre (convention projet) :
+- [x] Migration Dexie v4→v5 (`src/data/db.ts`) : 4 nouvelles tables, redéclaration intégrale du `.stores({...})` (pattern existant), mise à jour `db.test.ts` (`verno` = 5, existence des tables et migration d'une base v4 existante)
+- [x] Repositories (`src/data/repositories/`) : `budgetCategoryRepository`, `budgetEntryRepository`, `budgetAccountRepository`, `budgetDepositRepository` — CRUD + accesseurs par période/catégorie, sans chiffrement (conforme cadrage)
+- [x] Règles pures (`src/domain/rules/budgetRules.ts`), `now` injecté en paramètre (convention projet) :
   - bornes de période courante (semaine lundi→dimanche, mois calendaire) et d'une période passée arbitraire
   - dépensé / restant par catégorie sur une période
   - total revenus, total budgétisé, total dépôts livrets, **reste non budgétisé** (revenus − budgétisé − dépôts)
   - solde cumulé d'un livret
-- [ ] Tests unitaires exhaustifs des règles (bords de période : changement de semaine, de mois, d'année) + tests repos
+- [x] Tests unitaires exhaustifs des règles (bords de période : changement de semaine, de mois, d'année) + tests repos
 
-Gate : [ ] tests verts · [ ] `tsc -b` clean · [ ] doc · [ ] sortie : migration v5 propre sur base existante, toutes les règles de calcul testées, aucun impact visible dans l'app
+Gate : [x] tests Budget verts (27/27), suite complète 454/455 avec 1 échec intermittent pré-existant dans `AppContext.test.tsx` · [x] `tsc -b` clean · [x] doc · [x] sortie : migration v5 propre sur base existante, toutes les règles de calcul testées, aucun impact visible dans l'app
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-19 (codage V4-1 : D2/E7/D4) (archivé depuis contexte.md 2026-07-21 suite 6, clôture Phase V4.1-2)
+- D2, E7 et D4 codés : vocabulaire énergie ajusté, bouton « Mode surcharge » permanent, destination « Planifier » filtrée depuis Todo via `taskCreateOrigin`. La validation avait identifié deux écarts ensuite traités : explication du mode surcharge sous forme de modale et retour de création contextualisé. 383/383 tests, `tsc -b` clean.
+
 ## 2026-07-18 (suite, codage V4-0 + B1) (archivé depuis contexte.md 2026-07-21 suite 5, clôture Phase V4.1-1)
 - Phase V4-0 codée sous Opus — `taskSlotRange`/`taskOccupiesSlot` (`taskRulesV2.ts`) remplacent le helper local `taskSlot()` de `E40Planning.tsx`, occupation du planning calculée par plage (`scheduled_start`/`scheduled_end`) plutôt qu'au seul créneau de début ; `--color-accent` injecté sur `documentElement` depuis `Settings.ambiance_color` (fallback `--color-primary`) dans `AppContext.tsx`, défini dans `index.css`. Validation manuelle (`validation_manuelle.md`, 20 points) intégralement passée par l'utilisateur, aucune régression visuelle constatée. B1 tranché par l'utilisateur : périmètre large — tous les boutons utilisant le bleu clair de base doivent suivre la couleur d'ambiance (pas seulement les 2 boutons cités initialement) ; codé sur `Button.tsx`, `BottomNav.tsx`, `E120Resources.tsx`, `E31EnergyCheckIn.tsx`, `E03Energy.tsx`, `E21CreateTaskV2.tsx`, `E40Planning.tsx`. 382/382 tests, `tsc -b` clean, eslint 0 erreur.
 

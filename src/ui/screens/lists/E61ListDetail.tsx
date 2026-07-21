@@ -16,7 +16,7 @@ export function E61ListDetail() {
   useEffect(() => {
     if (!selectedListId) return
     getListItems(selectedListId).then(setItems)
-  }, [selectedListId])
+  }, [selectedListId, getListItems])
 
   async function handleAdd() {
     const title = newTitle.trim()

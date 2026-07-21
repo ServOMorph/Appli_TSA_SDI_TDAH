@@ -38,11 +38,11 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 **Branche `v4.1` active, roadmap `roadmap_v4.1.md` active à la racine** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
 
-Phase V4.1-0 (nav + hub `E70Tools.tsx`) et Phase V4.1-1 (listes épinglables dans Outils) codées, testées et validées manuellement.
+Phases V4.1-0 à V4.1-2 closes : nav et hub `E70Tools.tsx`, listes épinglables, puis modèle Budget avec quatre entités/tables Dexie v5, repositories et règles de calcul semaine/mois. La Phase V4.1-2 n'ajoute aucune interface.
 
 Cadrage produit Budget tranché avec l'utilisateur (pas encore avec Marie) — voir `roadmap_v4.1.md` § Décisions de cadrage.
 
-Tests unitaires verts (433/435, 2 échecs pré-existants sans lien), `tsc -b` clean.
+Tests Budget verts (27/27), build et lint verts. Suite complète : 454/455, avec un échec intermittent pré-existant dans `AppContext.test.tsx`. Prochaine étape : Phase V4.1-3, configuration Budget et écran `E71Budget.tsx`.
 
 ## Stack
 

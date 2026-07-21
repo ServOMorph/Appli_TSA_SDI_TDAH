@@ -1,4 +1,5 @@
 import { beforeEach, describe, it, expect } from 'vitest'
+import Dexie from 'dexie'
 import { AppDatabase } from './db'
 
 let db: AppDatabase
@@ -18,10 +19,44 @@ describe('AppDatabase', () => {
     expect(db.listItems).toBeDefined()
     expect(db.energyEntries).toBeDefined()
     expect(db.settings).toBeDefined()
+    expect(db.budgetCategories).toBeDefined()
+    expect(db.budgetEntries).toBeDefined()
+    expect(db.budgetAccounts).toBeDefined()
+    expect(db.budgetDeposits).toBeDefined()
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(4)
+    expect(db.verno).toBe(5)
+  })
+
+  it('upgrades a version 4 database without losing existing data', async () => {
+    const name = `migration-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(4).stores({
+      users: 'id',
+      tasks: 'id, status, position',
+      subTasks: 'id, task_id, position, scheduled_date',
+      tasksV2: 'id, status, position, scheduled_date, essential',
+      lists: 'id',
+      listItems: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+    })
+    await legacy.open()
+    await legacy.table('lists').add({
+      id: 'list-1',
+      name: 'Existante',
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(await upgraded.lists.get('list-1')).toMatchObject({ name: 'Existante' })
+    expect(upgraded.budgetCategories).toBeDefined()
+    await upgraded.delete()
   })
 
   it('creates and retrieves users', async () => {

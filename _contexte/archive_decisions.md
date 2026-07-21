@@ -161,3 +161,6 @@
 - E90 simplifié — "Retour au dashboard" supprimé (boucle sans issue), seul "Désactiver" disponible.
 - Phase 6 code complète — audit architecture, 99.34% couverture, build PWA, erasableSyntaxOnly fix, offline validé.
 - Tests E2E Playwright adoptés (46/46, 12.7s) — remplacent les tests manuels desktop.
+
+## 2026-07-19 (archivé depuis contexte.md 2026-07-21)
+- Validation manuelle V4-3 close après correction du bandeau de planification et mesure dynamique de `--bottomnav-h` via `ResizeObserver`. 386/386 tests, `tsc -b` clean.

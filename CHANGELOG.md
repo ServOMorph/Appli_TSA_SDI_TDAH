@@ -1,3 +1,21 @@
+## v4.15 — 2026-07-21
+
+### Ajouté
+- Phase V4.1-3 validée : configuration des catégories Budget et des livrets depuis `E71Budget`.
+- Phase V4.1-4 implémentée : saisie et suppression des dépenses/dépôts, calcul des soldes, navigation dans l'historique semaine/mois et recalcul après correction.
+- Parcours `tests_manuels.md`, tests unitaires Budget et scénario e2e `e2e/08-tools-budget.spec.ts`.
+
+### Corrigé
+- Actions de suppression rendues explicites dans les livrets : « Supprimer le dépôt » et « Supprimer le livret ».
+- État React rechargé depuis Dexie après suppression directe d'une dépense ou d'un dépôt.
+
+### Validé
+- Phase V4.1-3 validée manuellement ; Phase V4.1-4 validée jusqu'au point 47. Tests Budget ciblés, build, lint et e2e Budget verts.
+
+### En attente
+- Phase V4.1-4 non close : les dépôts d'un livret supprimé deviennent orphelins, invisibles mais encore comptés. Migration de réparation, suppressions en cascade et périodicité des dépôts à implémenter avant la reprise au point 48.
+- Suite Vitest complète : un échec intermittent pré-existant dans `AppContext.test.tsx`.
+
 ## v4.14 — 2026-07-21
 
 ### Ajouté

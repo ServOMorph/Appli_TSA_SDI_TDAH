@@ -24,6 +24,7 @@ const SCREEN_CODES: Record<Screen, string> = {
   lists: 'E60',
   'list-detail': 'E61',
   tools: 'E70',
+  budget: 'E71',
 }
 
 export function DevResetButton() {

@@ -21,6 +21,7 @@ import { E117Export } from '@/ui/screens/settings/E117Export'
 import { E60Lists } from '@/ui/screens/lists/E60Lists'
 import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
 import { E70Tools } from '@/ui/screens/tools/E70Tools'
+import { E71Budget } from '@/ui/screens/tools/E71Budget'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
 import type { Screen } from '@/app/AppContext'
@@ -111,6 +112,8 @@ export function AppScreens() {
         return <E61ListDetail />
       case 'tools':
         return <E70Tools />
+      case 'budget':
+        return <E71Budget />
     }
   }
 

@@ -8,6 +8,10 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
+import { BudgetCategoryRepository } from '@/data/repositories/budgetCategoryRepository'
+import { BudgetEntryRepository } from '@/data/repositories/budgetEntryRepository'
+import { BudgetAccountRepository } from '@/data/repositories/budgetAccountRepository'
+import { BudgetDepositRepository } from '@/data/repositories/budgetDepositRepository'
 import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, reportTaskV2 as reportTaskV2Rule, renameTaskV2 as renameTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { scheduleSubTask as scheduleSubTaskRule, reportSubTask as reportSubTaskRule, renameSubTask as renameSubTaskRule } from '@/domain/rules/subTaskRules'
 import { isOverloaded } from '@/domain/rules/energyRules'
@@ -19,6 +23,10 @@ import type { SubTask } from '@/domain/entities/subTask'
 import type { Settings } from '@/domain/entities/settings'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { BudgetCategory, BudgetCategoryKind, BudgetPeriod } from '@/domain/entities/budgetCategory'
+import type { BudgetAccount } from '@/domain/entities/budgetAccount'
+import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 
 export type Screen =
   | 'welcome'
@@ -43,6 +51,7 @@ export type Screen =
   | 'lists'
   | 'list-detail'
   | 'tools'
+  | 'budget'
 
 interface AppContextValue {
   screen: Screen
@@ -127,6 +136,21 @@ interface AppContextValue {
   getListItems: (listId: string) => Promise<ListItem[]>
   addListItem: (listId: string, title: string) => Promise<void>
   deleteListItem: (id: string) => Promise<void>
+  budgetCategories: BudgetCategory[]
+  budgetAccounts: BudgetAccount[]
+  budgetEntries: BudgetEntry[]
+  budgetDeposits: BudgetDeposit[]
+  createBudgetCategory: (name: string, kind: BudgetCategoryKind, period: BudgetPeriod, amount: number) => Promise<void>
+  renameBudgetCategory: (id: string, name: string) => Promise<void>
+  updateBudgetCategoryAmount: (id: string, amount: number) => Promise<void>
+  deleteBudgetCategory: (id: string, confirmed?: boolean) => Promise<'deleted' | 'needs_confirmation'>
+  createBudgetAccount: (name: string) => Promise<void>
+  renameBudgetAccount: (id: string, name: string) => Promise<void>
+  deleteBudgetAccount: (id: string, confirmed?: boolean) => Promise<'deleted' | 'needs_confirmation'>
+  createBudgetEntry: (categoryId: string, amount: number, label?: string, date?: string) => Promise<void>
+  deleteBudgetEntry: (id: string) => Promise<void>
+  createBudgetDeposit: (accountId: string, amount: number, date?: string) => Promise<void>
+  deleteBudgetDeposit: (id: string) => Promise<void>
 }
 
 export interface PendingPlanTask {
@@ -156,6 +180,10 @@ const energyRepo = new EnergyEntryRepository(db)
 const settingsRepo = new SettingsRepository(db)
 const listRepo = new ListRepository(db)
 const listItemRepo = new ListItemRepository(db)
+const budgetCategoryRepo = new BudgetCategoryRepository(db)
+const budgetEntryRepo = new BudgetEntryRepository(db)
+const budgetAccountRepo = new BudgetAccountRepository(db)
+const budgetDepositRepo = new BudgetDepositRepository(db)
 
 function todayDate(): string {
   if (import.meta.env.DEV) {
@@ -194,6 +222,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [listDetailOrigin, setListDetailOrigin] = useState<Screen | null>(null)
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
+  const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>([])
+  const [budgetAccounts, setBudgetAccounts] = useState<BudgetAccount[]>([])
+  const [budgetEntries, setBudgetEntries] = useState<BudgetEntry[]>([])
+  const [budgetDeposits, setBudgetDeposits] = useState<BudgetDeposit[]>([])
   const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
   const [movingTask, setMovingTask] = useState<MovingPlanItem | null>(null)
   const [planningTargetDate, setPlanningTargetDate] = useState<string | null>(null)
@@ -232,12 +264,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [settings])
 
   async function loadAll() {
-    const [inbox, today, entry, listsData, planned] = await Promise.all([
+    const [inbox, today, entry, listsData, planned, categories, accounts, entries, deposits] = await Promise.all([
       taskRepo.getByStatus('inbox'),
       taskRepo.getTodayTasks(),
       energyRepo.getByDate(todayDate()),
       listRepo.getAll(),
       taskV2Repo.getByDate(todayDate()),
+      budgetCategoryRepo.getAll(),
+      budgetAccountRepo.getAll(),
+      budgetEntryRepo.getAll(),
+      budgetDepositRepo.getAll(),
     ])
     const subTaskArrays = await Promise.all(today.map((t) => subTaskRepo.getByTaskId(t.id)))
     const subTasksMap: Record<string, SubTask[]> = {}
@@ -257,6 +293,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setTodayEnergyStatus(entry?.status ?? null)
     setLists(listsData)
     setTodayPlannedTasks(planned)
+    setBudgetCategories(categories)
+    setBudgetAccounts(accounts)
+    setBudgetEntries(entries)
+    setBudgetDeposits(deposits)
   }
 
   async function refreshTodayPlanned() {
@@ -597,6 +637,120 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await listItemRepo.delete(id)
   }
 
+  async function createBudgetCategory(
+    name: string,
+    kind: BudgetCategoryKind,
+    period: BudgetPeriod,
+    amount: number,
+  ) {
+    const trimmed = name.trim()
+    if (!trimmed || !Number.isFinite(amount) || amount <= 0) return
+    const now = new Date().toISOString()
+    const category: BudgetCategory = {
+      id: newId(),
+      name: trimmed,
+      kind,
+      period,
+      amount,
+      position: budgetCategories.filter((item) => item.period === period).length,
+      created_at: now,
+      updated_at: now,
+    }
+    await budgetCategoryRepo.create(category)
+    setBudgetCategories((previous) => [...previous, category])
+  }
+
+  async function renameBudgetCategory(id: string, name: string) {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    const category = budgetCategories.find((item) => item.id === id)
+    if (!category) return
+    const updated = { ...category, name: trimmed, updated_at: new Date().toISOString() }
+    await budgetCategoryRepo.update(updated)
+    setBudgetCategories((previous) => previous.map((item) => (item.id === id ? updated : item)))
+  }
+
+  async function updateBudgetCategoryAmount(id: string, amount: number) {
+    if (!Number.isFinite(amount) || amount <= 0) return
+    const category = budgetCategories.find((item) => item.id === id)
+    if (!category) return
+    const updated = { ...category, amount, updated_at: new Date().toISOString() }
+    await budgetCategoryRepo.update(updated)
+    setBudgetCategories((previous) => previous.map((item) => (item.id === id ? updated : item)))
+  }
+
+  async function deleteBudgetCategory(id: string, confirmed = false): Promise<'deleted' | 'needs_confirmation'> {
+    const entries = await budgetEntryRepo.getByCategoryId(id)
+    if (entries.length > 0 && !confirmed) return 'needs_confirmation'
+    await budgetCategoryRepo.delete(id)
+    setBudgetCategories((previous) => previous.filter((item) => item.id !== id))
+    return 'deleted'
+  }
+
+  async function createBudgetAccount(name: string) {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    const now = new Date().toISOString()
+    const account: BudgetAccount = { id: newId(), name: trimmed, created_at: now, updated_at: now }
+    await budgetAccountRepo.create(account)
+    setBudgetAccounts((previous) => [...previous, account])
+  }
+
+  async function renameBudgetAccount(id: string, name: string) {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    const account = budgetAccounts.find((item) => item.id === id)
+    if (!account) return
+    const updated = { ...account, name: trimmed, updated_at: new Date().toISOString() }
+    await budgetAccountRepo.update(updated)
+    setBudgetAccounts((previous) => previous.map((item) => (item.id === id ? updated : item)))
+  }
+
+  async function deleteBudgetAccount(id: string, confirmed = false): Promise<'deleted' | 'needs_confirmation'> {
+    const deposits = await budgetDepositRepo.getByAccountId(id)
+    if (deposits.length > 0 && !confirmed) return 'needs_confirmation'
+    await budgetAccountRepo.delete(id)
+    setBudgetAccounts((previous) => previous.filter((item) => item.id !== id))
+    return 'deleted'
+  }
+
+  async function createBudgetEntry(categoryId: string, amount: number, label?: string, date = todayDate()) {
+    if (!Number.isFinite(amount) || amount <= 0) return
+    const entry: BudgetEntry = {
+      id: newId(),
+      category_id: categoryId,
+      amount,
+      label: label?.trim() || undefined,
+      date,
+      created_at: new Date().toISOString(),
+    }
+    await budgetEntryRepo.create(entry)
+    setBudgetEntries(await budgetEntryRepo.getAll())
+  }
+
+  async function deleteBudgetEntry(id: string) {
+    await budgetEntryRepo.delete(id)
+    setBudgetEntries(await budgetEntryRepo.getAll())
+  }
+
+  async function createBudgetDeposit(accountId: string, amount: number, date = todayDate()) {
+    if (!Number.isFinite(amount) || amount <= 0) return
+    const deposit: BudgetDeposit = {
+      id: newId(),
+      account_id: accountId,
+      amount,
+      date,
+      created_at: new Date().toISOString(),
+    }
+    await budgetDepositRepo.create(deposit)
+    setBudgetDeposits(await budgetDepositRepo.getAll())
+  }
+
+  async function deleteBudgetDeposit(id: string) {
+    await budgetDepositRepo.delete(id)
+    setBudgetDeposits(await budgetDepositRepo.getAll())
+  }
+
   async function updateSettings(patch: Partial<Settings>) {
     if (!currentUser) return
     const s = await settingsRepo.getByUserId(currentUser.id)
@@ -608,7 +762,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   async function exportData() {
     if (!currentUser) return
-    const [user, tasks, subTasks, tasksV2, lists, listItems, energyEntries, settingsData] = await Promise.all([
+    const [user, tasks, subTasks, tasksV2, lists, listItems, energyEntries, settingsData, categories, entries, accounts, deposits] = await Promise.all([
       userRepo.getFirst(),
       db.tasks.toArray(),
       db.subTasks.toArray(),
@@ -617,6 +771,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       db.listItems.toArray(),
       db.energyEntries.toArray(),
       settingsRepo.getByUserId(currentUser.id),
+      db.budgetCategories.toArray(),
+      db.budgetEntries.toArray(),
+      db.budgetAccounts.toArray(),
+      db.budgetDeposits.toArray(),
     ])
     const payload = {
       export_date: new Date().toISOString(),
@@ -629,6 +787,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       list_items: listItems,
       energy_entries: energyEntries,
       settings: settingsData,
+      budget_categories: categories,
+      budget_entries: entries,
+      budget_accounts: accounts,
+      budget_deposits: deposits,
     }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -649,6 +811,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       db.lists.clear(),
       db.listItems.clear(),
       db.tasksV2.clear(),
+      db.budgetCategories.clear(),
+      db.budgetEntries.clear(),
+      db.budgetAccounts.clear(),
+      db.budgetDeposits.clear(),
     ])
     setCurrentUser(null)
     setSettings(null)
@@ -660,6 +826,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSelectedTaskId(null)
     setLists([])
     setSelectedListId(null)
+    setBudgetCategories([])
+    setBudgetAccounts([])
+    setBudgetEntries([])
+    setBudgetDeposits([])
     setScreen('welcome')
   }
 
@@ -752,6 +922,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         getListItems,
         addListItem,
         deleteListItem,
+        budgetCategories,
+        budgetAccounts,
+        budgetEntries,
+        budgetDeposits,
+        createBudgetCategory,
+        renameBudgetCategory,
+        updateBudgetCategoryAmount,
+        deleteBudgetCategory,
+        createBudgetAccount,
+        renameBudgetAccount,
+        deleteBudgetAccount,
+        createBudgetEntry,
+        deleteBudgetEntry,
+        createBudgetDeposit,
+        deleteBudgetDeposit,
       }}
     >
       {children}

@@ -54,9 +54,9 @@ export function E70Tools() {
       </Card>
 
       <Card>
-        <span style={{ color: 'var(--color-text-muted)', fontSize: '1rem' }}>
-          Budget (bientôt disponible)
-        </span>
+        <button style={entryBtnStyle} onClick={() => goTo('budget')}>
+          Budget
+        </button>
       </Card>
 
       <section>

@@ -95,32 +95,37 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V4.1-3 — Budget : configuration [TODO]
+## Phase V4.1-3 — Budget : configuration [FAIT]
 
-- [ ] État et actions dans `AppContext.tsx` (pattern existant : repos au niveau module, state + fonctions exposées via `useApp()`) — vigilance : fichier déjà volumineux (751 lignes), extraire la logique budget dans un module dédié si le volume le justifie
-- [ ] Écran `E71Budget.tsx` (screen `'budget'`), accessible depuis le hub : deux sections « À la semaine » / « Au mois », reste non budgétisé en tête (grisé/na tant que rien n'est configuré)
-- [ ] Gestion des catégories : créer (nom + type revenu/dépense + périodicité + montant), renommer, modifier le montant, supprimer (avec confirmation si des dépenses existent)
-- [ ] Gestion des livrets : créer, renommer, supprimer (avec confirmation si des dépôts existent)
-- [ ] Tests unitaires écrans + mise à jour tests contexte
+- [x] État et actions dans `AppContext.tsx` (repos Budget, state et fonctions exposées via `useApp()`)
+- [x] Écran `E71Budget.tsx` (screen `'budget'`), accessible depuis le hub : deux sections « À la semaine » / « Au mois », reste non budgétisé en tête
+- [x] Gestion des catégories : créer (nom + type revenu/dépense + périodicité + montant), renommer, modifier le montant, supprimer (avec confirmation si des dépenses existent)
+- [x] Gestion des livrets : créer, renommer, supprimer (avec confirmation si des dépôts existent)
+- [x] Tests unitaires écrans + mise à jour tests contexte
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : Marie peut reproduire sa configuration réelle (revenus du mois ; chit/santé/box/salle/cloud au mois ; courses 60 €/plaisir 50 € à la semaine ; livrets A/épargne/jeune)
+Gate : [x] tests ciblés verts (18/18), build et lint verts ; suite complète : 1 échec intermittent pré-existant dans `AppContext.test.tsx` · [x] test manuel (validé par l'utilisateur) · [x] doc · [x] sortie : la configuration réelle peut être reproduite
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
 ---
 
-## Phase V4.1-4 — Budget : usage courant [TODO]
+## Phase V4.1-4 — Budget : usage courant [EN COURS]
 
-- [ ] Saisie d'une dépense : choix de la catégorie, montant, libellé optionnel — soustraction immédiate, restant de la catégorie mis à jour
-- [ ] Affichage par catégorie : budgétisé / dépensé / restant sur la période courante
-- [ ] Dépôt vers un livret : saisie du montant, déduit du reste non budgétisé, solde cumulé du livret affiché
-- [ ] Reset automatique au changement de période (purement calculé — vérifier le comportement aux bornes via les règles de V4.1-2)
-- [ ] Historique : consultation des périodes passées (navigation semaine/mois précédents, dépenses datées conservées)
-- [ ] Correction d'erreur de saisie : supprimer une dépense / un dépôt (Marie : « se rappeler si on l'a bien noté »)
-- [ ] Tests unitaires + e2e (`e2e/08-tools-budget.spec.ts` : hub Outils, épinglage liste, configuration budget, saisie dépense, dépôt livret, reste)
+- [x] Saisie d'une dépense : choix de la catégorie, montant, libellé optionnel — soustraction immédiate, restant de la catégorie mis à jour
+- [x] Affichage par catégorie : budgétisé / dépensé / restant sur la période courante
+- [x] Dépôt vers un livret : saisie du montant, déduit du reste non budgétisé, solde cumulé du livret affiché
+- [x] Reset automatique au changement de période (purement calculé — comportement aux bornes couvert par les règles de V4.1-2)
+- [x] Historique : consultation des périodes passées (navigation semaine/mois précédents, dépenses datées conservées)
+- [x] Correction d'erreur de saisie : supprimer une dépense / un dépôt, avec libellés distincts de la suppression d'une catégorie ou d'un livret
+- [x] Tests unitaires + e2e (`e2e/08-tools-budget.spec.ts` : hub Outils, configuration budget, saisie dépense, dépôt livret, suppression et recalcul du reste)
+- [ ] Corriger l'intégrité relationnelle : migration des dépôts/écritures orphelins et suppressions transactionnelles en cascade pour les livrets/catégories
+- [ ] Définir la périodicité d'un dépôt afin qu'il ne soit pas déduit simultanément des vues semaine et mois ; recommandation : champ `period`, existant migré vers `month`
+- [ ] Reprendre la validation manuelle aux points 48 à 69 de `tests_manuels.md`
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] e2e mis à jour · [ ] sortie : flux complet de Marie fonctionnel — configurer, saisir une dépense, voir le restant se mettre à jour, alimenter un livret, consulter la semaine passée
+Anomalie bloquante constatée sur les données réelles de test : un dépôt de 50 € lié à un livret supprimé est devenu invisible, mais reste inclus dans `getTotalDeposits`. Le reste mensuel affiche donc 1 280 € au lieu de 1 330 € avec le dépôt visible, puis 1 330 € au lieu de 1 380 € après sa suppression. Le même défaut structurel est possible pour les écritures d'une catégorie supprimée.
+
+Gate : [x] tests Budget ciblés, build et lint verts (suite complète : 1 échec intermittent pré-existant dans `AppContext.test.tsx`) · [~] test manuel validé jusqu'au point 47, arrêté sur l'anomalie d'intégrité · [x] doc · [x] e2e Budget vert · [ ] sortie : flux complet de Marie fonctionnel et données existantes réparées
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -129,8 +134,8 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ## Q à trancher (au fil des phases, non bloquant pour démarrer)
 
-- **V4.1-0** : icône de l'onglet « Outils » ; le placeholder Budget du hub est-il grisé ou masqué jusqu'à V4.1-3 ?
 - **V4.1-3** : une catégorie de dépense peut-elle changer de périodicité après création (impact sur l'historique) ?
+- **V4.1-4** : confirmer que les dépôts existants seront migrés comme dépôts mensuels lors de l'ajout du champ de périodicité.
 
 ## Reporté hors V4.1
 

@@ -38,11 +38,11 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 **Branche `v4.1` active, roadmap `roadmap_v4.1.md` active à la racine** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
 
-Phases V4.1-0 à V4.1-2 closes : nav et hub `E70Tools.tsx`, listes épinglables, puis modèle Budget avec quatre entités/tables Dexie v5, repositories et règles de calcul semaine/mois. La Phase V4.1-2 n'ajoute aucune interface.
+Phases V4.1-0 à V4.1-3 closes : nav et hub `E70Tools.tsx`, listes épinglables, modèle Budget Dexie v5, puis configuration des catégories et livrets dans `E71Budget.tsx`.
 
 Cadrage produit Budget tranché avec l'utilisateur (pas encore avec Marie) — voir `roadmap_v4.1.md` § Décisions de cadrage.
 
-Tests Budget verts (27/27), build et lint verts. Suite complète : 454/455, avec un échec intermittent pré-existant dans `AppContext.test.tsx`. Prochaine étape : Phase V4.1-3, configuration Budget et écran `E71Budget.tsx`.
+Phase V4.1-4 en cours : saisie/suppression des dépenses et dépôts, soldes et historique sont implémentés. Tests Budget ciblés, build, lint et e2e Budget verts ; validation manuelle réussie jusqu'au point 47. La phase reste bloquée par des dépôts orphelins conservés après suppression d'un livret, invisibles mais encore comptés, et par l'absence de périodicité propre aux dépôts. La suite Vitest complète conserve un échec intermittent pré-existant dans `AppContext.test.tsx`.
 
 ## Stack
 
@@ -78,7 +78,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Démarrer la Phase V4.1-2 (modèle de données Budget) — voir `roadmap_v4.1.md`.
+Réparer l'intégrité des données Budget (migration des orphelins, suppressions en cascade, périodicité des dépôts), puis reprendre `tests_manuels.md` au point 48.
 
 ## Licence
 

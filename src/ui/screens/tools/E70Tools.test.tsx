@@ -20,7 +20,7 @@ describe('E70Tools', () => {
     renderWithApp(<E70Tools />)
     expect(screen.getByRole('heading', { name: 'Outils' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Todo' })).toBeDefined()
-    expect(screen.getByText('Budget (bientôt disponible)')).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Budget' })).toBeDefined()
   })
 
   it('affiche la section Listes épinglées vide', () => {
@@ -34,6 +34,13 @@ describe('E70Tools', () => {
     renderWithApp(<E70Tools />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+  })
+
+  it('le clic sur Budget navigue vers le budget', async () => {
+    const ctx = makeAppContext()
+    renderWithApp(<E70Tools />, ctx)
+    await userEvent.click(screen.getByRole('button', { name: 'Budget' }))
+    expect(ctx.goTo).toHaveBeenCalledWith('budget')
   })
 
   it('le retour navigue vers dashboard', async () => {

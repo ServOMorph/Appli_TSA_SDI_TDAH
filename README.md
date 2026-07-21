@@ -21,13 +21,22 @@ npm run lint       # ESLint
 npm run format     # Prettier
 ```
 
+### Liens locaux
+
+| | PC | Mobile (même réseau Wi-Fi) |
+|---|---|---|
+| DEV | http://localhost:5173/ | http://192.168.1.180:5173/ |
+| PROD | http://localhost:4173/ | http://192.168.1.180:4173/ |
+
 ## État actuel
 
-V2 close (V2-0 à V2-10, V2-5 retirée) : doc V2 et déploiement Netlify confirmés terminés. Tag `v1.0-mvp` + `dist/v1/` archivé (rollback opérationnel), `dist/v2/` à jour.
+V2 close (V2-0 à V2-10, V2-5 retirée) : doc V2 et déploiement Netlify confirmés terminés.
 
-Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Build de production sur `dist/v3` (`vite.config.ts`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
+Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
 
-**Branche `v4` active. Roadmap V4 intégralement close** (V4-0 à V4-5) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
+Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archivée (`Archives/roadmap_v4.md`) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
+
+**Branche `v4.1` active** (créée depuis `v4`, aucune roadmap active à la racine pour l'instant). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
 
 Module de gestion budget/comptes (E3) reste hors V4, cadrage produit requis avec Marie.
 
@@ -51,17 +60,15 @@ src/
   crypto/    — wrapper Web Crypto (AES-GCM, PBKDF2)
   app/       — point d'entrée, routing, providers
   test/      — setup Vitest, helpers partagés
-docs/adr/    — Architecture Decision Records
-_docs/       — Documentation produit (cahier des charges + 6 docs de dev)
+scripts/     — Scripts utilitaires (lancement dev/prod, appel Ollama)
+_docs/       — Documentation produit (cahier des charges, docs de dev, ADR)
 _contexte/   — Contexte de session (protocole vibecoding)
-roadmap_v4.md    — Roadmap V4 active (6 phases, pilotée par tests utilisateurs)
-plan_test_manuel_v3-*.md — Plans de test manuel V3, un par phase
-Archives/        — Roadmaps V1, V2 et V3 archivées
+Archives/        — Roadmaps V1 à V4 archivées
 Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse générés (`/analyse_visio`)
 ```
 ## Concepts d'architecture
 
-L'application repose sur une architecture découplée stricte en couches, documentée dans les [Architecture Decision Records](docs/adr/) :
+L'application repose sur une architecture découplée stricte en couches, documentée dans les [Architecture Decision Records](_docs/adr/) :
 - **Logique métier pure (`src/domain/`)** : Contient les entités et les règles de gestion (calcul de planification, seuils d'énergie, mode surcharge). Elle est totalement isolée et ne possède aucune dépendance envers le framework UI (React) ou le système de stockage (Dexie.js).
 - **Couche d'infrastructure (`src/data/`)** : Gère la persistance locale dans la base de données IndexedDB via Dexie.js et applique les migrations de schémas.
 - **Sécurité et chiffrement (`src/crypto/`)** : Implémente le chiffrement des données sensibles (titres des tâches, notes, etc.) côté client avec AES-GCM et PBKDF2 via l'API standard Web Crypto, garantissant la confidentialité des données utilisateur en local.
@@ -69,7 +76,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Cadrer E3 (module budget/comptes) avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : doc V2 et déploiement Netlify.
+Cadrer E3 (module budget/comptes) avec Marie, hors V4 — voir `Archives/roadmap_v4.md` § Q à trancher et `_contexte/signals.md`.
 
 ## Licence
 

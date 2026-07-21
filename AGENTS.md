@@ -37,4 +37,4 @@ Lire `.claude/memory.md` en début de chaque session si le fichier existe. Ce fi
 Certains dossiers ou fichiers peuvent contenir des données sensibles (informations clients, données personnelles, fichiers financiers). Les lister ici pour interdire toute lecture ou écriture sans instruction explicite :
 
 ## Délégation Ollama
-Pour les tâches répétitives et templated (commits, posts, changelogs, données de test, digest de logs), déléguer à Ollama via `./ollama_call.sh` plutôt que de traiter en cloud. Ne jamais envoyer de données sensibles à un modèle cloud.
+Pour les tâches répétitives et templated (commits, posts, changelogs, données de test, digest de logs), déléguer à Ollama via `./scripts/ollama_call.sh` plutôt que de traiter en cloud. Ne jamais envoyer de données sensibles à un modèle cloud.

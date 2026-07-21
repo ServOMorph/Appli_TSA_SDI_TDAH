@@ -1,3 +1,12 @@
+## v4.10 — 2026-07-21
+
+### Modifié
+- Ménage complet de la racine du projet (8 points validés par l'utilisateur) : `docs/adr/` fusionné dans `_docs/adr/`, scripts regroupés dans `scripts/`, `SERVEURS.md` fusionné dans `README.md`, `validation_manuelle.md` archivé, `Retours/` fusionné dans `Note de réunion/`, `dist/v1`/`dist/v2` supprimés (`dist/v3` conservée), `.gitignore` ignore `dist/` entier.
+- `roadmap_v4.md` archivé (`Archives/roadmap_v4.md`) — plus aucune roadmap active à la racine.
+
+### Ajouté
+- Branche `v4.1` créée depuis `v4` et activée.
+
 ## v4.9 — 2026-07-21
 
 ### Validé

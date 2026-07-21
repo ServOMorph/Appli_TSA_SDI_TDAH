@@ -1,3 +1,11 @@
+## v4.11 — 2026-07-21
+
+### Ajouté
+- `roadmap_v4.1.md` créée à la racine (5 phases V4.1-0 à V4.1-4) : cadrage complet d'E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec catégories, revenus multiples, livrets simples, reste non budgétisé).
+
+### Décidé
+- Nav « Outils » (pluriel) ; onglet Listes conservé, listes épinglables dans Outils plutôt que dupliquées. Budget : périodicités semaine/mois, reset auto par période avec historique conservé, données en clair (cohérent avec le reste du modèle non chiffré). Hors périmètre V4.1 : intégration accueil, date butoir Todo, liste courses spécialisée, virements livrets.
+
 ## v4.10 — 2026-07-21
 
 ### Modifié

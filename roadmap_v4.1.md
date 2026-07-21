@@ -1,0 +1,140 @@
+# Roadmap — V4.1 (rubrique « Outils » : Todo / Listes épinglées / Budget)
+
+Version : 4.1 — créée 2026-07-21. Succède à `Archives/roadmap_v4.md` (V4 close).
+Source : constat E3 (`Note de réunion/2026-07-16/constats_2026-07-18.md`, transcription l.140-278) + cadrage utilisateur du 2026-07-21 (session courante).
+Branche : `v4.1`.
+
+Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.
+Gate commun : tests créés et verts · test manuel de la phase · doc à jour · aucun écran ne perd son point d'entrée · critère de sortie.
+
+## Décisions de cadrage (2026-07-21)
+
+- **Libellé nav** : « Outils » (pluriel). Remplace « Todo » dans le bottom nav ; Todo devient une sous-partie d'Outils, déplacé **tel quel** (pas de date butoir en V4.1).
+- **Nav** : Dashboard / Outils / Planning / Listes — l'onglet Listes reste. Pas de refonte du bottom nav : « Outils » est un écran hub avec navigation interne (pattern plat existant, nouveaux `Screen` ajoutés sans toucher aux routes existantes).
+- **Listes dans Outils** : pas de « Liste courses » codée en dur. L'utilisateur crée sa liste dans l'onglet Listes puis l'épingle dans Outils (flag sur l'entité `List`). La liste « particulière » de courses évoquée par Marie n'a jamais été précisée (transcription coupée) — reporté à un cadrage ultérieur.
+- **Budget — périodicités** : semaine + mois uniquement (acté en séance avec Marie).
+- **Budget — revenus** : plusieurs entrées de revenu possibles (même modèle que les catégories de dépense, type `income`).
+- **Budget — passage de période** : reset automatique des compteurs à chaque nouvelle période (semaine lundi→dimanche, mois calendaire), historique conservé — les dépenses sont datées, les soldes par période sont calculés, rien n'est effacé.
+- **Budget — livrets** : version simple. Livrets créés manuellement, un dépôt vers un livret est déduit du revenu comme une dépense, solde cumulé affiché. Pas de retrait ni de virement entre livrets en V4.1.
+- **Budget — reste non budgétisé** : revenu − total budgétisé − dépôts livrets, affiché en permanence en tête de l'écran Budget.
+- **Hors périmètre V4.1** : intégration accueil (saisie rapide de dépense et reste sur le Dashboard), date butoir Todo, retraits/virements livrets, périodicité jour/année, liste courses spécialisée.
+- **Chiffrement** : données budget en clair dans IndexedDB, comme tout le modèle actuel (le mécanisme AES-GCM existant n'est câblé nulle part — chantier global à traiter séparément, pas en douce dans V4.1).
+
+## Ordre & dépendances
+
+```
+V4.1-0 Nav + hub Outils ──┬──► V4.1-1 Listes épinglables
+                          └──► V4.1-2 Modèle de données Budget
+                                        │
+                                        └──► V4.1-3 Budget : configuration
+                                                    │
+                                                    └──► V4.1-4 Budget : usage courant
+```
+
+V4.1-0 d'abord : le hub est le support d'accueil de tout le reste.
+V4.1-2 avant V4.1-3/4 : entités, migration Dexie et règles de calcul testées avant toute UI.
+V4.1-3 avant V4.1-4 : impossible de saisir une dépense sans catégories configurées.
+
+---
+
+## Phase V4.1-0 — Nav + écran hub « Outils » [TODO]
+
+Bloc d'écrans E7x (libre dans le code actuel).
+
+- [ ] Renommer l'onglet nav « Todo » → « Outils » (`BottomNav.tsx` : libellé, icône à choisir ; le tab `inbox` devient `tools` ou est conservé avec libellé changé — trancher en implémentation pour minimiser le churn de `activeTabFor`)
+- [ ] Nouvel écran hub `E70Tools.tsx` (screen `'tools'`) : entrées « Todo » et « Budget » (Budget peut pointer vers un placeholder tant que V4.1-3 n'est pas codée — dans ce cas le masquer ou le griser, décision au moment du codage), section « Listes épinglées » vide pour l'instant
+- [ ] L'onglet « Outils » ouvre `E70Tools` ; `E20Inbox` (Todo) reste accessible depuis le hub avec retour vers le hub (`activeTabFor('inbox')` → tab Outils, pattern `'list-detail'` → `'lists'` existant)
+- [ ] Vérifier tous les points d'entrée existants vers `'inbox'` (Dashboard, création de tâche, `taskCreateOrigin`) : aucun flux existant ne doit casser
+- [ ] Tests unitaires (rendu hub, navigation, `activeTabFor`) + mise à jour des tests existants touchés
+
+Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : l'onglet « Outils » ouvre le hub, Todo accessible et fonctionnel à l'identique depuis le hub, aucun autre écran impacté
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Phase V4.1-1 — Listes épinglables dans Outils [TODO]
+
+- [ ] Champ optionnel `pinned_to_tools?: boolean` sur `List` (`src/domain/entities/list.ts`) — pattern champs optionnels déjà utilisé (`TaskV2.postponed?`), pas de migration de données nécessaire (Dexie n'indexe pas ce champ)
+- [ ] Action « Épingler dans Outils » / « Retirer d'Outils » sur une liste (`E60Lists.tsx` ou `E61ListDetail.tsx` — trancher l'emplacement au codage)
+- [ ] Section « Listes épinglées » du hub `E70Tools` : affiche les listes épinglées, tap → `E61ListDetail` avec retour vers le hub
+- [ ] `listRules.ts` / `listRepository.ts` : règle de bascule + persistance + tests
+
+Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une liste créée dans l'onglet Listes apparaît dans Outils après épinglage, se désépingle, s'ouvre depuis les deux entrées
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Phase V4.1-2 — Modèle de données Budget [TODO]
+
+Aucune UI dans cette phase. Fonctions pures + repos + migration, entièrement testés.
+
+- [ ] Entités (`src/domain/entities/`) :
+  - `budgetCategory.ts` — `{ id, name, kind: 'income' | 'expense', period: 'week' | 'month', amount, position, created_at, updated_at }` (`amount` = montant budgétisé pour une dépense, montant perçu pour un revenu)
+  - `budgetEntry.ts` — `{ id, category_id, amount, label?, date, created_at }` (dépense réelle datée ; `label` libre, ex. « Intermarché »)
+  - `budgetAccount.ts` — `{ id, name, created_at, updated_at }` (livret)
+  - `budgetDeposit.ts` — `{ id, account_id, amount, date, created_at }` (dépôt vers livret)
+- [ ] Migration Dexie v4→v5 (`src/data/db.ts`) : 4 nouvelles tables, redéclaration intégrale du `.stores({...})` (pattern existant), mise à jour `db.test.ts` (`verno` = 5, existence des tables)
+- [ ] Repositories (`src/data/repositories/`) : `budgetCategoryRepository`, `budgetEntryRepository`, `budgetAccountRepository`, `budgetDepositRepository` — CRUD + accesseurs par période/catégorie, sans chiffrement (conforme cadrage)
+- [ ] Règles pures (`src/domain/rules/budgetRules.ts`), `now` injecté en paramètre (convention projet) :
+  - bornes de période courante (semaine lundi→dimanche, mois calendaire) et d'une période passée arbitraire
+  - dépensé / restant par catégorie sur une période
+  - total revenus, total budgétisé, total dépôts livrets, **reste non budgétisé** (revenus − budgétisé − dépôts)
+  - solde cumulé d'un livret
+- [ ] Tests unitaires exhaustifs des règles (bords de période : changement de semaine, de mois, d'année) + tests repos
+
+Gate : [ ] tests verts · [ ] `tsc -b` clean · [ ] doc · [ ] sortie : migration v5 propre sur base existante, toutes les règles de calcul testées, aucun impact visible dans l'app
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Phase V4.1-3 — Budget : configuration [TODO]
+
+- [ ] État et actions dans `AppContext.tsx` (pattern existant : repos au niveau module, state + fonctions exposées via `useApp()`) — vigilance : fichier déjà volumineux (751 lignes), extraire la logique budget dans un module dédié si le volume le justifie
+- [ ] Écran `E71Budget.tsx` (screen `'budget'`), accessible depuis le hub : deux sections « À la semaine » / « Au mois », reste non budgétisé en tête (grisé/na tant que rien n'est configuré)
+- [ ] Gestion des catégories : créer (nom + type revenu/dépense + périodicité + montant), renommer, modifier le montant, supprimer (avec confirmation si des dépenses existent)
+- [ ] Gestion des livrets : créer, renommer, supprimer (avec confirmation si des dépôts existent)
+- [ ] Tests unitaires écrans + mise à jour tests contexte
+
+Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : Marie peut reproduire sa configuration réelle (revenus du mois ; chit/santé/box/salle/cloud au mois ; courses 60 €/plaisir 50 € à la semaine ; livrets A/épargne/jeune)
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Phase V4.1-4 — Budget : usage courant [TODO]
+
+- [ ] Saisie d'une dépense : choix de la catégorie, montant, libellé optionnel — soustraction immédiate, restant de la catégorie mis à jour
+- [ ] Affichage par catégorie : budgétisé / dépensé / restant sur la période courante
+- [ ] Dépôt vers un livret : saisie du montant, déduit du reste non budgétisé, solde cumulé du livret affiché
+- [ ] Reset automatique au changement de période (purement calculé — vérifier le comportement aux bornes via les règles de V4.1-2)
+- [ ] Historique : consultation des périodes passées (navigation semaine/mois précédents, dépenses datées conservées)
+- [ ] Correction d'erreur de saisie : supprimer une dépense / un dépôt (Marie : « se rappeler si on l'a bien noté »)
+- [ ] Tests unitaires + e2e (`e2e/08-tools-budget.spec.ts` : hub Outils, épinglage liste, configuration budget, saisie dépense, dépôt livret, reste)
+
+Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] e2e mis à jour · [ ] sortie : flux complet de Marie fonctionnel — configurer, saisir une dépense, voir le restant se mettre à jour, alimenter un livret, consulter la semaine passée
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Q à trancher (au fil des phases, non bloquant pour démarrer)
+
+- **V4.1-0** : icône de l'onglet « Outils » ; le placeholder Budget du hub est-il grisé ou masqué jusqu'à V4.1-3 ?
+- **V4.1-1** : emplacement du bouton d'épinglage (liste des listes ou détail de liste).
+- **V4.1-3** : une catégorie de dépense peut-elle changer de périodicité après création (impact sur l'historique) ?
+
+## Reporté hors V4.1
+
+- Intégration accueil : saisie rapide de dépense + reste affiché sur le Dashboard (à cadrer, dépend du retour d'usage de Marie sur V4.1).
+- Todo à date butoir + alerte accueil.
+- Liste courses « particulière » (besoin jamais précisé par Marie — recadrer en visio).
+- Retraits et virements entre livrets ; périodicités jour/année.
+- Câblage global du chiffrement local (chantier transverse, pas spécifique au budget).

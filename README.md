@@ -27,9 +27,9 @@ V2 quasi close sur branche `v2` (V2-0 à V2-9 closes, V2-5 retirée). Reste sur 
 
 Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Build de production sur `dist/v3` (`vite.config.ts`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
 
-**Branche `v4` active.** Phases V4-0 à V4-4 closes : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », validation manuelle intégralement passée.
+**Branche `v4` active. Roadmap V4 intégralement close** (V4-0 à V4-5) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
 
-Phase V4-5 (sous-tâches planifiables) codée intégralement : une sous-tâche se planifie à son propre créneau en restant rattachée à sa tâche parente, avec affichage hiérarchique et parité complète d'interactions (glisser, menu déplacer/renommer/supprimer, report) avec une tâche planifiée. Validation manuelle quasi close, un point (renommer une sous-étape depuis le détail de tâche) reste à confirmer. Module de gestion budget/comptes (E3) reporté hors V4, cadrage produit requis.
+Module de gestion budget/comptes (E3) reste hors V4, cadrage produit requis avec Marie.
 
 Tests unitaires verts (422), `tsc -b` clean, e2e Playwright 51/51.
 
@@ -69,7 +69,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Confirmer le dernier point de validation manuelle de la Phase V4-5 (renommer une sous-étape depuis le détail de tâche), puis clore formellement la phase. Seule E3 (module budget) reste à trancher avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : doc V2 et déploiement Netlify.
+Cadrer E3 (module budget/comptes) avec Marie, hors V4 — voir `roadmap_v4.md` § Q à trancher et `_contexte/signals.md`. En parallèle, finaliser V2-10 sur la branche `v2` : doc V2 et déploiement Netlify.
 
 ## Licence
 

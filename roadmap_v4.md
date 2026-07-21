@@ -93,7 +93,7 @@ Gate : [x] tests verts (403/403) · [x] test manuel (validé le 2026-07-19, `val
 - [x] E9c — Point d'entrée « Planifier » depuis l'écran de décomposition et le détail de tâche (`E23Decompose.tsx`, `E22TaskDetail.tsx`), + bouton « Renommer » une sous-étape ajouté sur E22 sur demande utilisateur en cours de validation manuelle
 - [x] Périmètre étendu sur demande explicite de l'utilisateur : parité complète d'interactions avec les tâches (E1 glisser, E6 menu déplacer/renommer/supprimer, E8 reporter) sur une sous-tâche planifiée, au-delà du minimum initial du gate
 
-Gate : [x] tests verts (422/422, `tsc -b` clean, eslint 0 erreur) · [~] test manuel (1.1-1.4, 2.1-2.3, 3.1-3.6 validés ; point 1.5 « Renommer » ajouté en cours de session, validation restant à confirmer) · [x] doc (`validation_manuelle.md`) · [x] e2e (51/51, T51 nouveau) · [~] sortie : une sous-étape se planifie à son propre créneau et reste lisible comme sous-tâche de son parent — atteint en code, validation manuelle du point 1.5 à boucler avant clôture définitive
+Gate : [x] tests verts (422/422, `tsc -b` clean, eslint 0 erreur) · [x] test manuel (1.1-1.5, 2.1-2.3, 3.1-3.6 validés le 2026-07-19) · [x] doc (`validation_manuelle.md`) · [x] e2e (51/51, T51 nouveau) · [x] sortie : une sous-étape se planifie à son propre créneau et reste lisible comme sous-tâche de son parent
 
 ---
 

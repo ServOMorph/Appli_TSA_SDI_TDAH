@@ -24,7 +24,7 @@ Repartir d'une base propre via le bouton « Reset DB » (dev) si besoin.
       supprimée ni transformée — elle reste visible avec ses autres sous-étapes dans Décomposer.
 - [x] 1.4 — Le même point d'entrée « Planifier » est disponible depuis l'écran de détail de tâche
       (pas seulement depuis Décomposer).
-- [ ] 1.5 — Depuis l'écran de détail de tâche (E22), chaque sous-étape a un bouton « Renommer » qui
+- [x] 1.5 — Depuis l'écran de détail de tâche (E22), chaque sous-étape a un bouton « Renommer » qui
       ouvre une modale pré-remplie ; enregistrer met à jour le titre affiché.
 
 ## E9b — Affichage hiérarchique

@@ -1,3 +1,9 @@
+## v4.8 — 2026-07-21
+
+### Validé
+- Point 1.5 de `validation_manuelle.md` (bouton « Renommer » une sous-étape depuis E22) validé par l'utilisateur.
+- Phase V4-5 close. Roadmap V4 intégralement terminée (V4-0 à V4-5).
+
 ## v4.7 — 2026-07-19
 
 ### Ajouté

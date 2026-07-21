@@ -38,11 +38,11 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 **Branche `v4.1` active, roadmap `roadmap_v4.1.md` active à la racine** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
 
-Phase V4.1-0 (nav + hub `E70Tools.tsx`) codée, testée et validée manuellement.
+Phase V4.1-0 (nav + hub `E70Tools.tsx`) et Phase V4.1-1 (listes épinglables dans Outils) codées, testées et validées manuellement.
 
 Cadrage produit Budget tranché avec l'utilisateur (pas encore avec Marie) — voir `roadmap_v4.1.md` § Décisions de cadrage.
 
-Tests unitaires verts (427), `tsc -b` clean.
+Tests unitaires verts (433/435, 2 échecs pré-existants sans lien), `tsc -b` clean.
 
 ## Stack
 
@@ -78,7 +78,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Démarrer la Phase V4.1-1 (listes épinglables dans Outils) — voir `roadmap_v4.1.md`.
+Démarrer la Phase V4.1-2 (modèle de données Budget) — voir `roadmap_v4.1.md`.
 
 ## Licence
 

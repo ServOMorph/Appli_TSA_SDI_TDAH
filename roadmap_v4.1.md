@@ -55,14 +55,15 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V4.1-1 — Listes épinglables dans Outils [TODO]
+## Phase V4.1-1 — Listes épinglables dans Outils [FAIT]
 
-- [ ] Champ optionnel `pinned_to_tools?: boolean` sur `List` (`src/domain/entities/list.ts`) — pattern champs optionnels déjà utilisé (`TaskV2.postponed?`), pas de migration de données nécessaire (Dexie n'indexe pas ce champ)
-- [ ] Action « Épingler dans Outils » / « Retirer d'Outils » sur une liste (`E60Lists.tsx` ou `E61ListDetail.tsx` — trancher l'emplacement au codage)
-- [ ] Section « Listes épinglées » du hub `E70Tools` : affiche les listes épinglées, tap → `E61ListDetail` avec retour vers le hub
-- [ ] `listRules.ts` / `listRepository.ts` : règle de bascule + persistance + tests
+- [x] Champ optionnel `pinned_to_tools?: boolean` sur `List` (`src/domain/entities/list.ts`) — pattern champs optionnels déjà utilisé (`TaskV2.postponed?`), pas de migration de données nécessaire (Dexie n'indexe pas ce champ)
+- [x] Action « Épingler dans Outils » / « Retirer d'Outils » sur une liste (`E60Lists.tsx`, à côté de Renommer/Supprimer)
+- [x] Section « Listes épinglées » du hub `E70Tools` : affiche les listes épinglées, tap → `E61ListDetail` avec retour vers le hub
+- [x] `listRules.ts` (`togglePinList`) : règle de bascule pure, persistée via `AppContext.togglePinList` (réutilise `listRepo.update`, pattern `renameList`) + tests
+- [x] Retour dynamique d'`E61ListDetail` : nouveau state `listDetailOrigin`/`setListDetailOrigin` (pattern `taskCreateOrigin`) posé à chaque point d'entrée existant (`E60Lists`, `E20Inbox`, `E21CreateTaskV2`, `E22TaskDetail` → `'lists'` ; hub `E70Tools` → `'tools'`), défaut `'lists'` si non posé
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une liste créée dans l'onglet Listes apparaît dans Outils après épinglage, se désépingle, s'ouvre depuis les deux entrées
+Gate : [x] tests verts (433/435, 2 échecs pré-existants sans lien confirmés en amont) · [x] `tsc -b` clean · [x] test manuel (validé par l'utilisateur) · [x] doc · [x] sortie : une liste créée dans l'onglet Listes apparaît dans Outils après épinglage, se désépingle, s'ouvre depuis les deux entrées
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -129,7 +130,6 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 ## Q à trancher (au fil des phases, non bloquant pour démarrer)
 
 - **V4.1-0** : icône de l'onglet « Outils » ; le placeholder Budget du hub est-il grisé ou masqué jusqu'à V4.1-3 ?
-- **V4.1-1** : emplacement du bouton d'épinglage (liste des listes ou détail de liste).
 - **V4.1-3** : une catégorie de dépense peut-elle changer de périodicité après création (impact sur l'historique) ?
 
 ## Reporté hors V4.1

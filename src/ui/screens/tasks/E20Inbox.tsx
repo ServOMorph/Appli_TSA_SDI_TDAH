@@ -61,6 +61,7 @@ export function E20Inbox() {
     moveTodoTaskToList,
     createList,
     setTaskCreateOrigin,
+    setListDetailOrigin,
   } = useApp()
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
   const [newListName, setNewListName] = useState('')
@@ -80,6 +81,7 @@ export function E20Inbox() {
     await moveTodoTaskToList(listPickerTask.id, listId)
     setListPickerTask(null)
     selectList(listId)
+    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 
@@ -90,6 +92,7 @@ export function E20Inbox() {
     setNewListName('')
     setListPickerTask(null)
     selectList(listId)
+    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 

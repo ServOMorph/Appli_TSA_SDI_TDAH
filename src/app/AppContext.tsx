@@ -11,7 +11,7 @@ import { ListItemRepository } from '@/data/repositories/listItemRepository'
 import { createTaskV2 as createTaskV2Rule, scheduleTaskV2 as scheduleTaskV2Rule, toggleTaskV2Completion as toggleTaskV2CompletionRule, toggleEssentialV2 as toggleEssentialV2Rule, setEnergyCostV2 as setEnergyCostV2Rule, reportTaskV2 as reportTaskV2Rule, renameTaskV2 as renameTaskV2Rule, getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { scheduleSubTask as scheduleSubTaskRule, reportSubTask as reportSubTaskRule, renameSubTask as renameSubTaskRule } from '@/domain/rules/subTaskRules'
 import { isOverloaded } from '@/domain/rules/energyRules'
-import { createList as createListRule, createListItem as createListItemRule } from '@/domain/rules/listRules'
+import { createList as createListRule, createListItem as createListItemRule, togglePinList as togglePinListRule } from '@/domain/rules/listRules'
 import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task, TaskStatus } from '@/domain/entities/task'
 import type { TaskV2, TaskStatusV2 } from '@/domain/entities/taskV2'
@@ -111,6 +111,9 @@ interface AppContextValue {
   createList: (name: string) => Promise<string>
   renameList: (id: string, name: string) => Promise<void>
   deleteList: (id: string) => Promise<void>
+  togglePinList: (id: string) => Promise<void>
+  listDetailOrigin: Screen | null
+  setListDetailOrigin: (s: Screen) => void
   completeV2Task: (taskId: string) => Promise<void>
   renameV2Task: (id: string, title: string) => Promise<void>
   deleteV2Task: (id: string) => Promise<void>
@@ -188,6 +191,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [taskDetailOrigin, setTaskDetailOrigin] = useState<Screen | null>(null)
   const [taskCreateOrigin, setTaskCreateOrigin] = useState<Screen | null>(null)
+  const [listDetailOrigin, setListDetailOrigin] = useState<Screen | null>(null)
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
   const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
@@ -570,6 +574,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setLists((prev) => prev.filter((l) => l.id !== id))
   }
 
+  async function togglePinList(id: string) {
+    const list = lists.find((l) => l.id === id)
+    if (!list) return
+    const updated = togglePinListRule(list, new Date().toISOString())
+    await listRepo.update(updated)
+    setLists((prev) => prev.map((l) => (l.id === id ? updated : l)))
+  }
+
   async function getListItems(listId: string): Promise<ListItem[]> {
     return listItemRepo.getByListId(listId)
   }
@@ -734,6 +746,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         createList,
         renameList,
         deleteList,
+        togglePinList,
+        listDetailOrigin,
+        setListDetailOrigin,
         getListItems,
         addListItem,
         deleteListItem,

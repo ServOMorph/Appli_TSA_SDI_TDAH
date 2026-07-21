@@ -93,6 +93,7 @@ export function E21CreateTaskV2() {
     addTask,
     createList,
     selectList,
+    setListDetailOrigin,
     startPlanTask,
     taskCreateOrigin,
   } = useApp()
@@ -140,6 +141,7 @@ export function E21CreateTaskV2() {
     await addListItem(listId, trimmed)
     setShowListPicker(false)
     selectList(listId)
+    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 
@@ -151,6 +153,7 @@ export function E21CreateTaskV2() {
     setNewListName('')
     setShowListPicker(false)
     selectList(listId)
+    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 

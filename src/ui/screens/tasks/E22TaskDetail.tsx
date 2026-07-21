@@ -201,6 +201,7 @@ export function E22TaskDetail() {
     deleteTask,
     selectTask,
     selectList,
+    setListDetailOrigin,
     reorderSubTasks,
     refreshDashboard,
     taskDetailOrigin,
@@ -319,6 +320,7 @@ export function E22TaskDetail() {
     await moveTodoTaskToList(selectedTaskId, listId)
     selectTask(null)
     selectList(listId)
+    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 
@@ -329,6 +331,7 @@ export function E22TaskDetail() {
     setNewListName('')
     selectTask(null)
     selectList(listId)
+    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 

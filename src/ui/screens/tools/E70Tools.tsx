@@ -25,7 +25,14 @@ const entryBtnStyle: React.CSSProperties = {
 }
 
 export function E70Tools() {
-  const { goTo } = useApp()
+  const { goTo, lists, selectList, setListDetailOrigin } = useApp()
+  const pinnedLists = lists.filter((l) => l.pinned_to_tools)
+
+  function handleOpenList(id: string) {
+    selectList(id)
+    setListDetailOrigin('tools')
+    goTo('list-detail')
+  }
 
   return (
     <main style={pageStyle}>
@@ -54,7 +61,21 @@ export function E70Tools() {
 
       <section>
         <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm) 0' }}>Listes épinglées</h2>
-        <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste épinglée pour l'instant.</p>
+        {pinnedLists.length === 0 ? (
+          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste épinglée pour l'instant.</p>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+            {pinnedLists.map((list) => (
+              <li key={list.id}>
+                <Card>
+                  <button style={entryBtnStyle} onClick={() => handleOpenList(list.id)}>
+                    {list.name}
+                  </button>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </main>
   )

@@ -1,3 +1,11 @@
+## v4.13 — 2026-07-21
+
+### Ajouté
+- Phase V4.1-1 codée : champ `pinned_to_tools?` sur `List`, règle `togglePinList`, bouton épingler/désépingler sur `E60Lists.tsx`, section « Listes épinglées » sur le hub `E70Tools.tsx`, retour contextuel de `E61ListDetail` (`listDetailOrigin`).
+
+### Validé
+- Phase V4.1-1 validée manuellement par l'utilisateur. 433/435 tests unitaires verts (2 échecs pré-existants sans lien), `tsc -b` clean.
+
 ## v4.12 — 2026-07-21
 
 ### Ajouté

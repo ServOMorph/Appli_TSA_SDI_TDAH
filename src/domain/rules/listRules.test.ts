@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createList, createListItem } from './listRules'
+import { createList, createListItem, togglePinList } from './listRules'
 
 describe('createList', () => {
   it('crée une liste avec les champs attendus', () => {
@@ -18,6 +18,23 @@ describe('createList', () => {
     expect(a.id).not.toBe(b.id)
     expect(a.name).toBe('Musiques')
     expect(b.name).toBe('Livres')
+  })
+})
+
+describe('togglePinList', () => {
+  it('épingle une liste non épinglée', () => {
+    const now = '2026-06-30T10:00:00.000Z'
+    const list = createList('id-1', 'Musiques', now)
+    const pinned = togglePinList(list, '2026-07-01T10:00:00.000Z')
+    expect(pinned.pinned_to_tools).toBe(true)
+    expect(pinned.updated_at).toBe('2026-07-01T10:00:00.000Z')
+  })
+
+  it('désépingle une liste épinglée', () => {
+    const now = '2026-06-30T10:00:00.000Z'
+    const list = { ...createList('id-1', 'Musiques', now), pinned_to_tools: true }
+    const unpinned = togglePinList(list, '2026-07-01T10:00:00.000Z')
+    expect(unpinned.pinned_to_tools).toBe(false)
   })
 })
 

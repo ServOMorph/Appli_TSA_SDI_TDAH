@@ -3,4 +3,5 @@ export interface List {
   name: string
   created_at: string
   updated_at: string
+  pinned_to_tools?: boolean
 }

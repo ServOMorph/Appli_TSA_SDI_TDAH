@@ -27,7 +27,7 @@ const modalBox: React.CSSProperties = {
 }
 
 export function E60Lists() {
-  const { lists, createList, renameList, deleteList, selectList, goTo } = useApp()
+  const { lists, createList, renameList, deleteList, togglePinList, selectList, setListDetailOrigin, goTo } = useApp()
   const [showNewForm, setShowNewForm] = useState(false)
   const [newName, setNewName] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -47,6 +47,7 @@ export function E60Lists() {
 
   function handleSelectList(id: string) {
     selectList(id)
+    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 
@@ -144,6 +145,20 @@ export function E60Lists() {
               }}
             >
               {list.name}
+            </button>
+            <button
+              aria-label={list.pinned_to_tools ? `Retirer ${list.name} d'Outils` : `Épingler ${list.name} dans Outils`}
+              onClick={() => togglePinList(list.id)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: list.pinned_to_tools ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                fontSize: '0.875rem',
+                padding: '4px 8px',
+              }}
+            >
+              {list.pinned_to_tools ? 'Épinglée' : 'Épingler'}
             </button>
             <button
               aria-label={`Renommer ${list.name}`}

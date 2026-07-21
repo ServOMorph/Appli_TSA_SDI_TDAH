@@ -1,3 +1,14 @@
+## v4.12 — 2026-07-21
+
+### Ajouté
+- Phase V4.1-0 codée : nouvel écran hub `E70Tools.tsx` (screen `'tools'`), onglet nav « Todo » renommé « Outils », `E20Inbox` accessible depuis le hub avec retour vers celui-ci.
+
+### Corrigé
+- `E21CreateTaskV2` : depuis Todo, le choix de destination (Todo/Tâche du jour/Planifier/Liste) n'a plus de sens et n'est plus affiché — la tâche est créée directement dans Todo.
+
+### Validé
+- Phase V4.1-0 validée manuellement par l'utilisateur. 427 tests unitaires verts, `tsc -b` clean.
+
 ## v4.11 — 2026-07-21
 
 ### Ajouté

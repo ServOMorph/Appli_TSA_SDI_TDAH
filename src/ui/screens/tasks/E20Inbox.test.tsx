@@ -81,11 +81,11 @@ describe('E20Inbox', () => {
   })
 
   describe('navigation', () => {
-    it('retour navigue vers dashboard', async () => {
+    it('retour navigue vers tools', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+      expect(ctx.goTo).toHaveBeenCalledWith('tools')
     })
 
     it('Ajouter une tâche navigue vers task-create-v2', async () => {

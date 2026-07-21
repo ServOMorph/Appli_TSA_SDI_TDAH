@@ -37,17 +37,18 @@ V4.1-3 avant V4.1-4 : impossible de saisir une dépense sans catégories configu
 
 ---
 
-## Phase V4.1-0 — Nav + écran hub « Outils » [TODO]
+## Phase V4.1-0 — Nav + écran hub « Outils » [FAIT]
 
 Bloc d'écrans E7x (libre dans le code actuel).
 
-- [ ] Renommer l'onglet nav « Todo » → « Outils » (`BottomNav.tsx` : libellé, icône à choisir ; le tab `inbox` devient `tools` ou est conservé avec libellé changé — trancher en implémentation pour minimiser le churn de `activeTabFor`)
-- [ ] Nouvel écran hub `E70Tools.tsx` (screen `'tools'`) : entrées « Todo » et « Budget » (Budget peut pointer vers un placeholder tant que V4.1-3 n'est pas codée — dans ce cas le masquer ou le griser, décision au moment du codage), section « Listes épinglées » vide pour l'instant
-- [ ] L'onglet « Outils » ouvre `E70Tools` ; `E20Inbox` (Todo) reste accessible depuis le hub avec retour vers le hub (`activeTabFor('inbox')` → tab Outils, pattern `'list-detail'` → `'lists'` existant)
-- [ ] Vérifier tous les points d'entrée existants vers `'inbox'` (Dashboard, création de tâche, `taskCreateOrigin`) : aucun flux existant ne doit casser
-- [ ] Tests unitaires (rendu hub, navigation, `activeTabFor`) + mise à jour des tests existants touchés
+- [x] Renommer l'onglet nav « Todo » → « Outils » (`BottomNav.tsx` : libellé changé, tab `inbox` conservé tel quel côté `BottomNavTab`, pas de churn sur `activeTabFor`)
+- [x] Nouvel écran hub `E70Tools.tsx` (screen `'tools'`) : entrées « Todo » et « Budget » (placeholder grisé non cliquable « Budget (bientôt disponible) » tant que V4.1-3 n'est pas codée), section « Listes épinglées » vide pour l'instant
+- [x] L'onglet « Outils » ouvre `E70Tools` ; `E20Inbox` (Todo) reste accessible depuis le hub avec retour vers le hub (`activeTabFor` : `'tools'` et `'inbox'` → tab `inbox`, pattern `'list-detail'` → `'lists'` existant)
+- [x] Vérifié tous les points d'entrée existants vers `'inbox'` (Dashboard, création de tâche, `taskCreateOrigin`) : aucun flux existant cassé
+- [x] Tests unitaires (rendu hub, navigation, `activeTabFor`) + mise à jour des tests existants touchés (`BottomNav.test.tsx`, `App.test.tsx`, `E20Inbox.test.tsx`, nouveau `E70Tools.test.tsx`)
+- [x] Correctif hors périmètre initial, trouvé en validation manuelle : depuis Todo, `E21CreateTaskV2` affichait encore le choix de destination (Todo/Tâche du jour/Planifier/Liste) alors que la destination est obligatoirement Todo — section masquée et destination forcée quand `taskCreateOrigin === 'inbox'`
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : l'onglet « Outils » ouvre le hub, Todo accessible et fonctionnel à l'identique depuis le hub, aucun autre écran impacté
+Gate : [x] tests verts (427, 2 échecs pré-existants sans lien confirmés via `git stash`) · [x] test manuel (validé par l'utilisateur) · [x] doc · [x] sortie : l'onglet « Outils » ouvre le hub, Todo accessible et fonctionnel à l'identique depuis le hub, aucun autre écran impacté
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

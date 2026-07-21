@@ -42,6 +42,7 @@ export type Screen =
   | 'settings-export'
   | 'lists'
   | 'list-detail'
+  | 'tools'
 
 interface AppContextValue {
   screen: Screen

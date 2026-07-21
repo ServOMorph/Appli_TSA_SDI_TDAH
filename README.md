@@ -36,11 +36,13 @@ Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archiv�
 
 Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archivée (`Archives/roadmap_v4.md`) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
 
-**Branche `v4.1` active, roadmap `roadmap_v4.1.md` active à la racine** (5 phases V4.1-0 à V4.1-4, aucune codée) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
+**Branche `v4.1` active, roadmap `roadmap_v4.1.md` active à la racine** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
+
+Phase V4.1-0 (nav + hub `E70Tools.tsx`) codée, testée et validée manuellement.
 
 Cadrage produit Budget tranché avec l'utilisateur (pas encore avec Marie) — voir `roadmap_v4.1.md` § Décisions de cadrage.
 
-Tests unitaires verts (422), `tsc -b` clean, e2e Playwright 51/51.
+Tests unitaires verts (427), `tsc -b` clean.
 
 ## Stack
 
@@ -76,7 +78,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Démarrer la Phase V4.1-0 (nav + hub `E70Tools.tsx`) — voir `roadmap_v4.1.md`.
+Démarrer la Phase V4.1-1 (listes épinglables dans Outils) — voir `roadmap_v4.1.md`.
 
 ## Licence
 

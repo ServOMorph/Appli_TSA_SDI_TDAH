@@ -129,7 +129,7 @@ export function E20Inbox() {
 
   return (
     <main style={pageStyle}>
-      <button style={backBtnStyle} onClick={() => goTo('dashboard')} aria-label="Retour">
+      <button style={backBtnStyle} onClick={() => goTo('tools')} aria-label="Retour">
         ← Retour
       </button>
 

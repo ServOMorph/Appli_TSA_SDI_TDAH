@@ -37,9 +37,9 @@ describe('BottomNav', () => {
     expect(props.onGoDashboard).toHaveBeenCalled()
   })
 
-  it('appelle onGoTodo au clic sur Todo', async () => {
+  it('appelle onGoTodo au clic sur Outils', async () => {
     const props = renderNav()
-    await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Outils' }))
     expect(props.onGoTodo).toHaveBeenCalled()
   })
 
@@ -60,25 +60,25 @@ describe('BottomNav', () => {
     renderNav({ activeTab: 'planning' })
     const planningButton = screen.getByRole('button', { name: 'Planning' })
     expect(planningButton.getAttribute('aria-current')).toBe('page')
-    const todoButton = screen.getByRole('button', { name: 'Todo' })
-    expect(todoButton.getAttribute('aria-current')).toBeNull()
+    const toolsButton = screen.getByRole('button', { name: 'Outils' })
+    expect(toolsButton.getAttribute('aria-current')).toBeNull()
   })
 
-  it('affiche une pastille sur Todo si des tâches sont en attente', () => {
+  it('affiche une pastille sur Outils si des tâches sont en attente', () => {
     renderNav({ inboxHasTasks: true })
-    const todoButton = screen.getByRole('button', { name: 'Todo' })
-    expect(todoButton.querySelector('[aria-hidden="true"]')).not.toBeNull()
+    const toolsButton = screen.getByRole('button', { name: 'Outils' })
+    expect(toolsButton.querySelector('[aria-hidden="true"]')).not.toBeNull()
   })
 
-  it("n'affiche pas de pastille sur Todo si aucune tâche en attente", () => {
+  it("n'affiche pas de pastille sur Outils si aucune tâche en attente", () => {
     renderNav({ inboxHasTasks: false })
-    const todoButton = screen.getByRole('button', { name: 'Todo' })
-    expect(todoButton.querySelector('[aria-hidden="true"]')).toBeNull()
+    const toolsButton = screen.getByRole('button', { name: 'Outils' })
+    expect(toolsButton.querySelector('[aria-hidden="true"]')).toBeNull()
   })
 
   it('masque le bouton Ajouter une tâche et la navigation en mode surcharge', () => {
     renderNav({ overloadMode: true })
     expect(screen.queryByRole('button', { name: 'Ajouter une tâche' })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Todo' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Outils' })).toBeNull()
   })
 })

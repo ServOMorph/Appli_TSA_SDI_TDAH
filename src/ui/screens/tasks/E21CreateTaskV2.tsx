@@ -100,9 +100,8 @@ export function E21CreateTaskV2() {
   const [destination, setDestination] = useState<Destination | null>(null)
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
-  const destinations = taskCreateOrigin === 'inbox'
-    ? DESTINATIONS.filter((d) => d.value !== 'planned')
-    : DESTINATIONS
+  const isFromInbox = taskCreateOrigin === 'inbox'
+  const effectiveDestination = isFromInbox ? 'todo' : destination
 
   function returnToOrigin() {
     goTo(taskCreateOrigin ?? 'inbox')
@@ -111,27 +110,27 @@ export function E21CreateTaskV2() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = title.trim()
-    if (!trimmed || !destination) return
-    if (destination === 'todo') {
+    if (!trimmed || !effectiveDestination) return
+    if (effectiveDestination === 'todo') {
       await createTaskInbox(trimmed)
       goTo('inbox')
       return
     }
-    if (destination === 'list') {
+    if (effectiveDestination === 'list') {
       setShowListPicker(true)
       return
     }
-    if (destination === 'today') {
+    if (effectiveDestination === 'today') {
       await addTask(trimmed)
       goTo('today')
       return
     }
-    if (destination === 'planned') {
+    if (effectiveDestination === 'planned') {
       startPlanTask(trimmed)
       goTo('planning')
       return
     }
-    await createTaskV2Dest(trimmed, destination)
+    await createTaskV2Dest(trimmed, effectiveDestination)
     goTo('inbox')
   }
 
@@ -182,22 +181,24 @@ export function E21CreateTaskV2() {
           />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-          <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Que faire de cette tâche ?</p>
-          {destinations.map((d) => (
-            <button
-              key={d.value}
-              type="button"
-              aria-pressed={destination === d.value}
-              onClick={() => setDestination(d.value)}
-              style={destinationBtnStyle(destination === d.value)}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
+        {!isFromInbox && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Que faire de cette tâche ?</p>
+            {DESTINATIONS.map((d) => (
+              <button
+                key={d.value}
+                type="button"
+                aria-pressed={destination === d.value}
+                onClick={() => setDestination(d.value)}
+                style={destinationBtnStyle(destination === d.value)}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+        )}
 
-        <Button fullWidth type="submit" disabled={!title.trim() || !destination}>
+        <Button fullWidth type="submit" disabled={!title.trim() || !effectiveDestination}>
           Valider
         </Button>
         <Button variant="secondary" fullWidth type="button" onClick={() => goTo('inbox')}>

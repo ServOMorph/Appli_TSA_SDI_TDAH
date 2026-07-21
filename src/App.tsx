@@ -20,6 +20,7 @@ import { E116Privacy } from '@/ui/screens/settings/E116Privacy'
 import { E117Export } from '@/ui/screens/settings/E117Export'
 import { E60Lists } from '@/ui/screens/lists/E60Lists'
 import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
+import { E70Tools } from '@/ui/screens/tools/E70Tools'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
 import type { Screen } from '@/app/AppContext'
@@ -31,6 +32,7 @@ export function activeTabFor(screen: Screen): BottomNavTab | null {
     case 'dashboard':
       return 'dashboard'
     case 'inbox':
+    case 'tools':
       return 'inbox'
     case 'planning':
       return 'planning'
@@ -107,6 +109,8 @@ export function AppScreens() {
         return <E60Lists />
       case 'list-detail':
         return <E61ListDetail />
+      case 'tools':
+        return <E70Tools />
     }
   }
 
@@ -126,7 +130,7 @@ export function AppScreens() {
             goTo('task-create-v2')
           }}
           onGoDashboard={() => goTo('dashboard')}
-          onGoTodo={() => goTo('inbox')}
+          onGoTodo={() => goTo('tools')}
           onGoPlanning={() => goTo('planning')}
           onGoLists={() => goTo('lists')}
         />

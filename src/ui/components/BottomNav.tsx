@@ -112,7 +112,7 @@ export function BottomNav({
           aria-current={activeTab === 'inbox' ? 'page' : undefined}
           style={segmentStyle(true, activeTab === 'inbox')}
         >
-          Todo
+          Outils
           {inboxHasTasks && <span aria-hidden style={segmentPastilleStyle} />}
         </button>
         <button

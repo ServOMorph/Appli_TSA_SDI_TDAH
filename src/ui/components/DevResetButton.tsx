@@ -23,6 +23,7 @@ const SCREEN_CODES: Record<Screen, string> = {
   'settings-export': 'E117',
   lists: 'E60',
   'list-detail': 'E61',
+  tools: 'E70',
 }
 
 export function DevResetButton() {

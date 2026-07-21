@@ -115,6 +115,20 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
+  it("depuis Todo (taskCreateOrigin 'inbox') : aucun choix de destination affiché, Valider crée directement une tâche todo", async () => {
+    const ctx = makeAppContext({ taskCreateOrigin: 'inbox' })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Tâche du jour' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Mettre dans une liste' })).toBeNull()
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis todo')
+    const btn = screen.getByRole('button', { name: 'Valider' }) as HTMLButtonElement
+    expect(btn.disabled).toBe(false)
+    await userEvent.click(btn)
+    expect(ctx.createTaskInbox).toHaveBeenCalledWith('Tâche depuis todo')
+    expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+  })
+
   it('la destination sélectionnée a aria-pressed=true', async () => {
     renderWithApp(<E21CreateTaskV2 />)
     const btn = screen.getByRole('button', { name: 'Todo' })

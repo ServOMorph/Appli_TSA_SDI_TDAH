@@ -7,6 +7,7 @@ describe('activeTabFor', () => {
   it('associe chaque écran à son onglet (N1)', () => {
     expect(activeTabFor('dashboard')).toBe('dashboard')
     expect(activeTabFor('inbox')).toBe('inbox')
+    expect(activeTabFor('tools')).toBe('inbox')
     expect(activeTabFor('planning')).toBe('planning')
     expect(activeTabFor('lists')).toBe('lists')
     expect(activeTabFor('list-detail')).toBe('lists')

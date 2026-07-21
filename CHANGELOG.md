@@ -1,3 +1,8 @@
+## v4.9 — 2026-07-21
+
+### Validé
+- V2-10 (doc V2, déploiement Netlify, branche `v2`) confirmée terminée par l'utilisateur — roadmap V2 intégralement close.
+
 ## v4.8 — 2026-07-21
 
 ### Validé

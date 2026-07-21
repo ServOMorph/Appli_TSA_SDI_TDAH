@@ -1,4 +1,4 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-07-19)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-07-21)
 
 ## Actions ouvertes
 
@@ -10,11 +10,6 @@
 - [P3|ouvert] Faire le ménage à la racine du projet
   - fait quand: fichiers/dossiers non pertinents à la racine identifiés et supprimés ou déplacés.
   - réf: `roadmap_v4.md` § Divers (hors phases)
-
-### V2 — reste en parallèle (branche `v2`)
-- [P2|ouvert] Finaliser V2-10 : doc V2, déploiement Netlify
-  - fait quand: doc V2 à jour, déploiement Netlify effectué.
-  - réf: `Archives/roadmap_v2.md`
 
 ## Questions ouvertes
 - E3 seule question restante (`roadmap_v4.md` § Q à trancher) : cadrage produit complet requis, gros chantier reporté.
@@ -33,21 +28,20 @@ Aucun.
 - Le flux E6 « Déplacer » et E8 « Reporter » restent unifiés sur le bandeau « "X" est en cours de déplacement. » (flux « tâche en main » d'E5) — pas de modale de liste de créneaux, y compris pour les sous-tâches.
 - `--bottomnav-h` mesuré dynamiquement via `ResizeObserver` (`BottomNav.tsx`). Effet de bord non vérifié visuellement : en mode surcharge la nav est vide donc plus courte, `--bottomnav-h` rétrécit en conséquence sur les écrans qui en dépendent.
 
-## Dernière session (2026-07-21)
+## Dernière session (2026-07-21, suite)
 
 ## Décisions prises
-- Point 1.5 de `validation_manuelle.md` (bouton « Renommer » une sous-étape depuis E22) validé par l'utilisateur.
-- Phase V4-5 close ; roadmap V4 intégralement terminée (V4-0 à V4-5, toutes phases closes).
+- V2-10 (doc V2 + déploiement Netlify, branche `v2`) signalée terminée par l'utilisateur.
+- Tentative de création d'une branche `v4.1` annulée par l'utilisateur (aucune branche créée) ; motif non précisé.
 
 ## Livrables produits ou modifiés
-- `validation_manuelle.md` : point 1.5 coché.
-- `roadmap_v4.md` : gate de la Phase V4-5 passé entièrement à `[x]`.
+- `_contexte/signals.md` : action V2-10 retirée des actions ouvertes.
 
 ## Hypothèses validées / invalidées
-- VALIDE : point 1.5 (« Renommer » une sous-étape depuis E22), dernier point restant de la validation manuelle V4-5.
+- VALIDE : V2-10 terminée (doc V2 à jour, déploiement Netlify effectué).
 
 ## Prochaine étape exacte
-Roadmap V4 close. Reste hors phases : E3 (cadrage produit budget/comptes, à faire avec Marie) et ménage de la racine du projet. En parallèle, finaliser V2-10 (doc + déploiement Netlify) sur la branche `v2`.
+Restent hors phases : E3 (cadrage produit budget/comptes, à faire avec Marie) et ménage de la racine du projet. Aucune roadmap active en cours sur `v4`.
 
 ## Question bloquante pour la session suivante
 Aucune.

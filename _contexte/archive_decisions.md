@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-21 (suite, hors phase) (archivé depuis contexte.md 2026-07-25, correctif dette e2e)
+- V2-10 (doc V2, déploiement Netlify, branche `v2`) confirmée terminée par l'utilisateur — clôt la roadmap V2. Tentative de création de branche `v4.1` annulée par l'utilisateur en cours de session (aucune branche créée).
+
 ## 2026-07-21 (validation manuelle V4-5, clôture de phase) (archivé depuis contexte.md 2026-07-25, build dist v4.1)
 - Point 1.5 (« Renommer » une sous-étape depuis E22) validé par l'utilisateur. Phase V4-5 close ; roadmap V4 intégralement terminée (V4-0 à V4-5). Restent hors phases : E3 (cadrage produit budget/comptes) et ménage de la racine du projet.
 

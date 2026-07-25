@@ -104,10 +104,10 @@ test('T50 — Déplacer une tâche vers un autre jour via le bandeau (E6)', asyn
 })
 
 test('T51 — planifier une sous-tâche depuis Décomposer, affichage hiérarchique dans le planning (E9)', async ({ page }) => {
-  await page.getByRole('button', { name: 'Todo' }).click()
+  await page.getByRole('button', { name: 'Outils' }).click()
+  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Grand ménage')
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.getByText('Grand ménage').click()
   await page.getByRole('button', { name: 'Décomposer' }).click()

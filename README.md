@@ -42,7 +42,9 @@ Module Budget (`E71Budget.tsx`) complet : configuration des catégories et livre
 
 Refonte de lisibilité de l'écran Budget sur retour utilisateur : reste non budgétisé mis en avant et coloré vert/rouge, dépassement de budget signalé visuellement, boutons destructifs distincts en rouge, distinction semaine/mois, formulaire de catégorie allégé. Rendu réel non encore vérifié en navigateur (retour utilisateur à recueillir). La suite Vitest complète conserve un échec intermittent pré-existant dans `AppContext.test.tsx`, sans lien.
 
-**2 nouvelles phases `[TODO]`** ajoutées à `roadmap_v4.1.md` depuis le tri de `bug et ameliorations.txt` : V4.1-5 (ajout de tâche contextuel selon écran d'origine, distinction visuelle liste épinglée) et V4.1-6 (auto-scroll vertical de la grille planning pendant un drag). Aucun code applicatif modifié pour l'instant.
+**2 nouvelles phases `[TODO]`** ajoutées à `roadmap_v4.1.md` depuis le tri de `bug et ameliorations.txt` : V4.1-5 (ajout de tâche contextuel selon écran d'origine, distinction visuelle liste épinglée) et V4.1-6 (auto-scroll vertical de la grille planning pendant un drag).
+
+Dette e2e du renommage nav Todo→Outils (Phase V4.1-0) traitée : 10 specs corrigées (`02-tasks`, `06-offline`, `07-planning-v4`) + un bug de test lié (bouton Retour de l'inbox pointant vers le hub Outils). Suite e2e complète 53/53 verte.
 
 Reste hors périmètre V4.1 (à cadrer) : intégration accueil du budget, date butoir Todo, liste courses spécialisée, retraits/virements entre livrets, chiffrement global.
 
@@ -80,7 +82,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Décider de la prochaine feature parmi le hors périmètre V4.1 listé (`roadmap_v4.1.md` § Reporté hors V4.1) ; aucune roadmap active en cours.
+Coder la Phase V4.1-5 (`roadmap_v4.1.md`) : nav « + » contextuel selon l'écran d'origine, distinction visuelle liste épinglée.
 
 ## Licence
 

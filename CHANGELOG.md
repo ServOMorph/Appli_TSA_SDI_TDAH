@@ -1,3 +1,11 @@
+## v4.20 — 2026-07-25
+
+### Corrigé
+- Dette e2e du renommage nav Todo→Outils (Phase V4.1-0) : `02-tasks.spec.ts`, `06-offline.spec.ts`, `07-planning-v4.spec.ts` mis à jour (flux via hub Outils, suppression du clic sur le sélecteur de destination masqué depuis V4.1-0). Bug de test lié découvert en cascade : bouton Retour de `E20Inbox` pointant vers le hub Outils depuis V4.1-0 (au lieu du Dashboard), tâche déplacée invisible après Retour (T14) — assertion corrigée.
+
+### Validé
+- Cause des 10 échecs e2e confirmée unique (renommage nav, pas de régression fonctionnelle). Suite e2e complète 53/53 verte, suite unitaire 464/466 (flaky pré-existant `AppContext.test.tsx`, sans lien).
+
 ## v4.19 — 2026-07-25
 
 ### Ajouté

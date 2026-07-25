@@ -1,3 +1,11 @@
+## v4.19 — 2026-07-25
+
+### Ajouté
+- Roadmap `roadmap_v4.1.md` : Phase V4.1-5 (ajout de tâche contextuel selon l'écran d'origine, distinction visuelle liste épinglée) et Phase V4.1-6 (auto-scroll vertical de la grille planning pendant un drag), toutes deux `[TODO]`.
+
+### Validé
+- Les 4 retours bruts de `bug et ameliorations.txt` triés et intégralement repris dans la roadmap — aucun écarté hors périmètre. Aucun code applicatif modifié cette session.
+
 ## v4.18 — 2026-07-25
 
 ### Modifié

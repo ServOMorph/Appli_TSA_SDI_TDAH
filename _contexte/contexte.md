@@ -12,11 +12,10 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-V2 close ; roadmaps V1 à V4 archivées. Branche `v4.1` active ; roadmap `roadmap_v4.1.md` intégralement close (V4.1-0 à V4.1-4).
-Intégrité relationnelle du Budget corrigée (migration Dexie v6, cascades, périodicité des dépôts) ; validation manuelle complète (points 48 à 73, `tests_manuels.md` purgé).
-Refonte de lisibilité de l'écran Budget (`E71Budget.tsx`) sur retour utilisateur : hiérarchie visuelle, reste non budgétisé mis en avant et coloré vert/rouge, dépassement de budget signalé, boutons destructifs en rouge distincts, distinction visuelle semaine/mois.
-`outDir` de build corrigé (`dist/v3` → `dist/v4.1`, résidu de version) ; build de production régénéré.
-Prochaine étape : recueillir le retour utilisateur sur le rendu réel de la refonte Budget, trier `bug et ameliorations.txt`, sinon décider de la suite (hors périmètre V4.1 listé dans `roadmap_v4.1.md`) — aucune roadmap active en cours.
+V2 close ; roadmaps V1 à V4 archivées. Branche `v4.1` active ; roadmap `roadmap_v4.1.md` : phases V4.1-0 à V4.1-4 close, 2 nouvelles phases `[TODO]` ajoutées (V4.1-5, V4.1-6).
+Intégrité relationnelle du Budget corrigée (migration Dexie v6, cascades, périodicité des dépôts) ; refonte de lisibilité de l'écran Budget faite ; retour utilisateur sur le rendu réel encore à recueillir.
+`bug et ameliorations.txt` (4 retours bruts) trié et transformé en roadmap : V4.1-5 (ajout de tâche contextuel selon écran d'origine, distinction visuelle liste épinglée) et V4.1-6 (auto-scroll vertical de la grille planning pendant un drag).
+Prochaine étape : coder la Phase V4.1-5 (`roadmap_v4.1.md`), aucun code applicatif modifié cette session.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-07-21 (suite, hors phase) : V2-10 (doc V2, déploiement Netlify, branche `v2`) confirmée terminée par l'utilisateur — clôt la roadmap V2. Tentative de création de branche `v4.1` annulée par l'utilisateur en cours de session (aucune branche créée).

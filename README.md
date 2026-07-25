@@ -36,13 +36,15 @@ Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archiv�
 
 Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archivée (`Archives/roadmap_v4.md`) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
 
-**Branche `v4.1` active, roadmap `roadmap_v4.1.md` intégralement close** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v4.1` (`vite.config.ts`), dossier `dist/` entier non versionné.
+**Branche `v4.1` active, roadmap `roadmap_v4.1.md`** : phases V4.1-0 à V4.1-4 closes (traite E3 — rubrique nav « Outils » remplaçant « Todo », Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v4.1` (`vite.config.ts`), dossier `dist/` entier non versionné.
 
 Module Budget (`E71Budget.tsx`) complet : configuration des catégories et livrets, saisie/suppression des dépenses et dépôts, soldes, historique semaine/mois. Intégrité relationnelle réparée (migration Dexie v6) : suppressions en cascade sur livrets/catégories, périodicité propre à chaque dépôt (`week`/`month`) pour éviter la double déduction. Validation manuelle intégrale confirmée par l'utilisateur.
 
 Refonte de lisibilité de l'écran Budget sur retour utilisateur : reste non budgétisé mis en avant et coloré vert/rouge, dépassement de budget signalé visuellement, boutons destructifs distincts en rouge, distinction semaine/mois, formulaire de catégorie allégé. Rendu réel non encore vérifié en navigateur (retour utilisateur à recueillir). La suite Vitest complète conserve un échec intermittent pré-existant dans `AppContext.test.tsx`, sans lien.
 
-Aucune roadmap active à la racine pour l'instant. Reste hors périmètre V4.1 (à cadrer) : intégration accueil du budget, date butoir Todo, liste courses spécialisée, retraits/virements entre livrets, chiffrement global.
+**2 nouvelles phases `[TODO]`** ajoutées à `roadmap_v4.1.md` depuis le tri de `bug et ameliorations.txt` : V4.1-5 (ajout de tâche contextuel selon écran d'origine, distinction visuelle liste épinglée) et V4.1-6 (auto-scroll vertical de la grille planning pendant un drag). Aucun code applicatif modifié pour l'instant.
+
+Reste hors périmètre V4.1 (à cadrer) : intégration accueil du budget, date butoir Todo, liste courses spécialisée, retraits/virements entre livrets, chiffrement global.
 
 ## Stack
 

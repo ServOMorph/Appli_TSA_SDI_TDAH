@@ -132,6 +132,41 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
+## Correctifs ergonomiques post-validation (retours `bug et ameliorations.txt`)
+
+Trois retours utilisateur bruts triés en correctifs. Bornés, sur la branche `v4.1`.
+Regroupés en 2 phases : correctifs UI simples ensemble, drag planning isolé (le plus délicat).
+
+### Phase V4.1-5 — Ajout de tâche contextuel + distinction listes épinglées [TODO]
+
+- [ ] Nav « + » (`App.tsx`, `BottomNav.onAddTask`) : passer l'écran courant comme origin au lieu de `'dashboard'` codé en dur
+- [ ] `E21CreateTaskV2.tsx` : généraliser `effectiveDestination` via un mapping origin→destination — `inbox`/`tools` → `todo`, `today` → `today`, `planning` → `planned`, autres (`dashboard`, `lists`, …) → sélecteur affiché ; masquer la section « Que faire de cette tâche ? » dès qu'une destination est forcée (pattern `isFromInbox` existant, étendu)
+- [ ] Vérifier tous les points d'entrée vers `task-create-v2` (`dashboard`, `inbox`, `today`, + nouveaux via nav contextuel) : la tâche va dans l'écran d'origine sans étape superflue
+- [ ] `E60Lists.tsx` : accent visuel sur la `li` d'une liste épinglée (bordure gauche + fond teinté colorés) pour distinguer nettement épinglée / non épinglée, au-delà du seul libellé du bouton
+- [ ] Tests unitaires (destination forcée par origin, masquage du sélecteur, rendu de la ligne épinglée) + mise à jour des tests existants touchés (`E21CreateTaskV2.test.tsx`, `E60Lists.test.tsx`, `App.test.tsx`)
+
+Gate : [ ] tests verts · [ ] `tsc -b` clean · [ ] lint clean · [ ] test manuel (validé par l'utilisateur) · [ ] sortie : depuis Planning/Today/Inbox le « + » crée la tâche dans l'écran courant sans demander la destination ; une liste épinglée est visuellement distincte
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+### Phase V4.1-6 — Auto-scroll vertical du drag planning [TODO]
+
+Retour : lors du glissement d'une tâche vers un autre jour, une fois sur le nouveau jour, impossible de remonter/descendre pour choisir l'heure. Cause : aucun défilement vertical de la grille (`gridRef`, `overflowY: auto`) pendant le drag — seuls les bords latéraux (dwell gauche/droite → changement de jour) sont gérés.
+
+- [ ] `E40Planning.tsx` : détecter la proximité du haut/bas de `gridRef` pendant un drag actif et faire défiler la grille verticalement (dwell/répétition symétrique à `armDwell` latéral), pour que tous les créneaux restent atteignables sans lâcher
+- [ ] Ne pas casser la logique existante : drop via `slotFromPoint`, dwell latéral de changement de jour, `finishDrag` (retour anticipé si `edgeZoneAt !== null`)
+- [ ] Tests (auto-scroll déclenché en zone haute/basse pendant drag ; pas de scroll hors drag) + e2e planning si le scénario est reproductible
+
+Gate : [ ] tests verts · [ ] `tsc -b` clean · [ ] lint clean · [ ] test manuel (validé par l'utilisateur, appareil tactile) · [ ] sortie : pendant un drag, la grille défile pour atteindre n'importe quel créneau, y compris après un changement de jour
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
 ## Q à trancher (au fil des phases, non bloquant pour démarrer)
 
 - **V4.1-3** : une catégorie de dépense peut-elle changer de périodicité après création (impact sur l'historique) ?

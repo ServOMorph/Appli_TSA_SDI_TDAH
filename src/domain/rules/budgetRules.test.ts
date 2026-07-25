@@ -40,6 +40,7 @@ const deposit = (overrides: Partial<BudgetDeposit> = {}): BudgetDeposit => ({
   id: 'deposit-1',
   account_id: 'livret-a',
   amount: 50,
+  period: 'month',
   date: '2026-07-21',
   created_at: '2026-07-21T00:00:00Z',
   ...overrides,
@@ -123,12 +124,13 @@ describe('budgetRules', () => {
       expect(getTotalBudgeted(categories, 'week')).toBe(60)
     })
 
-    it('sums only deposits from the selected period', () => {
+    it('sums only deposits from the selected period and periodicity', () => {
       const deposits = [
         deposit({ amount: 100 }),
         deposit({ id: 'outside', amount: 50, date: '2026-07-27' }),
+        deposit({ id: 'wrong-periodicity', amount: 999, period: 'week' }),
       ]
-      expect(getTotalDeposits(deposits, bounds)).toBe(100)
+      expect(getTotalDeposits(deposits, 'month', bounds)).toBe(100)
     })
 
     it('calculates the unbudgeted remainder', () => {

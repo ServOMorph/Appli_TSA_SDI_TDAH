@@ -21,7 +21,7 @@ L'application est structurée en couches étanches :
 
 - **Développement** :
   - `npm install` : Installer les dépendances.
-  - `npm run dev` / `python run_dev.py` : Lancer le serveur de développement local (Vite).
+  - `npm run dev` / `python run.py` : Lancer le serveur de développement local (Vite).
 - **Tests et Qualité** :
   - `npm test` : Lancer la suite de tests unitaires et d'intégration (Vitest).
   - `npm run test:coverage` : Lancer les tests avec calcul de la couverture de code (Vitest).

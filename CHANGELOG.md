@@ -1,3 +1,16 @@
+## v4.16 — 2026-07-25
+
+### Corrigé
+- Intégrité relationnelle du Budget : migration Dexie v6 supprimant les dépôts/écritures orphelins issus d'une suppression de livret ou de catégorie ; `deleteBudgetCategory`/`deleteBudgetAccount` suppriment désormais en cascade les écritures/dépôts liés une fois la suppression confirmée.
+- Périodicité des dépôts (`period: 'week' | 'month'`, sélecteur ajouté au formulaire) : un dépôt n'est plus déduit simultanément des vues semaine et mois ; existant migré vers `month`.
+- Bouton de suppression d'une dépense libellé « Supprimer la dépense » (ambigu avec le bouton de suppression de la catégorie, relevé en validation manuelle).
+
+### Modifié
+- Script de lancement dev déplacé de `scripts/run_dev.py` vers `run.py` (racine), référence corrigée dans `llms.txt`.
+
+### Validé
+- Phase V4.1-4 close : validation manuelle intégrale des points 48 à 73 confirmée par l'utilisateur ; `tests_manuels.md` purgé de tous les points validés. Roadmap `roadmap_v4.1.md` intégralement terminée (V4.1-0 à V4.1-4). 466/466 tests unitaires verts (seul échec rencontré : le flaky pré-existant `AppContext.test.tsx`, sans lien), `tsc -b` clean, lint clean, e2e Budget 2/2 verts (nouveau scénario T53 sur la suppression en cascade).
+
 ## v4.15 — 2026-07-21
 
 ### Ajouté

@@ -36,13 +36,11 @@ Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archiv�
 
 Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archivée (`Archives/roadmap_v4.md`) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
 
-**Branche `v4.1` active, roadmap `roadmap_v4.1.md` active à la racine** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
+**Branche `v4.1` active, roadmap `roadmap_v4.1.md` intégralement close** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
 
-Phases V4.1-0 à V4.1-3 closes : nav et hub `E70Tools.tsx`, listes épinglables, modèle Budget Dexie v5, puis configuration des catégories et livrets dans `E71Budget.tsx`.
+Module Budget (`E71Budget.tsx`) complet : configuration des catégories et livrets, saisie/suppression des dépenses et dépôts, soldes, historique semaine/mois. Intégrité relationnelle réparée (migration Dexie v6) : suppressions en cascade sur livrets/catégories, périodicité propre à chaque dépôt (`week`/`month`) pour éviter la double déduction. Validation manuelle intégrale confirmée par l'utilisateur. La suite Vitest complète conserve un échec intermittent pré-existant dans `AppContext.test.tsx`, sans lien.
 
-Cadrage produit Budget tranché avec l'utilisateur (pas encore avec Marie) — voir `roadmap_v4.1.md` § Décisions de cadrage.
-
-Phase V4.1-4 en cours : saisie/suppression des dépenses et dépôts, soldes et historique sont implémentés. Tests Budget ciblés, build, lint et e2e Budget verts ; validation manuelle réussie jusqu'au point 47. La phase reste bloquée par des dépôts orphelins conservés après suppression d'un livret, invisibles mais encore comptés, et par l'absence de périodicité propre aux dépôts. La suite Vitest complète conserve un échec intermittent pré-existant dans `AppContext.test.tsx`.
+Aucune roadmap active à la racine pour l'instant. Reste hors périmètre V4.1 (à cadrer) : intégration accueil du budget, date butoir Todo, liste courses spécialisée, retraits/virements entre livrets, chiffrement global.
 
 ## Stack
 
@@ -78,7 +76,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Réparer l'intégrité des données Budget (migration des orphelins, suppressions en cascade, périodicité des dépôts), puis reprendre `tests_manuels.md` au point 48.
+Décider de la prochaine feature parmi le hors périmètre V4.1 listé (`roadmap_v4.1.md` § Reporté hors V4.1) ; aucune roadmap active en cours.
 
 ## Licence
 

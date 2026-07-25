@@ -71,9 +71,13 @@ export function getTotalBudgeted(categories: BudgetCategory[], period: BudgetPer
     .reduce((total, category) => total + category.amount, 0)
 }
 
-export function getTotalDeposits(deposits: BudgetDeposit[], bounds: BudgetPeriodBounds): number {
+export function getTotalDeposits(
+  deposits: BudgetDeposit[],
+  period: BudgetPeriod,
+  bounds: BudgetPeriodBounds,
+): number {
   return deposits
-    .filter((deposit) => isDateInPeriod(deposit.date, bounds))
+    .filter((deposit) => deposit.period === period && isDateInPeriod(deposit.date, bounds))
     .reduce((total, deposit) => total + deposit.amount, 0)
 }
 
@@ -86,7 +90,7 @@ export function getUnbudgetedRemainder(
   return (
     getTotalIncome(categories, period) -
     getTotalBudgeted(categories, period) -
-    getTotalDeposits(deposits, bounds)
+    getTotalDeposits(deposits, period, bounds)
   )
 }
 

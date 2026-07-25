@@ -80,6 +80,43 @@ export class AppDatabase extends Dexie {
       budgetAccounts: 'id',
       budgetDeposits: 'id, account_id, date',
     })
+    this.version(6)
+      .stores({
+        users: 'id',
+        tasks: 'id, status, position',
+        subTasks: 'id, task_id, position, scheduled_date',
+        tasksV2: 'id, status, position, scheduled_date, essential',
+        lists: 'id',
+        listItems: 'id, list_id, position',
+        energyEntries: 'id, entry_date',
+        settings: 'id, user_id',
+        budgetCategories: 'id, kind, period, position',
+        budgetEntries: 'id, category_id, date',
+        budgetAccounts: 'id',
+        budgetDeposits: 'id, account_id, date, period',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('budgetDeposits')
+          .toCollection()
+          .modify((deposit) => {
+            deposit.period = 'month'
+          })
+
+        const accountIds = new Set((await tx.table('budgetAccounts').toArray()).map((account) => account.id))
+        const orphanDeposits = await tx
+          .table('budgetDeposits')
+          .filter((deposit) => !accountIds.has(deposit.account_id))
+          .primaryKeys()
+        await tx.table('budgetDeposits').bulkDelete(orphanDeposits)
+
+        const categoryIds = new Set((await tx.table('budgetCategories').toArray()).map((category) => category.id))
+        const orphanEntries = await tx
+          .table('budgetEntries')
+          .filter((entry) => !categoryIds.has(entry.category_id))
+          .primaryKeys()
+        await tx.table('budgetEntries').bulkDelete(orphanEntries)
+      })
   }
 }
 

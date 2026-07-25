@@ -108,6 +108,7 @@ export function E71Budget() {
   const [showDepositForm, setShowDepositForm] = useState(false)
   const [depositAccountId, setDepositAccountId] = useState('')
   const [depositAmount, setDepositAmount] = useState('')
+  const [depositPeriod, setDepositPeriod] = useState<BudgetPeriod>('month')
 
   function resetCategoryForm() {
     setCategoryName('')
@@ -193,13 +194,14 @@ export function E71Budget() {
     if (!firstAccount) return
     setDepositAccountId(firstAccount.id)
     setDepositAmount('')
+    setDepositPeriod('month')
     setShowDepositForm(true)
   }
 
   async function handleCreateDeposit() {
     const amount = Number(depositAmount.replace(',', '.'))
     if (!depositAccountId || !Number.isFinite(amount) || amount <= 0) return
-    await createBudgetDeposit(depositAccountId, amount)
+    await createBudgetDeposit(depositAccountId, amount, depositPeriod)
     setShowDepositForm(false)
   }
 
@@ -245,7 +247,7 @@ export function E71Budget() {
                   {category.kind === 'expense' && budgetEntries.filter((entry) => entry.category_id === category.id && isDateInPeriod(entry.date, bounds)).map((entry) => (
                     <div key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
                       <span style={{ flex: 1 }}>{entry.date} · {entry.label || 'Dépense'} · {formatEuro(entry.amount)}</span>
-                      <button aria-label={`Supprimer la dépense ${entry.label || entry.amount}`} onClick={() => deleteBudgetEntry(entry.id)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-text-muted)', cursor: 'pointer' }}>Supprimer</button>
+                      <button aria-label={`Supprimer la dépense ${entry.label || entry.amount}`} onClick={() => deleteBudgetEntry(entry.id)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-text-muted)', cursor: 'pointer' }}>Supprimer la dépense</button>
                     </div>
                   ))}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
@@ -295,7 +297,7 @@ export function E71Budget() {
                   <div style={{ flex: 1 }}>
                     <strong>{account.name}</strong>
                     <p style={{ margin: '4px 0', color: 'var(--color-text-muted)' }}>Solde : {formatEuro(getAccountBalance(budgetDeposits, account.id))}</p>
-                    {budgetDeposits.filter((deposit) => deposit.account_id === account.id && isDateInPeriod(deposit.date, getPeriodBounds('month', periodDates.month))).map((deposit) => (
+                    {budgetDeposits.filter((deposit) => deposit.account_id === account.id && isDateInPeriod(deposit.date, getPeriodBounds(deposit.period, periodDates[deposit.period]))).map((deposit) => (
                       <div key={deposit.id} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
                         <span style={{ flex: '1 1 180px' }}>{deposit.date} · Dépôt : {formatEuro(deposit.amount)}</span>
                         <button aria-label={`Supprimer le dépôt ${deposit.amount}`} onClick={() => deleteBudgetDeposit(deposit.id)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-text-muted)', cursor: 'pointer' }}>Supprimer le dépôt</button>
@@ -344,6 +346,11 @@ export function E71Budget() {
             </select>
             <label htmlFor="budget-deposit-amount">Montant</label>
             <input id="budget-deposit-amount" type="number" min="0.01" step="0.01" inputMode="decimal" value={depositAmount} onChange={(event) => setDepositAmount(event.target.value)} style={inputStyle} />
+            <label htmlFor="budget-deposit-period">Périodicité</label>
+            <select id="budget-deposit-period" value={depositPeriod} onChange={(event) => setDepositPeriod(event.target.value as BudgetPeriod)} style={inputStyle}>
+              <option value="week">À la semaine</option>
+              <option value="month">Au mois</option>
+            </select>
             <Button fullWidth onClick={handleCreateDeposit} disabled={Number(depositAmount.replace(',', '.')) <= 0}>Enregistrer</Button>
             <Button variant="secondary" fullWidth onClick={() => setShowDepositForm(false)}>Annuler</Button>
           </div>

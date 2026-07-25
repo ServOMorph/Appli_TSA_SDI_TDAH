@@ -26,7 +26,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(5)
+    expect(db.verno).toBe(6)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -56,6 +56,60 @@ describe('AppDatabase', () => {
 
     expect(await upgraded.lists.get('list-1')).toMatchObject({ name: 'Existante' })
     expect(upgraded.budgetCategories).toBeDefined()
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 5 database by migrating deposit periodicity and repairing orphaned data', async () => {
+    const name = `migration-v5-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(5).stores({
+      users: 'id',
+      tasks: 'id, status, position',
+      subTasks: 'id, task_id, position, scheduled_date',
+      tasksV2: 'id, status, position, scheduled_date, essential',
+      lists: 'id',
+      listItems: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, kind, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
+    })
+    await legacy.open()
+    await legacy.table('budgetAccounts').add({
+      id: 'account-1',
+      name: 'Livret A',
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+    })
+    await legacy.table('budgetCategories').add({
+      id: 'category-1',
+      name: 'Courses',
+      kind: 'expense',
+      period: 'week',
+      amount: 60,
+      position: 0,
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+    })
+    await legacy.table('budgetDeposits').bulkAdd([
+      { id: 'deposit-valid', account_id: 'account-1', amount: 50, date: '2026-07-21', created_at: '2026-07-21T00:00:00Z' },
+      { id: 'deposit-orphan', account_id: 'account-deleted', amount: 30, date: '2026-07-21', created_at: '2026-07-21T00:00:00Z' },
+    ])
+    await legacy.table('budgetEntries').bulkAdd([
+      { id: 'entry-valid', category_id: 'category-1', amount: 20, date: '2026-07-21', created_at: '2026-07-21T00:00:00Z' },
+      { id: 'entry-orphan', category_id: 'category-deleted', amount: 10, date: '2026-07-21', created_at: '2026-07-21T00:00:00Z' },
+    ])
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(await upgraded.budgetDeposits.get('deposit-valid')).toMatchObject({ period: 'month' })
+    expect(await upgraded.budgetDeposits.get('deposit-orphan')).toBeUndefined()
+    expect(await upgraded.budgetEntries.get('entry-valid')).toBeDefined()
+    expect(await upgraded.budgetEntries.get('entry-orphan')).toBeUndefined()
     await upgraded.delete()
   })
 

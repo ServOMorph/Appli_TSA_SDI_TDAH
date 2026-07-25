@@ -149,7 +149,7 @@ interface AppContextValue {
   deleteBudgetAccount: (id: string, confirmed?: boolean) => Promise<'deleted' | 'needs_confirmation'>
   createBudgetEntry: (categoryId: string, amount: number, label?: string, date?: string) => Promise<void>
   deleteBudgetEntry: (id: string) => Promise<void>
-  createBudgetDeposit: (accountId: string, amount: number, date?: string) => Promise<void>
+  createBudgetDeposit: (accountId: string, amount: number, period?: BudgetPeriod, date?: string) => Promise<void>
   deleteBudgetDeposit: (id: string) => Promise<void>
 }
 
@@ -682,8 +682,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   async function deleteBudgetCategory(id: string, confirmed = false): Promise<'deleted' | 'needs_confirmation'> {
     const entries = await budgetEntryRepo.getByCategoryId(id)
     if (entries.length > 0 && !confirmed) return 'needs_confirmation'
+    await Promise.all(entries.map((entry) => budgetEntryRepo.delete(entry.id)))
     await budgetCategoryRepo.delete(id)
     setBudgetCategories((previous) => previous.filter((item) => item.id !== id))
+    setBudgetEntries((previous) => previous.filter((item) => item.category_id !== id))
     return 'deleted'
   }
 
@@ -709,8 +711,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   async function deleteBudgetAccount(id: string, confirmed = false): Promise<'deleted' | 'needs_confirmation'> {
     const deposits = await budgetDepositRepo.getByAccountId(id)
     if (deposits.length > 0 && !confirmed) return 'needs_confirmation'
+    await Promise.all(deposits.map((deposit) => budgetDepositRepo.delete(deposit.id)))
     await budgetAccountRepo.delete(id)
     setBudgetAccounts((previous) => previous.filter((item) => item.id !== id))
+    setBudgetDeposits((previous) => previous.filter((item) => item.account_id !== id))
     return 'deleted'
   }
 
@@ -733,12 +737,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setBudgetEntries(await budgetEntryRepo.getAll())
   }
 
-  async function createBudgetDeposit(accountId: string, amount: number, date = todayDate()) {
+  async function createBudgetDeposit(
+    accountId: string,
+    amount: number,
+    period: BudgetPeriod = 'month',
+    date = todayDate(),
+  ) {
     if (!Number.isFinite(amount) || amount <= 0) return
     const deposit: BudgetDeposit = {
       id: newId(),
       account_id: accountId,
       amount,
+      period,
       date,
       created_at: new Date().toISOString(),
     }

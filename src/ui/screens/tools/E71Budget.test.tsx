@@ -49,6 +49,7 @@ function makeDeposit(overrides: Partial<BudgetDeposit> = {}): BudgetDeposit {
     id: 'deposit-1',
     account_id: 'account-1',
     amount: 50,
+    period: 'month',
     date: new Date().toISOString().slice(0, 10),
     created_at: '2026-07-21T10:00:00.000Z',
     ...overrides,
@@ -130,6 +131,7 @@ describe('E71Budget', () => {
     await userEvent.type(screen.getByLabelText('Libellé (facultatif)'), 'Marché')
     await userEvent.click(within(screen.getByRole('dialog', { name: 'Ajouter une dépense' })).getByRole('button', { name: 'Enregistrer' }))
     expect(createBudgetEntry).toHaveBeenCalledWith('category-1', 15, 'Marché')
+    expect(screen.getByRole('button', { name: 'Supprimer la dépense Intermarché' }).textContent).toBe('Supprimer la dépense')
     await userEvent.click(screen.getByRole('button', { name: 'Supprimer la dépense Intermarché' }))
     expect(deleteBudgetEntry).toHaveBeenCalledWith('entry-1')
   })
@@ -142,10 +144,11 @@ describe('E71Budget', () => {
     expect(screen.getByRole('button', { name: 'Supprimer le dépôt 50' }).textContent).toBe('Supprimer le dépôt')
     expect(screen.getByRole('button', { name: 'Supprimer Livret A' }).textContent).toBe('Supprimer le livret')
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter un dépôt' }))
-    await userEvent.type(screen.getByLabelText('Montant'), '25')
     const dialog = screen.getByRole('dialog', { name: 'Ajouter un dépôt' })
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '25')
+    await userEvent.selectOptions(within(dialog).getByLabelText('Périodicité'), 'week')
     await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
-    expect(createBudgetDeposit).toHaveBeenCalledWith('account-1', 25)
+    expect(createBudgetDeposit).toHaveBeenCalledWith('account-1', 25, 'week')
     await userEvent.click(screen.getByRole('button', { name: 'Supprimer le dépôt 50' }))
     expect(deleteBudgetDeposit).toHaveBeenCalledWith('deposit-1')
   })

@@ -1,3 +1,11 @@
+## v4.18 — 2026-07-25
+
+### Modifié
+- `outDir` de `vite.config.ts` corrigé (`dist/v3` → `dist/v4.1`, résidu de version), aligné sur la branche/version active.
+
+### Validé
+- Build de production régénéré avec succès (`tsc -b` + `vite build` + PWA) vers `dist/v4.1/`.
+
 ## v4.17 — 2026-07-25
 
 ### Modifié

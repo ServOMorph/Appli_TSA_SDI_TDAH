@@ -38,6 +38,6 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist/v3',
+    outDir: 'dist/v4.1',
   },
 })

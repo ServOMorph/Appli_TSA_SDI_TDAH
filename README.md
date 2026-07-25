@@ -36,7 +36,7 @@ Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archiv�
 
 Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archivée (`Archives/roadmap_v4.md`) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
 
-**Branche `v4.1` active, roadmap `roadmap_v4.1.md` intégralement close** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v3` (`vite.config.ts`), seul build versionné.
+**Branche `v4.1` active, roadmap `roadmap_v4.1.md` intégralement close** (5 phases V4.1-0 à V4.1-4) : traite E3 — rubrique nav « Outils » remplaçant « Todo » (Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v4.1` (`vite.config.ts`), dossier `dist/` entier non versionné.
 
 Module Budget (`E71Budget.tsx`) complet : configuration des catégories et livrets, saisie/suppression des dépenses et dépôts, soldes, historique semaine/mois. Intégrité relationnelle réparée (migration Dexie v6) : suppressions en cascade sur livrets/catégories, périodicité propre à chaque dépôt (`week`/`month`) pour éviter la double déduction. Validation manuelle intégrale confirmée par l'utilisateur.
 

@@ -38,6 +38,8 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 **Branche `v4.1` active, roadmap `roadmap_v4.1.md`** : phases V4.1-0 à V4.1-5 closes (traite E3 — rubrique nav « Outils » remplaçant « Todo », Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v4.1` (`vite.config.ts`), dossier `dist/` entier non versionné.
 
+Correctif hors roadmap (2026-07-25) : sélection de texte parasite pendant le drag-and-drop dans `E40Planning` corrigée, validation tactile réelle en attente.
+
 Module Budget (`E71Budget.tsx`) complet : configuration des catégories et livrets, saisie/suppression des dépenses et dépôts, soldes, historique semaine/mois. Intégrité relationnelle réparée (migration Dexie v6) : suppressions en cascade sur livrets/catégories, périodicité propre à chaque dépôt (`week`/`month`) pour éviter la double déduction. Validation manuelle intégrale confirmée par l'utilisateur.
 
 Refonte de lisibilité de l'écran Budget sur retour utilisateur : reste non budgétisé mis en avant et coloré vert/rouge, dépassement de budget signalé visuellement, boutons destructifs distincts en rouge, distinction semaine/mois, formulaire de catégorie allégé. Rendu réel non encore vérifié en navigateur (retour utilisateur à recueillir).

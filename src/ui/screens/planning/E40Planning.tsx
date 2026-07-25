@@ -189,6 +189,9 @@ function slotCellStyle(block: PlanBlock | undefined, ambianceColor: string, isCo
     flexDirection: 'column',
     gap: '4px',
     cursor: 'pointer',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    touchAction: 'none',
     ...(isContinuation ? { marginTop: '-1px' } : {}),
     ...(block ? plannedTaskTintStyle(blockCompleted(block), ambianceColor) : {}),
   }
@@ -669,6 +672,7 @@ export function E40Planning() {
     longPressTimerRef.current = setTimeout(() => {
       dragActiveRef.current = true
       setIsDragging(true)
+      window.getSelection?.()?.removeAllRanges()
       const info = dragRef.current
       if (info) {
         setDragOverlay({ block: info.block, x: info.startX, y: info.startY, label: '' })
@@ -729,7 +733,7 @@ export function E40Planning() {
   const isToday = displayDate === todayStr()
 
   return (
-    <main style={pageStyle}>
+    <main style={isDragging ? { ...pageStyle, userSelect: 'none', WebkitUserSelect: 'none' } : pageStyle}>
       <div style={headerStyle}>
         <button style={iconBtnStyle} onClick={handleBack} aria-label="Retour">
           &larr;

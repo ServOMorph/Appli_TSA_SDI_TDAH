@@ -1,3 +1,8 @@
+## v4.22 — 2026-07-25
+
+### Corrigé
+- `E40Planning.tsx` : sélection de texte parasite du navigateur pendant le drag-and-drop d'une tâche (déclenchée par le long-press). `userSelect`/`touchAction: none` sur les cellules du planning, purge de la sélection au démarrage du drag, `userSelect: none` sur la page tant que le drag est actif. Correctif hors roadmap, signalé par l'utilisateur. 474/474 tests verts, `tsc -b` clean. Validation manuelle tactile à confirmer.
+
 ## v4.21 — 2026-07-25
 
 ### Ajouté

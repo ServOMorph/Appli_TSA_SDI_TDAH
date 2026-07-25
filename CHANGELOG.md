@@ -1,3 +1,14 @@
+## v4.17 — 2026-07-25
+
+### Modifié
+- Refonte de lisibilité de l'écran Budget (`E71Budget.tsx`) sur retour utilisateur : hiérarchie visuelle renforcée (Restant avant Dépensé), reste non budgétisé mis en avant (gros chiffre coloré vert/rouge selon le signe), dépassement de budget signalé par la couleur du Restant de catégorie, boutons destructifs (Supprimer, Supprimer la dépense/le dépôt/le livret) distingués en rouge des actions neutres, accent visuel par période (pastille + bordure colorée, semaine/mois), formulaire de catégorie allégé (Type et Périodicité groupés).
+
+### Corrigé
+- Modales de confirmation de suppression (catégorie/livret) : le texte affichait encore « seront conservées » alors que la suppression est réellement en cascade depuis la correction d'intégrité précédente — corrigé pour refléter le comportement réel.
+
+### Validé
+- 465/466 tests unitaires (flaky pré-existant `AppContext.test.tsx`, sans lien), `tsc -b` clean, lint clean, build et e2e Budget 2/2 verts après adaptation des assertions au nouvel ordre Restant/Dépensé. Rendu visuel réel non vérifié en navigateur dans cette session.
+
 ## v4.16 — 2026-07-25
 
 ### Corrigé

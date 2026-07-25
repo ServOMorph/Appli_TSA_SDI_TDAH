@@ -42,7 +42,7 @@ test('T52 — configurer le Budget, saisir une dépense, un dépôt et corriger 
   await expenseDialog.getByLabel('Montant').fill('20')
   await expenseDialog.getByLabel('Libellé (facultatif)').fill('Intermarché')
   await expenseDialog.getByRole('button', { name: 'Enregistrer' }).click()
-  await expect(page.getByText(/Dépensé.*20.*Restant.*40/)).toBeVisible()
+  await expect(page.getByText(/Restant.*40.*Dépensé.*20/)).toBeVisible()
   await expect(page.getByText(/Intermarché/)).toBeVisible()
 
   await page.getByRole('button', { name: 'Ajouter un dépôt' }).click()
@@ -53,7 +53,7 @@ test('T52 — configurer le Budget, saisir une dépense, un dépôt et corriger 
   await expect(page.getByText(/Solde.*50/)).toBeVisible()
 
   await page.getByRole('button', { name: 'Supprimer la dépense Intermarché' }).click()
-  await expect(page.getByText(/Dépensé.*0.*Restant.*60/)).toBeVisible()
+  await expect(page.getByText(/Restant.*60.*Dépensé.*0/)).toBeVisible()
   await page.getByRole('button', { name: 'Supprimer le dépôt 50' }).click()
   await expect(page.getByText(/Solde.*0/)).toBeVisible()
   await expect(page.getByText(/Reste non budgétisé.*1.*380/)).toBeVisible()
@@ -104,7 +104,7 @@ test('T53 — suppression en cascade d’un livret et d’une catégorie, sans d
   await expenseEntryDialog.getByLabel('Catégorie').selectOption({ label: 'Loisirs' })
   await expenseEntryDialog.getByLabel('Montant').fill('40')
   await expenseEntryDialog.getByRole('button', { name: 'Enregistrer' }).click()
-  await expect(page.getByText(/Dépensé.*40.*Restant.*60/)).toBeVisible()
+  await expect(page.getByText(/Restant.*60.*Dépensé.*40/)).toBeVisible()
 
   await page.getByRole('button', { name: 'Supprimer Loisirs' }).click()
   await expect(page.getByRole('dialog', { name: 'Supprimer la catégorie' })).toBeVisible()

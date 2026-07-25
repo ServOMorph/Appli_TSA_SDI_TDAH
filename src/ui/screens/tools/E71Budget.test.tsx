@@ -62,7 +62,7 @@ describe('E71Budget', () => {
     expect(screen.getByRole('heading', { name: 'Budget' })).toBeDefined()
     expect(screen.getByRole('heading', { name: 'À la semaine' })).toBeDefined()
     expect(screen.getByRole('heading', { name: 'Au mois' })).toBeDefined()
-    expect(screen.getAllByText('Reste non budgétisé : Non configuré')).toHaveLength(2)
+    expect(screen.getAllByText('Non configuré')).toHaveLength(2)
     expect(screen.getByText('Aucun livret configuré.')).toBeDefined()
   })
 

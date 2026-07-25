@@ -137,15 +137,17 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 Trois retours utilisateur bruts triés en correctifs. Bornés, sur la branche `v4.1`.
 Regroupés en 2 phases : correctifs UI simples ensemble, drag planning isolé (le plus délicat).
 
-### Phase V4.1-5 — Ajout de tâche contextuel + distinction listes épinglées [TODO]
+### Phase V4.1-5 — Ajout de tâche contextuel + distinction listes épinglées [FAIT]
 
-- [ ] Nav « + » (`App.tsx`, `BottomNav.onAddTask`) : passer l'écran courant comme origin au lieu de `'dashboard'` codé en dur
-- [ ] `E21CreateTaskV2.tsx` : généraliser `effectiveDestination` via un mapping origin→destination — `inbox`/`tools` → `todo`, `today` → `today`, `planning` → `planned`, autres (`dashboard`, `lists`, …) → sélecteur affiché ; masquer la section « Que faire de cette tâche ? » dès qu'une destination est forcée (pattern `isFromInbox` existant, étendu)
-- [ ] Vérifier tous les points d'entrée vers `task-create-v2` (`dashboard`, `inbox`, `today`, + nouveaux via nav contextuel) : la tâche va dans l'écran d'origine sans étape superflue
-- [ ] `E60Lists.tsx` : accent visuel sur la `li` d'une liste épinglée (bordure gauche + fond teinté colorés) pour distinguer nettement épinglée / non épinglée, au-delà du seul libellé du bouton
-- [ ] Tests unitaires (destination forcée par origin, masquage du sélecteur, rendu de la ligne épinglée) + mise à jour des tests existants touchés (`E21CreateTaskV2.test.tsx`, `E60Lists.test.tsx`, `App.test.tsx`)
+- [x] Nav « + » (`App.tsx`, `BottomNav.onAddTask`) : passe désormais l'écran courant (`screen`) comme origin au lieu de `'dashboard'` codé en dur
+- [x] `E21CreateTaskV2.tsx` : `effectiveDestination` généralisé via `FORCED_DESTINATION_BY_ORIGIN` (mapping origin→destination) — `inbox`/`tools` → `todo`, `today` → `today`, `planning` → `planned`, `lists` → `list` (ouvre directement le sélecteur de liste, création de liste incluse), `dashboard` (et tout origin non mappé) → sélecteur affiché ; section « Que faire de cette tâche ? » masquée dès qu'une destination est forcée (généralisation de l'ancien `isFromInbox`)
+- [x] Tous les points d'entrée vers `task-create-v2` vérifiés (`dashboard`, `inbox`/`tools`, `today`, `planning`, `lists`) : la tâche va dans l'écran d'origine sans étape superflue
+- [x] `E60Lists.tsx` : accent visuel sur la `li` d'une liste épinglée (bordure gauche + fond teinté `color-mix` avec `--color-primary`) pour distinguer nettement épinglée / non épinglée, au-delà du seul libellé du bouton
+- [x] Tests unitaires (destination forcée par origin dont `lists`, masquage du sélecteur, rendu de la ligne épinglée) + mise à jour des tests existants touchés (`E21CreateTaskV2.test.tsx`, `E60Lists.test.tsx`, `App.test.tsx`)
 
-Gate : [ ] tests verts · [ ] `tsc -b` clean · [ ] lint clean · [ ] test manuel (validé par l'utilisateur) · [ ] sortie : depuis Planning/Today/Inbox le « + » crée la tâche dans l'écran courant sans demander la destination ; une liste épinglée est visuellement distincte
+Décision prise au fil de l'implémentation, hors périmètre initial du cadrage de la phase : l'origin `lists` n'a pas été laissé sur le sélecteur générique — il force directement la destination `list`, évitant à l'utilisateur de recliquer « Mettre dans une liste » alors qu'il est déjà dans l'onglet Listes.
+
+Gate : [x] tests verts (474/474 au run de clôture ; flaky intermittent pré-existant `AppContext.test.tsx` observé en cours de développement, sans lien) · [x] `tsc -b` clean · [x] lint clean · [x] test manuel validé par l'utilisateur (`tests_manuels.md` points 74-82, purgés après validation) · [x] sortie : depuis Planning/Today/Inbox/Outils/Listes le « + » crée la tâche dans l'écran courant sans étape superflue ; une liste épinglée est visuellement distincte
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

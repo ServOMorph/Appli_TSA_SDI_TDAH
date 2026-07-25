@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-21 (suite 2, ménage racine) (archivé depuis contexte.md 2026-07-25, clôture Phase V4.1-5)
+- Branche `v4.1` créée depuis `v4` et activée (objet non précisé pour l'instant). `roadmap_v4.md` archivé (`Archives/roadmap_v4.md`) — plus aucune roadmap active à la racine. Ménage de la racine exécuté intégralement, 8 points validés par l'utilisateur : `docs/adr/` fusionné dans `_docs/adr/` (dossier `docs/` supprimé), 4 scripts regroupés dans `scripts/` (chemin corrigé dans `.claude/CLAUDE.md` et `AGENTS.md`), `SERVEURS.md` supprimé et fusionné dans `README.md`, `validation_manuelle.md` (V4-5, close) archivé, `Retours/` fusionné dans `Note de réunion/` (dossier supprimé), `dist/v1`/`dist/v2` supprimés et retirés du suivi git (`dist/v3` conservée), `.gitignore` ignore désormais `dist/` entier, `vite-preview.out.log`/`coverage/` supprimés.
+
 ## 2026-07-21 (suite, hors phase) (archivé depuis contexte.md 2026-07-25, correctif dette e2e)
 - V2-10 (doc V2, déploiement Netlify, branche `v2`) confirmée terminée par l'utilisateur — clôt la roadmap V2. Tentative de création de branche `v4.1` annulée par l'utilisateur en cours de session (aucune branche créée).
 

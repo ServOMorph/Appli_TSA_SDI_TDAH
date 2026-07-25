@@ -129,7 +129,7 @@ export function AppScreens() {
           overloadMode={overloadMode}
           inboxHasTasks={inboxTasks.length > 0}
           onAddTask={() => {
-            setTaskCreateOrigin('dashboard')
+            setTaskCreateOrigin(screen)
             goTo('task-create-v2')
           }}
           onGoDashboard={() => goTo('dashboard')}

@@ -83,6 +83,22 @@ describe('E60Lists', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Épingler Musiques dans Outils' }))
       expect(ctx.togglePinList).toHaveBeenCalledWith('l1')
     })
+
+    it('une liste épinglée a une bordure gauche visuellement distincte', () => {
+      const ctx = makeAppContext({
+        lists: [makeList({ id: 'l1', name: 'Musiques', pinned_to_tools: true })],
+      })
+      renderWithApp(<E60Lists />, ctx)
+      const item = screen.getByRole('button', { name: 'Musiques' }).closest('li')
+      expect(item?.style.borderLeft).toContain('var(--color-primary)')
+    })
+
+    it("une liste non épinglée n'a pas de bordure gauche distincte", () => {
+      const ctx = makeAppContext({ lists: [makeList({ id: 'l1', name: 'Musiques' })] })
+      renderWithApp(<E60Lists />, ctx)
+      const item = screen.getByRole('button', { name: 'Musiques' }).closest('li')
+      expect(item?.style.borderLeft).not.toContain('var(--color-primary)')
+    })
   })
 
   describe('bouton retour', () => {

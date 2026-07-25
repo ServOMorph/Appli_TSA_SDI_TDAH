@@ -10,3 +10,7 @@ Testeur : à compléter
 - Le changement de périodicité d'une catégorie existante n'est pas disponible.
 - Les retraits et virements entre livrets ne sont pas disponibles.
 - La saisie rapide depuis le Dashboard n'est pas disponible.
+
+## Phase V4.1-5 — Ajout de tâche contextuel + distinction listes épinglées
+
+Points 74 à 82 validés (retirés de ce fichier) : « + » contextuel depuis Planning, Outils, Todo, Aujourd'hui, Dashboard et Listes (sélecteur de liste direct, création de liste incluse) ; distinction visuelle des listes épinglées.

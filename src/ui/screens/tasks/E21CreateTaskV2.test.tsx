@@ -129,6 +129,62 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
+  it("depuis Outils (taskCreateOrigin 'tools') : aucun choix de destination affiché, Valider crée directement une tâche todo", async () => {
+    const ctx = makeAppContext({ taskCreateOrigin: 'tools' })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis outils')
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(ctx.createTaskInbox).toHaveBeenCalledWith('Tâche depuis outils')
+    expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+  })
+
+  it("depuis Today (taskCreateOrigin 'today') : aucun choix de destination affiché, Valider crée directement une tâche today", async () => {
+    const ctx = makeAppContext({ taskCreateOrigin: 'today' })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis today')
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(ctx.addTask).toHaveBeenCalledWith('Tâche depuis today')
+    expect(ctx.goTo).toHaveBeenCalledWith('today')
+  })
+
+  it("depuis Planning (taskCreateOrigin 'planning') : aucun choix de destination affiché, Valider planifie directement la tâche", async () => {
+    const ctx = makeAppContext({ taskCreateOrigin: 'planning' })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis planning')
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(ctx.startPlanTask).toHaveBeenCalledWith('Tâche depuis planning')
+    expect(ctx.goTo).toHaveBeenCalledWith('planning')
+  })
+
+  it("depuis Listes (taskCreateOrigin 'lists') : aucun choix de destination affiché, Valider ouvre directement le sélecteur de liste", async () => {
+    const ctx = makeAppContext({
+      taskCreateOrigin: 'lists',
+      lists: [{ id: 'list-1', name: 'Courses', created_at: '2026-07-05', updated_at: '2026-07-05' }],
+    })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis listes')
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(screen.getByRole('dialog', { name: 'Choisir une liste' })).toBeDefined()
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter à Courses' }))
+    expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Tâche depuis listes')
+    expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
+  })
+
+  it("depuis Listes (taskCreateOrigin 'lists') : le sélecteur de liste permet de créer une nouvelle liste", async () => {
+    const ctx = makeAppContext({ taskCreateOrigin: 'lists', lists: [] })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche nouvelle liste')
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    await userEvent.type(screen.getByLabelText('Nom de la nouvelle liste'), 'Bricolage')
+    await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
+    expect(ctx.createList).toHaveBeenCalledWith('Bricolage')
+    expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
+  })
+
   it('la destination sélectionnée a aria-pressed=true', async () => {
     renderWithApp(<E21CreateTaskV2 />)
     const btn = screen.getByRole('button', { name: 'Todo' })

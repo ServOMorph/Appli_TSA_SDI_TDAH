@@ -124,8 +124,13 @@ export function E60Lists() {
               display: 'flex',
               alignItems: 'center',
               gap: 'var(--spacing-sm)',
-              background: 'var(--color-surface)',
+              background: list.pinned_to_tools
+                ? 'color-mix(in srgb, var(--color-primary) 8%, var(--color-surface))'
+                : 'var(--color-surface)',
               border: '1px solid var(--color-border)',
+              borderLeft: list.pinned_to_tools
+                ? '3px solid var(--color-primary)'
+                : '1px solid var(--color-border)',
               borderRadius: 'var(--radius-md)',
             }}
           >

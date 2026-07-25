@@ -2,8 +2,17 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import type { TaskStatusV2 } from '@/domain/entities/taskV2'
+import type { Screen } from '@/app/AppContext'
 
 type Destination = TaskStatusV2 | 'list' | 'today'
+
+const FORCED_DESTINATION_BY_ORIGIN: Partial<Record<Screen, Destination>> = {
+  inbox: 'todo',
+  tools: 'todo',
+  today: 'today',
+  planning: 'planned',
+  lists: 'list',
+}
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -101,8 +110,8 @@ export function E21CreateTaskV2() {
   const [destination, setDestination] = useState<Destination | null>(null)
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
-  const isFromInbox = taskCreateOrigin === 'inbox'
-  const effectiveDestination = isFromInbox ? 'todo' : destination
+  const forcedDestination = taskCreateOrigin ? FORCED_DESTINATION_BY_ORIGIN[taskCreateOrigin] : undefined
+  const effectiveDestination = forcedDestination ?? destination
 
   function returnToOrigin() {
     goTo(taskCreateOrigin ?? 'inbox')
@@ -184,7 +193,7 @@ export function E21CreateTaskV2() {
           />
         </div>
 
-        {!isFromInbox && (
+        {!forcedDestination && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
             <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Que faire de cette tâche ?</p>
             {DESTINATIONS.map((d) => (

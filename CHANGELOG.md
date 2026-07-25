@@ -1,3 +1,13 @@
+## v4.21 — 2026-07-25
+
+### Ajouté
+- Nav « + » contextuel (`App.tsx`) : pose désormais l'écran courant comme origin de création de tâche au lieu de `'dashboard'` en dur.
+- `E21CreateTaskV2.tsx` : `effectiveDestination` généralisé via `FORCED_DESTINATION_BY_ORIGIN` (`inbox`/`tools`→`todo`, `today`→`today`, `planning`→`planned`, `lists`→`list`) ; depuis Listes, le « + » ouvre directement le sélecteur de liste (existante ou création d'une nouvelle liste) sans passer par le choix générique à 4 destinations.
+- `E60Lists.tsx` : accent visuel (bordure gauche + fond teinté) sur une liste épinglée dans Outils, distinct du seul libellé du bouton.
+
+### Validé
+- Phase V4.1-5 (`roadmap_v4.1.md`) close. 474/474 tests unitaires au run de clôture, `tsc -b` clean, lint clean. Validation manuelle intégrale confirmée par l'utilisateur (`tests_manuels.md` points 74-82, purgés).
+
 ## v4.20 — 2026-07-25
 
 ### Corrigé

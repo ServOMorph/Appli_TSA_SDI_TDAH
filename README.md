@@ -38,9 +38,9 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 Roadmap V4.1 (6 phases, V4.1-0 à V4.1-5) **close**, désormais archivée (`Archives/roadmap_v4.1.md`) : rubrique nav « Outils » remplaçant « Todo », listes épinglables, module Budget semaine/mois avec livrets simples, nav « + » contextuelle. Phase V4.1-6 (auto-scroll drag planning) jamais codée, reprise dans la roadmap suivante.
 
-**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — 4 phases `[TODO]` : V5-0 (refacto du système d'état et de navigation), V5-1 (nav + écran d'accueil fusionné avec le planning), V5-2 (planning et tâches refondus — logos, couleurs, durée en jours, récurrence), V5-3 (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel). Les 5 outils spécialisés décrits par la testeuse (Sentiments, Liste comptage, Comptes à colonnes configurables, Routine, Tableau prévisions) sont reportés en V5.1+, faute de retour d'usage sur la version actuelle. 7 arbitrages tranchés avec l'utilisateur, consignés en tête de `roadmap_v5.0.md`.
+**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — 4 phases `[TODO]` : V5-0 (refacto du système d'état et de navigation), V5-1 (nav + écran d'accueil fusionné avec le planning), V5-2 (planning et tâches refondus — logos, couleurs, durée en jours, récurrence, fiche tâche cliquable), V5-3 (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel). Modification d'une tâche désormais exclusivement via sa fiche (plus de glisser-déposer, aligné sur l'application de référence de la testeuse). Les 5 outils spécialisés reportés en V5.1+ (Comptage, Météo du jour, Comptes à colonnes configurables, Routine, Tableau prévisions), faute de retour d'usage sur la version actuelle — ordre de priorité fixé, Comptage en premier.
 
-Aucun code applicatif modifié depuis la clôture de V4.1. Dernier état de code stable : correctif hors roadmap (2026-07-25) de sélection de texte parasite pendant le drag-and-drop dans `E40Planning`, validation tactile réelle toujours en attente.
+Aucun code applicatif modifié depuis la clôture de V4.1.
 
 ## Stack
 
@@ -76,7 +76,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Communiquer à la testeuse les points de `Note de réunion/2026-07-28/a_communiquer_2026-07-28.md`, puis démarrer la Phase V5-0 (`roadmap_v5.0.md`) : refacto du socle de navigation et d'état, sous Opus.
+Démarrer la Phase V5-0 (`roadmap_v5.0.md`) : refacto du socle de navigation et d'état, sous Opus. La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
 
 ## Licence
 

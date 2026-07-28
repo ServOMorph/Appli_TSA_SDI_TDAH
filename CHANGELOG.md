@@ -1,3 +1,12 @@
+## v4.24 — 2026-07-28
+
+### Modifié
+- `roadmap_v5.0.md` : Q10 révisé, tranché directement avec l'utilisateur — abandon du glisser-déposer sur le planning au profit d'une fiche tâche cliquable (date, horaire, alerte, énergie éditables individuellement), alignée sur l'application de référence de la testeuse. Rend obsolètes la dette V4.1-6 (auto-scroll pendant drag) et la validation tactile du correctif de sélection de texte du 2026-07-25. Q2 résolu (« Sentiments » → « Météo du jour »), Q3 résolu (« joint » → « Comptage »), ordre de priorité des 5 outils reportés fixé (Comptage en premier).
+- `a_communiquer_v5.md` (racine) : créé — synthèse finale à communiquer à la testeuse à la livraison de la V5.0 (envoi différé, décision explicite).
+
+### Corrigé
+- 7 fichiers de communication testeuse devenus obsolètes supprimés (questions déjà répondues dans des visios ultérieures, ou remplacées par `a_communiquer_v5.md`).
+
 ## v4.23 — 2026-07-28
 
 ### Ajouté

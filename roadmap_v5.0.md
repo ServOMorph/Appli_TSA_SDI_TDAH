@@ -14,7 +14,7 @@ Tranchés avec l'utilisateur après production des constats. Ils priment sur la 
 - **Q8 — Accueil et planning** : un seul écran à deux états. `E10Dashboard` absorbe `E40Planning`. Replié : planning à l'heure courante + bloc widgets. Déplié : planning entier scrollable, widgets masqués.
 - **Q5 — Budget V4.1** : rebranché tel quel comme outil de type « tableau comptage » v1, posé sur l'accueil. Aucune refonte du modèle de données en V5.0 ; les colonnes configurables décrites par Marie (`E32`) sont traitées en V5.1 avec son retour d'usage.
 - **Q9 — Arborescence** : un seul niveau de dossier (racine → dossier → outils). Pas de sous-dossier. Motif : la maquette de Marie (`C27`, `F1`, `C29`) contient huit outils tous à la racine et aucun dossier ; son seul exemple de sous-dossier est verbal et hypothétique.
-- **Q10 — Grille du planning** : cases et lignes supprimées au repos, repères horaires révélés en fond léger **pendant un drag**, effacés au relâchement. Motif : Marie a arbitré un rendu en regardant une application de référence qui n'a pas de drag-and-drop (`C5` : l'heure s'y change par la fiche) ; elle a donc arbitré un geste sans le savoir.
+- **Q10 — Grille du planning et modification d'une tâche** : révisé le 2026-07-28 (post-communication) — pas de glisser-déposer. Cases et lignes supprimées définitivement, comme dans l'application de référence. Une tâche se modifie en cliquant dessus pour ouvrir sa fiche, où chaque champ (date, horaire, alerte, énergie...) est cliquable et ouvre son propre sélecteur — cf. `Note de réunion/2026-07-28/Capture pendant la visio/Capture d'écran 2026-07-28 160841.png`. Tranché directement avec l'utilisateur.
 - **Q11 — Récurrence** : modèle Google Agenda complet. Toute modification d'une occurrence pose la question « cette occurrence » / « toutes les occurrences ». Implique une entité d'exception.
 - **Q12 — Bouton « + »** : crée directement une tâche, sans écran de choix. La saisie de dépense passe par le widget Comptes de l'accueil, en un tap. Motif : la phase V4.1-5 vient de supprimer exactement cette étape intermédiaire, et Marie a elle-même identifié que la profondeur d'accès tue l'usage (`E38`, l.1112-1113).
 - **Q1 — Énergie** : sans objet. `energyRules.ts` implémente déjà la sémantique décrite par Marie (`EnergyEntry.value` = énergie disponible du jour, `plannedCost` = somme des coûts planifiés, `isOverloaded` quand le second dépasse le premier). Reste à afficher les deux nombres côte à côte.
@@ -23,7 +23,7 @@ Tranchés avec l'utilisateur après production des constats. Ils priment sur la 
 
 - Un seul niveau de dossier au lieu d'une arborescence libre (`Q9`).
 - Le « + » ne propose pas « ajouter une dépense » (`Q12`).
-- La grille réapparaît pendant le drag alors qu'elle l'a supprimée (`Q10`) — à lui **montrer**, pas à lui demander.
+- Aucun glisser-déposer sur le planning : toute modification (y compris la date) passe par la fiche de la tâche (`Q10`).
 - Le budget qu'elle va découvrir n'a pas les colonnes configurables qu'elle a dessinées (`Q5`).
 
 ## Ordre & dépendances
@@ -48,7 +48,7 @@ Aucun changement de comportement visible.
 - [ ] Découper `AppContext.tsx` (961 l., ~85 propriétés exposées) en contextes par domaine — tâches, listes, énergie, budget, outils (`src/app/AppContext.tsx`, nouveaux `src/app/contexts/*`)
 - [ ] Remplacer l'union plate `Screen` (23 valeurs) par une route porteuse de paramètres et une pile de navigation ; nécessaire dès un niveau de dossier et pour le retour contextuel généralisé (`src/app/AppContext.tsx` l.31-53, `src/App.tsx`)
 - [ ] Supprimer les retours codés en dur `taskCreateOrigin` / `listDetailOrigin` au profit de la pile (`src/app/AppContext.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`, `src/ui/screens/lists/E61ListDetail.tsx`)
-- [ ] Extraire de `E40Planning.tsx` (1049 l.) la logique de drag-and-drop et de calcul de créneaux, prérequis de la fusion `Q8` et de la grille révélée `Q10` (`src/ui/screens/planning/E40Planning.tsx`, nouveau `src/domain/rules/planningDragRules.ts`)
+- [ ] Extraire de `E40Planning.tsx` (1049 l.) la logique de calcul de créneaux, prérequis de la fusion `Q8` (`src/ui/screens/planning/E40Planning.tsx`, nouveau `src/domain/rules/planningSlotRules.ts`)
 - [ ] Suite existante (474 tests) verte sans modification des assertions métier
 
 Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : application strictement iso-fonctionnelle, navigation à pile en place, aucun module d'état au-dessus de 300 lignes
@@ -63,7 +63,6 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - [ ] `N1` (cf. C26, C27) — nav basse à 4 éléments : Boîte de réception, Accueil, Paramètres, bouton « + » ; retrait des onglets Dashboard / Outils / Planning / Listes (`src/ui/components/BottomNav.tsx`, `src/App.tsx`)
 - [ ] `E19` + `Q8` (cf. C27, C31, C32) — fusion de `E40Planning` dans `E10Dashboard` : état replié planning à l'heure courante + bloc widgets, état déplié planning entier scrollable (`src/ui/screens/dashboard/E10Dashboard.tsx`, `src/ui/screens/planning/E40Planning.tsx`)
 - [ ] `E18` (cf. C30, C31) — geste de dépliement par poignée, symétrique au repli (`src/ui/screens/dashboard/E10Dashboard.tsx`)
-- [ ] **V4.1-6** — auto-scroll vertical de la grille pendant un drag actif, dette reprise de la roadmap V4.1 et devenue bloquante : sans elle le planning déplié n'est pas manipulable au doigt (`src/domain/rules/planningDragRules.ts`)
 - [ ] `E14` + `Q1` (cf. C28) — affichage des deux valeurs d'énergie côte à côte (planifié | disponible) et pastille mode surcharge en tête d'accueil (`src/ui/components/EnergyDisplay.tsx`, `src/ui/components/BatteryIcon.tsx`)
 - [ ] `E21` — pastille de surcharge claire quand inactive, intensifiée quand active, cliquable vers l'écran de récupération existant (`src/ui/screens/overload/E90OverloadRecovery.tsx`)
 - [ ] `E24` (cf. C27, C29) — zone de widgets d'outils sur l'accueil, alimentée en V5-3 et vide à ce stade (`src/ui/screens/dashboard/E10Dashboard.tsx`)
@@ -71,7 +70,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - [ ] `Q12` — le « + » conserve la création directe de tâche héritée de V4.1-5, sans écran de choix (`src/App.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`)
 - [ ] Tests de nav, de dépliement, d'auto-scroll pendant drag, et de non-régression des points d'entrée existants
 
-Gate : [ ] tests verts · [ ] test manuel (appareil tactile) · [ ] doc · [ ] sortie : un seul écran d'accueil déplie et replie le planning, une tâche se déplace au doigt jusqu'à n'importe quel créneau, aucun écran existant n'est devenu inatteignable
+Gate : [ ] tests verts · [ ] test manuel (appareil tactile) · [ ] doc · [ ] sortie : un seul écran d'accueil déplie et replie le planning, une tâche se modifie via sa fiche (date, horaire, énergie), aucun écran existant n'est devenu inatteignable
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -80,7 +79,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ## Phase V5-2 — Planning et tâches refondus [TODO]
 
-- [ ] `D5` + `Q10` (cf. C14, C37) — suppression des cases et lignes horaires au repos ; repères horaires révélés en fond léger pendant un drag, effacés au relâchement (`src/ui/screens/dashboard/E10Dashboard.tsx`, `src/domain/rules/planningDragRules.ts`)
+- [ ] `D5` + `Q10` (cf. C14, C37) — suppression définitive des cases et lignes horaires, planning épuré comme l'application de référence (`src/ui/screens/dashboard/E10Dashboard.tsx`)
 - [ ] `E1`, `D6` (cf. C1, C21) — ligne de tâche : logo, plage horaire, nom, coût en énergie, pastille de complétion à droite
 - [ ] `D1`, `D2` (cf. C3, C4) — bandeau de dates avec jour réel souligné, point indiquant le jour affiché, navigation par appui et glissement
 - [ ] `D4` — tâche cochée barrée et conservée (comportement déjà acté, à préserver) (`src/domain/rules/taskRulesV2.ts`)
@@ -90,14 +89,14 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - [ ] `E2` (cf. C2, C18, C22) — énergie saisie manuellement de 1 à 12, aucun calcul automatique par durée ; `ENERGY_MIN`/`ENERGY_MAX` existants déjà conformes (`src/domain/rules/energyRules.ts`)
 - [ ] `E8`, `E11` (cf. C12, C13, C15) — saisie de durée par trois rouleaux jour / heure / minute, sur le même écran que l'heure de début, sans préréglages (`src/ui/screens/tasks/E21CreateTaskV2.tsx`)
 - [ ] `E25` + `Q11` (cf. C36, C37) — choix tâche récurrente ou ponctuelle à la création ; récurrence sur le modèle Google Agenda (`src/domain/entities/taskV2.ts` champ `recurrence`, `src/domain/rules/taskRulesV2.ts`)
-- [ ] `Q11` — entité d'exception d'occurrence et boîte de dialogue « cette occurrence » / « toutes les occurrences » à chaque modification d'une tâche récurrente, drag compris (`src/domain/entities/taskException.ts`, `src/data/db.ts`)
-- [ ] `E5`, `E13` (cf. C5, C17, C39) — fiche tâche au clic avec dupliquer, supprimer, déplacer ; la duplication rouvre la création préremplie sur l'étape de planification (`src/ui/screens/tasks/E22TaskDetail.tsx`)
+- [ ] `Q11` — entité d'exception d'occurrence et boîte de dialogue « cette occurrence » / « toutes les occurrences » à chaque modification d'une tâche récurrente depuis sa fiche (`src/domain/entities/taskException.ts`, `src/data/db.ts`)
+- [ ] `E5`, `E13`, `Q10` (cf. C5, C17, C39) — fiche tâche au clic, seul point de modification (pas de glisser-déposer) : champs date, horaire, alerte, énergie cliquables ouvrant chacun leur sélecteur ; actions dupliquer, supprimer, déplacer ; la duplication rouvre la création préremplie sur l'étape de planification (`src/ui/screens/tasks/E22TaskDetail.tsx`)
 - [ ] `E10`, `E22` (cf. C19, C23) — sous-tâches avec compteur `n/N` dépliable et cochable depuis le planning (`src/domain/rules/subTaskRules.ts`)
 - [ ] `E7` — vérifier qu'aucune donnée n'est préremplie à l'installation (`src/ui/screens/onboarding/*`)
 - [ ] `E12` — retirer toute notion d'alerte du périmètre courant
 - [ ] Migration Dexie v7 (`icon`, `color`, `description`, `recurrence`, exceptions) et tests de bords de récurrence
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une tâche récurrente se crée, se déplace au doigt en choisissant occurrence ou série, et s'affiche avec logo et couleur sans quadrillage au repos
+Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une tâche récurrente se crée, se modifie via sa fiche en choisissant occurrence ou série, et s'affiche avec logo et couleur sans quadrillage
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -126,8 +125,8 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ## Q à trancher
 
-- `Q2` — nom définitif de l'outil Sentiments. Reporté avec l'outil en V5.1.
-- `Q3` — renommage de l'outil de comptage (« joint » est ambigu). Reporté avec l'outil en V5.1.
+- `Q2` — résolu le 2026-07-28 : l'outil se nomme « Météo du jour » (au lieu de « Sentiments »). Nom acté, implémentation reportée avec l'outil en V5.1.
+- `Q3` — résolu le 2026-07-28 : l'outil se nomme « Comptage » (au lieu de « joint »). Nom acté, implémentation reportée avec l'outil en V5.1.
 - `Q4` — date des lignes de dépense, stockée ou non. Reporté avec la refonte des comptes en V5.1.
 - `Q6` — liste comptage, un incrément par jour ou horodatage complet. Reporté avec l'outil en V5.1.
 
@@ -135,8 +134,10 @@ Aucune question ouverte ne bloque le démarrage de V5-0.
 
 ## Reporté en V5.1+
 
-- `E23` — outil Sentiments (cf. C43, C47, C48).
-- `E31`, `E31b`, `E38` — outil Liste comptage, raccourci d'incrément et vue statistique hebdomadaire (cf. C51, C52, C54, C58).
+Ordre de priorité tranché le 2026-07-28 : Comptage en premier.
+
+- `E31`, `E31b`, `E38` — outil **Comptage** (ex-« joint »), raccourci d'incrément et vue statistique hebdomadaire (cf. C51, C52, C54, C58). **Priorité 1.**
+- `E23` — outil **Météo du jour** (ex-« Sentiments ») (cf. C43, C47, C48).
 - `E32`, `E33`, `E34`, `E17` — refonte des comptes en tableaux à colonnes configurables, revenu en tête, livrets reliés, saisie de dépense depuis le « + » (cf. C50).
 - `E35` — outil Routine (cf. C55).
 - `E36`, `E36b`, `E37` — outil Tableau prévisions (cf. C56, C57, C58).

@@ -1,3 +1,13 @@
+## v4.23 — 2026-07-28
+
+### Ajouté
+- `.claude/commands/analyse_visio.md` : commande corrigée en profondeur après échec constaté en exécution — appariement horodaté du `.jsonl` remplacé par un appariement ordinal par annonce vérifié image par image (le premier avait un retard cumulatif de ~20 min sur ce jeu de données) ; garde-fou d'intégrité systématisé ; étape d'arbitrage interactif ajoutée avant l'écriture de la roadmap ; lecture conditionnelle des documents non lisibles (`.docx`) ; étape finale d'archivage/promotion de roadmap.
+- `roadmap_v5.0.md` (racine) : roadmap V5.0 issue de la visio testeuse du 2026-07-28 (`Note de réunion/2026-07-28/`), 4 phases socle (V5-0 à V5-3), 7 arbitrages tranchés avec l'utilisateur. `Note de réunion/2026-07-28/captures_2026-07-28.md`, `constats_2026-07-28.md`, `a_communiquer_2026-07-28.md` produits en amont.
+
+### Modifié
+- Branche `v5.0` créée depuis `v4.1`.
+- `roadmap_v4.1.md` archivée (`Archives/roadmap_v4.1.md`).
+
 ## v4.22 — 2026-07-25
 
 ### Corrigé

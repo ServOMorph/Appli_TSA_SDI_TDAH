@@ -32,25 +32,15 @@ npm run format     # Prettier
 
 V2 close (V2-0 à V2-10, V2-5 retirée) : doc V2 et déploiement Netlify confirmés terminés.
 
-Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`). Tests unitaires verts (374), `tsc -b` clean, `eslint` 0 erreur, e2e Playwright 44/44 — code inchangé depuis le 2026-07-09.
+Roadmap V3 (7 phases, V3-0 à V3-6) **intégralement close**, désormais archivée (`Archives/roadmap_v3.md`).
 
-Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archivée (`Archives/roadmap_v4.md`) : sélection de plages multi-créneaux, tâche active replaçable, retrait de « Répéter demain », menu déplacer/renommer/supprimer sur une tâche planifiée, glisser (souris/tactile) avec zones de bord pour changer de jour, report unifié sur le flux « tâche en main », sous-tâches planifiables (affichage hiérarchique, parité complète d'interactions avec les tâches). Validation manuelle intégralement passée sur toutes les phases.
+Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archivée (`Archives/roadmap_v4.md`).
 
-**Branche `v4.1` active, roadmap `roadmap_v4.1.md`** : phases V4.1-0 à V4.1-5 closes (traite E3 — rubrique nav « Outils » remplaçant « Todo », Todo tel quel, listes épinglables, module Budget semaine/mois avec livrets simples). Build de production sur `dist/v4.1` (`vite.config.ts`), dossier `dist/` entier non versionné.
+Roadmap V4.1 (6 phases, V4.1-0 à V4.1-5) **close**, désormais archivée (`Archives/roadmap_v4.1.md`) : rubrique nav « Outils » remplaçant « Todo », listes épinglables, module Budget semaine/mois avec livrets simples, nav « + » contextuelle. Phase V4.1-6 (auto-scroll drag planning) jamais codée, reprise dans la roadmap suivante.
 
-Correctif hors roadmap (2026-07-25) : sélection de texte parasite pendant le drag-and-drop dans `E40Planning` corrigée, validation tactile réelle en attente.
+**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — 4 phases `[TODO]` : V5-0 (refacto du système d'état et de navigation), V5-1 (nav + écran d'accueil fusionné avec le planning), V5-2 (planning et tâches refondus — logos, couleurs, durée en jours, récurrence), V5-3 (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel). Les 5 outils spécialisés décrits par la testeuse (Sentiments, Liste comptage, Comptes à colonnes configurables, Routine, Tableau prévisions) sont reportés en V5.1+, faute de retour d'usage sur la version actuelle. 7 arbitrages tranchés avec l'utilisateur, consignés en tête de `roadmap_v5.0.md`.
 
-Module Budget (`E71Budget.tsx`) complet : configuration des catégories et livrets, saisie/suppression des dépenses et dépôts, soldes, historique semaine/mois. Intégrité relationnelle réparée (migration Dexie v6) : suppressions en cascade sur livrets/catégories, périodicité propre à chaque dépôt (`week`/`month`) pour éviter la double déduction. Validation manuelle intégrale confirmée par l'utilisateur.
-
-Refonte de lisibilité de l'écran Budget sur retour utilisateur : reste non budgétisé mis en avant et coloré vert/rouge, dépassement de budget signalé visuellement, boutons destructifs distincts en rouge, distinction semaine/mois, formulaire de catégorie allégé. Rendu réel non encore vérifié en navigateur (retour utilisateur à recueillir).
-
-Dette e2e du renommage nav Todo→Outils (Phase V4.1-0) traitée : 10 specs corrigées (`02-tasks`, `06-offline`, `07-planning-v4`) + un bug de test lié (bouton Retour de l'inbox pointant vers le hub Outils). Suite e2e complète 53/53 verte.
-
-**Phase V4.1-5 close** : bouton « + » de la nav pose désormais l'écran courant comme origin de création de tâche (`FORCED_DESTINATION_BY_ORIGIN` dans `E21CreateTaskV2.tsx`) — depuis Planning/Today/Inbox/Outils/Listes, la tâche va directement dans l'écran d'origine sans étape superflue (Listes ouvre directement le sélecteur de liste, création de liste incluse). Liste épinglée distinguée visuellement dans `E60Lists.tsx`. Validation manuelle intégrale confirmée par l'utilisateur. Suite Vitest 474/474 au run de clôture (échec intermittent pré-existant possible dans `AppContext.test.tsx`, sans lien), `tsc -b` clean, lint clean.
-
-Reste `roadmap_v4.1.md` : Phase V4.1-6 (auto-scroll vertical de la grille planning pendant un drag).
-
-Reste hors périmètre V4.1 (à cadrer) : intégration accueil du budget, date butoir Todo, liste courses spécialisée, retraits/virements entre livrets, chiffrement global.
+Aucun code applicatif modifié depuis la clôture de V4.1. Dernier état de code stable : correctif hors roadmap (2026-07-25) de sélection de texte parasite pendant le drag-and-drop dans `E40Planning`, validation tactile réelle toujours en attente.
 
 ## Stack
 
@@ -86,7 +76,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Coder la Phase V4.1-6 (`roadmap_v4.1.md`) : auto-scroll vertical de la grille planning pendant un drag.
+Communiquer à la testeuse les points de `Note de réunion/2026-07-28/a_communiquer_2026-07-28.md`, puis démarrer la Phase V5-0 (`roadmap_v5.0.md`) : refacto du socle de navigation et d'état, sous Opus.
 
 ## Licence
 

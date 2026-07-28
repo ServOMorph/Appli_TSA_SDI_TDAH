@@ -1,0 +1,10 @@
+{
+  "nom": "Appli AuDHD",
+  "interlocuteur": "Marie",
+  "date_session": "2026-07-28",
+  "contexte": "test_tsa",
+  "mode": "prod",
+  "heure_debut": "2026-07-28T15:52:45",
+  "heure_fin": "2026-07-28T17:24:08",
+  "nb_remarques": 403
+}

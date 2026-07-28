@@ -121,12 +121,4 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 <!-- Convention : toute règle liée à une étape précise de la Procédure ci-dessus doit la
      référencer explicitement par son numéro (ex: "Étape 6 : ..."), plutôt que compter sur la
      position physique de cette zone (toujours en fin de fichier). -->
-
-**Étape 8 (CHANGELOG) — versioning remplacé :** la version est alignée sur la roadmap produit, pas sur un compteur indépendant.
-- Déterminer le **major** (X) : le numéro du `roadmap_v<N>.md` actif à la racine du projet (le plus élevé présent hors `Archives/`). Ex : `roadmap_v2.md` présent → major = 2.
-- Lire la dernière entrée de `CHANGELOG.md` pour extraire le major et le minor précédents.
-- Déterminer le **minor** (Y) :
-  - Si le major n'a pas changé depuis la dernière entrée : incrémenter le minor précédent de 1.
-  - Si le major a changé (nouvelle roadmap majeure devenue active) : minor = 0, et ajouter une ligne "### Contexte" en tête de l'entrée expliquant le changement de version majeure (ex : "Bascule vers roadmap V3 — voir `roadmap_v3.md`").
-
 <!-- SPECIFICITES PROJET : FIN -->

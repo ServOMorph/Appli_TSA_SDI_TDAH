@@ -6,12 +6,12 @@ import { AppScreens, activeTabFor, NO_NAV_SCREENS } from './App'
 describe('activeTabFor', () => {
   it('associe chaque écran à son onglet (N1)', () => {
     expect(activeTabFor('dashboard')).toBe('dashboard')
+    expect(activeTabFor('planning')).toBe('dashboard')
     expect(activeTabFor('inbox')).toBe('inbox')
-    expect(activeTabFor('tools')).toBe('inbox')
-    expect(activeTabFor('planning')).toBe('planning')
-    expect(activeTabFor('lists')).toBe('lists')
-    expect(activeTabFor('list-detail')).toBe('lists')
-    expect(activeTabFor('settings')).toBeNull()
+    expect(activeTabFor('settings')).toBe('settings')
+    expect(activeTabFor('tools')).toBeNull()
+    expect(activeTabFor('lists')).toBeNull()
+    expect(activeTabFor('list-detail')).toBeNull()
   })
 })
 
@@ -43,6 +43,20 @@ describe('AppScreens — navigation persistante (N1)', () => {
     renderWithApp(<AppScreens />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Accueil' }))
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+  })
+
+  it('rend le même écran fusionné sur dashboard et sur planning (E19, Q8)', () => {
+    const collapsed = renderWithApp(<AppScreens />, makeAppContext({ screen: 'dashboard' }))
+    expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Déplier le planning' })).toBeDefined()
+    collapsed.unmount()
+
+    renderWithApp(
+      <AppScreens />,
+      makeAppContext({ screen: 'planning', route: { name: 'planning' } }),
+    )
+    expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Replier le planning' })).toBeDefined()
   })
 
   it("le bouton \"+\" ouvre la création de tâche, la pile portant l'écran courant comme origine", async () => {

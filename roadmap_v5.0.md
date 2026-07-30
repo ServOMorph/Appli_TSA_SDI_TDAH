@@ -60,19 +60,29 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-1 — Navigation et écran d'accueil fusionné [TODO]
+## Phase V5-1 — Navigation et écran d'accueil fusionné [EN COURS]
 
-- [ ] `N1` (cf. C26, C27) — nav basse à 4 éléments : Boîte de réception, Accueil, Paramètres, bouton « + » ; retrait des onglets Dashboard / Outils / Planning / Listes (`src/ui/components/BottomNav.tsx`, `src/App.tsx`)
-- [ ] `E19` + `Q8` (cf. C27, C31, C32) — fusion de `E40Planning` dans `E10Dashboard` : état replié planning à l'heure courante + bloc widgets, état déplié planning entier scrollable (`src/ui/screens/dashboard/E10Dashboard.tsx`, `src/ui/screens/planning/E40Planning.tsx`)
-- [ ] `E18` (cf. C30, C31) — geste de dépliement par poignée, symétrique au repli (`src/ui/screens/dashboard/E10Dashboard.tsx`)
-- [ ] `E14` + `Q1` (cf. C28) — affichage des deux valeurs d'énergie côte à côte (planifié | disponible) et pastille mode surcharge en tête d'accueil (`src/ui/components/EnergyDisplay.tsx`, `src/ui/components/BatteryIcon.tsx`)
-- [ ] `E21` — pastille de surcharge claire quand inactive, intensifiée quand active, cliquable vers l'écran de récupération existant (`src/ui/screens/overload/E90OverloadRecovery.tsx`)
-- [ ] `E24` (cf. C27, C29) — zone de widgets d'outils sur l'accueil, alimentée en V5-3 et vide à ce stade (`src/ui/screens/dashboard/E10Dashboard.tsx`)
-- [ ] `E15` (cf. C24, C25) — boîte de réception repositionnée en entrée de nav, comportement inchangé (`src/ui/screens/tasks/E20Inbox.tsx`)
-- [ ] `Q12` — le « + » conserve la création directe de tâche héritée de V4.1-5, sans écran de choix (`src/App.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`)
-- [ ] Tests de nav, de dépliement, d'auto-scroll pendant drag, et de non-régression des points d'entrée existants
+- [x] `N1` (cf. C26, C27) — nav basse à 4 éléments : Boîte de réception, Accueil, Paramètres, bouton « + » ; retrait des onglets Dashboard / Outils / Planning / Listes (`src/ui/components/BottomNav.tsx`, `src/App.tsx`)
+- [x] `E19` + `Q8` (cf. C27, C31, C32) — fusion de `E40Planning` dans `E10Dashboard` : état replié planning à l'heure courante + bloc widgets, état déplié planning entier scrollable (`src/ui/screens/dashboard/E10Dashboard.tsx`, nouveau `src/ui/screens/dashboard/PlanningBoard.tsx` ; `src/ui/screens/planning/` supprimé)
+- [x] `E18` (cf. C30, C31) — geste de dépliement par poignée, symétrique au repli (`src/ui/screens/dashboard/E10Dashboard.tsx`)
+- [x] `E14` + `Q1` (cf. C28) — affichage des deux valeurs d'énergie côte à côte (planifié | disponible) et pastille mode surcharge en tête d'accueil (`src/ui/components/EnergyDisplay.tsx`, `getEnergyPairLabel` dans `energyRules.ts`)
+- [x] `E21` — pastille de surcharge claire quand inactive, intensifiée quand active, cliquable vers l'écran de récupération existant (`src/ui/components/TopBar.tsx`)
+- [x] `E24` (cf. C27, C29) — zone de widgets d'outils sur l'accueil ; en V5-1 porte deux entrées provisoires (Outils, Listes), remplacées par les vrais widgets en V5-3 (`src/ui/screens/dashboard/E10Dashboard.tsx`)
+- [x] `E15` (cf. C24, C25) — boîte de réception repositionnée en entrée de nav, comportement inchangé (`src/ui/screens/tasks/E20Inbox.tsx`)
+- [x] `Q12` — le « + » conserve la création directe de tâche héritée de V4.1-5, sans écran de choix (`src/App.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`)
+- [x] Tests de nav, de dépliement et de non-régression des points d'entrée existants (auto-scroll pendant drag sans objet, glisser-déposer supprimé — voir arbitrage ci-dessous)
 
-Gate : [ ] tests verts · [ ] test manuel (appareil tactile) · [ ] doc · [ ] sortie : un seul écran d'accueil déplie et replie le planning, une tâche se modifie via sa fiche (date, horaire, énergie), aucun écran existant n'est devenu inatteignable
+Gate : [x] tests verts (514/515 unitaires, seul échec le flaky pré-existant `AppContext.test.tsx` reproduit à l'identique sur le code d'avant V5-1 ; 53/53 e2e ; `tsc -b`, lint et build clean) · [ ] test manuel (appareil tactile, points 101-109 de `tests_manuels.md`) · [x] doc (`CHANGELOG.md`) · [x] sortie technique : un seul écran d'accueil déplie et replie le planning, aucun écran existant n'est devenu inatteignable
+
+Phase codée intégralement, gate non atteint faute de validation manuelle (appareil tactile requis) — reste `[EN COURS]` jusqu'à confirmation utilisateur.
+
+Arbitrages pris en cours de phase, au-delà de ceux tranchés au démarrage :
+- **Absorption complète de la route `planning`** : elle rend désormais l'accueil fusionné en état déplié plutôt que de conserver un écran séparé. `E40Planning.tsx` supprimé, son corps extrait dans `PlanningBoard.tsx`. Les six flux qui appelaient `goTo('planning')` (inbox, création, fiche tâche, décomposition, report) fonctionnent sans modification.
+- **Suppression anticipée du glisser-déposer** (prévu par `Q10` en V5-2) : ~250 lignes retirées pendant la fusion plutôt que portées puis supprimées à la phase suivante. Le déplacement d'une tâche passe par le menu « Déplacer » déjà en place.
+- **Pastille de surcharge** : navigue vers le centre de récupération quand active, ouvre la modale explicative quand inactive — préserve le comportement `E7` au lieu de le remplacer.
+- **Poignée de dépliement** : placée sous le planning en état replié, au-dessus en état déplié (défaut trouvé en e2e — bannière de planification et nav fixes la recouvraient en bas de page).
+- **`outDir`** : `dist/v4.1` → `dist/v5.0`, résidu de version aligné sur la branche active (même correctif que le 2026-07-25 sur v4.1).
+- **e2e T44** : réaffecté de « Terminer la tâche depuis le Planning » (sans objet après fusion) à la pastille de surcharge (`E21`). Suite toujours à 53 scénarios.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

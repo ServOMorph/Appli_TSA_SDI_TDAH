@@ -1,3 +1,27 @@
+## v5.2 — 2026-07-30
+
+Phase V5-1 — navigation et écran d'accueil fusionné. Validation manuelle en attente (`tests_manuels.md`, points 101 à 109).
+
+### Ajouté
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : corps du planning extrait de `E40Planning`, piloté par un état `collapsed`. Replié, il n'affiche qu'une fenêtre de créneaux autour de l'heure courante et masque la navigation par jour ; déplié, la journée entière défile. Créneaux, pickers, bannières de planification et de déplacement inchangés.
+- `visibleSlotWindow()` (`planningSlotRules.ts`) : fenêtre de six créneaux ancrée sur le créneau courant, recalée pour rester entière en début et en fin de journée. 4 tests.
+- `getEnergyPairLabel()` (`energyRules.ts`) : libellé « planifié / disponible » de la pastille d'énergie, avec repli sur le libellé simple quand l'énergie du jour n'est pas renseignée (E14, Q1). 4 tests.
+- Poignée de dépliement/repliement sur l'accueil (E18), sous le planning en état replié, au-dessus en état déplié.
+- Zone de widgets d'outils sur l'accueil (E24), portant en V5-1 deux entrées provisoires « Outils » et « Listes » — les vrais widgets arrivent en V5-3. Sans elles, le retrait des onglets rendait `tools`, `budget`, `lists` et `list-detail` inatteignables.
+
+### Modifié
+- `src/ui/components/BottomNav.tsx` : nav ramenée à quatre éléments — Boîte de réception, Accueil, Paramètres, « + » (N1). Les onglets Outils, Planning et Listes sont retirés ; le bouton pleine largeur « Ajouter une tâche » devient le segment « + ». La pastille de tâches en attente passe sur la boîte de réception.
+- `src/App.tsx` : la route `planning` rend l'accueil fusionné en état déplié. `activeTabFor` mappe `dashboard` et `planning` sur le même onglet. Les six flux qui appelaient `goTo('planning')` (inbox, création, fiche tâche, décomposition, report) fonctionnent sans modification.
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : écran unique à deux états (E19, Q8). Replié : planning à l'heure courante, Tâche du jour, zone widgets. Déplié : planning entier scrollable seul, Tâche du jour et widgets masqués. La liste de cartes « Planning du jour » est remplacée par la grille réelle.
+- `src/ui/components/EnergyDisplay.tsx` : affiche l'énergie planifiée et l'énergie disponible côte à côte (E14, Q1).
+- `src/ui/components/TopBar.tsx` : la pastille de surcharge ouvre le centre de récupération quand la surcharge est active, et conserve la modale explicative quand elle est inactive (E21).
+- `vite.config.ts` : `outDir` `dist/v4.1` → `dist/v5.0`, résidu de version aligné sur la branche active.
+- e2e : sélecteurs adaptés à la nouvelle nav et à la fusion. `T44` réaffecté — « Terminer la tâche depuis le Planning » n'a plus de sens distinct, un seul écran portant les deux états ; il vérifie désormais que la pastille de surcharge ouvre le centre de récupération (E21).
+
+### Supprimé
+- `src/ui/screens/planning/` (`E40Planning.tsx`, `E40Planning.test.tsx`) : absorbé par l'accueil fusionné.
+- Glisser-déposer du planning (~250 lignes : appui long, maintien aux bords pour changer de jour, overlay de glissement, neutralisation de la sélection de texte). Supprimé pendant la fusion plutôt que porté puis retiré en V5-2, conformément à l'arbitrage `Q10`. Le déplacement d'une tâche passe par le menu « Déplacer ».
+
 ## v5.1 — 2026-07-30
 
 ### Corrigé

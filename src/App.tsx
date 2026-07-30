@@ -5,7 +5,6 @@ import { E03Energy } from '@/ui/screens/onboarding/E03Energy'
 import { E10Dashboard } from '@/ui/screens/dashboard/E10Dashboard'
 import { E20Inbox } from '@/ui/screens/tasks/E20Inbox'
 import { E21CreateTaskV2 } from '@/ui/screens/tasks/E21CreateTaskV2'
-import { E40Planning } from '@/ui/screens/planning/E40Planning'
 import { E22TaskDetail } from '@/ui/screens/tasks/E22TaskDetail'
 import { E23Decompose } from '@/ui/screens/tasks/E23Decompose'
 import { E24Today } from '@/ui/screens/tasks/E24Today'
@@ -31,15 +30,12 @@ export const NO_NAV_SCREENS: Screen[] = ['welcome', 'profile', 'energy', 'energy
 export function activeTabFor(screen: Screen): BottomNavTab | null {
   switch (screen) {
     case 'dashboard':
+    case 'planning':
       return 'dashboard'
     case 'inbox':
-    case 'tools':
       return 'inbox'
-    case 'planning':
-      return 'planning'
-    case 'lists':
-    case 'list-detail':
-      return 'lists'
+    case 'settings':
+      return 'settings'
     default:
       return null
   }
@@ -75,13 +71,12 @@ export function AppScreens() {
       case 'energy':
         return <E03Energy />
       case 'dashboard':
+      case 'planning':
         return <E10Dashboard />
       case 'inbox':
         return <E20Inbox />
       case 'task-create-v2':
         return <E21CreateTaskV2 />
-      case 'planning':
-        return <E40Planning />
       case 'task-detail':
         return <E22TaskDetail />
       case 'task-decompose':
@@ -129,10 +124,9 @@ export function AppScreens() {
           overloadMode={overloadMode}
           inboxHasTasks={inboxTasks.length > 0}
           onAddTask={() => goTo('task-create-v2')}
+          onGoInbox={() => goTo('inbox')}
           onGoDashboard={() => goTo('dashboard')}
-          onGoTodo={() => goTo('tools')}
-          onGoPlanning={() => goTo('planning')}
-          onGoLists={() => goTo('lists')}
+          onGoSettings={() => goTo('settings')}
         />
       )}
     </>

@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('T30 — Dashboard → Paramètres → liste des sections', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await expect(page.getByRole('heading', { name: 'Paramètres' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Profil' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Accessibilité' })).toBeVisible()
@@ -17,7 +17,7 @@ test('T30 — Dashboard → Paramètres → liste des sections', async ({ page }
 })
 
 test('T31 — Paramètres → Accessibilité → grande police → DOM modifié', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Accessibilité' }).click()
   await expect(page.getByRole('heading', { name: 'Accessibilité' })).toBeVisible()
   await page.getByRole('button', { name: 'Grande' }).click()
@@ -28,7 +28,7 @@ test('T31 — Paramètres → Accessibilité → grande police → DOM modifié'
 })
 
 test('T32 — Accessibilité → petite police', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Accessibilité' }).click()
   await page.getByRole('button', { name: 'Petite' }).click()
   await page.waitForFunction(() => document.documentElement.style.fontSize === '13px')
@@ -37,7 +37,7 @@ test('T32 — Accessibilité → petite police', async ({ page }) => {
 })
 
 test('T33 — Accessibilité → mode sombre toggle', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Accessibilité' }).click()
   await page.getByLabel('Mode sombre').click()
   await page.waitForFunction(() => document.documentElement.classList.contains('dark-mode'))
@@ -49,7 +49,7 @@ test('T33 — Accessibilité → mode sombre toggle', async ({ page }) => {
 })
 
 test('T34 — Accessibilité → réduire animations toggle', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Accessibilité' }).click()
   await page.getByLabel('Réduire les animations').click()
   await page.waitForFunction(() => document.documentElement.classList.contains('reduce-motion'))
@@ -60,14 +60,14 @@ test('T34 — Accessibilité → réduire animations toggle', async ({ page }) =
 })
 
 test('T35 — Export → bouton export présent', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Export' }).click()
   await expect(page.getByRole('heading', { name: 'Export & suppression' }).or(page.getByRole('heading', { name: 'Export' }))).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/35-export-screen.png' })
 })
 
 test('T36 — Confidentialité → affiche infos données locales', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Confidentialité' }).click()
   await expect(page.getByRole('heading', { name: 'Confidentialité' })).toBeVisible()
   await expect(page.getByText('Stockage local')).toBeVisible()
@@ -75,7 +75,7 @@ test('T36 — Confidentialité → affiche infos données locales', async ({ pag
 })
 
 test('T37 — Confidentialité → supprimer données → modale confirmation', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Confidentialité' }).click()
   await page.getByRole('button', { name: 'Supprimer toutes les données' }).click()
   await expect(page.getByRole('dialog', { name: 'Confirmer la suppression' })).toBeVisible()
@@ -85,7 +85,7 @@ test('T37 — Confidentialité → supprimer données → modale confirmation', 
 })
 
 test('T38 — Supprimer toutes les données → retour écran Welcome', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Confidentialité' }).click()
   await page.getByRole('button', { name: 'Supprimer toutes les données' }).click()
   await page.getByRole('dialog').getByRole('button', { name: 'Supprimer' }).click()
@@ -94,7 +94,7 @@ test('T38 — Supprimer toutes les données → retour écran Welcome', async ({
 })
 
 test('T39 — Retour paramètres → dashboard', async ({ page }) => {
-  await page.getByRole('button', { name: 'Paramètres' }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await page.getByRole('button', { name: 'Retour' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 })

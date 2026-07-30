@@ -17,6 +17,7 @@ import {
   isRangeAvailable,
   normalizeRange,
   moveTargetRange,
+  visibleSlotWindow,
 } from '@/domain/rules/planningSlotRules'
 
 const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
@@ -62,61 +63,10 @@ const REPORTED_BADGE_STYLE: React.CSSProperties = {
   flexShrink: 0,
 }
 
-const LONG_PRESS_MS = 400
-const EDGE_DWELL_MS = 650
-
-const dragOverlayStyle: React.CSSProperties = {
-  position: 'fixed',
-  transform: 'translate(-50%, -120%)',
-  pointerEvents: 'none',
-  zIndex: 200,
-  background: 'var(--color-accent)',
-  color: '#fff',
-  padding: '6px 12px',
-  borderRadius: 'var(--radius-md)',
-  fontSize: '0.875rem',
-  fontWeight: 600,
-  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '2px',
-  whiteSpace: 'nowrap',
-}
-
-function slotFromPoint(clientX: number, clientY: number): number | null {
-  let el: Element | null = null
-  try {
-    el = typeof document.elementFromPoint === 'function' ? document.elementFromPoint(clientX, clientY) : null
-  } catch {
-    return null
-  }
-  const cell = el?.closest?.('[data-slot]') as HTMLElement | null
-  if (!cell?.dataset.slot) return null
-  const slot = Number(cell.dataset.slot)
-  return Number.isInteger(slot) && slot >= 0 && slot < SLOT_INDEXES.length ? slot : null
-}
-
-const pageStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  maxWidth: '480px',
-  margin: '0 auto',
-  minHeight: '100svh',
-  paddingBottom: 'var(--bottomnav-h)',
-  position: 'relative',
-}
-
-const headerStyle: React.CSSProperties = {
+const dateHeaderStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: 'var(--spacing-sm)',
-  padding: 'var(--spacing-md) var(--spacing-xl)',
-  position: 'sticky',
-  top: 0,
-  background: 'var(--color-background)',
-  zIndex: 10,
-  borderBottom: '1px solid var(--color-border)',
 }
 
 const iconBtnStyle: React.CSSProperties = {
@@ -169,9 +119,6 @@ function slotCellStyle(block: PlanBlock | undefined, ambianceColor: string, isCo
     flexDirection: 'column',
     gap: '4px',
     cursor: 'pointer',
-    userSelect: 'none',
-    WebkitUserSelect: 'none',
-    touchAction: 'none',
     ...(isContinuation ? { marginTop: '-1px' } : {}),
     ...(block ? plannedTaskTintStyle(blockCompleted(block), ambianceColor) : {}),
   }
@@ -318,9 +265,14 @@ const validateBtnDisabledStyle: React.CSSProperties = {
   cursor: 'not-allowed',
 }
 
-export function E40Planning() {
+interface PlanningBoardProps {
+  collapsed: boolean
+  /** Appelé quand une action du planning replié nécessite la vue entière. */
+  onRequestExpand: () => void
+}
+
+export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps) {
   const {
-    goTo,
     getPlannedTasksForDate,
     scheduleV2Task,
     pendingPlanTask,
@@ -359,8 +311,6 @@ export function E40Planning() {
   const [step, setStep] = useState<'name' | 'details'>('name')
   const [rangeStart, setRangeStart] = useState<number | null>(null)
   const [renameTitle, setRenameTitle] = useState('')
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragOverlay, setDragOverlay] = useState<{ block: PlanBlock; x: number; y: number; label: string } | null>(null)
 
   const blocks: PlanBlock[] = [
     ...scheduledTasks.map((t): PlanBlock => ({ kind: 'task', item: t })),
@@ -369,13 +319,6 @@ export function E40Planning() {
 
   const currentSlot = slotFromDate(new Date())
   const currentSlotRef = useRef<HTMLDivElement | null>(null)
-  const gridRef = useRef<HTMLDivElement | null>(null)
-  const dragRef = useRef<{ block: PlanBlock; sourceSlot: number; sourceDate: string; startX: number; startY: number } | null>(null)
-  const dragActiveRef = useRef(false)
-  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const dwellTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const dwellZoneRef = useRef<'left' | 'right' | null>(null)
-  const lastPointerRef = useRef<{ x: number; y: number } | null>(null)
   const displayDateRef = useRef(displayDate)
 
   useEffect(() => {
@@ -408,10 +351,10 @@ export function E40Planning() {
   }, [displayDate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (currentSlotRef.current) {
+    if (!collapsed && currentSlotRef.current) {
       currentSlotRef.current.scrollIntoView?.({ behavior: 'instant', block: 'center' })
     }
-  }, [])
+  }, [collapsed])
 
   async function reload() {
     const [sched, schedSub] = await Promise.all([
@@ -506,12 +449,12 @@ export function E40Planning() {
       await handleMoveTargetClick(slot)
       return
     }
-    if (block && !pendingPlanTask) {
-      setPicker({ mode: 'menu', block })
-      return
-    }
     if (block) {
-      setConflictError(`Le créneau ${slotLabel(slot)} est déjà occupé.`)
+      if (pendingPlanTask) {
+        setConflictError(`Le créneau ${slotLabel(slot)} est déjà occupé.`)
+        return
+      }
+      setPicker({ mode: 'menu', block })
       return
     }
     if (rangeStart === null) {
@@ -548,187 +491,49 @@ export function E40Planning() {
     setRenameTitle('')
   }
 
-  function handleBack() {
-    clearPendingPlanTask()
-    clearMoveTask()
-    goTo('dashboard')
+  function startMoveFromMenu(block: PlanBlock, report: boolean) {
+    if (block.kind === 'task') startMoveTask(block.item, report)
+    else startMoveSubTask(block.item, report)
+    setPicker(null)
+    if (collapsed) onRequestExpand()
   }
-
-  function clearLongPressTimer() {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current)
-      longPressTimerRef.current = null
-    }
-  }
-
-  function edgeZoneAt(clientX: number): 'left' | 'right' | null {
-    const rect = gridRef.current?.getBoundingClientRect()
-    if (!rect || rect.width === 0) return null
-    if (clientX > rect.right) return 'right'
-    if (clientX < rect.left) return 'left'
-    return null
-  }
-
-  function canFlipLeft(): boolean {
-    return addDays(displayDateRef.current, -1) >= todayStr()
-  }
-
-  function dragHoverLabel(clientX: number, clientY: number): string {
-    const zone = edgeZoneAt(clientX)
-    if (zone === 'right') return `→ ${formatPlanningDate(addDays(displayDateRef.current, 1))}`
-    if (zone === 'left') {
-      return canFlipLeft() ? `→ ${formatPlanningDate(addDays(displayDateRef.current, -1))}` : 'Retour impossible'
-    }
-    const slot = slotFromPoint(clientX, clientY)
-    return slot !== null ? `→ ${slotLabel(slot)}` : ''
-  }
-
-  function clearDwell() {
-    if (dwellTimerRef.current) {
-      clearTimeout(dwellTimerRef.current)
-      dwellTimerRef.current = null
-    }
-    dwellZoneRef.current = null
-  }
-
-  function armDwell(zone: 'left' | 'right') {
-    dwellTimerRef.current = setTimeout(() => {
-      if (!dragActiveRef.current || dwellZoneRef.current !== zone) return
-      if (zone === 'right') {
-        setDisplayDate(addDays(displayDateRef.current, 1))
-      } else if (canFlipLeft()) {
-        setDisplayDate(addDays(displayDateRef.current, -1))
-      } else {
-        return
-      }
-      const info = dragRef.current
-      const pos = lastPointerRef.current
-      if (info && pos) {
-        const next = zone === 'right' ? addDays(displayDateRef.current, 1) : addDays(displayDateRef.current, -1)
-        setDragOverlay({ block: info.block, x: pos.x, y: pos.y, label: `→ ${formatPlanningDate(next)}` })
-      }
-      armDwell(zone)
-    }, EDGE_DWELL_MS)
-  }
-
-  function finishDrag(clientX: number, clientY: number) {
-    const info = dragRef.current
-    dragActiveRef.current = false
-    dragRef.current = null
-    setIsDragging(false)
-    setDragOverlay(null)
-    clearDwell()
-    if (!info) return
-    if (edgeZoneAt(clientX) !== null) return
-    const slot = slotFromPoint(clientX, clientY)
-    if (slot === null) return
-    const date = displayDateRef.current
-    if (slot === info.sourceSlot && date === info.sourceDate) return
-    handleMove(info.block, slot, date, false)
-  }
-
-  function handleTaskPointerDown(event: React.PointerEvent, block: PlanBlock) {
-    const range = taskSlotRange(block.item)
-    if (!range) return
-    dragRef.current = { block, sourceSlot: range.start, sourceDate: displayDate, startX: event.clientX, startY: event.clientY }
-    clearLongPressTimer()
-    longPressTimerRef.current = setTimeout(() => {
-      dragActiveRef.current = true
-      setIsDragging(true)
-      window.getSelection?.()?.removeAllRanges()
-      const info = dragRef.current
-      if (info) {
-        setDragOverlay({ block: info.block, x: info.startX, y: info.startY, label: '' })
-      }
-    }, LONG_PRESS_MS)
-  }
-
-  function handleTaskPointerUp(event: React.PointerEvent, block: PlanBlock) {
-    clearLongPressTimer()
-    if (dragActiveRef.current) {
-      finishDrag(event.clientX, event.clientY)
-      return
-    }
-    dragRef.current = null
-    setPicker({ mode: 'menu', block })
-  }
-
-  function handleTaskPointerCancel() {
-    clearLongPressTimer()
-    clearDwell()
-    dragActiveRef.current = false
-    dragRef.current = null
-    setIsDragging(false)
-    setDragOverlay(null)
-  }
-
-  useEffect(() => {
-    if (!isDragging) return
-    function onWindowPointerMove(event: PointerEvent) {
-      const info = dragRef.current
-      if (!info) return
-      lastPointerRef.current = { x: event.clientX, y: event.clientY }
-      const zone = edgeZoneAt(event.clientX)
-      if (zone !== dwellZoneRef.current) {
-        if (dwellTimerRef.current) {
-          clearTimeout(dwellTimerRef.current)
-          dwellTimerRef.current = null
-        }
-        dwellZoneRef.current = zone
-        if (zone) armDwell(zone)
-      }
-      setDragOverlay({ block: info.block, x: event.clientX, y: event.clientY, label: dragHoverLabel(event.clientX, event.clientY) })
-    }
-    function onWindowPointerUp(event: PointerEvent) {
-      finishDrag(event.clientX, event.clientY)
-    }
-    window.addEventListener('pointermove', onWindowPointerMove)
-    window.addEventListener('pointerup', onWindowPointerUp)
-    window.addEventListener('pointercancel', onWindowPointerUp)
-    return () => {
-      window.removeEventListener('pointermove', onWindowPointerMove)
-      window.removeEventListener('pointerup', onWindowPointerUp)
-      window.removeEventListener('pointercancel', onWindowPointerUp)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDragging])
 
   const isToday = displayDate === todayStr()
+  const displayedSlots = collapsed ? visibleSlotWindow(currentSlot) : SLOT_INDEXES
 
   return (
-    <main style={isDragging ? { ...pageStyle, userSelect: 'none', WebkitUserSelect: 'none' } : pageStyle}>
-      <div style={headerStyle}>
-        <button style={iconBtnStyle} onClick={handleBack} aria-label="Retour">
-          &larr;
-        </button>
-        <button
-          style={iconBtnStyle}
-          onClick={() => setDisplayDate((d) => addDays(d, -1))}
-          aria-label="Jour précédent"
-        >
-          &lsaquo;
-        </button>
-        <span
-          style={{ flex: 1, textAlign: 'center', fontWeight: 600, fontSize: '0.9375rem', textTransform: 'capitalize' }}
-        >
-          {formatPlanningDate(displayDate)}
-        </span>
-        <button
-          style={iconBtnStyle}
-          onClick={() => setDisplayDate((d) => addDays(d, 1))}
-          aria-label="Jour suivant"
-        >
-          &rsaquo;
-        </button>
-      </div>
+    <section
+      aria-label="Planning du jour"
+      style={{ display: 'flex', flexDirection: 'column', minHeight: 0, gap: 'var(--spacing-sm)' }}
+    >
+      {!collapsed && (
+        <div style={dateHeaderStyle}>
+          <button style={iconBtnStyle} onClick={() => setDisplayDate((d) => addDays(d, -1))} aria-label="Jour précédent">
+            &lsaquo;
+          </button>
+          <span
+            style={{ flex: 1, textAlign: 'center', fontWeight: 600, fontSize: '0.9375rem', textTransform: 'capitalize' }}
+          >
+            {formatPlanningDate(displayDate)}
+          </span>
+          <button style={iconBtnStyle} onClick={() => setDisplayDate((d) => addDays(d, 1))} aria-label="Jour suivant">
+            &rsaquo;
+          </button>
+        </div>
+      )}
 
-      <div ref={gridRef} style={{ flex: 1, overflowY: 'auto' }} role="grid" aria-label="Planning de la journée">
-        {rangeStart !== null && (
-          <p style={{ margin: 'var(--spacing-sm) var(--spacing-xl)', fontSize: '0.8125rem' }} aria-live="polite">
-            Début sélectionné à {slotLabel(rangeStart)}. Choisissez la fin.
-          </p>
-        )}
-        {SLOT_INDEXES.map((slot) => {
+      {rangeStart !== null && (
+        <p style={{ margin: 0, fontSize: '0.8125rem' }} aria-live="polite">
+          Début sélectionné à {slotLabel(rangeStart)}. Choisissez la fin.
+        </p>
+      )}
+
+      <div
+        style={collapsed ? undefined : { flex: 1, minHeight: 0, overflowY: 'auto' }}
+        role="grid"
+        aria-label="Planning de la journée"
+      >
+        {displayedSlots.map((slot) => {
           const isNow = isToday && slot === currentSlot
           const block = blocks.find((item) => taskOccupiesSlot(item.item, slot))
           const isTaskStart = block ? taskSlotRange(block.item)?.start === slot : false
@@ -737,12 +542,7 @@ export function E40Planning() {
           const canPostpone = isTaskStart && block !== undefined && isToday && overloadMode && !blockEssential(block) && !completed
 
           return (
-            <div
-              key={slot}
-              ref={isNow ? currentSlotRef : null}
-              role="row"
-              style={slotRowStyle(isNow)}
-            >
+            <div key={slot} ref={isNow ? currentSlotRef : null} role="row" style={slotRowStyle(isNow)}>
               <div style={hourLabelStyle} aria-hidden>
                 {slotLabel(slot)}
               </div>
@@ -750,10 +550,7 @@ export function E40Planning() {
                 role="gridcell"
                 data-slot={slot}
                 style={slotCellStyle(block, ambianceColor, isContinuation)}
-                onClick={movingTask || !block || pendingPlanTask ? () => handleSlotClick(slot, block) : undefined}
-                onPointerDown={block && !pendingPlanTask && !movingTask ? (event) => handleTaskPointerDown(event, block) : undefined}
-                onPointerUp={block && !pendingPlanTask && !movingTask ? (event) => handleTaskPointerUp(event, block) : undefined}
-                onPointerCancel={block && !pendingPlanTask && !movingTask ? handleTaskPointerCancel : undefined}
+                onClick={() => handleSlotClick(slot, block)}
                 aria-label={`Créneau ${slotLabel(slot)}${block ? ` : ${blockDisplayTitle(block)}${isContinuation ? ' (suite)' : ''}` : ''}`}
               >
                 {!block && (
@@ -784,30 +581,25 @@ export function E40Planning() {
                         type="checkbox"
                         checked={completed}
                         onClick={(event) => event.stopPropagation()}
-                        onPointerDown={(event) => event.stopPropagation()}
-                        onPointerUp={(event) => event.stopPropagation()}
                         onChange={() => handleComplete(block)}
                         aria-label={`Terminer ${blockDisplayTitle(block)}`}
                         style={taskCheckboxStyle}
                       />
                     </div>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                      {canPostpone && (
+                    {canPostpone && (
+                      <div style={{ display: 'flex', gap: '4px' }}>
                         <button
-                          onPointerDown={(event) => event.stopPropagation()}
-                          onPointerUp={(event) => event.stopPropagation()}
                           onClick={(event) => {
                             event.stopPropagation()
-                            if (block.kind === 'task') startMoveTask(block.item, true)
-                            else startMoveSubTask(block.item, true)
+                            startMoveFromMenu(block, true)
                           }}
                           aria-label={`Reporter ${blockDisplayTitle(block)}`}
                           style={taskActionStyle}
                         >
                           Reporter
                         </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -906,14 +698,7 @@ export function E40Planning() {
 
             {picker.mode === 'menu' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                <button
-                  style={pickerItemStyle}
-                  onClick={() => {
-                    if (picker.block.kind === 'task') startMoveTask(picker.block.item, false)
-                    else startMoveSubTask(picker.block.item, false)
-                    setPicker(null)
-                  }}
-                >
+                <button style={pickerItemStyle} onClick={() => startMoveFromMenu(picker.block, false)}>
                   Déplacer
                 </button>
                 <button
@@ -956,12 +741,14 @@ export function E40Planning() {
                 <p style={{ margin: 0, fontSize: '0.9375rem' }}>
                   {picker.block.kind === 'task' ? 'Cette tâche sera' : 'Cette sous-tâche sera'} définitivement supprimée.
                 </p>
-                <button style={{ ...validateBtnStyle, background: 'var(--color-error, #c0392b)' }} onClick={() => handleDelete(picker.block)}>
+                <button
+                  style={{ ...validateBtnStyle, background: 'var(--color-error, #c0392b)' }}
+                  onClick={() => handleDelete(picker.block)}
+                >
                   Supprimer
                 </button>
               </>
             )}
-
           </div>
         </div>
       )}
@@ -971,7 +758,11 @@ export function E40Planning() {
           <span aria-live="polite" style={{ flex: 1, fontSize: '0.8125rem' }}>
             « {pendingPlanTask.title} » est en cours de planification.
           </span>
-          <button style={taskActionStyle} onClick={clearPendingPlanTask} aria-label={`Terminer la planification de ${pendingPlanTask.title}`}>
+          <button
+            style={taskActionStyle}
+            onClick={clearPendingPlanTask}
+            aria-label={`Terminer la planification de ${pendingPlanTask.title}`}
+          >
             Terminer
           </button>
         </div>
@@ -982,7 +773,11 @@ export function E40Planning() {
           <span aria-live="polite" style={{ flex: 1, fontSize: '0.8125rem' }}>
             « {movingItemTitle(movingTask)} » est en cours de déplacement.
           </span>
-          <button style={taskActionStyle} onClick={clearMoveTask} aria-label={`Annuler le déplacement de ${movingItemTitle(movingTask)}`}>
+          <button
+            style={taskActionStyle}
+            onClick={clearMoveTask}
+            aria-label={`Annuler le déplacement de ${movingItemTitle(movingTask)}`}
+          >
             Annuler
           </button>
         </div>
@@ -1000,13 +795,6 @@ export function E40Planning() {
           </div>
         </div>
       )}
-
-      {dragOverlay && (
-        <div style={{ ...dragOverlayStyle, left: dragOverlay.x, top: dragOverlay.y }} aria-hidden>
-          <span>{blockDisplayTitle(dragOverlay.block)}</span>
-          {dragOverlay.label && <span style={{ fontSize: '0.75rem', fontWeight: 500, opacity: 0.9 }}>{dragOverlay.label}</span>}
-        </div>
-      )}
-    </main>
+    </section>
   )
 }

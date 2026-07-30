@@ -1,15 +1,13 @@
 import { useApp } from '@/app/AppContext'
 import { useState, useEffect } from 'react'
 import type { Task } from '@/domain/entities/task'
-import type { TaskV2 } from '@/domain/entities/taskV2'
-import type { PlannedSubTask } from '@/app/AppContext'
-import { getRemainingPlannedCost, taskSlotRange } from '@/domain/rules/taskRulesV2'
+import { getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
-import { BatteryCost } from '@/ui/components/BatteryCost'
-import { DEFAULT_AMBIANCE_COLOR, flashyBackground, plannedTaskTintStyle } from '@/ui/styles/ambiance'
+import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
+import { flashyBackground } from '@/ui/styles/ambiance'
 import {
   DndContext,
   PointerSensor,
@@ -28,10 +26,6 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10)
-}
 
 interface SortableTaskItemProps {
   task: Task
@@ -117,20 +111,44 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
   )
 }
 
-type PlanBlock =
-  | { kind: 'task'; item: TaskV2 }
-  | { kind: 'subtask'; item: PlannedSubTask }
-
-function blockCompleted(block: PlanBlock): boolean {
-  return block.kind === 'task' ? block.item.status === 'completed' : block.item.is_completed
+const handleStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 'var(--spacing-xs)',
+  width: '100%',
+  padding: '8px 0',
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '0.8125rem',
+  fontFamily: 'var(--font-body)',
 }
 
-function blockEssential(block: PlanBlock): boolean {
-  return block.kind === 'task' ? block.item.essential : false
+const handleBarStyle: React.CSSProperties = {
+  display: 'block',
+  width: '36px',
+  height: '4px',
+  borderRadius: '2px',
+  background: 'var(--color-border)',
+}
+
+const widgetBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  width: '100%',
+  textAlign: 'left',
+  cursor: 'pointer',
+  color: 'var(--color-text)',
+  fontSize: '1rem',
+  fontFamily: 'var(--font-body)',
+  padding: 0,
 }
 
 export function E10Dashboard() {
   const {
+    route,
     todayTasks,
     todaySubTasksMap,
     todayEnergy,
@@ -140,37 +158,15 @@ export function E10Dashboard() {
     goTo,
     selectTask,
     reorderTodayTasks,
-    getPlannedTasksForDate,
-    getPlannedSubTasksForDate,
-    completeV2Task,
-    toggleSubTask,
-    startMoveTask,
-    startMoveSubTask,
-    settings,
   } = useApp()
 
-  const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
+  const expanded = route.name === 'planning'
 
   const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks)
-  const [todayPlanned, setTodayPlanned] = useState<TaskV2[]>([])
-  const [todayPlannedSubTasks, setTodayPlannedSubTasks] = useState<PlannedSubTask[]>([])
 
   useEffect(() => {
     setVisibleOrder(todayTasks)
   }, [todayTasks])
-
-  useEffect(() => {
-    async function loadPlanningToday() {
-      const date = todayStr()
-      const [planned, plannedSubs] = await Promise.all([
-        getPlannedTasksForDate(date),
-        getPlannedSubTasksForDate(date),
-      ])
-      setTodayPlanned(planned)
-      setTodayPlannedSubTasks(plannedSubs)
-    }
-    loadPlanningToday()
-  }, [getPlannedTasksForDate, getPlannedSubTasksForDate])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -181,35 +177,6 @@ export function E10Dashboard() {
   function openDetail(taskId: string) {
     selectTask(taskId)
     goTo('task-detail')
-  }
-
-  const planBlocks: PlanBlock[] = [
-    ...todayPlanned.map((t): PlanBlock => ({ kind: 'task', item: t })),
-    ...todayPlannedSubTasks.map((s): PlanBlock => ({ kind: 'subtask', item: s })),
-  ].sort((a, b) => (taskSlotRange(a.item)?.start ?? 0) - (taskSlotRange(b.item)?.start ?? 0))
-
-  const hasPlanningToday = planBlocks.length > 0
-
-  async function reloadPlanned() {
-    const date = todayStr()
-    const [planned, plannedSubs] = await Promise.all([
-      getPlannedTasksForDate(date),
-      getPlannedSubTasksForDate(date),
-    ])
-    setTodayPlanned(planned)
-    setTodayPlannedSubTasks(plannedSubs)
-  }
-
-  async function handleCompletePlanned(block: PlanBlock) {
-    if (block.kind === 'task') await completeV2Task(block.item.id)
-    else await toggleSubTask(block.item)
-    await reloadPlanned()
-  }
-
-  function handleReportPlanned(block: PlanBlock) {
-    if (block.kind === 'task') startMoveTask(block.item, true)
-    else startMoveSubTask(block.item, true)
-    goTo('planning')
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -226,6 +193,19 @@ export function E10Dashboard() {
   }
 
   const isEmpty = todayTasks.length === 0
+  const showSecondary = !expanded
+
+  const handle = (
+    <button
+      onClick={() => goTo(expanded ? 'dashboard' : 'planning')}
+      aria-expanded={expanded}
+      aria-label={expanded ? 'Replier le planning' : 'Déplier le planning'}
+      style={handleStyle}
+    >
+      <span aria-hidden style={handleBarStyle} />
+      <span>{expanded ? 'Replier' : 'Déplier'}</span>
+    </button>
+  )
 
   return (
     <AppShell overloadMode={overloadMode}>
@@ -238,9 +218,10 @@ export function E10Dashboard() {
         plannedCost={getRemainingPlannedCost(todayPlannedTasks)}
         onResourcesClick={() => goTo('resources')}
         onSettingsClick={() => goTo('settings')}
+        onOverloadClick={() => goTo('overload-recovery')}
       />
 
-      {overloadMode && (
+      {overloadMode && showSecondary && (
         <Card style={{ borderColor: 'var(--color-warning)' }}>
           <p style={{ fontWeight: 600, margin: 0, color: 'var(--color-warning)' }}>
             Mode surcharge actif
@@ -259,7 +240,20 @@ export function E10Dashboard() {
         </Card>
       )}
 
-      {!overloadMode && (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+          ...(expanded ? { flex: 1 } : {}),
+        }}
+      >
+        {expanded && handle}
+        <PlanningBoard collapsed={!expanded} onRequestExpand={() => goTo('planning')} />
+        {!expanded && handle}
+      </div>
+
+      {showSecondary && !overloadMode && (
         <section aria-label="Tâche du jour">
           <h2 style={{ fontSize: '1.1rem' }}>Tâche du jour</h2>
           {isEmpty ? (
@@ -290,78 +284,23 @@ export function E10Dashboard() {
         </section>
       )}
 
-      <section aria-label="Planning du jour">
-        <h2>Planning du jour</h2>
-        {hasPlanningToday ? (
+      {showSecondary && !overloadMode && (
+        <section aria-label="Outils">
+          <h2 style={{ fontSize: '1.1rem' }}>Outils</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            {planBlocks.map((block) => {
-              const completed = blockCompleted(block)
-              const label = block.kind === 'task' ? block.item.title : `${block.item.parentTitle} - ${block.item.title}`
-              return (
-              <Card key={block.item.id} style={{ padding: 'var(--spacing-sm)', ...plannedTaskTintStyle(completed, ambianceColor) }}>
-                <div style={{ display: 'flex', gap: 'var(--spacing-xs)', alignItems: 'center' }}>
-                  <input
-                    type="checkbox"
-                    checked={completed}
-                    onChange={() => handleCompletePlanned(block)}
-                    aria-label={`Terminer ${label}`}
-                    style={{ width: '20px', height: '20px', margin: 0, accentColor: 'var(--color-accent)', cursor: 'pointer', flexShrink: 0 }}
-                  />
-                  <button
-                    onClick={() => goTo('planning')}
-                    aria-label={`${label} — voir dans le planning`}
-                    style={{
-                      flex: 1,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 'var(--spacing-xs)',
-                      background: 'none',
-                      border: 'none',
-                      padding: '6px 0',
-                      color: 'inherit',
-                      textDecoration: completed ? 'line-through' : 'none',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      font: 'inherit',
-                    }}
-                  >
-                    {block.kind === 'task' ? (
-                      <span>{block.item.scheduled_start} · {block.item.title}</span>
-                    ) : (
-                      <span style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span>{block.item.scheduled_start} · {block.item.parentTitle}</span>
-                        <span style={{ fontSize: '0.75rem', opacity: 0.85 }}>- {block.item.title}</span>
-                      </span>
-                    )}
-                    {block.kind === 'task' && block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
-                  </button>
-                  {!completed && overloadMode && !blockEssential(block) && (
-                    <button
-                      aria-label={`Reporter ${label}`}
-                      onClick={() => handleReportPlanned(block)}
-                      style={{
-                        background: 'none',
-                        border: '1px solid var(--color-border)',
-                        borderRadius: 'var(--radius-sm)',
-                        padding: '6px 10px',
-                        cursor: 'pointer',
-                        fontSize: '0.75rem',
-                        color: 'inherit',
-                        flexShrink: 0,
-                      }}
-                    >
-                      Reporter
-                    </button>
-                  )}
-                </div>
-              </Card>
-              )
-            })}
+            <Card>
+              <button style={widgetBtnStyle} onClick={() => goTo('tools')}>
+                Outils
+              </button>
+            </Card>
+            <Card>
+              <button style={widgetBtnStyle} onClick={() => goTo('lists')}>
+                Listes
+              </button>
+            </Card>
           </div>
-        ) : (
-          <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Rien de planifié aujourd'hui.</p>
-        )}
-      </section>
+        </section>
+      )}
     </AppShell>
   )
 }

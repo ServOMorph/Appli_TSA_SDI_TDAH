@@ -5,6 +5,7 @@ import {
   getTodayEntry,
   isValidEnergyValue,
   getEnergyLabel,
+  getEnergyPairLabel,
   isOverloaded,
   ENERGY_MIN,
   ENERGY_MAX,
@@ -158,5 +159,26 @@ describe('energyRules', () => {
     it('returns false when energy is not set', () => {
       expect(isOverloaded(null, 5)).toBe(false)
     })
+  })
+})
+
+describe('getEnergyPairLabel', () => {
+  it('affiche planifié et disponible côte à côte quand l\u0027énergie est renseignée', () => {
+    expect(getEnergyPairLabel('filled', 7, 5)).toEqual({
+      label: '5 / 7',
+      ariaLabel: "5 énergie planifiée sur 7 disponible aujourd'hui",
+    })
+  })
+
+  it('affiche 0 planifié quand rien n\u0027est planifié', () => {
+    expect(getEnergyPairLabel('filled', 7, 0).label).toBe('0 / 7')
+  })
+
+  it('retombe sur le libellé simple quand l\u0027énergie est ignorée', () => {
+    expect(getEnergyPairLabel('skipped', null, 5)).toEqual(getEnergyLabel('skipped', null))
+  })
+
+  it('retombe sur le libellé simple quand aucune énergie n\u0027est renseignée', () => {
+    expect(getEnergyPairLabel(null, null, 5)).toEqual(getEnergyLabel(null, null))
   })
 })

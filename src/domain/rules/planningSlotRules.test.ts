@@ -10,6 +10,7 @@ import {
   isRangeAvailable,
   normalizeRange,
   moveTargetRange,
+  visibleSlotWindow,
 } from '@/domain/rules/planningSlotRules'
 
 function scheduled(start: string | null, end: string | null) {
@@ -148,5 +149,23 @@ describe('moveTargetRange', () => {
 
   it('produit un créneau unique pour une tâche sans horaire', () => {
     expect(moveTargetRange(scheduled(null, null), 10)).toEqual({ start: 10, end: 10 })
+  })
+})
+
+describe('visibleSlotWindow', () => {
+  it('ancre la fenêtre un créneau avant le créneau courant', () => {
+    expect(visibleSlotWindow(20)).toEqual([19, 20, 21, 22, 23, 24])
+  })
+
+  it('ne déborde pas en début de journée', () => {
+    expect(visibleSlotWindow(0)).toEqual([0, 1, 2, 3, 4, 5])
+  })
+
+  it('ne déborde pas en fin de journée', () => {
+    expect(visibleSlotWindow(47)).toEqual([42, 43, 44, 45, 46, 47])
+  })
+
+  it('accepte une taille de fenêtre explicite', () => {
+    expect(visibleSlotWindow(20, 3, 0)).toEqual([20, 21, 22])
   })
 })

@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { Button } from '@/ui/components/Button'
 
-export type BottomNavTab = 'dashboard' | 'inbox' | 'planning' | 'lists'
+export type BottomNavTab = 'inbox' | 'dashboard' | 'settings'
 
 function segmentStyle(withDivider: boolean, active: boolean): React.CSSProperties {
   return {
@@ -17,6 +16,14 @@ function segmentStyle(withDivider: boolean, active: boolean): React.CSSPropertie
     fontFamily: 'var(--font-body)',
     cursor: 'pointer',
   }
+}
+
+const addSegmentStyle: React.CSSProperties = {
+  ...segmentStyle(true, false),
+  color: 'var(--color-accent)',
+  fontWeight: 700,
+  fontSize: '1.375rem',
+  lineHeight: 1,
 }
 
 const segmentPastilleStyle: React.CSSProperties = {
@@ -50,10 +57,9 @@ interface BottomNavProps {
   overloadMode: boolean
   inboxHasTasks: boolean
   onAddTask: () => void
+  onGoInbox: () => void
   onGoDashboard: () => void
-  onGoTodo: () => void
-  onGoPlanning: () => void
-  onGoLists: () => void
+  onGoSettings: () => void
 }
 
 export function BottomNav({
@@ -61,10 +67,9 @@ export function BottomNav({
   overloadMode,
   inboxHasTasks,
   onAddTask,
+  onGoInbox,
   onGoDashboard,
-  onGoTodo,
-  onGoPlanning,
-  onGoLists,
+  onGoSettings,
 }: BottomNavProps) {
   const navRef = useRef<HTMLElement | null>(null)
 
@@ -87,9 +92,6 @@ export function BottomNav({
 
   return (
     <nav ref={navRef} aria-label="Navigation principale" style={navContainerStyle}>
-      <Button fullWidth onClick={onAddTask}>
-        Ajouter une tâche
-      </Button>
       <div
         role="group"
         aria-label="Navigation"
@@ -101,33 +103,30 @@ export function BottomNav({
         }}
       >
         <button
+          onClick={onGoInbox}
+          aria-label="Boîte de réception"
+          aria-current={activeTab === 'inbox' ? 'page' : undefined}
+          style={segmentStyle(false, activeTab === 'inbox')}
+        >
+          Réception
+          {inboxHasTasks && <span aria-hidden style={segmentPastilleStyle} />}
+        </button>
+        <button
           onClick={onGoDashboard}
           aria-current={activeTab === 'dashboard' ? 'page' : undefined}
-          style={segmentStyle(false, activeTab === 'dashboard')}
+          style={segmentStyle(true, activeTab === 'dashboard')}
         >
           Accueil
         </button>
         <button
-          onClick={onGoTodo}
-          aria-current={activeTab === 'inbox' ? 'page' : undefined}
-          style={segmentStyle(true, activeTab === 'inbox')}
+          onClick={onGoSettings}
+          aria-current={activeTab === 'settings' ? 'page' : undefined}
+          style={segmentStyle(true, activeTab === 'settings')}
         >
-          Outils
-          {inboxHasTasks && <span aria-hidden style={segmentPastilleStyle} />}
+          Paramètres
         </button>
-        <button
-          onClick={onGoPlanning}
-          aria-current={activeTab === 'planning' ? 'page' : undefined}
-          style={segmentStyle(true, activeTab === 'planning')}
-        >
-          Planning
-        </button>
-        <button
-          onClick={onGoLists}
-          aria-current={activeTab === 'lists' ? 'page' : undefined}
-          style={segmentStyle(true, activeTab === 'lists')}
-        >
-          Listes
+        <button onClick={onAddTask} aria-label="Ajouter une tâche" style={addSegmentStyle}>
+          +
         </button>
       </div>
     </nav>

@@ -38,9 +38,11 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 Roadmap V4.1 (6 phases, V4.1-0 à V4.1-5) **close**, désormais archivée (`Archives/roadmap_v4.1.md`) : rubrique nav « Outils » remplaçant « Todo », listes épinglables, module Budget semaine/mois avec livrets simples, nav « + » contextuelle. Phase V4.1-6 (auto-scroll drag planning) jamais codée, reprise dans la roadmap suivante.
 
-**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — 4 phases : **V5-0 `[FAIT]`** (refacto du système d'état et de navigation), V5-1 `[TODO]` (nav + écran d'accueil fusionné avec le planning), V5-2 `[TODO]` (planning et tâches refondus — logos, couleurs, durée en jours, récurrence, fiche tâche cliquable), V5-3 `[TODO]` (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel). Modification d'une tâche désormais exclusivement via sa fiche (plus de glisser-déposer, aligné sur l'application de référence de la testeuse). Les 5 outils spécialisés reportés en V5.1+ (Comptage, Météo du jour, Comptes à colonnes configurables, Routine, Tableau prévisions), faute de retour d'usage sur la version actuelle — ordre de priorité fixé, Comptage en premier.
+**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — 4 phases : **V5-0 `[FAIT]`** (refacto du système d'état et de navigation), **V5-1 `[EN COURS]`** (nav + écran d'accueil fusionné avec le planning), V5-2 `[TODO]` (planning et tâches refondus — logos, couleurs, durée en jours, récurrence, fiche tâche cliquable), V5-3 `[TODO]` (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel). Modification d'une tâche désormais exclusivement via sa fiche (plus de glisser-déposer, aligné sur l'application de référence de la testeuse). Les 5 outils spécialisés reportés en V5.1+ (Comptage, Météo du jour, Comptes à colonnes configurables, Routine, Tableau prévisions), faute de retour d'usage sur la version actuelle — ordre de priorité fixé, Comptage en premier.
 
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
+
+Phase V5-1 codée : nav basse ramenée à 4 éléments (Réception, Accueil, Paramètres, +), `E40Planning` absorbé par `E10Dashboard` (écran unique replié/déplié, corps extrait dans `PlanningBoard.tsx`), énergie planifiée/disponible affichée côte à côte, pastille de surcharge cliquable vers le centre de récupération, glisser-déposer du planning supprimé par anticipation. Gate technique atteint (tests unitaires et e2e verts, build/lint/tsc clean) ; validation manuelle sur appareil tactile encore en attente.
 
 ## Stack
 
@@ -76,7 +78,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Démarrer la Phase V5-1 (`roadmap_v5.0.md`) : nav + écran d'accueil fusionné avec le planning. La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
+Valider manuellement la Phase V5-1 sur appareil tactile (`tests_manuels.md`), puis démarrer la Phase V5-2 (`roadmap_v5.0.md`) : planning et tâches refondus. La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
 
 ## Licence
 

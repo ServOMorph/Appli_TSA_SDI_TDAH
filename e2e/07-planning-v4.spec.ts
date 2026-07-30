@@ -29,13 +29,13 @@ test('T46 — planifier une tâche sur plusieurs créneaux et la repositionner',
 })
 
 test('T47 — Répéter demain est absent du planning', async ({ page }) => {
-  await page.getByRole('button', { name: 'Planning' }).click()
+  await page.getByRole('button', { name: 'Déplier le planning' }).click()
   await expect(page.getByRole('grid', { name: 'Planning de la journée' })).toBeVisible()
   await expect(page.getByRole('button', { name: /Répéter.*demain/ })).toHaveCount(0)
 })
 
 async function planTask(page: import('@playwright/test').Page, title: string, startSlot: string) {
-  await page.getByRole('button', { name: 'Planning' }).click()
+  await page.getByRole('button', { name: 'Déplier le planning' }).click()
   await page.getByRole('gridcell', { name: startSlot }).click()
   await page.getByRole('gridcell', { name: startSlot }).click()
   await page.getByLabel('Nom de la tâche').fill(title)
@@ -65,7 +65,7 @@ test('T48 — tap sur une tâche planifiée ouvre le menu déplacer/renommer/sup
 })
 
 test('T49 — Reporter une tâche en surcharge affiche le bandeau et bascule sur le lendemain (E8)', async ({ page }) => {
-  await page.getByRole('button', { name: 'Planning' }).click()
+  await page.getByRole('button', { name: 'Déplier le planning' }).click()
   await page.getByRole('gridcell', { name: 'Créneau 8h00' }).click()
   await page.getByRole('gridcell', { name: 'Créneau 8h00' }).click()
   await page.getByLabel('Nom de la tâche').fill('Tâche lourde')
@@ -124,6 +124,7 @@ test('T51 — planifier une sous-tâche depuis Décomposer, affichage hiérarchi
   await expect(page.getByText('- Ranger le bureau')).toBeVisible()
 
   await page.getByRole('button', { name: 'Accueil' }).click()
-  await expect(page.getByText(/10:00 · Grand ménage/)).toBeVisible()
+  await page.getByRole('button', { name: 'Déplier le planning' }).click()
+  await expect(page.getByRole('gridcell', { name: 'Créneau 10h00 : Grand ménage - Ranger le bureau' })).toBeVisible()
   await expect(page.getByText('- Ranger le bureau')).toBeVisible()
 })

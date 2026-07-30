@@ -11,6 +11,7 @@ interface TopBarProps {
   plannedCost: number
   onResourcesClick: () => void
   onSettingsClick: () => void
+  onOverloadClick: () => void
 }
 
 const modalOverlayStyle: React.CSSProperties = {
@@ -69,6 +70,7 @@ export function TopBar({
   plannedCost,
   onResourcesClick,
   onSettingsClick,
+  onOverloadClick,
 }: TopBarProps) {
   const [showOverloadInfo, setShowOverloadInfo] = useState(false)
 
@@ -87,10 +89,10 @@ export function TopBar({
           style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', flexShrink: 0 }}
         >
           <button
-            onClick={() => setShowOverloadInfo(true)}
-            aria-expanded={showOverloadInfo}
-            aria-haspopup="dialog"
-            aria-label="Détail du mode surcharge"
+            onClick={() => (overloadActive ? onOverloadClick() : setShowOverloadInfo(true))}
+            aria-expanded={overloadActive ? undefined : showOverloadInfo}
+            aria-haspopup={overloadActive ? undefined : 'dialog'}
+            aria-label={overloadActive ? 'Mode surcharge actif, ouvrir le centre récupération' : 'Détail du mode surcharge'}
             style={overloadButtonStyle(overloadActive)}
           >
             {overloadActive ? 'Mode surcharge actif' : 'Mode surcharge'}
@@ -177,7 +179,12 @@ export function TopBar({
       )}
       {!overloadActive && (
         <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
-          <EnergyDisplay status={energyStatus} value={energyValue} onClick={onEnergyClick} />
+          <EnergyDisplay
+            status={energyStatus}
+            value={energyValue}
+            plannedCost={plannedCost}
+            onClick={onEnergyClick}
+          />
         </div>
       )}
     </header>

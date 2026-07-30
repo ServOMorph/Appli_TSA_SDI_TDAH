@@ -1,10 +1,11 @@
-import { getEnergyLabel } from '@/domain/rules/energyRules'
+import { getEnergyPairLabel } from '@/domain/rules/energyRules'
 import type { EnergyStatus } from '@/domain/entities/energyEntry'
 import { BatteryIcon } from '@/ui/components/BatteryIcon'
 
 interface EnergyDisplayProps {
   status: EnergyStatus | null
   value: number | null
+  plannedCost: number
   onClick: () => void
 }
 
@@ -21,12 +22,14 @@ const chipStyle: React.CSSProperties = {
   cursor: 'pointer',
 }
 
-export function EnergyDisplay({ status, value, onClick }: EnergyDisplayProps) {
-  const { label, ariaLabel } = getEnergyLabel(status, value)
+export function EnergyDisplay({ status, value, plannedCost, onClick }: EnergyDisplayProps) {
+  const filled = status === 'filled' && value !== null
+  const { label, ariaLabel } = getEnergyPairLabel(status, value, plannedCost)
   return (
     <button onClick={onClick} aria-label={ariaLabel} style={chipStyle}>
-      {status === 'filled' && value !== null && <BatteryIcon size={16} />}
+      {filled && <BatteryIcon size={16} />}
       {label}
+      {filled && <span style={{ fontSize: '0.75rem' }}>planifié / dispo</span>}
     </button>
   )
 }

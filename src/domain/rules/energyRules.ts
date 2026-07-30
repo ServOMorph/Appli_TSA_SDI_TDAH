@@ -20,6 +20,21 @@ export function getEnergyLabel(
   return { label: 'Mon énergie', ariaLabel: 'Renseigner mon énergie' }
 }
 
+/** Énergie planifiée et énergie disponible affichées côte à côte (E14, Q1). */
+export function getEnergyPairLabel(
+  status: EnergyStatus | null,
+  value: number | null,
+  plannedCost: number,
+): { label: string; ariaLabel: string } {
+  if (status === 'filled' && value !== null) {
+    return {
+      label: `${plannedCost} / ${value}`,
+      ariaLabel: `${plannedCost} énergie planifiée sur ${value} disponible aujourd'hui`,
+    }
+  }
+  return getEnergyLabel(status, value)
+}
+
 export function hasCheckedInToday(entries: EnergyEntry[], date: string): boolean {
   return entries.some((e) => e.entry_date === date && e.status === 'filled')
 }

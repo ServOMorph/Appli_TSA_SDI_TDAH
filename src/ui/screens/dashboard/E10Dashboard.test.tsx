@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E10Dashboard } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
@@ -82,7 +82,7 @@ describe('E10Dashboard', () => {
         todayTasks: [makeTask()],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByLabelText(/7 énergie/i)).toBeDefined()
+      expect(screen.getByLabelText(/sur 7 disponible/i)).toBeDefined()
     })
 
     it('conserve une tâche du jour terminée avec une teinte intensifiée (P3)', () => {
@@ -153,8 +153,19 @@ describe('E10Dashboard', () => {
     it('clic sur badge énergie navigue vers energy-view', async () => {
       const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByLabelText(/7 énergie/i))
+      await userEvent.click(screen.getByLabelText(/sur 7 disponible/i))
       expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+    })
+
+    it('affiche énergie planifiée et énergie disponible côte à côte (E14, Q1)', () => {
+      const ctx = makeAppContext({
+        todayEnergy: 7,
+        todayEnergyStatus: 'filled',
+        todayPlannedTasks: [makeTaskV2({ energy_cost: 5 })],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(screen.getByLabelText("5 énergie planifiée sur 7 disponible aujourd'hui")).toBeDefined()
+      expect(screen.getByText('5 / 7')).toBeDefined()
     })
 
     it('affiche "Énergie ignorée" si todayEnergyStatus skipped', () => {
@@ -207,18 +218,62 @@ describe('E10Dashboard', () => {
     })
   })
 
-  describe('planning du jour (V2-9)', () => {
-    it('affiche un message si rien n\'est planifié', async () => {
-      renderWithApp(<E10Dashboard />)
-      expect(await screen.findByText('Rien de planifié aujourd\'hui.')).toBeDefined()
+  describe('accueil fusionné (E19, Q8)', () => {
+    beforeEach(() => {
+      vi.setSystemTime(new Date('2026-07-01T09:00:00'))
     })
 
-    it('affiche une tâche planifiée du jour', async () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it("replié : n'affiche que les créneaux autour de l'heure courante", async () => {
+      renderWithApp(<E10Dashboard />)
+      expect(await screen.findByText('9h00')).toBeDefined()
+      expect(screen.queryByText('0h00')).toBeNull()
+      expect(screen.queryByText('23h30')).toBeNull()
+    })
+
+    it('replié : affiche la tâche du jour et la zone widgets', async () => {
+      const ctx = makeAppContext({ todayTasks: [makeTask({ title: 'Appeler le médecin' })] })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(await screen.findByRole('heading', { name: 'Tâche du jour' })).toBeDefined()
+      expect(screen.getByRole('region', { name: 'Outils' })).toBeDefined()
+    })
+
+    it('replié : la poignée déplie le planning (E18)', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(await screen.findByRole('button', { name: 'Déplier le planning' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    })
+
+    it('déplié : affiche le planning entier et masque tâche du jour et widgets', async () => {
+      const ctx = makeAppContext({
+        route: { name: 'planning' },
+        screen: 'planning',
+        todayTasks: [makeTask({ title: 'Appeler le médecin' })],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(await screen.findByText('0h00')).toBeDefined()
+      expect(screen.getByText('23h30')).toBeDefined()
+      expect(screen.queryByRole('heading', { name: 'Tâche du jour' })).toBeNull()
+      expect(screen.queryByRole('region', { name: 'Outils' })).toBeNull()
+    })
+
+    it('déplié : la poignée replie vers l\'accueil (E18)', async () => {
+      const ctx = makeAppContext({ route: { name: 'planning' }, screen: 'planning' })
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(await screen.findByRole('button', { name: 'Replier le planning' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+    })
+
+    it('affiche une tâche planifiée du jour dans son créneau', async () => {
       const ctx = makeAppContext({
         getPlannedTasksForDate: async () => [makeTaskV2({ title: 'RDV médecin' })],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByText(/RDV médecin/)).toBeDefined()
+      expect(await screen.findByText('RDV médecin')).toBeDefined()
     })
 
     it('cocher une tâche planifiée la termine', async () => {
@@ -231,143 +286,22 @@ describe('E10Dashboard', () => {
       await userEvent.click(checkbox)
       expect(ctx.completeV2Task).toHaveBeenCalledWith('taskv2-1')
     })
+  })
 
-    it('affiche une tâche planifiée terminée avec une case cochée (P2)', async () => {
-      const ctx = makeAppContext({
-        getPlannedTasksForDate: async () => [makeTaskV2({ title: 'RDV médecin', status: 'completed' })],
-      })
+  describe('zone widgets provisoire (E24)', () => {
+    it('ouvre les outils depuis la zone widgets', async () => {
+      const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByText(/RDV médecin/)).toBeDefined()
-      expect(screen.getByRole('checkbox', { name: 'Terminer RDV médecin' })).toBeChecked()
-      expect(screen.getByRole('checkbox', { name: 'Terminer RDV médecin' })).not.toBeDisabled()
+      const zone = screen.getByRole('region', { name: 'Outils' })
+      await userEvent.click(within(zone).getByRole('button', { name: 'Outils' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('tools')
     })
 
-    it('affiche la section Planning du jour en mode surcharge (E6)', async () => {
-      const ctx = makeAppContext({
-        overloadMode: true,
-        getPlannedTasksForDate: async () => [
-          makeTaskV2({ id: 'a', title: 'Tâche planifiée', essential: false }),
-        ],
-      })
+    it('ouvre les listes depuis la zone widgets', async () => {
+      const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByText(/Tâche planifiée/)).toBeDefined()
-    })
-
-    it('affiche le bouton Reporter sur une tâche non-obligatoire grisée en surcharge', async () => {
-      const ctx = makeAppContext({
-        overloadMode: true,
-        getPlannedTasksForDate: async () => [
-          makeTaskV2({ id: 'a', title: 'Tâche non essentielle', essential: false }),
-        ],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByLabelText(/Reporter Tâche non essentielle/)).toBeDefined()
-    })
-
-    it("n'affiche pas le bouton Reporter sur une tâche obligatoire en surcharge", async () => {
-      const ctx = makeAppContext({
-        overloadMode: true,
-        getPlannedTasksForDate: async () => [
-          makeTaskV2({ id: 'a', title: 'Tâche obligatoire', essential: true }),
-        ],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      await screen.findByText(/Tâche obligatoire/)
-      expect(screen.queryByLabelText(/Reporter Tâche obligatoire/)).toBeNull()
-    })
-
-    it("n'affiche pas le bouton Reporter hors surcharge", async () => {
-      const ctx = makeAppContext({
-        overloadMode: false,
-        getPlannedTasksForDate: async () => [
-          makeTaskV2({ id: 'a', title: 'Tâche planifiée', essential: false }),
-        ],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      await screen.findByText(/Tâche planifiée/)
-      expect(screen.queryByLabelText(/Reporter Tâche planifiée/)).toBeNull()
-    })
-
-    it('déclenche le déplacement en mode report et navigue vers le planning au clic sur Reporter (E8)', async () => {
-      const task = makeTaskV2({ id: 'a', title: 'Tâche non essentielle', essential: false })
-      const ctx = makeAppContext({
-        overloadMode: true,
-        getPlannedTasksForDate: async () => [task],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      const btn = await screen.findByLabelText(/Reporter Tâche non essentielle/)
-      await userEvent.click(btn)
-      expect(ctx.startMoveTask).toHaveBeenCalledWith(task, true)
-      expect(ctx.goTo).toHaveBeenCalledWith('planning')
-    })
-
-    it('affiche une sous-tâche planifiée avec le titre du parent et son propre titre (E9b)', async () => {
-      const sub = makeSubTask({
-        id: 'st-1',
-        task_id: 'parent-1',
-        title: 'Ranger le bureau',
-        scheduled_date: '2026-07-01',
-        scheduled_start: '09:00',
-        scheduled_end: '09:30',
-      })
-      const ctx = makeAppContext({
-        getPlannedTasksForDate: async () => [],
-        getPlannedSubTasksForDate: async () => [{ ...sub, parentTitle: 'Rangement' }],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByText(/09:00 · Rangement/)).toBeDefined()
-      expect(screen.getByText('- Ranger le bureau')).toBeDefined()
-    })
-
-    it('cocher une sous-tâche planifiée appelle toggleSubTask', async () => {
-      const sub = makeSubTask({
-        id: 'st-1',
-        task_id: 'parent-1',
-        title: 'Ranger le bureau',
-        scheduled_date: '2026-07-01',
-        scheduled_start: '09:00',
-        scheduled_end: '09:30',
-      })
-      const planned = { ...sub, parentTitle: 'Rangement' }
-      const ctx = makeAppContext({
-        getPlannedTasksForDate: async () => [],
-        getPlannedSubTasksForDate: async () => [planned],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      const checkbox = await screen.findByRole('checkbox', { name: 'Terminer Rangement - Ranger le bureau' })
-      await userEvent.click(checkbox)
-      expect(ctx.toggleSubTask).toHaveBeenCalledWith(planned)
-    })
-
-    it('déclenche le report d\'une sous-tâche via startMoveSubTask en surcharge (E8)', async () => {
-      const sub = makeSubTask({
-        id: 'st-1',
-        task_id: 'parent-1',
-        title: 'Ranger le bureau',
-        scheduled_date: '2026-07-01',
-        scheduled_start: '09:00',
-        scheduled_end: '09:30',
-      })
-      const planned = { ...sub, parentTitle: 'Rangement' }
-      const ctx = makeAppContext({
-        overloadMode: true,
-        getPlannedTasksForDate: async () => [],
-        getPlannedSubTasksForDate: async () => [planned],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      const btn = await screen.findByLabelText(/Reporter Rangement - Ranger le bureau/)
-      await userEvent.click(btn)
-      expect(ctx.startMoveSubTask).toHaveBeenCalledWith(planned, true)
-      expect(ctx.goTo).toHaveBeenCalledWith('planning')
-    })
-
-    it('n’affiche plus le bouton Répéter demain', async () => {
-      const ctx = makeAppContext({
-        getPlannedTasksForDate: async () => [makeTaskV2({ id: 'a', title: 'RDV médecin' })],
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      await screen.findByRole('checkbox', { name: 'Terminer RDV médecin' })
-      expect(screen.queryByRole('button', { name: /Répéter.*demain/ })).toBeNull()
+      await userEvent.click(screen.getByRole('button', { name: 'Listes' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('lists')
     })
   })
 
@@ -379,18 +313,22 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     })
 
-    it('affiche le bouton Mode surcharge actif et cliquable', () => {
+    it('affiche la pastille de surcharge active et cliquable (E21)', () => {
       const ctx = makeAppContext({ overloadMode: true })
       renderWithApp(<E10Dashboard />, ctx)
-      const btn = screen.getByRole('button', { name: 'Détail du mode surcharge' }) as HTMLButtonElement
+      const btn = screen.getByRole('button', {
+        name: 'Mode surcharge actif, ouvrir le centre récupération',
+      }) as HTMLButtonElement
       expect(btn.disabled).toBe(false)
     })
 
-    it('ouvre une modale chiffrée au clic sur le bouton actif', async () => {
+    it('la pastille active navigue vers le centre de récupération (E21)', async () => {
       const ctx = makeAppContext({ overloadMode: true, todayEnergy: 4 })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Détail du mode surcharge' }))
-      expect(screen.getByRole('dialog', { name: 'Mode surcharge' })).toHaveTextContent(/disponible aujourd'hui/)
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Mode surcharge actif, ouvrir le centre récupération' }),
+      )
+      expect(ctx.goTo).toHaveBeenCalledWith('overload-recovery')
     })
 
     it('navigue vers le centre de récupération au clic', async () => {

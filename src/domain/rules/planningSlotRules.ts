@@ -63,3 +63,21 @@ export function moveTargetRange(item: Scheduled, slot: number): { start: number;
   const length = slotSpan(item)
   return { start: slot, end: slot + length - 1 }
 }
+
+export const COLLAPSED_SLOT_COUNT = 6
+export const COLLAPSED_SLOTS_BEFORE = 1
+
+/**
+ * Créneaux affichés par le planning replié : une fenêtre ancrée sur le créneau
+ * courant, décalée pour rester entière en début et en fin de journée.
+ */
+export function visibleSlotWindow(
+  currentSlot: number,
+  count: number = COLLAPSED_SLOT_COUNT,
+  before: number = COLLAPSED_SLOTS_BEFORE,
+): number[] {
+  const size = Math.min(count, SLOTS_PER_DAY)
+  const maxStart = SLOTS_PER_DAY - size
+  const start = Math.max(0, Math.min(currentSlot - before, maxStart))
+  return SLOT_INDEXES.slice(start, start + size)
+}

@@ -27,7 +27,7 @@ const modalBox: React.CSSProperties = {
 }
 
 export function E60Lists() {
-  const { lists, createList, renameList, deleteList, togglePinList, selectList, setListDetailOrigin, goTo } = useApp()
+  const { lists, createList, renameList, deleteList, togglePinList, selectList, goTo } = useApp()
   const [showNewForm, setShowNewForm] = useState(false)
   const [newName, setNewName] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -47,7 +47,6 @@ export function E60Lists() {
 
   function handleSelectList(id: string) {
     selectList(id)
-    setListDetailOrigin('lists')
     goTo('list-detail')
   }
 

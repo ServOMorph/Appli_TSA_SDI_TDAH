@@ -6,8 +6,19 @@ import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import { BatteryCost } from '@/ui/components/BatteryCost'
 import { DEFAULT_AMBIANCE_COLOR, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import { taskSlotRange, taskOccupiesSlot } from '@/domain/rules/taskRulesV2'
+import {
+  SLOT_INDEXES,
+  slotTime,
+  slotLabel,
+  slotFromDate,
+  todayStr,
+  addDays,
+  formatPlanningDate,
+  isRangeAvailable,
+  normalizeRange,
+  moveTargetRange,
+} from '@/domain/rules/planningSlotRules'
 
-const SLOTS = Array.from({ length: 48 }, (_, i) => i)
 const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
 
 type PlanBlock =
@@ -33,37 +44,6 @@ function blockDisplayTitle(block: PlanBlock): string {
 function movingItemTitle(moving: MovingPlanItem): string {
   return moving.kind === 'task' ? moving.task.title : `${moving.subTask.parentTitle} - ${moving.subTask.title}`
 }
-
-function slotTime(slot: number): string {
-  const hour = Math.floor(slot / 2)
-  const minute = slot % 2 === 0 ? '00' : '30'
-  return `${String(hour).padStart(2, '0')}:${minute}`
-}
-
-function slotLabel(slot: number): string {
-  const hour = Math.floor(slot / 2)
-  const minute = slot % 2 === 0 ? '00' : '30'
-  return `${hour}h${minute}`
-}
-
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function addDays(date: string, n: number): string {
-  const d = new Date(date + 'T12:00:00')
-  d.setDate(d.getDate() + n)
-  return d.toISOString().slice(0, 10)
-}
-
-function formatDate(date: string): string {
-  return new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  })
-}
-
 
 type Picker =
   | { mode: 'assign'; start: number; end: number }
@@ -114,7 +94,7 @@ function slotFromPoint(clientX: number, clientY: number): number | null {
   const cell = el?.closest?.('[data-slot]') as HTMLElement | null
   if (!cell?.dataset.slot) return null
   const slot = Number(cell.dataset.slot)
-  return Number.isInteger(slot) && slot >= 0 && slot < SLOTS.length ? slot : null
+  return Number.isInteger(slot) && slot >= 0 && slot < SLOT_INDEXES.length ? slot : null
 }
 
 const pageStyle: React.CSSProperties = {
@@ -387,8 +367,7 @@ export function E40Planning() {
     ...scheduledSubTasks.map((s): PlanBlock => ({ kind: 'subtask', item: s })),
   ]
 
-  const now = new Date()
-  const currentSlot = now.getHours() * 2 + (now.getMinutes() >= 30 ? 1 : 0)
+  const currentSlot = slotFromDate(new Date())
   const currentSlotRef = useRef<HTMLDivElement | null>(null)
   const gridRef = useRef<HTMLDivElement | null>(null)
   const dragRef = useRef<{ block: PlanBlock; sourceSlot: number; sourceDate: string; startX: number; startY: number } | null>(null)
@@ -453,32 +432,22 @@ export function E40Planning() {
   }
 
   async function handleMove(block: PlanBlock, slot: number, targetDate: string, report: boolean): Promise<boolean> {
-    const range = taskSlotRange(block.item)
-    const length = range ? range.end - range.start + 1 : 1
-    const endSlot = slot + length - 1
+    const target = moveTargetRange(block.item, slot)
     const [targetTasks, targetSubTasks] = await Promise.all([
       getPlannedTasksForDate(targetDate),
       getPlannedSubTasksForDate(targetDate),
     ])
-    const conflict =
-      endSlot >= SLOTS.length ||
-      targetTasks.some(
-        (t) =>
-          !(block.kind === 'task' && t.id === block.item.id) &&
-          SLOTS.slice(slot, endSlot + 1).some((candidate) => taskOccupiesSlot(t, candidate)),
-      ) ||
-      targetSubTasks.some(
-        (s) =>
-          !(block.kind === 'subtask' && s.id === block.item.id) &&
-          SLOTS.slice(slot, endSlot + 1).some((candidate) => taskOccupiesSlot(s, candidate)),
-      )
-    if (conflict) {
+    const others = [
+      ...targetTasks.filter((t) => !(block.kind === 'task' && t.id === block.item.id)),
+      ...targetSubTasks.filter((s) => !(block.kind === 'subtask' && s.id === block.item.id)),
+    ]
+    if (!isRangeAvailable(others, target.start, target.end)) {
       setConflictError(`La plage à partir de ${slotLabel(slot)} est déjà occupée par une autre tâche.`)
       return false
     }
     setConflictError(null)
-    const start = slotTime(slot)
-    const end = slotTime(slot + length)
+    const start = slotTime(target.start)
+    const end = slotTime(target.end + 1)
     if (block.kind === 'task') {
       if (report) await reportV2Task(block.item.id, targetDate, start, end)
       else await scheduleV2Task(block.item.id, targetDate, start, end)
@@ -512,11 +481,6 @@ export function E40Planning() {
     else await deleteSubTask(block.item.id)
     await reload()
     closePicker()
-  }
-
-  function rangeIsAvailable(start: number, end: number): boolean {
-    const occupied: (TaskV2 | PlannedSubTask)[] = [...scheduledTasks, ...scheduledSubTasks]
-    return !occupied.some((item) => SLOTS.slice(start, end + 1).some((slot) => taskOccupiesSlot(item, slot)))
   }
 
   async function handlePlace(range: { start: number; end: number }) {
@@ -556,9 +520,8 @@ export function E40Planning() {
       return
     }
 
-    const start = Math.min(rangeStart, slot)
-    const end = Math.max(rangeStart, slot)
-    if (!rangeIsAvailable(start, end)) {
+    const { start, end } = normalizeRange(rangeStart, slot)
+    if (!isRangeAvailable([...scheduledTasks, ...scheduledSubTasks], start, end)) {
       setConflictError(`Un créneau de ${slotLabel(start)} à ${slotLabel(end)} est déjà occupé.`)
       return
     }
@@ -612,9 +575,9 @@ export function E40Planning() {
 
   function dragHoverLabel(clientX: number, clientY: number): string {
     const zone = edgeZoneAt(clientX)
-    if (zone === 'right') return `→ ${formatDate(addDays(displayDateRef.current, 1))}`
+    if (zone === 'right') return `→ ${formatPlanningDate(addDays(displayDateRef.current, 1))}`
     if (zone === 'left') {
-      return canFlipLeft() ? `→ ${formatDate(addDays(displayDateRef.current, -1))}` : 'Retour impossible'
+      return canFlipLeft() ? `→ ${formatPlanningDate(addDays(displayDateRef.current, -1))}` : 'Retour impossible'
     }
     const slot = slotFromPoint(clientX, clientY)
     return slot !== null ? `→ ${slotLabel(slot)}` : ''
@@ -642,7 +605,7 @@ export function E40Planning() {
       const pos = lastPointerRef.current
       if (info && pos) {
         const next = zone === 'right' ? addDays(displayDateRef.current, 1) : addDays(displayDateRef.current, -1)
-        setDragOverlay({ block: info.block, x: pos.x, y: pos.y, label: `→ ${formatDate(next)}` })
+        setDragOverlay({ block: info.block, x: pos.x, y: pos.y, label: `→ ${formatPlanningDate(next)}` })
       }
       armDwell(zone)
     }, EDGE_DWELL_MS)
@@ -748,7 +711,7 @@ export function E40Planning() {
         <span
           style={{ flex: 1, textAlign: 'center', fontWeight: 600, fontSize: '0.9375rem', textTransform: 'capitalize' }}
         >
-          {formatDate(displayDate)}
+          {formatPlanningDate(displayDate)}
         </span>
         <button
           style={iconBtnStyle}
@@ -765,7 +728,7 @@ export function E40Planning() {
             Début sélectionné à {slotLabel(rangeStart)}. Choisissez la fin.
           </p>
         )}
-        {SLOTS.map((slot) => {
+        {SLOT_INDEXES.map((slot) => {
           const isNow = isToday && slot === currentSlot
           const block = blocks.find((item) => taskOccupiesSlot(item.item, slot))
           const isTaskStart = block ? taskSlotRange(block.item)?.start === slot : false

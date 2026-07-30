@@ -39,19 +39,21 @@ V5-2 avant V5-3 : `E29` (réveil sur un item de liste) réutilise le flux récur
 
 ---
 
-## Phase V5-0 — Refacto du socle de navigation et d'état [TODO]
+## Phase V5-0 — Refacto du socle de navigation et d'état [FAIT]
 
 > Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase.
 
 Aucun changement de comportement visible.
 
-- [ ] Découper `AppContext.tsx` (961 l., ~85 propriétés exposées) en contextes par domaine — tâches, listes, énergie, budget, outils (`src/app/AppContext.tsx`, nouveaux `src/app/contexts/*`)
-- [ ] Remplacer l'union plate `Screen` (23 valeurs) par une route porteuse de paramètres et une pile de navigation ; nécessaire dès un niveau de dossier et pour le retour contextuel généralisé (`src/app/AppContext.tsx` l.31-53, `src/App.tsx`)
-- [ ] Supprimer les retours codés en dur `taskCreateOrigin` / `listDetailOrigin` au profit de la pile (`src/app/AppContext.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`, `src/ui/screens/lists/E61ListDetail.tsx`)
-- [ ] Extraire de `E40Planning.tsx` (1049 l.) la logique de calcul de créneaux, prérequis de la fusion `Q8` (`src/ui/screens/planning/E40Planning.tsx`, nouveau `src/domain/rules/planningSlotRules.ts`)
-- [ ] Suite existante (474 tests) verte sans modification des assertions métier
+- [x] Découper `AppContext.tsx` (961 l., ~85 propriétés exposées) en contextes par domaine — tâches, listes, énergie, budget, outils (`src/app/AppContext.tsx`, nouveaux `src/app/contexts/*`)
+- [x] Remplacer l'union plate `Screen` (23 valeurs) par une route porteuse de paramètres et une pile de navigation ; nécessaire dès un niveau de dossier et pour le retour contextuel généralisé (`src/app/AppContext.tsx` l.31-53, `src/App.tsx`)
+- [x] Supprimer les retours codés en dur `taskCreateOrigin` / `listDetailOrigin` au profit de la pile (`src/app/AppContext.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`, `src/ui/screens/lists/E61ListDetail.tsx`)
+- [x] Extraire de `E40Planning.tsx` (1049 l.) la logique de calcul de créneaux, prérequis de la fusion `Q8` (`src/ui/screens/planning/E40Planning.tsx`, nouveau `src/domain/rules/planningSlotRules.ts`)
+- [x] Suite existante (474 tests) verte sans modification des assertions métier — 515/516 au run de clôture (+42 tests), seul échec le flaky pré-existant `AppContext.test.tsx` (confirmé identique sur le code d'avant refacto)
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : application strictement iso-fonctionnelle, navigation à pile en place, aucun module d'état au-dessus de 300 lignes
+Gate : [x] tests verts · [x] test manuel (points 83-100, `tests_manuels.md` purgé) · [x] doc (`CHANGELOG.md`) · [x] sortie : application strictement iso-fonctionnelle (53/53 e2e), navigation à pile en place, aucun module d'état au-dessus de 300 lignes (`AppContext.tsx` 961→169 l., plus gros module `useTasksState.ts` 205 l.)
+
+Bug trouvé et corrigé en validation manuelle : `push()` (`navigation.ts`) remontait à tort vers une occurrence antérieure du même écran dans la pile, tronquant les niveaux intermédiaires quand un écran sans paramètre différenciant (ex. `task-create-v2`) était réutilisé deux fois dans un même flux — cassait le retour contextuel (ex. depuis Aujourd'hui, la destination « Tâche du jour » n'était plus forcée après un second passage par la création). Clause de collapse supprimée ; `push` empile simplement désormais. Régression verrouillée par un test dédié (`navigation.test.ts`).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -148,3 +150,8 @@ Ordre de priorité tranché le 2026-07-28 : Comptage en premier.
 - `E16` — boîte de réception en widget système.
 - `E39` — anniversaires.
 - `E40` — amis et cercles de proximité.
+- Réglage « Réduire les animations » (`E112Accessibility.tsx`) : la mécanique fonctionne (`html.reduce-motion` force les durées à 0ms) mais n'a presque rien à couper — l'interface est construite quasi entièrement en style inline statique, sans animation d'apparition ni transition d'écran. Seuls cas concrets identifiés : fondu d'opacité d'un bouton désactivé (`Button.tsx`, 150ms) et animation de drag lors du réordonnancement de tâches (`dnd-kit`, `E10Dashboard.tsx`/`E23Decompose.tsx`). Angle mort produit constaté lors du test manuel V5-0 (point 97), pas une régression. À retravailler : soit enrichir l'interface d'animations pour lesquelles ce réglage aurait un sens, soit accepter l'état actuel.
+
+## Bugs constatés (hors périmètre V5-0, à corriger séparément)
+
+- `exportData()` (`useSettingsState.ts:66`) lit `db.energyEntries.toArray()` directement au lieu de passer par `EnergyEntryRepository`. La table `energyEntries` stocke `value` en texte, avec chiffrement optionnel selon `local_encryption` (`EnergyEntryRepository.ts:17-21`) ; seul le repository sait le déchiffrer/parser (`decryptValue`). Conséquence : l'export sort la valeur brute stockée — une chaîne numérique lisible si `local_encryption` est désactivé, mais du **texte chiffré illisible** si activé, rendant `energy_entries[].value` inexploitable dans l'export. Constaté lors du test manuel V5-0 (point 98) sur `export-audhd-2026-07-30.json`. Correctif : faire passer `exportData` par `energyRepo` (ou une méthode de listage déchiffrée équivalente) au lieu de la table Dexie brute.

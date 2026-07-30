@@ -102,19 +102,20 @@ export function E21CreateTaskV2() {
     addTask,
     createList,
     selectList,
-    setListDetailOrigin,
+    goToPath,
     startPlanTask,
-    taskCreateOrigin,
+    back,
+    originScreen,
   } = useApp()
   const [title, setTitle] = useState('')
   const [destination, setDestination] = useState<Destination | null>(null)
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
-  const forcedDestination = taskCreateOrigin ? FORCED_DESTINATION_BY_ORIGIN[taskCreateOrigin] : undefined
+  const forcedDestination = originScreen ? FORCED_DESTINATION_BY_ORIGIN[originScreen] : undefined
   const effectiveDestination = forcedDestination ?? destination
 
   function returnToOrigin() {
-    goTo(taskCreateOrigin ?? 'inbox')
+    back('inbox')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -150,8 +151,7 @@ export function E21CreateTaskV2() {
     await addListItem(listId, trimmed)
     setShowListPicker(false)
     selectList(listId)
-    setListDetailOrigin('lists')
-    goTo('list-detail')
+    goToPath(['lists', 'list-detail'])
   }
 
   async function handleCreateList() {
@@ -162,8 +162,7 @@ export function E21CreateTaskV2() {
     setNewListName('')
     setShowListPicker(false)
     selectList(listId)
-    setListDetailOrigin('lists')
-    goTo('list-detail')
+    goToPath(['lists', 'list-detail'])
   }
 
   return (

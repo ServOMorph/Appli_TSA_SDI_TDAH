@@ -63,14 +63,13 @@ describe('E70Tools', () => {
     expect(screen.queryByText("Aucune liste épinglée pour l'instant.")).toBeNull()
   })
 
-  it('le clic sur une liste épinglée sélectionne la liste et navigue vers list-detail avec origin tools', async () => {
+  it('le clic sur une liste épinglée sélectionne la liste et navigue vers list-detail', async () => {
     const ctx = makeAppContext({
       lists: [makeList({ id: 'l1', name: 'Courses', pinned_to_tools: true })],
     })
     renderWithApp(<E70Tools />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Courses' }))
     expect(ctx.selectList).toHaveBeenCalledWith('l1')
-    expect(ctx.setListDetailOrigin).toHaveBeenCalledWith('tools')
     expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
   })
 })

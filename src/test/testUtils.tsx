@@ -1,12 +1,17 @@
 import { render } from '@testing-library/react'
 import { vi } from 'vitest'
 import { AppContext } from '@/app/AppContext'
-import type { Screen } from '@/app/AppContext'
+import type { Screen, Route } from '@/app/AppContext'
 
 export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.Provider>[0]['value']> = {}) {
   return {
     screen: 'welcome' as Screen,
+    route: { name: 'welcome' } as Route,
     goTo: vi.fn(),
+    goToPath: vi.fn(),
+    back: vi.fn(),
+    canGoBack: false,
+    originScreen: null as Screen | null,
     loading: false,
     currentUser: null,
     todayTasks: [],
@@ -23,10 +28,6 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     deleteAllData: vi.fn().mockResolvedValue(undefined),
     selectedTaskId: null,
     selectTask: vi.fn(),
-    taskDetailOrigin: null,
-    setTaskDetailOrigin: vi.fn(),
-    taskCreateOrigin: null,
-    setTaskCreateOrigin: vi.fn(),
     createUser: vi.fn().mockResolvedValue(undefined),
     completeOnboarding: vi.fn().mockResolvedValue(undefined),
     saveTodayEnergy: vi.fn().mockResolvedValue(undefined),
@@ -74,8 +75,6 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     renameList: vi.fn().mockResolvedValue(undefined),
     deleteList: vi.fn().mockResolvedValue(undefined),
     togglePinList: vi.fn().mockResolvedValue(undefined),
-    listDetailOrigin: null,
-    setListDetailOrigin: vi.fn(),
     getListItems: vi.fn().mockResolvedValue([]),
     addListItem: vi.fn().mockResolvedValue(undefined),
     deleteListItem: vi.fn().mockResolvedValue(undefined),

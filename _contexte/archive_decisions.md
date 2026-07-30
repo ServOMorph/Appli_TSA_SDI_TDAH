@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-21 (suite 6, codage + clôture Phase V4.1-2) (archivé depuis contexte.md 2026-07-30, clôture Phase V5-0)
+- Modèle Budget ajouté sans UI — quatre entités et tables Dexie v5, migration v4→v5, quatre repositories et règles pures pour périodes, catégories, totaux, reste non budgétisé et soldes livrets. Données conservées en clair conformément au cadrage V4.1. 27/27 tests Budget, build et lint verts ; suite complète 454/455 avec un échec intermittent pré-existant dans `AppContext.test.tsx`. Phase V4.1-2 close ; roadmap V4.1 passe à la Phase V4.1-3 (configuration Budget).
+
 ## 2026-07-21 (suite 5, codage + clôture Phase V4.1-1) (archivé depuis contexte.md 2026-07-28, suite arbitrages finaux V5.0)
 - Phase V4.1-1 codée intégralement — champ optionnel `pinned_to_tools?` sur `List`, règle pure `togglePinList`, bouton épingler/désépingler placé sur `E60Lists.tsx` (question ouverte du cadrage tranchée au codage). Retour contextuel de `E61ListDetail` introduit via `listDetailOrigin`/`setListDetailOrigin` (`AppContext.tsx`), pattern répliqué à l'identique de `taskCreateOrigin` (précédent de la Phase V4.1-0/V4-1). Les 3 flux existants « déplacer une tâche vers une liste » (`E20Inbox`, `E21CreateTaskV2`, `E22TaskDetail`) posent explicitement l'origin `'lists'` avant leur `goTo('list-detail')` pour ne pas hériter d'un `'tools'` périmé. Aucune migration Dexie nécessaire (champ optionnel non indexé). 433/435 tests verts (2 échecs pré-existants confirmés en amont, sans lien), `tsc -b` clean. Validation manuelle confirmée par l'utilisateur. Phase V4.1-1 close ; roadmap V4.1 passe à la Phase V4.1-2 (modèle de données Budget).
 

@@ -52,12 +52,11 @@ describe('E60Lists', () => {
       expect(screen.queryByText("Aucune liste pour l'instant.")).toBeNull()
     })
 
-    it('clic sur une liste appelle selectList puis goTo list-detail avec origin lists', async () => {
+    it('clic sur une liste appelle selectList puis goTo list-detail', async () => {
       const ctx = makeAppContext({ lists: [makeList({ id: 'l1', name: 'Musiques' })] })
       renderWithApp(<E60Lists />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Musiques' }))
       expect(ctx.selectList).toHaveBeenCalledWith('l1')
-      expect(ctx.setListDetailOrigin).toHaveBeenCalledWith('lists')
       expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
     })
   })

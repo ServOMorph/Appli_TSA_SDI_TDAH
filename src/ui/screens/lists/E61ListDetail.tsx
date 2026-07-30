@@ -5,7 +5,7 @@ import { Card } from '@/ui/components/Card'
 import type { ListItem } from '@/domain/entities/listItem'
 
 export function E61ListDetail() {
-  const { lists, selectedListId, getListItems, addListItem, deleteListItem, listDetailOrigin, goTo } = useApp()
+  const { lists, selectedListId, getListItems, addListItem, deleteListItem, back } = useApp()
   const list = lists.find((l) => l.id === selectedListId) ?? null
 
   const [items, setItems] = useState<ListItem[]>([])
@@ -51,7 +51,7 @@ export function E61ListDetail() {
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
         <button
           aria-label="Retour"
-          onClick={() => goTo(listDetailOrigin ?? 'lists')}
+          onClick={() => back('lists')}
           style={{
             background: 'none',
             border: 'none',

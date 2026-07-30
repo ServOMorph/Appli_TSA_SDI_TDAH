@@ -139,7 +139,6 @@ export function E10Dashboard() {
     overloadMode,
     goTo,
     selectTask,
-    setTaskDetailOrigin,
     reorderTodayTasks,
     getPlannedTasksForDate,
     getPlannedSubTasksForDate,
@@ -181,7 +180,6 @@ export function E10Dashboard() {
 
   function openDetail(taskId: string) {
     selectTask(taskId)
-    setTaskDetailOrigin('dashboard')
     goTo('task-detail')
   }
 

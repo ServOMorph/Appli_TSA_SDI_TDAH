@@ -1,3 +1,31 @@
+## v5.1 — 2026-07-30
+
+### Corrigé
+- `src/app/navigation.ts` : `push()` ne remonte plus vers une occurrence antérieure du même écran dans la pile — cette clause anti-cycle tronquait les niveaux intermédiaires quand un écran sans paramètre différenciant (ex. `task-create-v2`) était réutilisé deux fois dans un même flux, cassant le retour contextuel (ex. depuis Aujourd'hui, la destination « Tâche du jour » n'était plus forcée après un second passage par la création). Détecté en validation manuelle de la Phase V5-0. Test de non-régression ajouté (`navigation.test.ts`).
+
+### Validé
+- Phase V5-0 (`roadmap_v5.0.md`) passée à `[FAIT]` : validation manuelle intégrale (points 83 à 100, `tests_manuels.md` purgé) — retours contextuels, non-régression Planning/Budget/Réglages/onboarding. Aucune régression fonctionnelle trouvée hors le bug de navigation ci-dessus.
+
+### Constaté (non corrigé, tracé dans `roadmap_v5.0.md`)
+- Réglage « Réduire les animations » (`E112Accessibility.tsx`) : mécanique correcte mais quasiment aucune animation à réduire dans l'interface actuelle. Angle mort produit, reporté hors V5.
+- `exportData()` (`useSettingsState.ts`) lit la table `energyEntries` brute au lieu de passer par `EnergyEntryRepository` : `energy_entries[].value` sort non déchiffré dans l'export si le chiffrement local est activé. Bug isolé, hors périmètre V5-0, à corriger séparément.
+
+## v5.0.0 — 2026-07-30
+
+### Ajouté
+- `src/app/navigation.ts` : pile de navigation et route porteuse de paramètres (`Route`, `NavStack`, `push`/`pop`/`replace`, `previousRoute`). Remplace l'union plate `Screen` à 23 valeurs comme source de vérité ; `Screen` reste exporté comme alias de `Route['name']`. 21 tests.
+- `src/domain/rules/planningSlotRules.ts` : logique de calcul de créneaux extraite de `E40Planning.tsx` (`slotTime`, `slotLabel`, `slotFromDate`, `addDays`, `formatPlanningDate`, `isRangeAvailable`, `normalizeRange`, `moveTargetRange`). Prérequis de la fusion accueil/planning (Q8). 22 tests.
+- `src/app/repositories.ts` : instances de repositories, `todayDate` et `newId` partagés par les contextes de domaine.
+- `src/app/contexts/` : six modules d'état par domaine — `useTasksState` (tâches V1 et sous-tâches), `usePlanningState` (tâches V2, placement, déplacement), `useEnergyState`, `useListsState`, `useBudgetState`, `useSettingsState`.
+- `goToPath(routes)` : empile un chemin de navigation complet, pour les écrans qui doivent retomber sur un parent qui n'est pas l'écran d'appel.
+
+### Modifié
+- `src/app/AppContext.tsx` : 961 → 169 lignes. Devient la façade qui compose les six domaines ; `useApp()` conserve la même surface, aucun écran n'a changé d'API. Aucun module d'état ne dépasse 300 lignes.
+- `E40Planning.tsx` : branché sur `planningSlotRules`, helpers locaux dupliqués supprimés.
+
+### Supprimé
+- `taskCreateOrigin`, `taskDetailOrigin`, `listDetailOrigin` et leurs setters : les retours codés en dur sont remplacés par la pile (`back(fallback)`), l'origine étant dérivée via `originScreen`.
+
 ## v4.24 — 2026-07-28
 
 ### Modifié

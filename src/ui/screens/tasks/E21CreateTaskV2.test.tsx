@@ -72,7 +72,7 @@ describe('E21CreateTaskV2', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter à Courses' }))
     expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Tâche liste')
     expect(ctx.selectList).toHaveBeenCalledWith('list-1')
-    expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
+    expect(ctx.goToPath).toHaveBeenCalledWith(['lists', 'list-detail'])
   })
 
   it("chemin Tâche du jour : crée directement la tâche today et navigue vers today", async () => {
@@ -105,18 +105,11 @@ describe('E21CreateTaskV2', () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+    expect(ctx.back).toHaveBeenCalledWith('inbox')
   })
 
-  it("Retour navigue vers l'écran d'origine", async () => {
-    const ctx = makeAppContext({ taskCreateOrigin: 'dashboard' })
-    renderWithApp(<E21CreateTaskV2 />, ctx)
-    await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
-  })
-
-  it("depuis Todo (taskCreateOrigin 'inbox') : aucun choix de destination affiché, Valider crée directement une tâche todo", async () => {
-    const ctx = makeAppContext({ taskCreateOrigin: 'inbox' })
+  it("depuis Todo (originScreen 'inbox') : aucun choix de destination affiché, Valider crée directement une tâche todo", async () => {
+    const ctx = makeAppContext({ originScreen: 'inbox' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Tâche du jour' })).toBeNull()
@@ -129,8 +122,8 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it("depuis Outils (taskCreateOrigin 'tools') : aucun choix de destination affiché, Valider crée directement une tâche todo", async () => {
-    const ctx = makeAppContext({ taskCreateOrigin: 'tools' })
+  it("depuis Outils (originScreen 'tools') : aucun choix de destination affiché, Valider crée directement une tâche todo", async () => {
+    const ctx = makeAppContext({ originScreen: 'tools' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis outils')
@@ -139,8 +132,8 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it("depuis Today (taskCreateOrigin 'today') : aucun choix de destination affiché, Valider crée directement une tâche today", async () => {
-    const ctx = makeAppContext({ taskCreateOrigin: 'today' })
+  it("depuis Today (originScreen 'today') : aucun choix de destination affiché, Valider crée directement une tâche today", async () => {
+    const ctx = makeAppContext({ originScreen: 'today' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis today')
@@ -149,8 +142,8 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('today')
   })
 
-  it("depuis Planning (taskCreateOrigin 'planning') : aucun choix de destination affiché, Valider planifie directement la tâche", async () => {
-    const ctx = makeAppContext({ taskCreateOrigin: 'planning' })
+  it("depuis Planning (originScreen 'planning') : aucun choix de destination affiché, Valider planifie directement la tâche", async () => {
+    const ctx = makeAppContext({ originScreen: 'planning' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis planning')
@@ -159,9 +152,9 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
-  it("depuis Listes (taskCreateOrigin 'lists') : aucun choix de destination affiché, Valider ouvre directement le sélecteur de liste", async () => {
+  it("depuis Listes (originScreen 'lists') : aucun choix de destination affiché, Valider ouvre directement le sélecteur de liste", async () => {
     const ctx = makeAppContext({
-      taskCreateOrigin: 'lists',
+      originScreen: 'lists',
       lists: [{ id: 'list-1', name: 'Courses', created_at: '2026-07-05', updated_at: '2026-07-05' }],
     })
     renderWithApp(<E21CreateTaskV2 />, ctx)
@@ -171,18 +164,18 @@ describe('E21CreateTaskV2', () => {
     expect(screen.getByRole('dialog', { name: 'Choisir une liste' })).toBeDefined()
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter à Courses' }))
     expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Tâche depuis listes')
-    expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
+    expect(ctx.goToPath).toHaveBeenCalledWith(['lists', 'list-detail'])
   })
 
-  it("depuis Listes (taskCreateOrigin 'lists') : le sélecteur de liste permet de créer une nouvelle liste", async () => {
-    const ctx = makeAppContext({ taskCreateOrigin: 'lists', lists: [] })
+  it("depuis Listes (originScreen 'lists') : le sélecteur de liste permet de créer une nouvelle liste", async () => {
+    const ctx = makeAppContext({ originScreen: 'lists', lists: [] })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche nouvelle liste')
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     await userEvent.type(screen.getByLabelText('Nom de la nouvelle liste'), 'Bricolage')
     await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
     expect(ctx.createList).toHaveBeenCalledWith('Bricolage')
-    expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
+    expect(ctx.goToPath).toHaveBeenCalledWith(['lists', 'list-detail'])
   })
 
   it('la destination sélectionnée a aria-pressed=true', async () => {

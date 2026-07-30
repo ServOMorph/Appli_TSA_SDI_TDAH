@@ -201,10 +201,10 @@ export function E22TaskDetail() {
     deleteTask,
     selectTask,
     selectList,
-    setListDetailOrigin,
+    goToPath,
     reorderSubTasks,
     refreshDashboard,
-    taskDetailOrigin,
+    back,
     goTo,
     moveTask,
     startPlanTask,
@@ -320,8 +320,7 @@ export function E22TaskDetail() {
     await moveTodoTaskToList(selectedTaskId, listId)
     selectTask(null)
     selectList(listId)
-    setListDetailOrigin('lists')
-    goTo('list-detail')
+    goToPath(['lists', 'list-detail'])
   }
 
   async function handleCreateList() {
@@ -331,8 +330,7 @@ export function E22TaskDetail() {
     setNewListName('')
     selectTask(null)
     selectList(listId)
-    setListDetailOrigin('lists')
-    goTo('list-detail')
+    goToPath(['lists', 'list-detail'])
   }
 
   function handleClickPlan() {
@@ -372,11 +370,10 @@ export function E22TaskDetail() {
     )
   }
 
-  const back = taskDetailOrigin ?? backScreenForTask(task)
 
   return (
     <main style={pageStyle}>
-      <button style={backBtnStyle} onClick={() => goTo(back)} aria-label="Retour">
+      <button style={backBtnStyle} onClick={() => back(backScreenForTask(task))} aria-label="Retour">
         ← Retour
       </button>
 

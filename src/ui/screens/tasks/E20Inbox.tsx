@@ -60,8 +60,7 @@ export function E20Inbox() {
     startPlanTask,
     moveTodoTaskToList,
     createList,
-    setTaskCreateOrigin,
-    setListDetailOrigin,
+    goToPath,
   } = useApp()
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
   const [newListName, setNewListName] = useState('')
@@ -81,8 +80,7 @@ export function E20Inbox() {
     await moveTodoTaskToList(listPickerTask.id, listId)
     setListPickerTask(null)
     selectList(listId)
-    setListDetailOrigin('lists')
-    goTo('list-detail')
+    goToPath(['lists', 'list-detail'])
   }
 
   async function handleCreateList() {
@@ -92,8 +90,7 @@ export function E20Inbox() {
     setNewListName('')
     setListPickerTask(null)
     selectList(listId)
-    setListDetailOrigin('lists')
-    goTo('list-detail')
+    goToPath(['lists', 'list-detail'])
   }
 
   function handleClickPlan(task: Task) {
@@ -195,10 +192,7 @@ export function E20Inbox() {
 
       <Button
         fullWidth
-        onClick={() => {
-          setTaskCreateOrigin('inbox')
-          goTo('task-create-v2')
-        }}
+        onClick={() => goTo('task-create-v2')}
       >
         Ajouter une tâche
       </Button>

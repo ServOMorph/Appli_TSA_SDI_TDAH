@@ -193,7 +193,7 @@ describe('E22TaskDetail', () => {
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+      expect(ctx.back).toHaveBeenCalledWith('inbox')
     })
 
     it('retour vers today pour tâche today', async () => {
@@ -201,7 +201,7 @@ describe('E22TaskDetail', () => {
       const ctx = makeAppContext({ selectedTaskId: 'task-1', todayTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('today')
+      expect(ctx.back).toHaveBeenCalledWith('today')
     })
 
   })

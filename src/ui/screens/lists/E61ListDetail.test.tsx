@@ -107,25 +107,14 @@ describe('E61ListDetail', () => {
   })
 
   describe('bouton retour', () => {
-    it('clic sur ← navigue vers lists par défaut', async () => {
+    it('clic sur ← dépile la navigation, avec lists en repli', async () => {
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
       })
       renderWithApp(<E61ListDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('lists')
-    })
-
-    it('clic sur ← navigue vers tools quand listDetailOrigin vaut tools', async () => {
-      const ctx = makeAppContext({
-        lists: [makeList()],
-        selectedListId: 'list-1',
-        listDetailOrigin: 'tools',
-      })
-      renderWithApp(<E61ListDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('tools')
+      expect(ctx.back).toHaveBeenCalledWith('lists')
     })
   })
 

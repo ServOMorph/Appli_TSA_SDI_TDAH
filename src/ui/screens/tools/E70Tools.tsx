@@ -25,12 +25,11 @@ const entryBtnStyle: React.CSSProperties = {
 }
 
 export function E70Tools() {
-  const { goTo, lists, selectList, setListDetailOrigin } = useApp()
+  const { goTo, lists, selectList } = useApp()
   const pinnedLists = lists.filter((l) => l.pinned_to_tools)
 
   function handleOpenList(id: string) {
     selectList(id)
-    setListDetailOrigin('tools')
     goTo('list-detail')
   }
 

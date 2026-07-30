@@ -45,12 +45,11 @@ describe('AppScreens — navigation persistante (N1)', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
-  it('le bouton "+" pose l\'écran courant comme origin de création de tâche', async () => {
+  it("le bouton \"+\" ouvre la création de tâche, la pile portant l'écran courant comme origine", async () => {
     const { default: userEvent } = await import('@testing-library/user-event')
     const ctx = makeAppContext({ screen: 'planning' })
     renderWithApp(<AppScreens />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
-    expect(ctx.setTaskCreateOrigin).toHaveBeenCalledWith('planning')
     expect(ctx.goTo).toHaveBeenCalledWith('task-create-v2')
   })
 })

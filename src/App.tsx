@@ -46,7 +46,7 @@ export function activeTabFor(screen: Screen): BottomNavTab | null {
 }
 
 export function AppScreens() {
-  const { screen, loading, overloadMode, inboxTasks, goTo, setTaskCreateOrigin } = useApp()
+  const { screen, loading, overloadMode, inboxTasks, goTo } = useApp()
 
   if (loading) {
     return (
@@ -128,10 +128,7 @@ export function AppScreens() {
           activeTab={activeTabFor(screen)}
           overloadMode={overloadMode}
           inboxHasTasks={inboxTasks.length > 0}
-          onAddTask={() => {
-            setTaskCreateOrigin(screen)
-            goTo('task-create-v2')
-          }}
+          onAddTask={() => goTo('task-create-v2')}
           onGoDashboard={() => goTo('dashboard')}
           onGoTodo={() => goTo('tools')}
           onGoPlanning={() => goTo('planning')}

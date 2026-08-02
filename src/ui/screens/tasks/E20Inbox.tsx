@@ -133,7 +133,7 @@ export function E20Inbox() {
         ← Retour
       </button>
 
-      <h1 style={{ margin: 0 }}>Todo</h1>
+      <h1 style={{ margin: 0 }}>Réception</h1>
 
       {inboxTasks.length === 0 ? (
         <p aria-live="polite">Aucune tâche enregistrée.</p>

@@ -60,7 +60,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-1 — Navigation et écran d'accueil fusionné [EN COURS]
+## Phase V5-1 — Navigation et écran d'accueil fusionné [FAIT]
 
 - [x] `N1` (cf. C26, C27) — nav basse à 4 éléments : Boîte de réception, Accueil, Paramètres, bouton « + » ; retrait des onglets Dashboard / Outils / Planning / Listes (`src/ui/components/BottomNav.tsx`, `src/App.tsx`)
 - [x] `E19` + `Q8` (cf. C27, C31, C32) — fusion de `E40Planning` dans `E10Dashboard` : état replié planning à l'heure courante + bloc widgets, état déplié planning entier scrollable (`src/ui/screens/dashboard/E10Dashboard.tsx`, nouveau `src/ui/screens/dashboard/PlanningBoard.tsx` ; `src/ui/screens/planning/` supprimé)
@@ -72,9 +72,11 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - [x] `Q12` — le « + » conserve la création directe de tâche héritée de V4.1-5, sans écran de choix (`src/App.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx`)
 - [x] Tests de nav, de dépliement et de non-régression des points d'entrée existants (auto-scroll pendant drag sans objet, glisser-déposer supprimé — voir arbitrage ci-dessous)
 
-Gate : [x] tests verts (514/515 unitaires, seul échec le flaky pré-existant `AppContext.test.tsx` reproduit à l'identique sur le code d'avant V5-1 ; 53/53 e2e ; `tsc -b`, lint et build clean) · [ ] test manuel (appareil tactile, points 101-109 de `tests_manuels.md`) · [x] doc (`CHANGELOG.md`) · [x] sortie technique : un seul écran d'accueil déplie et replie le planning, aucun écran existant n'est devenu inatteignable
+Gate : [x] tests verts (514/515 unitaires, seul échec le flaky pré-existant `AppContext.test.tsx` reproduit à l'identique sur le code d'avant V5-1 ; 53/53 e2e ; `tsc -b`, lint et build clean) · [x] test manuel (appareil tactile, points 101-109 de `tests_manuels.md`, validés le 2026-08-02) · [x] doc (`CHANGELOG.md`) · [x] sortie technique : un seul écran d'accueil déplie et replie le planning, aucun écran existant n'est devenu inatteignable
 
-Phase codée intégralement, gate non atteint faute de validation manuelle (appareil tactile requis) — reste `[EN COURS]` jusqu'à confirmation utilisateur.
+Phase close le 2026-08-02. 3 défauts trouvés en validation manuelle et corrigés :
+- `E20Inbox.tsx` : titre `<h1>` « Todo » → « Réception » (résidu du renommage nav Todo→Outils de la Phase V4.1-0, jamais corrigé sur cet écran).
+- `index.html` : `lang="en"` → `lang="fr"`, cause racine des deux anomalies restantes. La page anglaise déclenchait la traduction automatique de Chrome sur une UI française — celle-ci remplace les nœuds texte du DOM et casse la réconciliation React, d'où « Replier » affiché « Répondeur » et la pastille d'énergie figée jusqu'au changement d'écran (React perd la référence du nœud texte traduit).
 
 Arbitrages pris en cours de phase, au-delà de ceux tranchés au démarrage :
 - **Absorption complète de la route `planning`** : elle rend désormais l'accueil fusionné en état déplié plutôt que de conserver un écran séparé. `E40Planning.tsx` supprimé, son corps extrait dans `PlanningBoard.tsx`. Les six flux qui appelaient `goTo('planning')` (inbox, création, fiche tâche, décomposition, report) fonctionnent sans modification.

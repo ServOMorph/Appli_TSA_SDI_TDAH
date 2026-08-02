@@ -1,3 +1,15 @@
+## v5.3 — 2026-08-02
+
+Phase V5-1 close après validation manuelle intégrale sur appareil tactile (points 101-109).
+
+### Corrigé
+- `src/ui/screens/tasks/E20Inbox.tsx` : titre `<h1>` « Todo » → « Réception » (résidu du renommage nav Todo→Outils de la Phase V4.1-0, jamais corrigé sur cet écran).
+- `index.html` : `lang="en"` → `lang="fr"`. Cause racine de deux anomalies constatées en validation manuelle : la page anglaise déclenchait la traduction automatique de Chrome sur une interface entièrement française, ce qui remplace les nœuds texte du DOM et casse la réconciliation React sur ces nœuds — « Replier » affiché « Répondeur », pastille d'énergie figée jusqu'au changement d'écran (React perd la référence du nœud traduit).
+- `e2e/02-tasks.spec.ts` : assertion de titre alignée sur « Réception ».
+
+### Validé
+- Points 101 à 109 de `tests_manuels.md` validés sur appareil tactile après correctifs. 514/515 tests unitaires (flaky pré-existant `AppContext.test.tsx`, sans lien), 53/53 e2e, build/lint clean.
+
 ## v5.2 — 2026-07-30
 
 Phase V5-1 — navigation et écran d'accueil fusionné. Validation manuelle en attente (`tests_manuels.md`, points 101 à 109).

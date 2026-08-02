@@ -1,16 +1,15 @@
 import { useState } from 'react'
-import { newId, subTaskRepo, taskRepo, taskV2Repo, todayDate } from '@/app/repositories'
+import { newId, taskRepo, todayDate } from '@/app/repositories'
 import {
-  createTaskV2 as createTaskV2Rule,
-  scheduleTaskV2 as scheduleTaskV2Rule,
-  toggleTaskV2Completion as toggleTaskV2CompletionRule,
-  toggleEssentialV2 as toggleEssentialV2Rule,
-  setEnergyCostV2 as setEnergyCostV2Rule,
-  reportTaskV2 as reportTaskV2Rule,
-  renameTaskV2 as renameTaskV2Rule,
-} from '@/domain/rules/taskRulesV2'
-import type { TaskV2, TaskStatusV2 } from '@/domain/entities/taskV2'
-import type { SubTask } from '@/domain/entities/subTask'
+  createTask as createTaskRule,
+  scheduleTask as scheduleTaskRule,
+  toggleTaskCompletion as toggleTaskCompletionRule,
+  toggleEssential as toggleEssentialRule,
+  setEnergyCost as setEnergyCostRule,
+  reportTask as reportTaskRule,
+  renameTask as renameTaskRule,
+} from '@/domain/rules/taskRules'
+import type { Task, TaskStatus } from '@/domain/entities/task'
 
 export interface PendingPlanTask {
   kind: 'task' | 'subtask'
@@ -20,76 +19,76 @@ export interface PendingPlanTask {
   subTaskId?: string
 }
 
-export interface PlannedSubTask extends SubTask {
+export interface PlannedSubTask extends Task {
   parentTitle: string
 }
 
 export type MovingPlanItem =
-  | { kind: 'task'; task: TaskV2; report: boolean }
+  | { kind: 'task'; task: Task; report: boolean }
   | { kind: 'subtask'; subTask: PlannedSubTask; report: boolean }
 
 /**
- * Tâches planifiées (V2) et opérations de placement sur le planning.
- * `reloadTasks` rafraîchit les tâches V1 quand une tâche source est consommée.
+ * Tâches planifiées et opérations de placement sur le planning.
+ * `reloadTasks` rafraîchit la réception et la journée quand une tâche source est consommée.
  */
 export function usePlanningState(reloadTasks: () => Promise<void>) {
-  const [todayPlannedTasks, setTodayPlannedTasks] = useState<TaskV2[]>([])
+  const [todayPlannedTasks, setTodayPlannedTasks] = useState<Task[]>([])
   const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
   const [movingTask, setMovingTask] = useState<MovingPlanItem | null>(null)
   const [planningTargetDate, setPlanningTargetDate] = useState<string | null>(null)
 
   async function load() {
-    setTodayPlannedTasks(await taskV2Repo.getByDate(todayDate()))
+    setTodayPlannedTasks(await taskRepo.getRootByDate(todayDate()))
   }
 
   function reset() {
     setTodayPlannedTasks([])
   }
 
-  async function createTaskV2Dest(title: string, status: TaskStatusV2): Promise<string> {
+  async function createTaskV2Dest(title: string, status: TaskStatus): Promise<string> {
     const now = new Date().toISOString()
-    const task = createTaskV2Rule(newId(), title, status, false, now)
-    await taskV2Repo.create(task)
+    const task = createTaskRule(newId(), title, status, false, now)
+    await taskRepo.create(task)
     return task.id
   }
 
   async function scheduleV2Task(taskId: string, date: string, start: string, end: string) {
-    const task = await taskV2Repo.getById(taskId)
+    const task = await taskRepo.getById(taskId)
     if (!task) return
-    await taskV2Repo.update(scheduleTaskV2Rule(task, date, start, end, new Date().toISOString()))
+    await taskRepo.update(scheduleTaskRule(task, date, start, end, new Date().toISOString()))
     await load()
   }
 
-  async function getPlannedTasksForDate(date: string): Promise<TaskV2[]> {
-    const tasks = await taskV2Repo.getByDate(date)
+  async function getPlannedTasksForDate(date: string): Promise<Task[]> {
+    const tasks = await taskRepo.getRootByDate(date)
     return tasks.sort((a, b) => (a.scheduled_start ?? '').localeCompare(b.scheduled_start ?? ''))
   }
 
   async function completeV2Task(taskId: string) {
-    const task = await taskV2Repo.getById(taskId)
+    const task = await taskRepo.getById(taskId)
     if (!task) return
-    await taskV2Repo.update(toggleTaskV2CompletionRule(task, new Date().toISOString()))
+    await taskRepo.update(toggleTaskCompletionRule(task, new Date().toISOString()))
     await load()
   }
 
   async function renameV2Task(id: string, title: string) {
     const trimmed = title.trim()
     if (!trimmed) return
-    const task = await taskV2Repo.getById(id)
+    const task = await taskRepo.getById(id)
     if (!task) return
-    await taskV2Repo.update(renameTaskV2Rule(task, trimmed, new Date().toISOString()))
+    await taskRepo.update(renameTaskRule(task, trimmed, new Date().toISOString()))
     await load()
   }
 
   async function deleteV2Task(id: string) {
-    await taskV2Repo.delete(id)
+    await taskRepo.deleteWithChildren(id)
     await load()
   }
 
   async function reportV2Task(taskId: string, date: string, start: string, end: string) {
-    const task = await taskV2Repo.getById(taskId)
+    const task = await taskRepo.getById(taskId)
     if (!task) return
-    await taskV2Repo.update(reportTaskV2Rule(task, date, start, end, new Date().toISOString()))
+    await taskRepo.update(reportTaskRule(task, date, start, end, new Date().toISOString()))
     await load()
   }
 
@@ -115,15 +114,13 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     essential = false,
   ): Promise<string> {
     const now = new Date().toISOString()
-    const base = createTaskV2Rule(newId(), title, 'planned', false, now)
-    let scheduled = scheduleTaskV2Rule(base, date, start, end, now)
-    scheduled = setEnergyCostV2Rule(scheduled, energyCost, now)
-    if (essential) scheduled = toggleEssentialV2Rule(scheduled, now)
-    await taskV2Repo.create(scheduled)
+    const base = createTaskRule(newId(), title, 'planned', false, now)
+    let scheduled = scheduleTaskRule(base, date, start, end, now)
+    scheduled = setEnergyCostRule(scheduled, energyCost, now)
+    if (essential) scheduled = toggleEssentialRule(scheduled, now)
+    await taskRepo.create(scheduled)
     if (sourceTaskId) {
-      const subs = await subTaskRepo.getByTaskId(sourceTaskId)
-      await Promise.all(subs.map((st) => subTaskRepo.delete(st.id)))
-      await taskRepo.delete(sourceTaskId)
+      await taskRepo.deleteWithChildren(sourceTaskId)
       await reloadTasks()
     }
     await load()
@@ -131,7 +128,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     return scheduled.id
   }
 
-  function startMoveTask(task: TaskV2, report: boolean) {
+  function startMoveTask(task: Task, report: boolean) {
     setMovingTask({ kind: 'task', task, report })
   }
 

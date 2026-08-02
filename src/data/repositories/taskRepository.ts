@@ -1,7 +1,10 @@
 import type { AppDatabase } from '@/data/db'
-import type { Task } from '@/domain/entities/task'
-import type { TaskStatus } from '@/domain/entities/task'
+import type { Task, TaskStatus } from '@/domain/entities/task'
 import { encrypt, decrypt } from '@/crypto/crypto'
+
+function isRoot(task: Task): boolean {
+  return task.parent_id === null || task.parent_id === undefined
+}
 
 export class TaskRepository {
   private db: AppDatabase
@@ -20,6 +23,15 @@ export class TaskRepository {
     } catch {
       return title
     }
+  }
+
+  private async decryptAll(tasks: Task[]): Promise<Task[]> {
+    return Promise.all(
+      tasks.map(async (task) => ({
+        ...task,
+        title: await this.decryptTitle(task.title),
+      })),
+    )
   }
 
   async create(task: Task): Promise<string> {
@@ -51,14 +63,16 @@ export class TaskRepository {
     await this.db.tasks.delete(id)
   }
 
+  /** Supprime une tâche et toutes ses sous-étapes. */
+  async deleteWithChildren(id: string): Promise<void> {
+    const children = await this.db.tasks.where('parent_id').equals(id).primaryKeys()
+    await this.db.tasks.bulkDelete([...children, id])
+  }
+
+  /** Tâches principales d'un statut donné, sous-étapes exclues. */
   async getByStatus(status: TaskStatus): Promise<Task[]> {
     const tasks = await this.db.tasks.where('status').equals(status).toArray()
-    return Promise.all(
-      tasks.map(async (task) => ({
-        ...task,
-        title: await this.decryptTitle(task.title),
-      })),
-    )
+    return this.decryptAll(tasks.filter(isRoot))
   }
 
   async getTodayTasks(): Promise<Task[]> {
@@ -68,18 +82,36 @@ export class TaskRepository {
       this.db.tasks.where('status').equals('completed').toArray(),
     ])
     const tasks = [
-      ...activeTasks,
-      ...completedTasks.filter((task) => task.completed_at?.slice(0, 10) === today),
+      ...activeTasks.filter(isRoot),
+      ...completedTasks.filter((task) => isRoot(task) && task.completed_at?.slice(0, 10) === today),
     ].sort((a, b) => {
       if (a.status !== b.status) return a.status === 'completed' ? 1 : -1
       return a.position - b.position
     })
-    return Promise.all(
-      tasks.map(async (task) => ({
-        ...task,
-        title: await this.decryptTitle(task.title),
-      })),
-    )
+    return this.decryptAll(tasks)
+  }
+
+  /** Sous-étapes d'une tâche, triées par position. */
+  async getChildren(parentId: string): Promise<Task[]> {
+    const children = await this.db.tasks.where('parent_id').equals(parentId).sortBy('position')
+    return this.decryptAll(children)
+  }
+
+  /** Tâches principales planifiées à une date, triées par position. */
+  async getRootByDate(date: string): Promise<Task[]> {
+    const tasks = await this.db.tasks.where('scheduled_date').equals(date).sortBy('position')
+    return this.decryptAll(tasks.filter(isRoot))
+  }
+
+  /** Sous-étapes planifiées à une date. */
+  async getChildrenByDate(date: string): Promise<Task[]> {
+    const tasks = await this.db.tasks.where('scheduled_date').equals(date).toArray()
+    return this.decryptAll(tasks.filter((task) => !isRoot(task)))
+  }
+
+  async getEssentialTasks(): Promise<Task[]> {
+    const tasks = await this.db.tasks.toArray()
+    return this.decryptAll(tasks.filter((task) => task.essential))
   }
 
   async reorder(ids: string[]): Promise<void> {
@@ -93,7 +125,7 @@ export class TaskRepository {
     }))
 
     for (const task of updated) {
-      await this.update(task)
+      await this.db.tasks.put(task)
     }
   }
 }

@@ -29,13 +29,16 @@ Tranchés avec l'utilisateur après production des constats. Ils priment sur la 
 ## Ordre & dépendances
 
 ```
-V5-0 Refacto socle ──► V5-1 Nav + accueil fusionné ──► V5-2 Planning & tâches
+V5-0 Refacto socle ──► V5-1 Nav + accueil fusionné ──► V5-2a Refacto modèle de tâches
                                                                 │
-                                                                └──► V5-3 Outils, dossiers,
-                                                                          listes, budget rebranché
+                                                                └──► V5-2b Planning & tâches
+                                                                          │
+                                                                          └──► V5-3 Outils, dossiers,
+                                                                                    listes, budget rebranché
 ```
 
-V5-2 avant V5-3 : `E29` (réveil sur un item de liste) réutilise le flux récurrente/ponctuelle produit par `E25`.
+V5-2a avant V5-2b : les sous-étapes sur une tâche planifiée (`E9`, `E10`, `E22`) supposent un modèle de tâche unique.
+V5-2b avant V5-3 : `E29` (réveil sur un item de liste) réutilise le flux récurrente/ponctuelle produit par `E25`.
 
 ---
 
@@ -91,7 +94,32 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-2 — Planning et tâches refondus [TODO]
+## Phase V5-2a — Refacto : unification du modèle de tâches [EN COURS]
+
+> Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase.
+
+Phase insérée le 2026-08-02, au démarrage de V5-2. Motif : le code portait **deux modèles de tâches parallèles** — `Task`/`SubTask` (réception, journée, `E22TaskDetail`, `E23Decompose`, sans énergie ni obligatoire) et `TaskV2` (planning, avec énergie et obligatoire, sans sous-étapes). Or `E9`, `E10` et `E22` de la phase V5-2 supposent tous qu'une tâche planifiée porte des sous-étapes. Implémenter V5-2 sur ce socle aurait dupliqué le système de sous-étapes au lieu de le poser une fois. Chantier trop large pour être absorbé silencieusement dans la phase fonctionnelle (règle de la section Roadmap du kit), d'où une phase de refacto dédiée. L'ancienne phase V5-2 devient V5-2b.
+
+Aucun changement de comportement visible.
+
+- [x] Entité `Task` unique absorbant `SubTask` et `TaskV2` : `parent_id` (null = tâche principale), `essential`, `energy_cost`, `postponed`, créneau ; `TaskStatus` = `inbox | today | planned | completed` (`src/domain/entities/task.ts`, `subTask.ts` et `taskV2.ts` supprimés)
+- [x] `taskRules.ts` : fusion de `taskRulesV2.ts` et `subTaskRules.ts`, suffixes `V2` retirés, ajout de `isCompleted`/`isSubTask`/`getSubTasks`/`getSubTaskCounts`/`uncompleteTask` (`src/domain/rules/taskRules.ts`)
+- [x] `TaskRepository` unique remplaçant les trois repositories ; `getByStatus`/`getTodayTasks` excluent les sous-étapes, ajout de `getChildren`/`getRootByDate`/`getChildrenByDate`/`deleteWithChildren` (`src/data/repositories/taskRepository.ts`)
+- [x] Migration Dexie v7 (fusion des trois tables, rattachement `parent_id`, conversion de statut, écartement des sous-étapes orphelines) puis v8 (suppression de `subTasks` et `tasksV2`) (`src/data/db.ts`)
+- [x] `useTasksState` et `usePlanningState` opèrent sur la collection unique, API du contexte inchangée pour ne pas propager le refacto aux écrans
+- [x] Écrans adaptés aux types unifiés, sans changement de rendu (`E20Inbox`, `E22TaskDetail`, `E23Decompose`, `E24Today`, `E10Dashboard`, `PlanningBoard`, `E21CreateTaskV2`)
+- [x] Fabriques de tests partagées (`src/test/factories.ts`) remplaçant sept fabriques dupliquées ; test de migration v6 → v8 ; couverture du filtrage racine/sous-étape et du chiffrement au réordonnancement
+
+Gate : [x] tests verts (508/508 unitaires, 53/53 e2e, `tsc -b`/lint/build clean) · [ ] test manuel (points 110-117 de `tests_manuels.md`) · [x] doc (`CHANGELOG.md`) · [ ] sortie : un seul modèle de tâche en base, `subTasks` et `tasksV2` disparus, application strictement iso-fonctionnelle
+
+Défaut latent trouvé et corrigé en chemin : `TaskRepository.reorder()` réencryptait un titre déjà chiffré (lecture brute en base puis passage par `update()`), corrompant le titre au réordonnancement quand le chiffrement local est actif. Préexistant à cette phase, révélé par l'unification (`SubTaskRepository.reorder()` écrivait correctement en base, pas `TaskRepository`). Verrouillé par un test.
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Phase V5-2b — Planning et tâches refondus [TODO]
 
 - [ ] `D5` + `Q10` (cf. C14, C37) — suppression définitive des cases et lignes horaires, planning épuré comme l'application de référence (`src/ui/screens/dashboard/E10Dashboard.tsx`)
 - [ ] `E1`, `D6` (cf. C1, C21) — ligne de tâche : logo, plage horaire, nom, coût en énergie, pastille de complétion à droite

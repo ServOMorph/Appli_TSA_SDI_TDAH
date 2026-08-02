@@ -56,11 +56,9 @@ export function useSettingsState() {
 
   async function exportData() {
     if (!currentUser) return
-    const [user, tasks, subTasks, tasksV2, lists, listItems, energyEntries, settingsData, categories, entries, accounts, deposits] = await Promise.all([
+    const [user, tasks, lists, listItems, energyEntries, settingsData, categories, entries, accounts, deposits] = await Promise.all([
       userRepo.getFirst(),
       db.tasks.toArray(),
-      db.subTasks.toArray(),
-      db.tasksV2.toArray(),
       db.lists.toArray(),
       db.listItems.toArray(),
       db.energyEntries.toArray(),
@@ -72,11 +70,9 @@ export function useSettingsState() {
     ])
     const payload = {
       export_date: new Date().toISOString(),
-      version: '2.0',
+      version: '3.0',
       user,
       tasks,
-      sub_tasks: subTasks,
-      tasks_v2: tasksV2,
       lists,
       list_items: listItems,
       energy_entries: energyEntries,
@@ -99,12 +95,10 @@ export function useSettingsState() {
     await Promise.all([
       db.users.clear(),
       db.tasks.clear(),
-      db.subTasks.clear(),
       db.energyEntries.clear(),
       db.settings.clear(),
       db.lists.clear(),
       db.listItems.clear(),
-      db.tasksV2.clear(),
       db.budgetCategories.clear(),
       db.budgetEntries.clear(),
       db.budgetAccounts.clear(),

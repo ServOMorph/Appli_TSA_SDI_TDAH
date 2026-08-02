@@ -2,6 +2,7 @@ import { beforeEach, describe, it, expect } from 'vitest'
 import { AppDatabase } from '@/data/db'
 import { TaskRepository } from './taskRepository'
 import type { Task } from '@/domain/entities/task'
+import { makeTask } from '@/test/factories'
 
 let db: AppDatabase
 let repo: TaskRepository
@@ -15,16 +16,7 @@ beforeEach(() => {
 })
 
 describe('TaskRepository', () => {
-  const mockTask = (overrides?: Partial<Task>): Task => ({
-    id: 'task-1',
-    title: 'Test task',
-    status: 'inbox',
-    position: 0,
-    created_at: '2026-06-24T00:00:00Z',
-    updated_at: '2026-06-24T00:00:00Z',
-    completed_at: null,
-    ...overrides,
-  })
+  const mockTask = (overrides?: Partial<Task>): Task => makeTask(overrides)
 
   describe('without encryption', () => {
     it('creates and retrieves task', async () => {
@@ -87,6 +79,66 @@ describe('TaskRepository', () => {
     })
   })
 
+  describe('hiérarchie tâche / sous-étape', () => {
+    it('exclut les sous-étapes de getByStatus', async () => {
+      await repo.create(mockTask({ id: 'root', status: 'inbox' }))
+      await repo.create(mockTask({ id: 'child', status: 'inbox', parent_id: 'root' }))
+
+      const roots = await repo.getByStatus('inbox')
+      expect(roots.map((t) => t.id)).toEqual(['root'])
+    })
+
+    it('exclut les sous-étapes de getTodayTasks', async () => {
+      await repo.create(mockTask({ id: 'root', status: 'today' }))
+      await repo.create(mockTask({ id: 'child', status: 'today', parent_id: 'root' }))
+
+      const tasks = await repo.getTodayTasks()
+      expect(tasks.map((t) => t.id)).toEqual(['root'])
+    })
+
+    it('retourne les sous-étapes triées par position', async () => {
+      await repo.create(mockTask({ id: 'root' }))
+      await repo.create(mockTask({ id: 'b', parent_id: 'root', position: 1 }))
+      await repo.create(mockTask({ id: 'a', parent_id: 'root', position: 0 }))
+      await repo.create(mockTask({ id: 'autre', parent_id: 'root-2', position: 0 }))
+
+      const children = await repo.getChildren('root')
+      expect(children.map((t) => t.id)).toEqual(['a', 'b'])
+    })
+
+    it('sépare tâches principales et sous-étapes planifiées à une date', async () => {
+      await repo.create(mockTask({ id: 'root', status: 'planned', scheduled_date: '2026-07-22' }))
+      await repo.create(
+        mockTask({ id: 'child', parent_id: 'root', status: 'planned', scheduled_date: '2026-07-22' }),
+      )
+      await repo.create(mockTask({ id: 'autre-jour', status: 'planned', scheduled_date: '2026-07-23' }))
+
+      expect((await repo.getRootByDate('2026-07-22')).map((t) => t.id)).toEqual(['root'])
+      expect((await repo.getChildrenByDate('2026-07-22')).map((t) => t.id)).toEqual(['child'])
+    })
+
+    it('supprime une tâche avec toutes ses sous-étapes', async () => {
+      await repo.create(mockTask({ id: 'root' }))
+      await repo.create(mockTask({ id: 'child-1', parent_id: 'root' }))
+      await repo.create(mockTask({ id: 'child-2', parent_id: 'root' }))
+      await repo.create(mockTask({ id: 'autre', parent_id: 'root-2' }))
+
+      await repo.deleteWithChildren('root')
+
+      expect(await repo.getById('root')).toBeUndefined()
+      expect(await repo.getById('child-1')).toBeUndefined()
+      expect(await repo.getById('child-2')).toBeUndefined()
+      expect(await repo.getById('autre')).toBeDefined()
+    })
+
+    it('retourne les tâches obligatoires', async () => {
+      await repo.create(mockTask({ id: 't1', essential: true }))
+      await repo.create(mockTask({ id: 't2', essential: false }))
+
+      expect((await repo.getEssentialTasks()).map((t) => t.id)).toEqual(['t1'])
+    })
+  })
+
   describe('with encryption', () => {
     it('encrypts title on create', async () => {
       const task = mockTask({ title: 'Secret task' })
@@ -112,6 +164,24 @@ describe('TaskRepository', () => {
       const unencrypted = new TaskRepository(db)
       const retrieved = await unencrypted.getById(id)
       expect(retrieved?.title).not.toBe('Secret task')
+    })
+
+    it('ne réencrypte pas le titre lors du réordonnancement', async () => {
+      await repoEncrypted.create(mockTask({ id: 't1', title: 'Première', position: 0 }))
+      await repoEncrypted.create(mockTask({ id: 't2', title: 'Seconde', position: 1 }))
+
+      await repoEncrypted.reorder(['t2', 't1'])
+
+      expect((await repoEncrypted.getById('t2'))?.title).toBe('Seconde')
+      expect((await repoEncrypted.getById('t1'))?.title).toBe('Première')
+    })
+
+    it('déchiffre les titres des sous-étapes', async () => {
+      await repoEncrypted.create(mockTask({ id: 'root', title: 'Parent' }))
+      await repoEncrypted.create(mockTask({ id: 'child', parent_id: 'root', title: 'Étape secrète' }))
+
+      const children = await repoEncrypted.getChildren('root')
+      expect(children.map((t) => t.title)).toEqual(['Étape secrète'])
     })
   })
 })

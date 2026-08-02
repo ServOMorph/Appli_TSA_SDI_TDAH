@@ -17,7 +17,7 @@ import { useSettingsState } from '@/app/contexts/useSettingsState'
 import { useTasksState } from '@/app/contexts/useTasksState'
 import { usePlanningState } from '@/app/contexts/usePlanningState'
 import { isOverloaded } from '@/domain/rules/energyRules'
-import { getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 
 export type { Screen, Route } from '@/app/navigation'
 export type { PendingPlanTask, PlannedSubTask, MovingPlanItem } from '@/app/contexts/usePlanningState'

@@ -4,51 +4,23 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E10Dashboard } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
-import type { SubTask } from '@/domain/entities/subTask'
-import type { TaskV2 } from '@/domain/entities/taskV2'
+import { makeTask as baseTask, makeSubTask } from '@/test/factories'
 
-function makeTaskV2(overrides: Partial<TaskV2> = {}): TaskV2 {
-  return {
+function makeTaskV2(overrides: Partial<Task> = {}): Task {
+  return baseTask({
     id: 'taskv2-1',
     title: 'Tâche planifiée',
     status: 'planned',
     essential: true,
-    position: 0,
     scheduled_date: '2026-07-01',
     scheduled_start: '09:00',
     scheduled_end: '09:30',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    completed_at: null,
     ...overrides,
-  }
+  })
 }
 
 function makeTask(overrides: Partial<Task> = {}): Task {
-  return {
-    id: 'task-1',
-    title: 'Appeler le médecin',
-    status: 'today',
-    position: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    completed_at: null,
-    ...overrides,
-  }
-}
-
-function makeSubTask(overrides: Partial<SubTask> = {}): SubTask {
-  return {
-    id: 'st-1',
-    task_id: 'task-1',
-    title: 'Ouvrir le template',
-    is_completed: false,
-    position: 0,
-    scheduled_date: null,
-    scheduled_start: null,
-    scheduled_end: null,
-    ...overrides,
-  }
+  return baseTask({ title: 'Appeler le médecin', status: 'today', ...overrides })
 }
 
 describe('E10Dashboard', () => {
@@ -116,9 +88,9 @@ describe('E10Dashboard', () => {
         todayTasks: [task],
         todaySubTasksMap: {
           'task-1': [
-            makeSubTask({ id: 'st-1', is_completed: true }),
-            makeSubTask({ id: 'st-2', is_completed: false }),
-            makeSubTask({ id: 'st-3', is_completed: false }),
+            makeSubTask({ id: 'st-1', status: 'completed' }),
+            makeSubTask({ id: 'st-2', status: 'inbox' }),
+            makeSubTask({ id: 'st-3', status: 'inbox' }),
           ],
         },
       })

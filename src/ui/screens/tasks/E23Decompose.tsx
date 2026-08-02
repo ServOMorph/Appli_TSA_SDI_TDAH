@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
-import type { SubTask } from '@/domain/entities/subTask'
+import type { Task } from '@/domain/entities/task'
+import { isCompleted } from '@/domain/rules/taskRules'
 import {
   DndContext,
   PointerSensor,
@@ -55,16 +56,17 @@ const inputStyle: React.CSSProperties = {
 }
 
 interface SortableSubTaskItemProps {
-  subTask: SubTask
+  subTask: Task
   onDelete: (id: string) => void
-  onToggle: (subTask: SubTask) => void
-  onPlan: (subTask: SubTask) => void
+  onToggle: (subTask: Task) => void
+  onPlan: (subTask: Task) => void
 }
 
 function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan }: SortableSubTaskItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: subTask.id,
   })
+  const completed = isCompleted(subTask)
 
   return (
     <div
@@ -101,15 +103,15 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan }: SortableSu
           </span>
           <input
             type="checkbox"
-            checked={subTask.is_completed}
-            aria-label={`${subTask.is_completed ? 'Marquer non terminée' : 'Marquer terminée'} : ${subTask.title}`}
+            checked={completed}
+            aria-label={`${completed ? 'Marquer non terminée' : 'Marquer terminée'} : ${subTask.title}`}
             onClick={(e) => e.stopPropagation()}
             onChange={() => onToggle(subTask)}
           />
           <span
             style={{
-              color: subTask.is_completed ? 'var(--color-text-muted)' : 'var(--color-text)',
-              textDecoration: subTask.is_completed ? 'line-through' : 'none',
+              color: completed ? 'var(--color-text-muted)' : 'var(--color-text)',
+              textDecoration: completed ? 'line-through' : 'none',
               flex: 1,
             }}
           >
@@ -170,7 +172,7 @@ export function E23Decompose() {
     goTo,
   } = useApp()
 
-  const [subTasks, setSubTasks] = useState<SubTask[]>([])
+  const [subTasks, setSubTasks] = useState<Task[]>([])
   const [newTitle, setNewTitle] = useState('')
 
   const task = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
@@ -222,7 +224,7 @@ export function E23Decompose() {
     }
   }
 
-  async function handleToggle(subTask: SubTask) {
+  async function handleToggle(subTask: Task) {
     await toggleSubTask(subTask)
     if (selectedTaskId) {
       const updated = await getSubTasks(selectedTaskId)
@@ -230,7 +232,7 @@ export function E23Decompose() {
     }
   }
 
-  function handlePlan(subTask: SubTask) {
+  function handlePlan(subTask: Task) {
     startPlanSubTask(subTask.id, subTask.title)
     goTo('planning')
   }

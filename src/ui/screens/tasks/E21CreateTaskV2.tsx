@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
-import type { TaskStatusV2 } from '@/domain/entities/taskV2'
 import type { Screen } from '@/app/AppContext'
 
-type Destination = TaskStatusV2 | 'list' | 'today'
+type Destination = 'todo' | 'planned' | 'list' | 'today'
 
 const FORCED_DESTINATION_BY_ORIGIN: Partial<Record<Screen, Destination>> = {
   inbox: 'todo',

@@ -3,6 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import type { Task } from '@/domain/entities/task'
+import { isCompleted } from '@/domain/rules/taskRules'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -141,7 +142,7 @@ export function E20Inbox() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
           {inboxTasks.map((task) => {
             const subs = inboxSubTasksMap[task.id] ?? []
-            const done = subs.filter((s) => s.is_completed).length
+            const done = subs.filter(isCompleted).length
             const total = subs.length
             return (
             <Card key={task.id} style={{ padding: 'var(--spacing-md)' }}>

@@ -2,6 +2,7 @@ import { useApp } from '@/app/AppContext'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { flashyBackground } from '@/ui/styles/ambiance'
+import { isCompleted } from '@/domain/rules/taskRules'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -47,10 +48,10 @@ export function E24Today() {
           {todayTasks.map((task) => {
             const completed = task.status === 'completed'
             const subs = todaySubTasksMap[task.id] ?? []
-            const done = subs.filter((s) => s.is_completed).length
+            const done = subs.filter(isCompleted).length
             const total = subs.length
             const nextSubTask = subs
-              .filter((s) => !s.is_completed)
+              .filter((s) => !isCompleted(s))
               .sort((a, b) => a.position - b.position)[0]
             return (
             <Card key={task.id} style={{

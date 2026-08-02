@@ -1,6 +1,7 @@
 import { beforeEach, describe, it, expect } from 'vitest'
 import Dexie from 'dexie'
 import { AppDatabase } from './db'
+import { makeTask } from '@/test/factories'
 
 let db: AppDatabase
 let testCount = 0
@@ -13,8 +14,6 @@ describe('AppDatabase', () => {
   it('initializes with all tables', () => {
     expect(db.users).toBeDefined()
     expect(db.tasks).toBeDefined()
-    expect(db.subTasks).toBeDefined()
-    expect(db.tasksV2).toBeDefined()
     expect(db.lists).toBeDefined()
     expect(db.listItems).toBeDefined()
     expect(db.energyEntries).toBeDefined()
@@ -26,7 +25,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(6)
+    expect(db.verno).toBe(8)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -113,6 +112,140 @@ describe('AppDatabase', () => {
     await upgraded.delete()
   })
 
+  it('upgrades a version 6 database by merging subTasks and tasksV2 into a single tasks table', async () => {
+    const name = `migration-v6-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(6).stores({
+      users: 'id',
+      tasks: 'id, status, position',
+      subTasks: 'id, task_id, position, scheduled_date',
+      tasksV2: 'id, status, position, scheduled_date, essential',
+      lists: 'id',
+      listItems: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, kind, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date, period',
+    })
+    await legacy.open()
+    await legacy.table('tasks').add({
+      id: 'legacy-task',
+      title: 'Tâche V1',
+      status: 'today',
+      position: 0,
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+      completed_at: null,
+    })
+    await legacy.table('subTasks').bulkAdd([
+      {
+        id: 'legacy-sub-done',
+        task_id: 'legacy-task',
+        title: 'Étape terminée',
+        is_completed: true,
+        position: 0,
+        scheduled_date: null,
+        scheduled_start: null,
+        scheduled_end: null,
+      },
+      {
+        id: 'legacy-sub-planned',
+        task_id: 'legacy-task',
+        title: 'Étape planifiée',
+        is_completed: false,
+        position: 1,
+        scheduled_date: '2026-07-22',
+        scheduled_start: '10:00',
+        scheduled_end: '10:30',
+      },
+      {
+        id: 'legacy-sub-orphan',
+        task_id: 'parent-supprime',
+        title: 'Étape orpheline',
+        is_completed: false,
+        position: 0,
+        scheduled_date: null,
+        scheduled_start: null,
+        scheduled_end: null,
+      },
+    ])
+    await legacy.table('tasksV2').bulkAdd([
+      {
+        id: 'legacy-v2-planned',
+        title: 'Tâche planifiée',
+        status: 'planned',
+        essential: true,
+        energy_cost: 4,
+        position: 0,
+        scheduled_date: '2026-07-22',
+        scheduled_start: '14:00',
+        scheduled_end: '15:00',
+        created_at: '2026-07-21T00:00:00Z',
+        updated_at: '2026-07-21T00:00:00Z',
+        completed_at: null,
+      },
+      {
+        id: 'legacy-v2-todo',
+        title: 'Tâche todo',
+        status: 'todo',
+        essential: false,
+        position: 1,
+        scheduled_date: null,
+        scheduled_start: null,
+        scheduled_end: null,
+        created_at: '2026-07-21T00:00:00Z',
+        updated_at: '2026-07-21T00:00:00Z',
+        completed_at: null,
+      },
+    ])
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(8)
+    expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
+    expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
+
+    expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
+      title: 'Tâche V1',
+      status: 'today',
+      parent_id: null,
+      essential: false,
+      energy_cost: null,
+      postponed: false,
+    })
+
+    expect(await upgraded.tasks.get('legacy-sub-done')).toMatchObject({
+      parent_id: 'legacy-task',
+      status: 'completed',
+      title: 'Étape terminée',
+    })
+    expect(await upgraded.tasks.get('legacy-sub-planned')).toMatchObject({
+      parent_id: 'legacy-task',
+      status: 'planned',
+      scheduled_date: '2026-07-22',
+      scheduled_start: '10:00',
+    })
+    expect(await upgraded.tasks.get('legacy-sub-orphan')).toBeUndefined()
+
+    expect(await upgraded.tasks.get('legacy-v2-planned')).toMatchObject({
+      parent_id: null,
+      status: 'planned',
+      essential: true,
+      energy_cost: 4,
+      scheduled_date: '2026-07-22',
+    })
+    expect(await upgraded.tasks.get('legacy-v2-todo')).toMatchObject({
+      parent_id: null,
+      status: 'inbox',
+    })
+
+    await upgraded.delete()
+  })
+
   it('creates and retrieves users', async () => {
     const user = {
       id: 'user-1',
@@ -128,36 +261,15 @@ describe('AppDatabase', () => {
   })
 
   it('creates and retrieves tasks', async () => {
-    const task = {
-      id: 'task-1',
-      title: 'Test task',
-      status: 'inbox' as const,
-      position: 0,
-      created_at: '2026-06-24T00:00:00Z',
-      updated_at: '2026-06-24T00:00:00Z',
-      completed_at: null,
-    }
-
+    const task = makeTask()
     await db.tasks.add(task)
-    const retrieved = await db.tasks.get('task-1')
-    expect(retrieved).toEqual(task)
+    expect(await db.tasks.get('task-1')).toEqual(task)
   })
 
-  it('creates and retrieves subtasks', async () => {
-    const subTask = {
-      id: 'subtask-1',
-      task_id: 'task-1',
-      title: 'Subtask',
-      is_completed: false,
-      position: 0,
-      scheduled_date: null,
-      scheduled_start: null,
-      scheduled_end: null,
-    }
-
-    await db.subTasks.add(subTask)
-    const retrieved = await db.subTasks.get('subtask-1')
-    expect(retrieved).toEqual(subTask)
+  it('creates and retrieves subtasks in the same table', async () => {
+    const subTask = makeTask({ id: 'subtask-1', parent_id: 'task-1', title: 'Subtask' })
+    await db.tasks.add(subTask)
+    expect(await db.tasks.get('subtask-1')).toEqual(subTask)
   })
 
   it('creates and retrieves energy entries', async () => {

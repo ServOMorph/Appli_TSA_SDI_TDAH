@@ -1,3 +1,23 @@
+## v5.4 — 2026-08-02
+
+Phase V5-2a — refacto : unification du modèle de tâches. Aucun changement de comportement visible. Validation manuelle en attente (`tests_manuels.md`, points 110 à 117).
+
+### Modifié
+- `src/domain/entities/task.ts` : entité `Task` unique, absorbant `SubTask` et `TaskV2`. Nouveaux champs `parent_id` (null pour une tâche principale, id du parent pour une sous-étape), `essential`, `energy_cost`, `postponed`, `scheduled_date`/`scheduled_start`/`scheduled_end`. `TaskStatus` passe à `'inbox' | 'today' | 'planned' | 'completed'` ; le statut `'todo'` de `TaskV2` (jamais atteignable depuis l'interface) est fusionné dans `'inbox'`.
+- `src/domain/rules/taskRules.ts` : fusion de `taskRulesV2.ts` et `subTaskRules.ts`. Suffixes `V2` retirés (`createTask`, `scheduleTask`, `reportTask`, `renameTask`, `toggleEssential`, `setEnergyCost`, `toggleTaskCompletion`). Ajout de `isCompleted`, `isSubTask`, `getSubTasks`, `getSubTaskCounts`, `uncompleteTask`. La logique de créneaux (`SLOTS_PER_DAY`, `taskSlotRange`, `taskOccupiesSlot`) est déplacée sans changement.
+- `src/data/repositories/taskRepository.ts` : repository unique remplaçant `TaskRepository` + `SubTaskRepository` + `TaskV2Repository`. `getByStatus` et `getTodayTasks` excluent désormais les sous-étapes ; ajout de `getChildren`, `getRootByDate`, `getChildrenByDate`, `deleteWithChildren`, `getEssentialTasks`.
+- `src/app/contexts/useTasksState.ts`, `usePlanningState.ts` : opèrent sur la collection unique. L'API exposée par le contexte est inchangée, pour ne pas propager le refacto aux écrans au-delà des types.
+- `src/app/contexts/useSettingsState.ts` : l'export ne contient plus `sub_tasks` ni `tasks_v2`, tout est dans `tasks` (version de payload `2.0` → `3.0`).
+- `src/test/factories.ts` : fabriques de tests partagées (`makeTask`, `makeSubTask`, `makePlannedSubTask`), remplaçant sept fabriques dupliquées dans les fichiers de test.
+
+### Ajouté
+- Migration Dexie v7 : fusionne `subTasks` et `tasksV2` dans `tasks` en conservant les identifiants. Les sous-étapes prennent `parent_id` = ancien `task_id` et un statut dérivé de `is_completed` puis de la présence d'un créneau ; les sous-étapes orphelines (parent supprimé) sont écartées. Les tâches V2 conservent énergie, obligatoire et créneau.
+- Migration Dexie v8 : suppression des tables `subTasks` et `tasksV2`. Séparée de la v7 parce que Dexie supprime les object stores avant d'exécuter le `upgrade` de la même version — les lire et les supprimer d'un coup n'est pas fiable.
+- `src/data/db.test.ts` : test de migration v6 → v8 vérifiant la fusion des trois tables, le rattachement `parent_id`, la conversion de statut et l'écartement des orphelines.
+
+### Corrigé
+- `TaskRepository.reorder()` réencryptait un titre déjà chiffré (lecture brute en base puis passage par `update()`), corrompant le titre au réordonnancement quand le chiffrement local est actif. Le réordonnancement écrit désormais directement en base. Défaut latent préexistant, révélé par l'unification ; verrouillé par un test.
+
 ## v5.3 — 2026-08-02
 
 Phase V5-1 close après validation manuelle intégrale sur appareil tactile (points 101-109).

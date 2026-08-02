@@ -3,39 +3,16 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PlanningBoard } from './PlanningBoard'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
-import type { TaskV2 } from '@/domain/entities/taskV2'
+import type { Task } from '@/domain/entities/task'
 import type { PlannedSubTask } from '@/app/AppContext'
+import { makeTask as baseTask, makePlannedSubTask } from '@/test/factories'
 
 function makeSubTaskV2(overrides: Partial<PlannedSubTask> = {}): PlannedSubTask {
-  return {
-    id: 'sub-1',
-    task_id: 'parent-1',
-    parentTitle: 'Rangement',
-    title: 'Ranger le bureau',
-    is_completed: false,
-    position: 0,
-    scheduled_date: null,
-    scheduled_start: null,
-    scheduled_end: null,
-    ...overrides,
-  }
+  return makePlannedSubTask(overrides)
 }
 
-function makeTaskV2(overrides: Partial<TaskV2> = {}): TaskV2 {
-  return {
-    id: 'task-1',
-    title: 'Médecin',
-    status: 'planned',
-    essential: false,
-    position: 0,
-    scheduled_date: null,
-    scheduled_start: null,
-    scheduled_end: null,
-    created_at: '2026-06-30T10:00:00Z',
-    updated_at: '2026-06-30T10:00:00Z',
-    completed_at: null,
-    ...overrides,
-  }
+function makeTaskV2(overrides: Partial<Task> = {}): Task {
+  return baseTask({ title: 'Médecin', status: 'planned', ...overrides })
 }
 
 function renderExpanded(ctx = makeAppContext(), onRequestExpand = vi.fn()) {

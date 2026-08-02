@@ -4,19 +4,10 @@ import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E20Inbox } from './E20Inbox'
 import type { Task } from '@/domain/entities/task'
-import type { SubTask } from '@/domain/entities/subTask'
+import { makeTask as baseTask, makeSubTask } from '@/test/factories'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
-  return {
-    id: 'task-1',
-    title: 'Tâche inbox',
-    status: 'inbox',
-    position: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    completed_at: null,
-    ...overrides,
-  }
+  return baseTask({ title: 'Tâche inbox', status: 'inbox', ...overrides })
 }
 
 describe('E20Inbox', () => {
@@ -50,9 +41,9 @@ describe('E20Inbox', () => {
 
     it('affiche la progression des sous-étapes', () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const subs: SubTask[] = [
-        { id: 'st-1', task_id: 'abc', title: 'Étape 1', is_completed: true, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null },
-        { id: 'st-2', task_id: 'abc', title: 'Étape 2', is_completed: false, position: 1, scheduled_date: null, scheduled_start: null, scheduled_end: null },
+      const subs: Task[] = [
+        makeSubTask({ id: 'st-1', parent_id: 'abc', title: 'Étape 1', status: 'completed', position: 0 }),
+        makeSubTask({ id: 'st-2', parent_id: 'abc', title: 'Étape 2', status: 'inbox', position: 1 }),
       ]
       const ctx = makeAppContext({ inboxTasks: [task], inboxSubTasksMap: { abc: subs } })
       renderWithApp(<E20Inbox />, ctx)
@@ -162,7 +153,7 @@ describe('E20Inbox', () => {
 
     it('avertit avant de planifier une tâche ayant des sous-tâches', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null }
+      const sub: Task = makeSubTask({ id: 'st-1', parent_id: 'abc', title: 'Chapitre 1', status: 'inbox' })
       const ctx = makeAppContext({
         inboxTasks: [task],
         inboxSubTasksMap: { abc: [sub] },
@@ -177,7 +168,7 @@ describe('E20Inbox', () => {
 
     it('avertit avant de mettre dans une liste une tâche ayant des sous-tâches', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const sub: SubTask = { id: 'st-1', task_id: 'abc', title: 'Chapitre 1', is_completed: false, position: 0, scheduled_date: null, scheduled_start: null, scheduled_end: null }
+      const sub: Task = makeSubTask({ id: 'st-1', parent_id: 'abc', title: 'Chapitre 1', status: 'inbox' })
       const ctx = makeAppContext({
         inboxTasks: [task],
         inboxSubTasksMap: { abc: [sub] },

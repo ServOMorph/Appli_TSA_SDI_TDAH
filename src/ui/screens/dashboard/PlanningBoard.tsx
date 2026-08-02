@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useApp } from '@/app/AppContext'
-import type { TaskV2 } from '@/domain/entities/taskV2'
+import type { Task } from '@/domain/entities/task'
 import type { PlannedSubTask, MovingPlanItem } from '@/app/AppContext'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import { BatteryCost } from '@/ui/components/BatteryCost'
 import { DEFAULT_AMBIANCE_COLOR, plannedTaskTintStyle } from '@/ui/styles/ambiance'
-import { taskSlotRange, taskOccupiesSlot } from '@/domain/rules/taskRulesV2'
+import { taskSlotRange, taskOccupiesSlot, isCompleted } from '@/domain/rules/taskRules'
 import {
   SLOT_INDEXES,
   slotTime,
@@ -23,11 +23,11 @@ import {
 const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
 
 type PlanBlock =
-  | { kind: 'task'; item: TaskV2 }
+  | { kind: 'task'; item: Task }
   | { kind: 'subtask'; item: PlannedSubTask }
 
 function blockCompleted(block: PlanBlock): boolean {
-  return block.kind === 'task' ? block.item.status === 'completed' : block.item.is_completed
+  return isCompleted(block.item)
 }
 
 function blockEssential(block: PlanBlock): boolean {
@@ -301,7 +301,7 @@ export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps
   const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
 
   const [displayDate, setDisplayDate] = useState(() => planningTargetDate ?? todayStr())
-  const [scheduledTasks, setScheduledTasks] = useState<TaskV2[]>([])
+  const [scheduledTasks, setScheduledTasks] = useState<Task[]>([])
   const [scheduledSubTasks, setScheduledSubTasks] = useState<PlannedSubTask[]>([])
   const [picker, setPicker] = useState<Picker>(null)
   const [newTaskTitle, setNewTaskTitle] = useState('')

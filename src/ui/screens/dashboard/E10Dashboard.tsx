@@ -1,7 +1,7 @@
 import { useApp } from '@/app/AppContext'
 import { useState, useEffect } from 'react'
 import type { Task } from '@/domain/entities/task'
-import { getRemainingPlannedCost } from '@/domain/rules/taskRulesV2'
+import { getRemainingPlannedCost, isCompleted } from '@/domain/rules/taskRules'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
@@ -29,7 +29,7 @@ import { CSS } from '@dnd-kit/utilities'
 
 interface SortableTaskItemProps {
   task: Task
-  subs: { is_completed: boolean }[]
+  subs: Task[]
   onOpen: (id: string) => void
 }
 
@@ -37,9 +37,9 @@ function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: task.id,
   })
-  const done = subs.filter((s) => s.is_completed).length
+  const done = subs.filter(isCompleted).length
   const total = subs.length
-  const completed = task.status === 'completed'
+  const completed = isCompleted(task)
 
   return (
     <div

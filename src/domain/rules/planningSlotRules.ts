@@ -1,4 +1,4 @@
-import { SLOTS_PER_DAY, taskOccupiesSlot, taskSlotRange, type Scheduled } from '@/domain/rules/taskRulesV2'
+import { SLOTS_PER_DAY, taskOccupiesSlot, taskSlotRange, type Scheduled } from '@/domain/rules/taskRules'
 
 export const SLOT_INDEXES = Array.from({ length: SLOTS_PER_DAY }, (_, i) => i)
 

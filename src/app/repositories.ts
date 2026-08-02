@@ -1,8 +1,6 @@
 import { AppDatabase } from '@/data/db'
 import { UserRepository } from '@/data/repositories/userRepository'
 import { TaskRepository } from '@/data/repositories/taskRepository'
-import { TaskV2Repository } from '@/data/repositories/taskV2Repository'
-import { SubTaskRepository } from '@/data/repositories/subTaskRepository'
 import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository'
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
@@ -15,8 +13,6 @@ import { BudgetDepositRepository } from '@/data/repositories/budgetDepositReposi
 export const db = new AppDatabase()
 export const userRepo = new UserRepository(db)
 export const taskRepo = new TaskRepository(db)
-export const taskV2Repo = new TaskV2Repository(db)
-export const subTaskRepo = new SubTaskRepository(db)
 export const energyRepo = new EnergyEntryRepository(db)
 export const settingsRepo = new SettingsRepository(db)
 export const listRepo = new ListRepository(db)

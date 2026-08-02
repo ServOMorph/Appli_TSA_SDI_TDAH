@@ -4,33 +4,14 @@ import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E22TaskDetail } from './E22TaskDetail'
 import type { Task } from '@/domain/entities/task'
-import type { SubTask } from '@/domain/entities/subTask'
+import { makeTask as baseTask, makeSubTask as baseSubTask } from '@/test/factories'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
-  return {
-    id: 'task-1',
-    title: 'Appeler le médecin',
-    status: 'inbox',
-    position: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    completed_at: null,
-    ...overrides,
-  }
+  return baseTask({ title: 'Appeler le médecin', status: 'inbox', ...overrides })
 }
 
-function makeSubTask(overrides: Partial<SubTask> = {}): SubTask {
-  return {
-    id: 'st-1',
-    task_id: 'task-1',
-    title: 'Prendre le téléphone',
-    is_completed: false,
-    position: 0,
-    scheduled_date: null,
-    scheduled_start: null,
-    scheduled_end: null,
-    ...overrides,
-  }
+function makeSubTask(overrides: Partial<Task> = {}): Task {
+  return baseSubTask({ title: 'Prendre le téléphone', ...overrides })
 }
 
 describe('E22TaskDetail', () => {
@@ -155,7 +136,7 @@ describe('E22TaskDetail', () => {
     it('coche une sous-étape et recharge la liste', async () => {
       const task = makeTask()
       const st = makeSubTask()
-      const done = makeSubTask({ is_completed: true })
+      const done = makeSubTask({ status: 'completed' })
       const getSubTasks = vi.fn().mockResolvedValueOnce([st]).mockResolvedValueOnce([done])
       const ctx = makeAppContext({
         selectedTaskId: 'task-1',
@@ -173,7 +154,7 @@ describe('E22TaskDetail', () => {
 
     it('affiche une sous-étape terminée comme barrée', async () => {
       const task = makeTask()
-      const done = makeSubTask({ is_completed: true })
+      const done = makeSubTask({ status: 'completed' })
       const ctx = makeAppContext({
         selectedTaskId: 'task-1',
         inboxTasks: [task],

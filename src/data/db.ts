@@ -2,8 +2,6 @@ import Dexie from 'dexie'
 import type { Table } from 'dexie'
 import type { User } from '@/domain/entities/user'
 import type { Task } from '@/domain/entities/task'
-import type { SubTask } from '@/domain/entities/subTask'
-import type { TaskV2 } from '@/domain/entities/taskV2'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { EnergyEntry } from '@/domain/entities/energyEntry'
@@ -16,8 +14,6 @@ import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 export class AppDatabase extends Dexie {
   users!: Table<User>
   tasks!: Table<Task>
-  subTasks!: Table<SubTask>
-  tasksV2!: Table<TaskV2>
   lists!: Table<List>
   listItems!: Table<ListItem>
   energyEntries!: Table<EnergyEntry>
@@ -117,6 +113,86 @@ export class AppDatabase extends Dexie {
           .primaryKeys()
         await tx.table('budgetEntries').bulkDelete(orphanEntries)
       })
+    this.version(7)
+      .stores({
+        users: 'id',
+        tasks: 'id, parent_id, status, position, scheduled_date',
+        subTasks: 'id, task_id, position, scheduled_date',
+        tasksV2: 'id, status, position, scheduled_date, essential',
+        lists: 'id',
+        listItems: 'id, list_id, position',
+        energyEntries: 'id, entry_date',
+        settings: 'id, user_id',
+        budgetCategories: 'id, kind, period, position',
+        budgetEntries: 'id, category_id, date',
+        budgetAccounts: 'id',
+        budgetDeposits: 'id, account_id, date, period',
+      })
+      .upgrade(async (tx) => {
+        const tasksTable = tx.table('tasks')
+
+        await tasksTable.toCollection().modify((task) => {
+          task.parent_id = null
+          task.essential = false
+          task.energy_cost = null
+          task.postponed = false
+          task.scheduled_date = null
+          task.scheduled_start = null
+          task.scheduled_end = null
+        })
+
+        const legacyTasks = await tasksTable.toArray()
+        const parentById = new Map(legacyTasks.map((task) => [task.id, task]))
+        const fallbackDate = new Date().toISOString()
+
+        const legacySubTasks = await tx.table('subTasks').toArray()
+        const migratedSubTasks = legacySubTasks
+          .filter((subTask) => parentById.has(subTask.task_id))
+          .map((subTask) => {
+            const parent = parentById.get(subTask.task_id)
+            const scheduledDate = subTask.scheduled_date ?? null
+            return {
+              id: subTask.id,
+              parent_id: subTask.task_id,
+              title: subTask.title,
+              status: subTask.is_completed ? 'completed' : scheduledDate ? 'planned' : 'inbox',
+              essential: false,
+              energy_cost: null,
+              postponed: subTask.postponed ?? false,
+              position: subTask.position,
+              scheduled_date: scheduledDate,
+              scheduled_start: subTask.scheduled_start ?? null,
+              scheduled_end: subTask.scheduled_end ?? null,
+              created_at: parent?.created_at ?? fallbackDate,
+              updated_at: parent?.updated_at ?? fallbackDate,
+              completed_at: null,
+            }
+          })
+
+        const legacyTasksV2 = await tx.table('tasksV2').toArray()
+        const migratedTasksV2 = legacyTasksV2.map((task) => ({
+          id: task.id,
+          parent_id: null,
+          title: task.title,
+          status: task.status === 'todo' ? 'inbox' : task.status,
+          essential: task.essential ?? false,
+          energy_cost: task.energy_cost ?? null,
+          postponed: task.postponed ?? false,
+          position: task.position,
+          scheduled_date: task.scheduled_date ?? null,
+          scheduled_start: task.scheduled_start ?? null,
+          scheduled_end: task.scheduled_end ?? null,
+          created_at: task.created_at,
+          updated_at: task.updated_at,
+          completed_at: task.completed_at ?? null,
+        }))
+
+        await tasksTable.bulkPut([...migratedSubTasks, ...migratedTasksV2])
+      })
+    this.version(8).stores({
+      subTasks: null,
+      tasksV2: null,
+    })
   }
 }
 

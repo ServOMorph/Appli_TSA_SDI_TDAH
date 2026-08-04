@@ -351,7 +351,6 @@ describe('AppDatabase', () => {
       dark_mode: true,
       font_size: 'medium' as const,
       reduced_motion: false,
-      local_encryption: false,
     }
 
     await db.settings.add(settings)

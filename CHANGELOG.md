@@ -1,3 +1,14 @@
+## v5.8 — 2026-08-05
+
+Session hors roadmap : deux constats hérités d'une session antérieure corrigés après vérification en profondeur, plutôt qu'exécutés tels quels.
+
+### Modifié
+- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : destination de création de tâche toujours forcée automatiquement (`DEFAULT_DESTINATION = 'todo'` en repli pour toute origine non listée dans `FORCED_DESTINATION_BY_ORIGIN`) ; le bloc UI « Que faire de cette tâche ? », cru à tort mort dans une session antérieure, était en réalité atteignable depuis une dizaine d'écrans (task-detail, settings*, list-detail, budget, resources, overload-recovery, energy-view, task-decompose) via le « + » de la nav basse — retiré, décidé avec l'utilisateur.
+- `e2e/02-tasks.spec.ts` : nouveau scénario T19 couvrant ce comportement depuis une origine non mappée (Paramètres).
+
+### Retiré
+- Chiffrement local (`Settings.local_encryption`, `src/crypto/`, paramètres `password` de `TaskRepository`/`EnergyEntryRepository`/`ListItemRepository`) supprimé entièrement plutôt que corrigé — jamais activable depuis aucun écran ni actif en production (repositories toujours instanciés sans mot de passe). L'ancien bug tracé « `exportData()` non déchiffré » présupposait à tort que le chiffrement pouvait être actif ; devenu sans objet.
+
 ## v5.7 — 2026-08-05
 
 Phase V5-2b (planning et tâches refondus) — milestone M5 codé et testé (automatisé) : planning épuré, sans grille ni flux tap-based. Validation manuelle en cours.

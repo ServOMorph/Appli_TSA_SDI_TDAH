@@ -19,7 +19,6 @@ describe('SettingsRepository', () => {
     dark_mode: true,
     font_size: 'medium',
     reduced_motion: false,
-    local_encryption: false,
     ...overrides,
   })
 

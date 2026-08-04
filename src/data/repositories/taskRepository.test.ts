@@ -6,19 +6,17 @@ import { makeTask } from '@/test/factories'
 
 let db: AppDatabase
 let repo: TaskRepository
-let repoEncrypted: TaskRepository
 let testCount = 0
 
 beforeEach(() => {
   db = new AppDatabase(`task-repo-test-${++testCount}`)
   repo = new TaskRepository(db)
-  repoEncrypted = new TaskRepository(db, 'test-password')
 })
 
 describe('TaskRepository', () => {
   const mockTask = (overrides?: Partial<Task>): Task => makeTask(overrides)
 
-  describe('without encryption', () => {
+  describe('CRUD', () => {
     it('creates and retrieves task', async () => {
       const task = mockTask()
       const id = await repo.create(task)
@@ -136,71 +134,6 @@ describe('TaskRepository', () => {
       await repo.create(mockTask({ id: 't2', essential: false }))
 
       expect((await repo.getEssentialTasks()).map((t) => t.id)).toEqual(['t1'])
-    })
-  })
-
-  describe('with encryption', () => {
-    it('encrypts title on create', async () => {
-      const task = mockTask({ title: 'Secret task' })
-      const id = await repoEncrypted.create(task)
-
-      const raw = await db.tasks.get(id)
-      expect(raw?.title).not.toBe('Secret task')
-      expect(raw?.title.length).toBeGreaterThan(0)
-    })
-
-    it('decrypts title on read', async () => {
-      const task = mockTask({ title: 'Secret task' })
-      const id = await repoEncrypted.create(task)
-
-      const retrieved = await repoEncrypted.getById(id)
-      expect(retrieved?.title).toBe('Secret task')
-    })
-
-    it('cannot read encrypted data without password', async () => {
-      const task = mockTask({ title: 'Secret task' })
-      const id = await repoEncrypted.create(task)
-
-      const unencrypted = new TaskRepository(db)
-      const retrieved = await unencrypted.getById(id)
-      expect(retrieved?.title).not.toBe('Secret task')
-    })
-
-    it('ne réencrypte pas le titre lors du réordonnancement', async () => {
-      await repoEncrypted.create(mockTask({ id: 't1', title: 'Première', position: 0 }))
-      await repoEncrypted.create(mockTask({ id: 't2', title: 'Seconde', position: 1 }))
-
-      await repoEncrypted.reorder(['t2', 't1'])
-
-      expect((await repoEncrypted.getById('t2'))?.title).toBe('Seconde')
-      expect((await repoEncrypted.getById('t1'))?.title).toBe('Première')
-    })
-
-    it('chiffre et déchiffre la description', async () => {
-      const task = mockTask({ description: 'Notes privées' })
-      const id = await repoEncrypted.create(task)
-
-      const raw = await db.tasks.get(id)
-      expect(raw?.description).not.toBe('Notes privées')
-
-      const retrieved = await repoEncrypted.getById(id)
-      expect(retrieved?.description).toBe('Notes privées')
-    })
-
-    it('ne chiffre pas une description vide', async () => {
-      const task = mockTask({ description: '' })
-      const id = await repoEncrypted.create(task)
-
-      const raw = await db.tasks.get(id)
-      expect(raw?.description).toBe('')
-    })
-
-    it('déchiffre les titres des sous-étapes', async () => {
-      await repoEncrypted.create(mockTask({ id: 'root', title: 'Parent' }))
-      await repoEncrypted.create(mockTask({ id: 'child', parent_id: 'root', title: 'Étape secrète' }))
-
-      const children = await repoEncrypted.getChildren('root')
-      expect(children.map((t) => t.title)).toEqual(['Étape secrète'])
     })
   })
 })

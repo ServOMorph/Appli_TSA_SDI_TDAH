@@ -6,7 +6,6 @@ export interface Settings {
   dark_mode: boolean
   font_size: FontSize
   reduced_motion: boolean
-  local_encryption: boolean
   ambiance_color?: string
   energy_max?: number
 }

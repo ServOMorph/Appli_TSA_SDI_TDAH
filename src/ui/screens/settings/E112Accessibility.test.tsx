@@ -11,7 +11,6 @@ const defaultSettings: Settings = {
   dark_mode: false,
   font_size: 'medium',
   reduced_motion: false,
-  local_encryption: false,
 }
 
 function renderE112(overrides = {}) {

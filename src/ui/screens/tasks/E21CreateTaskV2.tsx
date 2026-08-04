@@ -11,7 +11,9 @@ import type { Screen } from '@/app/AppContext'
 import type { RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
 import type { TaskStatus } from '@/domain/entities/task'
 
-type Destination = 'todo' | 'planned' | 'list' | 'today'
+type Destination = 'todo' | 'planned' | 'list'
+
+const DEFAULT_DESTINATION: Destination = 'todo'
 
 const FORCED_DESTINATION_BY_ORIGIN: Partial<Record<Screen, Destination>> = {
   inbox: 'todo',
@@ -23,13 +25,11 @@ const FORCED_DESTINATION_BY_ORIGIN: Partial<Record<Screen, Destination>> = {
 
 const DESTINATION_STATUS: Record<Exclude<Destination, 'list'>, TaskStatus> = {
   todo: 'inbox',
-  today: 'today',
   planned: 'planned',
 }
 
 const DESTINATION_SCREEN: Record<Exclude<Destination, 'list'>, Screen> = {
   todo: 'inbox',
-  today: 'dashboard',
   planned: 'planning',
 }
 
@@ -123,13 +123,6 @@ const removeBtnStyle: React.CSSProperties = {
   lineHeight: 1,
 }
 
-const DESTINATIONS: { value: Destination; label: string }[] = [
-  { value: 'todo', label: 'Todo' },
-  { value: 'today', label: 'Tâche du jour' },
-  { value: 'planned', label: 'Planifier' },
-  { value: 'list', label: 'Mettre dans une liste' },
-]
-
 const modalOverlay: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
@@ -153,21 +146,6 @@ const modalBox: React.CSSProperties = {
   gap: 'var(--spacing-md)',
 }
 
-function destinationBtnStyle(selected: boolean): React.CSSProperties {
-  return {
-    padding: '12px 16px',
-    borderRadius: 'var(--radius-md)',
-    border: selected ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
-    backgroundColor: selected ? 'color-mix(in srgb, var(--color-accent) 10%, transparent)' : 'var(--color-surface)',
-    color: 'var(--color-text)',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    textAlign: 'left',
-    fontFamily: 'var(--font-body)',
-    width: '100%',
-  }
-}
-
 export function E21CreateTaskV2() {
   const {
     goTo,
@@ -189,7 +167,6 @@ export function E21CreateTaskV2() {
   const [essential, setEssential] = useState(false)
   const [subTasks, setSubTasks] = useState<string[]>([])
   const [subTaskInput, setSubTaskInput] = useState('')
-  const [destination, setDestination] = useState<Destination | null>(null)
   const [date, setDate] = useState(todayDate())
   const [startTime, setStartTime] = useState('')
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null)
@@ -197,10 +174,9 @@ export function E21CreateTaskV2() {
   const [recurrence, setRecurrence] = useState<RecurrenceRuleInput>(DEFAULT_RECURRENCE)
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
-  const forcedDestination = originScreen ? FORCED_DESTINATION_BY_ORIGIN[originScreen] : undefined
-  const effectiveDestination = forcedDestination ?? destination
+  const effectiveDestination = (originScreen ? FORCED_DESTINATION_BY_ORIGIN[originScreen] : undefined) ?? DEFAULT_DESTINATION
   const isPlanned = effectiveDestination === 'planned'
-  const canSubmit = title.trim().length > 0 && !!effectiveDestination && (!isPlanned || startTime.length > 0)
+  const canSubmit = title.trim().length > 0 && (!isPlanned || startTime.length > 0)
 
   function returnToOrigin() {
     back('inbox')
@@ -368,23 +344,6 @@ export function E21CreateTaskV2() {
           <input type="checkbox" checked={essential} onChange={(e) => setEssential(e.target.checked)} />
           Obligatoire
         </label>
-
-        {!forcedDestination && (
-          <div style={fieldGroupStyle}>
-            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Que faire de cette tâche ?</p>
-            {DESTINATIONS.map((d) => (
-              <button
-                key={d.value}
-                type="button"
-                aria-pressed={destination === d.value}
-                onClick={() => setDestination(d.value)}
-                style={destinationBtnStyle(destination === d.value)}
-              >
-                {d.label}
-              </button>
-            ))}
-          </div>
-        )}
 
         {isPlanned && (
           <div style={fieldGroupStyle}>

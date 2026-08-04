@@ -1,6 +1,5 @@
 import type { AppDatabase } from '@/data/db'
 import type { Task, TaskStatus } from '@/domain/entities/task'
-import { encrypt, decrypt } from '@/crypto/crypto'
 
 function isRoot(task: Task): boolean {
   return task.parent_id === null || task.parent_id === undefined
@@ -8,59 +7,18 @@ function isRoot(task: Task): boolean {
 
 export class TaskRepository {
   private db: AppDatabase
-  private password?: string
-  constructor(db: AppDatabase, password?: string) { this.db = db; this.password = password }
-
-  private async encryptField(value: string): Promise<string> {
-    if (!this.password) return value
-    return encrypt(value, this.password)
-  }
-
-  private async decryptField(value: string): Promise<string> {
-    if (!this.password) return value
-    try {
-      return await decrypt(value, this.password)
-    } catch {
-      return value
-    }
-  }
-
-  private async decryptAll(tasks: Task[]): Promise<Task[]> {
-    return Promise.all(
-      tasks.map(async (task) => ({
-        ...task,
-        title: await this.decryptField(task.title),
-        description: task.description ? await this.decryptField(task.description) : task.description,
-      })),
-    )
-  }
+  constructor(db: AppDatabase) { this.db = db }
 
   async create(task: Task): Promise<string> {
-    const encrypted = {
-      ...task,
-      title: await this.encryptField(task.title),
-      description: task.description ? await this.encryptField(task.description) : task.description,
-    }
-    return this.db.tasks.add(encrypted)
+    return this.db.tasks.add(task)
   }
 
   async getById(id: string): Promise<Task | undefined> {
-    const task = await this.db.tasks.get(id)
-    if (!task) return undefined
-    return {
-      ...task,
-      title: await this.decryptField(task.title),
-      description: task.description ? await this.decryptField(task.description) : task.description,
-    }
+    return this.db.tasks.get(id)
   }
 
   async update(task: Task): Promise<void> {
-    const encrypted = {
-      ...task,
-      title: await this.encryptField(task.title),
-      description: task.description ? await this.encryptField(task.description) : task.description,
-    }
-    await this.db.tasks.put(encrypted)
+    await this.db.tasks.put(task)
   }
 
   async delete(id: string): Promise<void> {
@@ -76,7 +34,7 @@ export class TaskRepository {
   /** Tâches principales d'un statut donné, sous-étapes exclues. */
   async getByStatus(status: TaskStatus): Promise<Task[]> {
     const tasks = await this.db.tasks.where('status').equals(status).toArray()
-    return this.decryptAll(tasks.filter(isRoot))
+    return tasks.filter(isRoot)
   }
 
   async getTodayTasks(): Promise<Task[]> {
@@ -85,43 +43,41 @@ export class TaskRepository {
       this.db.tasks.where('status').equals('today').toArray(),
       this.db.tasks.where('status').equals('completed').toArray(),
     ])
-    const tasks = [
+    return [
       ...activeTasks.filter(isRoot),
       ...completedTasks.filter((task) => isRoot(task) && task.completed_at?.slice(0, 10) === today),
     ].sort((a, b) => {
       if (a.status !== b.status) return a.status === 'completed' ? 1 : -1
       return a.position - b.position
     })
-    return this.decryptAll(tasks)
   }
 
   /** Sous-étapes d'une tâche, triées par position. */
   async getChildren(parentId: string): Promise<Task[]> {
-    const children = await this.db.tasks.where('parent_id').equals(parentId).sortBy('position')
-    return this.decryptAll(children)
+    return this.db.tasks.where('parent_id').equals(parentId).sortBy('position')
   }
 
   /** Tâches principales planifiées à une date, triées par position. */
   async getRootByDate(date: string): Promise<Task[]> {
     const tasks = await this.db.tasks.where('scheduled_date').equals(date).sortBy('position')
-    return this.decryptAll(tasks.filter(isRoot))
+    return tasks.filter(isRoot)
   }
 
   /** Sous-étapes planifiées à une date. */
   async getChildrenByDate(date: string): Promise<Task[]> {
     const tasks = await this.db.tasks.where('scheduled_date').equals(date).toArray()
-    return this.decryptAll(tasks.filter((task) => !isRoot(task)))
+    return tasks.filter((task) => !isRoot(task))
   }
 
   async getEssentialTasks(): Promise<Task[]> {
     const tasks = await this.db.tasks.toArray()
-    return this.decryptAll(tasks.filter((task) => task.essential))
+    return tasks.filter((task) => task.essential)
   }
 
   /** Toutes les occurrences d'une série récurrente (racine incluse). */
   async getByRecurrenceId(recurrenceId: string): Promise<Task[]> {
     const tasks = await this.db.tasks.where('recurrence_id').equals(recurrenceId).toArray()
-    return this.decryptAll(tasks.filter(isRoot))
+    return tasks.filter(isRoot)
   }
 
   async reorder(ids: string[]): Promise<void> {

@@ -15,7 +15,7 @@ npm run build      # build de production
 npm run preview    # prévisualisation du build
 npm test               # tests unitaires (Vitest)
 npm run test:coverage  # couverture (seuil 85 %)
-npm run test:e2e       # tests E2E Playwright (build + 52 scénarios)
+npm run test:e2e       # tests E2E Playwright (build + 53 scénarios)
 npm run test:e2e:report  # ouvrir le rapport HTML Playwright
 npm run lint       # ESLint
 npm run format     # Prettier
@@ -46,13 +46,14 @@ Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`s
 
 Phase V5-1 close le 2026-08-02 après validation manuelle intégrale sur appareil tactile : nav basse ramenée à 4 éléments (Réception, Accueil, Paramètres, +), `E40Planning` absorbé par `E10Dashboard` (écran unique replié/déplié, corps extrait dans `PlanningBoard.tsx`), énergie planifiée/disponible affichée côte à côte, pastille de surcharge cliquable vers le centre de récupération, glisser-déposer du planning supprimé par anticipation. 3 défauts trouvés et corrigés en validation manuelle : titre `<h1>` de l'écran Réception resté « Todo » ; `index.html` déclarait `lang="en"` sur une UI française, déclenchant la traduction automatique de Chrome (corruption des nœuds texte du DOM, cassant la réconciliation React).
 
-Phase V5-2a close le 2026-08-04 après validation manuelle intégrale : `Task`/`SubTask`/`TaskV2` — deux systèmes de tâches parallèles — fusionnés en une entité `Task` unique avec `parent_id` pour les sous-étapes, un seul repository et un seul jeu de règles (`taskRules.ts`), migration Dexie v7/v8. Nécessaire avant V5-2b, qui suppose des sous-étapes sur les tâches planifiées. Défaut latent trouvé et corrigé en chemin (`TaskRepository.reorder()` corrompait les titres au réordonnancement sous chiffrement local actif). Régression trouvée en validation manuelle et corrigée : le « + » de l'accueil rouvrait l'écran de choix de destination au lieu de créer directement la tâche (`FORCED_DESTINATION_BY_ORIGIN` sans entrée pour l'écran `dashboard` depuis la fusion V5-1).
+Phase V5-2a close le 2026-08-04 après validation manuelle intégrale : `Task`/`SubTask`/`TaskV2` — deux systèmes de tâches parallèles — fusionnés en une entité `Task` unique avec `parent_id` pour les sous-étapes, un seul repository et un seul jeu de règles (`taskRules.ts`), migration Dexie v7/v8. Nécessaire avant V5-2b, qui suppose des sous-étapes sur les tâches planifiées. Régression trouvée en validation manuelle et corrigée : le « + » de l'accueil rouvrait l'écran de choix de destination au lieu de créer directement la tâche (`FORCED_DESTINATION_BY_ORIGIN` sans entrée pour l'écran `dashboard` depuis la fusion V5-1).
+
+Session 2026-08-05 hors roadmap : deux constats hérités d'une session antérieure se sont révélés faux en vérification. Destination de création de tâche (`E21CreateTaskV2.tsx`) désormais toujours forcée automatiquement — le bloc de choix libre, cru mort, était en réalité atteignable depuis une dizaine d'écrans non mappés via le « + » de la nav basse. Chiffrement local retiré entièrement (`src/crypto/`, `Settings.local_encryption`) plutôt que corrigé : il n'a jamais été activable ni actif en production.
 
 ## Stack
 
 - React + TypeScript, PWA (Vite)
 - Stockage local : IndexedDB via Dexie.js
-- Chiffrement : Web Crypto API (AES-GCM / PBKDF2)
 - Mobile futur : Capacitor (même codebase web)
 - Sync cloud : post-MVP, Supabase région UE
 
@@ -63,7 +64,6 @@ src/
   domain/    — logique métier pure (zéro import Dexie / React)
   data/      — repositories Dexie, migrations
   ui/        — composants React, écrans, hooks
-  crypto/    — wrapper Web Crypto (AES-GCM, PBKDF2)
   app/       — point d'entrée, routing, providers
   test/      — setup Vitest, helpers partagés
 scripts/     — Scripts utilitaires (lancement dev/prod, appel Ollama)
@@ -77,7 +77,6 @@ Note de réunion/ — Transcriptions de visios testeurs + documents d'analyse g�
 L'application repose sur une architecture découplée stricte en couches, documentée dans les [Architecture Decision Records](_docs/adr/) :
 - **Logique métier pure (`src/domain/`)** : Contient les entités et les règles de gestion (calcul de planification, seuils d'énergie, mode surcharge). Elle est totalement isolée et ne possède aucune dépendance envers le framework UI (React) ou le système de stockage (Dexie.js).
 - **Couche d'infrastructure (`src/data/`)** : Gère la persistance locale dans la base de données IndexedDB via Dexie.js et applique les migrations de schémas.
-- **Sécurité et chiffrement (`src/crypto/`)** : Implémente le chiffrement des données sensibles (titres des tâches, notes, etc.) côté client avec AES-GCM et PBKDF2 via l'API standard Web Crypto, garantissant la confidentialité des données utilisateur en local.
 - **Interface utilisateur (`src/ui/`)** : Écrans et composants React stylisés en CSS natif respectant des directives d'accessibilité cognitive pour la neurodivergence (contrastes doux, animations réduites, repères d'énergie simples via un système de "batteries").
 
 ## Prochaine étape

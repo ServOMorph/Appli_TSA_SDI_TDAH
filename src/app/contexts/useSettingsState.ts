@@ -38,7 +38,6 @@ export function useSettingsState() {
       dark_mode: false,
       font_size: 'medium',
       reduced_motion: false,
-      local_encryption: false,
     }
     await userRepo.create(user)
     await settingsRepo.create(defaultSettings)

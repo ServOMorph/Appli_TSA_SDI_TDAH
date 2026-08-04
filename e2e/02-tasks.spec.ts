@@ -91,6 +91,19 @@ test('T17 — Supprimer tâche avec confirmation', async ({ page }) => {
   await expect(page.getByText('Tâche à supprimer')).toHaveCount(0)
 })
 
+test('T19 — Depuis Paramètres, "+" crée directement une tâche en réception (destination toujours forcée)', async ({ page }) => {
+  await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
+  await expect(page.getByRole('heading', { name: 'Paramètres' })).toBeVisible()
+  await page.getByRole('navigation').getByRole('button', { name: 'Ajouter une tâche' }).click()
+  await expect(page.getByRole('heading', { name: 'Nouvelle tâche' })).toBeVisible()
+  await expect(page.getByText('Que faire de cette tâche ?')).toHaveCount(0)
+  await page.getByLabel('Titre de la tâche').fill('Tâche depuis paramètres')
+  await page.getByRole('button', { name: 'Valider' }).click()
+  await expect(page.getByRole('heading', { name: 'Réception' })).toBeVisible()
+  await expect(page.getByText('Tâche depuis paramètres')).toBeVisible()
+  await page.screenshot({ path: 'e2e/screenshots/19-forced-destination-from-settings.png' })
+})
+
 test('T18 — Annuler suppression tâche', async ({ page }) => {
   await page.getByRole('button', { name: 'Outils' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()

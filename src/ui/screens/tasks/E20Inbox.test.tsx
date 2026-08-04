@@ -88,13 +88,14 @@ describe('E20Inbox', () => {
   })
 
   describe('planifier et mettre dans une liste', () => {
-    it('planifier une tâche place la tâche en attente (sans la persister) puis navigue vers planning', async () => {
+    it('planifier une tâche la place au jour courant puis ouvre sa fiche', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
       const ctx = makeAppContext({ inboxTasks: [task] })
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByLabelText('Planifier Lire livre'))
-      expect(ctx.startPlanTask).toHaveBeenCalledWith('Lire livre', 'abc')
-      expect(ctx.goTo).toHaveBeenCalledWith('planning')
+      expect(ctx.planTaskToday).toHaveBeenCalledWith('abc')
+      expect(ctx.selectTask).toHaveBeenCalledWith('abc')
+      expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
     })
 
     it('ouvre le sélecteur de liste au clic sur Liste', async () => {
@@ -151,7 +152,7 @@ describe('E20Inbox', () => {
       expect(screen.queryByRole('dialog')).toBeNull()
     })
 
-    it('avertit avant de planifier une tâche ayant des sous-tâches', async () => {
+    it('planifier une tâche ayant des sous-tâches ne demande plus de confirmation (les sous-tâches sont conservées)', async () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
       const sub: Task = makeSubTask({ id: 'st-1', parent_id: 'abc', title: 'Chapitre 1', status: 'inbox' })
       const ctx = makeAppContext({
@@ -160,10 +161,8 @@ describe('E20Inbox', () => {
       })
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByLabelText('Planifier Lire livre'))
-      expect(screen.getByRole('dialog', { name: 'Sous-tâches perdues' })).toBeDefined()
-      expect(ctx.startPlanTask).not.toHaveBeenCalled()
-      await userEvent.click(screen.getByRole('button', { name: 'Continuer' }))
-      expect(ctx.startPlanTask).toHaveBeenCalledWith('Lire livre', 'abc')
+      expect(screen.queryByRole('dialog', { name: 'Sous-tâches perdues' })).toBeNull()
+      expect(ctx.planTaskToday).toHaveBeenCalledWith('abc')
     })
 
     it('avertit avant de mettre dans une liste une tâche ayant des sous-tâches', async () => {

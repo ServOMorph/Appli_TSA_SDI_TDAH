@@ -46,7 +46,7 @@ test('T06 — Ajouter une tâche depuis Dashboard vide → visible sur Dashboard
   await page.getByRole('button', { name: 'Ignorer' }).click()
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche onboarding test')
-  await page.getByRole('button', { name: 'Tâche du jour' }).click()
+  await page.getByLabel('Heure de début').fill('09:00')
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.getByRole('button', { name: 'Accueil' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()

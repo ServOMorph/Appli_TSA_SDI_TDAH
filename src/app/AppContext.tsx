@@ -20,7 +20,7 @@ import { isOverloaded } from '@/domain/rules/energyRules'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 
 export type { Screen, Route } from '@/app/navigation'
-export type { PendingPlanTask, PlannedSubTask, MovingPlanItem } from '@/app/contexts/usePlanningState'
+export type { PlannedSubTask } from '@/app/contexts/usePlanningState'
 
 type NavigationValue = {
   screen: Screen

@@ -4,31 +4,17 @@ import {
   createTask as createTaskRule,
   scheduleTask as scheduleTaskRule,
   toggleTaskCompletion as toggleTaskCompletionRule,
-  toggleEssential as toggleEssentialRule,
   setEnergyCost as setEnergyCostRule,
   reportTask as reportTaskRule,
-  renameTask as renameTaskRule,
   addMinutesToTime,
 } from '@/domain/rules/taskRules'
 import { generateOccurrenceDates, isValidRecurrence } from '@/domain/rules/taskRecurrenceRules'
 import type { Task, TaskStatus } from '@/domain/entities/task'
 import type { RecurrenceFrequency, RecurrenceEndType } from '@/domain/entities/taskRecurrence'
 
-export interface PendingPlanTask {
-  kind: 'task' | 'subtask'
-  title: string
-  sourceTaskId?: string
-  taskId?: string
-  subTaskId?: string
-}
-
 export interface PlannedSubTask extends Task {
   parentTitle: string
 }
-
-export type MovingPlanItem =
-  | { kind: 'task'; task: Task; report: boolean }
-  | { kind: 'subtask'; subTask: PlannedSubTask; report: boolean }
 
 export interface RecurrenceRuleInput {
   frequency: RecurrenceFrequency
@@ -75,9 +61,6 @@ const RECURRENCE_MATERIALIZATION_DAYS = 90
  */
 export function usePlanningState(reloadTasks: () => Promise<void>) {
   const [todayPlannedTasks, setTodayPlannedTasks] = useState<Task[]>([])
-  const [pendingPlanTask, setPendingPlanTask] = useState<PendingPlanTask | null>(null)
-  const [movingTask, setMovingTask] = useState<MovingPlanItem | null>(null)
-  const [planningTargetDate, setPlanningTargetDate] = useState<string | null>(null)
 
   async function load() {
     setTodayPlannedTasks(await taskRepo.getRootByDate(todayDate()))
@@ -85,13 +68,6 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
 
   function reset() {
     setTodayPlannedTasks([])
-  }
-
-  async function createTaskDest(title: string, status: TaskStatus): Promise<string> {
-    const now = new Date().toISOString()
-    const task = createTaskRule(newId(), title, status, false, now)
-    await taskRepo.create(task)
-    return task.id
   }
 
   async function scheduleTask(taskId: string, date: string, start: string, end: string) {
@@ -113,20 +89,6 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     await load()
   }
 
-  async function renameTaskById(id: string, title: string) {
-    const trimmed = title.trim()
-    if (!trimmed) return
-    const task = await taskRepo.getById(id)
-    if (!task) return
-    await taskRepo.update(renameTaskRule(task, trimmed, new Date().toISOString()))
-    await load()
-  }
-
-  async function deleteTaskById(id: string) {
-    await taskRepo.deleteWithChildren(id)
-    await load()
-  }
-
   async function reportTaskById(taskId: string, date: string, start: string, end: string) {
     const task = await taskRepo.getById(taskId)
     if (!task) return
@@ -134,40 +96,13 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     await load()
   }
 
-  function startPlanTask(title: string, sourceTaskId?: string) {
-    setPendingPlanTask({ kind: 'task', title, sourceTaskId })
-  }
-
-  function startPlanSubTask(subTaskId: string, title: string) {
-    setPendingPlanTask({ kind: 'subtask', title, subTaskId })
-  }
-
-  function clearPendingPlanTask() {
-    setPendingPlanTask(null)
-  }
-
-  async function schedulePendingTask(
-    title: string,
-    date: string,
-    start: string,
-    end: string,
-    sourceTaskId?: string,
-    energyCost: number | null = null,
-    essential = false,
-  ): Promise<string> {
-    const now = new Date().toISOString()
-    const base = createTaskRule(newId(), title, 'planned', false, now)
-    let scheduled = scheduleTaskRule(base, date, start, end, now)
-    scheduled = setEnergyCostRule(scheduled, energyCost, now)
-    if (essential) scheduled = toggleEssentialRule(scheduled, now)
-    await taskRepo.create(scheduled)
-    if (sourceTaskId) {
-      await taskRepo.deleteWithChildren(sourceTaskId)
-      await reloadTasks()
-    }
+  /** Planifie une tâche à la date du jour, sans horaire : l'utilisateur affine ensuite via sa fiche. */
+  async function planTaskToday(taskId: string): Promise<void> {
+    const task = await taskRepo.getById(taskId)
+    if (!task) return
+    await taskRepo.update({ ...task, status: 'planned', scheduled_date: todayDate(), updated_at: new Date().toISOString() })
+    await reloadTasks()
     await load()
-    setPendingPlanTask({ kind: 'task', title, taskId: scheduled.id })
-    return scheduled.id
   }
 
   /**
@@ -293,7 +228,9 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
    * uniquement cette occurrence (`recurrence_exception: true`), `'series'` propage le
    * changement à cette occurrence et à toutes les occurrences futures non détachées de la
    * série (la date elle-même n'est jamais propagée, seule l'occurrence éditée peut être
-   * déplacée à une nouvelle date).
+   * déplacée à une nouvelle date). L'occurrence éditée est toujours mise à jour, même si elle
+   * avait été détachée par un edit précédent — seules les AUTRES occurrences détachées restent
+   * exclues de la propagation.
    */
   async function updateTaskFields(id: string, edit: TaskFieldEdit, scope: TaskEditScope = 'occurrence'): Promise<void> {
     const task = await taskRepo.getById(id)
@@ -303,7 +240,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     if (task.recurrence_id && scope === 'series') {
       const series = await taskRepo.getByRecurrenceId(task.recurrence_id)
       const targets = series.filter(
-        (t) => !t.recurrence_exception && (t.scheduled_date ?? '') >= (task.scheduled_date ?? ''),
+        (t) => (t.id === id || !t.recurrence_exception) && (t.scheduled_date ?? '') >= (task.scheduled_date ?? ''),
       )
       for (const target of targets) {
         await taskRepo.update(applyFieldEdit(target, edit, false, now))
@@ -327,7 +264,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     if (task.recurrence_id && scope === 'series') {
       const series = await taskRepo.getByRecurrenceId(task.recurrence_id)
       const targets = series.filter(
-        (t) => !t.recurrence_exception && (t.scheduled_date ?? '') >= (task.scheduled_date ?? ''),
+        (t) => (t.id === id || !t.recurrence_exception) && (t.scheduled_date ?? '') >= (task.scheduled_date ?? ''),
       )
       for (const target of targets) {
         await taskRepo.deleteWithChildren(target.id)
@@ -339,43 +276,18 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     await load()
   }
 
-  function startMoveTask(task: Task, report: boolean) {
-    setMovingTask({ kind: 'task', task, report })
-  }
-
-  function startMoveSubTask(subTask: PlannedSubTask, report: boolean) {
-    setMovingTask({ kind: 'subtask', subTask, report })
-  }
-
-  function clearMoveTask() {
-    setMovingTask(null)
-  }
-
   return {
     todayPlannedTasks,
-    pendingPlanTask,
-    movingTask,
-    planningTargetDate,
-    setPlanningTargetDate,
-    createTaskDest,
     scheduleTask,
     getPlannedTasksForDate,
     completeTaskById,
-    renameTaskById,
-    deleteTaskById,
     reportTaskById,
-    startPlanTask,
-    startPlanSubTask,
-    clearPendingPlanTask,
-    schedulePendingTask,
+    planTaskToday,
     createDetailedTask,
     getTaskById,
     duplicateTaskById,
     updateTaskFields,
     deleteTaskScoped,
-    startMoveTask,
-    startMoveSubTask,
-    clearMoveTask,
     load,
     reset,
   }

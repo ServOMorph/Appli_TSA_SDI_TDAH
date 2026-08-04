@@ -16,7 +16,6 @@ type Destination = 'todo' | 'planned' | 'list' | 'today'
 const FORCED_DESTINATION_BY_ORIGIN: Partial<Record<Screen, Destination>> = {
   inbox: 'todo',
   tools: 'todo',
-  today: 'today',
   planning: 'planned',
   dashboard: 'planned',
   lists: 'list',
@@ -30,7 +29,7 @@ const DESTINATION_STATUS: Record<Exclude<Destination, 'list'>, TaskStatus> = {
 
 const DESTINATION_SCREEN: Record<Exclude<Destination, 'list'>, Screen> = {
   todo: 'inbox',
-  today: 'today',
+  today: 'dashboard',
   planned: 'planning',
 }
 
@@ -181,7 +180,6 @@ export function E21CreateTaskV2() {
     createDetailedTask,
     back,
     originScreen,
-    planningTargetDate,
   } = useApp()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -192,7 +190,7 @@ export function E21CreateTaskV2() {
   const [subTasks, setSubTasks] = useState<string[]>([])
   const [subTaskInput, setSubTaskInput] = useState('')
   const [destination, setDestination] = useState<Destination | null>(null)
-  const [date, setDate] = useState(planningTargetDate ?? todayDate())
+  const [date, setDate] = useState(todayDate())
   const [startTime, setStartTime] = useState('')
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null)
   const [recurring, setRecurring] = useState(false)

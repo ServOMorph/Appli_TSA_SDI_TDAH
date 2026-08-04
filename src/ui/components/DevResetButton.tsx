@@ -11,7 +11,6 @@ const SCREEN_CODES: Record<Screen, string> = {
   planning: 'E40',
   'task-detail': 'E22',
   'task-decompose': 'E23',
-  today: 'E24',
   'energy-view': 'E30',
   'energy-checkin': 'E31',
   'overload-recovery': 'E90',

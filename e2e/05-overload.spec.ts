@@ -17,15 +17,13 @@ async function collapse(page: Page) {
   await page.getByRole('button', { name: 'Replier le planning' }).click()
 }
 
-/** Laisse le planning déplié après la pose de la tâche. */
+/** La tâche est créée directement planifiée ; le planning est déplié à l'arrivée. */
 async function planOverloadingTask(page: Page, title: string) {
-  await expand(page)
-  await page.getByRole('gridcell', { name: 'Créneau 8h00' }).click()
-  await page.getByRole('gridcell', { name: 'Créneau 8h00' }).click()
-  await page.getByLabel('Nom de la tâche').fill(title)
-  await page.getByRole('button', { name: 'Valider' }).click()
+  await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
+  await page.getByLabel('Titre de la tâche').fill(title)
+  await page.getByLabel('Heure de début').fill('08:00')
   await page.getByRole('group', { name: 'Coût en énergie' }).getByRole('button', { name: '12', exact: true }).click()
-  await page.getByRole('button', { name: 'Placer' }).click()
+  await page.getByRole('button', { name: 'Valider' }).click()
 }
 
 test('T40 — Planifier une tâche coûteuse en énergie → surcharge activée automatiquement', async ({ page }) => {

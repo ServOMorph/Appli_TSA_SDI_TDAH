@@ -199,11 +199,11 @@ describe('E10Dashboard', () => {
       vi.useRealTimers()
     })
 
-    it("replié : n'affiche que les créneaux autour de l'heure courante", async () => {
-      renderWithApp(<E10Dashboard />)
-      expect(await screen.findByText('9h00')).toBeDefined()
-      expect(screen.queryByText('0h00')).toBeNull()
-      expect(screen.queryByText('23h30')).toBeNull()
+    it("replié : n'affiche pas le bandeau de dates", async () => {
+      const ctx = makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) })
+      renderWithApp(<E10Dashboard />, ctx)
+      await screen.findByRole('heading', { name: 'Tâche du jour' })
+      expect(screen.queryByRole('button', { name: /jour précédent/i })).toBeNull()
     })
 
     it('replié : affiche la tâche du jour et la zone widgets', async () => {
@@ -220,15 +220,15 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 
-    it('déplié : affiche le planning entier et masque tâche du jour et widgets', async () => {
+    it('déplié : affiche le bandeau de dates du planning et masque tâche du jour et widgets', async () => {
       const ctx = makeAppContext({
         route: { name: 'planning' },
         screen: 'planning',
         todayTasks: [makeTask({ title: 'Appeler le médecin' })],
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByText('0h00')).toBeDefined()
-      expect(screen.getByText('23h30')).toBeDefined()
+      expect(await screen.findByRole('button', { name: /jour précédent/i })).toBeDefined()
       expect(screen.queryByRole('heading', { name: 'Tâche du jour' })).toBeNull()
       expect(screen.queryByRole('region', { name: 'Outils' })).toBeNull()
     })

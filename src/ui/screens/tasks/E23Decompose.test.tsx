@@ -98,9 +98,9 @@ describe('E23Decompose', () => {
     })
   })
 
-  it('Planifier une sous-étape appelle startPlanSubTask et navigue vers planning (E9c)', async () => {
+  it('donner un horaire à une sous-étape appelle scheduleSubTask (E9c)', async () => {
     const task = makeTask()
-    const st = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone' })
+    const st = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone', scheduled_date: null, scheduled_start: null })
     const ctx = makeAppContext({
       selectedTaskId: 'task-1',
       inboxTasks: [task],
@@ -108,9 +108,9 @@ describe('E23Decompose', () => {
     })
     renderWithApp(<E23Decompose />, ctx)
     await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
-    await userEvent.click(screen.getByLabelText('Planifier Prendre le téléphone'))
-    expect(ctx.startPlanSubTask).toHaveBeenCalledWith('st-1', 'Prendre le téléphone')
-    expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    await userEvent.click(screen.getByLabelText('Horaire de Prendre le téléphone'))
+    await userEvent.type(screen.getByLabelText('Heure de Prendre le téléphone'), '09:00')
+    expect(ctx.scheduleSubTask).toHaveBeenCalledWith('st-1', expect.any(String), '09:00', '09:00')
   })
 
   it('le bouton Ajouter est désactivé si le champ est vide', async () => {

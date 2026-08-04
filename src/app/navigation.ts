@@ -4,7 +4,6 @@ export type Route =
   | { name: 'energy' }
   | { name: 'dashboard' }
   | { name: 'inbox' }
-  | { name: 'today' }
   | { name: 'task-create-v2' }
   | { name: 'planning'; date?: string }
   | { name: 'task-detail'; taskId?: string }

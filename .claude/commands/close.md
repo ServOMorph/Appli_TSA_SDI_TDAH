@@ -2,7 +2,7 @@
 description: Clôture la session d'une zone — synthèse, mise à jour du contexte, commit
 argument-hint: <zone>
 model: sonnet
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*)
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*)
 ---
 
 # /close <zone>
@@ -121,4 +121,16 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 <!-- Convention : toute règle liée à une étape précise de la Procédure ci-dessus doit la
      référencer explicitement par son numéro (ex: "Étape 6 : ..."), plutôt que compter sur la
      position physique de cette zone (toujours en fin de fichier). -->
+
+## Test en cours : push automatique après commit (Étape 10)
+
+Après le commit de l'étape 10, exécuter :
+```bash
+git push
+```
+- Si le push échoue (pas de remote tracking, conflit, réseau, etc.) : afficher l'erreur telle quelle
+  dans le bilan de l'étape 11, ne pas tenter de résolution automatique (pas de force push, pas de
+  pull/rebase automatique).
+- Fonctionnalité en test sur ce projet uniquement. Ne pas propager à d'autres projets sans décision
+  explicite prise dans `claude-vibecoding-kit`.
 <!-- SPECIFICITES PROJET : FIN -->

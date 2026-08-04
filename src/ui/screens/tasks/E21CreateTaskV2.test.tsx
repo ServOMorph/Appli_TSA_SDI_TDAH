@@ -83,14 +83,14 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goToPath).toHaveBeenCalledWith(['lists', 'list-detail'])
   })
 
-  it("chemin Tâche du jour : crée directement la tâche today et navigue vers today", async () => {
+  it("chemin Tâche du jour : crée directement la tâche today et navigue vers l'accueil", async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche du jour')
     await userEvent.click(screen.getByRole('button', { name: 'Tâche du jour' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche du jour', status: 'today' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('today')
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
   it('ne crée pas si le titre est uniquement des espaces', async () => {
@@ -138,16 +138,6 @@ describe('E21CreateTaskV2', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche depuis outils', status: 'inbox' }))
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
-  })
-
-  it("depuis Today (originScreen 'today') : aucun choix de destination affiché, Valider crée directement une tâche today", async () => {
-    const ctx = makeAppContext({ originScreen: 'today' })
-    renderWithApp(<E21CreateTaskV2 />, ctx)
-    expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
-    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis today')
-    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche depuis today', status: 'today' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('today')
   })
 
   it("depuis Planning (originScreen 'planning') : aucun choix de destination affiché, l'heure de début est requise puis planifie directement la tâche", async () => {

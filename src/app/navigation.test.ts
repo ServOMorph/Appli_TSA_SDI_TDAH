@@ -72,8 +72,8 @@ describe('push', () => {
   })
 
   it('réutilise un écran sans paramètre deux fois dans le même flux sans perdre les niveaux intermédiaires', () => {
-    const stack = push(push(push(dashboard, 'task-create-v2'), 'today'), 'task-create-v2')
-    expect(currentRoute(pop(stack))).toEqual({ name: 'today' })
+    const stack = push(push(push(dashboard, 'task-create-v2'), 'inbox'), 'task-create-v2')
+    expect(currentRoute(pop(stack))).toEqual({ name: 'inbox' })
   })
 
   it('conserve les paramètres de route', () => {

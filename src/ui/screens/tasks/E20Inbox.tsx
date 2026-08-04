@@ -58,22 +58,23 @@ export function E20Inbox() {
     selectList,
     goTo,
     moveTask,
-    startPlanTask,
+    planTaskToday,
     moveTodoTaskToList,
     createList,
     goToPath,
   } = useApp()
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
   const [newListName, setNewListName] = useState('')
-  const [subtaskWarning, setSubtaskWarning] = useState<{ task: Task; action: 'plan' | 'list' } | null>(null)
+  const [subtaskWarning, setSubtaskWarning] = useState<{ task: Task; action: 'list' } | null>(null)
 
   async function handleMoveToToday(taskId: string) {
     await moveTask(taskId, 'today')
   }
 
-  function handlePlan(task: Task) {
-    startPlanTask(task.title, task.id)
-    goTo('planning')
+  async function handlePlan(task: Task) {
+    await planTaskToday(task.id)
+    selectTask(task.id)
+    goTo('task-detail')
   }
 
   async function handleChooseList(listId: string) {
@@ -94,15 +95,6 @@ export function E20Inbox() {
     goToPath(['lists', 'list-detail'])
   }
 
-  function handleClickPlan(task: Task) {
-    const subs = inboxSubTasksMap[task.id] ?? []
-    if (subs.length > 0) {
-      setSubtaskWarning({ task, action: 'plan' })
-    } else {
-      handlePlan(task)
-    }
-  }
-
   function handleClickList(task: Task) {
     const subs = inboxSubTasksMap[task.id] ?? []
     if (subs.length > 0) {
@@ -114,13 +106,9 @@ export function E20Inbox() {
 
   function confirmSubtaskWarning() {
     if (!subtaskWarning) return
-    const { task, action } = subtaskWarning
+    const { task } = subtaskWarning
     setSubtaskWarning(null)
-    if (action === 'plan') {
-      handlePlan(task)
-    } else {
-      setListPickerTask(task)
-    }
+    setListPickerTask(task)
   }
 
   function openDetail(task: Task) {
@@ -172,7 +160,7 @@ export function E20Inbox() {
                   <button
                     aria-label={`Planifier ${task.title}`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
-                    onClick={() => handleClickPlan(task)}
+                    onClick={() => handlePlan(task)}
                   >
                     Planifier
                   </button>

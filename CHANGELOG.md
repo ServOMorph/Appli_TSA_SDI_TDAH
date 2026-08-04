@@ -1,3 +1,25 @@
+## v5.7 — 2026-08-05
+
+Phase V5-2b (planning et tâches refondus) — milestone M5 codé et testé (automatisé) : planning épuré, sans grille ni flux tap-based. Validation manuelle en cours.
+
+### Ajouté
+- `src/domain/rules/planningSlotRules.ts` : `formatDayBadge`, `dateStrip` pour le bandeau de dates.
+- `src/app/contexts/usePlanningState.ts` : `planTaskToday` (place une tâche au jour courant sans horaire, l'utilisateur affine ensuite via sa fiche).
+- `src/ui/screens/tasks/E22TaskDetail.tsx` : champ « Titre » cliquable/éditable (compense le retrait du « Renommer » de l'ancien menu planning) ; panneau horaire inline par sous-étape (date/heure/durée), réutilisant `scheduleSubTask`. Même ajout dans `E23Decompose.tsx`.
+
+### Modifié
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : réécrit intégralement — grille horaire et flux tap-based (assign/menu/déplacer/renommer/supprimer) supprimés, remplacés par une liste par tâche (icône/horaire/nom/énergie/pastille de complétion), un bandeau de dates (jour réel souligné, navigation par appui et glissement tactile, sélecteur « aller à une date »), des sous-tâches dépliables avec compteur n/N. Bouton « Reporter » simplifié : bascule directe au lendemain, même horaire.
+- `src/app/contexts/usePlanningState.ts` : retrait de `pendingPlanTask`/`movingTask` et de toute leur plomberie, devenus morts avec le flux tap-based ; retrait de `planningTargetDate`/`createTaskDest`, déjà morts avant cette session.
+- `src/ui/screens/tasks/E20Inbox.tsx` : « Planifier » appelle `planTaskToday` puis ouvre la fiche ; l'avertissement « sous-tâches perdues » retiré pour ce chemin (les sous-tâches sont désormais préservées, la tâche n'étant plus recréée).
+- `src/domain/rules/planningSlotRules.ts` : réduit aux fonctions de date, les fonctions de grille/picker (créneaux, disponibilité de plage, fenêtre visible) retirées avec leurs tests.
+
+### Retiré
+- Écran « Aujourd'hui » (`E24Today.tsx`) et route `today` — jugé redondant avec la section « Tâche du jour » déjà présente sur l'accueil, décidé avec l'utilisateur plutôt que de lui donner un point d'accès.
+
+### Corrigé
+- `src/app/contexts/usePlanningState.ts` (`updateTaskFields`/`deleteTaskScoped`) : sur une occurrence déjà détachée d'une série (`recurrence_exception: true`), la modifier à nouveau en choisissant « Toutes les occurrences » ne la mettait pas à jour elle-même — le filtre de ciblage l'excluait à tort au même titre que les autres occurrences détachées. L'occurrence cliquée est désormais toujours incluse dans la cible, trouvé en validation manuelle.
+- 4 tests e2e pré-existants (`01-onboarding.spec.ts` T06, `02-tasks.spec.ts` T13/T16/T17) : collision d'accessible name avec le nouveau champ Titre de la fiche (le titre de la tâche de test contenait le mot recherché, ex. « Tâche à décomposer » contient « décomposer »).
+
 ## v5.6 — 2026-08-04
 
 Phase V5-2b (planning et tâches refondus) en cours — milestones M1 à M4 codés et validés manuellement : entités et migration, moteur de récurrence, écran de création et fiche tâche redessinés.

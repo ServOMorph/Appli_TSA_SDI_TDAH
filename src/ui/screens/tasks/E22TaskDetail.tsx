@@ -6,7 +6,8 @@ import { IconPicker } from '@/ui/components/IconPicker'
 import { ColorPicker } from '@/ui/components/ColorPicker'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
-import { isCompleted } from '@/domain/rules/taskRules'
+import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
+import { todayStr } from '@/domain/rules/planningSlotRules'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import type { Screen } from '@/app/AppContext'
 import type { TaskEditScope, TaskFieldEdit } from '@/app/contexts/usePlanningState'
@@ -77,15 +78,23 @@ interface SortableSubTaskItemProps {
   subTask: Task
   onDelete: (id: string) => void
   onToggle: (subTask: Task) => void
-  onPlan: (subTask: Task) => void
+  onSchedule: (subTask: Task, date: string, start: string, durationMinutes: number | null) => void
   onRename: (subTask: Task) => void
 }
 
-function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan, onRename }: SortableSubTaskItemProps) {
+const subTaskScheduleFieldStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--spacing-sm)',
+  padding: '8px 0 0 30px',
+}
+
+function SortableSubTaskItem({ subTask, onDelete, onToggle, onSchedule, onRename }: SortableSubTaskItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: subTask.id,
   })
   const completed = isCompleted(subTask)
+  const [scheduling, setScheduling] = useState(false)
 
   return (
     <div
@@ -148,7 +157,8 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan, onRename }: 
             Renommer
           </button>
           <button
-            aria-label={`Planifier ${subTask.title}`}
+            aria-label={`Horaire de ${subTask.title}`}
+            aria-pressed={scheduling}
             style={{
               background: 'none',
               border: '1px solid var(--color-border)',
@@ -160,10 +170,10 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan, onRename }: 
             }}
             onClick={(e) => {
               e.stopPropagation()
-              onPlan(subTask)
+              setScheduling((v) => !v)
             }}
           >
-            Planifier
+            {subTask.scheduled_start ? `${subTask.scheduled_date} ${subTask.scheduled_start}` : 'Horaire'}
           </button>
           <button
             aria-label={`Supprimer ${subTask.title}`}
@@ -183,13 +193,61 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan, onRename }: 
             ×
           </button>
         </div>
+
+        {scheduling && (
+          <div style={subTaskScheduleFieldStyle} onClick={(e) => e.stopPropagation()}>
+            <input
+              type="date"
+              aria-label={`Date de ${subTask.title}`}
+              defaultValue={subTask.scheduled_date ?? todayStr()}
+              onChange={(e) =>
+                onSchedule(subTask, e.target.value, subTask.scheduled_start ?? '09:00', subTask.duration_minutes)
+              }
+              style={{
+                padding: '10px 12px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                fontFamily: 'var(--font-body)',
+              }}
+            />
+            <input
+              type="time"
+              aria-label={`Heure de ${subTask.title}`}
+              defaultValue={subTask.scheduled_start ?? ''}
+              onChange={(e) =>
+                onSchedule(subTask, subTask.scheduled_date ?? todayStr(), e.target.value, subTask.duration_minutes)
+              }
+              style={{
+                padding: '10px 12px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--color-border)',
+                backgroundColor: 'var(--color-surface)',
+                color: 'var(--color-text)',
+                fontFamily: 'var(--font-body)',
+              }}
+            />
+            <DurationRoller
+              minutes={subTask.duration_minutes}
+              onChange={(durationMinutes) =>
+                onSchedule(
+                  subTask,
+                  subTask.scheduled_date ?? todayStr(),
+                  subTask.scheduled_start ?? '09:00',
+                  durationMinutes,
+                )
+              }
+            />
+          </div>
+        )}
       </Card>
     </div>
   )
 }
 
 function backScreenForTask(task: Task): Screen {
-  if (task.status === 'today') return 'today'
+  if (task.status === 'today' || task.status === 'planned') return 'dashboard'
   return 'inbox'
 }
 
@@ -243,7 +301,7 @@ const inputStyle: React.CSSProperties = {
 
 const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
 
-type EditableField = 'date' | 'time' | 'energy' | 'icon' | 'color' | null
+type EditableField = 'title' | 'date' | 'time' | 'energy' | 'icon' | 'color' | null
 
 export function E22TaskDetail() {
   const {
@@ -265,8 +323,8 @@ export function E22TaskDetail() {
     back,
     goTo,
     moveTask,
-    startPlanTask,
-    startPlanSubTask,
+    planTaskToday,
+    scheduleSubTask,
     moveTodoTaskToList,
     createList,
     getTaskById,
@@ -279,7 +337,7 @@ export function E22TaskDetail() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showListPicker, setShowListPicker] = useState(false)
   const [newListName, setNewListName] = useState('')
-  const [subtaskWarningAction, setSubtaskWarningAction] = useState<'plan' | 'list' | null>(null)
+  const [subtaskWarningAction, setSubtaskWarningAction] = useState<'list' | null>(null)
   const [renamingSubTask, setRenamingSubTask] = useState<Task | null>(null)
   const [renameSubTaskTitle, setRenameSubTaskTitle] = useState('')
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
@@ -417,15 +475,20 @@ export function E22TaskDetail() {
     await moveTask(selectedTaskId, 'today')
   }
 
-  function handlePlan() {
-    if (!selectedTaskId || !task) return
-    startPlanTask(task.title, selectedTaskId)
-    goTo('planning')
+  async function handlePlan() {
+    if (!selectedTaskId) return
+    await planTaskToday(selectedTaskId)
+    await refreshFetchedTask()
   }
 
-  function handlePlanSubTask(subTask: Task) {
-    startPlanSubTask(subTask.id, subTask.title)
-    goTo('planning')
+  async function handleScheduleSubTask(subTask: Task, date: string, start: string, durationMinutes: number | null) {
+    const end = addMinutesToTime(start, durationMinutes ?? 0)
+    await scheduleSubTask(subTask.id, date, start, end)
+    if (selectedTaskId) {
+      const updated = await getSubTasks(selectedTaskId)
+      setSubTasks(updated)
+    }
+    await refreshDashboard()
   }
 
   function handleOpenRenameSubTask(subTask: Task) {
@@ -462,14 +525,6 @@ export function E22TaskDetail() {
     goToPath(['lists', 'list-detail'])
   }
 
-  function handleClickPlan() {
-    if (subTasks.length > 0) {
-      setSubtaskWarningAction('plan')
-    } else {
-      handlePlan()
-    }
-  }
-
   function handleClickList() {
     if (subTasks.length > 0) {
       setSubtaskWarningAction('list')
@@ -479,13 +534,8 @@ export function E22TaskDetail() {
   }
 
   function confirmSubtaskWarning() {
-    const action = subtaskWarningAction
     setSubtaskWarningAction(null)
-    if (action === 'plan') {
-      handlePlan()
-    } else if (action === 'list') {
-      setShowListPicker(true)
-    }
+    setShowListPicker(true)
   }
 
   if (!task) {
@@ -509,6 +559,24 @@ export function E22TaskDetail() {
       <h1 style={{ margin: 0 }}>{task.title}</h1>
 
       <section aria-label="Détails" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+        <button
+          type="button"
+          style={fieldRowStyle}
+          onClick={() => setActiveField(activeField === 'title' ? null : 'title')}
+        >
+          <span style={fieldLabelStyle}>Titre</span>
+          <span>{task.title}</span>
+        </button>
+        {activeField === 'title' && (
+          <input
+            type="text"
+            aria-label="Modifier le titre"
+            defaultValue={task.title}
+            onBlur={(e) => e.target.value.trim() && handleFieldEdit({ title: e.target.value.trim() })}
+            style={inputStyle}
+          />
+        )}
+
         <button
           type="button"
           style={fieldRowStyle}
@@ -618,7 +686,7 @@ export function E22TaskDetail() {
                     subTask={st}
                     onDelete={handleDeleteSubTask}
                     onToggle={handleToggleSubTask}
-                    onPlan={handlePlanSubTask}
+                    onSchedule={handleScheduleSubTask}
                     onRename={handleOpenRenameSubTask}
                   />
                 ))}
@@ -637,7 +705,7 @@ export function E22TaskDetail() {
             Tâche du jour
           </Button>
         )}
-        <Button fullWidth onClick={handleClickPlan}>
+        <Button fullWidth onClick={handlePlan}>
           Planifier
         </Button>
         <Button fullWidth onClick={handleClickList}>

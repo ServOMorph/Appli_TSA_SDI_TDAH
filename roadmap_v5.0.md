@@ -127,10 +127,10 @@ Note : les références de ce checklist à `taskV2.ts`/`taskRulesV2.ts`/`subTask
 « v7 » datent d'avant la fusion V5-2a et sont obsolètes — l'entité unique est `task.ts` /
 `taskRules.ts`, et la migration réelle est **v9** (v7/v8 déjà consommées par V5-2a).
 
-- [ ] `D5` + `Q10` (cf. C14, C37) — suppression définitive des cases et lignes horaires, planning épuré comme l'application de référence (`src/ui/screens/dashboard/E10Dashboard.tsx`) — **M5, pas commencé**
-- [ ] `E1`, `D6` (cf. C1, C21) — ligne de tâche : logo, plage horaire, nom, coût en énergie, pastille de complétion à droite — **M5**
-- [ ] `D1`, `D2` (cf. C3, C4) — bandeau de dates avec jour réel souligné, point indiquant le jour affiché, navigation par appui et glissement — **M5**
-- [ ] `D4` — tâche cochée barrée et conservée (comportement déjà acté, à préserver) — **M5** (à vérifier au rendu une fois le quadrillage retiré)
+- [x] `D5` + `Q10` (cf. C14, C37) — suppression définitive des cases et lignes horaires, planning épuré comme l'application de référence (`src/ui/screens/dashboard/PlanningBoard.tsx`) — codé et testé (unitaires + e2e), validation manuelle en cours
+- [x] `E1`, `D6` (cf. C1, C21) — ligne de tâche : icône, horaire, nom, coût en énergie, pastille de complétion à droite (`PlanningBoard.tsx`)
+- [x] `D1`, `D2` (cf. C3, C4) — bandeau de dates avec jour réel souligné, point indiquant le jour affiché, navigation par appui, glissement tactile et sélecteur de date pour le déplacement rapide (`PlanningBoard.tsx`, `planningSlotRules.ts`)
+- [x] `D4` — tâche cochée barrée et conservée (comportement préservé au rendu sans quadrillage)
 - [x] `E4` (cf. C7) — champ `icon` restreint (`Task.icon`, `src/domain/rules/taskAppearance.ts` : 15 icônes SVG internes, `src/ui/components/IconPicker.tsx`)
 - [x] `E3` (cf. C6) — champ `color` libre par tâche avec sélecteur complet (`Task.color`, `src/ui/components/ColorPicker.tsx`, `<input type="color">`)
 - [x] `E9` (cf. C34, C35) — écran de création redessiné : logo, nom, sous-tâches puis description, énergie, obligatoire (`src/ui/screens/tasks/E21CreateTaskV2.tsx`)
@@ -138,13 +138,15 @@ Note : les références de ce checklist à `taskV2.ts`/`taskRulesV2.ts`/`subTask
 - [x] `E8`, `E11` (cf. C12, C13, C15) — durée par trois rouleaux jour/heure/minute sur le même écran que l'heure de début, sans préréglages (`src/ui/components/DurationRoller.tsx`, `E21CreateTaskV2.tsx`)
 - [x] `E25` + `Q11` (cf. C36, C37) — choix récurrente/ponctuelle à la création, récurrence type Google Agenda (quotidien/hebdo/mensuel/annuel, intervalle, fin par date ou nombre) — `src/domain/entities/taskRecurrence.ts`, `src/domain/rules/taskRecurrenceRules.ts`, `src/ui/components/RecurrenceEditor.tsx`, matérialisation des occurrences sur 90 jours (`usePlanningState.createDetailedTask`)
 - [x] `Q11` — boîte de dialogue « cette occurrence » / « toutes les occurrences » à chaque modification/suppression d'une tâche récurrente depuis sa fiche (`E22TaskDetail.tsx`, `usePlanningState.updateTaskFields`/`deleteTaskScoped`). Simplification assumée : l'entité `TaskException` (`src/domain/entities/taskException.ts`) existe en base mais n'est pas encore utilisée par cette UI — la détection « cette occurrence » repose sur `Task.recurrence_exception`, suffisant tant que les occurrences sont toutes matérialisées à l'avance (pas de régénération différée)
-- [ ] `E5`, `E13`, `Q10` (cf. C5, C17, C39) — fiche tâche au clic, **seul** point de modification (pas de glisser-déposer) : champs date/horaire/énergie cliquables **fait** (`E22TaskDetail.tsx`), actions dupliquer/supprimer **fait** ; reste à retirer le flux tap-based du planning (`PlanningBoard.tsx`) pour que la fiche devienne le seul point d'entrée — **M5**. `E12` retire la notion d'alerte du périmètre (pas de champ alerte dans la fiche, conforme).
-- [ ] `E10`, `E22` (cf. C19, C23) — sous-tâches avec compteur `n/N` dépliable et cochable **depuis le planning** — **M5** (la fiche tâche gère déjà les sous-étapes, reste l'intégration dans les lignes du planning)
+- [x] `E5`, `E13`, `Q10` (cf. C5, C17, C39) — fiche tâche au clic, **seul** point de modification (pas de glisser-déposer) : champs titre/icône/couleur/date/horaire/énergie cliquables, actions dupliquer/supprimer (`E22TaskDetail.tsx`) ; flux tap-based du planning (menu Déplacer/Renommer/Supprimer) entièrement retiré, tap sur une ligne planning ouvre directement la fiche. `E12` retire la notion d'alerte du périmètre (pas de champ alerte dans la fiche, conforme).
+- [x] `E10`, `E22` (cf. C19, C23) — sous-tâches avec compteur `n/N` dépliable et cochable depuis le planning (`PlanningBoard.tsx`) ; une sous-tâche conserve la possibilité d'un horaire propre, réglable depuis la fiche parente (`E22TaskDetail.tsx`, `E23Decompose.tsx`)
 - [ ] `E7` — vérifier qu'aucune donnée n'est préremplie à l'installation (`src/ui/screens/onboarding/*`) — **M6, pas fait**
 - [x] `E12` — aucune notion d'alerte dans la fiche tâche ni dans la création (hors périmètre, conforme)
 - [x] Migration Dexie **v9** (`icon`, `color`, `description`, `duration_minutes`, `recurrence_id`, `is_recurrence_root`, `recurrence_exception`, tables `taskRecurrences`/`taskExceptions`) et tests de bords de récurrence (`taskRecurrenceRules.test.ts`, 18 tests : intervalles, fins par date/nombre, mois courts)
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une tâche récurrente se crée, se modifie via sa fiche en choisissant occurrence ou série, et s'affiche avec logo et couleur sans quadrillage — **quadrillage pas encore retiré (M5), gate non atteint**
+Gate : [x] tests verts (510/510 unitaires, 52/52 e2e, `tsc -b`/lint clean) · [~] test manuel (M5 en cours, cf. `tests_manuels.md`) · [ ] doc · [ ] sortie — **reste M6 (E7) et M7 (gate de phase), gate non atteint**
+
+M5 close côté code le 2026-08-05 : planning épuré sans quadrillage (liste par tâche, bandeau de dates avec navigation par appui/glissement/sélecteur de date), sous-tâches dépliables avec compteur n/N, flux tap-based entièrement retiré au profit de la fiche. Écran « Aujourd'hui » (`E24Today`) retiré (décidé avec l'utilisateur — redondant avec la section « Tâche du jour » déjà sur l'accueil). Bug trouvé et corrigé en validation manuelle : sur une occurrence déjà détachée d'une série (`recurrence_exception: true`), la modifier à nouveau en choisissant « Toutes les occurrences » ne la mettait pas à jour elle-même (`usePlanningState.ts`, filtre de ciblage excluait à tort l'occurrence cliquée) — corrigé, testé automatiquement, retest manuel en attente (`tests_manuels.md` § 2b).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

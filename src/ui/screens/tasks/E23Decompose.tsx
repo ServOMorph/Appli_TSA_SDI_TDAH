@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
-import { isCompleted } from '@/domain/rules/taskRules'
+import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
+import { todayStr } from '@/domain/rules/planningSlotRules'
 import {
   DndContext,
   PointerSensor,
@@ -55,18 +57,35 @@ const inputStyle: React.CSSProperties = {
   color: 'var(--color-text)',
 }
 
+const scheduleFieldStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--spacing-sm)',
+  padding: '8px 0 0 30px',
+}
+
+const dateTimeInputStyle: React.CSSProperties = {
+  padding: '10px 12px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text)',
+  fontFamily: 'var(--font-body)',
+}
+
 interface SortableSubTaskItemProps {
   subTask: Task
   onDelete: (id: string) => void
   onToggle: (subTask: Task) => void
-  onPlan: (subTask: Task) => void
+  onSchedule: (subTask: Task, date: string, start: string, durationMinutes: number | null) => void
 }
 
-function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan }: SortableSubTaskItemProps) {
+function SortableSubTaskItem({ subTask, onDelete, onToggle, onSchedule }: SortableSubTaskItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: subTask.id,
   })
   const completed = isCompleted(subTask)
+  const [scheduling, setScheduling] = useState(false)
 
   return (
     <div
@@ -118,7 +137,8 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan }: SortableSu
             {subTask.title}
           </span>
           <button
-            aria-label={`Planifier ${subTask.title}`}
+            aria-label={`Horaire de ${subTask.title}`}
+            aria-pressed={scheduling}
             style={{
               background: 'none',
               border: '1px solid var(--color-border)',
@@ -130,10 +150,10 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan }: SortableSu
             }}
             onClick={(e) => {
               e.stopPropagation()
-              onPlan(subTask)
+              setScheduling((v) => !v)
             }}
           >
-            Planifier
+            {subTask.scheduled_start ? `${subTask.scheduled_date} ${subTask.scheduled_start}` : 'Horaire'}
           </button>
           <button
             aria-label={`Supprimer ${subTask.title}`}
@@ -153,6 +173,40 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onPlan }: SortableSu
             ×
           </button>
         </div>
+
+        {scheduling && (
+          <div style={scheduleFieldStyle} onClick={(e) => e.stopPropagation()}>
+            <input
+              type="date"
+              aria-label={`Date de ${subTask.title}`}
+              defaultValue={subTask.scheduled_date ?? todayStr()}
+              onChange={(e) =>
+                onSchedule(subTask, e.target.value, subTask.scheduled_start ?? '09:00', subTask.duration_minutes)
+              }
+              style={dateTimeInputStyle}
+            />
+            <input
+              type="time"
+              aria-label={`Heure de ${subTask.title}`}
+              defaultValue={subTask.scheduled_start ?? ''}
+              onChange={(e) =>
+                onSchedule(subTask, subTask.scheduled_date ?? todayStr(), e.target.value, subTask.duration_minutes)
+              }
+              style={dateTimeInputStyle}
+            />
+            <DurationRoller
+              minutes={subTask.duration_minutes}
+              onChange={(durationMinutes) =>
+                onSchedule(
+                  subTask,
+                  subTask.scheduled_date ?? todayStr(),
+                  subTask.scheduled_start ?? '09:00',
+                  durationMinutes,
+                )
+              }
+            />
+          </div>
+        )}
       </Card>
     </div>
   )
@@ -168,7 +222,8 @@ export function E23Decompose() {
     deleteSubTask,
     toggleSubTask,
     reorderSubTasks,
-    startPlanSubTask,
+    scheduleSubTask,
+    refreshDashboard,
     goTo,
   } = useApp()
 
@@ -232,9 +287,14 @@ export function E23Decompose() {
     }
   }
 
-  function handlePlan(subTask: Task) {
-    startPlanSubTask(subTask.id, subTask.title)
-    goTo('planning')
+  async function handleSchedule(subTask: Task, date: string, start: string, durationMinutes: number | null) {
+    const end = addMinutesToTime(start, durationMinutes ?? 0)
+    await scheduleSubTask(subTask.id, date, start, end)
+    if (selectedTaskId) {
+      const updated = await getSubTasks(selectedTaskId)
+      setSubTasks(updated)
+    }
+    await refreshDashboard()
   }
 
   return (
@@ -261,7 +321,7 @@ export function E23Decompose() {
                   subTask={st}
                   onDelete={handleDelete}
                   onToggle={handleToggle}
-                  onPlan={handlePlan}
+                  onSchedule={handleSchedule}
                 />
               ))}
             </div>

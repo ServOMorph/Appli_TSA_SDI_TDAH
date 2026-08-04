@@ -249,7 +249,7 @@ export function E10Dashboard() {
         }}
       >
         {expanded && handle}
-        <PlanningBoard collapsed={!expanded} onRequestExpand={() => goTo('planning')} />
+        <PlanningBoard collapsed={!expanded} />
         {!expanded && handle}
       </div>
 

@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-07-25 (clôture Phase V4.1-5) (archivé depuis contexte.md 2026-08-05, session Phase V5-2b M5)
+- nav « + » (`App.tsx`) passe désormais l'écran courant comme `taskCreateOrigin` au lieu de `'dashboard'` en dur. `E21CreateTaskV2.tsx` : `effectiveDestination` généralisé via `FORCED_DESTINATION_BY_ORIGIN` (`inbox`/`tools`→`todo`, `today`→`today`, `planning`→`planned`, `lists`→`list`), remplaçant l'ancien `isFromInbox`. Décision prise au fil du codage, hors cadrage initial : l'origin `lists` force directement le sélecteur de liste (avec création de liste) plutôt que le sélecteur générique à 4 choix — validé par l'utilisateur en test manuel. `E60Lists.tsx` : accent visuel (bordure gauche + fond teinté `color-mix`) sur une liste épinglée. 474/474 tests verts au run de clôture, `tsc -b` clean, lint clean. Validation manuelle intégrale confirmée par l'utilisateur (`tests_manuels.md` points 74-82, purgés). Roadmap `roadmap_v4.1.md` : Phase V4.1-5 passée à `[FAIT]`, reste V4.1-6 (auto-scroll drag planning).
+
 ## 2026-07-25 (suite, build dist v4.1) (archivé depuis contexte.md 2026-08-04, clôture Phase V5-2a)
 - `outDir` de `vite.config.ts` codé en dur sur `dist/v3` (résidu de version) corrigé vers `dist/v4.1`, alignant le dossier de build sur la branche/version active. Build de production régénéré avec succès.
 

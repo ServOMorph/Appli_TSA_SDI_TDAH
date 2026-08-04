@@ -62,7 +62,7 @@ function addOneDay(date: string): string {
 }
 
 function OverloadWorkflow() {
-  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeTaskById, reportTaskById } = useApp()
+  const { overloadMode, saveTodayEnergy, createDetailedTask, completeTaskById, reportTaskById } = useApp()
   const [taskId, setTaskId] = useState<string | null>(null)
   const today = new Date().toISOString().slice(0, 10)
   return (
@@ -71,10 +71,20 @@ function OverloadWorkflow() {
       <button onClick={() => saveTodayEnergy(3)}>énergie basse</button>
       <button
         onClick={async () => {
-          await schedulePendingTask('Tâche coûteuse', today, '09:00', '09:30', undefined, 5, false)
-          const planned = await getPlannedTasksForDate(today)
-          const target = planned.find((t) => t.title === 'Tâche coûteuse' && t.status === 'planned')
-          setTaskId(target?.id ?? null)
+          const id = await createDetailedTask({
+            title: 'Tâche coûteuse',
+            description: '',
+            icon: null,
+            color: null,
+            energyCost: 5,
+            essential: false,
+            durationMinutes: 30,
+            date: today,
+            startTime: '09:00',
+            status: 'planned',
+            recurrence: null,
+          })
+          setTaskId(id)
         }}
       >
         planifier tâche coûteuse
@@ -626,6 +636,12 @@ describe('AppProvider — updateTaskFields / deleteTaskScoped sur une série ré
       setOpCount((c) => c + 1)
     }
 
+    async function detachRoot() {
+      if (!rootId) return
+      await updateTaskFields(rootId, { energyCost: 5 }, 'occurrence')
+      setOpCount((c) => c + 1)
+    }
+
     async function deleteSeries() {
       if (!rootId) return
       await deleteTaskScoped(rootId, 'series')
@@ -638,13 +654,21 @@ describe('AppProvider — updateTaskFields / deleteTaskScoped sur une série ré
       setCountByDate(tasks.length)
     }
 
+    async function inspectStart() {
+      const tasks = (await getPlannedTasksForDate(startDate)).filter((t) => t.title === title)
+      setEnergyByDate(String(tasks[0]?.energy_cost ?? 'none'))
+      setCountByDate(tasks.length)
+    }
+
     return (
       <>
         <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
         <button onClick={createSeries}>créer série</button>
         <button onClick={modifySeries}>modifier série</button>
+        <button onClick={detachRoot}>détacher occurrence de départ</button>
         <button onClick={deleteSeries}>supprimer série</button>
         <button onClick={inspect}>inspecter semaine suivante</button>
+        <button onClick={inspectStart}>inspecter semaine de départ</button>
         <div data-testid="op-count">{opCount}</div>
         <div data-testid="energy">{energyByDate}</div>
         <div data-testid="count">{countByDate}</div>
@@ -668,6 +692,27 @@ describe('AppProvider — updateTaskFields / deleteTaskScoped sur une série ré
     await userEvent.click(screen.getByRole('button', { name: 'modifier série' }))
     await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('2'))
     await userEvent.click(screen.getByRole('button', { name: 'inspecter semaine suivante' }))
+    await waitFor(() => expect(screen.getByTestId('energy').textContent).toBe('7'))
+  })
+
+  it('une occurrence déjà détachée est tout de même mise à jour quand on la modifie à nouveau en série', async () => {
+    render(
+      <AppProvider>
+        <RecurringSeriesPanel title="Série hebdo C" startDate="2026-10-05" nextDate="2026-10-12" />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer série' }))
+    await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('1'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'détacher occurrence de départ' }))
+    await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('2'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'modifier série' }))
+    await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('3'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter semaine de départ' }))
     await waitFor(() => expect(screen.getByTestId('energy').textContent).toBe('7'))
   })
 

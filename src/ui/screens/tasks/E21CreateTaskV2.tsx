@@ -10,6 +10,7 @@ const FORCED_DESTINATION_BY_ORIGIN: Partial<Record<Screen, Destination>> = {
   tools: 'todo',
   today: 'today',
   planning: 'planned',
+  dashboard: 'planned',
   lists: 'list',
 }
 

@@ -94,7 +94,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-2a — Refacto : unification du modèle de tâches [EN COURS]
+## Phase V5-2a — Refacto : unification du modèle de tâches [FAIT]
 
 > Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase.
 
@@ -110,9 +110,11 @@ Aucun changement de comportement visible.
 - [x] Écrans adaptés aux types unifiés, sans changement de rendu (`E20Inbox`, `E22TaskDetail`, `E23Decompose`, `E24Today`, `E10Dashboard`, `PlanningBoard`, `E21CreateTaskV2`)
 - [x] Fabriques de tests partagées (`src/test/factories.ts`) remplaçant sept fabriques dupliquées ; test de migration v6 → v8 ; couverture du filtrage racine/sous-étape et du chiffrement au réordonnancement
 
-Gate : [x] tests verts (508/508 unitaires, 53/53 e2e, `tsc -b`/lint/build clean) · [ ] test manuel (points 110-117 de `tests_manuels.md`) · [x] doc (`CHANGELOG.md`) · [ ] sortie : un seul modèle de tâche en base, `subTasks` et `tasksV2` disparus, application strictement iso-fonctionnelle
+Gate : [x] tests verts (509/509 unitaires, 53/53 e2e, `tsc -b`/lint/build clean) · [x] test manuel (points 110-117 de `tests_manuels.md`, validés le 2026-08-04, fichier purgé) · [x] doc (`CHANGELOG.md`) · [x] sortie : un seul modèle de tâche en base, `subTasks` et `tasksV2` disparus, application strictement iso-fonctionnelle
 
 Défaut latent trouvé et corrigé en chemin : `TaskRepository.reorder()` réencryptait un titre déjà chiffré (lecture brute en base puis passage par `update()`), corrompant le titre au réordonnancement quand le chiffrement local est actif. Préexistant à cette phase, révélé par l'unification (`SubTaskRepository.reorder()` écrivait correctement en base, pas `TaskRepository`). Verrouillé par un test.
+
+Phase close le 2026-08-04. Point 111 (validation manuelle) a révélé une régression indépendante de la migration : le « + » de l'accueil (`E10Dashboard`, écran `dashboard` depuis la fusion V5-1) rouvrait l'écran de choix de destination au lieu de créer directement la tâche, `FORCED_DESTINATION_BY_ORIGIN` (`E21CreateTaskV2.tsx`) n'ayant pas d'entrée pour l'origine `dashboard` — contraire à `Q12`. Corrigé (`dashboard: 'planned'`), test dédié ajouté, 509/509 unitaires verts. Point 110 (perte apparente de tâches à l'ouverture) : non reproductible, infirmé par l'export (`export-audhd-2026-08-04.json`, toutes les tâches antérieures au 2026-07-31 présentes) — écran d'affichage vide transitoire au chargement, pas une perte de données ; résolu par rechargement complet de l'UI.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

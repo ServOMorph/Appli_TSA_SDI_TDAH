@@ -1,3 +1,13 @@
+## v5.5 — 2026-08-04
+
+Phase V5-2a close après validation manuelle intégrale (points 110-117, `tests_manuels.md` purgé).
+
+### Corrigé
+- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : `FORCED_DESTINATION_BY_ORIGIN` n'avait pas d'entrée pour l'origine `dashboard` (écran d'accueil depuis la fusion V5-1), faisant réapparaître l'écran de choix de destination au lieu de créer directement la tâche depuis le « + » de l'accueil. Ajout de `dashboard: 'planned'`.
+
+### Validé
+- Migration Dexie v7/v8 confirmée sans perte de données sur un export réel utilisateur (tâches antérieures au 2026-07-31 toutes présentes).
+
 ## v5.4 — 2026-08-02
 
 Phase V5-2a — refacto : unification du modèle de tâches. Aucun changement de comportement visible. Validation manuelle en attente (`tests_manuels.md`, points 110 à 117).

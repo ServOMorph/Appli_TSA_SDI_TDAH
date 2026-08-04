@@ -152,6 +152,16 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
+  it("depuis Accueil (originScreen 'dashboard') : aucun choix de destination affiché, Valider planifie directement la tâche", async () => {
+    const ctx = makeAppContext({ originScreen: 'dashboard' })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis accueil')
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(ctx.startPlanTask).toHaveBeenCalledWith('Tâche depuis accueil')
+    expect(ctx.goTo).toHaveBeenCalledWith('planning')
+  })
+
   it("depuis Listes (originScreen 'lists') : aucun choix de destination affiché, Valider ouvre directement le sélecteur de liste", async () => {
     const ctx = makeAppContext({
       originScreen: 'lists',

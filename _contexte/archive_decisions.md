@@ -203,3 +203,6 @@
 
 ## 2026-07-19 (archivé depuis contexte.md 2026-07-21)
 - Validation manuelle V4-3 close après correction du bandeau de planification et mesure dynamique de `--bottomnav-h` via `ResizeObserver`. 386/386 tests, `tsc -b` clean.
+
+## 2026-07-25 (archivé depuis contexte.md 2026-08-04)
+- Correctif dette e2e : angle mort signalé en fin de session précédente traité — 10 specs e2e cassées par le renommage nav Todo→Outils (Phase V4.1-0) corrigées (`02-tasks`, `06-offline`, `07-planning-v4`), plus un bug de test lié découvert en cascade (bouton Retour de `E20Inbox` pointant vers le hub Outils depuis V4.1-0, tâche déplacée invisible après Retour). Cause confirmée unique (pas de régression fonctionnelle). Suite e2e complète 53/53 verte, suite unitaire 464/466 (flaky pré-existant sans lien).

@@ -1,8 +1,21 @@
 import { render, screen, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useState } from 'react'
 import { AppProvider, useApp } from './AppContext'
+import { db } from '@/app/repositories'
+
+/**
+ * Les tâches créées par un test (y compris les tests qui s'appuient sur `inboxTasks[0]`
+ * sans nettoyer) persistaient sinon dans la base partagée du fichier et polluaient les
+ * tests suivants (ex. `first` pointant sur un résidu renommé plutôt que sur la tâche
+ * fraîchement créée). Les autres tables (utilisateur, réglages...) restent volontairement
+ * non réinitialisées : plusieurs blocs `describe` comptent sur l'utilisateur créé dans un
+ * test antérieur.
+ */
+afterEach(async () => {
+  await Promise.all([db.tasks.clear(), db.taskRecurrences.clear(), db.taskExceptions.clear()])
+})
 
 function ScreenIndicator() {
   const { screen: s, loading } = useApp()
@@ -49,7 +62,7 @@ function addOneDay(date: string): string {
 }
 
 function OverloadWorkflow() {
-  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeV2Task, reportV2Task } = useApp()
+  const { overloadMode, saveTodayEnergy, schedulePendingTask, getPlannedTasksForDate, completeTaskById, reportTaskById } = useApp()
   const [taskId, setTaskId] = useState<string | null>(null)
   const today = new Date().toISOString().slice(0, 10)
   return (
@@ -66,8 +79,8 @@ function OverloadWorkflow() {
       >
         planifier tâche coûteuse
       </button>
-      <button onClick={() => taskId && completeV2Task(taskId)}>terminer tâche</button>
-      <button onClick={() => taskId && reportV2Task(taskId, addOneDay(today), '09:00', '09:30')}>reporter tâche</button>
+      <button onClick={() => taskId && completeTaskById(taskId)}>terminer tâche</button>
+      <button onClick={() => taskId && reportTaskById(taskId, addOneDay(today), '09:00', '09:30')}>reporter tâche</button>
     </>
   )
 }
@@ -268,6 +281,7 @@ describe('AppProvider — opérations tâches inbox', () => {
     await waitFor(() => expect(getCount()).toBe(before + 1))
   })
 
+
   it('moveTask déplace une tâche inbox vers today', async () => {
     render(<AppProvider><InboxPanel /></AppProvider>)
     await waitReady()
@@ -355,9 +369,9 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
       addSubTask,
       getSubTasks,
       getPlannedSubTasksForDate,
-      scheduleSubTaskV2,
-      reportSubTaskV2,
-      renameSubTaskV2,
+      scheduleSubTask,
+      reportSubTask,
+      renameSubTask,
     } = useApp()
     const first = inboxTasks[0]
     const [planned, setPlanned] = useState<string | null>(null)
@@ -370,7 +384,7 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
       const subs = await getSubTasks(first.id)
       const sub = subs[0]
       setSubTaskId(sub.id)
-      await scheduleSubTaskV2(sub.id, today, '09:00', '09:30')
+      await scheduleSubTask(sub.id, today, '09:00', '09:30')
       const plannedToday = await getPlannedSubTasksForDate(today)
       const match = plannedToday.find((s) => s.id === sub.id)
       setPlanned(match ? `${match.parentTitle}|${match.scheduled_start}|${String(match.postponed)}` : null)
@@ -378,7 +392,7 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
 
     async function report() {
       if (!subTaskId) return
-      await reportSubTaskV2(subTaskId, today, '14:00', '14:30')
+      await reportSubTask(subTaskId, today, '14:00', '14:30')
       const plannedToday = await getPlannedSubTasksForDate(today)
       const match = plannedToday.find((s) => s.id === subTaskId)
       setPlanned(match ? `${match.parentTitle}|${match.scheduled_start}|${String(match.postponed)}` : null)
@@ -386,7 +400,7 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
 
     async function rename() {
       if (!subTaskId) return
-      await renameSubTaskV2(subTaskId, 'Sous-étape renommée')
+      await renameSubTask(subTaskId, 'Sous-étape renommée')
       const plannedToday = await getPlannedSubTasksForDate(today)
       const match = plannedToday.find((s) => s.id === subTaskId)
       setPlanned(match ? match.title : null)
@@ -403,7 +417,7 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
     )
   }
 
-  it('scheduleSubTaskV2 planifie la sous-tâche et la rattache à sa tâche parente', async () => {
+  it('scheduleSubTask planifie la sous-tâche et la rattache à sa tâche parente', async () => {
     render(<AppProvider><SubTaskPlanningPanel /></AppProvider>)
     await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
     await waitFor(() => expect(screen.getByRole('button', { name: 'planifier sous-étape' })).not.toBeDisabled())
@@ -415,7 +429,7 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
     })
   })
 
-  it('reportSubTaskV2 reprogramme la sous-tâche et la marque reportée', async () => {
+  it('reportSubTask reprogramme la sous-tâche et la marque reportée', async () => {
     render(<AppProvider><SubTaskPlanningPanel /></AppProvider>)
     await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
     await waitFor(() => expect(screen.getByRole('button', { name: 'planifier sous-étape' })).not.toBeDisabled())
@@ -431,7 +445,7 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
     })
   })
 
-  it('renameSubTaskV2 renomme uniquement la sous-tâche', async () => {
+  it('renameSubTask renomme uniquement la sous-tâche', async () => {
     render(<AppProvider><SubTaskPlanningPanel /></AppProvider>)
     await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
     await waitFor(() => expect(screen.getByRole('button', { name: 'planifier sous-étape' })).not.toBeDisabled())
@@ -495,5 +509,184 @@ describe('AppProvider — settings et données', () => {
       await userEvent.click(screen.getByRole('button', { name: 'supprimer tout' }))
     })
     await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('welcome'))
+  })
+})
+
+describe('AppProvider — createDetailedTask (E21)', () => {
+  function DetailedTaskPanel() {
+    const { createUser, completeOnboarding, createDetailedTask, inboxTasks, todayTasks, loading } = useApp()
+    if (loading) return <div data-testid="loading">chargement</div>
+    return (
+      <>
+        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button
+          onClick={() =>
+            createDetailedTask({
+              title: 'Tâche détaillée inbox',
+              description: '',
+              icon: null,
+              color: null,
+              energyCost: null,
+              essential: false,
+              durationMinutes: null,
+              date: null,
+              startTime: null,
+              status: 'inbox',
+              recurrence: null,
+            })
+          }
+        >
+          créer inbox détaillée
+        </button>
+        <button
+          onClick={() =>
+            createDetailedTask({
+              title: 'Tâche détaillée today',
+              description: '',
+              icon: null,
+              color: null,
+              energyCost: null,
+              essential: false,
+              durationMinutes: null,
+              date: null,
+              startTime: null,
+              status: 'today',
+              recurrence: null,
+            })
+          }
+        >
+          créer today détaillée
+        </button>
+        <div data-testid="inbox-count">{inboxTasks.length}</div>
+        <div data-testid="today-count">{todayTasks.length}</div>
+      </>
+    )
+  }
+
+  it('une tâche créée via createDetailedTask apparaît immédiatement dans inboxTasks / todayTasks', async () => {
+    render(<AppProvider><DetailedTaskPanel /></AppProvider>)
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await waitFor(() => expect(screen.getByTestId('inbox-count')).toBeInTheDocument())
+
+    const inboxBefore = parseInt(screen.getByTestId('inbox-count').textContent ?? '0')
+    await userEvent.click(screen.getByRole('button', { name: 'créer inbox détaillée' }))
+    await waitFor(() => expect(parseInt(screen.getByTestId('inbox-count').textContent ?? '0')).toBe(inboxBefore + 1))
+
+    const todayBefore = parseInt(screen.getByTestId('today-count').textContent ?? '0')
+    await userEvent.click(screen.getByRole('button', { name: 'créer today détaillée' }))
+    await waitFor(() => expect(parseInt(screen.getByTestId('today-count').textContent ?? '0')).toBe(todayBefore + 1))
+  })
+})
+
+describe('AppProvider — updateTaskFields / deleteTaskScoped sur une série récurrente (M4)', () => {
+  interface RecurringSeriesPanelProps {
+    title: string
+    startDate: string
+    nextDate: string
+  }
+
+  function RecurringSeriesPanel({ title, startDate, nextDate }: RecurringSeriesPanelProps) {
+    const {
+      createUser,
+      completeOnboarding,
+      createDetailedTask,
+      getPlannedTasksForDate,
+      updateTaskFields,
+      deleteTaskScoped,
+      loading,
+    } = useApp()
+    const [rootId, setRootId] = useState<string | null>(null)
+    const [energyByDate, setEnergyByDate] = useState<string>('none')
+    const [countByDate, setCountByDate] = useState<number>(0)
+    const [opCount, setOpCount] = useState(0)
+    if (loading) return <div data-testid="loading">chargement</div>
+
+    async function createSeries() {
+      const id = await createDetailedTask({
+        title,
+        description: '',
+        icon: null,
+        color: null,
+        energyCost: 3,
+        essential: false,
+        durationMinutes: 30,
+        date: startDate,
+        startTime: '09:00',
+        status: 'planned',
+        recurrence: { frequency: 'weekly', interval: 1, weekdays: [1], end_type: 'never', end_date: null, end_count: null },
+      })
+      setRootId(id)
+      setOpCount((c) => c + 1)
+    }
+
+    async function modifySeries() {
+      if (!rootId) return
+      await updateTaskFields(rootId, { energyCost: 7 }, 'series')
+      setOpCount((c) => c + 1)
+    }
+
+    async function deleteSeries() {
+      if (!rootId) return
+      await deleteTaskScoped(rootId, 'series')
+      setOpCount((c) => c + 1)
+    }
+
+    async function inspect() {
+      const tasks = (await getPlannedTasksForDate(nextDate)).filter((t) => t.title === title)
+      setEnergyByDate(String(tasks[0]?.energy_cost ?? 'none'))
+      setCountByDate(tasks.length)
+    }
+
+    return (
+      <>
+        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={createSeries}>créer série</button>
+        <button onClick={modifySeries}>modifier série</button>
+        <button onClick={deleteSeries}>supprimer série</button>
+        <button onClick={inspect}>inspecter semaine suivante</button>
+        <div data-testid="op-count">{opCount}</div>
+        <div data-testid="energy">{energyByDate}</div>
+        <div data-testid="count">{countByDate}</div>
+      </>
+    )
+  }
+
+  it('propage une modification de champ à toute la série future', async () => {
+    render(
+      <AppProvider>
+        <RecurringSeriesPanel title="Série hebdo A" startDate="2026-08-10" nextDate="2026-08-17" />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer série' }))
+    await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('1'))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter semaine suivante' }))
+    await waitFor(() => expect(screen.getByTestId('energy').textContent).toBe('3'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'modifier série' }))
+    await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('2'))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter semaine suivante' }))
+    await waitFor(() => expect(screen.getByTestId('energy').textContent).toBe('7'))
+  })
+
+  it('supprime la série entière à partir de cette occurrence', async () => {
+    render(
+      <AppProvider>
+        <RecurringSeriesPanel title="Série hebdo B" startDate="2026-09-07" nextDate="2026-09-14" />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer série' }))
+    await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('1'))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter semaine suivante' }))
+    await waitFor(() => expect(screen.getByTestId('count').textContent).toBe('1'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'supprimer série' }))
+    await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('2'))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter semaine suivante' }))
+    await waitFor(() => expect(screen.getByTestId('count').textContent).toBe('0'))
   })
 })

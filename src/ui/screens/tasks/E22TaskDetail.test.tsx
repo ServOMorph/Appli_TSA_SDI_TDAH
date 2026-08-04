@@ -67,7 +67,7 @@ describe('E22TaskDetail', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
-  it('Renommer une sous-étape appelle renameSubTaskV2 et recharge la liste', async () => {
+  it('Renommer une sous-étape appelle renameSubTask et recharge la liste', async () => {
     const task = makeTask()
     const subTask = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone' })
     const getSubTasks = vi.fn()
@@ -85,7 +85,7 @@ describe('E22TaskDetail', () => {
     await userEvent.clear(input)
     await userEvent.type(input, 'Appeler le secrétariat')
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
-    expect(ctx.renameSubTaskV2).toHaveBeenCalledWith('st-1', 'Appeler le secrétariat')
+    expect(ctx.renameSubTask).toHaveBeenCalledWith('st-1', 'Appeler le secrétariat')
     await waitFor(() => {
       expect(screen.getByText('Appeler le secrétariat')).toBeDefined()
     })
@@ -165,6 +165,71 @@ describe('E22TaskDetail', () => {
         const checkbox = screen.getByLabelText('Marquer non terminée : Prendre le téléphone') as HTMLInputElement
         expect(checkbox.checked).toBe(true)
       })
+    })
+  })
+
+  describe('champs éditables (M4)', () => {
+    it('affiche et modifie l\'icône', async () => {
+      const task = makeTask({ icon: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Icône Aucune' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Sport' }))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { icon: 'sport' }, 'occurrence')
+    })
+
+    it('modifie l\'heure de début', async () => {
+      const task = makeTask({ scheduled_date: '2026-08-10', scheduled_start: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Horaire Non planifié' }))
+      await userEvent.type(screen.getByLabelText("Modifier l'heure de début"), '09:00')
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { startTime: '09:00' }, 'occurrence')
+    })
+
+    it('modifie le coût en énergie', async () => {
+      const task = makeTask({ energy_cost: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Coût en énergie Non défini' }))
+      await userEvent.click(screen.getByRole('group', { name: 'Modifier le coût en énergie' }).querySelector('button:nth-child(5)')!)
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { energyCost: 5 }, 'occurrence')
+    })
+
+    it('une tâche récurrente ouvre le choix occurrence/série avant d\'appliquer une modification', async () => {
+      const task = makeTask({ recurrence_id: 'rec-1', energy_cost: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Coût en énergie Non défini' }))
+      await userEvent.click(screen.getByRole('group', { name: 'Modifier le coût en énergie' }).querySelector('button:nth-child(5)')!)
+      expect(ctx.updateTaskFields).not.toHaveBeenCalled()
+      expect(screen.getByRole('dialog', { name: 'Modifier la série récurrente' })).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Toutes les occurrences' }))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { energyCost: 5 }, 'series')
+    })
+
+    it('une tâche récurrente ouvre le choix occurrence/série avant la suppression', async () => {
+      const task = makeTask({ recurrence_id: 'rec-1' })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
+      const confirmBtn = screen.getAllByRole('button', { name: 'Supprimer' }).find((b) => b.closest('[role="dialog"]'))
+      await userEvent.click(confirmBtn!)
+      expect(ctx.deleteTaskScoped).not.toHaveBeenCalled()
+      expect(screen.getByRole('dialog', { name: 'Modifier la série récurrente' })).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Cette occurrence' }))
+      expect(ctx.deleteTaskScoped).toHaveBeenCalledWith('task-1', 'occurrence')
+    })
+  })
+
+  describe('Dupliquer (M4)', () => {
+    it('appelle duplicateTaskById et navigue vers l\'écran d\'origine', async () => {
+      const task = makeTask({ status: 'inbox' })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Dupliquer' }))
+      expect(ctx.duplicateTaskById).toHaveBeenCalledWith('task-1')
+      expect(ctx.goTo).toHaveBeenCalledWith('inbox')
     })
   })
 

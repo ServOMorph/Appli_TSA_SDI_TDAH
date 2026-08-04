@@ -39,25 +39,33 @@ describe('E21CreateTaskV2', () => {
     expect(btn.disabled).toBe(false)
   })
 
-  it('chemin Todo : crée une tâche V1 inbox et navigue vers inbox', async () => {
+  it('chemin Todo : crée la tâche en réception et navigue vers inbox', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche todo')
     await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.createTaskInbox).toHaveBeenCalledWith('Tâche todo')
-    expect(ctx.createTaskV2Dest).not.toHaveBeenCalled()
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche todo', status: 'inbox' }))
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it('chemin Planifier : place la tâche en attente (sans la persister) et navigue vers planning', async () => {
+  it('chemin Planifier : affiche date/heure/durée, désactive Valider tant que l\'heure n\'est pas choisie', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche planifiée')
     await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
-    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.startPlanTask).toHaveBeenCalledWith('Tâche planifiée')
-    expect(ctx.createTaskV2Dest).not.toHaveBeenCalled()
+    expect(screen.getByLabelText('Date')).toBeDefined()
+    expect(screen.getByLabelText('Heure de début')).toBeDefined()
+    const btn = screen.getByRole('button', { name: 'Valider' }) as HTMLButtonElement
+    expect(btn.disabled).toBe(true)
+    expect(screen.getByText("L'heure de début est requise pour planifier la tâche.")).toBeDefined()
+    await userEvent.type(screen.getByLabelText('Heure de début'), '09:00')
+    expect(btn.disabled).toBe(false)
+    expect(screen.queryByText("L'heure de début est requise pour planifier la tâche.")).toBeNull()
+    await userEvent.click(btn)
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Tâche planifiée', status: 'planned', startTime: '09:00' }),
+    )
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
@@ -81,7 +89,7 @@ describe('E21CreateTaskV2', () => {
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche du jour')
     await userEvent.click(screen.getByRole('button', { name: 'Tâche du jour' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.addTask).toHaveBeenCalledWith('Tâche du jour')
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche du jour', status: 'today' }))
     expect(ctx.goTo).toHaveBeenCalledWith('today')
   })
 
@@ -91,7 +99,7 @@ describe('E21CreateTaskV2', () => {
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), '   ')
     await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.createTaskV2Dest).not.toHaveBeenCalled()
+    expect(ctx.createDetailedTask).not.toHaveBeenCalled()
   })
 
   it('Annuler navigue vers inbox', async () => {
@@ -118,7 +126,7 @@ describe('E21CreateTaskV2', () => {
     const btn = screen.getByRole('button', { name: 'Valider' }) as HTMLButtonElement
     expect(btn.disabled).toBe(false)
     await userEvent.click(btn)
-    expect(ctx.createTaskInbox).toHaveBeenCalledWith('Tâche depuis todo')
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche depuis todo', status: 'inbox' }))
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
@@ -128,7 +136,7 @@ describe('E21CreateTaskV2', () => {
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis outils')
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.createTaskInbox).toHaveBeenCalledWith('Tâche depuis outils')
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche depuis outils', status: 'inbox' }))
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
@@ -138,27 +146,33 @@ describe('E21CreateTaskV2', () => {
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis today')
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.addTask).toHaveBeenCalledWith('Tâche depuis today')
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ title: 'Tâche depuis today', status: 'today' }))
     expect(ctx.goTo).toHaveBeenCalledWith('today')
   })
 
-  it("depuis Planning (originScreen 'planning') : aucun choix de destination affiché, Valider planifie directement la tâche", async () => {
+  it("depuis Planning (originScreen 'planning') : aucun choix de destination affiché, l'heure de début est requise puis planifie directement la tâche", async () => {
     const ctx = makeAppContext({ originScreen: 'planning' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis planning')
+    await userEvent.type(screen.getByLabelText('Heure de début'), '10:30')
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.startPlanTask).toHaveBeenCalledWith('Tâche depuis planning')
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Tâche depuis planning', status: 'planned', startTime: '10:30' }),
+    )
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
-  it("depuis Accueil (originScreen 'dashboard') : aucun choix de destination affiché, Valider planifie directement la tâche", async () => {
+  it("depuis Accueil (originScreen 'dashboard') : aucun choix de destination affiché, planifie directement la tâche", async () => {
     const ctx = makeAppContext({ originScreen: 'dashboard' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     expect(screen.queryByText('Que faire de cette tâche ?')).toBeNull()
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis accueil')
+    await userEvent.type(screen.getByLabelText('Heure de début'), '08:00')
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.startPlanTask).toHaveBeenCalledWith('Tâche depuis accueil')
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Tâche depuis accueil', status: 'planned', startTime: '08:00' }),
+    )
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
@@ -194,5 +208,35 @@ describe('E21CreateTaskV2', () => {
     expect(btn.getAttribute('aria-pressed')).toBe('false')
     await userEvent.click(btn)
     expect(btn.getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('permet d\'ajouter et retirer des sous-tâches', async () => {
+    renderWithApp(<E21CreateTaskV2 />)
+    await userEvent.type(screen.getByLabelText('Nouvelle sous-tâche'), 'Étape 1')
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+    expect(screen.getByText('Étape 1')).toBeDefined()
+    await userEvent.click(screen.getByRole('button', { name: 'Retirer Étape 1' }))
+    expect(screen.queryByText('Étape 1')).toBeNull()
+  })
+
+  it('transmet les sous-tâches créées à addSubTask après la création de la tâche', async () => {
+    const ctx = makeAppContext()
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche avec sous-tâches')
+    await userEvent.type(screen.getByLabelText('Nouvelle sous-tâche'), 'Étape 1')
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(ctx.addSubTask).toHaveBeenCalledWith('task-1', 'Étape 1')
+  })
+
+  it('transmet le coût en énergie choisi à createDetailedTask', async () => {
+    const ctx = makeAppContext()
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche énergie')
+    await userEvent.click(screen.getByRole('button', { name: '5' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Todo' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(expect.objectContaining({ energyCost: 5 }))
   })
 })

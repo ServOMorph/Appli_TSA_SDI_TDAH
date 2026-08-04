@@ -274,14 +274,14 @@ interface PlanningBoardProps {
 export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps) {
   const {
     getPlannedTasksForDate,
-    scheduleV2Task,
+    scheduleTask,
     pendingPlanTask,
     clearPendingPlanTask,
     schedulePendingTask,
-    completeV2Task,
-    renameV2Task,
-    deleteV2Task,
-    reportV2Task,
+    completeTaskById,
+    renameTaskById,
+    deleteTaskById,
+    reportTaskById,
     movingTask,
     startMoveTask,
     startMoveSubTask,
@@ -289,9 +289,9 @@ export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps
     planningTargetDate,
     setPlanningTargetDate,
     getPlannedSubTasksForDate,
-    scheduleSubTaskV2,
-    reportSubTaskV2,
-    renameSubTaskV2,
+    scheduleSubTask,
+    reportSubTask,
+    renameSubTask,
     deleteSubTask,
     toggleSubTask,
     overloadMode,
@@ -367,7 +367,7 @@ export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps
 
   async function handleComplete(block: PlanBlock) {
     if (block.kind === 'task') {
-      await completeV2Task(block.item.id)
+      await completeTaskById(block.item.id)
     } else {
       await toggleSubTask(block.item)
     }
@@ -392,11 +392,11 @@ export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps
     const start = slotTime(target.start)
     const end = slotTime(target.end + 1)
     if (block.kind === 'task') {
-      if (report) await reportV2Task(block.item.id, targetDate, start, end)
-      else await scheduleV2Task(block.item.id, targetDate, start, end)
+      if (report) await reportTaskById(block.item.id, targetDate, start, end)
+      else await scheduleTask(block.item.id, targetDate, start, end)
     } else {
-      if (report) await reportSubTaskV2(block.item.id, targetDate, start, end)
-      else await scheduleSubTaskV2(block.item.id, targetDate, start, end)
+      if (report) await reportSubTask(block.item.id, targetDate, start, end)
+      else await scheduleSubTask(block.item.id, targetDate, start, end)
     }
     await reload()
     return true
@@ -413,14 +413,14 @@ export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps
   async function handleRename(block: PlanBlock) {
     const title = renameTitle.trim()
     if (!title) return
-    if (block.kind === 'task') await renameV2Task(block.item.id, title)
-    else await renameSubTaskV2(block.item.id, title)
+    if (block.kind === 'task') await renameTaskById(block.item.id, title)
+    else await renameSubTask(block.item.id, title)
     await reload()
     closePicker()
   }
 
   async function handleDelete(block: PlanBlock) {
-    if (block.kind === 'task') await deleteV2Task(block.item.id)
+    if (block.kind === 'task') await deleteTaskById(block.item.id)
     else await deleteSubTask(block.item.id)
     await reload()
     closePicker()
@@ -433,9 +433,9 @@ export function PlanningBoard({ collapsed, onRequestExpand }: PlanningBoardProps
     const start = slotTime(range.start)
     const end = slotTime(range.end + 1)
     if (pendingPlanTask?.kind === 'subtask' && pendingPlanTask.subTaskId) {
-      await scheduleSubTaskV2(pendingPlanTask.subTaskId, displayDate, start, end)
+      await scheduleSubTask(pendingPlanTask.subTaskId, displayDate, start, end)
     } else if (pendingPlanTask?.taskId) {
-      await scheduleV2Task(pendingPlanTask.taskId, displayDate, start, end)
+      await scheduleTask(pendingPlanTask.taskId, displayDate, start, end)
     } else {
       await schedulePendingTask(title, displayDate, start, end, pendingPlanTask?.sourceTaskId, energyCost, essential)
     }

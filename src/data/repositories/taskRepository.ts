@@ -11,17 +11,17 @@ export class TaskRepository {
   private password?: string
   constructor(db: AppDatabase, password?: string) { this.db = db; this.password = password }
 
-  private async encryptTitle(title: string): Promise<string> {
-    if (!this.password) return title
-    return encrypt(title, this.password)
+  private async encryptField(value: string): Promise<string> {
+    if (!this.password) return value
+    return encrypt(value, this.password)
   }
 
-  private async decryptTitle(title: string): Promise<string> {
-    if (!this.password) return title
+  private async decryptField(value: string): Promise<string> {
+    if (!this.password) return value
     try {
-      return await decrypt(title, this.password)
+      return await decrypt(value, this.password)
     } catch {
-      return title
+      return value
     }
   }
 
@@ -29,7 +29,8 @@ export class TaskRepository {
     return Promise.all(
       tasks.map(async (task) => ({
         ...task,
-        title: await this.decryptTitle(task.title),
+        title: await this.decryptField(task.title),
+        description: task.description ? await this.decryptField(task.description) : task.description,
       })),
     )
   }
@@ -37,7 +38,8 @@ export class TaskRepository {
   async create(task: Task): Promise<string> {
     const encrypted = {
       ...task,
-      title: await this.encryptTitle(task.title),
+      title: await this.encryptField(task.title),
+      description: task.description ? await this.encryptField(task.description) : task.description,
     }
     return this.db.tasks.add(encrypted)
   }
@@ -47,14 +49,16 @@ export class TaskRepository {
     if (!task) return undefined
     return {
       ...task,
-      title: await this.decryptTitle(task.title),
+      title: await this.decryptField(task.title),
+      description: task.description ? await this.decryptField(task.description) : task.description,
     }
   }
 
   async update(task: Task): Promise<void> {
     const encrypted = {
       ...task,
-      title: await this.encryptTitle(task.title),
+      title: await this.encryptField(task.title),
+      description: task.description ? await this.encryptField(task.description) : task.description,
     }
     await this.db.tasks.put(encrypted)
   }
@@ -112,6 +116,12 @@ export class TaskRepository {
   async getEssentialTasks(): Promise<Task[]> {
     const tasks = await this.db.tasks.toArray()
     return this.decryptAll(tasks.filter((task) => task.essential))
+  }
+
+  /** Toutes les occurrences d'une série récurrente (racine incluse). */
+  async getByRecurrenceId(recurrenceId: string): Promise<Task[]> {
+    const tasks = await this.db.tasks.where('recurrence_id').equals(recurrenceId).toArray()
+    return this.decryptAll(tasks.filter(isRoot))
   }
 
   async reorder(ids: string[]): Promise<void> {

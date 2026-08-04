@@ -91,18 +91,18 @@ describe('PlanningBoard — déplié', () => {
   })
 
   it('repositionne la tâche active sur une nouvelle plage sans rouvrir le formulaire (E5)', async () => {
-    const scheduleV2Task = vi.fn().mockResolvedValue(undefined)
+    const scheduleTask = vi.fn().mockResolvedValue(undefined)
     renderExpanded(
       makeAppContext({
         pendingPlanTask: { kind: 'task', title: 'McDo', taskId: 'active-1' },
-        scheduleV2Task,
+        scheduleTask,
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       }),
     )
     await waitFor(() => expect(screen.getByText(/McDo.*cours de planification/)).toBeInTheDocument())
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 11h00' }))
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 12h00' }))
-    expect(scheduleV2Task).toHaveBeenCalledWith('active-1', '2026-06-30', '11:00', '12:30')
+    expect(scheduleTask).toHaveBeenCalledWith('active-1', '2026-06-30', '11:00', '12:30')
     expect(screen.queryByRole('dialog', { name: 'Choisir une tâche' })).toBeNull()
   })
 
@@ -183,13 +183,13 @@ describe('PlanningBoard — déplié', () => {
     expect(await screen.findByText(/« médecin » est en cours de déplacement\./i)).toBeInTheDocument()
   })
 
-  it('avec une tâche en cours de déplacement, cliquer une case appelle scheduleV2Task puis clearMoveTask', async () => {
-    const scheduleV2Task = vi.fn().mockResolvedValue(undefined)
+  it('avec une tâche en cours de déplacement, cliquer une case appelle scheduleTask puis clearMoveTask', async () => {
+    const scheduleTask = vi.fn().mockResolvedValue(undefined)
     const clearMoveTask = vi.fn()
     const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     renderExpanded(
       makeAppContext({
-        scheduleV2Task,
+        scheduleTask,
         clearMoveTask,
         movingTask: { kind: 'task', task, report: false },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
@@ -199,17 +199,17 @@ describe('PlanningBoard — déplié', () => {
 
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 14h00' }))
 
-    expect(scheduleV2Task).toHaveBeenCalledWith('t1', '2026-06-30', '14:00', '15:00')
+    expect(scheduleTask).toHaveBeenCalledWith('t1', '2026-06-30', '14:00', '15:00')
     await waitFor(() => expect(clearMoveTask).toHaveBeenCalled())
   })
 
   it('« Annuler » appelle clearMoveTask sans déplacer la tâche', async () => {
-    const scheduleV2Task = vi.fn().mockResolvedValue(undefined)
+    const scheduleTask = vi.fn().mockResolvedValue(undefined)
     const clearMoveTask = vi.fn()
     const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     renderExpanded(
       makeAppContext({
-        scheduleV2Task,
+        scheduleTask,
         clearMoveTask,
         movingTask: { kind: 'task', task, report: false },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
@@ -218,17 +218,17 @@ describe('PlanningBoard — déplié', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Annuler le déplacement de Médecin' }))
 
     expect(clearMoveTask).toHaveBeenCalled()
-    expect(scheduleV2Task).not.toHaveBeenCalled()
+    expect(scheduleTask).not.toHaveBeenCalled()
   })
 
   it("déplacer vers une case déjà occupée affiche une erreur et n'appelle pas clearMoveTask", async () => {
-    const scheduleV2Task = vi.fn().mockResolvedValue(undefined)
+    const scheduleTask = vi.fn().mockResolvedValue(undefined)
     const clearMoveTask = vi.fn()
     const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     const other = makeTaskV2({ id: 't2', title: 'Autre', scheduled_date: '2026-06-30', scheduled_start: '14:00', scheduled_end: '14:30' })
     renderExpanded(
       makeAppContext({
-        scheduleV2Task,
+        scheduleTask,
         clearMoveTask,
         movingTask: { kind: 'task', task, report: false },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([task, other]),
@@ -238,16 +238,16 @@ describe('PlanningBoard — déplié', () => {
 
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 14h00 : Autre' }))
 
-    expect(scheduleV2Task).not.toHaveBeenCalled()
+    expect(scheduleTask).not.toHaveBeenCalled()
     expect(screen.getByRole('alert')).toHaveTextContent(/déjà occupée/i)
     expect(clearMoveTask).not.toHaveBeenCalled()
   })
 
-  it('Renommer depuis le menu appelle renameV2Task (E6)', async () => {
-    const renameV2Task = vi.fn().mockResolvedValue(undefined)
+  it('Renommer depuis le menu appelle renameTaskById (E6)', async () => {
+    const renameTaskById = vi.fn().mockResolvedValue(undefined)
     const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     renderExpanded(
-      makeAppContext({ renameV2Task, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+      makeAppContext({ renameTaskById, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
 
@@ -258,14 +258,14 @@ describe('PlanningBoard — déplié', () => {
     await userEvent.type(input, 'Dentiste')
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
 
-    expect(renameV2Task).toHaveBeenCalledWith('t1', 'Dentiste')
+    expect(renameTaskById).toHaveBeenCalledWith('t1', 'Dentiste')
   })
 
-  it('Supprimer depuis le menu appelle deleteV2Task (E6)', async () => {
-    const deleteV2Task = vi.fn().mockResolvedValue(undefined)
+  it('Supprimer depuis le menu appelle deleteTaskById (E6)', async () => {
+    const deleteTaskById = vi.fn().mockResolvedValue(undefined)
     const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     renderExpanded(
-      makeAppContext({ deleteV2Task, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+      makeAppContext({ deleteTaskById, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
 
@@ -273,7 +273,7 @@ describe('PlanningBoard — déplié', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
     await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
 
-    expect(deleteV2Task).toHaveBeenCalledWith('t1')
+    expect(deleteTaskById).toHaveBeenCalledWith('t1')
   })
 
   it('avec une tâche en attente, la plage ouvre directement les détails', async () => {
@@ -441,8 +441,8 @@ describe('PlanningBoard — déplié', () => {
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
   })
 
-  it('avec une tâche en cours de report, cliquer une case appelle reportV2Task sur le jour affiché', async () => {
-    const reportV2Task = vi.fn().mockResolvedValue(undefined)
+  it('avec une tâche en cours de report, cliquer une case appelle reportTaskById sur le jour affiché', async () => {
+    const reportTaskById = vi.fn().mockResolvedValue(undefined)
     const task = makeTaskV2({
       id: 't1',
       title: 'Shopping',
@@ -453,7 +453,7 @@ describe('PlanningBoard — déplié', () => {
     })
     renderExpanded(
       makeAppContext({
-        reportV2Task,
+        reportTaskById,
         movingTask: { kind: 'task', task, report: true },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       }),
@@ -461,7 +461,7 @@ describe('PlanningBoard — déplié', () => {
     await waitFor(() => expect(screen.getByText('11h00')).toBeInTheDocument())
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 11h00' }))
 
-    expect(reportV2Task).toHaveBeenCalledWith('t1', '2026-07-01', '11:00', '12:00')
+    expect(reportTaskById).toHaveBeenCalledWith('t1', '2026-07-01', '11:00', '12:00')
   })
 
   it('affiche une case à cocher non cochée sur une tâche planifiée (P2)', async () => {
@@ -471,15 +471,15 @@ describe('PlanningBoard — déplié', () => {
     expect(screen.getByRole('checkbox', { name: 'Terminer Médecin' })).not.toBeChecked()
   })
 
-  it('cocher une tâche appelle completeV2Task et recharge le planning', async () => {
-    const completeV2Task = vi.fn().mockResolvedValue(undefined)
+  it('cocher une tâche appelle completeTaskById et recharge le planning', async () => {
+    const completeTaskById = vi.fn().mockResolvedValue(undefined)
     const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
     renderExpanded(
-      makeAppContext({ completeV2Task, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
+      makeAppContext({ completeTaskById, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }),
     )
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
     await userEvent.click(screen.getByRole('checkbox', { name: 'Terminer Médecin' }))
-    expect(completeV2Task).toHaveBeenCalledWith('t1')
+    expect(completeTaskById).toHaveBeenCalledWith('t1')
   })
 
   it('affiche une case cochée et une teinte intensifiée sur une tâche déjà terminée', async () => {
@@ -601,11 +601,11 @@ describe('PlanningBoard — sous-tâches planifiables (E9)', () => {
     expect(screen.getByText('- Ranger le bureau')).toBeInTheDocument()
   })
 
-  it('avec une sous-tâche en attente, choisir un créneau appelle scheduleSubTaskV2', async () => {
-    const scheduleSubTaskV2 = vi.fn().mockResolvedValue(undefined)
+  it('avec une sous-tâche en attente, choisir un créneau appelle scheduleSubTask', async () => {
+    const scheduleSubTask = vi.fn().mockResolvedValue(undefined)
     renderExpanded(
       makeAppContext({
-        scheduleSubTaskV2,
+        scheduleSubTask,
         pendingPlanTask: { kind: 'subtask', title: 'Ranger le bureau', subTaskId: 'sub-1' },
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
         getPlannedSubTasksForDate: vi.fn().mockResolvedValue([]),
@@ -614,12 +614,12 @@ describe('PlanningBoard — sous-tâches planifiables (E9)', () => {
     await waitFor(() => expect(screen.getByText(/Ranger le bureau.*cours de planification/)).toBeInTheDocument())
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
     await userEvent.click(screen.getByRole('gridcell', { name: 'Créneau 10h00' }))
-    expect(scheduleSubTaskV2).toHaveBeenCalledWith('sub-1', '2026-06-30', '10:00', '10:30')
+    expect(scheduleSubTask).toHaveBeenCalledWith('sub-1', '2026-06-30', '10:00', '10:30')
   })
 
   it('le menu sur une sous-tâche propose Déplacer/Renommer/Supprimer et les branche sur les fonctions sous-tâche (E6)', async () => {
     const startMoveSubTask = vi.fn()
-    const renameSubTaskV2 = vi.fn().mockResolvedValue(undefined)
+    const renameSubTask = vi.fn().mockResolvedValue(undefined)
     const deleteSubTask = vi.fn().mockResolvedValue(undefined)
     const sub = makeSubTaskV2({
       id: 'sub-1',
@@ -630,7 +630,7 @@ describe('PlanningBoard — sous-tâches planifiables (E9)', () => {
     renderExpanded(
       makeAppContext({
         startMoveSubTask,
-        renameSubTaskV2,
+        renameSubTask,
         deleteSubTask,
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
         getPlannedSubTasksForDate: vi.fn().mockResolvedValue([sub]),
@@ -648,7 +648,7 @@ describe('PlanningBoard — sous-tâches planifiables (E9)', () => {
     await userEvent.clear(input)
     await userEvent.type(input, 'Trier les papiers')
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
-    expect(renameSubTaskV2).toHaveBeenCalledWith('sub-1', 'Trier les papiers')
+    expect(renameSubTask).toHaveBeenCalledWith('sub-1', 'Trier les papiers')
 
     await userEvent.click(screen.getByRole('gridcell', { name: /Créneau 9h00/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))

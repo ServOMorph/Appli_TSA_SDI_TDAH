@@ -2,9 +2,14 @@ import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+import { IconPicker } from '@/ui/components/IconPicker'
+import { ColorPicker } from '@/ui/components/ColorPicker'
+import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
 import { isCompleted } from '@/domain/rules/taskRules'
+import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import type { Screen } from '@/app/AppContext'
+import type { TaskEditScope, TaskFieldEdit } from '@/app/contexts/usePlanningState'
 import {
   DndContext,
   PointerSensor,
@@ -188,6 +193,58 @@ function backScreenForTask(task: Task): Screen {
   return 'inbox'
 }
 
+const fieldRowStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--spacing-sm)',
+  padding: 'var(--spacing-md)',
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--color-border)',
+  cursor: 'pointer',
+  background: 'none',
+  textAlign: 'left',
+  width: '100%',
+  color: 'var(--color-text)',
+  fontFamily: 'var(--font-body)',
+}
+
+const fieldLabelStyle: React.CSSProperties = { color: 'var(--color-text-muted)', fontSize: '0.875rem' }
+
+const energyGridStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(6, 1fr)',
+  gap: 'var(--spacing-xs)',
+}
+
+function energyGridButtonStyle(selected: boolean): React.CSSProperties {
+  return {
+    padding: '10px 0',
+    borderRadius: 'var(--radius-sm)',
+    border: 'none',
+    backgroundColor: selected ? 'var(--color-accent)' : 'var(--color-surface)',
+    color: selected ? '#fff' : 'var(--color-text)',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    fontFamily: 'var(--font-body)',
+    cursor: 'pointer',
+  }
+}
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 12px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text)',
+  fontFamily: 'var(--font-body)',
+  boxSizing: 'border-box',
+}
+
+const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
+
+type EditableField = 'date' | 'time' | 'energy' | 'icon' | 'color' | null
+
 export function E22TaskDetail() {
   const {
     selectedTaskId,
@@ -197,7 +254,7 @@ export function E22TaskDetail() {
     getSubTasks,
     deleteSubTask,
     toggleSubTask,
-    renameSubTaskV2,
+    renameSubTask,
     completeTask,
     deleteTask,
     selectTask,
@@ -212,6 +269,10 @@ export function E22TaskDetail() {
     startPlanSubTask,
     moveTodoTaskToList,
     createList,
+    getTaskById,
+    duplicateTaskById,
+    updateTaskFields,
+    deleteTaskScoped,
   } = useApp()
 
   const [subTasks, setSubTasks] = useState<Task[]>([])
@@ -221,14 +282,76 @@ export function E22TaskDetail() {
   const [subtaskWarningAction, setSubtaskWarningAction] = useState<'plan' | 'list' | null>(null)
   const [renamingSubTask, setRenamingSubTask] = useState<Task | null>(null)
   const [renameSubTaskTitle, setRenameSubTaskTitle] = useState('')
+  const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
+  const [activeField, setActiveField] = useState<EditableField>(null)
+  const [pendingEdit, setPendingEdit] = useState<TaskFieldEdit | null>(null)
+  const [pendingDelete, setPendingDelete] = useState(false)
 
-  const task = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
+  const taskFromLists = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
+  const task = taskFromLists ?? fetchedTask ?? undefined
 
   useEffect(() => {
     if (selectedTaskId) {
       getSubTasks(selectedTaskId).then(setSubTasks)
     }
   }, [getSubTasks, selectedTaskId])
+
+  useEffect(() => {
+    if (selectedTaskId && !taskFromLists) {
+      getTaskById(selectedTaskId).then((t) => setFetchedTask(t ?? null))
+    } else {
+      setFetchedTask((prev) => (prev === null ? prev : null))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTaskId, taskFromLists])
+
+  async function refreshFetchedTask() {
+    if (selectedTaskId) {
+      const t = await getTaskById(selectedTaskId)
+      setFetchedTask(t ?? null)
+    }
+  }
+
+  function requiresScopeChoice(): boolean {
+    return !!task?.recurrence_id
+  }
+
+  async function handleFieldEdit(edit: TaskFieldEdit) {
+    if (!selectedTaskId) return
+    setActiveField(null)
+    if (requiresScopeChoice()) {
+      setPendingEdit(edit)
+    } else {
+      await updateTaskFields(selectedTaskId, edit, 'occurrence')
+      await refreshFetchedTask()
+    }
+  }
+
+  async function confirmScope(scope: TaskEditScope) {
+    if (!selectedTaskId) return
+    if (pendingEdit) {
+      await updateTaskFields(selectedTaskId, pendingEdit, scope)
+      setPendingEdit(null)
+      await refreshFetchedTask()
+    } else if (pendingDelete) {
+      setPendingDelete(false)
+      await deleteTaskScoped(selectedTaskId, scope)
+      selectTask(null)
+      goTo(task ? backScreenForTask(task) : 'inbox')
+    }
+  }
+
+  function cancelScope() {
+    setPendingEdit(null)
+    setPendingDelete(false)
+  }
+
+  async function handleDuplicate() {
+    if (!selectedTaskId) return
+    await duplicateTaskById(selectedTaskId)
+    selectTask(null)
+    goTo(task ? backScreenForTask(task) : 'inbox')
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -279,6 +402,11 @@ export function E22TaskDetail() {
 
   async function handleDelete() {
     if (!selectedTaskId) return
+    if (requiresScopeChoice()) {
+      setShowDeleteConfirm(false)
+      setPendingDelete(true)
+      return
+    }
     await deleteTask(selectedTaskId)
     selectTask(null)
     goTo(task ? backScreenForTask(task) : 'inbox')
@@ -308,7 +436,7 @@ export function E22TaskDetail() {
   async function handleConfirmRenameSubTask() {
     const trimmed = renameSubTaskTitle.trim()
     if (!renamingSubTask || !trimmed) return
-    await renameSubTaskV2(renamingSubTask.id, trimmed)
+    await renameSubTask(renamingSubTask.id, trimmed)
     setRenamingSubTask(null)
     if (selectedTaskId) {
       const updated = await getSubTasks(selectedTaskId)
@@ -380,6 +508,97 @@ export function E22TaskDetail() {
 
       <h1 style={{ margin: 0 }}>{task.title}</h1>
 
+      <section aria-label="Détails" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+        <button
+          type="button"
+          style={fieldRowStyle}
+          onClick={() => setActiveField(activeField === 'icon' ? null : 'icon')}
+        >
+          <span style={fieldLabelStyle}>Icône</span>
+          <span>{task.icon ?? 'Aucune'}</span>
+        </button>
+        {activeField === 'icon' && (
+          <IconPicker value={task.icon} onChange={(icon) => handleFieldEdit({ icon })} />
+        )}
+
+        <button
+          type="button"
+          style={fieldRowStyle}
+          onClick={() => setActiveField(activeField === 'color' ? null : 'color')}
+        >
+          <span style={fieldLabelStyle}>Couleur</span>
+          <span>{task.color ?? 'Aucune couleur'}</span>
+        </button>
+        {activeField === 'color' && (
+          <ColorPicker value={task.color} onChange={(color) => handleFieldEdit({ color })} />
+        )}
+
+        <button
+          type="button"
+          style={fieldRowStyle}
+          onClick={() => setActiveField(activeField === 'date' ? null : 'date')}
+        >
+          <span style={fieldLabelStyle}>Date</span>
+          <span>{task.scheduled_date ?? 'Non planifiée'}</span>
+        </button>
+        {activeField === 'date' && (
+          <input
+            type="date"
+            aria-label="Modifier la date"
+            defaultValue={task.scheduled_date ?? ''}
+            onChange={(e) => handleFieldEdit({ date: e.target.value })}
+            style={inputStyle}
+          />
+        )}
+
+        <button
+          type="button"
+          style={fieldRowStyle}
+          onClick={() => setActiveField(activeField === 'time' ? null : 'time')}
+        >
+          <span style={fieldLabelStyle}>Horaire</span>
+          <span>{task.scheduled_start ? `${task.scheduled_start} (${task.duration_minutes ?? 0} min)` : 'Non planifié'}</span>
+        </button>
+        {activeField === 'time' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+            <input
+              type="time"
+              aria-label="Modifier l'heure de début"
+              defaultValue={task.scheduled_start ?? ''}
+              onChange={(e) => handleFieldEdit({ startTime: e.target.value })}
+              style={inputStyle}
+            />
+            <DurationRoller
+              minutes={task.duration_minutes}
+              onChange={(durationMinutes) => handleFieldEdit({ durationMinutes })}
+            />
+          </div>
+        )}
+
+        <button
+          type="button"
+          style={fieldRowStyle}
+          onClick={() => setActiveField(activeField === 'energy' ? null : 'energy')}
+        >
+          <span style={fieldLabelStyle}>Coût en énergie</span>
+          <span>{task.energy_cost ?? 'Non défini'}</span>
+        </button>
+        {activeField === 'energy' && (
+          <div style={energyGridStyle} role="group" aria-label="Modifier le coût en énergie">
+            {ENERGY_OPTIONS.map((v) => (
+              <button
+                key={v}
+                type="button"
+                style={energyGridButtonStyle(task.energy_cost === v)}
+                onClick={() => handleFieldEdit({ energyCost: task.energy_cost === v ? null : v })}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
       {subTasks.length > 0 && (
         <section aria-label="Sous-étapes">
           <h2>Sous-étapes</h2>
@@ -427,10 +646,34 @@ export function E22TaskDetail() {
         <Button fullWidth onClick={handleComplete}>
           Terminer
         </Button>
+        <Button fullWidth onClick={handleDuplicate}>
+          Dupliquer
+        </Button>
         <Button variant="secondary" fullWidth onClick={() => setShowDeleteConfirm(true)}>
           Supprimer
         </Button>
       </div>
+
+      {(pendingEdit || pendingDelete) && (
+        <div role="dialog" aria-modal="true" aria-label="Modifier la série récurrente" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Tâche récurrente</h2>
+            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+              Appliquer {pendingDelete ? 'la suppression' : 'la modification'} à cette occurrence
+              seulement, ou à toutes les occurrences futures de la série ?
+            </p>
+            <Button fullWidth onClick={() => confirmScope('occurrence')}>
+              Cette occurrence
+            </Button>
+            <Button fullWidth onClick={() => confirmScope('series')}>
+              Toutes les occurrences
+            </Button>
+            <Button variant="secondary" fullWidth onClick={cancelScope}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
 
       {showDeleteConfirm && (
         <div role="dialog" aria-modal="true" aria-label="Supprimer la tâche" style={modalOverlay}>

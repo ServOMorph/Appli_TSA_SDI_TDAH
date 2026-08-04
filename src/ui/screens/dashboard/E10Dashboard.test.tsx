@@ -256,7 +256,7 @@ describe('E10Dashboard', () => {
       const checkbox = await screen.findByRole('checkbox', { name: 'Terminer RDV médecin' })
       expect(checkbox).not.toBeChecked()
       await userEvent.click(checkbox)
-      expect(ctx.completeV2Task).toHaveBeenCalledWith('taskv2-1')
+      expect(ctx.completeTaskById).toHaveBeenCalledWith('taskv2-1')
     })
   })
 

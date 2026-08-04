@@ -176,6 +176,25 @@ describe('TaskRepository', () => {
       expect((await repoEncrypted.getById('t1'))?.title).toBe('Première')
     })
 
+    it('chiffre et déchiffre la description', async () => {
+      const task = mockTask({ description: 'Notes privées' })
+      const id = await repoEncrypted.create(task)
+
+      const raw = await db.tasks.get(id)
+      expect(raw?.description).not.toBe('Notes privées')
+
+      const retrieved = await repoEncrypted.getById(id)
+      expect(retrieved?.description).toBe('Notes privées')
+    })
+
+    it('ne chiffre pas une description vide', async () => {
+      const task = mockTask({ description: '' })
+      const id = await repoEncrypted.create(task)
+
+      const raw = await db.tasks.get(id)
+      expect(raw?.description).toBe('')
+    })
+
     it('déchiffre les titres des sous-étapes', async () => {
       await repoEncrypted.create(mockTask({ id: 'root', title: 'Parent' }))
       await repoEncrypted.create(mockTask({ id: 'child', parent_id: 'root', title: 'Étape secrète' }))

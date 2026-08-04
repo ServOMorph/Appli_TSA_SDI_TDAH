@@ -121,26 +121,30 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-2b — Planning et tâches refondus [TODO]
+## Phase V5-2b — Planning et tâches refondus [EN COURS]
 
-- [ ] `D5` + `Q10` (cf. C14, C37) — suppression définitive des cases et lignes horaires, planning épuré comme l'application de référence (`src/ui/screens/dashboard/E10Dashboard.tsx`)
-- [ ] `E1`, `D6` (cf. C1, C21) — ligne de tâche : logo, plage horaire, nom, coût en énergie, pastille de complétion à droite
-- [ ] `D1`, `D2` (cf. C3, C4) — bandeau de dates avec jour réel souligné, point indiquant le jour affiché, navigation par appui et glissement
-- [ ] `D4` — tâche cochée barrée et conservée (comportement déjà acté, à préserver) (`src/domain/rules/taskRulesV2.ts`)
-- [ ] `E4` (cf. C7) — champ `icon` sur `TaskV2` et bibliothèque d'icônes restreinte (`src/domain/entities/taskV2.ts`, `src/data/db.ts` migration v7)
-- [ ] `E3` (cf. C6) — champ `color` libre par tâche avec sélecteur de couleur complet (`src/domain/entities/taskV2.ts`)
-- [ ] `E9` (cf. C34, C35) — écran de création : logo, nom, **sous-tâches puis description**, énergie, obligatoire ; `TaskV2.essential` couvre déjà « obligatoire », ne pas le renommer (`src/ui/screens/tasks/E21CreateTaskV2.tsx`, champ `description`)
-- [ ] `E2` (cf. C2, C18, C22) — énergie saisie manuellement de 1 à 12, aucun calcul automatique par durée ; `ENERGY_MIN`/`ENERGY_MAX` existants déjà conformes (`src/domain/rules/energyRules.ts`)
-- [ ] `E8`, `E11` (cf. C12, C13, C15) — saisie de durée par trois rouleaux jour / heure / minute, sur le même écran que l'heure de début, sans préréglages (`src/ui/screens/tasks/E21CreateTaskV2.tsx`)
-- [ ] `E25` + `Q11` (cf. C36, C37) — choix tâche récurrente ou ponctuelle à la création ; récurrence sur le modèle Google Agenda (`src/domain/entities/taskV2.ts` champ `recurrence`, `src/domain/rules/taskRulesV2.ts`)
-- [ ] `Q11` — entité d'exception d'occurrence et boîte de dialogue « cette occurrence » / « toutes les occurrences » à chaque modification d'une tâche récurrente depuis sa fiche (`src/domain/entities/taskException.ts`, `src/data/db.ts`)
-- [ ] `E5`, `E13`, `Q10` (cf. C5, C17, C39) — fiche tâche au clic, seul point de modification (pas de glisser-déposer) : champs date, horaire, alerte, énergie cliquables ouvrant chacun leur sélecteur ; actions dupliquer, supprimer, déplacer ; la duplication rouvre la création préremplie sur l'étape de planification (`src/ui/screens/tasks/E22TaskDetail.tsx`)
-- [ ] `E10`, `E22` (cf. C19, C23) — sous-tâches avec compteur `n/N` dépliable et cochable depuis le planning (`src/domain/rules/subTaskRules.ts`)
-- [ ] `E7` — vérifier qu'aucune donnée n'est préremplie à l'installation (`src/ui/screens/onboarding/*`)
-- [ ] `E12` — retirer toute notion d'alerte du périmètre courant
-- [ ] Migration Dexie v7 (`icon`, `color`, `description`, `recurrence`, exceptions) et tests de bords de récurrence
+Note : les références de ce checklist à `taskV2.ts`/`taskRulesV2.ts`/`subTaskRules.ts`/migration
+« v7 » datent d'avant la fusion V5-2a et sont obsolètes — l'entité unique est `task.ts` /
+`taskRules.ts`, et la migration réelle est **v9** (v7/v8 déjà consommées par V5-2a).
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une tâche récurrente se crée, se modifie via sa fiche en choisissant occurrence ou série, et s'affiche avec logo et couleur sans quadrillage
+- [ ] `D5` + `Q10` (cf. C14, C37) — suppression définitive des cases et lignes horaires, planning épuré comme l'application de référence (`src/ui/screens/dashboard/E10Dashboard.tsx`) — **M5, pas commencé**
+- [ ] `E1`, `D6` (cf. C1, C21) — ligne de tâche : logo, plage horaire, nom, coût en énergie, pastille de complétion à droite — **M5**
+- [ ] `D1`, `D2` (cf. C3, C4) — bandeau de dates avec jour réel souligné, point indiquant le jour affiché, navigation par appui et glissement — **M5**
+- [ ] `D4` — tâche cochée barrée et conservée (comportement déjà acté, à préserver) — **M5** (à vérifier au rendu une fois le quadrillage retiré)
+- [x] `E4` (cf. C7) — champ `icon` restreint (`Task.icon`, `src/domain/rules/taskAppearance.ts` : 15 icônes SVG internes, `src/ui/components/IconPicker.tsx`)
+- [x] `E3` (cf. C6) — champ `color` libre par tâche avec sélecteur complet (`Task.color`, `src/ui/components/ColorPicker.tsx`, `<input type="color">`)
+- [x] `E9` (cf. C34, C35) — écran de création redessiné : logo, nom, sous-tâches puis description, énergie, obligatoire (`src/ui/screens/tasks/E21CreateTaskV2.tsx`)
+- [x] `E2` (cf. C2, C18, C22) — énergie manuelle 1-12, aucun calcul automatique (déjà conforme, `energyRules.ts`, inchangé)
+- [x] `E8`, `E11` (cf. C12, C13, C15) — durée par trois rouleaux jour/heure/minute sur le même écran que l'heure de début, sans préréglages (`src/ui/components/DurationRoller.tsx`, `E21CreateTaskV2.tsx`)
+- [x] `E25` + `Q11` (cf. C36, C37) — choix récurrente/ponctuelle à la création, récurrence type Google Agenda (quotidien/hebdo/mensuel/annuel, intervalle, fin par date ou nombre) — `src/domain/entities/taskRecurrence.ts`, `src/domain/rules/taskRecurrenceRules.ts`, `src/ui/components/RecurrenceEditor.tsx`, matérialisation des occurrences sur 90 jours (`usePlanningState.createDetailedTask`)
+- [x] `Q11` — boîte de dialogue « cette occurrence » / « toutes les occurrences » à chaque modification/suppression d'une tâche récurrente depuis sa fiche (`E22TaskDetail.tsx`, `usePlanningState.updateTaskFields`/`deleteTaskScoped`). Simplification assumée : l'entité `TaskException` (`src/domain/entities/taskException.ts`) existe en base mais n'est pas encore utilisée par cette UI — la détection « cette occurrence » repose sur `Task.recurrence_exception`, suffisant tant que les occurrences sont toutes matérialisées à l'avance (pas de régénération différée)
+- [ ] `E5`, `E13`, `Q10` (cf. C5, C17, C39) — fiche tâche au clic, **seul** point de modification (pas de glisser-déposer) : champs date/horaire/énergie cliquables **fait** (`E22TaskDetail.tsx`), actions dupliquer/supprimer **fait** ; reste à retirer le flux tap-based du planning (`PlanningBoard.tsx`) pour que la fiche devienne le seul point d'entrée — **M5**. `E12` retire la notion d'alerte du périmètre (pas de champ alerte dans la fiche, conforme).
+- [ ] `E10`, `E22` (cf. C19, C23) — sous-tâches avec compteur `n/N` dépliable et cochable **depuis le planning** — **M5** (la fiche tâche gère déjà les sous-étapes, reste l'intégration dans les lignes du planning)
+- [ ] `E7` — vérifier qu'aucune donnée n'est préremplie à l'installation (`src/ui/screens/onboarding/*`) — **M6, pas fait**
+- [x] `E12` — aucune notion d'alerte dans la fiche tâche ni dans la création (hors périmètre, conforme)
+- [x] Migration Dexie **v9** (`icon`, `color`, `description`, `duration_minutes`, `recurrence_id`, `is_recurrence_root`, `recurrence_exception`, tables `taskRecurrences`/`taskExceptions`) et tests de bords de récurrence (`taskRecurrenceRules.test.ts`, 18 tests : intervalles, fins par date/nombre, mois courts)
+
+Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : une tâche récurrente se crée, se modifie via sa fiche en choisissant occurrence ou série, et s'affiche avec logo et couleur sans quadrillage — **quadrillage pas encore retiré (M5), gate non atteint**
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

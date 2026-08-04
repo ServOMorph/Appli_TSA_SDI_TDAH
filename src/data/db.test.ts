@@ -22,10 +22,12 @@ describe('AppDatabase', () => {
     expect(db.budgetEntries).toBeDefined()
     expect(db.budgetAccounts).toBeDefined()
     expect(db.budgetDeposits).toBeDefined()
+    expect(db.taskRecurrences).toBeDefined()
+    expect(db.taskExceptions).toBeDefined()
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(8)
+    expect(db.verno).toBe(9)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -205,7 +207,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(8)
+    expect(upgraded.verno).toBe(9)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -243,6 +245,63 @@ describe('AppDatabase', () => {
       status: 'inbox',
     })
 
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 8 database by adding recurrence fields with defaults', async () => {
+    const name = `migration-v8-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(7).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date',
+      subTasks: 'id, task_id, position, scheduled_date',
+      tasksV2: 'id, status, position, scheduled_date, essential',
+      lists: 'id',
+      listItems: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, kind, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date, period',
+    })
+    legacy.version(8).stores({
+      subTasks: null,
+      tasksV2: null,
+    })
+    await legacy.open()
+    await legacy.table('tasks').add({
+      id: 'legacy-task',
+      parent_id: null,
+      title: 'Tâche existante',
+      status: 'inbox',
+      essential: false,
+      energy_cost: null,
+      postponed: false,
+      position: 0,
+      scheduled_date: null,
+      scheduled_start: null,
+      scheduled_end: null,
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+      completed_at: null,
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(9)
+    expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
+      title: 'Tâche existante',
+      description: '',
+      duration_minutes: null,
+      icon: null,
+      color: null,
+      recurrence_id: null,
+      is_recurrence_root: false,
+      recurrence_exception: false,
+    })
     await upgraded.delete()
   })
 

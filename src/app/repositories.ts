@@ -9,10 +9,14 @@ import { BudgetCategoryRepository } from '@/data/repositories/budgetCategoryRepo
 import { BudgetEntryRepository } from '@/data/repositories/budgetEntryRepository'
 import { BudgetAccountRepository } from '@/data/repositories/budgetAccountRepository'
 import { BudgetDepositRepository } from '@/data/repositories/budgetDepositRepository'
+import { TaskRecurrenceRepository } from '@/data/repositories/taskRecurrenceRepository'
+import { TaskExceptionRepository } from '@/data/repositories/taskExceptionRepository'
 
 export const db = new AppDatabase()
 export const userRepo = new UserRepository(db)
 export const taskRepo = new TaskRepository(db)
+export const taskRecurrenceRepo = new TaskRecurrenceRepository(db)
+export const taskExceptionRepo = new TaskExceptionRepository(db)
 export const energyRepo = new EnergyEntryRepository(db)
 export const settingsRepo = new SettingsRepository(db)
 export const listRepo = new ListRepository(db)

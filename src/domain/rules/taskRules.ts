@@ -23,6 +23,7 @@ export function createTask(
     id,
     parent_id: parentId,
     title,
+    description: '',
     status,
     essential,
     energy_cost: null,
@@ -31,6 +32,12 @@ export function createTask(
     scheduled_date: null,
     scheduled_start: null,
     scheduled_end: null,
+    duration_minutes: null,
+    icon: null,
+    color: null,
+    recurrence_id: null,
+    is_recurrence_root: false,
+    recurrence_exception: false,
     created_at: now,
     updated_at: now,
     completed_at: null,
@@ -96,6 +103,15 @@ export function reportTask(task: Task, date: string, start: string, end: string,
     ...scheduleTask(task, date, start, end, now),
     postponed: true,
   }
+}
+
+/** Additionne des minutes à une heure "HH:MM", en s'arrêtant à la fin de la journée affichée (23:59). */
+export function addMinutesToTime(time: string, minutes: number): string {
+  const [h, m] = time.split(':').map(Number)
+  const total = Math.min(h * 60 + m + Math.max(0, minutes), 23 * 60 + 59)
+  const endH = Math.floor(total / 60)
+  const endM = total % 60
+  return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`
 }
 
 export function renameTask(task: Task, title: string, now: string): Task {

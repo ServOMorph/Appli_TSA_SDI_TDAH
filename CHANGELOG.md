@@ -1,3 +1,26 @@
+## v5.6 — 2026-08-04
+
+Phase V5-2b (planning et tâches refondus) en cours — milestones M1 à M4 codés et validés manuellement : entités et migration, moteur de récurrence, écran de création et fiche tâche redessinés.
+
+### Ajouté
+- `src/domain/entities/task.ts` : nouveaux champs `icon`, `color`, `description`, `duration_minutes`, `recurrence_id`, `is_recurrence_root`, `recurrence_exception`.
+- `src/domain/entities/taskRecurrence.ts`, `taskException.ts` : nouvelles entités (fréquence, intervalle, fin par date/nombre ; exception d'occurrence).
+- Migration Dexie **v9** (`src/data/db.ts`) : nouveaux champs par défaut sur les tâches existantes, tables `taskRecurrences`/`taskExceptions`.
+- `src/domain/rules/taskRecurrenceRules.ts` : génération des dates d'occurrence par scan jour par jour (quotidien/hebdo/mensuel/annuel, intervalle, fin par date ou nombre), sans librairie RRULE — 18 tests.
+- `src/domain/rules/taskAppearance.ts` : bibliothèque de 15 icônes SVG internes restreintes.
+- Composants `IconPicker.tsx`, `ColorPicker.tsx`, `DurationRoller.tsx` (3 rouleaux jour/heure/minute), `RecurrenceEditor.tsx`.
+- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : écran de création entièrement redessiné (icône, titre, sous-tâches puis description, couleur, énergie, obligatoire, puis pour une tâche planifiée : date/heure/durée et récurrence).
+- `src/app/contexts/usePlanningState.ts` : `createDetailedTask` (matérialise les occurrences sur 90 jours), `getTaskById`, `duplicateTaskById`, `updateTaskFields`/`deleteTaskScoped` (portée occurrence ou série).
+- `src/ui/screens/tasks/E22TaskDetail.tsx` : champs cliquables (icône/couleur/date/horaire/énergie), action Dupliquer, dialogue « cette occurrence » / « toutes les occurrences » sur toute modification ou suppression d'une tâche récurrente.
+
+### Modifié
+- Suffixe historique `*V2` retiré des fonctions de `usePlanningState.ts`/`useTasksState.ts` (`createTaskDest`, `scheduleTask`, `completeTaskById`, etc.), sans plus de sens après la fusion V5-2a.
+
+### Corrigé
+- `IconPicker.tsx` : cliquer sur une icône déjà sélectionnée ne la désélectionnait pas.
+- `usePlanningState.createDetailedTask` : ne rafraîchissait pas toujours `inboxTasks`/`todayTasks`, rendant une tâche fraîchement créée invisible en Réception ou Aujourd'hui.
+- `AppContext.test.tsx` : absence de nettoyage entre tests provoquait une pollution intermittente d'un test pré-existant (confirmée présente avant cette session) — ajout d'un `afterEach` vidant les tables tâches/récurrences/exceptions.
+
 ## v5.5 — 2026-08-04
 
 Phase V5-2a close après validation manuelle intégrale (points 110-117, `tests_manuels.md` purgé).

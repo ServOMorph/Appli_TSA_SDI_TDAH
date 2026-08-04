@@ -10,6 +10,8 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
+import type { TaskException } from '@/domain/entities/taskException'
 
 export class AppDatabase extends Dexie {
   users!: Table<User>
@@ -22,6 +24,8 @@ export class AppDatabase extends Dexie {
   budgetEntries!: Table<BudgetEntry>
   budgetAccounts!: Table<BudgetAccount>
   budgetDeposits!: Table<BudgetDeposit>
+  taskRecurrences!: Table<TaskRecurrence>
+  taskExceptions!: Table<TaskException>
 
   constructor(name = 'appli-tsa-sdi-tdah') {
     super(name)
@@ -193,6 +197,26 @@ export class AppDatabase extends Dexie {
       subTasks: null,
       tasksV2: null,
     })
+    this.version(9)
+      .stores({
+        tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+        taskRecurrences: 'id',
+        taskExceptions: 'id, recurrence_id',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('tasks')
+          .toCollection()
+          .modify((task) => {
+            task.description = ''
+            task.duration_minutes = null
+            task.icon = null
+            task.color = null
+            task.recurrence_id = null
+            task.is_recurrence_root = false
+            task.recurrence_exception = false
+          })
+      })
   }
 }
 

@@ -132,19 +132,19 @@ export function useTasksState() {
     return subs.map((s, i) => ({ ...s, parentTitle: parents[i]?.title ?? '' }))
   }
 
-  async function scheduleSubTaskV2(subTaskId: string, date: string, start: string, end: string) {
+  async function scheduleSubTask(subTaskId: string, date: string, start: string, end: string) {
     const subTask = await taskRepo.getById(subTaskId)
     if (!subTask) return
     await taskRepo.update(scheduleTaskRule(subTask, date, start, end, new Date().toISOString()))
   }
 
-  async function reportSubTaskV2(subTaskId: string, date: string, start: string, end: string) {
+  async function reportSubTask(subTaskId: string, date: string, start: string, end: string) {
     const subTask = await taskRepo.getById(subTaskId)
     if (!subTask) return
     await taskRepo.update(reportTaskRule(subTask, date, start, end, new Date().toISOString()))
   }
 
-  async function renameSubTaskV2(id: string, title: string) {
+  async function renameSubTask(id: string, title: string) {
     const trimmed = title.trim()
     if (!trimmed) return
     const subTask = await taskRepo.getById(id)
@@ -173,9 +173,9 @@ export function useTasksState() {
     reorderSubTasks,
     getSubTasks,
     getPlannedSubTasksForDate,
-    scheduleSubTaskV2,
-    reportSubTaskV2,
-    renameSubTaskV2,
+    scheduleSubTask,
+    reportSubTask,
+    renameSubTask,
     load,
     reset,
   }

@@ -66,6 +66,13 @@ describe('E71Budget', () => {
     expect(screen.getByText('Aucun livret configuré.')).toBeDefined()
   })
 
+  it('le retour utilise back("dashboard") pour respecter l\'origine réelle de navigation', async () => {
+    const ctx = makeAppContext()
+    renderWithApp(<E71Budget />, ctx)
+    await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
+    expect(ctx.back).toHaveBeenCalledWith('dashboard')
+  })
+
   it('crée une catégorie avec ses paramètres', async () => {
     const createBudgetCategory = vi.fn().mockResolvedValue(undefined)
     renderWithApp(<E71Budget />, makeAppContext({ createBudgetCategory }))

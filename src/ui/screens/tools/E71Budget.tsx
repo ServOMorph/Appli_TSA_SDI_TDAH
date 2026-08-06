@@ -79,7 +79,7 @@ function periodDescription(period: BudgetPeriod, date: string): string {
 
 export function E71Budget() {
   const {
-    goTo,
+    back,
     budgetCategories,
     budgetAccounts,
     budgetEntries,
@@ -297,7 +297,7 @@ export function E71Budget() {
   return (
     <main style={{ display: 'flex', flexDirection: 'column', padding: 'var(--spacing-xl)', gap: 'var(--spacing-lg)', maxWidth: '480px', margin: '0 auto', minHeight: '100svh', paddingBottom: 'var(--bottomnav-h)' }}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
-        <button aria-label="Retour" onClick={() => goTo('tools')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
+        <button aria-label="Retour" onClick={() => back('dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ←
         </button>
         <h1 style={{ margin: 0, fontSize: '1.25rem' }}>Budget</h1>

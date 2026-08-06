@@ -15,6 +15,16 @@ import type { TaskException } from '@/domain/entities/taskException'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
 
+function migrationId(): string {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  const b = crypto.getRandomValues(new Uint8Array(16))
+  b[6] = (b[6] & 0x0f) | 0x40
+  b[8] = (b[8] & 0x3f) | 0x80
+  return [...b]
+    .map((v, i) => ([4, 6, 8, 10].includes(i) ? '-' : '') + v.toString(16).padStart(2, '0'))
+    .join('')
+}
+
 export class AppDatabase extends Dexie {
   users!: Table<User>
   tasks!: Table<Task>
@@ -237,10 +247,10 @@ export class AppDatabase extends Dexie {
           })
 
         const now = new Date().toISOString()
-        const todoListId = crypto.randomUUID()
+        const todoListId = migrationId()
         await tx.table('lists').add({ id: todoListId, name: 'To Do', created_at: now, updated_at: now })
         await tx.table('tools').add({
-          id: crypto.randomUUID(),
+          id: migrationId(),
           type: 'liste',
           folder_id: null,
           list_id: todoListId,
@@ -249,7 +259,7 @@ export class AppDatabase extends Dexie {
           updated_at: now,
         })
         await tx.table('tools').add({
-          id: crypto.randomUUID(),
+          id: migrationId(),
           type: 'tableau_comptage',
           folder_id: null,
           list_id: null,

@@ -1,7 +1,4 @@
-import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
-import { Button } from '@/ui/components/Button'
-import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { FolderCard, ToolCard } from '@/ui/components/ToolWidgetCard'
 
 const pageStyle: React.CSSProperties = {
@@ -17,7 +14,6 @@ const pageStyle: React.CSSProperties = {
 
 export function E70Tools() {
   const { goTo, folders, tools, selectList } = useApp()
-  const [showCreate, setShowCreate] = useState(false)
   const rootTools = tools.filter((t) => t.folder_id === null)
 
   function openTool(toolId: string) {
@@ -31,12 +27,6 @@ export function E70Tools() {
     }
   }
 
-  function handleListCreated(listId: string) {
-    setShowCreate(false)
-    selectList(listId)
-    goTo('list-detail')
-  }
-
   return (
     <main style={pageStyle}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
@@ -48,9 +38,6 @@ export function E70Tools() {
           ←
         </button>
         <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Outils</h1>
-        <Button onClick={() => setShowCreate(true)} aria-label="Ajouter un outil ou un dossier">
-          +
-        </Button>
       </header>
 
       {folders.length === 0 && rootTools.length === 0 && (
@@ -66,15 +53,6 @@ export function E70Tools() {
       {rootTools.map((tool) => (
         <ToolCard key={tool.id} tool={tool} onOpen={() => openTool(tool.id)} />
       ))}
-
-      {showCreate && (
-        <ToolCreateModal
-          folderId={null}
-          allowFolder
-          onClose={() => setShowCreate(false)}
-          onListCreated={handleListCreated}
-        />
-      )}
     </main>
   )
 }

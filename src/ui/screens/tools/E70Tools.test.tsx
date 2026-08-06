@@ -79,12 +79,4 @@ describe('E70Tools', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
-
-  it('le "+" ouvre le sélecteur de création', async () => {
-    renderWithApp(<E70Tools />)
-    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un outil ou un dossier' }))
-    expect(screen.getByRole('dialog', { name: 'Ajouter un outil' })).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Nouvelle liste' })).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Nouveau dossier' })).toBeDefined()
-  })
 })

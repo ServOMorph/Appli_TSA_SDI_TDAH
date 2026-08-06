@@ -112,21 +112,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     async function init() {
-      const user = await userRepo.getFirst()
-      if (user) {
-        if (!user.onboarding_completed) {
-          await wipeAllData()
-          setLoading(false)
-          return
+      try {
+        const user = await userRepo.getFirst()
+        if (user) {
+          if (!user.onboarding_completed) {
+            await wipeAllData()
+            return
+          }
+          setCurrentUser(user)
+          const s = await settingsRepo.getByUserId(user.id)
+          if (s) setSettings(s)
+          const entry = await energyRepo.getByDate(todayDate())
+          await loadAll()
+          setStack([{ name: entry ? 'dashboard' : 'energy-checkin' }])
         }
-        setCurrentUser(user)
-        const s = await settingsRepo.getByUserId(user.id)
-        if (s) setSettings(s)
-        const entry = await energyRepo.getByDate(todayDate())
-        await loadAll()
-        setStack([{ name: entry ? 'dashboard' : 'energy-checkin' }])
+      } catch (error) {
+        console.error("Échec de l'initialisation de l'application", error)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     init()
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -254,21 +254,21 @@ describe('E10Dashboard', () => {
   })
 
   describe('zone widgets (E24)', () => {
-    it('ouvre la gestion des outils depuis la zone widgets', async () => {
+    it('le "+" ouvre le sélecteur de création d\'outil', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       const zone = screen.getByRole('region', { name: 'Outils' })
-      await userEvent.click(within(zone).getByRole('button', { name: 'Outils' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('tools')
+      await userEvent.click(within(zone).getByRole('button', { name: 'Ajouter un outil ou un dossier' }))
+      expect(screen.getByRole('dialog', { name: 'Ajouter un outil' })).toBeDefined()
     })
 
-    it('affiche un outil liste racine et navigue vers list-detail au clic', async () => {
+    it('affiche un outil liste racine avec le nom de la liste et navigue vers list-detail au clic', async () => {
       const ctx = makeAppContext({
         lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
         tools: [{ id: 't1', type: 'liste', folder_id: null, list_id: 'l1', position: 0, created_at: '', updated_at: '' }],
       })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Liste' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Courses' }))
       expect(ctx.selectList).toHaveBeenCalledWith('l1')
       expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
     })

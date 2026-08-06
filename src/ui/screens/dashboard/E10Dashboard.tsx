@@ -7,6 +7,8 @@ import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
 import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
+import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
+import { toolLabel } from '@/ui/components/ToolWidgetCard'
 import { flashyBackground } from '@/ui/styles/ambiance'
 import {
   DndContext,
@@ -160,6 +162,7 @@ export function E10Dashboard() {
     reorderTodayTasks,
     folders,
     tools,
+    lists,
     selectList,
     budgetCategories,
     createBudgetEntry,
@@ -168,6 +171,7 @@ export function E10Dashboard() {
   const [expenseCategoryId, setExpenseCategoryId] = useState<string | null>(null)
   const [expenseAmount, setExpenseAmount] = useState('')
   const [expenseLabel, setExpenseLabel] = useState('')
+  const [showCreateTool, setShowCreateTool] = useState(false)
 
   const expanded = route.name === 'planning'
 
@@ -215,6 +219,12 @@ export function E10Dashboard() {
       selectList(tool.list_id)
       goTo('list-detail')
     }
+  }
+
+  function handleToolListCreated(listId: string) {
+    setShowCreateTool(false)
+    selectList(listId)
+    goTo('list-detail')
   }
 
   function openExpenseForm() {
@@ -323,8 +333,13 @@ export function E10Dashboard() {
 
       {showSecondary && !overloadMode && (
         <section aria-label="Outils">
-          <h2 style={{ fontSize: '1.1rem' }}>Outils</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+            <h2 style={{ fontSize: '1.1rem', flex: 1 }}>Outils</h2>
+            <Button onClick={() => setShowCreateTool(true)} aria-label="Ajouter un outil ou un dossier">
+              +
+            </Button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-sm)' }}>
             <Card>
               <button style={widgetBtnStyle} onClick={openExpenseForm} disabled={!budgetCategories.some((c) => c.kind === 'expense')}>
                 Comptes
@@ -337,20 +352,27 @@ export function E10Dashboard() {
                 </button>
               </Card>
             ))}
-            {rootTools.map((tool) => (
-              <Card key={tool.id}>
-                <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
-                  {tool.type === 'tableau_comptage' ? 'Budget' : 'Liste'}
-                </button>
-              </Card>
-            ))}
-            <Card>
-              <button style={widgetBtnStyle} onClick={() => goTo('tools')}>
-                Outils
-              </button>
-            </Card>
+            {rootTools.map((tool) => {
+              const list = tool.list_id ? lists.find((l) => l.id === tool.list_id) : undefined
+              return (
+                <Card key={tool.id}>
+                  <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
+                    {toolLabel(tool, list?.name)}
+                  </button>
+                </Card>
+              )
+            })}
           </div>
         </section>
+      )}
+
+      {showCreateTool && (
+        <ToolCreateModal
+          folderId={null}
+          allowFolder
+          onClose={() => setShowCreateTool(false)}
+          onListCreated={handleToolListCreated}
+        />
       )}
 
       {showExpenseForm && (

@@ -1,3 +1,22 @@
+## v5.13 — 2026-08-06
+
+Premier passage de validation manuelle réelle de la Phase V5-3 : bugs de blocage et de navigation trouvés et corrigés.
+
+### Corrigé
+- Blocage bloquant à l'ouverture (« Chargement... » indéfini) : la migration Dexie v10 (`db.ts`) appelait `crypto.randomUUID()` directement, API indisponible hors contexte sécurisé (HTTP sur IP réseau) — remplacé par un repli local identique à celui de `newId()` (`repositories.ts`).
+- `AppContext.tsx` : `try/catch/finally` ajouté autour de `init()` pour qu'une erreur future ne bloque plus jamais silencieusement l'écran de chargement.
+- `E10Dashboard.tsx` : carte « Outils » redondante retirée de la zone widgets, libellé d'un outil de type liste affichant désormais son vrai nom (au lieu du générique « Liste »), zone Outils passée en grille 3 colonnes.
+- `E71Budget.tsx` : le bouton « Retour » forçait `goTo('tools')` au lieu de dépiler la pile de navigation réelle — remplacé par `back('dashboard')`.
+
+### Modifié
+- Bouton « + » de création d'un outil/dossier déplacé de l'écran Outils (`E70Tools.tsx`) vers l'accueil (`E10Dashboard.tsx`).
+
+### Vérifié
+- Widget « Comptes » de l'accueil confirmé conforme à la transcription du 28/07 (rattaché au domaine budget, distinct de l'outil « Comptage » reporté en V5.1) — non modifié.
+
+### Gate
+- 500/500 tests unitaires, `tsc -b`/lint clean (build/e2e non relancés cette session). Phase V5-3 reste `[EN COURS]` : points 1-2 de `tests_manuels.md` à revalider sur les écrans corrigés, points 3-6 jamais testés.
+
 ## v5.12 — 2026-08-06
 
 Clôture de la Phase V5-2b (M6/M7) et codage intégral de la Phase V5-3 (outils, dossiers, listes et Budget rebranché), en mode plan.

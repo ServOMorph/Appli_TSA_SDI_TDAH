@@ -1,3 +1,10 @@
+## v5.10 — 2026-08-06
+
+Clôture M5 de la Phase V5-2b : validation manuelle tactile du point 3.2, deux bugs fonctionnels signalés clos comme non reproductibles.
+
+### Corrigé
+- Aucun changement de code applicatif. Les deux bugs signalés (suppression d'une tâche récurrente sans effet, ajout de sous-tâche impossible) sont clos sans correctif : retest de l'utilisateur confirmant un comportement normal, signalement initial attribué à une erreur de manipulation.
+
 ## v5.9 — 2026-08-06
 
 Retours de tests manuels de la Phase V5-2b (M5) traités : corrections UI du planning, deux bugs fonctionnels signalés restent non reproduits.

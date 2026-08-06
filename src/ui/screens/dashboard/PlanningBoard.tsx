@@ -6,7 +6,7 @@ import { BatteryCost } from '@/ui/components/BatteryCost'
 import { TaskIcon } from '@/ui/components/TaskIcon'
 import { DEFAULT_AMBIANCE_COLOR, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import { isCompleted } from '@/domain/rules/taskRules'
-import { todayStr, addDays, formatDayBadge, dateStrip } from '@/domain/rules/planningSlotRules'
+import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@/domain/rules/planningSlotRules'
 
 const COLLAPSED_ROW_LIMIT = 4
 const DATE_STRIP_RADIUS = 2
@@ -116,14 +116,28 @@ const dayDotPlaceholderStyle: React.CSSProperties = {
 }
 
 const jumpInputStyle: React.CSSProperties = {
+  position: 'absolute',
+  width: 0,
+  height: 0,
+  padding: 0,
   border: 'none',
+  opacity: 0,
+  pointerEvents: 'none',
+}
+
+const monthButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '6px',
   background: 'none',
-  color: 'var(--color-text-muted)',
-  fontSize: '0.75rem',
-  fontFamily: 'var(--font-body)',
-  flexShrink: 0,
-  width: '28px',
+  border: 'none',
   cursor: 'pointer',
+  color: 'var(--color-text)',
+  fontSize: '0.875rem',
+  fontWeight: 700,
+  fontFamily: 'var(--font-body)',
+  padding: '10px 4px',
+  minHeight: '44px',
 }
 
 const rowStyle: React.CSSProperties = {
@@ -134,9 +148,32 @@ const rowStyle: React.CSSProperties = {
   borderRadius: 'var(--radius-md)',
   cursor: 'pointer',
   border: 'none',
+  outline: 'none',
+  background: 'none',
+  appearance: 'none',
+  WebkitAppearance: 'none',
   width: '100%',
   textAlign: 'left',
   fontFamily: 'var(--font-body)',
+}
+
+const monthBarStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 'var(--spacing-sm)',
+}
+
+const todayBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-sm)',
+  padding: '4px 10px',
+  cursor: 'pointer',
+  color: 'var(--color-text-muted)',
+  fontSize: '0.75rem',
+  fontFamily: 'var(--font-body)',
+  flexShrink: 0,
 }
 
 function rowTintStyle(block: PlanBlock, ambianceColor: string): React.CSSProperties {
@@ -217,6 +254,11 @@ const subTaskRowStyle: React.CSSProperties = {
 
 const emptyStateStyle: React.CSSProperties = {
   padding: 'var(--spacing-md)',
+  minHeight: '48px',
+  boxSizing: 'border-box',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   color: 'var(--color-text-muted)',
   fontSize: '0.875rem',
   textAlign: 'center',
@@ -239,11 +281,15 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
     settings,
     selectTask,
     goTo,
+    route,
+    replace,
   } = useApp()
 
   const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
 
-  const [displayDate, setDisplayDate] = useState(() => todayStr())
+  const [displayDate, setDisplayDate] = useState(() =>
+    route.name === 'planning' && route.date ? route.date : todayStr(),
+  )
   const [scheduledTasks, setScheduledTasks] = useState<Task[]>([])
   const [scheduledSubTasks, setScheduledSubTasks] = useState<PlannedSubTask[]>([])
   const [subTasksByTask, setSubTasksByTask] = useState<Record<string, Task[]>>({})
@@ -252,10 +298,19 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   const effectiveDate = collapsed ? todayStr() : displayDate
   const displayDateRef = useRef(effectiveDate)
   const touchStartX = useRef<number | null>(null)
+  const dateJumpRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     displayDateRef.current = effectiveDate
   }, [effectiveDate])
+
+  function updateDisplayDate(updater: string | ((d: string) => string)) {
+    setDisplayDate((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      if (!collapsed) replace({ name: 'planning', date: next })
+      return next
+    })
+  }
 
   async function reload() {
     const date = displayDateRef.current
@@ -321,7 +376,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
     const delta = endX - touchStartX.current
     touchStartX.current = null
     if (Math.abs(delta) < SWIPE_THRESHOLD_PX) return
-    setDisplayDate((d) => addDays(d, delta < 0 ? 1 : -1))
+    updateDisplayDate((d) => addDays(d, delta < 0 ? 1 : -1))
   }
 
   const isToday = effectiveDate === todayStr()
@@ -337,8 +392,43 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
       style={{ display: 'flex', flexDirection: 'column', minHeight: 0, gap: 'var(--spacing-sm)' }}
     >
       {!collapsed && (
+        <div style={monthBarStyle}>
+          <button
+            type="button"
+            style={monthButtonStyle}
+            aria-label={`${formatMonthYear(displayDate)}, aller à une date`}
+            onClick={() => {
+              const input = dateJumpRef.current
+              if (!input) return
+              if (typeof input.showPicker === 'function') input.showPicker()
+              else input.focus()
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            {formatMonthYear(displayDate)}
+          </button>
+          <input
+            ref={dateJumpRef}
+            type="date"
+            aria-label="Aller à une date"
+            value={displayDate}
+            onChange={(e) => e.target.value && updateDisplayDate(e.target.value)}
+            style={jumpInputStyle}
+            tabIndex={-1}
+          />
+          {!isToday && (
+            <button style={todayBtnStyle} onClick={() => updateDisplayDate(todayStr())}>
+              Aujourd'hui
+            </button>
+          )}
+        </div>
+      )}
+      {!collapsed && (
         <div style={dateStripStyle} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <button style={iconBtnStyle} onClick={() => setDisplayDate((d) => addDays(d, -1))} aria-label="Jour précédent">
+          <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, -1))} aria-label="Jour précédent">
             &lsaquo;
           </button>
           {dateStrip(displayDate, DATE_STRIP_RADIUS).map((d) => {
@@ -348,7 +438,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
               <button
                 key={d}
                 style={dayCellStyle(isDisplayed)}
-                onClick={() => setDisplayDate(d)}
+                onClick={() => updateDisplayDate(d)}
                 aria-current={isDisplayed ? 'date' : undefined}
                 aria-label={d}
               >
@@ -358,16 +448,9 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
               </button>
             )
           })}
-          <button style={iconBtnStyle} onClick={() => setDisplayDate((d) => addDays(d, 1))} aria-label="Jour suivant">
+          <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, 1))} aria-label="Jour suivant">
             &rsaquo;
           </button>
-          <input
-            type="date"
-            aria-label="Aller à une date"
-            value={displayDate}
-            onChange={(e) => e.target.value && setDisplayDate(e.target.value)}
-            style={jumpInputStyle}
-          />
         </div>
       )}
 

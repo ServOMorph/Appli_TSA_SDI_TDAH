@@ -5,6 +5,7 @@ import {
   type Screen,
   push as pushRoute,
   pop as popRoute,
+  replace as replaceRoute,
   currentRoute,
   previousRoute,
   canGoBack as stackCanGoBack,
@@ -27,6 +28,7 @@ type NavigationValue = {
   route: Route
   goTo: (s: Screen | Route) => void
   goToPath: (routes: (Screen | Route)[]) => void
+  replace: (s: Screen | Route) => void
   back: (fallback?: Screen | Route) => void
   canGoBack: boolean
   originScreen: Screen | null
@@ -64,6 +66,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     (routes: (Screen | Route)[]) => setStack((prev) => routes.reduce<NavStack>(pushRoute, prev)),
     [],
   )
+  const replace = useCallback((target: Screen | Route) => setStack((prev) => replaceRoute(prev, target)), [])
   const back = useCallback(
     (fallback?: Screen | Route) =>
       setStack((prev) => (stackCanGoBack(prev) ? popRoute(prev) : fallback ? pushRoute(prev, fallback) : prev)),
@@ -141,6 +144,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         route,
         goTo,
         goToPath,
+        replace,
         back,
         canGoBack: stackCanGoBack(stack),
         originScreen: previousRoute(stack)?.name ?? null,

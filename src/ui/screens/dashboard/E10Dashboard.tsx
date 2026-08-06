@@ -217,7 +217,6 @@ export function E10Dashboard() {
         overloadActive={overloadMode}
         plannedCost={getRemainingPlannedCost(todayPlannedTasks)}
         onResourcesClick={() => goTo('resources')}
-        onSettingsClick={() => goTo('settings')}
         onOverloadClick={() => goTo('overload-recovery')}
       />
 

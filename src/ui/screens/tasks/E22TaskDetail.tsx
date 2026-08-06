@@ -7,7 +7,7 @@ import { ColorPicker } from '@/ui/components/ColorPicker'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
 import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
-import { todayStr } from '@/domain/rules/planningSlotRules'
+import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import type { Screen } from '@/app/AppContext'
 import type { TaskEditScope, TaskFieldEdit } from '@/app/contexts/usePlanningState'
@@ -173,7 +173,9 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onSchedule, onRename
               setScheduling((v) => !v)
             }}
           >
-            {subTask.scheduled_start ? `${subTask.scheduled_date} ${subTask.scheduled_start}` : 'Horaire'}
+            {subTask.scheduled_start
+              ? `${subTask.scheduled_date ? formatFrenchDate(subTask.scheduled_date) : ''} ${subTask.scheduled_start}`
+              : 'Horaire'}
           </button>
           <button
             aria-label={`Supprimer ${subTask.title}`}
@@ -607,7 +609,7 @@ export function E22TaskDetail() {
           onClick={() => setActiveField(activeField === 'date' ? null : 'date')}
         >
           <span style={fieldLabelStyle}>Date</span>
-          <span>{task.scheduled_date ?? 'Non planifiée'}</span>
+          <span>{task.scheduled_date ? formatFrenchDate(task.scheduled_date) : 'Non planifiée'}</span>
         </button>
         {activeField === 'date' && (
           <input

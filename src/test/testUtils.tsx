@@ -9,6 +9,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     route: { name: 'welcome' } as Route,
     goTo: vi.fn(),
     goToPath: vi.fn(),
+    replace: vi.fn(),
     back: vi.fn(),
     canGoBack: false,
     originScreen: null as Screen | null,

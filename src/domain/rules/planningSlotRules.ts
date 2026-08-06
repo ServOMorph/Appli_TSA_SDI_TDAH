@@ -16,6 +16,17 @@ export function formatPlanningDate(date: string): string {
   })
 }
 
+/** Date compacte au format français jj/mm/aaaa (ex. affichage d'un champ de fiche). */
+export function formatFrenchDate(date: string): string {
+  return new Date(date + 'T12:00:00').toLocaleDateString('fr-FR')
+}
+
+/** Mois et année en toutes lettres, capitalisés (ex. « Août 2026 »), pour un repère permanent. */
+export function formatMonthYear(date: string): string {
+  const label = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+  return label.charAt(0).toUpperCase() + label.slice(1)
+}
+
 export interface DayBadge {
   weekday: string
   day: number

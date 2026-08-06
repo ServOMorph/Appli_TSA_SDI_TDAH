@@ -1,3 +1,21 @@
+## v5.9 — 2026-08-06
+
+Retours de tests manuels de la Phase V5-2b (M5) traités : corrections UI du planning, deux bugs fonctionnels signalés restent non reproduits.
+
+### Ajouté
+- `src/domain/rules/planningSlotRules.ts` : `formatFrenchDate`, `formatMonthYear`.
+- `src/app/AppContext.tsx` : fonction `replace` exposée dans le contexte de navigation (remplace la route courante sans empiler), utilisée pour préserver la date affichée du planning au retour depuis la fiche tâche.
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : nom du mois affiché en permanence dans le planning déplié, cliquable pour ouvrir le sélecteur de date natif (remplace l'ancienne icône calendrier illisible et non tactile) ; bouton « Aujourd'hui ».
+
+### Modifié
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : contour parasite (blanc en sombre, gris en clair) des lignes de tâche retiré (`background`/`appearance`/`outline` du bouton natif réinitialisés) ; hauteur minimale réservée sur l'état « rien de planifié » pour limiter le saut visuel.
+- `src/ui/screens/tasks/E22TaskDetail.tsx`, `E23Decompose.tsx` : dates affichées au format français.
+- `src/ui/components/TopBar.tsx`, `E10Dashboard.tsx` : icône Paramètres retirée du bandeau supérieur (doublon avec la nav basse).
+
+### Constaté, non corrigé
+- Suppression d'une tâche récurrente sans effet et ajout de sous-tâche impossible depuis une tâche existante : signalés en test manuel, non reproduits malgré lecture de code et tests automatisés Playwright rejouant les scénarios décrits — laissés en attente d'une reproduction précise plutôt que corrigés à l'aveugle (`tests_manuels.md`).
+- Bug de taille du planning vide : investigué avec un navigateur automatisé, confirmé non reproductible sur build reconstruit — la première tentative de mesure était faussée par un serveur de preview Playwright resté sur un `dist/` figé.
+
 ## v5.8 — 2026-08-05
 
 Session hors roadmap : deux constats hérités d'une session antérieure corrigés après vérification en profondeur, plutôt qu'exécutés tels quels.

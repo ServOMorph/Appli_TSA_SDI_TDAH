@@ -169,13 +169,6 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     })
 
-    it('navigue vers settings au clic sur la roue', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Paramètres' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('settings')
-    })
-
     it('navigue vers ressources au clic sur le document', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)

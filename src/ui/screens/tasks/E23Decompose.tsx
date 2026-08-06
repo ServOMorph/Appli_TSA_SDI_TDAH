@@ -5,7 +5,7 @@ import { Card } from '@/ui/components/Card'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
 import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
-import { todayStr } from '@/domain/rules/planningSlotRules'
+import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import {
   DndContext,
   PointerSensor,
@@ -153,7 +153,9 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onSchedule }: Sortab
               setScheduling((v) => !v)
             }}
           >
-            {subTask.scheduled_start ? `${subTask.scheduled_date} ${subTask.scheduled_start}` : 'Horaire'}
+            {subTask.scheduled_start
+              ? `${subTask.scheduled_date ? formatFrenchDate(subTask.scheduled_date) : ''} ${subTask.scheduled_start}`
+              : 'Horaire'}
           </button>
           <button
             aria-label={`Supprimer ${subTask.title}`}

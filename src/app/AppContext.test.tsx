@@ -522,6 +522,59 @@ describe('AppProvider — settings et données', () => {
   })
 })
 
+describe('AppProvider — outils et dossiers (V5-3)', () => {
+  function ToolsPanel() {
+    const { createUser, goTo, screen: s, tools, folders, createFolder, createToolList, deleteTool, deleteFolder } = useApp()
+    return (
+      <>
+        <div data-testid="screen">{s}</div>
+        <div data-testid="tool-count">{tools.length}</div>
+        <div data-testid="folder-count">{folders.length}</div>
+        <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
+        <button onClick={() => createFolder('Maison')}>créer dossier</button>
+        <button onClick={() => createToolList('Courses', null)}>créer liste</button>
+        <button onClick={() => folders[0] && deleteFolder(folders[0].id)}>supprimer dossier</button>
+        <button onClick={() => tools.find((t) => t.type === 'liste' && t.folder_id === null) && deleteTool(tools.find((t) => t.type === 'liste' && t.folder_id === null)!.id)}>
+          supprimer première liste
+        </button>
+      </>
+    )
+  }
+
+  it('createUser seede une To Do et un Budget par défaut', async () => {
+    render(<AppProvider><ToolsPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await waitFor(() => {
+      expect(Number(screen.getByTestId('tool-count').textContent)).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  it('createFolder puis createToolList ajoutent bien un dossier et une liste', async () => {
+    render(<AppProvider><ToolsPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    const toolCountBefore = Number(screen.getByTestId('tool-count').textContent)
+    const folderCountBefore = Number(screen.getByTestId('folder-count').textContent)
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer dossier' })) })
+    await waitFor(() => expect(Number(screen.getByTestId('folder-count').textContent)).toBe(folderCountBefore + 1))
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer liste' })) })
+    await waitFor(() => expect(Number(screen.getByTestId('tool-count').textContent)).toBe(toolCountBefore + 1))
+  })
+
+  it('deleteTool retire un outil de type liste', async () => {
+    render(<AppProvider><ToolsPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    const toolCountBefore = Number(screen.getByTestId('tool-count').textContent)
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'supprimer première liste' })) })
+    await waitFor(() => expect(Number(screen.getByTestId('tool-count').textContent)).toBe(toolCountBefore - 1))
+  })
+})
+
 describe('AppProvider — createDetailedTask (E21)', () => {
   function DetailedTaskPanel() {
     const { createUser, completeOnboarding, createDetailedTask, inboxTasks, todayTasks, loading } = useApp()

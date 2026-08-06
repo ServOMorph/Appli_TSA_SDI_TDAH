@@ -121,7 +121,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-2b — Planning et tâches refondus [EN COURS]
+## Phase V5-2b — Planning et tâches refondus [FAIT]
 
 Note : les références de ce checklist à `taskV2.ts`/`taskRulesV2.ts`/`subTaskRules.ts`/migration
 « v7 » datent d'avant la fusion V5-2a et sont obsolètes — l'entité unique est `task.ts` /
@@ -140,11 +140,13 @@ Note : les références de ce checklist à `taskV2.ts`/`taskRulesV2.ts`/`subTask
 - [x] `Q11` — boîte de dialogue « cette occurrence » / « toutes les occurrences » à chaque modification/suppression d'une tâche récurrente depuis sa fiche (`E22TaskDetail.tsx`, `usePlanningState.updateTaskFields`/`deleteTaskScoped`). Simplification assumée : l'entité `TaskException` (`src/domain/entities/taskException.ts`) existe en base mais n'est pas encore utilisée par cette UI — la détection « cette occurrence » repose sur `Task.recurrence_exception`, suffisant tant que les occurrences sont toutes matérialisées à l'avance (pas de régénération différée)
 - [x] `E5`, `E13`, `Q10` (cf. C5, C17, C39) — fiche tâche au clic, **seul** point de modification (pas de glisser-déposer) : champs titre/icône/couleur/date/horaire/énergie cliquables, actions dupliquer/supprimer (`E22TaskDetail.tsx`) ; flux tap-based du planning (menu Déplacer/Renommer/Supprimer) entièrement retiré, tap sur une ligne planning ouvre directement la fiche. `E12` retire la notion d'alerte du périmètre (pas de champ alerte dans la fiche, conforme).
 - [x] `E10`, `E22` (cf. C19, C23) — sous-tâches avec compteur `n/N` dépliable et cochable depuis le planning (`PlanningBoard.tsx`) ; une sous-tâche conserve la possibilité d'un horaire propre, réglable depuis la fiche parente (`E22TaskDetail.tsx`, `E23Decompose.tsx`)
-- [ ] `E7` — vérifier qu'aucune donnée n'est préremplie à l'installation (`src/ui/screens/onboarding/*`) — **M6, pas fait**
+- [x] `E7` — vérifié qu'aucune donnée n'est préremplie à l'installation (`src/ui/screens/onboarding/*`, `useSettingsState.ts`, `db.ts`) — **M6 clos**
 - [x] `E12` — aucune notion d'alerte dans la fiche tâche ni dans la création (hors périmètre, conforme)
 - [x] Migration Dexie **v9** (`icon`, `color`, `description`, `duration_minutes`, `recurrence_id`, `is_recurrence_root`, `recurrence_exception`, tables `taskRecurrences`/`taskExceptions`) et tests de bords de récurrence (`taskRecurrenceRules.test.ts`, 18 tests : intervalles, fins par date/nombre, mois courts)
 
-Gate : [x] tests verts (488/488 unitaires, `tsc -b`/lint clean) · [x] test manuel (point 3.2 validé le 2026-08-06, `tests_manuels.md` purgé) · [ ] doc · [ ] sortie — **reste M6 (E7) et M7 (gate de phase), gate non atteint**
+Gate : [x] tests verts (488/488 unitaires, `tsc -b`/lint clean) · [x] test manuel (point 3.2 validé le 2026-08-06, `tests_manuels.md` purgé) · [x] doc (`CHANGELOG.md`) · [x] sortie — planning épuré sans grille en place, un seul modèle de tâche, récurrence Google Agenda fonctionnelle, aucune donnée préremplie à l'installation (M6)
+
+Phase close le 2026-08-06.
 
 M5 close côté code le 2026-08-05 : planning épuré sans quadrillage (liste par tâche, bandeau de dates avec navigation par appui/glissement/sélecteur de date), sous-tâches dépliables avec compteur n/N, flux tap-based entièrement retiré au profit de la fiche. Écran « Aujourd'hui » (`E24Today`) retiré (décidé avec l'utilisateur — redondant avec la section « Tâche du jour » déjà sur l'accueil). Bug trouvé et corrigé en validation manuelle : sur une occurrence déjà détachée d'une série (`recurrence_exception: true`), la modifier à nouveau en choisissant « Toutes les occurrences » ne la mettait pas à jour elle-même (`usePlanningState.ts`, filtre de ciblage excluait à tort l'occurrence cliquée) — corrigé, testé automatiquement, retest manuel confirmé sans défaut le 2026-08-06.
 
@@ -155,20 +157,24 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-3 — Outils, dossiers, listes et budget rebranché [TODO]
+## Phase V5-3 — Outils, dossiers, listes et budget rebranché [EN COURS]
 
-- [ ] `E20` + `Q9` (cf. C27, C29, C39) — entité `Folder` à **un seul niveau** et entité `Tool` typée ; le « + » du bloc outils ajoute un outil ou un dossier (`src/domain/entities/folder.ts`, `src/domain/entities/tool.ts`, `src/data/db.ts` migration v8)
-- [ ] `E26` (cf. C41, C42) — types d'outils déclarés ; seuls `liste` et `tableau comptage` sont implémentés en V5.0, les trois autres apparaissent grisés (`src/domain/entities/tool.ts`, `src/ui/screens/tools/E70Tools.tsx`)
-- [ ] `E27` (cf. C43, C44) — outil Liste : coche qui s'intensifie, croix de suppression, items cochés relégués sous les non cochés ; champ `checked` sur `ListItem` (`src/domain/entities/listItem.ts`, `src/ui/screens/lists/E61ListDetail.tsx`)
-- [ ] `E28` (cf. C43) — rubriques optionnelles regroupant les items d'une liste (`src/domain/entities/listItem.ts` champ `section`)
-- [ ] `E29` (cf. C46) — icône réveil sur chaque item de liste ouvrant le seul choix récurrente / ponctuelle, en réutilisant le flux de V5-2 (`src/ui/screens/lists/E61ListDetail.tsx`)
-- [ ] `E30` — To Do ramené à une liste créée d'office ; retirer le traitement spécial et le flag `pinned_to_tools` hérités de V4.1 (`src/ui/screens/tools/E70Tools.tsx`, `src/domain/entities/list.ts`)
-- [ ] `Q5` — rebrancher `E71Budget` comme outil de type « tableau comptage », sans toucher à son modèle de données ni à ses règles (`src/ui/screens/tools/E71Budget.tsx`, `src/domain/entities/tool.ts`)
-- [ ] `Q12` — widget Comptes sur l'accueil ouvrant la saisie de dépense en un tap (`src/ui/screens/dashboard/E10Dashboard.tsx`)
-- [ ] `E24` — rendu effectif des widgets d'outils sur l'accueil, la zone posée en V5-1 étant désormais alimentée (`src/ui/screens/dashboard/E10Dashboard.tsx`)
-- [ ] Tests de dossiers (création, rangement, suppression en cascade), de tri des items cochés, et de non-régression du budget V4.1 (e2e `08-tools-budget.spec.ts`)
+- [x] `E20` + `Q9` (cf. C27, C29, C39) — entité `Folder` à **un seul niveau** et entité `Tool` typée ; le « + » du bloc outils ajoute un outil ou un dossier (`src/domain/entities/folder.ts`, `src/domain/entities/tool.ts`, `src/data/db.ts` migration **v10**)
+- [x] `E26` (cf. C41, C42) — types d'outils déclarés ; seuls `liste` et `tableau comptage` sont implémentés en V5.0, les trois autres apparaissent grisés (`src/domain/entities/tool.ts`, `src/ui/components/ToolCreateModal.tsx`)
+- [x] `E27` (cf. C43, C44) — outil Liste : coche qui s'intensifie, croix de suppression, items cochés relégués sous les non cochés ; champ `checked` sur `ListItem` (`src/domain/entities/listItem.ts`, `src/domain/rules/listItemSortRules.ts`, `src/ui/screens/lists/E61ListDetail.tsx`)
+- [x] `E28` (cf. C43) — rubriques optionnelles regroupant les items d'une liste (`ListItem.section`, `groupListItemsBySection` dans `listItemSortRules.ts`)
+- [x] `E29` (cf. C46) — icône réveil sur chaque item de liste ouvrant le choix récurrente / ponctuelle (date + heure requises), en réutilisant `createDetailedTask` de V5-2 (`src/ui/screens/lists/E61ListDetail.tsx`)
+- [x] `E30` — To Do ramenée à une liste comme les autres, créée d'office (migration v10 et, pour une installation neuve où l'upgrade ne s'exécute pas, `useSettingsState.seedDefaultToolsIfMissing`) ; `pinned_to_tools` et `E60Lists.tsx` retirés, remplacés par le modèle dossiers/outils (`E70Tools.tsx`, `E72FolderDetail.tsx`)
+- [x] `Q5` — `E71Budget` rebranché comme outil de type « tableau comptage », code interne inchangé, atteint via une carte outil au lieu du bouton codé en dur (`src/ui/screens/tools/E71Budget.tsx` non modifié, `src/ui/screens/tools/E70Tools.tsx`)
+- [x] `Q12` — widget Comptes sur l'accueil ouvrant la saisie de dépense en un tap (`src/ui/screens/dashboard/E10Dashboard.tsx`)
+- [x] `E24` — rendu effectif des widgets d'outils (dossiers + outils racine) sur l'accueil, la zone posée en V5-1 étant désormais alimentée (`src/ui/screens/dashboard/E10Dashboard.tsx`)
+- [x] Tests de dossiers (création, rangement, suppression en cascade), de tri/rubriques des items, de la migration v10 (seed) et de non-régression du budget (unitaires + e2e `08-tools-budget.spec.ts` inchangé côté comportement + nouveau `09-tools-folders-lists.spec.ts`)
 
-Gate : [ ] tests verts · [ ] test manuel · [ ] doc · [ ] sortie : un dossier contenant une liste se crée, la liste se coche, se trie et planifie un item ; le budget V4.1 reste intégralement accessible et fonctionnel depuis l'accueil
+Gate : [x] tests verts (500/500 unitaires, 57/57 e2e, `tsc -b`/lint/build clean) · [ ] test manuel (à faire, cf. `tests_manuels.md`) · [x] doc (`CHANGELOG.md`) · [ ] sortie — reste la validation manuelle avant clôture de phase
+
+Décision architecturale prise en cours de phase : le checklist V5-3 ne citait plus `E60Lists.tsx` ni la route `lists`, cohérent avec E20 (les listes ne s'ajoutent plus que via le « + » du bloc outils). `E60Lists.tsx` et la route `lists` ont été supprimés ; la carte « Listes » du dashboard a fusionné dans les widgets d'outils génériques. Décision validée avec l'utilisateur avant codage (mode plan).
+
+Défaut trouvé et corrigé en cours de route : le réveil d'un item (E29) ne fixait pas d'heure de début (`startTime: null`) ; or `scheduleTask` n'assigne `scheduled_date` que si une heure est fournie, rendant la tâche créée invisible sur le planning. Champ « Heure » ajouté à la mini-modale, requis pour planifier.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

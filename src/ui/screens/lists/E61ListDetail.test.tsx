@@ -22,6 +22,8 @@ function makeListItem(overrides: Partial<ListItem> = {}): ListItem {
     list_id: 'list-1',
     title: 'Hotel California',
     position: 0,
+    checked: false,
+    section: null,
     created_at: '2026-06-30T10:00:00.000Z',
     ...overrides,
   }
@@ -107,14 +109,95 @@ describe('E61ListDetail', () => {
   })
 
   describe('bouton retour', () => {
-    it('clic sur ← dépile la navigation, avec lists en repli', async () => {
+    it('clic sur ← dépile la navigation, avec tools en repli', async () => {
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
       })
       renderWithApp(<E61ListDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.back).toHaveBeenCalledWith('lists')
+      expect(ctx.back).toHaveBeenCalledWith('tools')
+    })
+  })
+
+  describe('coche (E27)', () => {
+    it('clic sur la coche appelle toggleListItem', async () => {
+      const items = [makeListItem({ id: 'i1', title: 'Hotel California' })]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue(items),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => screen.getByRole('button', { name: 'Cocher Hotel California' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Cocher Hotel California' }))
+      expect(ctx.toggleListItem).toHaveBeenCalledWith('i1')
+    })
+
+    it('les items cochés apparaissent sous les non cochés', async () => {
+      const items = [
+        makeListItem({ id: 'i1', title: 'Coché', checked: true, position: 0 }),
+        makeListItem({ id: 'i2', title: 'Non coché', checked: false, position: 1 }),
+      ]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue(items),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => screen.getByText('Coché'))
+      const titles = screen.getAllByText(/Coché|Non coché/).map((el) => el.textContent)
+      expect(titles).toEqual(['Non coché', 'Coché'])
+    })
+  })
+
+  describe('rubriques (E28)', () => {
+    it('regroupe les items par rubrique', async () => {
+      const items = [
+        makeListItem({ id: 'i1', title: 'T-shirt', section: 'Été' }),
+        makeListItem({ id: 'i2', title: 'Pull', section: 'Hiver' }),
+      ]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue(items),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => {
+        expect(screen.getByRole('heading', { name: 'Été' })).toBeDefined()
+        expect(screen.getByRole('heading', { name: 'Hiver' })).toBeDefined()
+      })
+    })
+  })
+
+  describe('réveil (E29)', () => {
+    it('ouvre la mini-modale de planification au clic sur le réveil', async () => {
+      const items = [makeListItem({ id: 'i1', title: 'Hotel California' })]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue(items),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => screen.getByRole('button', { name: 'Planifier Hotel California' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Planifier Hotel California' }))
+      expect(screen.getByRole('dialog', { name: 'Planifier Hotel California' })).toBeDefined()
+    })
+
+    it('la validation crée une tâche planifiée ponctuelle via createDetailedTask', async () => {
+      const items = [makeListItem({ id: 'i1', title: 'Hotel California' })]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue(items),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => screen.getByRole('button', { name: 'Planifier Hotel California' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Planifier Hotel California' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
+      expect(ctx.createDetailedTask).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Hotel California', status: 'planned', recurrence: null }),
+      )
     })
   })
 
@@ -154,7 +237,7 @@ describe('E61ListDetail', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter un élément' }))
       await userEvent.type(screen.getByLabelText('Élément'), 'Hotel California')
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
-      expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Hotel California')
+      expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Hotel California', null)
     })
 
     it('clic Annuler ferme le formulaire', async () => {

@@ -14,6 +14,7 @@ import { energyRepo, settingsRepo, todayDate, userRepo } from '@/app/repositorie
 import { useBudgetState } from '@/app/contexts/useBudgetState'
 import { useEnergyState } from '@/app/contexts/useEnergyState'
 import { useListsState } from '@/app/contexts/useListsState'
+import { useToolsState } from '@/app/contexts/useToolsState'
 import { useSettingsState } from '@/app/contexts/useSettingsState'
 import { useTasksState } from '@/app/contexts/useTasksState'
 import { usePlanningState } from '@/app/contexts/usePlanningState'
@@ -48,6 +49,7 @@ type AppContextValue = NavigationValue &
   Omit<ReturnType<typeof usePlanningState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useEnergyState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useListsState>, 'load' | 'reset'> &
+  Omit<ReturnType<typeof useToolsState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useBudgetState>, 'load' | 'reset'> &
   Omit<
     ReturnType<typeof useSettingsState>,
@@ -77,6 +79,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const planning = usePlanningState(tasks.load)
   const energy = useEnergyState()
   const lists = useListsState()
+  const tools = useToolsState(lists.load)
   const budget = useBudgetState()
   const session = useSettingsState()
 
@@ -84,6 +87,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { load: loadPlanning, reset: resetPlanning, ...planningValue } = planning
   const { load: loadEnergy, reset: resetEnergy, ...energyValue } = energy
   const { load: loadLists, reset: resetLists, ...listsValue } = lists
+  const { load: loadTools, reset: resetTools, ...toolsValue } = tools
   const { load: loadBudget, reset: resetBudget, ...budgetValue } = budget
   const {
     reset: resetSession,
@@ -91,13 +95,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setSettings,
     clearDatabase,
     completeOnboarding: markOnboardingComplete,
+    createUser: createUserAndSeedTools,
     ...sessionValue
   } = session
+
+  async function createUser(profile: Parameters<typeof createUserAndSeedTools>[0]) {
+    await createUserAndSeedTools(profile)
+    await Promise.all([loadLists(), loadTools()])
+  }
 
   const overloadMode = isOverloaded(energy.todayEnergy, getRemainingPlannedCost(planning.todayPlannedTasks))
 
   async function loadAll() {
-    await Promise.all([loadTasks(), loadPlanning(), loadEnergy(), loadLists(), loadBudget()])
+    await Promise.all([loadTasks(), loadPlanning(), loadEnergy(), loadLists(), loadTools(), loadBudget()])
   }
 
   useEffect(() => {
@@ -128,6 +138,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     resetPlanning()
     resetEnergy()
     resetLists()
+    resetTools()
     resetBudget()
     resetSession()
     setStack([{ name: 'welcome' }])
@@ -157,8 +168,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...planningValue,
         ...energyValue,
         ...listsValue,
+        ...toolsValue,
         ...budgetValue,
         ...sessionValue,
+        createUser,
       }}
     >
       {children}

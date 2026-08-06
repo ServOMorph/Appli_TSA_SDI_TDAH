@@ -23,6 +23,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'Item 1',
       position: 0,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     const id = await repo.create(item)
@@ -35,6 +37,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'My item',
       position: 0,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -48,6 +52,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'Item 1',
       position: 0,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     const item2: ListItem = {
@@ -55,6 +61,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'Item 2',
       position: 1,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     const item3: ListItem = {
@@ -62,6 +70,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-2',
       title: 'Item 3',
       position: 0,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item1)
@@ -78,6 +88,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'Original',
       position: 0,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -93,6 +105,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'Item 1',
       position: 0,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -107,6 +121,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'Item 1',
       position: 0,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     const item2: ListItem = {
@@ -114,6 +130,8 @@ describe('ListItemRepository', () => {
       list_id: 'list-1',
       title: 'Item 2',
       position: 1,
+      checked: false,
+      section: null,
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item1)

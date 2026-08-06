@@ -1,3 +1,42 @@
+## v5.12 — 2026-08-06
+
+Clôture de la Phase V5-2b (M6/M7) et codage intégral de la Phase V5-3 (outils, dossiers, listes et Budget rebranché), en mode plan.
+
+### Ajouté
+- Entités `Folder`/`Tool`, migration Dexie **v10** (`folders`, `tools`, `ListItem.checked`/`section` ; seed d'une To Do et d'un Budget d'office à l'installation, sans contenu).
+- `src/ui/screens/tools/E72FolderDetail.tsx`, `src/ui/components/ToolCreateModal.tsx`/`ToolWidgetCard.tsx`.
+- `E61ListDetail.tsx` : coche intensifiée avec tri (cochés sous les non cochés), rubriques optionnelles, icône réveil planifiant une tâche récurrente ou ponctuelle via `createDetailedTask`.
+- `E10Dashboard.tsx` : widget « Comptes » ouvrant la saisie de dépense en un tap.
+- `e2e/09-tools-folders-lists.spec.ts`.
+
+### Modifié
+- `E70Tools.tsx` : écran générique rendant dossiers et outils réels (plus de boutons « Todo »/« Budget » codés en dur).
+- `E71Budget.tsx` : code interne inchangé, atteint désormais via une carte outil.
+- Flux « déplacer une tâche vers une liste » (`E20Inbox.tsx`, `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx`) migré vers `createToolList` pour que toute nouvelle liste obtienne un outil associé.
+
+### Retiré
+- `E60Lists.tsx` et la route `lists` : les listes ne se créent plus que via le « + » du bloc outils (dossier ou racine). `pinned_to_tools` retiré de `List`.
+- Code mort dans `E21CreateTaskV2.tsx` (sélecteur de liste devenu inatteignable après retrait de l'origine `lists`).
+
+### Corrigé
+- Le réveil d'un item de liste ne fixait pas d'heure de début, rendant la tâche créée invisible sur le planning (`scheduleTask` n'assigne `scheduled_date` que si une heure est fournie) — champ Heure ajouté à la mini-modale, requis.
+
+### Vérifié
+- `E7` (M6, Phase V5-2b) — aucune donnée n'est préremplie à l'installation.
+
+### Gate
+- 500/500 tests unitaires, 57/57 e2e, `tsc -b`/lint/build clean. Phase V5-2b passée à `[FAIT]`. Phase V5-3 `[EN COURS]` — codée et testée, reste la validation manuelle (`tests_manuels.md`).
+
+## v5.11 — 2026-08-06
+
+Clôture de la Phase V5-2b (planning et tâches refondus) : M6 (audit E7) et M7 (gate de phase).
+
+### Vérifié
+- `E7` — aucune donnée n'est préremplie à l'installation (`src/ui/screens/onboarding/*`, `useSettingsState.ts`, `db.ts`) : `createUser` ne crée qu'un `User` et des `Settings` par défaut (configuration, pas contenu), aucune tâche/liste/catégorie budget créée automatiquement, aucun hook `populate` sur la base Dexie.
+
+### Gate de phase
+- 488/488 tests unitaires, `tsc -b`/lint clean. Phase V5-2b passée à `[FAIT]`.
+
 ## v5.10 — 2026-08-06
 
 Clôture M5 de la Phase V5-2b : validation manuelle tactile du point 3.2, deux bugs fonctionnels signalés clos comme non reproductibles.

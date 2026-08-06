@@ -10,7 +10,6 @@ describe('activeTabFor', () => {
     expect(activeTabFor('inbox')).toBe('inbox')
     expect(activeTabFor('settings')).toBe('settings')
     expect(activeTabFor('tools')).toBeNull()
-    expect(activeTabFor('lists')).toBeNull()
     expect(activeTabFor('list-detail')).toBeNull()
   })
 })
@@ -39,7 +38,7 @@ describe('AppScreens — navigation persistante (N1)', () => {
 
   it('navigue vers dashboard au clic sur Accueil depuis un autre écran', async () => {
     const { default: userEvent } = await import('@testing-library/user-event')
-    const ctx = makeAppContext({ screen: 'lists' })
+    const ctx = makeAppContext({ screen: 'tools' })
     renderWithApp(<AppScreens />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Accueil' }))
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')

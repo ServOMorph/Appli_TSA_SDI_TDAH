@@ -11,7 +11,7 @@ import type { Screen } from '@/app/AppContext'
 import type { RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
 import type { TaskStatus } from '@/domain/entities/task'
 
-type Destination = 'todo' | 'planned' | 'list'
+type Destination = 'todo' | 'planned'
 
 const DEFAULT_DESTINATION: Destination = 'todo'
 
@@ -20,15 +20,14 @@ const FORCED_DESTINATION_BY_ORIGIN: Partial<Record<Screen, Destination>> = {
   tools: 'todo',
   planning: 'planned',
   dashboard: 'planned',
-  lists: 'list',
 }
 
-const DESTINATION_STATUS: Record<Exclude<Destination, 'list'>, TaskStatus> = {
+const DESTINATION_STATUS: Record<Destination, TaskStatus> = {
   todo: 'inbox',
   planned: 'planned',
 }
 
-const DESTINATION_SCREEN: Record<Exclude<Destination, 'list'>, Screen> = {
+const DESTINATION_SCREEN: Record<Destination, Screen> = {
   todo: 'inbox',
   planned: 'planning',
 }
@@ -123,38 +122,10 @@ const removeBtnStyle: React.CSSProperties = {
   lineHeight: 1,
 }
 
-const modalOverlay: React.CSSProperties = {
-  position: 'fixed',
-  inset: 0,
-  backgroundColor: 'rgba(0,0,0,0.75)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  zIndex: 1000,
-}
-
-const modalBox: React.CSSProperties = {
-  backgroundColor: 'var(--color-surface)',
-  border: '1px solid var(--color-border)',
-  boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
-  borderRadius: 'var(--radius-lg)',
-  padding: 'var(--spacing-xl)',
-  maxWidth: '360px',
-  width: '90%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 'var(--spacing-md)',
-}
-
 export function E21CreateTaskV2() {
   const {
     goTo,
-    lists,
-    addListItem,
     addSubTask,
-    createList,
-    selectList,
-    goToPath,
     createDetailedTask,
     back,
     originScreen,
@@ -172,8 +143,6 @@ export function E21CreateTaskV2() {
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null)
   const [recurring, setRecurring] = useState(false)
   const [recurrence, setRecurrence] = useState<RecurrenceRuleInput>(DEFAULT_RECURRENCE)
-  const [showListPicker, setShowListPicker] = useState(false)
-  const [newListName, setNewListName] = useState('')
   const effectiveDestination = (originScreen ? FORCED_DESTINATION_BY_ORIGIN[originScreen] : undefined) ?? DEFAULT_DESTINATION
   const isPlanned = effectiveDestination === 'planned'
   const canSubmit = title.trim().length > 0 && (!isPlanned || startTime.length > 0)
@@ -217,33 +186,8 @@ export function E21CreateTaskV2() {
     e.preventDefault()
     if (!canSubmit || !effectiveDestination) return
 
-    if (effectiveDestination === 'list') {
-      setShowListPicker(true)
-      return
-    }
-
     await createFullTask(DESTINATION_STATUS[effectiveDestination])
     goTo(DESTINATION_SCREEN[effectiveDestination])
-  }
-
-  async function handleChooseList(listId: string) {
-    const trimmed = title.trim()
-    if (!trimmed) return
-    await addListItem(listId, trimmed)
-    setShowListPicker(false)
-    selectList(listId)
-    goToPath(['lists', 'list-detail'])
-  }
-
-  async function handleCreateList() {
-    const trimmed = title.trim()
-    if (!trimmed || !newListName.trim()) return
-    const listId = await createList(newListName.trim())
-    await addListItem(listId, trimmed)
-    setNewListName('')
-    setShowListPicker(false)
-    selectList(listId)
-    goToPath(['lists', 'list-detail'])
   }
 
   return (
@@ -395,47 +339,6 @@ export function E21CreateTaskV2() {
           Annuler
         </Button>
       </form>
-
-      {showListPicker && (
-        <div role="dialog" aria-modal="true" aria-label="Choisir une liste" style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Ajouter à une liste</h2>
-            {lists.length === 0 ? (
-              <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {lists.map((l) => (
-                  <button
-                    key={l.id}
-                    aria-label={`Ajouter à ${l.name}`}
-                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
-                    onClick={() => handleChooseList(l.id)}
-                  >
-                    {l.name}
-                  </button>
-                ))}
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-              <input
-                type="text"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                placeholder="Nouvelle liste"
-                aria-label="Nom de la nouvelle liste"
-                style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
-              />
-              <Button onClick={handleCreateList} disabled={!newListName.trim()}>
-                Créer
-              </Button>
-            </div>
-            <Button variant="secondary" fullWidth onClick={() => setShowListPicker(false)}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
     </main>
   )
 }

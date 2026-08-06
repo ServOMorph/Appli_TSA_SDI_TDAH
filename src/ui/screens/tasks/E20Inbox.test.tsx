@@ -128,14 +128,14 @@ describe('E20Inbox', () => {
       const ctx = makeAppContext({
         inboxTasks: [task],
         lists: [],
-        createList: vi.fn().mockResolvedValue('new-list-1'),
+        createToolList: vi.fn().mockResolvedValue('new-list-1'),
       })
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByLabelText('Ajouter Lire livre à une liste'))
       expect(screen.getByText("Aucune liste pour l'instant.")).toBeDefined()
       await userEvent.type(screen.getByLabelText('Nom de la nouvelle liste'), 'Livres')
       await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
-      expect(ctx.createList).toHaveBeenCalledWith('Livres')
+      expect(ctx.createToolList).toHaveBeenCalledWith('Livres', null)
       expect(ctx.moveTodoTaskToList).toHaveBeenCalledWith('abc', 'new-list-1')
       expect(screen.queryByRole('dialog')).toBeNull()
     })

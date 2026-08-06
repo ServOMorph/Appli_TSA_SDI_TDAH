@@ -16,9 +16,9 @@ import { E111Profile } from '@/ui/screens/settings/E111Profile'
 import { E112Accessibility } from '@/ui/screens/settings/E112Accessibility'
 import { E116Privacy } from '@/ui/screens/settings/E116Privacy'
 import { E117Export } from '@/ui/screens/settings/E117Export'
-import { E60Lists } from '@/ui/screens/lists/E60Lists'
 import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
 import { E70Tools } from '@/ui/screens/tools/E70Tools'
+import { E72FolderDetail } from '@/ui/screens/tools/E72FolderDetail'
 import { E71Budget } from '@/ui/screens/tools/E71Budget'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
@@ -98,12 +98,12 @@ export function AppScreens() {
         return <E116Privacy />
       case 'settings-export':
         return <E117Export />
-      case 'lists':
-        return <E60Lists />
       case 'list-detail':
         return <E61ListDetail />
       case 'tools':
         return <E70Tools />
+      case 'folder-detail':
+        return <E72FolderDetail />
       case 'budget':
         return <E71Budget />
     }

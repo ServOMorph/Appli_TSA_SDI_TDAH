@@ -253,8 +253,8 @@ describe('E10Dashboard', () => {
     })
   })
 
-  describe('zone widgets provisoire (E24)', () => {
-    it('ouvre les outils depuis la zone widgets', async () => {
+  describe('zone widgets (E24)', () => {
+    it('ouvre la gestion des outils depuis la zone widgets', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       const zone = screen.getByRole('region', { name: 'Outils' })
@@ -262,11 +262,24 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('tools')
     })
 
-    it('ouvre les listes depuis la zone widgets', async () => {
-      const ctx = makeAppContext()
+    it('affiche un outil liste racine et navigue vers list-detail au clic', async () => {
+      const ctx = makeAppContext({
+        lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
+        tools: [{ id: 't1', type: 'liste', folder_id: null, list_id: 'l1', position: 0, created_at: '', updated_at: '' }],
+      })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Listes' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('lists')
+      await userEvent.click(screen.getByRole('button', { name: 'Liste' }))
+      expect(ctx.selectList).toHaveBeenCalledWith('l1')
+      expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
+    })
+
+    it('le widget Comptes ouvre la saisie de dépense', async () => {
+      const ctx = makeAppContext({
+        budgetCategories: [{ id: 'c1', name: 'Courses', kind: 'expense', period: 'month', amount: 100, position: 0, created_at: '', updated_at: '' }],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Comptes' }))
+      expect(screen.getByRole('dialog', { name: 'Ajouter une dépense' })).toBeDefined()
     })
   })
 

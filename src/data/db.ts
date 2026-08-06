@@ -12,6 +12,8 @@ import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
+import type { Folder } from '@/domain/entities/folder'
+import type { Tool } from '@/domain/entities/tool'
 
 export class AppDatabase extends Dexie {
   users!: Table<User>
@@ -26,6 +28,8 @@ export class AppDatabase extends Dexie {
   budgetDeposits!: Table<BudgetDeposit>
   taskRecurrences!: Table<TaskRecurrence>
   taskExceptions!: Table<TaskException>
+  folders!: Table<Folder>
+  tools!: Table<Tool>
 
   constructor(name = 'appli-tsa-sdi-tdah') {
     super(name)
@@ -216,6 +220,43 @@ export class AppDatabase extends Dexie {
             task.is_recurrence_root = false
             task.recurrence_exception = false
           })
+      })
+    this.version(10)
+      .stores({
+        listItems: 'id, list_id, position, checked',
+        folders: 'id, position',
+        tools: 'id, type, folder_id, position',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('listItems')
+          .toCollection()
+          .modify((item) => {
+            item.checked = false
+            item.section = null
+          })
+
+        const now = new Date().toISOString()
+        const todoListId = crypto.randomUUID()
+        await tx.table('lists').add({ id: todoListId, name: 'To Do', created_at: now, updated_at: now })
+        await tx.table('tools').add({
+          id: crypto.randomUUID(),
+          type: 'liste',
+          folder_id: null,
+          list_id: todoListId,
+          position: 0,
+          created_at: now,
+          updated_at: now,
+        })
+        await tx.table('tools').add({
+          id: crypto.randomUUID(),
+          type: 'tableau_comptage',
+          folder_id: null,
+          list_id: null,
+          position: 1,
+          created_at: now,
+          updated_at: now,
+        })
       })
   }
 }

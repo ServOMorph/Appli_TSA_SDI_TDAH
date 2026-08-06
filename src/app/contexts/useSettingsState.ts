@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { db, newId, settingsRepo, userRepo } from '@/app/repositories'
+import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/repositories'
+import { createList } from '@/domain/rules/listRules'
+import { createTool } from '@/domain/rules/toolRules'
 import type { Settings } from '@/domain/entities/settings'
 import type { User, ProfileType } from '@/domain/entities/user'
 
@@ -41,7 +43,24 @@ export function useSettingsState() {
     }
     await userRepo.create(user)
     await settingsRepo.create(defaultSettings)
+    await seedDefaultToolsIfMissing()
     setCurrentUser(user)
+  }
+
+  /**
+   * Une installation neuve crée la base Dexie directement au dernier schéma, sans exécuter
+   * les callbacks `.upgrade()` des versions précédentes (rien à migrer) : la To Do et le
+   * Budget seedés par la migration v10 n'existent alors pas encore. Cette fonction couvre
+   * ce cas ; sur une base déjà migrée depuis v9, les outils existent déjà et rien n'est créé.
+   */
+  async function seedDefaultToolsIfMissing() {
+    const existing = await toolRepo.getAll()
+    if (existing.length > 0) return
+    const now = new Date().toISOString()
+    const todoList = createList(newId(), 'To Do', now)
+    await listRepo.create(todoList)
+    await toolRepo.create(createTool(newId(), 'liste', null, todoList.id, 0, now))
+    await toolRepo.create(createTool(newId(), 'tableau_comptage', null, null, 1, now))
   }
 
   async function updateSettings(patch: Partial<Settings>) {
@@ -102,6 +121,8 @@ export function useSettingsState() {
       db.budgetEntries.clear(),
       db.budgetAccounts.clear(),
       db.budgetDeposits.clear(),
+      db.folders.clear(),
+      db.tools.clear(),
     ])
   }
 

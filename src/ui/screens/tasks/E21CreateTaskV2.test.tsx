@@ -100,32 +100,6 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
-  it("depuis Listes (originScreen 'lists') : Valider ouvre directement le sélecteur de liste, crée un ListItem et navigue vers le détail de la liste", async () => {
-    const ctx = makeAppContext({
-      originScreen: 'lists',
-      lists: [{ id: 'list-1', name: 'Courses', created_at: '2026-07-05', updated_at: '2026-07-05' }],
-    })
-    renderWithApp(<E21CreateTaskV2 />, ctx)
-    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis listes')
-    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(screen.getByRole('dialog', { name: 'Choisir une liste' })).toBeDefined()
-    await userEvent.click(screen.getByRole('button', { name: 'Ajouter à Courses' }))
-    expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Tâche depuis listes')
-    expect(ctx.selectList).toHaveBeenCalledWith('list-1')
-    expect(ctx.goToPath).toHaveBeenCalledWith(['lists', 'list-detail'])
-  })
-
-  it("depuis Listes (originScreen 'lists') : le sélecteur de liste permet de créer une nouvelle liste", async () => {
-    const ctx = makeAppContext({ originScreen: 'lists', lists: [] })
-    renderWithApp(<E21CreateTaskV2 />, ctx)
-    await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche nouvelle liste')
-    await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    await userEvent.type(screen.getByLabelText('Nom de la nouvelle liste'), 'Bricolage')
-    await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
-    expect(ctx.createList).toHaveBeenCalledWith('Bricolage')
-    expect(ctx.goToPath).toHaveBeenCalledWith(['lists', 'list-detail'])
-  })
-
   it('permet d\'ajouter et retirer des sous-tâches', async () => {
     renderWithApp(<E21CreateTaskV2 />)
     await userEvent.type(screen.getByLabelText('Nouvelle sous-tâche'), 'Étape 1')

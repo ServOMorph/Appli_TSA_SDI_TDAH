@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
-import { FolderCard, ToolCard } from '@/ui/components/ToolWidgetCard'
+import { ToolCard } from '@/ui/components/ToolWidgetCard'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -15,13 +15,15 @@ const pageStyle: React.CSSProperties = {
   paddingBottom: 'var(--bottomnav-h)',
 }
 
-export function E70Tools() {
-  const { goTo, folders, tools, selectList } = useApp()
+export function E72FolderDetail() {
+  const { route, goTo, back, folders, tools, selectList } = useApp()
+  const folderId = route.name === 'folder-detail' ? (route.folderId ?? null) : null
+  const folder = folders.find((f) => f.id === folderId) ?? null
   const [showCreate, setShowCreate] = useState(false)
-  const rootTools = tools.filter((t) => t.folder_id === null)
+  const folderTools = folderId ? tools.filter((t) => t.folder_id === folderId) : []
 
   function openTool(toolId: string) {
-    const tool = rootTools.find((t) => t.id === toolId)
+    const tool = folderTools.find((t) => t.id === toolId)
     if (!tool) return
     if (tool.type === 'tableau_comptage') {
       goTo('budget')
@@ -42,35 +44,31 @@ export function E70Tools() {
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
         <button
           aria-label="Retour"
-          onClick={() => goTo('dashboard')}
+          onClick={() => back('tools')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}
         >
           ←
         </button>
-        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Outils</h1>
-        <Button onClick={() => setShowCreate(true)} aria-label="Ajouter un outil ou un dossier">
+        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>{folder?.name ?? 'Dossier'}</h1>
+        <Button onClick={() => setShowCreate(true)} aria-label="Ajouter un outil">
           +
         </Button>
       </header>
 
-      {folders.length === 0 && rootTools.length === 0 && (
+      {folderTools.length === 0 && (
         <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
-          Aucun outil pour l'instant.
+          Ce dossier est vide.
         </p>
       )}
 
-      {folders.map((folder) => (
-        <FolderCard key={folder.id} folder={folder} onOpen={() => goTo({ name: 'folder-detail', folderId: folder.id })} />
-      ))}
-
-      {rootTools.map((tool) => (
+      {folderTools.map((tool) => (
         <ToolCard key={tool.id} tool={tool} onOpen={() => openTool(tool.id)} />
       ))}
 
-      {showCreate && (
+      {showCreate && folderId && (
         <ToolCreateModal
-          folderId={null}
-          allowFolder
+          folderId={folderId}
+          allowFolder={false}
           onClose={() => setShowCreate(false)}
           onListCreated={handleListCreated}
         />

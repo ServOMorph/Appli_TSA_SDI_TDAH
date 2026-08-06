@@ -29,7 +29,7 @@ describe('isRootScreen', () => {
 
 describe('toRoute', () => {
   it('accepte un nom d écran nu', () => {
-    expect(toRoute('lists')).toEqual({ name: 'lists' })
+    expect(toRoute('tools')).toEqual({ name: 'tools' })
   })
 
   it('laisse intacte une route déjà construite', () => {
@@ -46,28 +46,28 @@ describe('sameRoute', () => {
 
 describe('push', () => {
   it('empile un écran non racine', () => {
-    const next = push(dashboard, 'lists')
-    expect(next).toEqual([{ name: 'dashboard' }, { name: 'lists' }])
+    const next = push(dashboard, 'tools')
+    expect(next).toEqual([{ name: 'dashboard' }, { name: 'tools' }])
   })
 
   it('réinitialise la pile sur un écran racine', () => {
-    const deep = push(push(dashboard, 'lists'), 'list-detail')
+    const deep = push(push(dashboard, 'tools'), 'list-detail')
     expect(push(deep, 'dashboard')).toEqual([{ name: 'dashboard' }])
   })
 
   it('ne réempile pas la route déjà courante', () => {
-    const next = push(dashboard, 'lists')
-    expect(push(next, 'lists')).toBe(next)
+    const next = push(dashboard, 'tools')
+    expect(push(next, 'tools')).toBe(next)
   })
 
   it('empile un écran déjà présent plus bas dans la pile sans collapser', () => {
-    const deep = push(push(push(dashboard, 'lists'), 'list-detail'), 'task-create-v2')
-    expect(push(deep, 'lists')).toEqual([
+    const deep = push(push(push(dashboard, 'tools'), 'list-detail'), 'task-create-v2')
+    expect(push(deep, 'tools')).toEqual([
       { name: 'dashboard' },
-      { name: 'lists' },
+      { name: 'tools' },
       { name: 'list-detail' },
       { name: 'task-create-v2' },
-      { name: 'lists' },
+      { name: 'tools' },
     ])
   })
 
@@ -90,7 +90,7 @@ describe('push', () => {
 
 describe('pop', () => {
   it('revient d un cran', () => {
-    const next = push(dashboard, 'lists')
+    const next = push(dashboard, 'tools')
     expect(pop(next)).toEqual([{ name: 'dashboard' }])
   })
 
@@ -99,21 +99,21 @@ describe('pop', () => {
   })
 
   it('traverse plusieurs niveaux successifs', () => {
-    const deep = push(push(dashboard, 'lists'), 'list-detail')
-    expect(currentRoute(pop(deep))).toEqual({ name: 'lists' })
+    const deep = push(push(dashboard, 'tools'), 'list-detail')
+    expect(currentRoute(pop(deep))).toEqual({ name: 'tools' })
     expect(currentRoute(pop(pop(deep)))).toEqual({ name: 'dashboard' })
   })
 })
 
 describe('replace', () => {
   it('remplace la route courante sans ajouter de niveau', () => {
-    const next = push(dashboard, 'lists')
+    const next = push(dashboard, 'tools')
     const replaced = replace(next, 'tools')
     expect(replaced).toEqual([{ name: 'dashboard' }, { name: 'tools' }])
   })
 
   it('réinitialise la pile si la cible est racine', () => {
-    const next = push(dashboard, 'lists')
+    const next = push(dashboard, 'tools')
     expect(replace(next, 'dashboard')).toEqual([{ name: 'dashboard' }])
   })
 })
@@ -125,7 +125,7 @@ describe('canGoBack et previousRoute', () => {
   })
 
   it('expose la route de retour', () => {
-    const next = push(dashboard, 'lists')
+    const next = push(dashboard, 'tools')
     expect(canGoBack(next)).toBe(true)
     expect(previousRoute(next)).toEqual({ name: 'dashboard' })
   })
@@ -136,8 +136,8 @@ describe('parcours de navigation complets', () => {
     const fromTools = push(push(dashboard, 'tools'), 'task-create-v2')
     expect(currentRoute(pop(fromTools))).toEqual({ name: 'tools' })
 
-    const fromLists = push(push(dashboard, 'lists'), 'task-create-v2')
-    expect(currentRoute(pop(fromLists))).toEqual({ name: 'lists' })
+    const fromLists = push(push(dashboard, 'tools'), 'task-create-v2')
+    expect(currentRoute(pop(fromLists))).toEqual({ name: 'tools' })
   })
 
   it('retourne au hub Outils depuis le détail d une liste ouverte depuis Outils', () => {
@@ -148,7 +148,7 @@ describe('parcours de navigation complets', () => {
   it('ne grandit pas indéfiniment sur un aller-retour répété', () => {
     let stack = dashboard
     for (let i = 0; i < 5; i++) {
-      stack = push(stack, 'lists')
+      stack = push(stack, 'tools')
       stack = push(stack, 'list-detail')
       stack = pop(stack)
     }

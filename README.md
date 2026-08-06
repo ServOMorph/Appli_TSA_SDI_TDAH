@@ -15,7 +15,7 @@ npm run build      # build de production
 npm run preview    # prévisualisation du build
 npm test               # tests unitaires (Vitest)
 npm run test:coverage  # couverture (seuil 85 %)
-npm run test:e2e       # tests E2E Playwright (build + 53 scénarios)
+npm run test:e2e       # tests E2E Playwright (build + 57 scénarios)
 npm run test:e2e:report  # ouvrir le rapport HTML Playwright
 npm run lint       # ESLint
 npm run format     # Prettier
@@ -38,9 +38,11 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 Roadmap V4.1 (6 phases, V4.1-0 à V4.1-5) **close**, désormais archivée (`Archives/roadmap_v4.1.md`) : rubrique nav « Outils » remplaçant « Todo », listes épinglables, module Budget semaine/mois avec livrets simples, nav « + » contextuelle. Phase V4.1-6 (auto-scroll drag planning) jamais codée, reprise dans la roadmap suivante.
 
-**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — **V5-0, V5-1 et V5-2a `[FAIT]`**, V5-2b `[EN COURS]` (planning et tâches refondus — logos, couleurs, durée en jours, récurrence, fiche tâche cliquable), V5-3 `[TODO]` (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel). Modification d'une tâche désormais exclusivement via sa fiche (plus de glisser-déposer, aligné sur l'application de référence de la testeuse). Les 5 outils spécialisés reportés en V5.1+ (Comptage, Météo du jour, Comptes à colonnes configurables, Routine, Tableau prévisions), faute de retour d'usage sur la version actuelle — ordre de priorité fixé, Comptage en premier.
+**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — **V5-0 à V5-2b `[FAIT]`**, V5-3 `[EN COURS]` (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel — codée et testée intégralement, reste la validation manuelle). Modification d'une tâche désormais exclusivement via sa fiche (plus de glisser-déposer, aligné sur l'application de référence de la testeuse). Les 5 outils spécialisés reportés en V5.1+ (Comptage, Météo du jour, Comptes à colonnes configurables, Routine, Tableau prévisions), faute de retour d'usage sur la version actuelle — ordre de priorité fixé, Comptage en premier.
 
-Phase V5-2b en cours : entités et migration Dexie v9 (`icon`, `color`, `description`, `duration_minutes`, récurrence, exceptions), moteur de récurrence maison (quotidien/hebdo/mensuel/annuel, sans librairie RRULE), écran de création et fiche tâche entièrement redessinés (icône, couleur, durée par rouleaux, récurrence type Google Agenda, choix occurrence/série à chaque modification d'une tâche récurrente, action dupliquer). Planning épuré (M5) : quadrillage horaire et flux de déplacement tap-based retirés, remplacés par une liste par tâche (icône/horaire/nom/énergie/pastille), un bandeau de dates (navigation par appui/glissement tactile/sélecteur de date, mois affiché en permanence et cliquable) et la fiche tâche comme seul point de modification ; sous-tâches dépliables avec compteur n/N tout en conservant un horaire propre indépendant. Écran « Aujourd'hui » retiré (redondant avec la section « Tâche du jour » de l'accueil). M5 clos côté validation manuelle le 2026-08-06 (dernier point tactile validé) ; les deux bugs fonctionnels signalés (suppression tâche récurrente, ajout sous-tâche) sont clos comme non reproductibles, aucun correctif appliqué. Reste à faire : audit E7 (aucune donnée préremplie à l'installation), gate de phase.
+Phase V5-2b close le 2026-08-06 : entités et migration Dexie v9 (`icon`, `color`, `description`, `duration_minutes`, récurrence, exceptions), moteur de récurrence maison, planning épuré (liste par tâche, bandeau de dates, fiche tâche comme seul point de modification), sous-tâches dépliables. E7 vérifié (aucune donnée préremplie à l'installation).
+
+Phase V5-3 en cours (codée et testée le 2026-08-06, reste la validation manuelle) : entités `Folder`/`Tool` (dossiers à un seul niveau, outils typés — seuls « liste » et « tableau comptage » implémentés), migration Dexie v10 (To Do et Budget créés d'office à l'installation, sans contenu). `E70Tools.tsx` refondu en écran générique + nouvel `E72FolderDetail.tsx` ; `E60Lists.tsx` et la route `lists` supprimés (les listes ne se créent plus que via le « + » des outils). `E61ListDetail.tsx` : coche intensifiée avec tri (cochés en dessous), rubriques optionnelles, icône réveil planifiant une tâche récurrente ou ponctuelle. Budget rebranché comme outil sans aucune modification de son code interne. Widget « Comptes » sur l'accueil pour la saisie de dépense en un tap. 500/500 tests unitaires, 57/57 e2e.
 
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
 
@@ -81,7 +83,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Enchaîner M6 (audit E7 — aucune donnée préremplie à l'installation) puis M7 (gate de phase V5-2b). La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
+Valider manuellement la Phase V5-3 (`tests_manuels.md`) puis clore sa gate de phase. La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
 
 ## Licence
 

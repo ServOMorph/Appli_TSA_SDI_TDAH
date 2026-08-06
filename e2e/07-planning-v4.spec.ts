@@ -68,8 +68,7 @@ test('T49 — Reporter une tâche en surcharge la bascule sur le lendemain (E8)'
 })
 
 test('T51 — planifier une sous-tâche depuis Décomposer, comptée sur la tâche parente dans le planning (E9)', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Grand ménage')
   await page.getByRole('button', { name: 'Valider' }).click()

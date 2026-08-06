@@ -3,5 +3,7 @@ export interface ListItem {
   list_id: string
   title: string
   position: number
+  checked: boolean
+  section: string | null
   created_at: string
 }

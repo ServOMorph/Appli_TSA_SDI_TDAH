@@ -328,7 +328,7 @@ export function E22TaskDetail() {
     planTaskToday,
     scheduleSubTask,
     moveTodoTaskToList,
-    createList,
+    createToolList,
     getTaskById,
     duplicateTaskById,
     updateTaskFields,
@@ -514,17 +514,17 @@ export function E22TaskDetail() {
     await moveTodoTaskToList(selectedTaskId, listId)
     selectTask(null)
     selectList(listId)
-    goToPath(['lists', 'list-detail'])
+    goToPath(['tools', 'list-detail'])
   }
 
   async function handleCreateList() {
     if (!selectedTaskId || !newListName.trim()) return
-    const listId = await createList(newListName.trim())
+    const listId = await createToolList(newListName.trim(), null)
     await moveTodoTaskToList(selectedTaskId, listId)
     setNewListName('')
     selectTask(null)
     selectList(listId)
-    goToPath(['lists', 'list-detail'])
+    goToPath(['tools', 'list-detail'])
   }
 
   function handleClickList() {

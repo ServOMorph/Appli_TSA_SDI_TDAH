@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createList, createListItem, togglePinList } from './listRules'
+import { createList, createListItem, toggleListItemChecked } from './listRules'
 
 describe('createList', () => {
   it('crée une liste avec les champs attendus', () => {
@@ -21,20 +21,19 @@ describe('createList', () => {
   })
 })
 
-describe('togglePinList', () => {
-  it('épingle une liste non épinglée', () => {
+describe('toggleListItemChecked', () => {
+  it('coche un item non coché', () => {
     const now = '2026-06-30T10:00:00.000Z'
-    const list = createList('id-1', 'Musiques', now)
-    const pinned = togglePinList(list, '2026-07-01T10:00:00.000Z')
-    expect(pinned.pinned_to_tools).toBe(true)
-    expect(pinned.updated_at).toBe('2026-07-01T10:00:00.000Z')
+    const item = createListItem('item-1', 'list-1', 'Titre', 0, now)
+    const toggled = toggleListItemChecked(item)
+    expect(toggled.checked).toBe(true)
   })
 
-  it('désépingle une liste épinglée', () => {
+  it('décoche un item coché', () => {
     const now = '2026-06-30T10:00:00.000Z'
-    const list = { ...createList('id-1', 'Musiques', now), pinned_to_tools: true }
-    const unpinned = togglePinList(list, '2026-07-01T10:00:00.000Z')
-    expect(unpinned.pinned_to_tools).toBe(false)
+    const item = { ...createListItem('item-1', 'list-1', 'Titre', 0, now), checked: true }
+    const toggled = toggleListItemChecked(item)
+    expect(toggled.checked).toBe(false)
   })
 })
 
@@ -46,6 +45,8 @@ describe('createListItem', () => {
     expect(item.list_id).toBe('list-1')
     expect(item.title).toBe('Hotel California')
     expect(item.position).toBe(0)
+    expect(item.checked).toBe(false)
+    expect(item.section).toBeNull()
     expect(item.created_at).toBe(now)
   })
 

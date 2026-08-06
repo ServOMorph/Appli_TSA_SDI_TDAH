@@ -60,7 +60,7 @@ export function E20Inbox() {
     moveTask,
     planTaskToday,
     moveTodoTaskToList,
-    createList,
+    createToolList,
     goToPath,
   } = useApp()
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
@@ -82,17 +82,17 @@ export function E20Inbox() {
     await moveTodoTaskToList(listPickerTask.id, listId)
     setListPickerTask(null)
     selectList(listId)
-    goToPath(['lists', 'list-detail'])
+    goToPath(['tools', 'list-detail'])
   }
 
   async function handleCreateList() {
     if (!listPickerTask || !newListName.trim()) return
-    const listId = await createList(newListName.trim())
+    const listId = await createToolList(newListName.trim(), null)
     await moveTodoTaskToList(listPickerTask.id, listId)
     setNewListName('')
     setListPickerTask(null)
     selectList(listId)
-    goToPath(['lists', 'list-detail'])
+    goToPath(['tools', 'list-detail'])
   }
 
   function handleClickList(task: Task) {

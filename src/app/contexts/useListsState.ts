@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { listItemRepo, listRepo, newId } from '@/app/repositories'
-import { createList as createListRule, createListItem as createListItemRule, togglePinList as togglePinListRule } from '@/domain/rules/listRules'
+import { createList as createListRule, createListItem as createListItemRule, toggleListItemChecked as toggleListItemCheckedRule } from '@/domain/rules/listRules'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
 
@@ -40,27 +40,31 @@ export function useListsState() {
     setLists((prev) => prev.filter((l) => l.id !== id))
   }
 
-  async function togglePinList(id: string) {
-    const list = lists.find((l) => l.id === id)
-    if (!list) return
-    const updated = togglePinListRule(list, new Date().toISOString())
-    await listRepo.update(updated)
-    setLists((prev) => prev.map((l) => (l.id === id ? updated : l)))
-  }
-
   const getListItems = useCallback(async (listId: string): Promise<ListItem[]> => {
     return listItemRepo.getByListId(listId)
   }, [])
 
-  async function addListItem(listId: string, title: string) {
+  async function addListItem(listId: string, title: string, section: string | null = null) {
     const existing = await listItemRepo.getByListId(listId)
     const now = new Date().toISOString()
-    const item = createListItemRule(newId(), listId, title, existing.length, now)
+    const item = createListItemRule(newId(), listId, title, existing.length, now, section)
     await listItemRepo.create(item)
   }
 
   async function deleteListItem(id: string) {
     await listItemRepo.delete(id)
+  }
+
+  async function toggleListItem(id: string) {
+    const item = await listItemRepo.getById(id)
+    if (!item) return
+    await listItemRepo.update(toggleListItemCheckedRule(item))
+  }
+
+  async function updateListItemSection(id: string, section: string | null) {
+    const item = await listItemRepo.getById(id)
+    if (!item) return
+    await listItemRepo.update({ ...item, section })
   }
 
   return {
@@ -70,10 +74,11 @@ export function useListsState() {
     createList,
     renameList,
     deleteList,
-    togglePinList,
     getListItems,
     addListItem,
     deleteListItem,
+    toggleListItem,
+    updateListItemSection,
     load,
     reset,
   }

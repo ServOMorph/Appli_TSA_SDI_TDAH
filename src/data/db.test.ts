@@ -24,10 +24,12 @@ describe('AppDatabase', () => {
     expect(db.budgetDeposits).toBeDefined()
     expect(db.taskRecurrences).toBeDefined()
     expect(db.taskExceptions).toBeDefined()
+    expect(db.folders).toBeDefined()
+    expect(db.tools).toBeDefined()
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(9)
+    expect(db.verno).toBe(10)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -207,7 +209,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(9)
+    expect(upgraded.verno).toBe(10)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -291,7 +293,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(9)
+    expect(upgraded.verno).toBe(10)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -302,6 +304,47 @@ describe('AppDatabase', () => {
       is_recurrence_root: false,
       recurrence_exception: false,
     })
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 9 database by seeding a default To Do list and tools, and adding checked/section to list items', async () => {
+    const name = `migration-v9-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(9).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+      lists: 'id',
+      listItems: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, kind, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date, period',
+      taskRecurrences: 'id',
+      taskExceptions: 'id, recurrence_id',
+    })
+    await legacy.open()
+    await legacy.table('lists').add({ id: 'existing-list', name: 'Musiques', created_at: '2026-08-01T00:00:00Z', updated_at: '2026-08-01T00:00:00Z' })
+    await legacy.table('listItems').add({ id: 'existing-item', list_id: 'existing-list', title: 'Item existant', position: 0, created_at: '2026-08-01T00:00:00Z' })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(10)
+    expect(await upgraded.listItems.get('existing-item')).toMatchObject({ checked: false, section: null })
+
+    const lists = await upgraded.lists.toArray()
+    expect(lists.some((l) => l.name === 'To Do')).toBe(true)
+
+    const tools = await upgraded.tools.toArray()
+    expect(tools.some((t) => t.type === 'tableau_comptage')).toBe(true)
+    const todoTool = tools.find((t) => t.type === 'liste')
+    expect(todoTool).toBeDefined()
+    const todoList = lists.find((l) => l.id === todoTool?.list_id)
+    expect(todoList?.name).toBe('To Do')
+
     await upgraded.delete()
   })
 

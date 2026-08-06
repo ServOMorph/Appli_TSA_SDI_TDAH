@@ -11,6 +11,8 @@ import { BudgetAccountRepository } from '@/data/repositories/budgetAccountReposi
 import { BudgetDepositRepository } from '@/data/repositories/budgetDepositRepository'
 import { TaskRecurrenceRepository } from '@/data/repositories/taskRecurrenceRepository'
 import { TaskExceptionRepository } from '@/data/repositories/taskExceptionRepository'
+import { FolderRepository } from '@/data/repositories/folderRepository'
+import { ToolRepository } from '@/data/repositories/toolRepository'
 
 export const db = new AppDatabase()
 export const userRepo = new UserRepository(db)
@@ -25,6 +27,8 @@ export const budgetCategoryRepo = new BudgetCategoryRepository(db)
 export const budgetEntryRepo = new BudgetEntryRepository(db)
 export const budgetAccountRepo = new BudgetAccountRepository(db)
 export const budgetDepositRepo = new BudgetDepositRepository(db)
+export const folderRepo = new FolderRepository(db)
+export const toolRepo = new ToolRepository(db)
 
 export function todayDate(): string {
   if (import.meta.env.DEV) {

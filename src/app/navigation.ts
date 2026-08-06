@@ -17,9 +17,9 @@ export type Route =
   | { name: 'settings-accessibility' }
   | { name: 'settings-privacy' }
   | { name: 'settings-export' }
-  | { name: 'lists' }
   | { name: 'list-detail'; listId?: string }
   | { name: 'tools' }
+  | { name: 'folder-detail'; folderId?: string }
   | { name: 'budget' }
 
 export type Screen = Route['name']

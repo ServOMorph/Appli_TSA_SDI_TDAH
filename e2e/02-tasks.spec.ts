@@ -13,8 +13,7 @@ test('T10 — Ajouter une tâche depuis dashboard → apparaît dans tâches du 
 })
 
 test('T11 — Créer tâche dans inbox → visible dans inbox', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await expect(page.getByRole('heading', { name: 'Nouvelle tâche' })).toBeVisible()
   await page.getByLabel('Titre de la tâche').fill('Tâche inbox Playwright')
@@ -25,8 +24,7 @@ test('T11 — Créer tâche dans inbox → visible dans inbox', async ({ page })
 })
 
 test('T12 — Ouvrir détail tâche depuis inbox', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche détail test')
   await page.getByRole('button', { name: 'Valider' }).click()
@@ -39,8 +37,7 @@ test('T12 — Ouvrir détail tâche depuis inbox', async ({ page }) => {
 })
 
 test('T13 — Décomposer tâche → ajouter sous-tâche → affichée dans détail', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche à décomposer')
   await page.getByRole('button', { name: 'Valider' }).click()
@@ -51,8 +48,7 @@ test('T13 — Décomposer tâche → ajouter sous-tâche → affichée dans dét
 })
 
 test('T14 — Déplacer tâche inbox → Aujourd\'hui', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche vers aujourd\'hui')
   await page.getByRole('button', { name: 'Valider' }).click()
@@ -64,8 +60,7 @@ test('T14 — Déplacer tâche inbox → Aujourd\'hui', async ({ page }) => {
 })
 
 test('T16 — Terminer tâche → retour dashboard', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche à terminer')
   await page.getByRole('button', { name: 'Valider' }).click()
@@ -76,8 +71,7 @@ test('T16 — Terminer tâche → retour dashboard', async ({ page }) => {
 })
 
 test('T17 — Supprimer tâche avec confirmation', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche à supprimer')
   await page.getByRole('button', { name: 'Valider' }).click()
@@ -105,8 +99,7 @@ test('T19 — Depuis Paramètres, "+" crée directement une tâche en réception
 })
 
 test('T18 — Annuler suppression tâche', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Todo', exact: true }).click()
+  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche à garder')
   await page.getByRole('button', { name: 'Valider' }).click()

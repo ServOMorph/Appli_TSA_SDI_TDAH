@@ -1,6 +1,7 @@
 # Roadmap — V5.0 (refonte accueil + modèle « outils »)
 
 Version : 5.0 — créée 2026-07-28. Succède à `roadmap_v4.1.md` (V4.1 close). Branche : `v5.0`.
+**Close le 2026-08-07 — V5-0 à V5-3 `[FAIT]`. Successeur : `roadmap_v5.1.md`**, qui reprend le backlog outils et les Q non tranchées listés en fin de fichier.
 Source : `constats_2026-07-28.md` et `captures_2026-07-28.md` (dossier `Note de réunion/2026-07-28/`). Ne couvre que les évolutions issues de cette visio.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.

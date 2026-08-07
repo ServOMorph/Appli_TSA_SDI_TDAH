@@ -42,11 +42,13 @@ Roadmap V4.1 (6 phases, V4.1-0 à V4.1-5) **close**, désormais archivée (`Arch
 
 Phase V5-2b close le 2026-08-06 : entités et migration Dexie v9 (`icon`, `color`, `description`, `duration_minutes`, récurrence, exceptions), moteur de récurrence maison, planning épuré (liste par tâche, bandeau de dates, fiche tâche comme seul point de modification), sous-tâches dépliables. E7 vérifié (aucune donnée préremplie à l'installation).
 
-Phase V5-3 en cours (codée et testée le 2026-08-06, validation manuelle réelle démarrée) : entités `Folder`/`Tool` (dossiers à un seul niveau, outils typés — seuls « liste » et « tableau comptage » implémentés), migration Dexie v10 (To Do et Budget créés d'office à l'installation, sans contenu). `E70Tools.tsx` refondu en écran générique + nouvel `E72FolderDetail.tsx` ; `E60Lists.tsx` et la route `lists` supprimés (les listes ne se créent plus que via le « + » des outils). `E61ListDetail.tsx` : coche intensifiée avec tri (cochés en dessous), rubriques optionnelles, icône réveil planifiant une tâche récurrente ou ponctuelle. Budget rebranché comme outil sans aucune modification de son code interne. Widget « Comptes » sur l'accueil pour la saisie de dépense en un tap.
+Phase V5-3 (codée et testée le 2026-08-06, close le 2026-08-07) : entités `Folder`/`Tool` (dossiers à un seul niveau, outils typés — seuls « liste » et « tableau comptage » implémentés), migration Dexie v10 (To Do et Budget créés d'office à l'installation, sans contenu). `E70Tools.tsx` refondu en écran générique + nouvel `E72FolderDetail.tsx` ; `E60Lists.tsx` et la route `lists` supprimés (les listes ne se créent plus que via le « + » des outils). `E61ListDetail.tsx` : coche intensifiée avec tri (cochés en dessous), rubriques optionnelles, icône réveil planifiant une tâche récurrente ou ponctuelle. Budget rebranché comme outil sans aucune modification de son code interne. Widget « Comptes » sur l'accueil pour la saisie de dépense en un tap.
 
 Premier passage de validation manuelle réelle (2026-08-06, suite 3) : blocage bloquant à l'ouverture corrigé (`crypto.randomUUID()` indisponible hors contexte sécurisé dans la migration Dexie v10, reproduit en HTTP sur IP réseau), `try/catch/finally` ajouté autour de l'initialisation de l'app pour éviter tout blocage silencieux futur. 3 défauts UI corrigés sur l'accueil (carte « Outils » redondante, libellé de liste générique, bouton « + » mal placé) et un bug de navigation retour sur Budget. 500/500 tests unitaires, `tsc -b`/lint clean.
 
 Validation manuelle des 6 points de `tests_manuels.md` (2026-08-07) : 5 points OK, point 5 (widget Comptes) en échec — bouton silencieusement désactivé sans catégorie de dépense créée dans le Budget, corrigé (bouton toujours actif, message d'invitation à créer une catégorie affiché à la place), puis revalidé par l'utilisateur le même jour. 501/501 tests unitaires, `tsc -b` clean. Phase V5-3 close, roadmap V5.0 intégralement terminée.
+
+**Roadmap `roadmap_v5.1.md` ouverte le 2026-08-07** (successeur de V5.0, à la racine). Phase V5.1-0 `[TODO]` : refonte ergonomique de l'écran Budget, demandée par l'utilisateur qui la juge peu intuitive. Modèle de données inchangé — trois écrans (consultation, fiche catégorie, configuration), chiffre-vedette « Il me reste » au lieu de « Reste non budgétisé », onglets Semaine/Mois au lieu des deux périodes empilées, jauges de progression, configuration sortie de l'écran principal. Le backlog outils V5.1+ et les Q non tranchées y ont été reportés depuis la roadmap V5.0 close.
 
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
 
@@ -87,7 +89,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Communiquer à la testeuse les points de `a_communiquer_v5.md` (racine) maintenant que la V5.0 complète est livrée, puis recueillir son retour et décider de la priorité de la suite (V5.1 ou retour utilisateur d'abord).
+Coder la Phase V5.1-0 (`roadmap_v5.1.md`) : refonte ergonomique de l'écran Budget, à modèle de données constant. En parallèle, communiquer à la testeuse les points de `a_communiquer_v5.md` (racine) maintenant que la V5.0 complète est livrée.
 
 ## Licence
 

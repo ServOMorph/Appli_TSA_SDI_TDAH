@@ -1,3 +1,21 @@
+## v5.16 — 2026-08-07
+
+Analyse UX de l'écran Budget sur demande de l'utilisateur et ouverture de la roadmap V5.1. Aucun code applicatif modifié.
+
+### Ajouté
+- `roadmap_v5.1.md` : successeur de `roadmap_v5.0.md` (close). Phase V5.1-0 `[TODO]` — refonte ergonomique de l'écran Budget, à modèle de données constant : 8 défauts constatés par lecture de code, 5 arbitrages validés avec l'utilisateur, 10 items de checklist, gate. Backlog outils V5.1+ et Q non tranchées reportés depuis V5.0.
+
+### Modifié
+- `roadmap_v5.0.md` : ligne de clôture ajoutée en tête, pointant vers le successeur.
+- `README.md` : état actuel et prochaine étape alignés sur la roadmap V5.1 ; mention « Phase V5-3 en cours » corrigée, contradictoire avec le paragraphe suivant qui la déclarait close.
+- `_contexte/archive_decisions.md` : décision du 2026-08-02 (Phase V5-2a) archivée, la liste de `contexte.md` atteignant 10 entrées.
+
+### Décisions
+- Refonte engagée maintenant sans attendre le retour de la testeuse : l'écran actuel est jugé assez confus pour biaiser ce retour.
+- Chiffre-vedette « Il me reste » remplaçant « Reste non budgétisé » — changement de sens assumé, pas seulement de mise en forme.
+- Trois écrans (`E71Budget` refondu, `E73CategoryDetail`, `E74BudgetSettings`) plutôt que des sections repliables dans un écran unique.
+- Aucune migration Dexie : `E32` (colonnes configurables) et `E34` (livrets reliés) restent au backlog, ils exigent un changement de modèle.
+
 ## v5.15 — 2026-08-07
 
 Point 5 de `tests_manuels.md` (widget Comptes) revalidé par l'utilisateur avec le correctif de la session précédente. Gate de sortie de la Phase V5-3 atteinte.

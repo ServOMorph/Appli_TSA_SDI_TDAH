@@ -111,8 +111,8 @@ describe('E74BudgetSettings', () => {
       createBudgetDeposit,
       deleteBudgetAccount,
     }))
-    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un dépôt' }))
-    const dialog = screen.getByRole('dialog', { name: 'Ajouter un dépôt' })
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
     await userEvent.type(within(dialog).getByLabelText('Montant'), '25')
     await userEvent.selectOptions(within(dialog).getByLabelText('Périodicité'), 'week')
     await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
@@ -123,6 +123,41 @@ describe('E74BudgetSettings', () => {
     await userEvent.click(within(confirm).getByRole('button', { name: 'Supprimer' }))
     expect(deleteBudgetAccount).toHaveBeenNthCalledWith(1, 'account-1')
     expect(deleteBudgetAccount).toHaveBeenNthCalledWith(2, 'account-1', true)
+  })
+
+  it('retire de l’argent d’un livret, montant envoyé négatif', async () => {
+    const createBudgetDeposit = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E74BudgetSettings />, makeAppContext({
+      budgetAccounts: [makeAccount()],
+      budgetDeposits: [makeDeposit()],
+      createBudgetDeposit,
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
+    await userEvent.selectOptions(within(dialog).getByLabelText('Type'), 'withdrawal')
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '20')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
+    expect(createBudgetDeposit).toHaveBeenCalledWith('account-1', -20, 'month')
+  })
+
+  it('bloque un retrait qui dépasse le solde du livret', async () => {
+    renderWithApp(<E74BudgetSettings />, makeAppContext({
+      budgetAccounts: [makeAccount()],
+      budgetDeposits: [makeDeposit({ amount: 50 })],
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
+    await userEvent.selectOptions(within(dialog).getByLabelText('Type'), 'withdrawal')
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '80')
+    expect(within(dialog).getByRole('button', { name: 'Enregistrer' }).hasAttribute('disabled')).toBe(true)
+  })
+
+  it('affiche un retrait dans la liste des mouvements du livret', () => {
+    renderWithApp(<E74BudgetSettings />, makeAppContext({
+      budgetAccounts: [makeAccount()],
+      budgetDeposits: [makeDeposit({ id: 'deposit-2', amount: -20, date: '2026-01-05' })],
+    }))
+    expect(screen.getByText(/05\/01\/2026.*Retrait.*20,00/)).toBeDefined()
   })
 
   it('supprime un dépôt', async () => {

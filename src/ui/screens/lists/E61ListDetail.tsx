@@ -18,8 +18,9 @@ const defaultRecurrence: RecurrenceRuleInput = {
 }
 
 export function E61ListDetail() {
-  const { lists, selectedListId, getListItems, addListItem, deleteListItem, toggleListItem, back, createDetailedTask } = useApp()
+  const { lists, tools, selectedListId, getListItems, addListItem, deleteListItem, toggleListItem, back, createDetailedTask, deleteTool } = useApp()
   const list = lists.find((l) => l.id === selectedListId) ?? null
+  const tool = tools.find((t) => t.type === 'liste' && t.list_id === selectedListId) ?? null
 
   const [items, setItems] = useState<ListItem[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
@@ -31,6 +32,7 @@ export function E61ListDetail() {
   const [alarmStartTime, setAlarmStartTime] = useState('09:00')
   const [alarmRecurring, setAlarmRecurring] = useState(false)
   const [alarmRecurrence, setAlarmRecurrence] = useState<RecurrenceRuleInput>(defaultRecurrence)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   useEffect(() => {
     if (!selectedListId) return
@@ -70,6 +72,13 @@ export function E61ListDetail() {
     setAlarmStartTime('09:00')
     setAlarmRecurring(false)
     setAlarmRecurrence(defaultRecurrence)
+  }
+
+  async function handleDeleteList() {
+    if (!tool) return
+    await deleteTool(tool.id)
+    setConfirmingDelete(false)
+    back('tools')
   }
 
   async function handleConfirmAlarm() {
@@ -132,6 +141,20 @@ export function E61ListDetail() {
         >
           {list?.name ?? 'Liste'}
         </h1>
+        <button
+          aria-label="Supprimer la liste"
+          onClick={() => setConfirmingDelete(true)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '1.1rem',
+            color: 'var(--color-error)',
+            padding: 0,
+          }}
+        >
+          ×
+        </button>
       </header>
 
       {items.length === 0 && !showAddForm && (
@@ -376,6 +399,49 @@ export function E61ListDetail() {
                 Annuler
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {confirmingDelete && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Supprimer la liste"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.75)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--spacing-xl)',
+              maxWidth: '360px',
+              width: '90%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-md)',
+            }}
+          >
+            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Supprimer cette liste ?</h2>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
+              Tous ses éléments seront définitivement supprimés.
+            </p>
+            <Button fullWidth onClick={handleDeleteList} style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}>
+              Supprimer
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setConfirmingDelete(false)}>
+              Annuler
+            </Button>
           </div>
         </div>
       )}

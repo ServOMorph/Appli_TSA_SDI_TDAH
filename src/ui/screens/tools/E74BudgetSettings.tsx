@@ -40,6 +40,7 @@ export function E74BudgetSettings() {
   const [deletingAccount, setDeletingAccount] = useState<BudgetAccount | null>(null)
   const [showDepositForm, setShowDepositForm] = useState(false)
   const [depositAccountId, setDepositAccountId] = useState('')
+  const [depositKind, setDepositKind] = useState<'deposit' | 'withdrawal'>('deposit')
   const [depositAmount, setDepositAmount] = useState('')
   const [depositPeriod, setDepositPeriod] = useState<BudgetPeriod>('month')
 
@@ -88,15 +89,21 @@ export function E74BudgetSettings() {
     const firstAccount = budgetAccounts[0]
     if (!firstAccount) return
     setDepositAccountId(firstAccount.id)
+    setDepositKind('deposit')
     setDepositAmount('')
     setDepositPeriod('month')
     setShowDepositForm(true)
   }
 
+  const depositAccountBalance = getAccountBalance(budgetDeposits, depositAccountId)
+  const parsedDepositAmount = Number(depositAmount.replace(',', '.'))
+  const depositExceedsBalance = depositKind === 'withdrawal' && parsedDepositAmount > depositAccountBalance
+  const canSubmitDeposit = Boolean(depositAccountId) && Number.isFinite(parsedDepositAmount) && parsedDepositAmount > 0 && !depositExceedsBalance
+
   async function handleCreateDeposit() {
-    const amount = Number(depositAmount.replace(',', '.'))
-    if (!depositAccountId || !Number.isFinite(amount) || amount <= 0) return
-    await createBudgetDeposit(depositAccountId, amount, depositPeriod)
+    if (!canSubmitDeposit) return
+    const signedAmount = depositKind === 'withdrawal' ? -parsedDepositAmount : parsedDepositAmount
+    await createBudgetDeposit(depositAccountId, signedAmount, depositPeriod)
     setShowDepositForm(false)
   }
 
@@ -169,12 +176,16 @@ export function E74BudgetSettings() {
                     <p style={{ margin: '4px 0', fontWeight: 600, color: 'var(--color-success)' }}>
                       Solde : {formatEuro(getAccountBalance(budgetDeposits, account.id))}
                     </p>
-                    {deposits.map((deposit) => (
-                      <div key={deposit.id} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                        <span style={{ flex: '1 1 180px' }}>{formatFrenchDate(deposit.date)} · Dépôt : {formatEuro(deposit.amount)}</span>
-                        <button aria-label={`Supprimer le dépôt ${deposit.amount}`} onClick={() => deleteBudgetDeposit(deposit.id)} style={dangerLinkStyle}>Supprimer le dépôt</button>
-                      </div>
-                    ))}
+                    {deposits.map((deposit) => {
+                      const isWithdrawal = deposit.amount < 0
+                      const movementLabel = isWithdrawal ? 'Retrait' : 'Dépôt'
+                      return (
+                        <div key={deposit.id} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+                          <span style={{ flex: '1 1 180px' }}>{formatFrenchDate(deposit.date)} · {movementLabel} : {formatEuro(Math.abs(deposit.amount))}</span>
+                          <button aria-label={`Supprimer le ${movementLabel.toLowerCase()} ${Math.abs(deposit.amount)}`} onClick={() => deleteBudgetDeposit(deposit.id)} style={dangerLinkStyle}>Supprimer</button>
+                        </div>
+                      )
+                    })}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginTop: '4px' }}>
                       <button aria-label={`Renommer ${account.name}`} onClick={() => { setRenamingAccount(account); setAccountRenameValue(account.name) }} style={neutralLinkStyle}>Renommer le livret</button>
                       <button aria-label={`Supprimer ${account.name}`} onClick={() => handleDeleteAccount(account)} style={{ ...dangerLinkStyle, marginLeft: 'auto' }}>Supprimer le livret</button>
@@ -187,7 +198,7 @@ export function E74BudgetSettings() {
         </Card>
       </section>
 
-      <Button fullWidth onClick={openDepositForm} disabled={budgetAccounts.length === 0}>Ajouter un dépôt</Button>
+      <Button fullWidth onClick={openDepositForm} disabled={budgetAccounts.length === 0}>Ajouter un mouvement</Button>
       <Button variant="secondary" fullWidth onClick={() => setShowAccountForm(true)}>Ajouter un livret</Button>
 
       {showCategoryForm && (
@@ -233,21 +244,31 @@ export function E74BudgetSettings() {
       )}
 
       {showDepositForm && (
-        <div role="dialog" aria-modal="true" aria-label="Ajouter un dépôt" style={modalOverlay}>
+        <div role="dialog" aria-modal="true" aria-label="Ajouter un mouvement" style={modalOverlay}>
           <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Ajouter un dépôt</h2>
+            <h2 style={{ margin: 0 }}>Ajouter un mouvement</h2>
             <label htmlFor="budget-deposit-account">Livret</label>
             <select id="budget-deposit-account" value={depositAccountId} onChange={(event) => setDepositAccountId(event.target.value)} style={inputStyle}>
               {budgetAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
             </select>
+            <label htmlFor="budget-deposit-kind">Type</label>
+            <select id="budget-deposit-kind" value={depositKind} onChange={(event) => setDepositKind(event.target.value as 'deposit' | 'withdrawal')} style={inputStyle}>
+              <option value="deposit">Dépôt</option>
+              <option value="withdrawal">Retrait</option>
+            </select>
             <label htmlFor="budget-deposit-amount">Montant</label>
             <input id="budget-deposit-amount" type="text" inputMode="decimal" value={depositAmount} onChange={(event) => setDepositAmount(event.target.value)} style={inputStyle} />
+            {depositExceedsBalance && (
+              <p style={{ margin: 0, color: 'var(--color-error)', fontSize: '0.8125rem' }}>
+                Le retrait dépasse le solde du livret ({formatEuro(depositAccountBalance)}).
+              </p>
+            )}
             <label htmlFor="budget-deposit-period">Périodicité</label>
             <select id="budget-deposit-period" value={depositPeriod} onChange={(event) => setDepositPeriod(event.target.value as BudgetPeriod)} style={inputStyle}>
               <option value="week">À la semaine</option>
               <option value="month">Au mois</option>
             </select>
-            <Button fullWidth onClick={handleCreateDeposit} disabled={Number(depositAmount.replace(',', '.')) <= 0}>Enregistrer</Button>
+            <Button fullWidth onClick={handleCreateDeposit} disabled={!canSubmitDeposit}>Enregistrer</Button>
             <Button variant="secondary" fullWidth onClick={() => setShowDepositForm(false)}>Annuler</Button>
           </div>
         </div>

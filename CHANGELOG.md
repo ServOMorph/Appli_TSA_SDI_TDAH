@@ -1,3 +1,18 @@
+## v5.18 — 2026-08-07
+
+Retours de validation manuelle de la Phase V5.1-0 (Outils et Budget), modèle de données inchangé.
+
+### Ajouté
+- Suppression d'une liste depuis sa fiche (`E61ListDetail.tsx`) : bouton dédié avec confirmation, `deleteTool` (déjà présent côté état) désormais câblé côté UI.
+- Retrait d'argent sur un livret (`E74BudgetSettings.tsx`) : `BudgetDeposit.amount` accepte un montant négatif, sélecteur Dépôt/Retrait, blocage si le retrait dépasse le solde du livret. Item auparavant hors périmètre de la phase.
+
+### Modifié
+- `ToolCreateModal.tsx` : création de dossier retirée, ne propose plus que la création d'une liste — dossiers existants toujours consultables et supprimables.
+- `e2e/09-tools-folders-lists.spec.ts` adapté (T55, plus de création de dossier).
+
+### Corrigé
+- Signalement initial d'une dépense non enregistrable après création d'une catégorie : non reproduit, confirmé par l'utilisateur comme une erreur de manipulation — aucun correctif de code nécessaire.
+
 ## v5.17 — 2026-08-07
 
 Phase V5.1-0 codée : refonte ergonomique du Budget en trois écrans, à modèle de données constant (aucune migration Dexie).

@@ -144,7 +144,7 @@ export function useBudgetState() {
     period: BudgetPeriod = 'month',
     date = todayDate(),
   ) {
-    if (!Number.isFinite(amount) || amount <= 0) return
+    if (!Number.isFinite(amount) || amount === 0) return
     const deposit: BudgetDeposit = {
       id: newId(),
       account_id: accountId,

@@ -258,7 +258,7 @@ describe('E10Dashboard', () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       const zone = screen.getByRole('region', { name: 'Outils' })
-      await userEvent.click(within(zone).getByRole('button', { name: 'Ajouter un outil ou un dossier' }))
+      await userEvent.click(within(zone).getByRole('button', { name: 'Ajouter un outil' }))
       expect(screen.getByRole('dialog', { name: 'Ajouter un outil' })).toBeDefined()
     })
 

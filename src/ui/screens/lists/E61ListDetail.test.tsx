@@ -1,10 +1,24 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E61ListDetail } from './E61ListDetail'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { Tool } from '@/domain/entities/tool'
+
+function makeTool(overrides: Partial<Tool> = {}): Tool {
+  return {
+    id: 'tool-1',
+    type: 'liste',
+    folder_id: null,
+    list_id: 'list-1',
+    position: 0,
+    created_at: '2026-06-30T10:00:00.000Z',
+    updated_at: '2026-06-30T10:00:00.000Z',
+    ...overrides,
+  }
+}
 
 function makeList(overrides: Partial<List> = {}): List {
   return {
@@ -105,6 +119,40 @@ describe('E61ListDetail', () => {
       await waitFor(() => screen.getByRole('button', { name: 'Supprimer Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Supprimer Hotel California' }))
       expect(ctx.deleteListItem).toHaveBeenCalledWith('i1')
+    })
+  })
+
+  describe('suppression de la liste', () => {
+    it('demande confirmation puis appelle deleteTool et repart vers tools', async () => {
+      const deleteTool = vi.fn().mockResolvedValue(undefined)
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        tools: [makeTool()],
+        deleteTool,
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Supprimer la liste' }))
+      const dialog = screen.getByRole('dialog', { name: 'Supprimer la liste' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Supprimer' }))
+      expect(deleteTool).toHaveBeenCalledWith('tool-1')
+      expect(ctx.back).toHaveBeenCalledWith('tools')
+    })
+
+    it('annuler ferme la confirmation sans supprimer', async () => {
+      const deleteTool = vi.fn().mockResolvedValue(undefined)
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        tools: [makeTool()],
+        deleteTool,
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Supprimer la liste' }))
+      const dialog = screen.getByRole('dialog', { name: 'Supprimer la liste' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Annuler' }))
+      expect(screen.queryByRole('dialog', { name: 'Supprimer la liste' })).toBeNull()
+      expect(deleteTool).not.toHaveBeenCalled()
     })
   })
 

@@ -61,7 +61,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ## Hors périmètre de la Phase V5.1-0 (à trancher plus tard)
 
-- Retrait d'argent d'un livret : impossible aujourd'hui, `BudgetDeposit` ne porte qu'un montant de dépôt. Signalé à l'utilisateur le 2026-08-07, non tranché.
+- Retrait d'argent d'un livret : ~~impossible aujourd'hui~~ codé hors phase le 2026-08-07 sur demande directe de l'utilisateur (retour de validation manuelle) — `BudgetDeposit.amount` accepte désormais un montant négatif (retrait), `E74BudgetSettings` expose un sélecteur Dépôt/Retrait avec blocage si le retrait dépasse le solde du livret. Modèle de données inchangé (pas de migration).
 - Report du reliquat d'une période à la suivante. `E33` des constats du 2026-07-28 précise que le reliquat n'est **pas** reporté mais reste visible dans la cagnotte globale — à traiter avec la refonte des comptes (`E32`/`E34`).
 
 ## Backlog outils (reporté de `roadmap_v5.0.md` § Reporté en V5.1+)

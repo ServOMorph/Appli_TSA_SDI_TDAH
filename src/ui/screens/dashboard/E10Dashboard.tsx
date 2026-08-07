@@ -333,7 +333,7 @@ export function E10Dashboard() {
         <section aria-label="Outils">
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
             <h2 style={{ fontSize: '1.1rem', flex: 1 }}>Outils</h2>
-            <Button onClick={() => setShowCreateTool(true)} aria-label="Ajouter un outil ou un dossier">
+            <Button onClick={() => setShowCreateTool(true)} aria-label="Ajouter un outil">
               +
             </Button>
           </div>
@@ -367,7 +367,6 @@ export function E10Dashboard() {
       {showCreateTool && (
         <ToolCreateModal
           folderId={null}
-          allowFolder
           onClose={() => setShowCreateTool(false)}
           onListCreated={handleToolListCreated}
         />

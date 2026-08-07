@@ -40,14 +40,13 @@ const toolTypeOrder: ToolType[] = ['liste', 'tableau_comptage', 'liste_comptage'
 
 interface ToolCreateModalProps {
   folderId: string | null
-  allowFolder: boolean
   onClose: () => void
   onListCreated: (listId: string) => void
 }
 
-export function ToolCreateModal({ folderId, allowFolder, onClose, onListCreated }: ToolCreateModalProps) {
-  const { createToolList, createFolder } = useApp()
-  const [mode, setMode] = useState<'choice' | 'new-list' | 'new-folder'>('choice')
+export function ToolCreateModal({ folderId, onClose, onListCreated }: ToolCreateModalProps) {
+  const { createToolList } = useApp()
+  const [mode, setMode] = useState<'choice' | 'new-list'>('choice')
   const [name, setName] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -60,15 +59,6 @@ export function ToolCreateModal({ folderId, allowFolder, onClose, onListCreated 
     onListCreated(listId)
   }
 
-  async function handleCreateFolder() {
-    const trimmed = name.trim()
-    if (!trimmed) return
-    setSubmitting(true)
-    await createFolder(trimmed)
-    setSubmitting(false)
-    onClose()
-  }
-
   return (
     <div style={overlayStyle} role="dialog" aria-label="Ajouter un outil">
       <div style={boxStyle}>
@@ -78,11 +68,6 @@ export function ToolCreateModal({ folderId, allowFolder, onClose, onListCreated 
             <Button fullWidth onClick={() => setMode('new-list')}>
               Nouvelle liste
             </Button>
-            {allowFolder && (
-              <Button fullWidth variant="secondary" onClick={() => setMode('new-folder')}>
-                Nouveau dossier
-              </Button>
-            )}
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
               {toolTypeOrder
                 .filter((type) => !IMPLEMENTED_TOOL_TYPES.includes(type))
@@ -113,30 +98,6 @@ export function ToolCreateModal({ folderId, allowFolder, onClose, onListCreated 
             />
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
               <Button fullWidth disabled={!name.trim() || submitting} onClick={handleCreateList}>
-                Créer
-              </Button>
-              <Button fullWidth variant="secondary" onClick={onClose}>
-                Annuler
-              </Button>
-            </div>
-          </>
-        )}
-
-        {mode === 'new-folder' && (
-          <>
-            <label htmlFor="new-tool-folder-name" style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-              Nom du dossier
-            </label>
-            <input
-              id="new-tool-folder-name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoFocus
-              style={inputStyle}
-            />
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-              <Button fullWidth disabled={!name.trim() || submitting} onClick={handleCreateFolder}>
                 Créer
               </Button>
               <Button fullWidth variant="secondary" onClick={onClose}>

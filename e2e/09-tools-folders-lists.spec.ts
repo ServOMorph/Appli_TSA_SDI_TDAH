@@ -14,14 +14,7 @@ test('T54 — la To Do et le Budget sont présents d’office à l’installatio
   await expect(page.getByText('Cette liste est vide.')).toBeVisible()
 })
 
-test('T55 — créer un dossier et une liste, cocher/décocher et trier, regrouper par rubrique', async ({ page }) => {
-  await page.getByRole('button', { name: 'Ajouter un outil ou un dossier' }).click()
-  await page.getByRole('button', { name: 'Nouveau dossier' }).click()
-  await page.getByLabel('Nom du dossier').fill('Maison')
-  await page.getByRole('button', { name: 'Créer' }).click()
-  await expect(page.getByRole('button', { name: /Maison/ })).toBeVisible()
-
-  await page.getByRole('button', { name: /Maison/ }).click()
+test('T55 — créer une liste, cocher/décocher et trier, regrouper par rubrique', async ({ page }) => {
   await page.getByRole('button', { name: 'Ajouter un outil' }).click()
   await page.getByRole('button', { name: 'Nouvelle liste' }).click()
   await page.getByLabel('Nom de la liste').fill('Courses')

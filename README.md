@@ -48,7 +48,9 @@ Premier passage de validation manuelle réelle (2026-08-06, suite 3) : blocage b
 
 Validation manuelle des 6 points de `tests_manuels.md` (2026-08-07) : 5 points OK, point 5 (widget Comptes) en échec — bouton silencieusement désactivé sans catégorie de dépense créée dans le Budget, corrigé (bouton toujours actif, message d'invitation à créer une catégorie affiché à la place), puis revalidé par l'utilisateur le même jour. 501/501 tests unitaires, `tsc -b` clean. Phase V5-3 close, roadmap V5.0 intégralement terminée.
 
-**Roadmap `roadmap_v5.1.md` ouverte le 2026-08-07** (successeur de V5.0, à la racine), branche `v5.1`. Phase V5.1-0 `[EN COURS]` : refonte ergonomique de l'écran Budget codée et testée le même jour. Modèle de données inchangé — trois écrans (`E71Budget` consultation, `E73CategoryDetail`, `E74BudgetSettings` configuration), chiffre-vedette « Il me reste » au lieu de « Reste non budgétisé », onglets Semaine/Mois au lieu des deux périodes empilées, jauges de progression, formulaire de dépense partagé avec le widget Comptes de l'accueil. 522/522 tests unitaires, 57/57 e2e, `tsc -b`/lint/build clean ; reste la validation manuelle (`tests_manuels.md`) avant clôture de la phase. Le backlog outils V5.1+ et les Q non tranchées y ont été reportés depuis la roadmap V5.0 close.
+**Roadmap `roadmap_v5.1.md` ouverte le 2026-08-07** (successeur de V5.0, à la racine), branche `v5.1`. Phase V5.1-0 `[EN COURS]` : refonte ergonomique de l'écran Budget codée et testée le même jour. Modèle de données inchangé — trois écrans (`E71Budget` consultation, `E73CategoryDetail`, `E74BudgetSettings` configuration), chiffre-vedette « Il me reste » au lieu de « Reste non budgétisé », onglets Semaine/Mois au lieu des deux périodes empilées, jauges de progression, formulaire de dépense partagé avec le widget Comptes de l'accueil. Le backlog outils V5.1+ et les Q non tranchées y ont été reportés depuis la roadmap V5.0 close.
+
+Retours de validation manuelle traités le même jour : création de dossier retirée du « + » des Outils, suppression de liste ajoutée à la fiche liste, retrait d'argent sur un livret ajouté (blocage si dépassement du solde) — modèle de données toujours inchangé. 527/527 tests unitaires, `tsc -b`/lint clean ; reste la validation manuelle (`tests_manuels.md`, 3 nouveaux points) avant clôture de la phase.
 
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
 
@@ -89,7 +91,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Valider les 4 points de `tests_manuels.md` sur appareil réel pour clore la Phase V5.1-0 (`roadmap_v5.1.md`). En parallèle, communiquer à la testeuse les points de `a_communiquer_v5.md` (racine) maintenant que la V5.0 complète est livrée.
+Valider les 3 points de `tests_manuels.md` sur appareil réel pour clore la Phase V5.1-0 (`roadmap_v5.1.md`). En parallèle, communiquer à la testeuse les points de `a_communiquer_v5.md` (racine) maintenant que la V5.0 complète est livrée, et lui demander un test réel du Budget refondu.
 
 ## Licence
 

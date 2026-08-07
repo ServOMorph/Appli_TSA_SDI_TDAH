@@ -68,7 +68,6 @@ export function E72FolderDetail() {
       {showCreate && folderId && (
         <ToolCreateModal
           folderId={folderId}
-          allowFolder={false}
           onClose={() => setShowCreate(false)}
           onListCreated={handleListCreated}
         />

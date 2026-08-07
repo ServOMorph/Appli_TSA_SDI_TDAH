@@ -281,6 +281,14 @@ describe('E10Dashboard', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Comptes' }))
       expect(screen.getByRole('dialog', { name: 'Ajouter une dépense' })).toBeDefined()
     })
+
+    it("le widget Comptes affiche un message quand aucune catégorie de dépense n'existe", async () => {
+      const ctx = makeAppContext({ budgetCategories: [] })
+      renderWithApp(<E10Dashboard />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Comptes' }))
+      expect(screen.getByRole('dialog', { name: 'Aucune catégorie de dépense' })).toBeDefined()
+      expect(screen.queryByRole('dialog', { name: 'Ajouter une dépense' })).toBeNull()
+    })
   })
 
   describe('mode surcharge (D10B)', () => {

@@ -1,3 +1,13 @@
+## v5.14 — 2026-08-07
+
+Validation manuelle des 6 points de `tests_manuels.md` (Phase V5-3) : 5 points OK, un bug trouvé et corrigé sur le widget Comptes.
+
+### Corrigé
+- `E10Dashboard.tsx` : le bouton « Comptes » de l'accueil était `disabled` (donc silencieusement inactif) tant qu'aucune catégorie budgétaire de type « dépense » n'existait dans le Budget, sans aucun retour visuel. Le bouton reste désormais toujours actif ; un clic sans catégorie de dépense ouvre un message dédié invitant à en créer une.
+
+### Gate
+- 501/501 tests unitaires, `tsc -b` clean. Phase V5-3 reste `[EN COURS]` : point 5 de `tests_manuels.md` à revalider par l'utilisateur avec le correctif.
+
 ## v5.13 — 2026-08-06
 
 Premier passage de validation manuelle réelle de la Phase V5-3 : bugs de blocage et de navigation trouvés et corrigés.

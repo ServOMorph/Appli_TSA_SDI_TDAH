@@ -46,6 +46,8 @@ Phase V5-3 en cours (codée et testée le 2026-08-06, validation manuelle réell
 
 Premier passage de validation manuelle réelle (2026-08-06, suite 3) : blocage bloquant à l'ouverture corrigé (`crypto.randomUUID()` indisponible hors contexte sécurisé dans la migration Dexie v10, reproduit en HTTP sur IP réseau), `try/catch/finally` ajouté autour de l'initialisation de l'app pour éviter tout blocage silencieux futur. 3 défauts UI corrigés sur l'accueil (carte « Outils » redondante, libellé de liste générique, bouton « + » mal placé) et un bug de navigation retour sur Budget. 500/500 tests unitaires, `tsc -b`/lint clean.
 
+Validation manuelle des 6 points de `tests_manuels.md` (2026-08-07) : 5 points OK, point 5 (widget Comptes) en échec — bouton silencieusement désactivé sans catégorie de dépense créée dans le Budget, corrigé (bouton toujours actif, message d'invitation à créer une catégorie affiché à la place). 501/501 tests unitaires, `tsc -b` clean. Reste à revalider avant clôture de la Phase V5-3.
+
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
 
 Phase V5-1 close le 2026-08-02 après validation manuelle intégrale sur appareil tactile : nav basse ramenée à 4 éléments (Réception, Accueil, Paramètres, +), `E40Planning` absorbé par `E10Dashboard` (écran unique replié/déplié, corps extrait dans `PlanningBoard.tsx`), énergie planifiée/disponible affichée côte à côte, pastille de surcharge cliquable vers le centre de récupération, glisser-déposer du planning supprimé par anticipation. 3 défauts trouvés et corrigés en validation manuelle : titre `<h1>` de l'écran Réception resté « Todo » ; `index.html` déclarait `lang="en"` sur une UI française, déclenchant la traduction automatique de Chrome (corruption des nœuds texte du DOM, cassant la réconciliation React).
@@ -85,7 +87,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Reprendre les 6 points de `tests_manuels.md` (Phase V5-3) sur les écrans corrigés, puis clore la gate de phase. La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
+Revalider le point 5 corrigé de `tests_manuels.md` (widget Comptes), puis clore la gate de sortie de la Phase V5-3. La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
 
 ## Licence
 

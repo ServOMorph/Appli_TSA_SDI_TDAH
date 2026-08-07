@@ -38,7 +38,7 @@ Roadmap V4 (6 phases, V4-0 à V4-5) **intégralement close**, désormais archiv�
 
 Roadmap V4.1 (6 phases, V4.1-0 à V4.1-5) **close**, désormais archivée (`Archives/roadmap_v4.1.md`) : rubrique nav « Outils » remplaçant « Todo », listes épinglables, module Budget semaine/mois avec livrets simples, nav « + » contextuelle. Phase V4.1-6 (auto-scroll drag planning) jamais codée, reprise dans la roadmap suivante.
 
-**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — **V5-0 à V5-2b `[FAIT]`**, V5-3 `[EN COURS]` (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel — codée et testée, validation manuelle réelle en cours). Modification d'une tâche désormais exclusivement via sa fiche (plus de glisser-déposer, aligné sur l'application de référence de la testeuse). Les 5 outils spécialisés reportés en V5.1+ (Comptage, Météo du jour, Comptes à colonnes configurables, Routine, Tableau prévisions), faute de retour d'usage sur la version actuelle — ordre de priorité fixé, Comptage en premier.
+**Branche `v5.0` active, roadmap `roadmap_v5.0.md`** (à la racine) : refonte issue de la visio testeuse du 2026-07-28, analysée via `/analyse_visio`. Périmètre volontairement réduit au socle — **V5-0 à V5-3 `[FAIT]`, roadmap V5.0 intégralement terminée** (modèle d'outils/dossiers, listes, Budget V4.1 rebranché tel quel, codée, testée et validée manuellement). Modification d'une tâche désormais exclusivement via sa fiche (plus de glisser-déposer, aligné sur l'application de référence de la testeuse). Les 5 outils spécialisés reportés en V5.1+ (Comptage, Météo du jour, Comptes à colonnes configurables, Routine, Tableau prévisions), faute de retour d'usage sur la version actuelle — ordre de priorité fixé, Comptage en premier.
 
 Phase V5-2b close le 2026-08-06 : entités et migration Dexie v9 (`icon`, `color`, `description`, `duration_minutes`, récurrence, exceptions), moteur de récurrence maison, planning épuré (liste par tâche, bandeau de dates, fiche tâche comme seul point de modification), sous-tâches dépliables. E7 vérifié (aucune donnée préremplie à l'installation).
 
@@ -46,7 +46,7 @@ Phase V5-3 en cours (codée et testée le 2026-08-06, validation manuelle réell
 
 Premier passage de validation manuelle réelle (2026-08-06, suite 3) : blocage bloquant à l'ouverture corrigé (`crypto.randomUUID()` indisponible hors contexte sécurisé dans la migration Dexie v10, reproduit en HTTP sur IP réseau), `try/catch/finally` ajouté autour de l'initialisation de l'app pour éviter tout blocage silencieux futur. 3 défauts UI corrigés sur l'accueil (carte « Outils » redondante, libellé de liste générique, bouton « + » mal placé) et un bug de navigation retour sur Budget. 500/500 tests unitaires, `tsc -b`/lint clean.
 
-Validation manuelle des 6 points de `tests_manuels.md` (2026-08-07) : 5 points OK, point 5 (widget Comptes) en échec — bouton silencieusement désactivé sans catégorie de dépense créée dans le Budget, corrigé (bouton toujours actif, message d'invitation à créer une catégorie affiché à la place). 501/501 tests unitaires, `tsc -b` clean. Reste à revalider avant clôture de la Phase V5-3.
+Validation manuelle des 6 points de `tests_manuels.md` (2026-08-07) : 5 points OK, point 5 (widget Comptes) en échec — bouton silencieusement désactivé sans catégorie de dépense créée dans le Budget, corrigé (bouton toujours actif, message d'invitation à créer une catégorie affiché à la place), puis revalidé par l'utilisateur le même jour. 501/501 tests unitaires, `tsc -b` clean. Phase V5-3 close, roadmap V5.0 intégralement terminée.
 
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
 
@@ -87,7 +87,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Revalider le point 5 corrigé de `tests_manuels.md` (widget Comptes), puis clore la gate de sortie de la Phase V5-3. La communication à la testeuse (`a_communiquer_v5.md`, racine) est différée à la livraison complète de la V5.0.
+Communiquer à la testeuse les points de `a_communiquer_v5.md` (racine) maintenant que la V5.0 complète est livrée, puis recueillir son retour et décider de la priorité de la suite (V5.1 ou retour utilisateur d'abord).
 
 ## Licence
 

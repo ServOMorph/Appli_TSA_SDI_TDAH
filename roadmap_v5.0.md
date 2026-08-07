@@ -157,7 +157,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase V5-3 — Outils, dossiers, listes et budget rebranché [EN COURS]
+## Phase V5-3 — Outils, dossiers, listes et budget rebranché [FAIT]
 
 - [x] `E20` + `Q9` (cf. C27, C29, C39) — entité `Folder` à **un seul niveau** et entité `Tool` typée ; le « + » du bloc outils ajoute un outil ou un dossier (`src/domain/entities/folder.ts`, `src/domain/entities/tool.ts`, `src/data/db.ts` migration **v10**)
 - [x] `E26` (cf. C41, C42) — types d'outils déclarés ; seuls `liste` et `tableau comptage` sont implémentés en V5.0, les trois autres apparaissent grisés (`src/domain/entities/tool.ts`, `src/ui/components/ToolCreateModal.tsx`)
@@ -170,7 +170,9 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - [x] `E24` — rendu effectif des widgets d'outils (dossiers + outils racine) sur l'accueil, la zone posée en V5-1 étant désormais alimentée (`src/ui/screens/dashboard/E10Dashboard.tsx`)
 - [x] Tests de dossiers (création, rangement, suppression en cascade), de tri/rubriques des items, de la migration v10 (seed) et de non-régression du budget (unitaires + e2e `08-tools-budget.spec.ts` inchangé côté comportement + nouveau `09-tools-folders-lists.spec.ts`)
 
-Gate : [x] tests verts (500/500 unitaires, 57/57 e2e, `tsc -b`/lint/build clean) · [ ] test manuel (à faire, cf. `tests_manuels.md`) · [x] doc (`CHANGELOG.md`) · [ ] sortie — reste la validation manuelle avant clôture de phase
+Gate : [x] tests verts (501/501 unitaires, 57/57 e2e, `tsc -b`/lint/build clean) · [x] test manuel (6 points de `tests_manuels.md` validés, fichier purgé) · [x] doc (`CHANGELOG.md`) · [x] sortie — outils/dossiers/listes/budget en place, aucun écran ne perd son point d'entrée
+
+Phase close le 2026-08-07.
 
 Décision architecturale prise en cours de phase : le checklist V5-3 ne citait plus `E60Lists.tsx` ni la route `lists`, cohérent avec E20 (les listes ne s'ajoutent plus que via le « + » du bloc outils). `E60Lists.tsx` et la route `lists` ont été supprimés ; la carte « Listes » du dashboard a fusionné dans les widgets d'outils génériques. Décision validée avec l'utilisateur avant codage (mode plan).
 
@@ -178,10 +180,7 @@ Défaut trouvé et corrigé en cours de route : le réveil d'un item (E29) ne fi
 
 Session 2026-08-06 (suite 3, bugs trouvés en validation manuelle réelle) : blocage bloquant à l'ouverture trouvé et corrigé — la migration Dexie v10 appelait `crypto.randomUUID()` directement (`src/data/db.ts`), API indisponible hors contexte sécurisé ; testé en HTTP sur l'IP réseau (`run.py` → `npm run dev -- --host`), l'exception non interceptée dans `AppContext.tsx` (`init()` sans `try/catch`) laissait l'app bloquée indéfiniment sur « Chargement... ». Corrigé par un repli local identique à celui de `newId()` (`repositories.ts`) ; `try/catch/finally` ajouté autour de `init()` pour qu'une erreur future ne bloque plus jamais silencieusement l'écran de chargement. Trois défauts UI trouvés lors du test manuel du point 1-2 (`tests_manuels.md`) et corrigés : carte « Outils » redondante sur l'accueil retirée (doublon avec le titre de section) ; outil de type liste affichait le libellé générique « Liste » au lieu du nom réel (« To Do »), source de la confusion rapportée ; bouton « + » de création déplacé de l'écran Outils (`E70Tools.tsx`) vers l'accueil (`E10Dashboard.tsx`), zone Outils passée en grille 3 colonnes. Bug de navigation retour trouvé et corrigé : `E71Budget.tsx` forçait `goTo('tools')` au lieu de dépiler la pile réelle — remplacé par `back('dashboard')`. Clarification actée avec l'utilisateur après relecture de `constats_2026-07-28.md` : le widget « Comptes » de l'accueil reste inchangé, correctement rattaché au domaine budget (E33/E34) et distinct de l'outil « Comptage » (E31, reporté V5.1) — non renommé. 500/500 tests unitaires, `tsc -b`/lint clean. Points 1-2 de `tests_manuels.md` restent à revalider par l'utilisateur sur les écrans corrigés ; points 3-6 non encore testés.
 
-Session 2026-08-07 (validation manuelle des 6 points de `tests_manuels.md`) : 5 points sur 6 validés sans défaut. Point 5 (widget « Comptes ») en échec — le bouton était `disabled` tant qu'aucune catégorie budgétaire de type « dépense » n'existait, sans aucun retour visuel, confirmé par l'utilisateur (fonctionnement rétabli après création d'une catégorie). Corrigé : bouton toujours actif, un clic sans catégorie de dépense ouvre un message dédié invitant à en créer une dans le Budget (`E10Dashboard.tsx`), test dédié ajouté. 501/501 tests unitaires, `tsc -b` clean. Point 5 reste à revalider par l'utilisateur avec le correctif avant clôture de la gate de phase.
-
-**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
-Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+Session 2026-08-07 (validation manuelle des 6 points de `tests_manuels.md`) : 5 points sur 6 validés sans défaut. Point 5 (widget « Comptes ») en échec — le bouton était `disabled` tant qu'aucune catégorie budgétaire de type « dépense » n'existait, sans aucun retour visuel, confirmé par l'utilisateur (fonctionnement rétabli après création d'une catégorie). Corrigé : bouton toujours actif, un clic sans catégorie de dépense ouvre un message dédié invitant à en créer une dans le Budget (`E10Dashboard.tsx`), test dédié ajouté. 501/501 tests unitaires, `tsc -b` clean. Point 5 revalidé par l'utilisateur avec le correctif le même jour, `tests_manuels.md` vidé intégralement. Phase V5-3 close, roadmap V5.0 (V5-0 à V5-3) intégralement terminée.
 
 ---
 

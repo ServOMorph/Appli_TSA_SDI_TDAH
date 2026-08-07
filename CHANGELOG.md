@@ -1,3 +1,13 @@
+## v5.15 — 2026-08-07
+
+Point 5 de `tests_manuels.md` (widget Comptes) revalidé par l'utilisateur avec le correctif de la session précédente. Gate de sortie de la Phase V5-3 atteinte.
+
+### Corrigé
+- Aucun correctif de code cette session.
+
+### Gate
+- 501/501 tests unitaires, `tsc -b` clean. Phase V5-3 passée à `[FAIT]`, roadmap V5.0 (V5-0 à V5-3) intégralement terminée.
+
 ## v5.14 — 2026-08-07
 
 Validation manuelle des 6 points de `tests_manuels.md` (Phase V5-3) : 5 points OK, un bug trouvé et corrigé sur le widget Comptes.

@@ -7,7 +7,6 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('T54 — la To Do et le Budget sont présents d’office à l’installation, sans donnée préremplie dedans', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
   await expect(page.getByRole('button', { name: 'To Do' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Budget' })).toBeVisible()
 
@@ -16,7 +15,6 @@ test('T54 — la To Do et le Budget sont présents d’office à l’installatio
 })
 
 test('T55 — créer un dossier et une liste, cocher/décocher et trier, regrouper par rubrique', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
   await page.getByRole('button', { name: 'Ajouter un outil ou un dossier' }).click()
   await page.getByRole('button', { name: 'Nouveau dossier' }).click()
   await page.getByLabel('Nom du dossier').fill('Maison')
@@ -50,7 +48,6 @@ test('T55 — créer un dossier et une liste, cocher/décocher et trier, regroup
 })
 
 test('T56 — le réveil d’un item de liste planifie une tâche ponctuelle', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
   await page.getByRole('button', { name: 'To Do' }).click()
   await page.getByRole('button', { name: 'Ajouter un élément' }).click()
   await page.getByLabel('Élément').fill('Appeler le médecin')
@@ -66,23 +63,23 @@ test('T56 — le réveil d’un item de liste planifie une tâche ponctuelle', a
 })
 
 test('T57 — le widget Comptes de l’accueil saisit une dépense en un tap, sans régression du Budget', async ({ page }) => {
-  await page.getByRole('button', { name: 'Outils' }).click()
   await page.getByRole('button', { name: 'Budget' }).click()
+  await page.getByRole('button', { name: 'Configurer le budget' }).click()
   await page.getByRole('button', { name: 'Ajouter une catégorie' }).click()
   await page.getByLabel('Nom').fill('Courses')
   await page.getByLabel('Périodicité').selectOption('week')
   await page.getByLabel('Montant').fill('60')
   await page.getByRole('button', { name: 'Créer' }).click()
-  await expect(page.getByText('Courses', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Ouvrir Courses' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Accueil' }).click()
   await page.getByRole('button', { name: 'Comptes' }).click()
   const dialog = page.getByRole('dialog', { name: 'Ajouter une dépense' })
   await expect(dialog).toBeVisible()
   await dialog.getByLabel('Montant').fill('15')
-  await dialog.getByRole('button', { name: 'Ajouter' }).click()
+  await dialog.getByRole('button', { name: 'Enregistrer' }).click()
   await expect(dialog).not.toBeVisible()
 
   await page.getByRole('button', { name: 'Budget' }).click()
-  await expect(page.getByText(/Restant.*45.*Dépensé.*15/)).toBeVisible()
+  await expect(page.getByText(/sur 60,00.*15,00.*dépensés/)).toBeVisible()
 })

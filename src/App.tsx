@@ -20,6 +20,8 @@ import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
 import { E70Tools } from '@/ui/screens/tools/E70Tools'
 import { E72FolderDetail } from '@/ui/screens/tools/E72FolderDetail'
 import { E71Budget } from '@/ui/screens/tools/E71Budget'
+import { E73CategoryDetail } from '@/ui/screens/tools/E73CategoryDetail'
+import { E74BudgetSettings } from '@/ui/screens/tools/E74BudgetSettings'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
 import type { Screen } from '@/app/AppContext'
@@ -106,6 +108,10 @@ export function AppScreens() {
         return <E72FolderDetail />
       case 'budget':
         return <E71Budget />
+      case 'budget-category-detail':
+        return <E73CategoryDetail />
+      case 'budget-settings':
+        return <E74BudgetSettings />
     }
   }
 

@@ -24,6 +24,8 @@ const SCREEN_CODES: Record<Screen, string> = {
   tools: 'E70',
   'folder-detail': 'E72',
   budget: 'E71',
+  'budget-category-detail': 'E73',
+  'budget-settings': 'E74',
 }
 
 export function DevResetButton() {

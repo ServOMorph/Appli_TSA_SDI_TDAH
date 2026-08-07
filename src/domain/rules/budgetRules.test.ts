@@ -5,12 +5,16 @@ import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import {
   getAccountBalance,
   getCurrentPeriodBounds,
+  getGaugeLevel,
+  getGaugeRatio,
   getPeriodBounds,
   getRemainingForCategory,
   getSpentForCategory,
   getTotalBudgeted,
   getTotalDeposits,
   getTotalIncome,
+  getTotalRemaining,
+  getTotalSpent,
   getUnbudgetedRemainder,
   isDateInPeriod,
 } from './budgetRules'
@@ -145,6 +149,57 @@ describe('budgetRules', () => {
         deposit({ id: 'other', account_id: 'livret-jeune', amount: 30 }),
       ]
       expect(getAccountBalance(deposits, 'livret-a')).toBe(150)
+    })
+  })
+
+  describe('totaux de période', () => {
+    const categories = [
+      category({ id: 'salary', name: 'Salaire', kind: 'income', period: 'week', amount: 400 }),
+      category({ id: 'courses', period: 'week', amount: 60 }),
+      category({ id: 'plaisir', name: 'Plaisir', period: 'week', amount: 40 }),
+      category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+    ]
+    const bounds = { startDate: '2026-07-20', endDate: '2026-07-26' }
+    const entries = [
+      entry({ id: 'e1', category_id: 'courses', amount: 15 }),
+      entry({ id: 'e2', category_id: 'plaisir', amount: 10 }),
+      entry({ id: 'e3', category_id: 'courses', amount: 30, date: '2026-07-27' }),
+      entry({ id: 'e4', category_id: 'rent', amount: 600 }),
+    ]
+
+    it('additionne les dépenses de la période, en ignorant les autres périodicités et les autres dates', () => {
+      expect(getTotalSpent(categories, entries, 'week', bounds)).toBe(25)
+    })
+
+    it('ne compte pas les revenus dans le restant à dépenser', () => {
+      expect(getTotalRemaining(categories, entries, 'week', bounds)).toBe(75)
+    })
+
+    it('rend un restant négatif quand la période est dépassée', () => {
+      const overspent = [entry({ id: 'e5', category_id: 'courses', amount: 200 })]
+      expect(getTotalRemaining(categories, overspent, 'week', bounds)).toBe(-100)
+    })
+  })
+
+  describe('seuils de jauge', () => {
+    it('borne le remplissage entre 0 et 1', () => {
+      expect(getGaugeRatio(0, 60)).toBe(0)
+      expect(getGaugeRatio(30, 60)).toBe(0.5)
+      expect(getGaugeRatio(90, 60)).toBe(1)
+      expect(getGaugeRatio(10, 0)).toBe(1)
+      expect(getGaugeRatio(0, 0)).toBe(0)
+    })
+
+    it('passe en ambre à 80 % de consommation et en rouge au dépassement', () => {
+      expect(getGaugeLevel(47, 60)).toBe('ok')
+      expect(getGaugeLevel(48, 60)).toBe('warning')
+      expect(getGaugeLevel(60, 60)).toBe('warning')
+      expect(getGaugeLevel(61, 60)).toBe('over')
+    })
+
+    it('reste neutre sur un budget nul non consommé', () => {
+      expect(getGaugeLevel(0, 0)).toBe('ok')
+      expect(getGaugeLevel(5, 0)).toBe('over')
     })
   })
 })

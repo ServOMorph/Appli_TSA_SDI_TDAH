@@ -1,3 +1,26 @@
+## v5.17 — 2026-08-07
+
+Phase V5.1-0 codée : refonte ergonomique du Budget en trois écrans, à modèle de données constant (aucune migration Dexie).
+
+### Ajouté
+- `E73CategoryDetail.tsx` (route `budget-category-detail`) : fiche d'une catégorie ouverte au tap depuis l'écran Budget — restant, jauge, historique des dépenses de la période consultée, renommer / modifier le montant / supprimer.
+- `E74BudgetSettings.tsx` (route `budget-settings`) : écran de configuration atteint par l'icône ⚙ du Budget — création de catégorie, gestion des livrets et dépôts, bloc « Non alloué » par période.
+- `BudgetExpenseModal.tsx` : formulaire de dépense partagé par l'écran Budget et le widget « Comptes » de l'accueil, avec sélection de catégorie en pastilles et champ Date (paramètre déjà supporté par `createBudgetEntry`, jamais exposé jusqu'ici).
+- `BudgetGauge.tsx` et `src/ui/styles/budget.ts` : jauge et styles communs aux trois écrans.
+- `budgetRules.ts` : `getTotalSpent`, `getTotalRemaining`, `getGaugeRatio`, `getGaugeLevel`, `GAUGE_WARNING_RATIO` — fonctions ajoutées, aucune fonction existante modifiée.
+
+### Modifié
+- `E71Budget.tsx` réécrit : chiffre-vedette « Il me reste » (budget des dépenses de la période moins dépensé) remplaçant « Reste non budgétisé », onglets Semaine / Mois avec un seul navigateur de période, jauge par catégorie remplaçant « Restant : X (Dépensé Y) », livrets réduits à une ligne de synthèse, une seule action principale. Les 18 liens de configuration permanents et le journal de dépenses inline ont quitté l'écran.
+- `E10Dashboard.tsx` : formulaire de dépense dupliqué remplacé par `BudgetExpenseModal` — les deux points d'entrée de saisie sont désormais le même composant.
+- Dates du domaine budget au format français (`formatFrenchDate`), au lieu des dates ISO brutes.
+
+### Corrigé
+- Bloc Livrets : le solde cumulait tous les dépôts alors que les mouvements listés juste en dessous étaient filtrés sur la période courante. La configuration liste désormais tous les dépôts d'un livret, cohérents avec son solde.
+- `e2e/08-tools-budget.spec.ts` et `e2e/09-tools-folders-lists.spec.ts` : point d'entrée « Outils » disparu de l'accueil depuis la v5.13 (carte redondante retirée), jamais répercuté faute d'exécution e2e depuis. Les 6 tests concernés échouaient avant cette session.
+
+### Gate
+- 522/522 tests unitaires, 57/57 e2e, `tsc -b` / lint / build clean. Validation manuelle en attente (`tests_manuels.md`).
+
 ## v5.16 — 2026-08-07
 
 Analyse UX de l'écran Budget sur demande de l'utilisateur et ouverture de la roadmap V5.1. Aucun code applicatif modifié.

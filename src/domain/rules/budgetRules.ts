@@ -94,6 +94,44 @@ export function getUnbudgetedRemainder(
   )
 }
 
+/** Total dépensé sur les catégories de dépense d'une période. */
+export function getTotalSpent(
+  categories: BudgetCategory[],
+  entries: BudgetEntry[],
+  period: BudgetPeriod,
+  bounds: BudgetPeriodBounds,
+): number {
+  return categories
+    .filter((category) => category.kind === 'expense' && category.period === period)
+    .reduce((total, category) => total + getSpentForCategory(entries, category.id, bounds), 0)
+}
+
+/** Ce qu'il reste à dépenser sur une période : budgétisé en dépense moins dépensé. */
+export function getTotalRemaining(
+  categories: BudgetCategory[],
+  entries: BudgetEntry[],
+  period: BudgetPeriod,
+  bounds: BudgetPeriodBounds,
+): number {
+  return getTotalBudgeted(categories, period) - getTotalSpent(categories, entries, period, bounds)
+}
+
+export const GAUGE_WARNING_RATIO = 0.8
+
+export type GaugeLevel = 'ok' | 'warning' | 'over'
+
+/** Part consommée d'un budget, bornée à [0, 1] pour le remplissage d'une jauge. */
+export function getGaugeRatio(spent: number, budgeted: number): number {
+  if (budgeted <= 0) return spent > 0 ? 1 : 0
+  return Math.min(1, Math.max(0, spent / budgeted))
+}
+
+export function getGaugeLevel(spent: number, budgeted: number): GaugeLevel {
+  if (spent > budgeted) return 'over'
+  if (budgeted <= 0) return 'ok'
+  return spent / budgeted >= GAUGE_WARNING_RATIO ? 'warning' : 'ok'
+}
+
 export function getAccountBalance(deposits: BudgetDeposit[], accountId: string): number {
   return deposits
     .filter((deposit) => deposit.account_id === accountId)

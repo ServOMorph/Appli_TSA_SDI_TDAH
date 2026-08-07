@@ -1,6 +1,6 @@
 # Roadmap — V5.1 (refonte ergonomique du Budget, puis outils reportés)
 
-Version : 5.1 — créée 2026-08-07. Succède à `roadmap_v5.0.md` (V5.0 close, V5-0 à V5-3 `[FAIT]`). Branche : `v5.0` (à rebrancher sur `v5.1` au démarrage de la phase).
+Version : 5.1 — créée 2026-08-07. Succède à `roadmap_v5.0.md` (V5.0 close, V5-0 à V5-3 `[FAIT]`). Branche : `v5.1`.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.
 Gate commun : tests créés et verts · test manuel de la phase · doc à jour · aucun écran ne perd son point d'entrée · critère de sortie.
@@ -9,7 +9,7 @@ Note de cadrage : la Phase V5.1-0 ci-dessous est un chantier d'une seule phase �
 
 ---
 
-## Phase V5.1-0 — Refonte ergonomique de l'écran Budget [TODO]
+## Phase V5.1-0 — Refonte ergonomique de l'écran Budget [EN COURS]
 
 > Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase.
 
@@ -40,19 +40,19 @@ Principe directeur : **séparer consulter de configurer**. L'écran principal r�
 
 ### Checklist
 
-- [ ] `B1` + `A2` — onglet segmenté Semaine / Mois, un seul navigateur de période et un seul état de date ; `renderPeriod` appelé une fois au lieu de deux (`src/ui/screens/tools/E71Budget.tsx`)
-- [ ] `B2` + `A1` — bloc de tête « Il me reste » : montant restant, rappel « sur X € · Y dépensés », jauge de progression ; deux fonctions de totaux de période ajoutées à `src/domain/rules/budgetRules.ts` (dépensé total et restant total sur les catégories de dépense d'une période), sans toucher aux fonctions existantes
-- [ ] `B3` — jauge par catégorie remplaçant « Restant : X (Dépensé Y) » : verte, ambre au-delà de 80 % de consommation, rouge en dépassement (`E71Budget.tsx`, seuils dans `budgetRules.ts` pour être testables)
-- [ ] `B4` + `A4` — nouvel écran fiche catégorie `src/ui/screens/tools/E73CategoryDetail.tsx`, ouvert au tap sur une ligne de catégorie, même pattern que la fiche tâche de V5-2b : nom, montant, périodicité, historique des dépenses de la période, actions renommer / modifier le montant / supprimer (avec la confirmation existante quand des dépenses existent). Retire les liens de gestion permanents de l'écran principal.
-- [ ] `B5` + `A3` + `A4` — nouvel écran de configuration `src/ui/screens/tools/E74BudgetSettings.tsx`, atteint par une icône en tête de `E71Budget` : création de catégorie, gestion des livrets, ajout de dépôt, et affichage du « Non alloué » par période
-- [ ] `B6` — action principale unique « + Dépense » sur l'écran principal ; les trois autres boutons pleine largeur migrent vers `E74BudgetSettings`
-- [ ] `B7` — formulaire de dépense enrichi : champ Date (paramètre déjà supporté par `createBudgetEntry`, jamais exposé) et sélection de catégorie en pastilles cliquables au lieu du `<select>` — un tap au lieu de deux. Le même formulaire est utilisé par le widget Comptes de l'accueil (`E10Dashboard.tsx` l.246) : vérifier la cohérence des deux points d'entrée.
-- [ ] `B8` — livrets condensés en une ligne de synthèse sur l'écran principal (total + accès), détail dans `E74BudgetSettings` ; corriger au passage l'incohérence solde cumulé / mouvements filtrés par période (défaut 7)
-- [ ] `B9` — dates au format français partout dans le domaine budget (défaut 6)
-- [ ] `B10` — routes `budget-category-detail` et `budget-settings` ajoutées à la pile de navigation, retour contextuel par `back()` et non par `goTo()` codé en dur (piège déjà rencontré sur `E71Budget` en V5-3)
-- [ ] Tests : unitaires des nouvelles fonctions de `budgetRules.ts` (totaux de période, seuils de jauge), unitaires des deux nouveaux écrans, adaptation de `E71Budget.test.tsx`, adaptation de l'e2e `08-tools-budget.spec.ts` (parcours changé : saisie de dépense, navigation vers la fiche catégorie, navigation vers la configuration)
+- [x] `B1` + `A2` — onglet segmenté Semaine / Mois, un seul navigateur de période et un seul état de date ; `renderPeriod` appelé une fois au lieu de deux (`src/ui/screens/tools/E71Budget.tsx`)
+- [x] `B2` + `A1` — bloc de tête « Il me reste » : montant restant, rappel « sur X € · Y dépensés », jauge de progression ; deux fonctions de totaux de période ajoutées à `src/domain/rules/budgetRules.ts` (dépensé total et restant total sur les catégories de dépense d'une période), sans toucher aux fonctions existantes
+- [x] `B3` — jauge par catégorie remplaçant « Restant : X (Dépensé Y) » : verte, ambre au-delà de 80 % de consommation, rouge en dépassement (`E71Budget.tsx`, seuils dans `budgetRules.ts` pour être testables)
+- [x] `B4` + `A4` — nouvel écran fiche catégorie `src/ui/screens/tools/E73CategoryDetail.tsx`, ouvert au tap sur une ligne de catégorie, même pattern que la fiche tâche de V5-2b : nom, montant, périodicité, historique des dépenses de la période, actions renommer / modifier le montant / supprimer (avec la confirmation existante quand des dépenses existent). Retire les liens de gestion permanents de l'écran principal.
+- [x] `B5` + `A3` + `A4` — nouvel écran de configuration `src/ui/screens/tools/E74BudgetSettings.tsx`, atteint par une icône en tête de `E71Budget` : création de catégorie, gestion des livrets, ajout de dépôt, et affichage du « Non alloué » par période
+- [x] `B6` — action principale unique sur l'écran principal (« Ajouter une dépense », plutôt que « + Dépense » — cohérence avec le titre du dialogue) ; les trois autres boutons pleine largeur migrent vers `E74BudgetSettings`
+- [x] `B7` — formulaire de dépense enrichi : champ Date (paramètre déjà supporté par `createBudgetEntry`, jamais exposé) et sélection de catégorie en pastilles cliquables au lieu du `<select>` — un tap au lieu de deux. Fusionné en un composant unique `BudgetExpenseModal.tsx`, utilisé à la fois par `E71Budget` et par le widget Comptes de l'accueil (`E10Dashboard.tsx`) — la « cohérence à vérifier » du texte d'origine est devenue une factorisation.
+- [x] `B8` — livrets condensés en une ligne de synthèse sur l'écran principal (total + accès), détail dans `E74BudgetSettings` ; incohérence solde cumulé / mouvements filtrés par période corrigée (défaut 7) : la configuration liste désormais tous les dépôts d'un livret, cohérents avec son solde cumulé.
+- [x] `B9` — dates au format français partout dans le domaine budget (défaut 6)
+- [x] `B10` — routes `budget-category-detail` (avec la date de la période consultée) et `budget-settings` ajoutées à la pile de navigation, retour contextuel par `back()` partout
+- [x] Tests : `budgetRules.test.ts` étendu (totaux de période, seuils de jauge), `E71Budget.test.tsx`/`E73CategoryDetail.test.tsx`/`E74BudgetSettings.test.tsx`, `e2e/08-tools-budget.spec.ts` adapté au nouveau parcours
 
-Gate : [ ] tests verts (unitaires + e2e, `tsc -b`/lint/build clean) · [ ] test manuel (`tests_manuels.md`) · [ ] doc (`CHANGELOG.md`) · [ ] sortie — l'écran Budget répond à « combien il me reste » sans scroll ni calcul, toute la configuration est atteignable depuis l'écran dédié, aucun écran ni action existante n'a perdu son point d'entrée
+Gate : [x] tests verts (522/522 unitaires, 57/57 e2e, `tsc -b`/lint/build clean) · [ ] test manuel (`tests_manuels.md`, 4 points en attente) · [x] doc (`CHANGELOG.md` v5.17) · [x] sortie — l'écran Budget répond à « combien il me reste » sans scroll ni calcul, toute la configuration est atteignable depuis l'écran dédié, aucun écran ni action existante n'a perdu son point d'entrée
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

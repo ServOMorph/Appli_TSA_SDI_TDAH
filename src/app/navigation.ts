@@ -21,6 +21,8 @@ export type Route =
   | { name: 'tools' }
   | { name: 'folder-detail'; folderId?: string }
   | { name: 'budget' }
+  | { name: 'budget-category-detail'; categoryId?: string; date?: string }
+  | { name: 'budget-settings' }
 
 export type Screen = Route['name']
 

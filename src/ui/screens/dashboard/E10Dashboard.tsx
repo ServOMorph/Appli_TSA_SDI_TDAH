@@ -8,6 +8,7 @@ import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
 import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
+import { BudgetExpenseModal } from '@/ui/components/BudgetExpenseModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
 import { flashyBackground } from '@/ui/styles/ambiance'
 import {
@@ -169,9 +170,6 @@ export function E10Dashboard() {
   } = useApp()
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [showNoExpenseCategory, setShowNoExpenseCategory] = useState(false)
-  const [expenseCategoryId, setExpenseCategoryId] = useState<string | null>(null)
-  const [expenseAmount, setExpenseAmount] = useState('')
-  const [expenseLabel, setExpenseLabel] = useState('')
   const [showCreateTool, setShowCreateTool] = useState(false)
 
   const expanded = route.name === 'planning'
@@ -228,22 +226,18 @@ export function E10Dashboard() {
     goTo('list-detail')
   }
 
+  const expenseCategories = budgetCategories.filter((category) => category.kind === 'expense')
+
   function openExpenseForm() {
-    const firstExpense = budgetCategories.find((category) => category.kind === 'expense')
-    if (!firstExpense) {
+    if (expenseCategories.length === 0) {
       setShowNoExpenseCategory(true)
       return
     }
-    setExpenseCategoryId(firstExpense.id)
-    setExpenseAmount('')
-    setExpenseLabel('')
     setShowExpenseForm(true)
   }
 
-  async function handleCreateExpense() {
-    const amount = Number(expenseAmount.replace(',', '.'))
-    if (!expenseCategoryId || !Number.isFinite(amount) || amount <= 0) return
-    await createBudgetEntry(expenseCategoryId, amount, expenseLabel)
+  async function handleCreateExpense(categoryId: string, amount: number, label: string, date: string) {
+    await createBudgetEntry(categoryId, amount, label, date)
     setShowExpenseForm(false)
   }
 
@@ -380,79 +374,11 @@ export function E10Dashboard() {
       )}
 
       {showExpenseForm && (
-        <div
-          role="dialog"
-          aria-label="Ajouter une dépense"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.75)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--spacing-xl)',
-              maxWidth: '360px',
-              width: '90%',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 'var(--spacing-md)',
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Ajouter une dépense</h2>
-            <label htmlFor="dashboard-expense-category" style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-              Catégorie
-            </label>
-            <select
-              id="dashboard-expense-category"
-              value={expenseCategoryId ?? ''}
-              onChange={(e) => setExpenseCategoryId(e.target.value)}
-              style={{ padding: '8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', background: 'var(--color-surface)', color: 'var(--color-text)' }}
-            >
-              {budgetCategories.filter((c) => c.kind === 'expense').map((category) => (
-                <option key={category.id} value={category.id}>{category.name}</option>
-              ))}
-            </select>
-            <label htmlFor="dashboard-expense-amount" style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-              Montant
-            </label>
-            <input
-              id="dashboard-expense-amount"
-              type="text"
-              inputMode="decimal"
-              value={expenseAmount}
-              onChange={(e) => setExpenseAmount(e.target.value)}
-              autoFocus
-              style={{ padding: '8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', background: 'var(--color-surface)', color: 'var(--color-text)' }}
-            />
-            <label htmlFor="dashboard-expense-label" style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-              Libellé (optionnel)
-            </label>
-            <input
-              id="dashboard-expense-label"
-              type="text"
-              value={expenseLabel}
-              onChange={(e) => setExpenseLabel(e.target.value)}
-              style={{ padding: '8px', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', background: 'var(--color-surface)', color: 'var(--color-text)' }}
-            />
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-              <Button fullWidth onClick={handleCreateExpense}>
-                Ajouter
-              </Button>
-              <Button fullWidth variant="secondary" onClick={() => setShowExpenseForm(false)}>
-                Annuler
-              </Button>
-            </div>
-          </div>
-        </div>
+        <BudgetExpenseModal
+          categories={expenseCategories}
+          onSubmit={handleCreateExpense}
+          onClose={() => setShowExpenseForm(false)}
+        />
       )}
       {showNoExpenseCategory && (
         <div

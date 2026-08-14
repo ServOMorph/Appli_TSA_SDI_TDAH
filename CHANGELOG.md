@@ -1,3 +1,15 @@
+## v5.22 — 2026-08-14
+
+Ajout de l'import de sauvegarde JSON dans Paramètres, et complétion de l'export à l'occasion de l'analyse des données de test de Marie.
+
+### Ajouté
+- Import de sauvegarde JSON (`E117Export.tsx`, écran renommé « Export et import ») : sélection de fichier, remplacement intégral des données de l'appareil après confirmation (irréversible), avec message d'erreur si le fichier est invalide.
+- `useSettingsState.importData()` : valide le fichier (profil utilisateur requis), remplace les 14 tables Dexie, reconstruit l'entrée `tools` manquante pour chaque liste d'un export v3.0 (avant l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export).
+
+### Corrigé
+- `useSettingsState.exportData()` : n'exportait que 10 des 14 tables Dexie (`folders`, `tools`, `task_recurrences`, `task_exceptions` manquants) — export désormais complet, version de payload passée à `3.1`.
+- `useSettingsState.clearDatabase()` : ne vidait pas `task_recurrences`/`task_exceptions` — désormais synchronisé avec le schéma Dexie réel.
+
 ## v5.21 — 2026-08-14
 
 Ménage de la racine du projet, sans modification de code applicatif.

@@ -22,7 +22,7 @@ const entries: SettingsEntry[] = [
   { label: 'Profil', description: 'Type de profil et informations', screen: 'settings-profile' },
   { label: 'Accessibilité', description: 'Taille texte, contraste, animations', screen: 'settings-accessibility' },
   { label: 'Confidentialité', description: 'Gestion des données et consentements', screen: 'settings-privacy' },
-  { label: 'Export', description: 'Exporter ou supprimer vos données', screen: 'settings-export' },
+  { label: 'Export et import', description: 'Exporter ou restaurer vos données', screen: 'settings-export' },
 ]
 
 export function E110Settings() {

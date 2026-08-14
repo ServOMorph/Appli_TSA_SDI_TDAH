@@ -15,7 +15,7 @@ import { useBudgetState } from '@/app/contexts/useBudgetState'
 import { useEnergyState } from '@/app/contexts/useEnergyState'
 import { useListsState } from '@/app/contexts/useListsState'
 import { useToolsState } from '@/app/contexts/useToolsState'
-import { useSettingsState } from '@/app/contexts/useSettingsState'
+import { useSettingsState, type ImportResult } from '@/app/contexts/useSettingsState'
 import { useTasksState } from '@/app/contexts/useTasksState'
 import { usePlanningState } from '@/app/contexts/usePlanningState'
 import { isOverloaded } from '@/domain/rules/energyRules'
@@ -41,6 +41,7 @@ type SessionValue = {
   completeOnboarding: () => Promise<void>
   deleteAllData: () => Promise<void>
   refreshDashboard: () => Promise<void>
+  importData: (raw: unknown) => Promise<ImportResult>
 }
 
 type AppContextValue = NavigationValue &
@@ -53,7 +54,7 @@ type AppContextValue = NavigationValue &
   Omit<ReturnType<typeof useBudgetState>, 'load' | 'reset'> &
   Omit<
     ReturnType<typeof useSettingsState>,
-    'load' | 'reset' | 'setCurrentUser' | 'setSettings' | 'clearDatabase' | 'completeOnboarding'
+    'load' | 'reset' | 'setCurrentUser' | 'setSettings' | 'clearDatabase' | 'completeOnboarding' | 'importData'
   >
 
 export const AppContext = createContext<AppContextValue | null>(null)
@@ -96,6 +97,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     clearDatabase,
     completeOnboarding: markOnboardingComplete,
     createUser: createUserAndSeedTools,
+    importData: importDataRaw,
     ...sessionValue
   } = session
 
@@ -152,6 +154,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (await markOnboardingComplete()) setStack([{ name: 'dashboard' }])
   }
 
+  async function importData(raw: unknown): Promise<ImportResult> {
+    const result = await importDataRaw(raw)
+    if (result.ok) {
+      await loadAll()
+      const entry = await energyRepo.getByDate(todayDate())
+      setStack([{ name: entry ? 'dashboard' : 'energy-checkin' }])
+    }
+    return result
+  }
+
   return (
     <AppContext.Provider
       value={{
@@ -168,6 +180,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         completeOnboarding,
         deleteAllData: wipeAllData,
         refreshDashboard: loadAll,
+        importData,
         ...tasksValue,
         ...planningValue,
         ...energyValue,

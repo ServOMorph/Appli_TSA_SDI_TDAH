@@ -18,6 +18,9 @@ e2e/test-results/
 .env.local
 .env.*.local
 
+# Données personnelles réelles (testeurs)
+donnees_marie/
+
 # Netlify CLI local state
 .netlify/
 

@@ -14,9 +14,9 @@ function renderE117(overrides = {}) {
 }
 
 describe('E117Export', () => {
-  it('affiche le titre Export des données', () => {
+  it('affiche le titre Export et import des données', () => {
     renderE117()
-    expect(screen.getByText('Export des données')).toBeInTheDocument()
+    expect(screen.getByText('Export et import des données')).toBeInTheDocument()
   })
 
   it('affiche le bouton Exporter en JSON', () => {
@@ -56,5 +56,54 @@ describe('E117Export', () => {
     renderE117({ goTo })
     fireEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(goTo).toHaveBeenCalledWith('settings')
+  })
+
+  function selectFile(content: string) {
+    const file = new File([content], 'export.json', { type: 'application/json' })
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    fireEvent.change(input, { target: { files: [file] } })
+  }
+
+  it('affiche la modal de confirmation après sélection d\'un fichier JSON valide', async () => {
+    renderE117()
+    selectFile('{"user":{"id":"u1","profile_type":"student"}}')
+    await vi.waitFor(() => {
+      expect(screen.getByText('Remplacer toutes les données ?')).toBeInTheDocument()
+    })
+  })
+
+  it('affiche une erreur si le fichier sélectionné n\'est pas un JSON valide', async () => {
+    renderE117()
+    selectFile('pas du json')
+    await vi.waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Fichier illisible : JSON invalide.')
+    })
+  })
+
+  it('appelle importData au clic Remplacer et ferme la modal en cas de succès', async () => {
+    const importData = vi.fn().mockResolvedValue({ ok: true })
+    renderE117({ importData })
+    selectFile('{"user":{"id":"u1","profile_type":"student"}}')
+    await vi.waitFor(() => screen.getByText('Remplacer toutes les données ?'))
+    await act(async () => {
+      fireEvent.click(screen.getByText('Remplacer'))
+    })
+    await vi.waitFor(() => {
+      expect(importData).toHaveBeenCalledWith({ user: { id: 'u1', profile_type: 'student' } })
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    })
+  })
+
+  it('affiche l\'erreur retournée par importData en cas d\'échec', async () => {
+    const importData = vi.fn().mockResolvedValue({ ok: false, error: 'Fichier invalide.' })
+    renderE117({ importData })
+    selectFile('{"user":{"id":"u1","profile_type":"student"}}')
+    await vi.waitFor(() => screen.getByText('Remplacer toutes les données ?'))
+    await act(async () => {
+      fireEvent.click(screen.getByText('Remplacer'))
+    })
+    await vi.waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Fichier invalide.')
+    })
   })
 })

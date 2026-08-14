@@ -24,7 +24,7 @@ describe('E110Settings', () => {
     expect(screen.getByText('Profil')).toBeInTheDocument()
     expect(screen.getByText('Accessibilité')).toBeInTheDocument()
     expect(screen.getByText('Confidentialité')).toBeInTheDocument()
-    expect(screen.getByText('Export')).toBeInTheDocument()
+    expect(screen.getByText('Export et import')).toBeInTheDocument()
   })
 
   it('navigue vers settings-profile au clic Profil', () => {

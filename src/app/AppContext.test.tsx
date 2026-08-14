@@ -474,15 +474,27 @@ describe('AppProvider — planification des sous-tâches (E9a)', () => {
 
 describe('AppProvider — settings et données', () => {
   function DataPanel() {
-    const { createUser, goTo, settings, updateSettings, exportData, deleteAllData, screen: s } = useApp()
+    const { createUser, goTo, settings, updateSettings, exportData, deleteAllData, importData, currentUser, screen: s } = useApp()
     return (
       <>
         <div data-testid="screen">{s}</div>
         <div data-testid="font-size">{settings?.font_size ?? 'none'}</div>
+        <div data-testid="user-id">{currentUser?.id ?? 'none'}</div>
         <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
         <button onClick={() => updateSettings({ font_size: 'large' })}>changer font</button>
         <button onClick={() => exportData()}>exporter</button>
         <button onClick={() => deleteAllData()}>supprimer tout</button>
+        <button
+          onClick={() =>
+            importData({
+              user: { id: 'imported-user', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+              tasks: [],
+            })
+          }
+        >
+          importer valide
+        </button>
+        <button onClick={() => importData({ not_a_user: true })}>importer invalide</button>
       </>
     )
   }
@@ -519,6 +531,31 @@ describe('AppProvider — settings et données', () => {
       await userEvent.click(screen.getByRole('button', { name: 'supprimer tout' }))
     })
     await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('welcome'))
+  })
+
+  it('importData remplace les données et bascule vers energy-checkin', async () => {
+    render(<AppProvider><DataPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'importer valide' }))
+    })
+    await waitFor(() => {
+      expect(screen.getByTestId('user-id').textContent).toBe('imported-user')
+      expect(screen.getByTestId('screen').textContent).toBe('energy-checkin')
+    })
+  })
+
+  it('importData rejette un fichier sans profil utilisateur sans toucher aux données actuelles', async () => {
+    render(<AppProvider><DataPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    const userIdBefore = screen.getByTestId('user-id').textContent
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'importer invalide' }))
+    })
+    expect(screen.getByTestId('screen').textContent).toBe('dashboard')
+    expect(screen.getByTestId('user-id').textContent).toBe(userIdBefore)
   })
 })
 

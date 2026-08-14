@@ -27,3 +27,11 @@ Signalé par Marie le 2026-08-13 (vidéo) : à l'ouverture du clavier sur « Ajo
 1. Ouvrir une liste, taper « Ajouter un élément » sur mobile.
 2. Vérifier que le formulaire (champs Élément/Rubrique, boutons Ajouter/Annuler) reste entièrement visible et cliquable dès l'ouverture du clavier, sans superposition de la barre de nav.
 
+## 5 — Import d'une sauvegarde JSON (E117)
+
+1. Depuis Paramètres > Export et import, taper « Importer un fichier JSON » et sélectionner `donnees_marie/export-audhd-2026-08-13.json`.
+2. Vérifier l'affichage de la modale « Remplacer toutes les données ? », confirmer.
+3. Vérifier que l'appli bascule sur l'écran attendu (énergie du jour ou accueil) avec le profil importé.
+4. Vérifier que la liste « À acheter » (32 éléments) et la liste « To Do » réapparaissent dans les Outils, chacune ouvrable normalement (entrée `tools` reconstruite pour l'ancien format v3.0 sans `tools`).
+5. Vérifier tâches (dont sous-tâches de « Routine soir »), budget (catégories, dépenses, livret « Livret Jeune » avec son dépôt) et énergie des deux jours.
+

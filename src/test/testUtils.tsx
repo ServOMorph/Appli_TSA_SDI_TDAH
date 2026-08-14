@@ -26,6 +26,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     overloadMode: false,
     updateSettings: vi.fn().mockResolvedValue(undefined),
     exportData: vi.fn().mockResolvedValue(undefined),
+    importData: vi.fn().mockResolvedValue({ ok: true }),
     deleteAllData: vi.fn().mockResolvedValue(undefined),
     selectedTaskId: null,
     selectTask: vi.fn(),

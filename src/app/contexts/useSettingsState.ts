@@ -4,6 +4,20 @@ import { createList } from '@/domain/rules/listRules'
 import { createTool } from '@/domain/rules/toolRules'
 import type { Settings } from '@/domain/entities/settings'
 import type { User, ProfileType } from '@/domain/entities/user'
+import type { Task } from '@/domain/entities/task'
+import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
+import type { TaskException } from '@/domain/entities/taskException'
+import type { List } from '@/domain/entities/list'
+import type { ListItem } from '@/domain/entities/listItem'
+import type { Folder } from '@/domain/entities/folder'
+import type { Tool } from '@/domain/entities/tool'
+import type { EnergyEntry } from '@/domain/entities/energyEntry'
+import type { BudgetCategory } from '@/domain/entities/budgetCategory'
+import type { BudgetEntry } from '@/domain/entities/budgetEntry'
+import type { BudgetAccount } from '@/domain/entities/budgetAccount'
+import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+
+export type ImportResult = { ok: true } | { ok: false; error: string }
 
 export function useSettingsState() {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -74,11 +88,30 @@ export function useSettingsState() {
 
   async function exportData() {
     if (!currentUser) return
-    const [user, tasks, lists, listItems, energyEntries, settingsData, categories, entries, accounts, deposits] = await Promise.all([
+    const [
+      user,
+      tasks,
+      taskRecurrences,
+      taskExceptions,
+      lists,
+      listItems,
+      folders,
+      tools,
+      energyEntries,
+      settingsData,
+      categories,
+      entries,
+      accounts,
+      deposits,
+    ] = await Promise.all([
       userRepo.getFirst(),
       db.tasks.toArray(),
+      db.taskRecurrences.toArray(),
+      db.taskExceptions.toArray(),
       db.lists.toArray(),
       db.listItems.toArray(),
+      db.folders.toArray(),
+      db.tools.toArray(),
       db.energyEntries.toArray(),
       settingsRepo.getByUserId(currentUser.id),
       db.budgetCategories.toArray(),
@@ -88,11 +121,15 @@ export function useSettingsState() {
     ])
     const payload = {
       export_date: new Date().toISOString(),
-      version: '3.0',
+      version: '3.1',
       user,
       tasks,
+      task_recurrences: taskRecurrences,
+      task_exceptions: taskExceptions,
       lists,
       list_items: listItems,
+      folders,
+      tools,
       energy_entries: energyEntries,
       settings: settingsData,
       budget_categories: categories,
@@ -123,7 +160,87 @@ export function useSettingsState() {
       db.budgetDeposits.clear(),
       db.folders.clear(),
       db.tools.clear(),
+      db.taskRecurrences.clear(),
+      db.taskExceptions.clear(),
     ])
+  }
+
+  /**
+   * Restaure intégralement les données à partir d'un export JSON : remplace tout le contenu
+   * de la base (§clearDatabase) par le contenu du fichier. Accepte les exports v3.0 (avant
+   * l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export) en recréant
+   * l'entrée Outil manquante pour chaque liste qui n'en a pas.
+   */
+  async function importData(raw: unknown): Promise<ImportResult> {
+    if (typeof raw !== 'object' || raw === null) {
+      return { ok: false, error: 'Fichier invalide : JSON attendu.' }
+    }
+    const data = raw as Record<string, unknown>
+    const importedUser = data.user
+    if (
+      !importedUser ||
+      typeof importedUser !== 'object' ||
+      typeof (importedUser as User).id !== 'string' ||
+      typeof (importedUser as User).profile_type !== 'string'
+    ) {
+      return { ok: false, error: 'Fichier invalide : profil utilisateur manquant ou incomplet.' }
+    }
+    const user = importedUser as User
+    const tasks = Array.isArray(data.tasks) ? (data.tasks as Task[]) : []
+    const taskRecurrences = Array.isArray(data.task_recurrences) ? (data.task_recurrences as TaskRecurrence[]) : []
+    const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
+    const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
+    const listItems = Array.isArray(data.list_items) ? (data.list_items as ListItem[]) : []
+    const folders = Array.isArray(data.folders) ? (data.folders as Folder[]) : []
+    const tools = Array.isArray(data.tools) ? (data.tools as Tool[]) : []
+    const energyEntries = Array.isArray(data.energy_entries) ? (data.energy_entries as EnergyEntry[]) : []
+    const categories = Array.isArray(data.budget_categories) ? (data.budget_categories as BudgetCategory[]) : []
+    const entries = Array.isArray(data.budget_entries) ? (data.budget_entries as BudgetEntry[]) : []
+    const accounts = Array.isArray(data.budget_accounts) ? (data.budget_accounts as BudgetAccount[]) : []
+    const deposits = Array.isArray(data.budget_deposits) ? (data.budget_deposits as BudgetDeposit[]) : []
+
+    const importedSettings = data.settings
+    const now = new Date().toISOString()
+    const settingsData: Settings =
+      importedSettings && typeof importedSettings === 'object' && typeof (importedSettings as Settings).id === 'string'
+        ? (importedSettings as Settings)
+        : { id: newId(), user_id: user.id, dark_mode: false, font_size: 'medium', reduced_motion: false }
+
+    const repairedTools = [...tools]
+    let nextPosition = repairedTools.length
+    for (const list of lists) {
+      const hasTool = repairedTools.some((t) => t.type === 'liste' && t.list_id === list.id)
+      if (!hasTool) {
+        repairedTools.push(createTool(newId(), 'liste', null, list.id, nextPosition, now))
+        nextPosition += 1
+      }
+    }
+
+    try {
+      await clearDatabase()
+      await db.users.add(user)
+      await Promise.all([
+        tasks.length ? db.tasks.bulkAdd(tasks) : Promise.resolve(),
+        taskRecurrences.length ? db.taskRecurrences.bulkAdd(taskRecurrences) : Promise.resolve(),
+        taskExceptions.length ? db.taskExceptions.bulkAdd(taskExceptions) : Promise.resolve(),
+        lists.length ? db.lists.bulkAdd(lists) : Promise.resolve(),
+        listItems.length ? db.listItems.bulkAdd(listItems) : Promise.resolve(),
+        folders.length ? db.folders.bulkAdd(folders) : Promise.resolve(),
+        repairedTools.length ? db.tools.bulkAdd(repairedTools) : Promise.resolve(),
+        energyEntries.length ? db.energyEntries.bulkAdd(energyEntries) : Promise.resolve(),
+        db.settings.add(settingsData),
+        categories.length ? db.budgetCategories.bulkAdd(categories) : Promise.resolve(),
+        entries.length ? db.budgetEntries.bulkAdd(entries) : Promise.resolve(),
+        accounts.length ? db.budgetAccounts.bulkAdd(accounts) : Promise.resolve(),
+        deposits.length ? db.budgetDeposits.bulkAdd(deposits) : Promise.resolve(),
+      ])
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Échec de l\'import.' }
+    }
+
+    setCurrentUser(user)
+    setSettings(settingsData)
+    return { ok: true }
   }
 
   async function completeOnboarding(): Promise<boolean> {
@@ -142,6 +259,7 @@ export function useSettingsState() {
     createUser,
     updateSettings,
     exportData,
+    importData,
     clearDatabase,
     completeOnboarding,
     reset,

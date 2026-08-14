@@ -10,8 +10,8 @@
 - Bug « Budget disparu à l'import » : cause identifiée et corrigée dans `useSettingsState.ts` — la réparation des `tools` à l'import ne recréait que les entrées `liste` manquantes, jamais l'entrée globale `tableau_comptage` (celle qui pilote la carte Budget de `E70Tools.tsx`). Un compte qui en était déjà dépourvu (cas de Marie) ne la récupérait donc jamais. Corrigé : la réparation couvre maintenant aussi cette entrée.
 
 ## Questions ouvertes
-- [P1] Valider les 6 points de `tests_manuels.md` (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, badge énergie fond couleur d'ambiance, import de sauvegarde JSON) sur appareil réel, puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase, le badge énergie et l'import sont hors périmètre de V5.1-0). — fait quand : les 6 points validés, `tests_manuels.md` vidé — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
-- [P1] Une fois ce déploiement effectif, redemander à Marie de réimporter son fichier (Paramètres > Export et import — bannière urgente déjà en place) et de revalider dans « Tests à faire » les 4 tests en échec de son export du 17h40 : « Retirer de l'argent d'un livret », « Utiliser le budget », « Importer une sauvegarde » (tous les trois « pas accès au budget » / « il manque le budget », cause commune corrigée) et confirmer la réapparition du Budget. — fait quand : ces 4 tests validés dans un nouvel export ingéré — réf : `_contexte/marie_tests_journal.json`, `useSettingsState.ts`
+- [P1] L'utilisateur va valider lui-même les 6 points de `tests_manuels.md` (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, badge énergie fond couleur d'ambiance, import de sauvegarde JSON) sur appareil réel avant de relancer `/deploy` (v5.33, déjà vérifié : `CHANGELOG.md` cohérent, 547/547 tests, `tsc -b`/lint clean — build jamais lancé, `dist/v5.33` n'existe pas). Puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase). — fait quand : les 6 points validés, `tests_manuels.md` vidé, v5.33 déployée — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
+- [P1] Une fois v5.33 déployée, redemander à Marie de réimporter son fichier (Paramètres > Export et import — bannière urgente déjà en place) et de revalider dans « Tests à faire » les 4 tests en échec de son export du 2026-08-14 17h40 : « Retirer de l'argent d'un livret », « Utiliser le budget », « Importer une sauvegarde » (tous les trois « pas accès au budget » / « il manque le budget », cause commune déjà corrigée) et confirmer la réapparition du Budget. — fait quand : ces 4 tests validés dans un nouvel export ingéré — réf : `_contexte/marie_tests_journal.json`, `useSettingsState.ts`
 - [P1] Informer Marie que l'adresse de test a changé : `delightful-sunflower-836720.netlify.app` (qu'elle a utilisée) n'est plus à jour, le site officiel est désormais `https://appli-audhd.netlify.app` (déployé en v5.22). — fait quand : nouvelle adresse communiquée à Marie — réf : `.claude/commands/deploy.md`, `_contexte/dernier_deploiement.md`
 - [P1] Communiquer à Marie les points de `a_communiquer_v5.md` maintenant que la V5.0 complète est livrée (V5-0 à V5-3 close), puis recueillir son retour sur les 3 écarts assumés et sur la priorité « Comptage en premier » parmi les outils reportés. — fait quand : retour de Marie recueilli après livraison — réf : `a_communiquer_v5.md`
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `roadmap_v5.1.md` § Q à trancher
@@ -19,7 +19,28 @@
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-14 — suite 12, correctif Budget, bannières et modale Nouveautés dynamiques, Phase 3 tests Marie close)
+## Dernière session (2026-08-14 — suite 13, déploiement v5.33 reporté à la demande de l'utilisateur)
+
+## Décisions prises
+- Déploiement de v5.33 (correctif Budget) reporté : l'utilisateur préfère valider lui-même les 6 points de `tests_manuels.md` avant de relancer `/deploy`. Toutes les vérifications bloquantes de l'étape 2 étaient déjà passées (tests, `tsc -b`, lint, cohérence CHANGELOG) ; seul l'avertissement 3.4 (tests manuels en attente) restait à trancher.
+- Export du 2026-08-14 17h40 reconfirmé comme dernier export disponible de Marie (ré-ingestion idempotente : 0 nouvelle entrée, 7 déjà présentes) — ses 4 tests en échec (Budget) restent à traiter en communication avec elle une fois v5.33 déployée.
+
+## Livrables produits ou modifiés
+- `_contexte/signals.md` : mise à jour des questions ouvertes (séquence attendue : validation manuelle utilisateur -> `/deploy` -> retour à Marie).
+- Aucun fichier de code applicatif modifié cette session.
+
+## Hypothèses validées / invalidées
+- VALIDE : `dist/v5.33` n'a jamais été construit (déploiement arrêté avant l'étape de build) — rien à annuler côté build.
+
+## Prochaine étape exacte
+Attendre que l'utilisateur valide les 6 points de `tests_manuels.md`, puis relancer `/deploy` (version v5.33 déjà prête). Une fois déployée, redemander à Marie de réimporter et revalider ses 4 tests en échec.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-14 — suite 12, correctif Budget, bannières et modale Nouveautés dynamiques, Phase 3 tests Marie close)
 
 ## Décisions prises
 - Cause du bug « Budget disparu à l'import » identifiée par lecture de code et confirmée par les retours de Marie, puis corrigée : `useSettingsState.ts` recrée désormais aussi l'entrée `tableau_comptage` manquante à l'import, en plus des entrées `liste`.
@@ -43,30 +64,6 @@
 
 ## Prochaine étape exacte
 Terminer le déploiement en cours, puis redemander à Marie de réimporter et revalider les 4 tests en échec (Budget).
-
-## Question bloquante pour la session suivante
-Aucune.
-
----
-
-## Dernière session archivée (2026-08-14 — suite 11, badge énergie couleur d'ambiance, déploiement v5.31)
-
-## Décisions prises
-- Retour de test manuel de Marie (screenshot annoté) traité : badge énergie de la barre du haut allégé (retrait du libellé texte) et fond teinté avec la couleur d'ambiance existante (`Settings.ambiance_color`), après clarification avec l'utilisateur que le rose du screen était cette couleur paramétrable, pas une couleur fixe à coder en dur. `/deploy` exécuté jusqu'au bout après confirmation explicite de l'utilisateur malgré `tests_manuels.md` non vide (6 points).
-
-## Livrables produits ou modifiés
-- `src/ui/components/EnergyDisplay.tsx` : retrait du texte « planifié / dispo », fond via `pastelBackground(ambianceColor)`.
-- `src/ui/components/TopBar.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx` : prop `ambianceColor` propagée depuis `settings.ambiance_color`.
-- `tests_manuels.md` : point 5 ajouté (vérification visuelle du badge énergie).
-- `dist/v5.31` : build déployé en prod, `_contexte/dernier_deploiement.md` mis à jour.
-
-## Hypothèses validées / invalidées
-- INVALIDE : première implémentation avec une couleur rose codée en dur (`--color-energy-bg`) -> pivot vers la couleur d'ambiance existante déjà utilisée pour teinter les tâches planifiées (`ambiance.ts`), sur correction explicite de l'utilisateur.
-- VALIDE : déploiement v5.31 effectif, HTTP 200 vérifié.
-- EN ATTENTE : connecteur MCP Google Drive confirmé actif mais avec des scopes d'authentification insuffisants pour lire le contenu d'un Google Doc ; aucun outil du connecteur ne permet d'écrire dans le corps d'un Doc existant, quel que soit le scope.
-
-## Prochaine étape exacte
-Attendre validation manuelle des 6 points de `tests_manuels.md` sur appareil réel.
 
 ## Question bloquante pour la session suivante
 Aucune.

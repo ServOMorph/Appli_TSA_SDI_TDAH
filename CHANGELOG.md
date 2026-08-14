@@ -1,3 +1,15 @@
+## v5.24 — 2026-08-14
+
+Modale « Nouveautés » sur l'écran d'accueil, site de test Netlify dédié, `/close` intégré aux commandes de déploiement.
+
+### Ajouté
+- `WhatsNewModal.tsx` : liste des nouveautés simples affichée sur l'image de l'écran d'accueil (`E01Welcome.tsx`), fond semi-transparent laissant l'image visible, fermable. Contenu maintenu à la main, limité pour l'instant au delta entre la dist prod v5.20 et v5.22 (import/export de sauvegarde).
+- `/deploy_dev` : nouvelle commande, build et déploiement de l'état courant du code sur un site Netlify de test dédié (`appli-audhd-dev.netlify.app`, distinct de la prod), pour tester sur un appareil hors réseau local. `NETLIFY_SITE_ID_DEV` ajouté à `.env`/`.env.example`.
+- `/deploy` et `/deploy_dev` exécutent désormais `/close` en étape 0 — le code déployé (prod ou test) est systématiquement clôturé et commité avant build.
+
+### Corrigé
+- `a_communiquer_v5.md` : caractère parasite ajouté accidentellement en tête du titre, restauré.
+
 ## v5.23 — 2026-08-14
 
 Durcissement de `/deploy` après un premier déploiement réel sous les nouvelles vérifications (v5.22), et mise à jour de la documentation de session.

@@ -2,12 +2,17 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*)
 ---
 
 # /deploy [version]
 
 ## Procédure
+
+0. Exécuter intégralement `/close` (sans argument — zone implicite : dossier courant) avant de
+   poursuivre. Le code à déployer doit être clôturé et commité, pas laissé en session ouverte.
+   Si `/close` signale des résidus non commités à son étape 12, les traiter comme un échec de
+   l'étape 2.1 ci-dessous plutôt que de continuer.
 
 1. Déterminer la version.
    - Si $ARGUMENTS est fourni (ex: `v5.19`) : l'utiliser.

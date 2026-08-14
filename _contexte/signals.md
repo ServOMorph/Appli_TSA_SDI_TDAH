@@ -2,9 +2,10 @@
 
 ## Contexte chaud
 - `donnees_marie/export-audhd-2026-08-13.json` : export réel de Marie, stocké en local, gitignoré et déclaré donnée sensible dans `CLAUDE.md` — ne pas lire/écrire sans instruction explicite.
-- `_contexte/dernier_deploiement.md` créé : `/deploy` y consigne désormais lui-même version/date/URL du dernier déploiement, indépendamment de `/close`. Avant l'exécution de `/deploy` demandée en fin de cette session : v5.22, 2026-08-14, `https://appli-audhd.netlify.app`.
+- `_contexte/dernier_deploiement.md` : consigné par `/deploy` lui-même (version/date/URL), indépendamment de `/close`. Dernier déploiement prod : v5.24, 2026-08-14, `https://appli-audhd.netlify.app`.
 - `src/ui/screens/onboarding/E01Welcome.tsx` : liste `WHATS_NEW` codée en dur, à mettre à jour manuellement à chaque nouvelle dist prod (pas d'automatisation depuis `/deploy` pour l'instant).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`, pour tester hors réseau local sans toucher la prod.
+- Panneau dev (haut à droite, visible uniquement en `npm run dev`) affiche désormais la version courante, lue automatiquement dans `CHANGELOG.md` au build (`__APP_DEV_VERSION__`, `vite.config.ts`) — se met à jour seule à chaque bump de version, rien à maintenir à la main.
 
 ## Questions ouvertes
 - [P1] Valider les 5 points de `tests_manuels.md` (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, import de sauvegarde JSON) sur appareil réel, puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase, le 5ᵉ — import — est hors périmètre de V5.1-0). — fait quand : les 5 points validés, `tests_manuels.md` vidé — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
@@ -16,28 +17,27 @@
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-14, suite 4 — modale Nouveautés, site de test dev, /close intégré aux déploiements)
+## Dernière session (2026-08-14, suite 5 — version dev affichée en permanence, déploiement v5.24)
 
 ## Décisions prises
-- Modale « Nouveautés » sur l'écran d'accueil : contenu limité au delta réel entre la dernière dist prod précédente (v5.20) et l'actuelle (v5.22), plutôt qu'au dernier vrai test de Marie (plus large mais moins objectif) — tranché avec l'utilisateur.
-- Tentative de couper l'image d'accueil en deux annulée sur demande explicite ; retour à l'image entière.
-- `/deploy` et `/deploy_dev` exécutent désormais `/close` en étape 0 — décision explicite de l'utilisateur.
+- Version affichée en permanence dans le panneau dev (haut à droite), lue automatiquement depuis `CHANGELOG.md` au build plutôt que codée en dur ou dépendante de `VITE_APP_VERSION` (réservée au bouton d'accueil en prod).
+- `/deploy` exécuté jusqu'au bout malgré les 5 points de `tests_manuels.md` non validés — confirmé explicitement par l'utilisateur.
 
 ## Livrables produits ou modifiés
-- `src/ui/components/WhatsNewModal.tsx` (nouveau) : overlay sur l'image, opacité réduite, liste alignée à gauche, fermable.
-- `src/ui/screens/onboarding/E01Welcome.tsx` : modale intégrée, contenu réel (import de sauvegarde, export complet).
-- `.claude/commands/deploy_dev.md` (nouveau) : build + déploiement sur `appli-audhd-dev.netlify.app`, sans version ni check bloquant lourd, `/close` en étape 0.
-- `.claude/commands/deploy.md` : étape 0 `/close` ajoutée, permissions `git add`/`commit`/`push`/`diff` fusionnées.
-- `.env`/`.env.example` : `NETLIFY_SITE_ID_DEV` ajouté (site déjà existant sur le compte Netlify).
-- `a_communiquer_v5.md` : restauré après corruption accidentelle d'un caractère (non liée à cette session).
-- Déploiement de test effectué sur `appli-audhd-dev.netlify.app`, vérifié HTTP 200.
-- Tests existants de `E01Welcome` toujours verts (3/3), `tsc -b` clean. Aucun test unitaire nouveau (composants UI simples).
+- `vite.config.ts` : lit `CHANGELOG.md`, injecte `__APP_DEV_VERSION__` (fonctionne en dev et en build).
+- `vitest.config.ts` : même define (`'test'`) pour ne pas casser `App.test.tsx` qui monte l'app entière.
+- `src/vite-env.d.ts` (nouveau) : déclaration de type de `__APP_DEV_VERSION__`.
+- `src/ui/components/DevResetButton.tsx` : version affichée au-dessus de « Reset DB ».
+- `@types/node` ajouté en devDependency (absent du projet, nécessaire pour lire `CHANGELOG.md` dans `vite.config.ts`), `tsconfig.node.json` : `types: ["node"]`.
+- Déploiement prod v5.24 effectué et vérifié (build `dist/v5.24`, HTTP 200) avant l'ajout de la version dev (donc v5.24 ne l'affiche pas encore, seul le prochain déploiement l'embarquera).
+- Vérifié visuellement (capture d'écran via un script Playwright temporaire sur le serveur dev, supprimé après usage).
+- 533/533 tests unitaires, `tsc -b`/lint clean.
 
 ## Hypothèses validées / invalidées
-- VALIDE : le site Netlify `appli-audhd-dev` existait déjà sur le compte (`netlify sites:list`) — pas de création nécessaire, juste son ID à brancher.
+- VALIDE : `@types/node` n'était pas installé dans le projet — requis pour `readFileSync`/`fileURLToPath` dans `vite.config.ts`.
 
 ## Prochaine étape exacte
-`/deploy` en cours d'exécution (demandé par l'utilisateur juste après cette clôture) : build versionné + déploiement prod sur `appli-audhd.netlify.app`.
+Valider les 5 points de `tests_manuels.md` sur appareil réel, puis clore la Phase V5.1-0. Informer Marie du changement d'adresse et lui transmettre `a_communiquer_v5.md` + demande de test du Budget.
 
 ## Question bloquante pour la session suivante
 Aucune.

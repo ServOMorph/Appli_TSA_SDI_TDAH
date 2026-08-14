@@ -64,6 +64,19 @@ export function DevResetButton() {
         gap: '4px',
       }}
     >
+      <span
+        style={{
+          fontSize: '0.7rem',
+          fontWeight: 700,
+          color: '#374151',
+          background: 'rgba(0,0,0,0.08)',
+          borderRadius: '3px',
+          padding: '1px 6px',
+          fontFamily: 'monospace',
+        }}
+      >
+        {__APP_DEV_VERSION__}
+      </span>
       <button
         onClick={handleReset}
         style={{

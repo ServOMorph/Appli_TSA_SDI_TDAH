@@ -1,8 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+
+function currentChangelogVersion(): string {
+  const changelogPath = fileURLToPath(new URL('./CHANGELOG.md', import.meta.url))
+  const match = readFileSync(changelogPath, 'utf-8').match(/^## (v\S+)/m)
+  return match ? match[1] : 'dev'
+}
 
 export default defineConfig({
+  define: {
+    __APP_DEV_VERSION__: JSON.stringify(currentChangelogVersion()),
+  },
   plugins: [
     react(),
     VitePWA({

@@ -1,3 +1,14 @@
+## v5.25 — 2026-08-14
+
+Déploiement v5.24 en prod, puis version courante affichée en permanence dans le panneau dev.
+
+### Ajouté
+- Panneau dev (haut à droite, `npm run dev` uniquement) : version courante affichée en permanence, lue automatiquement dans `CHANGELOG.md` au build (`__APP_DEV_VERSION__`, `vite.config.ts`) — se met à jour seule à chaque bump de version.
+- `@types/node` ajouté en devDependency, nécessaire pour lire `CHANGELOG.md` dans `vite.config.ts` (`tsconfig.node.json` : `types: ["node"]`).
+
+### Déployé
+- v5.24 build `dist/v5.24`, prod `https://appli-audhd.netlify.app`, vérifié HTTP 200 — déployé après confirmation explicite malgré les 5 points de `tests_manuels.md` non validés.
+
 ## v5.24 — 2026-08-14
 
 Modale « Nouveautés » sur l'écran d'accueil, site de test Netlify dédié, `/close` intégré aux commandes de déploiement.

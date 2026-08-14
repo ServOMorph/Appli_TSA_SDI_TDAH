@@ -50,14 +50,14 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Archivage côté projet [EN COURS]
+## Phase 3 — Archivage côté projet [FAIT]
 
 - [x] `T10` — script `scripts/ingest_manual_tests.py` : prend en argument un export JSON reçu de Marie, en extrait `manual_test_results`, fusionne dans un journal versionné du repo (dédoublonnage par `id`, jamais d'écrasement d'une entrée existante). Testé avec un export factice hors dépôt (ajout puis re-exécution idempotente vérifiés).
 - [x] `T11` — format tranché avec l'utilisateur : JSON structuré (`{ "entries": [...] }`, entrées = objets `ManualTestResult` tels quels), emplacement `_contexte/marie_tests_journal.json` (hors `donnees_marie/`, qui reste réservé aux exports bruts sensibles).
 - [x] `T12` — rappel ajouté à `_contexte/signals.md` du flux : réception d'un export de Marie → `python scripts/ingest_manual_tests.py <export>` → journal projet à jour.
-- [ ] Test manuel : ingestion d'un export réel de Marie, vérification du journal.
+- [x] Test manuel : ingestion réelle réussie le 2026-08-14 (export du soir, 17h40) — 7 résultats fusionnés dans `_contexte/marie_tests_journal.json`, dédoublonnage vérifié sur un deuxième export vide reçu plus tôt le même jour.
 
-Gate : [x] script fonctionnel (vérifié avec un export factice) · [ ] test manuel (ingestion réelle d'un export de Marie) · [x] doc (`signals.md`) · [ ] sortie — l'historique des tests de Marie survit à un remplacement total de sa base locale, la référence est le journal du repo.
+Gate : [x] script fonctionnel (vérifié avec un export factice) · [x] test manuel (ingestion réelle d'un export de Marie) · [x] doc (`signals.md`) · [x] sortie — l'historique des tests de Marie survit à un remplacement total de sa base locale, la référence est le journal du repo.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

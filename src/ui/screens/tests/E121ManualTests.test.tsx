@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 import { E121ManualTests } from './E121ManualTests'
+
+afterEach(() => {
+  localStorage.clear()
+})
 
 describe('E121ManualTests', () => {
   it('affiche les tests nouveaux avec une pastille rouge', () => {
@@ -60,5 +64,14 @@ describe('E121ManualTests', () => {
     expect(screen.getByRole('heading', { name: 'Historique' })).toBeInTheDocument()
     expect(screen.getByText('Le bouton est absent.')).toBeInTheDocument()
     expect(within(screen.getByRole('region', { name: 'Historique du test' })).getByText('Validé')).toBeInTheDocument()
+  })
+
+  it('masque la bannière urgente au clic sur Fait, de façon persistante', () => {
+    const { unmount } = renderWithApp(<E121ManualTests />)
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Fait' }))
+    unmount()
+    renderWithApp(<E121ManualTests />)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 })

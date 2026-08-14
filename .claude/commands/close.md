@@ -134,4 +134,11 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 <!-- Convention : toute règle liée à une étape précise de la Procédure ci-dessus doit la
      référencer explicitement par son numéro (ex: "Étape 6 : ..."), plutôt que compter sur la
      position physique de cette zone (toujours en fin de fichier). -->
+
+Étape 6 : si la session a introduit un changement visible pour Marie (nouvelle fonctionnalité,
+écran, comportement modifié — pas un correctif interne ni un refacto), ajouter une entrée en
+langage clair et sans jargon technique au tableau `WHATS_NEW` de
+`src/ui/screens/onboarding/E01Welcome.tsx`. Ajout uniquement, ne jamais réécrire ni supprimer les
+entrées existantes : le tableau accumule les changements depuis le dernier déploiement, la modale
+Nouveautés de l'écran d'accueil s'appuyant dessus pour la version publiée par `/deploy`.
 <!-- SPECIFICITES PROJET : FIN -->

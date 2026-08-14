@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { db, manualTestResultRepo } from '@/app/repositories'
+import { db, manualTestResultRepo, toolRepo } from '@/app/repositories'
 import { useSettingsState } from './useSettingsState'
 
 function SettingsPanel() {
@@ -22,6 +22,17 @@ function SettingsPanel() {
         }
       >
         Importer
+      </button>
+      <button
+        onClick={() =>
+          importData({
+            user: { id: 'imported-user', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+            tools: [{ id: 'tool-liste-1', type: 'liste', folder_id: null, list_id: 'list-1', position: 0, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' }],
+            lists: [{ id: 'list-1', name: 'Courses', created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' }],
+          })
+        }
+      >
+        Importer sans outil Budget
       </button>
     </>
   )
@@ -70,5 +81,16 @@ describe('useSettingsState — résultats des tests manuels', () => {
     })
     clickSpy.mockRestore()
     vi.unstubAllGlobals()
+  })
+
+  it('recrée l’entrée Outil Budget manquante à l’import', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer sans outil Budget' }))
+    })
+    await waitFor(async () => {
+      const tools = await toolRepo.getAll()
+      expect(tools.some((t) => t.type === 'tableau_comptage')).toBe(true)
+    })
   })
 })

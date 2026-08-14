@@ -1,3 +1,12 @@
+## v5.33 — 2026-08-14
+
+### Corrigé
+- Bug « Budget disparu à l'import » : l'entrée Outil Budget (`tableau_comptage`) manquante à l'import n'était jamais recréée, contrairement aux entrées de listes. Corrigé (`useSettingsState.ts`).
+
+### Modifié
+- Bannières urgentes (accueil, « Tests à faire ») : message adapté (demande de réimportation pour réparer le Budget), bouton « Fait » pour les masquer durablement.
+- Modale Nouveautés de l'accueil : ne se réaffiche plus une fois fermée pour une version donnée.
+
 ## v5.32 — 2026-08-14
 
 ### Modifié

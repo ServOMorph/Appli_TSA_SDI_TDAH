@@ -84,6 +84,11 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    Mettre à jour `_contexte/dernier_deploiement.md` (le créer s'il n'existe pas) avec la version, la date et
    l'URL de production déployées, pour que cette information reste à jour indépendamment de `/close`.
 
+   Vider intégralement le tableau `WHATS_NEW` de `src/ui/screens/onboarding/E01Welcome.tsx` (`[]`) : son
+   contenu vient d'être publié dans cette version et la modale Nouveautés de l'écran d'accueil ne doit pas
+   le réafficher aux versions suivantes. Committer ce vidage séparément après le déploiement (le build
+   `dist/<version>` a déjà embarqué le contenu avant le vidage).
+
 8. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par la commande Netlify,
    résultat de la vérification de fumée, et l'avertissement de taille de chunk le cas échéant.
    Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et attendre une nouvelle

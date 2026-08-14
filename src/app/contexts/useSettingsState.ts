@@ -174,8 +174,9 @@ export function useSettingsState() {
    * Restaure intégralement les données à partir d'un export JSON : remplace tout le contenu
    * de la base (§clearDatabase) par le contenu du fichier. Accepte les exports v3.0 (avant
    * l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export) en recréant
-   * l'entrée Outil manquante pour chaque liste qui n'en a pas. Les exports plus anciens
-   * sans résultats de tests manuels sont acceptés avec un historique vide.
+   * l'entrée Outil manquante pour chaque liste qui n'en a pas, ainsi que l'entrée Outil Budget
+   * (`tableau_comptage`) si elle est absente. Les exports plus anciens sans résultats de tests
+   * manuels sont acceptés avec un historique vide.
    */
   async function importData(raw: unknown): Promise<ImportResult> {
     if (typeof raw !== 'object' || raw === null) {
@@ -221,6 +222,11 @@ export function useSettingsState() {
         repairedTools.push(createTool(newId(), 'liste', null, list.id, nextPosition, now))
         nextPosition += 1
       }
+    }
+    const hasBudgetTool = repairedTools.some((t) => t.type === 'tableau_comptage')
+    if (!hasBudgetTool) {
+      repairedTools.push(createTool(newId(), 'tableau_comptage', null, null, nextPosition, now))
+      nextPosition += 1
     }
 
     try {

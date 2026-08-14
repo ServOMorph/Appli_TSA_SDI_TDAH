@@ -60,7 +60,9 @@ Modale « Nouveautés » et déploiement de test ajoutés hors phase (2026-08-14
 
 Déploiement v5.24 effectué (2026-08-14, suite 5), avertissements tests manuels confirmés. Version dev affichée en permanence ajoutée ensuite : le panneau dev (haut à droite, `npm run dev` uniquement) lit `CHANGELOG.md` au build et affiche la version courante sans intervention manuelle. 533/533 tests unitaires, `tsc -b`/lint clean.
 
-`roadmap_tests_marie.md` : phases 1 et 2 `[FAIT]` (2026-08-14). L’application fournit un catalogue de sept tests en langage clair pour Marie, accessible depuis une icône dédiée, avec pastilles « nouveau », validation commentée, historique append-only et export/import JSON v3.2 (15 tables). La phase 3 reste à réaliser : archivage versionné côté projet des résultats reçus.
+`roadmap_tests_marie.md` : phases 1 et 2 `[FAIT]` (2026-08-14). L’application fournit un catalogue de sept tests en langage clair pour Marie, accessible depuis une icône dédiée, avec pastilles « nouveau », validation commentée, historique append-only et export/import JSON v3.2 (15 tables).
+
+Phase 3 (2026-08-14, suite) `[EN COURS]` : script `scripts/ingest_manual_tests.py` et journal versionné `_contexte/marie_tests_journal.json` livrés (fusion par `manual_test_results`, dédoublonnage par `id`, jamais d'écrasement). Une bannière « URGENCE » sur l’écran d’accueil et l’écran « Tests à faire » invite Marie à exporter ses données après ce déploiement — reste le test manuel d’ingestion d’un export réel pour clore la phase.
 
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
 
@@ -101,7 +103,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Après le checkpoint `/compact` et une confirmation écrite, démarrer la phase 3 de `roadmap_tests_marie.md` (ingestion des exports de Marie dans un journal versionné). Les cinq validations techniques de `tests_manuels.md` et la communication à Marie restent ouvertes séparément.
+Obtenir un nouvel export de Marie après ce déploiement (bannière urgence sur l'accueil et « Tests à faire »), puis exécuter `python scripts/ingest_manual_tests.py <export>` pour clore le test manuel de la phase 3 de `roadmap_tests_marie.md`. Les cinq validations techniques de `tests_manuels.md` et la communication à Marie restent ouvertes séparément.
 
 ## Licence
 

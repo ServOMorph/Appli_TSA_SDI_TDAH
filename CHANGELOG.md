@@ -1,3 +1,12 @@
+## v5.29 — 2026-08-14
+
+### Ajouté
+- Phase 3 des tests manuels Marie : script `scripts/ingest_manual_tests.py` et journal versionné `_contexte/marie_tests_journal.json`, pour archiver côté projet les résultats reçus dans un export (fusion sans écrasement, dédoublonnage par `id`).
+- Bannière « URGENCE : importe tes données, vérifie-les, puis exporte-les et envoie-les-moi » sur l'écran d'accueil et l'écran « Tests à faire », pour obtenir un nouvel export de Marie après ce déploiement.
+
+### Modifié
+- `WHATS_NEW` de l'écran d'accueil : contenu périmé retiré, remplacé par l'annonce de la nouvelle icône « Tests à faire ».
+
 ## v5.28 — 2026-08-14
 
 ### Modifié

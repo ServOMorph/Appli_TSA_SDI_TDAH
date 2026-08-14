@@ -83,6 +83,19 @@ export function E121ManualTests() {
       >
         ← Retour
       </button>
+      <p
+        role="alert"
+        style={{
+          margin: 0,
+          padding: 'var(--spacing-sm)',
+          borderRadius: 'var(--radius-md)',
+          backgroundColor: 'var(--color-error)',
+          color: 'white',
+          fontWeight: 600,
+        }}
+      >
+        URGENCE : importe tes données, vérifie-les, puis exporte-les et envoie-les-moi.
+      </p>
       <div>
         <h1 style={{ margin: 0 }}>Tests à faire</h1>
         <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>

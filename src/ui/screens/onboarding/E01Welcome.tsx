@@ -4,8 +4,7 @@ import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
 const WHATS_NEW: string[] = [
-  'Import d\'une sauvegarde possible dans Réglages',
-  'L\'export contient maintenant toutes les données',
+  'Nouvelle icône « Tests à faire » en haut de l\'écran : des tests à réaliser et à valider',
 ]
 
 export function E01Welcome() {
@@ -29,6 +28,20 @@ export function E01Welcome() {
       }}
     >
       <h1 className="sr-only">Bienvenue</h1>
+      <p
+        role="alert"
+        style={{
+          margin: 0,
+          width: '100%',
+          padding: 'var(--spacing-sm)',
+          borderRadius: 'var(--radius-md)',
+          backgroundColor: 'var(--color-error)',
+          color: 'white',
+          fontWeight: 600,
+        }}
+      >
+        URGENCE : importe tes données, vérifie-les, puis exporte-les et envoie-les-moi.
+      </p>
       <div style={{ position: 'relative', width: '100%', flex: '1 1 auto', minHeight: 0 }}>
         <img
           src="/images/welcome-hero.png"

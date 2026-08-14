@@ -29,7 +29,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(10)
+    expect(db.verno).toBe(11)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -209,7 +209,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(10)
+    expect(upgraded.verno).toBe(11)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -293,7 +293,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(10)
+    expect(upgraded.verno).toBe(11)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -332,7 +332,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(10)
+    expect(upgraded.verno).toBe(11)
     expect(await upgraded.listItems.get('existing-item')).toMatchObject({ checked: false, section: null })
 
     const lists = await upgraded.lists.toArray()

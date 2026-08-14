@@ -13,36 +13,37 @@ Origine : demande utilisateur du 2026-08-14 — ajouter une icône dans le bande
 - **A2** — L'import JSON existant (E117) fait un remplacement total de la base ; l'historique des tests ne peut donc pas reposer uniquement sur l'IndexedDB de Marie sans risque de perte. Archive de référence côté projet, alimentée par un script d'ingestion exécuté manuellement à chaque réception d'un export de Marie.
 - **A3** — Système distinct de `tests_manuels.md` : celui-ci reste la file d'attente technique de nos propres validations manuelles de dev, inchangée. Le nouveau catalogue est un contenu séparé, en langage clair, alimenté par nous en parallèle quand un test doit être soumis à Marie.
 - **A4** — Un test est « nouveau » (jamais vu par Marie) tant qu'aucune entrée `manualTestResults` n'existe pour son `test_id`. Repère visuel rouge sur la ligne du test dans la liste, et pastille rouge sur l'icône du bandeau du haut tant qu'au moins un test du catalogue est dans cet état.
+- **A5** — Le catalogue in-app est la liste de référence de tous les tests demandés à Marie. Avant sa première livraison, auditer `tests_manuels.md` et y reprendre chaque scénario encore actuel, réécrit en langage clair. Ensuite, ajouter au catalogue tout scénario destiné à Marie à la fin de l'évolution qui le crée ; `tests_manuels.md` reste la file technique de validation interne.
 
 ---
 
-## Phase 1 — Modèle de données et écran de consultation [TODO]
+## Phase 1 — Modèle de données et écran de consultation [FAIT]
 
-- [ ] `T1` — entité `src/domain/entities/manualTestResult.ts` : `{ id, test_id, status: 'ok' | 'nok', comment: string | null, created_at }`. Append-only : aucune mise à jour ni suppression après création, un nouveau test = une nouvelle ligne horodatée (historique complet, y compris les tests refaits plusieurs fois).
-- [ ] `T2` — table Dexie `manualTestResults` (migration `db.ts` version 11, index `test_id`), repository dédié dans `repositories.ts`.
-- [ ] `T3` — catalogue statique `src/domain/data/manualTestsCatalog.ts` : tableau `{ id, title, description }` en langage clair et pédagogique, sans vocabulaire technique. Premier contenu à rédiger : le test du Budget refondu (E71/E73/E74), déjà en attente côté Marie (cf. `_contexte/signals.md`).
-- [ ] `T4` — écran `src/ui/screens/tests/E121ManualTests.tsx` : liste des tests du catalogue, statut visuel déduit du dernier résultat connu par `test_id` (jamais testé / validé / non validé — le plus récent l'emporte s'il y a plusieurs soumissions).
-- [ ] `T4b` — repère visuel rouge (pastille) sur chaque ligne de test « nouveau » (`A4` : aucune entrée `manualTestResults` pour son `test_id`), distinct des statuts validé/non validé.
-- [ ] `T5` — icône ajoutée dans `TopBar.tsx`, à droite de l'icône Ressources, ouvrant la nouvelle route ; masquée en mode surcharge (même règle que Ressources).
-- [ ] `T5b` — pastille rouge sur cette icône tant qu'au moins un test du catalogue est « nouveau » (`A4`), recalculée à chaque changement de `manualTestResults` ou du catalogue.
-- [ ] Tests : repository, catalogue (au moins un test présent), écran (statuts affichés correctement, pastille rouge sur test nouveau), icône (pastille présente/absente selon l'état).
+- [x] `T1` — entité `src/domain/entities/manualTestResult.ts` : `{ id, test_id, status: 'ok' | 'nok', comment: string | null, created_at }`. Append-only : aucune mise à jour ni suppression après création, un nouveau test = une nouvelle ligne horodatée (historique complet, y compris les tests refaits plusieurs fois).
+- [x] `T2` — table Dexie `manualTestResults` (migration `db.ts` version 11, index `test_id`), repository dédié dans `repositories.ts`.
+- [x] `T3` — catalogue statique `src/domain/data/manualTestsCatalog.ts` : tableau `{ id, title, description }` en langage clair et pédagogique, sans vocabulaire technique. Contenu initial, après audit : les cinq scénarios encore ouverts de `tests_manuels.md` (création de liste sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, import JSON) et le test du Budget refondu (E71/E73/E74). Le scénario d'import doit être reformulé pour l'appareil de Marie : il ne peut pas citer le chemin local `donnees_marie/` et doit rappeler qu'il remplace les données présentes.
+- [x] `T4` — écran `src/ui/screens/tests/E121ManualTests.tsx` : liste des tests du catalogue, statut visuel déduit du dernier résultat connu par `test_id` (jamais testé / validé / non validé — le plus récent l'emporte s'il y a plusieurs soumissions).
+- [x] `T4b` — repère visuel rouge (pastille) sur chaque ligne de test « nouveau » (`A4` : aucune entrée `manualTestResults` pour son `test_id`), distinct des statuts validé/non validé.
+- [x] `T5` — icône ajoutée dans `TopBar.tsx`, à droite de l'icône Ressources, ouvrant la nouvelle route ; masquée en mode surcharge (même règle que Ressources).
+- [x] `T5b` — pastille rouge sur cette icône tant qu'au moins un test du catalogue est « nouveau » (`A4`), recalculée à chaque changement de `manualTestResults` ou du catalogue.
+- [x] Tests : repository, catalogue (au moins un test présent), écran (statuts affichés correctement, pastille rouge sur test nouveau), icône (pastille présente/absente selon l'état).
 
-Gate : [ ] tests verts · [ ] test manuel (écran accessible, contenu lisible sans jargon, pastille rouge visible sur un test jamais soumis et sur l'icône) · [ ] doc (`CHANGELOG.md`) · [ ] sortie — Marie peut ouvrir l'écran et voir la liste des tests en attente, en langage clair, avec un repère clair sur ce qui est nouveau.
+Gate : [x] tests verts · [x] test manuel (écran accessible, contenu lisible sans jargon, pastille rouge visible sur un test jamais soumis et sur l'icône) · [x] doc (`CHANGELOG.md`) · [x] sortie — Marie peut ouvrir l'écran et voir la liste des tests en attente, en langage clair, avec un repère clair sur ce qui est nouveau.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
 ---
 
-## Phase 2 — Modale de validation et intégration export/import [TODO]
+## Phase 2 — Modale de validation et intégration export/import [FAIT]
 
-- [ ] `T6` — modale ouverte au tap sur un test : coche « Validé » / coche « Non validé », champ commentaire obligatoire uniquement si « Non validé » (bouton Enregistrer désactivé tant que le commentaire est vide dans ce cas).
-- [ ] `T7` — enregistrement dans `manualTestResults` (jamais d'écrasement, toujours un ajout).
-- [ ] `T8` — historique visible pour un test donné (soumissions précédentes, date, statut, commentaire), pour transparence côté Marie et côté dev.
-- [ ] `T9` — intégration à `useSettingsState.ts` (`exportData`/`clearDatabase`/`importData`) et à `db.ts` : `manual_test_results` ajouté au payload JSON d'export (15ᵉ table), à la purge et à la restauration, cohérent avec les autres tables.
-- [ ] Tests : modale (validation, commentaire obligatoire), export/import incluant la nouvelle table.
+- [x] `T6` — modale ouverte au tap sur un test : coche « Validé » / coche « Non validé », champ commentaire obligatoire uniquement si « Non validé » (bouton Enregistrer désactivé tant que le commentaire est vide dans ce cas).
+- [x] `T7` — enregistrement dans `manualTestResults` (jamais d'écrasement, toujours un ajout).
+- [x] `T8` — historique visible pour un test donné (soumissions précédentes, date, statut, commentaire), pour transparence côté Marie et côté dev. Le catalogue inclut le scénario Marie de validation et de restauration de cet historique.
+- [x] `T9` — intégration à `useSettingsState.ts` (`exportData`/`clearDatabase`/`importData`) et à `db.ts` : `manual_test_results` ajouté au payload JSON d'export (15ᵉ table), à la purge et à la restauration, cohérent avec les autres tables.
+- [x] Tests : modale (validation, commentaire obligatoire), export/import incluant la nouvelle table.
 
-Gate : [ ] tests verts · [ ] test manuel (validation d'un test réelle, export puis import vérifiés) · [ ] doc · [ ] sortie — un test peut être validé ou refusé avec commentaire, l'historique survit à un export/import.
+Gate : [x] tests verts · [x] test manuel (validation d'un test réelle, export puis import vérifiés) · [x] doc · [x] sortie — un test peut être validé ou refusé avec commentaire, l'historique survit à un export/import.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

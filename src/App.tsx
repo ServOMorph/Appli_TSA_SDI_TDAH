@@ -11,6 +11,7 @@ import { E30EnergyView } from '@/ui/screens/energy/E30EnergyView'
 import { E31EnergyCheckIn } from '@/ui/screens/energy/E31EnergyCheckIn'
 import { E90OverloadRecovery } from '@/ui/screens/overload/E90OverloadRecovery'
 import { E120Resources } from '@/ui/screens/resources/E120Resources'
+import { E121ManualTests } from '@/ui/screens/tests/E121ManualTests'
 import { E110Settings } from '@/ui/screens/settings/E110Settings'
 import { E111Profile } from '@/ui/screens/settings/E111Profile'
 import { E112Accessibility } from '@/ui/screens/settings/E112Accessibility'
@@ -90,6 +91,8 @@ export function AppScreens() {
         return <E90OverloadRecovery />
       case 'resources':
         return <E120Resources />
+      case 'manual-tests':
+        return <E121ManualTests />
       case 'settings':
         return <E110Settings />
       case 'settings-profile':

@@ -16,6 +16,7 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { ManualTestResult } from '@/domain/entities/manualTestResult'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
 
@@ -103,6 +104,7 @@ export function useSettingsState() {
       entries,
       accounts,
       deposits,
+      manualTestResults,
     ] = await Promise.all([
       userRepo.getFirst(),
       db.tasks.toArray(),
@@ -118,10 +120,11 @@ export function useSettingsState() {
       db.budgetEntries.toArray(),
       db.budgetAccounts.toArray(),
       db.budgetDeposits.toArray(),
+      db.manualTestResults.toArray(),
     ])
     const payload = {
       export_date: new Date().toISOString(),
-      version: '3.1',
+      version: '3.2',
       user,
       tasks,
       task_recurrences: taskRecurrences,
@@ -136,6 +139,7 @@ export function useSettingsState() {
       budget_entries: entries,
       budget_accounts: accounts,
       budget_deposits: deposits,
+      manual_test_results: manualTestResults,
     }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -162,6 +166,7 @@ export function useSettingsState() {
       db.tools.clear(),
       db.taskRecurrences.clear(),
       db.taskExceptions.clear(),
+      db.manualTestResults.clear(),
     ])
   }
 
@@ -169,7 +174,8 @@ export function useSettingsState() {
    * Restaure intégralement les données à partir d'un export JSON : remplace tout le contenu
    * de la base (§clearDatabase) par le contenu du fichier. Accepte les exports v3.0 (avant
    * l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export) en recréant
-   * l'entrée Outil manquante pour chaque liste qui n'en a pas.
+   * l'entrée Outil manquante pour chaque liste qui n'en a pas. Les exports plus anciens
+   * sans résultats de tests manuels sont acceptés avec un historique vide.
    */
   async function importData(raw: unknown): Promise<ImportResult> {
     if (typeof raw !== 'object' || raw === null) {
@@ -198,6 +204,7 @@ export function useSettingsState() {
     const entries = Array.isArray(data.budget_entries) ? (data.budget_entries as BudgetEntry[]) : []
     const accounts = Array.isArray(data.budget_accounts) ? (data.budget_accounts as BudgetAccount[]) : []
     const deposits = Array.isArray(data.budget_deposits) ? (data.budget_deposits as BudgetDeposit[]) : []
+    const manualTestResults = Array.isArray(data.manual_test_results) ? (data.manual_test_results as ManualTestResult[]) : []
 
     const importedSettings = data.settings
     const now = new Date().toISOString()
@@ -233,6 +240,7 @@ export function useSettingsState() {
         entries.length ? db.budgetEntries.bulkAdd(entries) : Promise.resolve(),
         accounts.length ? db.budgetAccounts.bulkAdd(accounts) : Promise.resolve(),
         deposits.length ? db.budgetDeposits.bulkAdd(deposits) : Promise.resolve(),
+        manualTestResults.length ? db.manualTestResults.bulkAdd(manualTestResults) : Promise.resolve(),
       ])
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Échec de l\'import.' }

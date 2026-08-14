@@ -251,3 +251,6 @@
 
 ## 2026-08-02 (archivé depuis contexte.md 2026-08-07)
 - Session Phase V5-2a, codage sous Opus : phase de refacto insérée avant l'ancienne V5-2 (renommée V5-2b) après constat que `Task`/`SubTask` (Réception, Aujourd'hui) et `TaskV2` (planning, énergie/obligatoire) étaient deux systèmes de tâches parallèles, alors que V5-2b (sous-étapes dépliables sur le planning) suppose un modèle unique. Fusionnés en une entité `Task` unique (`parent_id`), un repository et un jeu de règles uniques (`taskRules.ts`), migration Dexie v7 (fusion des trois tables) puis v8 (suppression des anciennes — Dexie ne permet pas de lire et supprimer un store dans le même `upgrade`). Défaut latent corrigé en chemin : `TaskRepository.reorder()` réencryptait un titre déjà chiffré, le corrompant au réordonnancement sous chiffrement local actif ; verrouillé par un test. Fabriques de tests partagées (`src/test/factories.ts`) remplaçant sept fabriques dupliquées. 508/508 tests unitaires, 53/53 e2e, `tsc -b`/lint/build clean, aucun changement de comportement visible.
+
+## 2026-08-07 (archivé depuis contexte.md 2026-08-14)
+- Validation manuelle de la Phase V5-3 : le widget Comptes de l’accueil, initialement silencieusement désactivé sans catégorie de dépense, a été corrigé puis revalidé. Phase V5-3 et roadmap V5.0 intégralement closes.

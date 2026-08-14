@@ -12,6 +12,7 @@ export type Route =
   | { name: 'energy-checkin' }
   | { name: 'overload-recovery' }
   | { name: 'resources' }
+  | { name: 'manual-tests' }
   | { name: 'settings' }
   | { name: 'settings-profile' }
   | { name: 'settings-accessibility' }

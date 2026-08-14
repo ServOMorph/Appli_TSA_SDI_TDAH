@@ -14,6 +14,7 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
+import type { ManualTestResult } from '@/domain/entities/manualTestResult'
 
 function migrationId(): string {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
@@ -40,6 +41,7 @@ export class AppDatabase extends Dexie {
   taskExceptions!: Table<TaskException>
   folders!: Table<Folder>
   tools!: Table<Tool>
+  manualTestResults!: Table<ManualTestResult>
 
   constructor(name = 'appli-tsa-sdi-tdah') {
     super(name)
@@ -268,6 +270,9 @@ export class AppDatabase extends Dexie {
           updated_at: now,
         })
       })
+    this.version(11).stores({
+      manualTestResults: 'id, test_id',
+    })
   }
 }
 

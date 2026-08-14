@@ -83,6 +83,8 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     budgetAccounts: [],
     budgetEntries: [],
     budgetDeposits: [],
+    manualTestResults: [],
+    submitManualTestResult: vi.fn().mockResolvedValue(undefined),
     createBudgetCategory: vi.fn().mockResolvedValue(undefined),
     renameBudgetCategory: vi.fn().mockResolvedValue(undefined),
     updateBudgetCategoryAmount: vi.fn().mockResolvedValue(undefined),

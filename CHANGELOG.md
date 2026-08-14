@@ -1,3 +1,16 @@
+## v5.28 — 2026-08-14
+
+### Modifié
+- Clôture des phases 1 et 2 des tests manuels Marie : catalogue de sept scénarios, validation commentée, historique append-only et export/import JSON v3.2 validés manuellement.
+- Contexte de session, README et procédure `/close` alignés sur la phase 3 restante : archivage côté projet des exports reçus.
+
+## v5.27 — 2026-08-14
+
+### Ajouté
+- Tests manuels Marie — catalogue in-app de sept scénarios actuels, écran « Tests à faire », statuts, pastilles rouges et saisie d’une validation ou d’un refus commenté.
+- Historique append-only des validations de Marie, visible par test et préservé dans les exports/imports JSON (payload v3.2, 15 tables).
+- Migration Dexie v11 : table `manualTestResults`.
+
 ## v5.26 — 2026-08-14
 
 Roadmap `roadmap_tests_marie.md` créée, vérification de fraîcheur du catalogue de tests Marie ajoutée à `/deploy` et `/deploy_dev`.

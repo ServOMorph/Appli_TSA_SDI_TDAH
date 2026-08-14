@@ -15,6 +15,7 @@ const SCREEN_CODES: Record<Screen, string> = {
   'energy-checkin': 'E31',
   'overload-recovery': 'E90',
   resources: 'E120',
+  'manual-tests': 'E121',
   settings: 'E110',
   'settings-profile': 'E111',
   'settings-accessibility': 'E112',

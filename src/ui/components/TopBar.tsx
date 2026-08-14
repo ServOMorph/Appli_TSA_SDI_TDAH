@@ -10,6 +10,8 @@ interface TopBarProps {
   overloadActive: boolean
   plannedCost: number
   onResourcesClick: () => void
+  onManualTestsClick: () => void
+  hasNewManualTests: boolean
   onOverloadClick: () => void
 }
 
@@ -68,6 +70,8 @@ export function TopBar({
   overloadActive,
   plannedCost,
   onResourcesClick,
+  onManualTestsClick,
+  hasNewManualTests,
   onOverloadClick,
 }: TopBarProps) {
   const [showOverloadInfo, setShowOverloadInfo] = useState(false)
@@ -127,6 +131,31 @@ export function TopBar({
                   <path d="M16 17H8" />
                   <path d="M10 9H8" />
                 </svg>
+              </button>
+              <button
+                onClick={onManualTestsClick}
+                aria-label={hasNewManualTests ? 'Tests à faire, nouveaux tests disponibles' : 'Tests à faire'}
+                title="Tests à faire"
+                style={{
+                  position: 'relative',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  color: 'var(--color-text-muted)',
+                  display: 'inline-flex',
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg>
+                {hasNewManualTests && (
+                  <span
+                    aria-label="Nouveaux tests disponibles"
+                    style={{ position: 'absolute', top: 2, right: 2, width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--color-error)', border: '1px solid var(--color-surface)' }}
+                  />
+                )}
               </button>
             </>
           )}

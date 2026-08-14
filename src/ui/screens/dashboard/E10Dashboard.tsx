@@ -29,6 +29,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 
 interface SortableTaskItemProps {
   task: Task
@@ -167,6 +168,7 @@ export function E10Dashboard() {
     selectList,
     budgetCategories,
     createBudgetEntry,
+    manualTestResults,
   } = useApp()
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [showNoExpenseCategory, setShowNoExpenseCategory] = useState(false)
@@ -208,6 +210,9 @@ export function E10Dashboard() {
   const showSecondary = !expanded
   const rootFolders = folders
   const rootTools = tools.filter((t) => t.folder_id === null)
+  const hasNewManualTests = manualTestsCatalog.some(
+    (test) => !manualTestResults.some((result) => result.test_id === test.id),
+  )
 
   function openTool(toolId: string) {
     const tool = rootTools.find((t) => t.id === toolId)
@@ -263,6 +268,8 @@ export function E10Dashboard() {
         overloadActive={overloadMode}
         plannedCost={getRemainingPlannedCost(todayPlannedTasks)}
         onResourcesClick={() => goTo('resources')}
+        onManualTestsClick={() => goTo('manual-tests')}
+        hasNewManualTests={hasNewManualTests}
         onOverloadClick={() => goTo('overload-recovery')}
       />
 

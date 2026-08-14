@@ -4,8 +4,8 @@ Consigne : valider chaque point sur l'appareil réel, puis supprimer la section 
 
 ## 1 — Création d'outil (E70/E72)
 
-1. Depuis l'accueil, ouvrir « Ajouter un outil » : seule l'option « Nouvelle liste » doit apparaître (plus de « Nouveau dossier »).
-2. Depuis un dossier existant (E72), vérifier que le bouton « + » propose aussi uniquement une nouvelle liste.
+1. Depuis l'accueil, ouvrir « Ajouter un outil » : « Nouvelle liste » est la seule action de création disponible. Les outils indiqués « bientôt disponibles » peuvent rester affichés ; « Nouveau dossier » ne doit plus apparaître.
+2. Depuis un dossier existant (E72), vérifier que le bouton « + » propose aussi « Nouvelle liste » comme seule action de création, sans « Nouveau dossier ».
 
 ## 2 — Suppression d'une liste (E61)
 

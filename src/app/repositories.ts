@@ -13,6 +13,7 @@ import { TaskRecurrenceRepository } from '@/data/repositories/taskRecurrenceRepo
 import { TaskExceptionRepository } from '@/data/repositories/taskExceptionRepository'
 import { FolderRepository } from '@/data/repositories/folderRepository'
 import { ToolRepository } from '@/data/repositories/toolRepository'
+import { ManualTestResultRepository } from '@/data/repositories/manualTestResultRepository'
 
 export const db = new AppDatabase()
 export const userRepo = new UserRepository(db)
@@ -29,6 +30,7 @@ export const budgetAccountRepo = new BudgetAccountRepository(db)
 export const budgetDepositRepo = new BudgetDepositRepository(db)
 export const folderRepo = new FolderRepository(db)
 export const toolRepo = new ToolRepository(db)
+export const manualTestResultRepo = new ManualTestResultRepository(db)
 
 export function todayDate(): string {
   if (import.meta.env.DEV) {

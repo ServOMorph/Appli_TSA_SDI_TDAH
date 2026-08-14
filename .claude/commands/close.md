@@ -67,6 +67,10 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 6. Si une `roadmap*.md` existe dans `<dossier>` : vérifier qu'elle reflète fidèlement l'état après
    session (statuts des tâches et phases). Mettre à jour si périmée.
    Invariant : ce que lira le prochain `/start` doit être vrai.
+   Si `src/domain/data/manualTestsCatalog.ts` existe : examiner les évolutions de la session et
+   mettre à jour ce catalogue pour chaque test à demander à Marie. Le catalogue doit couvrir tous
+   les tests Marie encore pertinents à la fin de l'évolution, dans un langage clair et sans détails
+   techniques ou chemins locaux. Ne pas y ajouter les validations internes réservées au développement.
 
 7. Mettre à jour `README.md` à la racine du projet :
    - Refléter l'état actuel du projet (section "État actuel" de `contexte.md`).

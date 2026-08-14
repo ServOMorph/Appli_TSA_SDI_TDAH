@@ -5,6 +5,7 @@ import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E10Dashboard } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
 import { makeTask as baseTask, makeSubTask } from '@/test/factories'
+import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 
 function makeTaskV2(overrides: Partial<Task> = {}): Task {
   return baseTask({
@@ -174,6 +175,29 @@ describe('E10Dashboard', () => {
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Ressources' }))
       expect(ctx.goTo).toHaveBeenCalledWith('resources')
+    })
+
+    it('navigue vers les tests à faire et affiche une pastille si un test est nouveau', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(screen.getByLabelText('Nouveaux tests disponibles')).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Tests à faire, nouveaux tests disponibles' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('manual-tests')
+    })
+
+    it('masque la pastille des tests quand tous les tests ont déjà été vus', () => {
+      const ctx = makeAppContext({
+        manualTestResults: manualTestsCatalog.map((test) => ({
+          id: `result-${test.id}`,
+          test_id: test.id,
+          status: 'ok' as const,
+          comment: null,
+          created_at: '2026-08-14T10:00:00.000Z',
+        })),
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      expect(screen.queryByLabelText('Nouveaux tests disponibles')).toBeNull()
+      expect(screen.getByRole('button', { name: 'Tests à faire' })).toBeDefined()
     })
 
     it('n\'affiche pas d\'icône Planning dans la TopBar', () => {

@@ -1,3 +1,9 @@
+## v5.30 — 2026-08-14
+
+### Modifié
+- Déploiement de la v5.29 effectué en production (bannière urgence tests Marie et catalogue de tests inclus), vérifié HTTP 200.
+- `README.md` restructuré (présentation professionnalisée du projet).
+
 ## v5.29 — 2026-08-14
 
 ### Ajouté

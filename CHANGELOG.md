@@ -1,3 +1,13 @@
+## v5.21 — 2026-08-14
+
+Ménage de la racine du projet, sans modification de code applicatif.
+
+### Corrigé
+- `ollama_call.py` (racine) supprimé, doublon exact de `scripts/ollama_call.py` — `CLAUDE.md` mis à jour en conséquence.
+- `llms.txt` : mentions résiduelles du chiffrement local (`src/crypto/`, retiré le 2026-08-05) supprimées.
+- `roadmap_v5.0.md` (close depuis le 2026-08-07) déplacé vers `Archives/`, cohérent avec les roadmaps v1 à v4.1.
+- Vieux builds `dist/v3`, `v4.1`, `v5.0`, `v5.1` purgés du disque (dossier non versionné).
+
 ## v5.20 — 2026-08-14
 
 ### Ajouté

@@ -4,7 +4,7 @@ Application web progressive (PWA) et mobile neuroinclusive pour personnes AuDHD 
 
 ## Informations principales
 
-- **Stack** : React 19, TypeScript, Vite, Dexie.js (IndexedDB), Web Crypto API (AES-GCM, PBKDF2), Vitest, Playwright.
+- **Stack** : React 19, TypeScript, Vite, Dexie.js (IndexedDB), Vitest, Playwright.
 - **Licence** : MIT
 - **Organisation** : ServOMorph
 
@@ -13,7 +13,6 @@ Application web progressive (PWA) et mobile neuroinclusive pour personnes AuDHD 
 L'application est structurée en couches étanches :
 - `src/domain/` : Logique métier pure, sans dépendance React ou base de données. Gère les entités (tasks, lists, routines) et les règles pures de gestion (`taskRulesV2.ts`, etc.).
 - `src/data/` : Couche d'infrastructure avec Dexie.js (IndexedDB) pour persister les tâches, listes, routines et check-ins d'énergie.
-- `src/crypto/` : Wrapper de sécurité pour le chiffrement des données utilisateur sensibles en local (titres des tâches, notes) via la Web Crypto API (AES-GCM, PBKDF2).
 - `src/ui/` : Interface utilisateur React stylisée avec du CSS vanilla. Comprend des optimisations cognitives pour la neurodivergence (contrastes doux, réduction de mouvements, repères d'énergie simples).
 - `src/app/` : Point d'entrée de l'application React, providers de contextes (`AppContext.tsx`) et routage.
 

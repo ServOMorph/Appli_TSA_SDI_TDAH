@@ -1,3 +1,15 @@
+## v5.23 — 2026-08-14
+
+Durcissement de `/deploy` après un premier déploiement réel sous les nouvelles vérifications (v5.22), et mise à jour de la documentation de session.
+
+### Ajouté
+- `/deploy` : 10 vérifications ajoutées avant build (7 bloquantes : arbre de travail propre, `.env` avec clés attendues, cohérence CHANGELOG/version, tests unitaires, `tsc -b`, lint ; 3 avertissements à confirmation explicite : branche git attendue, version déjà présente dans `dist/`, tests manuels en attente).
+- `/deploy` : vérification de fumée `curl` sur l'URL de production après déploiement, avertissement si des commits locaux ne sont pas poussés vers le remote, `_contexte/dernier_deploiement.md` créé et auto-maintenu par la commande (version/date/URL du dernier déploiement).
+
+### Corrigé
+- `/deploy` : vérification des clés `.env` durcie (`grep -qE '...=.+'`) — une clé présente mais vide passait auparavant le contrôle bloquant.
+- `_contexte/contexte.md` : mention de branche active obsolète corrigée (`v5.1` est fusionnée dans `main` depuis plusieurs sessions).
+
 ## v5.22 — 2026-08-14
 
 Ajout de l'import de sauvegarde JSON dans Paramètres, et complétion de l'export à l'occasion de l'analyse des données de test de Marie.

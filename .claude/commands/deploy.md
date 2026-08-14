@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(npx vitest run:*), Bash(npm run lint:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*)
 ---
 
 # /deploy [version]
@@ -20,9 +20,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 
    1. **Arbre de travail propre** : `git status --short`. Si la sortie n'est pas vide, s'arrêter — le code
       déployé doit être traçable dans un commit.
-   2. **`.env` présent avec les clés attendues** : `test -f .env`, puis `grep -q '^NETLIFY_AUTH_TOKEN=' .env`
-      et `grep -q '^NETLIFY_SITE_ID=' .env`. Si absent ou incomplet : dire à l'utilisateur de le créer/compléter
-      depuis `.env.example` et s'arrêter. Ne jamais lire ni afficher le contenu de `.env`.
+   2. **`.env` présent avec les clés attendues, valeurs non vides** : `test -f .env`, puis
+      `grep -qE '^NETLIFY_AUTH_TOKEN=.+' .env` et `grep -qE '^NETLIFY_SITE_ID=.+' .env` (le `.+` exige une
+      valeur après le `=`, pas seulement la clé). Si absent ou incomplet : dire à l'utilisateur de le
+      créer/compléter depuis `.env.example` et s'arrêter. Ne jamais lire ni afficher le contenu de `.env`.
    3. **Cohérence CHANGELOG.md / version cible** : `grep -q "^## <version> " CHANGELOG.md`. Si aucune entrée
       ne correspond à la version déterminée à l'étape 1, s'arrêter — ajouter une entrée CHANGELOG décrivant
       les changements à déployer avant de relancer `/deploy`.
@@ -35,18 +36,24 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 
    1. **Branche git attendue** : `git branch --show-current`, comparer à la branche mentionnée comme active
       dans `_contexte/contexte.md`. Si différente, signaler l'écart.
-   2. **Version déjà présente dans `dist/`** : `test -d dist/<version>`. Si le dossier existe déjà, signaler
+   2. **Commits locaux non poussés** : si un remote de suivi existe
+      (`git rev-parse --abbrev-ref --symbolic-full-name @{u}` réussit), compter
+      `git rev-list --count @{u}..HEAD`. Si > 0, signaler que le déploiement embarquerait du code qui
+      n'existe pas encore sur le remote (le déploiement Netlify envoie `dist/` directement, indépendamment
+      de git). Ne jamais pousser automatiquement.
+   3. **Version déjà présente dans `dist/`** : `test -d dist/<version>`. Si le dossier existe déjà, signaler
       qu'il sera écrasé par ce build.
-   3. **Tests manuels en attente** : lire `tests_manuels.md`. S'il contient autre chose que le fichier vide,
+   4. **Tests manuels en attente** : lire `tests_manuels.md`. S'il contient autre chose que le fichier vide,
       lister les points en attente et signaler qu'un déploiement prod interviendrait avant leur validation.
 
 4. Build :
    ```
    npx tsc -b && VITE_APP_VERSION=<version> npx vite build --outDir dist/<version>
    ```
-   `--outDir` prime sur `outDir` de `vite.config.ts` (branche `v5.1`) : chaque version obtient son propre dossier
-   sous `dist/`, sans toucher `vite.config.ts`. `VITE_APP_VERSION` alimente le bouton « Entrer dans la <version> »
-   de l'écran d'accueil (`E01Welcome.tsx`) — absente en dev/tests, le bouton reste « Entrer ».
+   `--outDir` prime sur `outDir` de `vite.config.ts` : chaque version obtient son propre dossier sous `dist/`,
+   sans toucher `vite.config.ts`. `VITE_APP_VERSION` alimente le bouton « Entrer dans la <version> » de l'écran
+   d'accueil (`E01Welcome.tsx`) — absente en dev/tests, le bouton reste « Entrer ». Si le build signale un
+   avertissement de taille de chunk (> 500 kB), le noter pour le rapport final (étape 8) sans bloquer.
 
 5. Vérifier que `dist/<version>` a été créé et n'est pas vide avant de déployer :
    ```
@@ -59,6 +66,15 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    set -a; source .env; set +a; npx netlify deploy --prod --dir=dist/<version>
    ```
 
-7. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par la commande Netlify.
+7. Vérification de fumée post-déploiement : lire l'URL de production annoncée par la commande précédente,
+   puis `curl -sf -o /dev/null -w '%{http_code}' <url>`. Un code différent de 200 est signalé dans le rapport
+   final mais n'invalide pas le déploiement déjà effectué (Netlify l'a déjà confirmé) — c'est une vérification
+   indépendante supplémentaire, pas une nouvelle porte bloquante.
+
+   Mettre à jour `_contexte/dernier_deploiement.md` (le créer s'il n'existe pas) avec la version, la date et
+   l'URL de production déployées, pour que cette information reste à jour indépendamment de `/close`.
+
+8. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par la commande Netlify,
+   résultat de la vérification de fumée, et l'avertissement de taille de chunk le cas échéant.
    Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et attendre une nouvelle
    confirmation explicite.

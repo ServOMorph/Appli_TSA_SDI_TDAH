@@ -1,3 +1,8 @@
+## v5.32 — 2026-08-14
+
+### Modifié
+- Déploiement de la v5.31 effectué en production (badge énergie allégé, fond en couleur d'ambiance), vérifié HTTP 200.
+
 ## v5.31 — 2026-08-14
 
 ### Modifié

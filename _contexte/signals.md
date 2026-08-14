@@ -2,7 +2,7 @@
 
 ## Contexte chaud
 - `donnees_marie/export-audhd-2026-08-13.json` : export réel de Marie, stocké en local, gitignoré et déclaré donnée sensible dans `CLAUDE.md` — ne pas lire/écrire sans instruction explicite.
-- `_contexte/dernier_deploiement.md` : consigné par `/deploy` lui-même (version/date/URL), indépendamment de `/close`. Dernier déploiement prod : v5.29, 2026-08-14, `https://appli-audhd.netlify.app` (HTTP 200 vérifié), inclut la bannière urgence et le catalogue de tests Marie.
+- `_contexte/dernier_deploiement.md` : consigné par `/deploy` lui-même (version/date/URL), indépendamment de `/close`. Dernier déploiement prod : v5.31, 2026-08-14, `https://appli-audhd.netlify.app` (HTTP 200 vérifié) — badge énergie allégé, fond en couleur d'ambiance.
 - `src/ui/screens/onboarding/E01Welcome.tsx` : liste `WHATS_NEW` codée en dur, à mettre à jour manuellement à chaque nouvelle dist prod (pas d'automatisation depuis `/deploy` pour l'instant).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`, pour tester hors réseau local sans toucher la prod.
 - Panneau dev (haut à droite, visible uniquement en `npm run dev`) affiche la version courante, lue automatiquement dans `CHANGELOG.md` au build (`__APP_DEV_VERSION__`, `vite.config.ts`) — se met à jour seule à chaque bump de version, rien à maintenir à la main.
@@ -15,29 +15,30 @@
 - [P1] Informer Marie que l'adresse de test a changé : `delightful-sunflower-836720.netlify.app` (qu'elle a utilisée) n'est plus à jour, le site officiel est désormais `https://appli-audhd.netlify.app` (déployé en v5.22). — fait quand : nouvelle adresse communiquée à Marie — réf : `.claude/commands/deploy.md`, `_contexte/dernier_deploiement.md`
 - [P1] Communiquer à Marie les points de `a_communiquer_v5.md` maintenant que la V5.0 complète est livrée (V5-0 à V5-3 close), puis recueillir son retour sur les 3 écarts assumés et sur la priorité « Comptage en premier » parmi les outils reportés. — fait quand : retour de Marie recueilli après livraison — réf : `a_communiquer_v5.md`
 - [P1] Demander à Marie un test réel du Budget refondu (E71/E73/E74) — jamais vu par elle, l'écran a changé depuis sa dernière utilisation. — fait quand : retour de Marie recueilli sur le Budget — réf : `E71Budget.tsx`, `roadmap_v5.1.md`
-- [P1] v5.29 est en prod (bannière urgence + catalogue de tests Marie). Obtenir l'export de Marie une fois envoyé, puis exécuter `python scripts/ingest_manual_tests.py <export>` pour clore le test manuel de la Phase 3. — fait quand : Phase 3 `[FAIT]`, journal projet alimenté avec un vrai résultat — réf : `roadmap_tests_marie.md` Phase 3, `scripts/ingest_manual_tests.py`
+- [P1] v5.31 est en prod (bannière urgence + catalogue de tests Marie, toujours actifs). Obtenir l'export de Marie une fois envoyé, puis exécuter `python scripts/ingest_manual_tests.py <export>` pour clore le test manuel de la Phase 3. — fait quand : Phase 3 `[FAIT]`, journal projet alimenté avec un vrai résultat — réf : `roadmap_tests_marie.md` Phase 3, `scripts/ingest_manual_tests.py`
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-14 — suite 10, badge énergie couleur d'ambiance, déploiement v5.31)
+## Dernière session (2026-08-14 — suite 11, badge énergie couleur d'ambiance, déploiement v5.31)
 
 ## Décisions prises
-- Retour de test manuel de Marie (screenshot annoté) traité : badge énergie de la barre du haut allégé (retrait du libellé texte) et fond teinté avec la couleur d'ambiance existante (`Settings.ambiance_color`), après clarification avec l'utilisateur que le rose du screen était cette couleur paramétrable, pas une couleur fixe à coder en dur.
+- Retour de test manuel de Marie (screenshot annoté) traité : badge énergie de la barre du haut allégé (retrait du libellé texte) et fond teinté avec la couleur d'ambiance existante (`Settings.ambiance_color`), après clarification avec l'utilisateur que le rose du screen était cette couleur paramétrable, pas une couleur fixe à coder en dur. `/deploy` exécuté jusqu'au bout après confirmation explicite de l'utilisateur malgré `tests_manuels.md` non vide (6 points).
 
 ## Livrables produits ou modifiés
 - `src/ui/components/EnergyDisplay.tsx` : retrait du texte « planifié / dispo », fond via `pastelBackground(ambianceColor)`.
 - `src/ui/components/TopBar.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx` : prop `ambianceColor` propagée depuis `settings.ambiance_color`.
 - `tests_manuels.md` : point 5 ajouté (vérification visuelle du badge énergie).
-- `CHANGELOG.md` : entrée v5.31.
+- `dist/v5.31` : build déployé en prod, `_contexte/dernier_deploiement.md` mis à jour.
 
 ## Hypothèses validées / invalidées
 - INVALIDE : première implémentation avec une couleur rose codée en dur (`--color-energy-bg`) -> pivot vers la couleur d'ambiance existante déjà utilisée pour teinter les tâches planifiées (`ambiance.ts`), sur correction explicite de l'utilisateur.
+- VALIDE : déploiement v5.31 effectif, HTTP 200 vérifié.
 - EN ATTENTE : connecteur MCP Google Drive confirmé actif mais avec des scopes d'authentification insuffisants pour lire le contenu d'un Google Doc ; aucun outil du connecteur ne permet d'écrire dans le corps d'un Doc existant, quel que soit le scope.
 
 ## Prochaine étape exacte
-Déployer v5.31 en prod via `/deploy`, puis attendre validation manuelle du point 5 de `tests_manuels.md` sur appareil réel.
+Attendre validation manuelle des 6 points de `tests_manuels.md` sur appareil réel.
 
 ## Question bloquante pour la session suivante
 Aucune.

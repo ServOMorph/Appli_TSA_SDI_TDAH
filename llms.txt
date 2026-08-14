@@ -1,38 +1,54 @@
 # Assistant AuDHD
 
-Application web progressive (PWA) et mobile neuroinclusive pour personnes AuDHD (TSA sans déficience intellectuelle + TDAH, 14–40 ans) agissant comme un système externe de fonctions exécutives pour réduire la charge mentale quotidienne.
+Assistant AuDHD est une application web progressive (PWA) neuroinclusive destinée aux personnes AuDHD (TSA et TDAH). Elle aide à planifier les tâches, suivre l'énergie, organiser des listes et utiliser des outils personnels avec un stockage local IndexedDB.
 
-## Informations principales
+## Stack
 
-- **Stack** : React 19, TypeScript, Vite, Dexie.js (IndexedDB), Vitest, Playwright.
-- **Licence** : MIT
-- **Organisation** : ServOMorph
+- React 19 et TypeScript
+- Vite et `vite-plugin-pwa`
+- Dexie.js sur IndexedDB
+- Vitest et Testing Library pour les tests unitaires et d'intégration
+- Playwright pour les scénarios end-to-end
 
-## Architecture du projet
+## Démarrage rapide
 
-L'application est structurée en couches étanches :
-- `src/domain/` : Logique métier pure, sans dépendance React ou base de données. Gère les entités (tasks, lists, routines) et les règles pures de gestion (`taskRulesV2.ts`, etc.).
-- `src/data/` : Couche d'infrastructure avec Dexie.js (IndexedDB) pour persister les tâches, listes, routines et check-ins d'énergie.
-- `src/ui/` : Interface utilisateur React stylisée avec du CSS vanilla. Comprend des optimisations cognitives pour la neurodivergence (contrastes doux, réduction de mouvements, repères d'énergie simples).
-- `src/app/` : Point d'entrée de l'application React, providers de contextes (`AppContext.tsx`) et routage.
+```bash
+npm install
+npm run dev
+```
 
-## Points d'entrée et commandes clés
+Commandes de vérification :
 
-- **Développement** :
-  - `npm install` : Installer les dépendances.
-  - `npm run dev` / `python run.py` : Lancer le serveur de développement local (Vite).
-- **Tests et Qualité** :
-  - `npm test` : Lancer la suite de tests unitaires et d'intégration (Vitest).
-  - `npm run test:coverage` : Lancer les tests avec calcul de la couverture de code (Vitest).
-  - `npm run test:e2e` : Lancer les tests E2E avec Playwright (compile l'application puis exécute les scénarios).
-  - `npm run lint` : Exécuter ESLint.
-  - `npm run format` : Formater le code avec Prettier.
+```bash
+npm run lint
+npm test
+npm run build
+npm run test:e2e
+```
 
-## Fonctionnalités majeures
+## Architecture
 
-1. **Todo / Inbox** : Collecte brute des tâches sans contraintes de temps.
-2. **Planning quotidien** : Grille horaire sur 24h découpée en créneaux de 30 minutes permettant de positionner les tâches par sélection de plages multi-créneaux.
-3. **Gestion d'énergie** : Saisie quotidienne du niveau d'énergie (échelle 1 à 12, représentée par des batteries).
-4. **Mode Surcharge** : Activation automatique si le coût énergétique total des tâches planifiées dépasse l'énergie saisie pour la journée, limitant l'accès au tableau de bord et à un centre de récupération.
-5. **Routines** : Blocs d'étapes prédéfinis planifiables.
-6. **Listes thématiques** : Groupement de tâches hors planning temporaire.
+- `src/domain/` : entités et règles métier sans dépendance React ni Dexie.
+- `src/data/` : schéma, migrations et repositories Dexie/IndexedDB.
+- `src/ui/` : composants et écrans React, styles et composants d'accessibilité cognitive.
+- `src/app/` : navigation, providers et coordination de l'état applicatif.
+- `src/test/` : configuration Vitest, factories et utilitaires de test.
+- `scripts/` : outils de développement et `ingest_manual_tests.py`, qui fusionne les résultats de tests manuels sans écraser les entrées existantes.
+
+## Fonctionnalités actuelles
+
+- Gestion de tâches, sous-étapes, récurrences et planification.
+- Suivi d'énergie et parcours de récupération en cas de surcharge.
+- Outils organisés par dossiers : listes et Budget.
+- Export/import local des données utilisateur.
+- Écran de tests manuels avec validations commentées et historique exportable.
+
+## État et documentation
+
+La version documentée est `v5.29`. Consultez `CHANGELOG.md` pour l'historique, `roadmap_tests_marie.md` pour le parcours de tests manuels et `_docs/adr/` pour les décisions d'architecture.
+
+L'application déployée est disponible sur https://appli-audhd.netlify.app.
+
+## Données et licence
+
+Les données de l'application sont conservées localement dans IndexedDB. Les variables d'environnement locales restent hors versionnement via `.gitignore`. Le projet est sous licence MIT ; voir `LICENSE`.

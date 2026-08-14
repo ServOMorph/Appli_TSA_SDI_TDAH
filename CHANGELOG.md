@@ -1,3 +1,8 @@
+## v5.34 — 2026-08-14
+
+### Modifié
+- `/deploy` : nouvelle étape 0 imposant de traiter les derniers exports de Marie avant tout déploiement (analyse des pertes/incohérences/frictions, ingestion des résultats de tests), avant le passage habituel par `/close`.
+
 ## v5.33 — 2026-08-14
 
 ### Corrigé

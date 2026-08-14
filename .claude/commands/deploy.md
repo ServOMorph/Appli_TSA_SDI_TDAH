@@ -9,17 +9,38 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 
 ## Procédure
 
-0. Exécuter intégralement `/close` (sans argument — zone implicite : dossier courant) avant de
+0. Traiter les exports de Marie avant toute chose.
+   1. Rappeler explicitement à l'utilisateur, avant de poursuivre, qu'il faut d'abord récupérer les
+      derniers exports de Marie disponibles. Ne pas continuer tant que confirmation n'est pas donnée
+      qu'ils sont fournis (fichiers reçus hors dépôt — jamais copiés automatiquement dans
+      `donnees_marie/` sans instruction explicite, donnée sensible listée dans `CLAUDE.md`).
+   2. Une fois les exports fournis, les analyser dans leur intégralité (toutes les tables du payload
+      JSON, pas seulement `manual_test_results`) :
+      - pertes ou incohérences de données par rapport au dernier état connu (journal
+        `_contexte/marie_tests_journal.json` pour l'historique des tests, comparaison structurelle du
+        reste du payload avec l'export précédent analysé) ;
+      - frictions signalées par Marie elle-même (commentaires des résultats `nok` dans
+        `manual_test_results`).
+   3. Ingérer les résultats de tests via `python scripts/ingest_manual_tests.py <export>`
+      (dédoublonnage par `id`, jamais d'écrasement d'une entrée existante).
+   4. Si l'analyse ne révèle ni perte, ni incohérence, ni friction bloquante : continuer normalement
+      à l'étape 1.
+   5. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
+      les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
+      fichiers d'export bruts ou `donnees_marie/` pour « résoudre » un problème constaté — toute
+      correction porte sur le code ou le journal projet, jamais sur les données sources de Marie.
+
+1. Exécuter intégralement `/close` (sans argument — zone implicite : dossier courant) avant de
    poursuivre. Le code à déployer doit être clôturé et commité, pas laissé en session ouverte.
    Si `/close` signale des résidus non commités à son étape 12, les traiter comme un échec de
-   l'étape 2.1 ci-dessous plutôt que de continuer.
+   l'étape 3.1 ci-dessous plutôt que de continuer.
 
-1. Déterminer la version.
+2. Déterminer la version.
    - Si $ARGUMENTS est fourni (ex: `v5.19`) : l'utiliser.
    - Sinon : la lire dans `CHANGELOG.md`, première ligne `## vX.Y — AAAA-MM-JJ` (grep -m1 '^## v').
    - Annoncer la version retenue avant de continuer.
 
-2. Vérifications bloquantes — dans l'ordre, s'arrêter et rapporter l'erreur précise au premier échec.
+3. Vérifications bloquantes — dans l'ordre, s'arrêter et rapporter l'erreur précise au premier échec.
    Ne jamais tenter de corriger automatiquement (committer, modifier le code, etc.) : rapporter et attendre
    une instruction explicite de l'utilisateur.
 
@@ -30,13 +51,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       valeur après le `=`, pas seulement la clé). Si absent ou incomplet : dire à l'utilisateur de le
       créer/compléter depuis `.env.example` et s'arrêter. Ne jamais lire ni afficher le contenu de `.env`.
    3. **Cohérence CHANGELOG.md / version cible** : `grep -q "^## <version> " CHANGELOG.md`. Si aucune entrée
-      ne correspond à la version déterminée à l'étape 1, s'arrêter — ajouter une entrée CHANGELOG décrivant
+      ne correspond à la version déterminée à l'étape 2, s'arrêter — ajouter une entrée CHANGELOG décrivant
       les changements à déployer avant de relancer `/deploy`.
    4. **Tests unitaires verts** : `npx vitest run`.
    5. **Compilation TypeScript clean** : `npx tsc -b`.
    6. **Lint clean** : `npm run lint`.
 
-3. Avertissements — signaler chacun s'il est détecté, puis demander une confirmation explicite unique
+4. Avertissements — signaler chacun s'il est détecté, puis demander une confirmation explicite unique
    avant de poursuivre (ne pas bloquer seul, ne pas continuer sans réponse de l'utilisateur).
 
    1. **Branche git attendue** : `git branch --show-current`, comparer à la branche mentionnée comme active
@@ -56,27 +77,27 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       (`CHANGELOG.md`) : si une fonctionnalité soumise à Marie a changé sans que le catalogue n'ait été mis à
       jour, le signaler. Ne pas modifier le catalogue automatiquement.
 
-4. Build :
+5. Build :
    ```
    npx tsc -b && VITE_APP_VERSION=<version> npx vite build --outDir dist/<version>
    ```
    `--outDir` prime sur `outDir` de `vite.config.ts` : chaque version obtient son propre dossier sous `dist/`,
    sans toucher `vite.config.ts`. `VITE_APP_VERSION` alimente le bouton « Entrer dans la <version> » de l'écran
    d'accueil (`E01Welcome.tsx`) — absente en dev/tests, le bouton reste « Entrer ». Si le build signale un
-   avertissement de taille de chunk (> 500 kB), le noter pour le rapport final (étape 8) sans bloquer.
+   avertissement de taille de chunk (> 500 kB), le noter pour le rapport final (étape 9) sans bloquer.
 
-5. Vérifier que `dist/<version>` a été créé et n'est pas vide avant de déployer :
+6. Vérifier que `dist/<version>` a été créé et n'est pas vide avant de déployer :
    ```
    test -d dist/<version> && test -n "$(ls -A dist/<version>)"
    ```
 
-6. Déployer en prod sur Netlify, en chargeant `.env` dans l'environnement de la seule commande (jamais affiché,
+7. Déployer en prod sur Netlify, en chargeant `.env` dans l'environnement de la seule commande (jamais affiché,
    jamais passé en argument visible) :
    ```
    set -a; source .env; set +a; npx netlify deploy --prod --dir=dist/<version>
    ```
 
-7. Vérification de fumée post-déploiement : lire l'URL de production annoncée par la commande précédente,
+8. Vérification de fumée post-déploiement : lire l'URL de production annoncée par la commande précédente,
    puis `curl -sf -o /dev/null -w '%{http_code}' <url>`. Un code différent de 200 est signalé dans le rapport
    final mais n'invalide pas le déploiement déjà effectué (Netlify l'a déjà confirmé) — c'est une vérification
    indépendante supplémentaire, pas une nouvelle porte bloquante.
@@ -89,7 +110,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    le réafficher aux versions suivantes. Committer ce vidage séparément après le déploiement (le build
    `dist/<version>` a déjà embarqué le contenu avant le vidage).
 
-8. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par la commande Netlify,
+9. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par la commande Netlify,
    résultat de la vérification de fumée, et l'avertissement de taille de chunk le cas échéant.
    Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et attendre une nouvelle
    confirmation explicite.

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
-import { Card } from '@/ui/components/Card'
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
 import { groupListItemsBySection } from '@/domain/rules/listItemSortRules'
 import { todayDate } from '@/app/repositories'
@@ -238,9 +237,39 @@ export function E61ListDetail() {
         </section>
       ))}
 
-      {showAddForm ? (
-        <Card>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+      <Button fullWidth onClick={() => setShowAddForm(true)}>
+        Ajouter un élément
+      </Button>
+
+      {showAddForm && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Ajouter un élément"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.75)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--spacing-xl)',
+              maxWidth: '360px',
+              width: '90%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-md)',
+            }}
+          >
             <label
               htmlFor="new-item-title"
               style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}
@@ -310,11 +339,7 @@ export function E61ListDetail() {
               </Button>
             </div>
           </div>
-        </Card>
-      ) : (
-        <Button fullWidth onClick={() => setShowAddForm(true)}>
-          Ajouter un élément
-        </Button>
+        </div>
       )}
 
       {alarmItem && (

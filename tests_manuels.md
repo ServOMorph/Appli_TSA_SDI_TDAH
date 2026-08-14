@@ -20,3 +20,10 @@ Consigne : valider chaque point sur l'appareil réel, puis supprimer la section 
 2. Choisir Type = Retrait, saisir un montant inférieur au solde : enregistrement possible, le solde du livret diminue, la ligne affiche « Retrait ».
 3. Saisir un montant supérieur au solde : le bouton Enregistrer reste désactivé, message d'erreur affiché.
 
+## 4 — Formulaire d'ajout d'élément de liste, superposition avec la nav (E61)
+
+Signalé par Marie le 2026-08-13 (vidéo) : à l'ouverture du clavier sur « Ajouter un élément », la barre de nav basse se superposait transitoirement au formulaire. Corrigé en le passant en boîte de dialogue plein écran.
+
+1. Ouvrir une liste, taper « Ajouter un élément » sur mobile.
+2. Vérifier que le formulaire (champs Élément/Rubrique, boutons Ajouter/Annuler) reste entièrement visible et cliquable dès l'ouverture du clavier, sans superposition de la barre de nav.
+

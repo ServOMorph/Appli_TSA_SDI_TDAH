@@ -84,6 +84,8 @@ Lire `.claude/memory.md` en début de chaque session si le fichier existe. Ce fi
 
 Certains dossiers ou fichiers peuvent contenir des données sensibles (informations clients, données personnelles, fichiers financiers). Les lister ici pour interdire toute lecture ou écriture sans instruction explicite :
 
+D:\ServOMorph\Appli_TSA_SDI_TDAH\.env
+
 <!-- Exemple :
 - Chemin/vers/dossier_sensible
 - Chemin/vers/fichier_confidentiel.md

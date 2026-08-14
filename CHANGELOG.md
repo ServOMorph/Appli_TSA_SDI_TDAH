@@ -1,3 +1,15 @@
+## v5.20 — 2026-08-14
+
+### Ajouté
+- `E01Welcome.tsx` : bouton d'accueil affiche « Entrer dans la <version> » en production, alimenté par `VITE_APP_VERSION` injectée au build par `/deploy`. Sans cette variable (dev, tests), reste « Entrer ».
+
+## v5.19 — 2026-08-13
+
+Retour vidéo de Marie sur la dist V5.1 : superposition de la nav basse sur le formulaire d'ajout d'élément de liste.
+
+### Corrigé
+- `E61ListDetail.tsx` : formulaire « Ajouter un élément » converti en boîte de dialogue plein écran (`position: fixed`, `z-index: 1000`), même pattern que les dialogues « Planifier » et « Supprimer la liste » du même fichier — corrige la superposition transitoire avec la barre de nav fixe à l'ouverture du clavier sur mobile.
+
 ## v5.18 — 2026-08-07
 
 Retours de validation manuelle de la Phase V5.1-0 (Outils et Budget), modèle de données inchangé.

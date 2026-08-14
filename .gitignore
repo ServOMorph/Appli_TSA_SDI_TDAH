@@ -18,6 +18,9 @@ e2e/test-results/
 .env.local
 .env.*.local
 
+# Netlify CLI local state
+.netlify/
+
 # Logs
 *.log
 npm-debug.log*

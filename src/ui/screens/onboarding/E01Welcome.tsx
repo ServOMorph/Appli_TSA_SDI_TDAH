@@ -33,7 +33,7 @@ export function E01Welcome() {
         }}
       />
       <Button fullWidth onClick={() => goTo('profile')} style={{ flex: '0 0 auto' }}>
-        Entrer
+        {import.meta.env.VITE_APP_VERSION ? `Entrer dans la ${import.meta.env.VITE_APP_VERSION}` : 'Entrer'}
       </Button>
     </main>
   )

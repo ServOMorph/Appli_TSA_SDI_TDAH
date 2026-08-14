@@ -13,6 +13,7 @@ interface TopBarProps {
   onManualTestsClick: () => void
   hasNewManualTests: boolean
   onOverloadClick: () => void
+  ambianceColor: string
 }
 
 const modalOverlayStyle: React.CSSProperties = {
@@ -73,6 +74,7 @@ export function TopBar({
   onManualTestsClick,
   hasNewManualTests,
   onOverloadClick,
+  ambianceColor,
 }: TopBarProps) {
   const [showOverloadInfo, setShowOverloadInfo] = useState(false)
 
@@ -183,6 +185,7 @@ export function TopBar({
             value={energyValue}
             plannedCost={plannedCost}
             onClick={onEnergyClick}
+            ambianceColor={ambianceColor}
           />
         </div>
       )}

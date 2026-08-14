@@ -27,7 +27,12 @@ Signalé par Marie le 2026-08-13 (vidéo) : à l'ouverture du clavier sur « Ajo
 1. Ouvrir une liste, taper « Ajouter un élément » sur mobile.
 2. Vérifier que le formulaire (champs Élément/Rubrique, boutons Ajouter/Annuler) reste entièrement visible et cliquable dès l'ouverture du clavier, sans superposition de la barre de nav.
 
-## 5 — Import d'une sauvegarde JSON (E117)
+## 5 — Badge énergie, fond en couleur d'ambiance (barre du haut)
+
+1. Ouvrir Paramètres > Accessibilité, choisir une couleur d'ambiance (ex. rose).
+2. Revenir à l'accueil : le badge énergie de la barre du haut n'affiche plus « planifié / dispo » (icône batterie + chiffres seulement) et son fond est teinté avec la couleur choisie.
+
+## 6 — Import d'une sauvegarde JSON (E117)
 
 1. Depuis Paramètres > Export et import, taper « Importer un fichier JSON » et sélectionner `donnees_marie/export-audhd-2026-08-13.json`.
 2. Vérifier l'affichage de la modale « Remplacer toutes les données ? », confirmer.

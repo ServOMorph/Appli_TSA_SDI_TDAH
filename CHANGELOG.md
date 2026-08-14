@@ -1,3 +1,8 @@
+## v5.31 — 2026-08-14
+
+### Modifié
+- Badge énergie de la barre du haut (`EnergyDisplay.tsx`) : retrait du libellé texte « planifié / dispo » (icône batterie et chiffres conservés), fond désormais teinté avec la couleur d'ambiance choisie par l'utilisateur dans Paramètres > Accessibilité (au lieu d'une couleur fixe), suite à un retour de test manuel de Marie.
+
 ## v5.30 — 2026-08-14
 
 ### Modifié

@@ -16,7 +16,7 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version fonctionnelle documentée est **v5.29** (voir le [CHANGELOG](CHANGELOG.md)). La phase 3 du parcours de tests manuels est en cours : le script d'ingestion et le journal de projet sont livrés, et attendent une validation sur un export réel.
+La version fonctionnelle documentée est **v5.31** (voir le [CHANGELOG](CHANGELOG.md)). La phase 3 du parcours de tests manuels est en cours : le script d'ingestion et le journal de projet sont livrés, et attendent une validation sur un export réel.
 
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
 

@@ -10,7 +10,7 @@ import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { BudgetExpenseModal } from '@/ui/components/BudgetExpenseModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
-import { flashyBackground } from '@/ui/styles/ambiance'
+import { flashyBackground, DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
 import {
   DndContext,
   PointerSensor,
@@ -169,6 +169,7 @@ export function E10Dashboard() {
     budgetCategories,
     createBudgetEntry,
     manualTestResults,
+    settings,
   } = useApp()
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [showNoExpenseCategory, setShowNoExpenseCategory] = useState(false)
@@ -271,6 +272,7 @@ export function E10Dashboard() {
         onManualTestsClick={() => goTo('manual-tests')}
         hasNewManualTests={hasNewManualTests}
         onOverloadClick={() => goTo('overload-recovery')}
+        ambianceColor={settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR}
       />
 
       {overloadMode && showSecondary && (

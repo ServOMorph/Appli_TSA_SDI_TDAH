@@ -11,7 +11,7 @@
 - Flux d'archivage des tests Marie (phase 3) : à réception d'un export JSON de Marie (`donnees_marie/`, donnée sensible), exécuter `python scripts/ingest_manual_tests.py <chemin_export>` — fusionne `manual_test_results` dans `_contexte/marie_tests_journal.json` (dédoublonnage par `id`, jamais d'écrasement).
 
 ## Questions ouvertes
-- [P1] Valider les 5 points de `tests_manuels.md` (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, import de sauvegarde JSON) sur appareil réel, puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase, le 5ᵉ — import — est hors périmètre de V5.1-0). — fait quand : les 5 points validés, `tests_manuels.md` vidé — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
+- [P1] Valider les 6 points de `tests_manuels.md` (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, badge énergie fond couleur d'ambiance, import de sauvegarde JSON) sur appareil réel, puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase, le badge énergie et l'import sont hors périmètre de V5.1-0). — fait quand : les 6 points validés, `tests_manuels.md` vidé — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
 - [P1] Informer Marie que l'adresse de test a changé : `delightful-sunflower-836720.netlify.app` (qu'elle a utilisée) n'est plus à jour, le site officiel est désormais `https://appli-audhd.netlify.app` (déployé en v5.22). — fait quand : nouvelle adresse communiquée à Marie — réf : `.claude/commands/deploy.md`, `_contexte/dernier_deploiement.md`
 - [P1] Communiquer à Marie les points de `a_communiquer_v5.md` maintenant que la V5.0 complète est livrée (V5-0 à V5-3 close), puis recueillir son retour sur les 3 écarts assumés et sur la priorité « Comptage en premier » parmi les outils reportés. — fait quand : retour de Marie recueilli après livraison — réf : `a_communiquer_v5.md`
 - [P1] Demander à Marie un test réel du Budget refondu (E71/E73/E74) — jamais vu par elle, l'écran a changé depuis sa dernière utilisation. — fait quand : retour de Marie recueilli sur le Budget — réf : `E71Budget.tsx`, `roadmap_v5.1.md`
@@ -21,7 +21,30 @@
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-14 — Phase 3 tests manuels Marie, bannière urgence, déploiement v5.29)
+## Dernière session (2026-08-14 — suite 10, badge énergie couleur d'ambiance, déploiement v5.31)
+
+## Décisions prises
+- Retour de test manuel de Marie (screenshot annoté) traité : badge énergie de la barre du haut allégé (retrait du libellé texte) et fond teinté avec la couleur d'ambiance existante (`Settings.ambiance_color`), après clarification avec l'utilisateur que le rose du screen était cette couleur paramétrable, pas une couleur fixe à coder en dur.
+
+## Livrables produits ou modifiés
+- `src/ui/components/EnergyDisplay.tsx` : retrait du texte « planifié / dispo », fond via `pastelBackground(ambianceColor)`.
+- `src/ui/components/TopBar.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx` : prop `ambianceColor` propagée depuis `settings.ambiance_color`.
+- `tests_manuels.md` : point 5 ajouté (vérification visuelle du badge énergie).
+- `CHANGELOG.md` : entrée v5.31.
+
+## Hypothèses validées / invalidées
+- INVALIDE : première implémentation avec une couleur rose codée en dur (`--color-energy-bg`) -> pivot vers la couleur d'ambiance existante déjà utilisée pour teinter les tâches planifiées (`ambiance.ts`), sur correction explicite de l'utilisateur.
+- EN ATTENTE : connecteur MCP Google Drive confirmé actif mais avec des scopes d'authentification insuffisants pour lire le contenu d'un Google Doc ; aucun outil du connecteur ne permet d'écrire dans le corps d'un Doc existant, quel que soit le scope.
+
+## Prochaine étape exacte
+Déployer v5.31 en prod via `/deploy`, puis attendre validation manuelle du point 5 de `tests_manuels.md` sur appareil réel.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-14 — Phase 3 tests manuels Marie, bannière urgence, déploiement v5.29)
 
 ## Décisions prises
 - Format du journal projet de la Phase 3 tranché avec l'utilisateur : JSON structuré (`{ "entries": [...] }`), emplacement `_contexte/marie_tests_journal.json`.

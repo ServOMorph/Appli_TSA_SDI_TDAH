@@ -60,6 +60,8 @@ Modale « Nouveautés » et déploiement de test ajoutés hors phase (2026-08-14
 
 Déploiement v5.24 effectué (2026-08-14, suite 5), avertissements tests manuels confirmés. Version dev affichée en permanence ajoutée ensuite : le panneau dev (haut à droite, `npm run dev` uniquement) lit `CHANGELOG.md` au build et affiche la version courante sans intervention manuelle. 533/533 tests unitaires, `tsc -b`/lint clean.
 
+Nouvelle roadmap ouverte (2026-08-14, suite 6) : `roadmap_tests_marie.md`, Phase 1 `[TODO]`, rien de codé. Catalogue de tests manuels pour Marie en langage clair, consultable in-app depuis une icône dédiée, modale de validation avec historique conservé au fil du développement, pastille rouge sur les tests jamais soumis. `/deploy` et `/deploy_dev` vérifient déjà (non bloquant, sans effet tant que la fonctionnalité n'existe pas) la fraîcheur du futur catalogue.
+
 Phase V5-0 codée et validée manuellement : pile de navigation paramétrée (`src/app/navigation.ts`), `AppContext.tsx` découpé de 961 à 169 lignes en 6 contextes de domaine (`src/app/contexts/*`), retours codés en dur remplacés par la pile. Deux constats non bloquants tracés dans la roadmap (réglage « Réduire les animations » quasi sans effet visible, bug d'export du chiffrement de l'énergie du jour) — non corrigés cette session.
 
 Phase V5-1 close le 2026-08-02 après validation manuelle intégrale sur appareil tactile : nav basse ramenée à 4 éléments (Réception, Accueil, Paramètres, +), `E40Planning` absorbé par `E10Dashboard` (écran unique replié/déplié, corps extrait dans `PlanningBoard.tsx`), énergie planifiée/disponible affichée côte à côte, pastille de surcharge cliquable vers le centre de récupération, glisser-déposer du planning supprimé par anticipation. 3 défauts trouvés et corrigés en validation manuelle : titre `<h1>` de l'écran Réception resté « Todo » ; `index.html` déclarait `lang="en"` sur une UI française, déclenchant la traduction automatique de Chrome (corruption des nœuds texte du DOM, cassant la réconciliation React).
@@ -99,7 +101,7 @@ L'application repose sur une architecture découplée stricte en couches, docume
 
 ## Prochaine étape
 
-Valider les 5 points de `tests_manuels.md` sur appareil réel (dont l'import d'une sauvegarde JSON), pour clore la Phase V5.1-0 (`roadmap_v5.1.md`) sur ses 4 premiers points. En parallèle, informer la testeuse du changement d'adresse du site (`appli-audhd.netlify.app`), lui communiquer les points de `a_communiquer_v5.md` (racine), et lui demander un test réel du Budget refondu.
+Valider les 5 points de `tests_manuels.md` sur appareil réel (dont l'import d'une sauvegarde JSON), pour clore la Phase V5.1-0 (`roadmap_v5.1.md`) sur ses 4 premiers points. En parallèle, informer la testeuse du changement d'adresse du site (`appli-audhd.netlify.app`), lui communiquer les points de `a_communiquer_v5.md` (racine), et lui demander un test réel du Budget refondu. Démarrer ensuite la Phase 1 de `roadmap_tests_marie.md`.
 
 ## Licence
 

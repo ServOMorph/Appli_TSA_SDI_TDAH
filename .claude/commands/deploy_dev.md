@@ -27,23 +27,28 @@ qu'une version soit prête à sortir.
    par `/close` à son étape 12), ne pas bloquer — signaler que du code non commité va être
    déployé et continuer.
 
-3. Build, sans version ni dossier dédié (écrasé à chaque appel) :
+3. **Catalogue des tests manuels pour Marie à jour** : `test -f src/domain/data/manualTestsCatalog.ts`
+   (cf. `roadmap_tests_marie.md`). Si absent, ignorer silencieusement — fonctionnalité pas encore livrée.
+   S'il existe, lire son contenu et signaler s'il semble ne pas refléter l'état actuel du code (changements
+   non commités ou récents touchant un écran soumis à Marie). Non bloquant, ne pas modifier le catalogue.
+
+4. Build, sans version ni dossier dédié (écrasé à chaque appel) :
    ```
    npx tsc -b && npx vite build --outDir dist/dev
    ```
    Si `tsc -b` échoue, s'arrêter et rapporter l'erreur — ne jamais déployer un build qui ne
    compile pas.
 
-4. Déployer sur le site dev, en chargeant `.env` dans l'environnement de la seule commande
+5. Déployer sur le site dev, en chargeant `.env` dans l'environnement de la seule commande
    (jamais affiché, jamais passé en argument visible) :
    ```
    set -a; source .env; set +a; npx netlify deploy --prod --dir=dist/dev --site="$NETLIFY_SITE_ID_DEV"
    ```
 
-5. Vérification de fumée : `curl -sf -o /dev/null -w '%{http_code}' https://appli-audhd-dev.netlify.app`.
+6. Vérification de fumée : `curl -sf -o /dev/null -w '%{http_code}' https://appli-audhd-dev.netlify.app`.
    Un code différent de 200 est signalé dans le rapport mais n'invalide pas le déploiement déjà
    effectué par Netlify.
 
-6. Rapporter à l'utilisateur : résultat du build, résultat du déploiement, résultat de la
+7. Rapporter à l'utilisateur : résultat du build, résultat du déploiement, résultat de la
    vérification de fumée, et rappeler l'URL de test `https://appli-audhd-dev.netlify.app`.
    Ne jamais relancer le déploiement automatiquement en cas d'échec.

@@ -50,6 +50,11 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       qu'il sera écrasé par ce build.
    4. **Tests manuels en attente** : lire `tests_manuels.md`. S'il contient autre chose que le fichier vide,
       lister les points en attente et signaler qu'un déploiement prod interviendrait avant leur validation.
+   5. **Catalogue des tests manuels pour Marie à jour** : `test -f src/domain/data/manualTestsCatalog.ts`
+      (cf. `roadmap_tests_marie.md`). Si absent, ignorer silencieusement — fonctionnalité pas encore livrée.
+      S'il existe, lire son contenu et le comparer aux changements de la version en cours de déploiement
+      (`CHANGELOG.md`) : si une fonctionnalité soumise à Marie a changé sans que le catalogue n'ait été mis à
+      jour, le signaler. Ne pas modifier le catalogue automatiquement.
 
 4. Build :
    ```

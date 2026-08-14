@@ -1,3 +1,11 @@
+## v5.26 — 2026-08-14
+
+Roadmap `roadmap_tests_marie.md` créée, vérification de fraîcheur du catalogue de tests Marie ajoutée à `/deploy` et `/deploy_dev`.
+
+### Ajouté
+- `roadmap_tests_marie.md` : catalogue in-app des tests manuels soumis à Marie (langage clair, modale de validation avec commentaire obligatoire si refus, historique append-only, pastille rouge sur les tests jamais soumis et sur l'icône du bandeau), et archivage côté projet des exports reçus (Phase 1 `[TODO]`, rien de codé).
+- `/deploy` et `/deploy_dev` : vérification non bloquante de la fraîcheur de `src/domain/data/manualTestsCatalog.ts` (no-op tant que ce fichier n'existe pas).
+
 ## v5.25 — 2026-08-14
 
 Déploiement v5.24 en prod, puis version courante affichée en permanence dans le panneau dev.

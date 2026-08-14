@@ -77,21 +77,6 @@ export function DevResetButton() {
       >
         {__APP_DEV_VERSION__}
       </span>
-      <button
-        onClick={handleReset}
-        style={{
-          padding: '4px 10px',
-          fontSize: '0.75rem',
-          background: '#dc2626',
-          color: '#fff',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          opacity: 0.8,
-        }}
-      >
-        Reset DB
-      </button>
       <span
         style={{
           fontSize: '0.7rem',
@@ -121,6 +106,21 @@ export function DevResetButton() {
           cursor: 'pointer',
         }}
       />
+      <button
+        onClick={handleReset}
+        style={{
+          padding: '4px 10px',
+          fontSize: '0.75rem',
+          background: '#dc2626',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          opacity: 0.8,
+        }}
+      >
+        Reset DB
+      </button>
     </div>
   )
 }

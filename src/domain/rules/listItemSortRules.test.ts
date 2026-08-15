@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { groupListItemsBySection, sortListItems } from './listItemSortRules'
+import { groupListItemsByCategory, sortListItems } from './listItemSortRules'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListCategory } from '@/domain/entities/listCategory'
 
 function makeItem(overrides: Partial<ListItem> = {}): ListItem {
   return {
@@ -9,7 +10,18 @@ function makeItem(overrides: Partial<ListItem> = {}): ListItem {
     title: 'Item',
     position: 0,
     checked: false,
-    section: null,
+    category_id: 'cat-ete',
+    created_at: '2026-08-06T00:00:00.000Z',
+    ...overrides,
+  }
+}
+
+function makeCategory(overrides: Partial<ListCategory> = {}): ListCategory {
+  return {
+    id: 'cat-ete',
+    list_id: 'list-1',
+    name: 'Été',
+    position: 0,
     created_at: '2026-08-06T00:00:00.000Z',
     ...overrides,
   }
@@ -37,33 +49,42 @@ describe('sortListItems', () => {
   })
 })
 
-describe('groupListItemsBySection', () => {
-  it('regroupe par rubrique dans l\'ordre de première apparition', () => {
-    const items = [
-      makeItem({ id: 'a', section: 'Été', position: 0 }),
-      makeItem({ id: 'b', section: 'Hiver', position: 0 }),
-      makeItem({ id: 'c', section: 'Été', position: 1 }),
+describe('groupListItemsByCategory', () => {
+  it('regroupe par catégorie dans l\'ordre de position des catégories', () => {
+    const categories = [
+      makeCategory({ id: 'cat-ete', name: 'Été', position: 0 }),
+      makeCategory({ id: 'cat-hiver', name: 'Hiver', position: 1 }),
     ]
-    const groups = groupListItemsBySection(items)
-    expect(groups.map((g) => g.section)).toEqual(['Été', 'Hiver'])
+    const items = [
+      makeItem({ id: 'a', category_id: 'cat-ete', position: 0 }),
+      makeItem({ id: 'b', category_id: 'cat-hiver', position: 0 }),
+      makeItem({ id: 'c', category_id: 'cat-ete', position: 1 }),
+    ]
+    const groups = groupListItemsByCategory(items, categories)
+    expect(groups.map((g) => g.category.name)).toEqual(['Été', 'Hiver'])
     expect(groups[0].items.map((i) => i.id)).toEqual(['a', 'c'])
   })
 
-  it('place le groupe sans rubrique en dernier', () => {
-    const items = [
-      makeItem({ id: 'a', section: null }),
-      makeItem({ id: 'b', section: 'Hiver' }),
+  it('respecte l\'ordre de position des catégories même inversé', () => {
+    const categories = [
+      makeCategory({ id: 'cat-hiver', name: 'Hiver', position: 0 }),
+      makeCategory({ id: 'cat-ete', name: 'Été', position: 1 }),
     ]
-    const groups = groupListItemsBySection(items)
-    expect(groups.map((g) => g.section)).toEqual(['Hiver', null])
+    const items = [
+      makeItem({ id: 'a', category_id: 'cat-ete' }),
+      makeItem({ id: 'b', category_id: 'cat-hiver' }),
+    ]
+    const groups = groupListItemsByCategory(items, categories)
+    expect(groups.map((g) => g.category.name)).toEqual(['Hiver', 'Été'])
   })
 
   it('trie les items cochés sous les non cochés au sein d\'un groupe', () => {
+    const categories = [makeCategory({ id: 'cat-hiver', name: 'Hiver', position: 0 })]
     const items = [
-      makeItem({ id: 'a', section: 'Hiver', checked: true, position: 0 }),
-      makeItem({ id: 'b', section: 'Hiver', checked: false, position: 1 }),
+      makeItem({ id: 'a', category_id: 'cat-hiver', checked: true, position: 0 }),
+      makeItem({ id: 'b', category_id: 'cat-hiver', checked: false, position: 1 }),
     ]
-    const groups = groupListItemsBySection(items)
+    const groups = groupListItemsByCategory(items, categories)
     expect(groups[0].items.map((i) => i.id)).toEqual(['b', 'a'])
   })
 })

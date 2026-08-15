@@ -2,10 +2,21 @@ import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
-import { groupListItemsBySection } from '@/domain/rules/listItemSortRules'
+import { groupListItemsByCategory } from '@/domain/rules/listItemSortRules'
 import { todayDate } from '@/app/repositories'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListCategory } from '@/domain/entities/listCategory'
 import type { RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
+
+const fieldInputStyle: React.CSSProperties = {
+  padding: '8px',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-sm)',
+  fontFamily: 'var(--font-body)',
+  fontSize: '1rem',
+  color: 'var(--color-text)',
+  background: 'var(--color-surface)',
+}
 
 const defaultRecurrence: RecurrenceRuleInput = {
   frequency: 'daily',
@@ -17,14 +28,31 @@ const defaultRecurrence: RecurrenceRuleInput = {
 }
 
 export function E61ListDetail() {
-  const { lists, tools, selectedListId, getListItems, addListItem, deleteListItem, toggleListItem, back, createDetailedTask, deleteTool } = useApp()
+  const {
+    lists,
+    tools,
+    selectedListId,
+    getListItems,
+    getListCategories,
+    createListCategory,
+    addListItem,
+    deleteListItem,
+    toggleListItem,
+    back,
+    createDetailedTask,
+    deleteTool,
+  } = useApp()
   const list = lists.find((l) => l.id === selectedListId) ?? null
   const tool = tools.find((t) => t.type === 'liste' && t.list_id === selectedListId) ?? null
 
   const [items, setItems] = useState<ListItem[]>([])
+  const [categories, setCategories] = useState<ListCategory[]>([])
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const [showAddCategoryForm, setShowAddCategoryForm] = useState(false)
+  const [addCategoryName, setAddCategoryName] = useState('')
+  const [addingCategory, setAddingCategory] = useState(false)
   const [showAddForm, setShowAddForm] = useState(false)
   const [newTitle, setNewTitle] = useState('')
-  const [newSection, setNewSection] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [alarmItem, setAlarmItem] = useState<ListItem | null>(null)
   const [alarmDate, setAlarmDate] = useState(todayDate())
@@ -36,7 +64,8 @@ export function E61ListDetail() {
   useEffect(() => {
     if (!selectedListId) return
     getListItems(selectedListId).then(setItems)
-  }, [selectedListId, getListItems])
+    getListCategories(selectedListId).then(setCategories)
+  }, [selectedListId, getListItems, getListCategories])
 
   async function refresh() {
     if (!selectedListId) return
@@ -45,14 +74,24 @@ export function E61ListDetail() {
 
   async function handleAdd() {
     const title = newTitle.trim()
-    if (!title || !selectedListId) return
+    if (!title || !selectedListId || !selectedCategoryId) return
     setSubmitting(true)
-    await addListItem(selectedListId, title, newSection.trim() || null)
+    await addListItem(selectedListId, title, selectedCategoryId)
     await refresh()
     setNewTitle('')
-    setNewSection('')
     setShowAddForm(false)
     setSubmitting(false)
+  }
+
+  async function handleAddCategory() {
+    const trimmed = addCategoryName.trim()
+    if (!trimmed || !selectedListId) return
+    setAddingCategory(true)
+    await createListCategory(selectedListId, trimmed)
+    setCategories(await getListCategories(selectedListId))
+    setAddingCategory(false)
+    setAddCategoryName('')
+    setShowAddCategoryForm(false)
   }
 
   async function handleDelete(id: string) {
@@ -98,7 +137,10 @@ export function E61ListDetail() {
     setAlarmItem(null)
   }
 
-  const sections = groupListItemsBySection(items)
+  const groups = groupListItemsByCategory(items, categories)
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null
+  const currentGroup = groups.find((g) => g.category.id === selectedCategoryId) ?? null
+  const currentItems = currentGroup?.items ?? []
 
   return (
     <main
@@ -116,7 +158,7 @@ export function E61ListDetail() {
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
         <button
           aria-label="Retour"
-          onClick={() => back('tools')}
+          onClick={() => (selectedCategory ? setSelectedCategoryId(null) : back('tools'))}
           style={{
             background: 'none',
             border: 'none',
@@ -138,7 +180,7 @@ export function E61ListDetail() {
             borderRadius: 'var(--radius-md)',
           }}
         >
-          {list?.name ?? 'Liste'}
+          {selectedCategory ? selectedCategory.name : list?.name ?? 'Liste'}
         </h1>
         <button
           aria-label="Supprimer la liste"
@@ -156,19 +198,86 @@ export function E61ListDetail() {
         </button>
       </header>
 
-      {items.length === 0 && !showAddForm && (
-        <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
-          Cette liste est vide.
-        </p>
+      {!selectedCategory && (
+        <>
+          {categories.length === 0 && (
+            <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
+              Cette liste n'a pas encore de catégorie.
+            </p>
+          )}
+
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+            {groups.map(({ category, items: categoryItems }) => (
+              <li key={category.id}>
+                <button
+                  onClick={() => setSelectedCategoryId(category.id)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    gap: 'var(--spacing-sm)',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: 'var(--spacing-md)',
+                    cursor: 'pointer',
+                    color: 'var(--color-text)',
+                    fontSize: '1rem',
+                  }}
+                >
+                  <span>{category.name}</span>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                    {categoryItems.length}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {showAddCategoryForm ? (
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="text"
+                value={addCategoryName}
+                onChange={(e) => setAddCategoryName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddCategory()
+                }}
+                autoFocus
+                placeholder="Nom de la catégorie…"
+                aria-label="Nom de la catégorie"
+                style={{ ...fieldInputStyle, flex: 1 }}
+              />
+              <Button onClick={handleAddCategory} disabled={!addCategoryName.trim() || addingCategory}>
+                Ajouter
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setShowAddCategoryForm(false)
+                  setAddCategoryName('')
+                }}
+              >
+                Annuler
+              </Button>
+            </div>
+          ) : (
+            <Button fullWidth variant="secondary" onClick={() => setShowAddCategoryForm(true)}>
+              Ajouter une catégorie
+            </Button>
+          )}
+        </>
       )}
 
-      {sections.map(({ section, items: sectionItems }) => (
-        <section key={section ?? '__no_section__'}>
-          {section && (
-            <h2 style={{ fontSize: '0.95rem', margin: '0 0 var(--spacing-xs) 0', color: 'var(--color-text-muted)' }}>
-              {section}
-            </h2>
+      {selectedCategory && (
+        <>
+          {currentItems.length === 0 && !showAddForm && (
+            <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
+              Cette catégorie est vide.
+            </p>
           )}
+
           <ul
             style={{
               listStyle: 'none',
@@ -179,7 +288,7 @@ export function E61ListDetail() {
               gap: 'var(--spacing-xs)',
             }}
           >
-            {sectionItems.map((item) => (
+            {currentItems.map((item) => (
               <li
                 key={item.id}
                 style={{
@@ -234,12 +343,12 @@ export function E61ListDetail() {
               </li>
             ))}
           </ul>
-        </section>
-      ))}
 
-      <Button fullWidth onClick={() => setShowAddForm(true)}>
-        Ajouter un élément
-      </Button>
+          <Button fullWidth onClick={() => setShowAddForm(true)}>
+            Ajouter un élément
+          </Button>
+        </>
+      )}
 
       {showAddForm && (
         <div
@@ -296,28 +405,6 @@ export function E61ListDetail() {
                 background: 'var(--color-surface)',
               }}
             />
-            <label
-              htmlFor="new-item-section"
-              style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}
-            >
-              Rubrique (optionnel)
-            </label>
-            <input
-              id="new-item-section"
-              type="text"
-              value={newSection}
-              onChange={(e) => setNewSection(e.target.value)}
-              placeholder="Ex. Habits été"
-              style={{
-                padding: '8px',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-sm)',
-                fontFamily: 'var(--font-body)',
-                fontSize: '1rem',
-                color: 'var(--color-text)',
-                background: 'var(--color-surface)',
-              }}
-            />
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
               <Button
                 fullWidth
@@ -332,7 +419,6 @@ export function E61ListDetail() {
                 onClick={() => {
                   setShowAddForm(false)
                   setNewTitle('')
-                  setNewSection('')
                 }}
               >
                 Annuler

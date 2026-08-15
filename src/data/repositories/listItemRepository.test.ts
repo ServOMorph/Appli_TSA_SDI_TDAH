@@ -24,7 +24,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     const id = await repo.create(item)
@@ -38,7 +38,7 @@ describe('ListItemRepository', () => {
       title: 'My item',
       position: 0,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -53,7 +53,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     const item2: ListItem = {
@@ -62,7 +62,7 @@ describe('ListItemRepository', () => {
       title: 'Item 2',
       position: 1,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     const item3: ListItem = {
@@ -71,7 +71,7 @@ describe('ListItemRepository', () => {
       title: 'Item 3',
       position: 0,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item1)
@@ -82,6 +82,32 @@ describe('ListItemRepository', () => {
     expect(items[0].id).toBe('1')
   })
 
+  it('retrieves items by category id', async () => {
+    const item1: ListItem = {
+      id: '1',
+      list_id: 'list-1',
+      title: 'Item 1',
+      position: 0,
+      checked: false,
+      category_id: 'cat-a',
+      created_at: '2026-06-29T00:00:00Z',
+    }
+    const item2: ListItem = {
+      id: '2',
+      list_id: 'list-1',
+      title: 'Item 2',
+      position: 1,
+      checked: false,
+      category_id: 'cat-b',
+      created_at: '2026-06-29T00:00:00Z',
+    }
+    await repo.create(item1)
+    await repo.create(item2)
+    const items = await repo.getByCategoryId('cat-a')
+    expect(items).toHaveLength(1)
+    expect(items[0].id).toBe('1')
+  })
+
   it('updates an item', async () => {
     const item: ListItem = {
       id: '1',
@@ -89,7 +115,7 @@ describe('ListItemRepository', () => {
       title: 'Original',
       position: 0,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -106,7 +132,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -122,7 +148,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     const item2: ListItem = {
@@ -131,7 +157,7 @@ describe('ListItemRepository', () => {
       title: 'Item 2',
       position: 1,
       checked: false,
-      section: null,
+      category_id: 'cat-1',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item1)

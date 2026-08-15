@@ -31,22 +31,22 @@ describe('PlanningBoard — déplié', () => {
     expect(screen.getByLabelText('2026-07-02')).toBeInTheDocument()
   })
 
-  it('navigation précédent charge le jour précédent', async () => {
+  it('navigation précédent charge la semaine précédente', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    await userEvent.click(screen.getByRole('button', { name: /jour précédent/i }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
+    await userEvent.click(screen.getByRole('button', { name: /semaine précédente/i }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-23'))
   })
 
-  it('navigation suivant charge le jour suivant', async () => {
+  it('navigation suivant charge la semaine suivante', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    await userEvent.click(screen.getByRole('button', { name: /jour suivant/i }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
+    await userEvent.click(screen.getByRole('button', { name: /semaine suivante/i }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-07'))
   })
 
   it('aller à une date via le sélecteur charge ce jour', async () => {
@@ -212,10 +212,10 @@ describe('PlanningBoard — replié', () => {
     vi.setSystemTime(new Date('2026-06-30T14:30:00'))
   })
 
-  it("n'affiche pas le bandeau de dates", async () => {
+  it('affiche le bandeau de dates comme en mode déplié', async () => {
     renderWithApp(<PlanningBoard collapsed />, makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
-    await waitFor(() => expect(screen.queryByLabelText('2026-06-30')).toBeNull())
-    expect(screen.queryByRole('button', { name: /jour précédent/i })).toBeNull()
+    await waitFor(() => expect(screen.queryByLabelText('2026-06-30')).not.toBeNull())
+    expect(screen.queryByRole('button', { name: /semaine précédente/i })).not.toBeNull()
   })
 
   it('charge toujours le jour courant, quelle que soit la navigation précédente', async () => {

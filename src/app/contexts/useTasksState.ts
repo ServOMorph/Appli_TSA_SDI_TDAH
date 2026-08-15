@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { listItemRepo, newId, taskRepo } from '@/app/repositories'
+import { listCategoryRepo, listItemRepo, newId, taskRepo } from '@/app/repositories'
 import {
   createTask as createTaskRule,
   scheduleTask as scheduleTaskRule,
@@ -8,7 +8,7 @@ import {
   toggleTaskCompletion as toggleTaskCompletionRule,
   completeTask as completeTaskRule,
 } from '@/domain/rules/taskRules'
-import { createListItem as createListItemRule } from '@/domain/rules/listRules'
+import { createListItem as createListItemRule, createListCategory as createListCategoryRule } from '@/domain/rules/listRules'
 import type { Task, TaskStatus } from '@/domain/entities/task'
 import type { PlannedSubTask } from '@/app/contexts/usePlanningState'
 
@@ -63,7 +63,14 @@ export function useTasksState() {
     if (!task) return
     const now = new Date().toISOString()
     const existing = await listItemRepo.getByListId(listId)
-    const item = createListItemRule(newId(), listId, task.title, existing.length, now)
+    const categories = await listCategoryRepo.getByListId(listId)
+    let categoryId = categories[0]?.id
+    if (!categoryId) {
+      const category = createListCategoryRule(newId(), listId, 'Général', 0, now)
+      await listCategoryRepo.create(category)
+      categoryId = category.id
+    }
+    const item = createListItemRule(newId(), listId, task.title, existing.length, now, categoryId)
     await listItemRepo.create(item)
     await taskRepo.deleteWithChildren(taskId)
     await load()

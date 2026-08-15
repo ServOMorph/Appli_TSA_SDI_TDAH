@@ -3,7 +3,12 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = []
+const WHATS_NEW: string[] = [
+  'La page d’accueil affiche maintenant les jours de la semaine et le mois, comme l’écran Planning. Le trait gris en bas de cette zone se glisse vers le bas pour agrandir le planning, ou vers le haut pour le refermer.',
+  'Les flèches du bandeau de dates avancent maintenant d’une semaine à chaque clic, au lieu d’un jour.',
+  'Vos listes peuvent maintenant être organisées en catégories : à la création, définissez-en une ou plusieurs. En ouvrant une liste, choisissez d’abord la catégorie, puis ses éléments s’affichent. Vous pouvez ajouter une catégorie à tout moment.',
+  'Dans le budget, les catégories de dépenses sont maintenant regroupées sous « Semaine » et « Mois » pour s’y retrouver plus facilement.',
+]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

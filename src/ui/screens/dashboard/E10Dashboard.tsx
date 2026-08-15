@@ -1,7 +1,6 @@
 import { useApp } from '@/app/AppContext'
-import { useState, useEffect } from 'react'
-import type { Task } from '@/domain/entities/task'
-import { getRemainingPlannedCost, isCompleted } from '@/domain/rules/taskRules'
+import { useState, useRef } from 'react'
+import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
@@ -10,110 +9,8 @@ import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { BudgetExpenseModal } from '@/ui/components/BudgetExpenseModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
-import { flashyBackground, DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
-import {
-  DndContext,
-  PointerSensor,
-  TouchSensor,
-  KeyboardSensor,
-  useSensor,
-  useSensors,
-  closestCenter,
-  type DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-  arrayMove,
-  sortableKeyboardCoordinates,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
-
-interface SortableTaskItemProps {
-  task: Task
-  subs: Task[]
-  onOpen: (id: string) => void
-}
-
-function SortableTaskItem({ task, subs, onOpen }: SortableTaskItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: task.id,
-  })
-  const done = subs.filter(isCompleted).length
-  const total = subs.length
-  const completed = isCompleted(task)
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-        touchAction: 'none',
-        cursor: 'grab',
-      }}
-    >
-      <Card style={{
-        padding: 'var(--spacing-12)',
-        ...(completed ? { backgroundColor: flashyBackground('var(--color-accent)'), borderColor: 'var(--color-accent)', color: '#fff' } : {}),
-      }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 'var(--spacing-sm)',
-          }}
-        >
-          <span
-            aria-hidden
-            style={{
-              fontSize: '0.9rem',
-              color: completed ? '#fff' : 'var(--color-text-muted)',
-              flexShrink: 0,
-              lineHeight: 1,
-            }}
-          >
-            ⠿
-          </span>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onOpen(task.id)
-            }}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: completed ? '#fff' : 'var(--color-text)',
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              padding: 0,
-              textAlign: 'left',
-              flex: 1,
-              textDecoration: completed ? 'line-through' : 'none',
-            }}
-          >
-            {task.title}
-          </button>
-          {total > 0 && (
-            <span
-              aria-label={`${done} sur ${total} étapes`}
-              style={{ fontSize: '0.75rem', color: completed ? '#fff' : 'var(--color-text-muted)', flexShrink: 0 }}
-            >
-              {done}/{total}
-            </span>
-          )}
-        </div>
-      </Card>
-    </div>
-  )
-}
 
 const handleStyle: React.CSSProperties = {
   display: 'flex',
@@ -138,6 +35,8 @@ const handleBarStyle: React.CSSProperties = {
   background: 'var(--color-border)',
 }
 
+const DRAG_EXPAND_THRESHOLD_PX = 24
+
 const widgetBtnStyle: React.CSSProperties = {
   background: 'none',
   border: 'none',
@@ -153,15 +52,11 @@ const widgetBtnStyle: React.CSSProperties = {
 export function E10Dashboard() {
   const {
     route,
-    todayTasks,
-    todaySubTasksMap,
     todayEnergy,
     todayEnergyStatus,
     todayPlannedTasks,
     overloadMode,
     goTo,
-    selectTask,
-    reorderTodayTasks,
     folders,
     tools,
     lists,
@@ -177,37 +72,9 @@ export function E10Dashboard() {
 
   const expanded = route.name === 'planning'
 
-  const [visibleOrder, setVisibleOrder] = useState<Task[]>(() => todayTasks)
+  const dragStartY = useRef<number | null>(null)
+  const dragTriggered = useRef(false)
 
-  useEffect(() => {
-    setVisibleOrder(todayTasks)
-  }, [todayTasks])
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  )
-
-  function openDetail(taskId: string) {
-    selectTask(taskId)
-    goTo('task-detail')
-  }
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-    const oldIndex = visibleOrder.findIndex((t) => t.id === active.id)
-    const newIndex = visibleOrder.findIndex((t) => t.id === over.id)
-    const newVisible = arrayMove(visibleOrder, oldIndex, newIndex).map((t, i) => ({
-      ...t,
-      position: i,
-    }))
-    setVisibleOrder(newVisible)
-    reorderTodayTasks(newVisible.map((t) => t.id))
-  }
-
-  const isEmpty = todayTasks.length === 0
   const showSecondary = !expanded
   const rootFolders = folders
   const rootTools = tools.filter((t) => t.folder_id === null)
@@ -247,15 +114,46 @@ export function E10Dashboard() {
     setShowExpenseForm(false)
   }
 
+  function handleHandlePointerDown(event: React.PointerEvent) {
+    dragStartY.current = event.clientY
+    dragTriggered.current = false
+  }
+
+  function handleHandlePointerMove(event: React.PointerEvent) {
+    if (dragStartY.current === null || dragTriggered.current) return
+    const delta = event.clientY - dragStartY.current
+    if (!expanded && delta > DRAG_EXPAND_THRESHOLD_PX) {
+      dragTriggered.current = true
+      goTo('planning')
+    } else if (expanded && delta < -DRAG_EXPAND_THRESHOLD_PX) {
+      dragTriggered.current = true
+      goTo('dashboard')
+    }
+  }
+
+  function handleHandlePointerUp() {
+    dragStartY.current = null
+  }
+
+  function handleHandleClick() {
+    if (dragTriggered.current) {
+      dragTriggered.current = false
+      return
+    }
+    goTo(expanded ? 'dashboard' : 'planning')
+  }
+
   const handle = (
     <button
-      onClick={() => goTo(expanded ? 'dashboard' : 'planning')}
+      onClick={handleHandleClick}
+      onPointerDown={handleHandlePointerDown}
+      onPointerMove={handleHandlePointerMove}
+      onPointerUp={handleHandlePointerUp}
       aria-expanded={expanded}
       aria-label={expanded ? 'Replier le planning' : 'Déplier le planning'}
-      style={handleStyle}
+      style={{ ...handleStyle, touchAction: 'none' }}
     >
       <span aria-hidden style={handleBarStyle} />
-      <span>{expanded ? 'Replier' : 'Déplier'}</span>
     </button>
   )
 
@@ -306,37 +204,6 @@ export function E10Dashboard() {
         <PlanningBoard collapsed={!expanded} />
         {!expanded && handle}
       </div>
-
-      {showSecondary && !overloadMode && (
-        <section aria-label="Tâche du jour">
-          <h2 style={{ fontSize: '1.1rem' }}>Tâche du jour</h2>
-          {isEmpty ? (
-            <p>Rien à faire aujourd'hui</p>
-          ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={visibleOrder.map((t) => t.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                  {visibleOrder.map((task) => (
-                    <SortableTaskItem
-                      key={task.id}
-                      task={task}
-                      subs={todaySubTasksMap[task.id] ?? []}
-                      onOpen={openDetail}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          )}
-        </section>
-      )}
 
       {showSecondary && !overloadMode && (
         <section aria-label="Outils">

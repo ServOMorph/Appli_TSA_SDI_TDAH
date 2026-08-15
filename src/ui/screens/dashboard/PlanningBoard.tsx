@@ -117,12 +117,13 @@ const dayDotPlaceholderStyle: React.CSSProperties = {
 
 const jumpInputStyle: React.CSSProperties = {
   position: 'absolute',
-  width: 0,
-  height: 0,
+  width: '1px',
+  height: '1px',
   padding: 0,
   border: 'none',
   opacity: 0,
   pointerEvents: 'none',
+  overflow: 'hidden',
 }
 
 const monthButtonStyle: React.CSSProperties = {
@@ -391,68 +392,64 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
       aria-label="Planning du jour"
       style={{ display: 'flex', flexDirection: 'column', minHeight: 0, gap: 'var(--spacing-sm)' }}
     >
-      {!collapsed && (
-        <div style={monthBarStyle}>
-          <button
-            type="button"
-            style={monthButtonStyle}
-            aria-label={`${formatMonthYear(displayDate)}, aller à une date`}
-            onClick={() => {
-              const input = dateJumpRef.current
-              if (!input) return
-              if (typeof input.showPicker === 'function') input.showPicker()
-              else input.focus()
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <path d="M16 2v4M8 2v4M3 10h18" />
-            </svg>
-            {formatMonthYear(displayDate)}
+      <div style={monthBarStyle}>
+        <button
+          type="button"
+          style={monthButtonStyle}
+          aria-label={`${formatMonthYear(displayDate)}, aller à une date`}
+          onClick={() => {
+            const input = dateJumpRef.current
+            if (!input) return
+            if (typeof input.showPicker === 'function') input.showPicker()
+            else input.focus()
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+          {formatMonthYear(displayDate)}
+        </button>
+        <input
+          ref={dateJumpRef}
+          type="date"
+          aria-label="Aller à une date"
+          value={displayDate}
+          onChange={(e) => e.target.value && updateDisplayDate(e.target.value)}
+          style={jumpInputStyle}
+          tabIndex={-1}
+        />
+        {!isToday && (
+          <button style={todayBtnStyle} onClick={() => updateDisplayDate(todayStr())}>
+            Aujourd'hui
           </button>
-          <input
-            ref={dateJumpRef}
-            type="date"
-            aria-label="Aller à une date"
-            value={displayDate}
-            onChange={(e) => e.target.value && updateDisplayDate(e.target.value)}
-            style={jumpInputStyle}
-            tabIndex={-1}
-          />
-          {!isToday && (
-            <button style={todayBtnStyle} onClick={() => updateDisplayDate(todayStr())}>
-              Aujourd'hui
+        )}
+      </div>
+      <div style={dateStripStyle} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, -7))} aria-label="Semaine précédente">
+          &lsaquo;
+        </button>
+        {dateStrip(displayDate, DATE_STRIP_RADIUS).map((d) => {
+          const badge = formatDayBadge(d)
+          const isDisplayed = d === displayDate
+          return (
+            <button
+              key={d}
+              style={dayCellStyle(isDisplayed)}
+              onClick={() => updateDisplayDate(d)}
+              aria-current={isDisplayed ? 'date' : undefined}
+              aria-label={d}
+            >
+              <span style={dayWeekdayStyle}>{badge.weekday}</span>
+              <span style={dayNumberStyle(d === todayStr())}>{badge.day}</span>
+              <span style={isDisplayed ? dayDotStyle : dayDotPlaceholderStyle} aria-hidden />
             </button>
-          )}
-        </div>
-      )}
-      {!collapsed && (
-        <div style={dateStripStyle} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, -1))} aria-label="Jour précédent">
-            &lsaquo;
-          </button>
-          {dateStrip(displayDate, DATE_STRIP_RADIUS).map((d) => {
-            const badge = formatDayBadge(d)
-            const isDisplayed = d === displayDate
-            return (
-              <button
-                key={d}
-                style={dayCellStyle(isDisplayed)}
-                onClick={() => updateDisplayDate(d)}
-                aria-current={isDisplayed ? 'date' : undefined}
-                aria-label={d}
-              >
-                <span style={dayWeekdayStyle}>{badge.weekday}</span>
-                <span style={dayNumberStyle(d === todayStr())}>{badge.day}</span>
-                <span style={isDisplayed ? dayDotStyle : dayDotPlaceholderStyle} aria-hidden />
-              </button>
-            )
-          })}
-          <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, 1))} aria-label="Jour suivant">
-            &rsaquo;
-          </button>
-        </div>
-      )}
+          )
+        })}
+        <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, 7))} aria-label="Semaine suivante">
+          &rsaquo;
+        </button>
+      </div>
 
       <div style={collapsed ? undefined : { flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {blocks.length === 0 && <p style={emptyStateStyle}>Rien de planifié ce jour-là.</p>}

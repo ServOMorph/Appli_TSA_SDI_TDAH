@@ -5,6 +5,7 @@ import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E61ListDetail } from './E61ListDetail'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListCategory } from '@/domain/entities/listCategory'
 import type { Tool } from '@/domain/entities/tool'
 
 function makeTool(overrides: Partial<Tool> = {}): Tool {
@@ -37,33 +38,52 @@ function makeListItem(overrides: Partial<ListItem> = {}): ListItem {
     title: 'Hotel California',
     position: 0,
     checked: false,
-    section: null,
+    category_id: 'cat-1',
     created_at: '2026-06-30T10:00:00.000Z',
     ...overrides,
   }
 }
 
+function makeCategory(overrides: Partial<ListCategory> = {}): ListCategory {
+  return {
+    id: 'cat-1',
+    list_id: 'list-1',
+    name: 'Général',
+    position: 0,
+    created_at: '2026-06-30T10:00:00.000Z',
+    ...overrides,
+  }
+}
+
+async function goToCategory(name: string) {
+  await waitFor(() => screen.getByRole('button', { name: new RegExp(`^${name}`) }))
+  await userEvent.click(screen.getByRole('button', { name: new RegExp(`^${name}`) }))
+}
+
 describe('E61ListDetail', () => {
-  describe('état vide', () => {
-    it('affiche le message vide quand aucun élément', async () => {
+  describe('écran de sélection de catégorie', () => {
+    it('affiche le message vide quand la liste n\'a aucune catégorie', async () => {
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
       })
       renderWithApp(<E61ListDetail />, ctx)
       await waitFor(() => {
-        expect(screen.getByText('Cette liste est vide.')).toBeDefined()
+        expect(screen.getByText("Cette liste n'a pas encore de catégorie.")).toBeDefined()
       })
     })
 
-    it('affiche le bouton "Ajouter un élément"', async () => {
+    it('liste les catégories de la liste', async () => {
+      const categories = [makeCategory({ id: 'cat-ete', name: 'Été' }), makeCategory({ id: 'cat-hiver', name: 'Hiver', position: 1 })]
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue(categories),
       })
       renderWithApp(<E61ListDetail />, ctx)
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: 'Ajouter un élément' })).toBeDefined()
+        expect(screen.getByRole('button', { name: /^Été/ })).toBeDefined()
+        expect(screen.getByRole('button', { name: /^Hiver/ })).toBeDefined()
       })
     })
 
@@ -75,10 +95,57 @@ describe('E61ListDetail', () => {
       renderWithApp(<E61ListDetail />, ctx)
       expect(screen.getByText('Musiques')).toBeDefined()
     })
+
+    it('clic sur "Ajouter une catégorie" crée la catégorie et l\'affiche dans la liste', async () => {
+      const createListCategory = vi.fn().mockResolvedValue('cat-new')
+      const getListCategories = vi.fn().mockResolvedValueOnce([]).mockResolvedValueOnce([makeCategory({ id: 'cat-new', name: 'Automne' })])
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        createListCategory,
+        getListCategories,
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => screen.getByRole('button', { name: 'Ajouter une catégorie' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter une catégorie' }))
+      await userEvent.type(screen.getByLabelText('Nom de la catégorie'), 'Automne')
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+      expect(createListCategory).toHaveBeenCalledWith('list-1', 'Automne')
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /^Automne/ })).toBeDefined()
+      })
+    })
   })
 
-  describe('avec des éléments', () => {
-    it('affiche les titres des éléments', async () => {
+  describe('bouton retour', () => {
+    it('clic sur ← depuis l\'écran des catégories dépile la navigation, avec tools en repli', async () => {
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
+      expect(ctx.back).toHaveBeenCalledWith('tools')
+    })
+
+    it('clic sur ← depuis les éléments d\'une catégorie revient à l\'écran des catégories', async () => {
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue([makeCategory({ name: 'Été' })]),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Été')
+      await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
+      expect(ctx.back).not.toHaveBeenCalled()
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /^Été/ })).toBeDefined()
+      })
+    })
+  })
+
+  describe('éléments d\'une catégorie', () => {
+    it('affiche les titres des éléments de la catégorie sélectionnée', async () => {
       const items = [
         makeListItem({ id: 'i1', title: 'Hotel California' }),
         makeListItem({ id: 'i2', title: 'Bohemian Rhapsody' }),
@@ -87,8 +154,10 @@ describe('E61ListDetail', () => {
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => {
         expect(screen.getByText('Hotel California')).toBeDefined()
         expect(screen.getByText('Bohemian Rhapsody')).toBeDefined()
@@ -101,8 +170,10 @@ describe('E61ListDetail', () => {
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Supprimer Hotel California' })).toBeDefined()
       })
@@ -114,8 +185,10 @@ describe('E61ListDetail', () => {
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByRole('button', { name: 'Supprimer Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Supprimer Hotel California' }))
       expect(ctx.deleteListItem).toHaveBeenCalledWith('i1')
@@ -156,18 +229,6 @@ describe('E61ListDetail', () => {
     })
   })
 
-  describe('bouton retour', () => {
-    it('clic sur ← dépile la navigation, avec tools en repli', async () => {
-      const ctx = makeAppContext({
-        lists: [makeList()],
-        selectedListId: 'list-1',
-      })
-      renderWithApp(<E61ListDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-      expect(ctx.back).toHaveBeenCalledWith('tools')
-    })
-  })
-
   describe('coche (E27)', () => {
     it('clic sur la coche appelle toggleListItem', async () => {
       const items = [makeListItem({ id: 'i1', title: 'Hotel California' })]
@@ -175,8 +236,10 @@ describe('E61ListDetail', () => {
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByRole('button', { name: 'Cocher Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Cocher Hotel California' }))
       expect(ctx.toggleListItem).toHaveBeenCalledWith('i1')
@@ -191,29 +254,34 @@ describe('E61ListDetail', () => {
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByText('Coché'))
       const titles = screen.getAllByText(/Coché|Non coché/).map((el) => el.textContent)
       expect(titles).toEqual(['Non coché', 'Coché'])
     })
   })
 
-  describe('rubriques (E28)', () => {
-    it('regroupe les items par rubrique', async () => {
+  describe('catégories (E28)', () => {
+    it('les items d\'une catégorie ne montrent pas ceux d\'une autre', async () => {
+      const categories = [makeCategory({ id: 'cat-ete', name: 'Été', position: 0 }), makeCategory({ id: 'cat-hiver', name: 'Hiver', position: 1 })]
       const items = [
-        makeListItem({ id: 'i1', title: 'T-shirt', section: 'Été' }),
-        makeListItem({ id: 'i2', title: 'Pull', section: 'Hiver' }),
+        makeListItem({ id: 'i1', title: 'T-shirt', category_id: 'cat-ete' }),
+        makeListItem({ id: 'i2', title: 'Pull', category_id: 'cat-hiver' }),
       ]
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue(categories),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Été')
       await waitFor(() => {
-        expect(screen.getByRole('heading', { name: 'Été' })).toBeDefined()
-        expect(screen.getByRole('heading', { name: 'Hiver' })).toBeDefined()
+        expect(screen.getByText('T-shirt')).toBeDefined()
+        expect(screen.queryByText('Pull')).toBeNull()
       })
     })
   })
@@ -225,8 +293,10 @@ describe('E61ListDetail', () => {
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByRole('button', { name: 'Planifier Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Planifier Hotel California' }))
       expect(screen.getByRole('dialog', { name: 'Planifier Hotel California' })).toBeDefined()
@@ -238,8 +308,10 @@ describe('E61ListDetail', () => {
         lists: [makeList()],
         selectedListId: 'list-1',
         getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByRole('button', { name: 'Planifier Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Planifier Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
@@ -254,8 +326,10 @@ describe('E61ListDetail', () => {
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByRole('button', { name: 'Ajouter un élément' }))
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter un élément' }))
       expect(screen.getByLabelText('Élément')).toBeDefined()
@@ -267,33 +341,52 @@ describe('E61ListDetail', () => {
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByRole('button', { name: 'Ajouter un élément' }))
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter un élément' }))
       const btn = screen.getByRole('button', { name: 'Ajouter' }) as HTMLButtonElement
       expect(btn.disabled).toBe(true)
     })
 
-    it('clic Ajouter appelle addListItem avec le titre saisi', async () => {
+    it('clic Ajouter avec une catégorie existante appelle addListItem avec cette catégorie', async () => {
+      const categories = [makeCategory({ id: 'cat-1', name: 'Général' })]
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue(categories),
       })
       renderWithApp(<E61ListDetail />, ctx)
-      await waitFor(() => screen.getByRole('button', { name: 'Ajouter un élément' }))
+      await goToCategory('Général')
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter un élément' }))
       await userEvent.type(screen.getByLabelText('Élément'), 'Hotel California')
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
-      expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Hotel California', null)
+      expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Hotel California', 'cat-1')
+    })
+
+    it('le formulaire ne propose plus de champ catégorie libre', async () => {
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter un élément' }))
+      expect(screen.queryByLabelText('Nouvelle catégorie')).toBeNull()
+      expect(screen.queryByLabelText('Catégorie')).toBeNull()
     })
 
     it('clic Annuler ferme le formulaire', async () => {
       const ctx = makeAppContext({
         lists: [makeList()],
         selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
       })
       renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
       await waitFor(() => screen.getByRole('button', { name: 'Ajouter un élément' }))
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter un élément' }))
       await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))

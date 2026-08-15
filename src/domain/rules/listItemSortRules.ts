@@ -1,11 +1,12 @@
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListCategory } from '@/domain/entities/listCategory'
 
-export interface ListItemSection {
-  section: string | null
+export interface ListItemGroup {
+  category: ListCategory
   items: ListItem[]
 }
 
-function byPosition(a: ListItem, b: ListItem): number {
+function byPosition(a: { position: number }, b: { position: number }): number {
   return a.position - b.position
 }
 
@@ -16,25 +17,11 @@ export function sortListItems(items: ListItem[]): ListItem[] {
   return [...unchecked, ...checked]
 }
 
-/** Groupe par rubrique dans l'ordre de première apparition ; les items sans rubrique (`null`) forment le dernier groupe. */
-export function groupListItemsBySection(items: ListItem[]): ListItemSection[] {
-  const order: (string | null)[] = []
-  const byKey = new Map<string | null, ListItem[]>()
-
-  for (const item of items) {
-    const key = item.section
-    if (!byKey.has(key)) {
-      byKey.set(key, [])
-      order.push(key)
-    }
-    byKey.get(key)!.push(item)
-  }
-
-  const sortedOrder = [...order].sort((a, b) => {
-    if (a === null) return 1
-    if (b === null) return -1
-    return 0
-  })
-
-  return sortedOrder.map((key) => ({ section: key, items: sortListItems(byKey.get(key)!) }))
+/** Groupe les items par catégorie, dans l'ordre de position des catégories. */
+export function groupListItemsByCategory(items: ListItem[], categories: ListCategory[]): ListItemGroup[] {
+  const sortedCategories = [...categories].sort(byPosition)
+  return sortedCategories.map((category) => ({
+    category,
+    items: sortListItems(items.filter((item) => item.category_id === category.id)),
+  }))
 }

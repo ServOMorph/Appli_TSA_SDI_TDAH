@@ -27,7 +27,13 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'ajouter-un-element-a-une-liste',
     title: 'Ajouter un élément à une liste sur téléphone',
     description:
-      'Sur téléphone, ouvrez une liste puis ajoutez un élément. Quand le clavier s’ouvre, tous les champs et boutons doivent rester visibles et utilisables.',
+      'Sur téléphone, ouvrez une liste, choisissez une catégorie, puis ajoutez un élément. Quand le clavier s’ouvre, tous les champs et boutons doivent rester visibles et utilisables.',
+  },
+  {
+    id: 'categories-de-liste',
+    title: 'Choisir et créer des catégories dans une liste',
+    description:
+      'Ouvrez une liste : vous devez d’abord voir ses catégories (avec le nombre d’éléments dans chacune), pas les éléments directement. Touchez une catégorie pour voir ses éléments. Depuis l’écran des catégories, touchez « Ajouter une catégorie », donnez-lui un nom, puis vérifiez qu’elle apparaît dans la liste.',
   },
   {
     id: 'importer-une-sauvegarde',
@@ -46,5 +52,11 @@ export const manualTestsCatalog: ManualTest[] = [
     title: 'Enregistrer un résultat de test',
     description:
       'Dans « Tests à faire », ouvrez un test. Choisissez « Non validé », expliquez ce qui ne fonctionne pas puis enregistrez. Vérifiez que ce résultat apparaît dans l’historique. Exportez ensuite vos données dans Paramètres, puis réimportez ce fichier : le résultat doit toujours être présent.',
+  },
+  {
+    id: 'glisser-pour-ouvrir-le-planning',
+    title: 'Ouvrir le planning en glissant',
+    description:
+      'Sur l’accueil, vous devez voir les jours de la semaine et le mois en cours, avec en dessous un petit trait gris. Glissez ce trait vers le bas avec le doigt : le planning doit s’agrandir. Glissez-le à nouveau vers le haut : le planning doit se refermer et revenir à l’accueil normal.',
   },
 ]

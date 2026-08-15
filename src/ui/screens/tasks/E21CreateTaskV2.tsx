@@ -214,7 +214,6 @@ export function E21CreateTaskV2() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Que faut-il faire ?"
-            autoFocus
             style={inputStyle}
           />
         </div>
@@ -291,7 +290,7 @@ export function E21CreateTaskV2() {
 
         {isPlanned && (
           <div style={fieldGroupStyle}>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <label htmlFor="task-date" style={labelStyle}>
                 Date
               </label>
@@ -300,10 +299,10 @@ export function E21CreateTaskV2() {
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                style={inputStyle}
+                style={{ ...inputStyle, minWidth: 0, maxWidth: '100%' }}
               />
             </div>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <label htmlFor="task-start-time" style={labelStyle}>
                 Heure de début
               </label>
@@ -312,7 +311,7 @@ export function E21CreateTaskV2() {
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                style={inputStyle}
+                style={{ ...inputStyle, minWidth: 0, maxWidth: '100%' }}
               />
               {!startTime && (
                 <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>

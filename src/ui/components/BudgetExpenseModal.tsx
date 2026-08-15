@@ -37,31 +37,42 @@ export function BudgetExpenseModal({
       <div style={modalBox}>
         <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Ajouter une dépense</h2>
 
-        <div role="group" aria-label="Catégorie" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
-          {categories.map((category) => {
-            const selected = category.id === categoryId
-            return (
-              <button
-                key={category.id}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => setCategoryId(category.id)}
-                style={{
-                  padding: '8px 14px',
-                  borderRadius: '999px',
-                  border: `1px solid ${selected ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                  backgroundColor: selected ? 'var(--color-accent)' : 'transparent',
-                  color: selected ? '#ffffff' : 'var(--color-text)',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '0.9375rem',
-                  cursor: 'pointer',
-                }}
-              >
-                {category.name}
-              </button>
-            )
-          })}
-        </div>
+        {(['week', 'month'] as const).map((period) => {
+          const periodCategories = categories.filter((category) => category.period === period)
+          if (periodCategories.length === 0) return null
+          return (
+            <div key={period} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+              <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                {period === 'week' ? 'Semaine' : 'Mois'}
+              </span>
+              <div role="group" aria-label={period === 'week' ? 'Catégorie semaine' : 'Catégorie mois'} style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
+                {periodCategories.map((category) => {
+                  const selected = category.id === categoryId
+                  return (
+                    <button
+                      key={category.id}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => setCategoryId(category.id)}
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '999px',
+                        border: `1px solid ${selected ? 'var(--color-accent)' : 'var(--color-border)'}`,
+                        backgroundColor: selected ? 'var(--color-accent)' : 'transparent',
+                        color: selected ? '#ffffff' : 'var(--color-text)',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '0.9375rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {category.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
 
         <label htmlFor="budget-expense-amount">Montant</label>
         <input

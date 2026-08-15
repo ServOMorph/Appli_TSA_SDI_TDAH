@@ -17,6 +17,10 @@ export class ListItemRepository {
     return this.db.listItems.where('list_id').equals(listId).sortBy('position')
   }
 
+  async getByCategoryId(categoryId: string): Promise<ListItem[]> {
+    return this.db.listItems.where('category_id').equals(categoryId).sortBy('position')
+  }
+
   async update(item: ListItem): Promise<void> {
     await this.db.listItems.put(item)
   }

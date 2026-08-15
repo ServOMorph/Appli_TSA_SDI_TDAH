@@ -16,6 +16,7 @@ describe('AppDatabase', () => {
     expect(db.tasks).toBeDefined()
     expect(db.lists).toBeDefined()
     expect(db.listItems).toBeDefined()
+    expect(db.listCategories).toBeDefined()
     expect(db.energyEntries).toBeDefined()
     expect(db.settings).toBeDefined()
     expect(db.budgetCategories).toBeDefined()
@@ -29,7 +30,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(11)
+    expect(db.verno).toBe(12)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -209,7 +210,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(11)
+    expect(upgraded.verno).toBe(12)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -293,7 +294,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(11)
+    expect(upgraded.verno).toBe(12)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -307,7 +308,7 @@ describe('AppDatabase', () => {
     await upgraded.delete()
   })
 
-  it('upgrades a version 9 database by seeding a default To Do list and tools, and adding checked/section to list items', async () => {
+  it('upgrades a version 9 database by seeding a default To Do list and tools, and adding checked/category_id to list items', async () => {
     const name = `migration-v9-db-${++testCount}`
     const legacy = new Dexie(name)
     legacy.version(9).stores({
@@ -332,8 +333,13 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(11)
-    expect(await upgraded.listItems.get('existing-item')).toMatchObject({ checked: false, section: null })
+    expect(upgraded.verno).toBe(12)
+
+    const migratedItem = await upgraded.listItems.get('existing-item')
+    expect(migratedItem).toMatchObject({ checked: false })
+    expect(migratedItem?.category_id).toBeDefined()
+    const category = await upgraded.listCategories.get(migratedItem!.category_id)
+    expect(category).toMatchObject({ list_id: 'existing-list', name: 'Général' })
 
     const lists = await upgraded.lists.toArray()
     expect(lists.some((l) => l.name === 'To Do')).toBe(true)
@@ -344,6 +350,52 @@ describe('AppDatabase', () => {
     expect(todoTool).toBeDefined()
     const todoList = lists.find((l) => l.id === todoTool?.list_id)
     expect(todoList?.name).toBe('To Do')
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 11 database by grouping list items into categories by their former section', async () => {
+    const name = `migration-v12-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(11).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+      lists: 'id',
+      listItems: 'id, list_id, position, checked',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, kind, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date, period',
+      taskRecurrences: 'id',
+      taskExceptions: 'id, recurrence_id',
+      folders: 'id, position',
+      tools: 'id, type, folder_id, position',
+      manualTestResults: 'id, test_id',
+    })
+    await legacy.open()
+    await legacy.table('lists').add({ id: 'list-1', name: 'À acheter', created_at: '2026-08-14T00:00:00Z', updated_at: '2026-08-14T00:00:00Z' })
+    await legacy.table('listItems').bulkAdd([
+      { id: 'item-ete-1', list_id: 'list-1', title: 'Short', position: 0, checked: false, section: 'Habits été', created_at: '2026-08-14T00:00:00Z' },
+      { id: 'item-ete-2', list_id: 'list-1', title: 'Sandales', position: 1, checked: false, section: 'Habits été', created_at: '2026-08-14T00:00:00Z' },
+      { id: 'item-sans', list_id: 'list-1', title: 'Divers', position: 0, checked: false, section: null, created_at: '2026-08-14T00:00:00Z' },
+    ])
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(12)
+    const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
+    expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
+
+    const items = await upgraded.listItems.where('list_id').equals('list-1').toArray()
+    const eteCategory = categories.find((c) => c.name === 'Habits été')!
+    const generalCategory = categories.find((c) => c.name === 'Général')!
+    expect(items.find((i) => i.id === 'item-ete-1')?.category_id).toBe(eteCategory.id)
+    expect(items.find((i) => i.id === 'item-ete-2')?.category_id).toBe(eteCategory.id)
+    expect(items.find((i) => i.id === 'item-sans')?.category_id).toBe(generalCategory.id)
 
     await upgraded.delete()
   })

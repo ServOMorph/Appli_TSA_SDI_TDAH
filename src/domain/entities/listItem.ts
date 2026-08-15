@@ -4,6 +4,6 @@ export interface ListItem {
   title: string
   position: number
   checked: boolean
-  section: string | null
+  category_id: string
   created_at: string
 }

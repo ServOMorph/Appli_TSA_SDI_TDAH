@@ -4,6 +4,7 @@ import type { User } from '@/domain/entities/user'
 import type { Task } from '@/domain/entities/task'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListCategory } from '@/domain/entities/listCategory'
 import type { EnergyEntry } from '@/domain/entities/energyEntry'
 import type { Settings } from '@/domain/entities/settings'
 import type { BudgetCategory } from '@/domain/entities/budgetCategory'
@@ -31,6 +32,7 @@ export class AppDatabase extends Dexie {
   tasks!: Table<Task>
   lists!: Table<List>
   listItems!: Table<ListItem>
+  listCategories!: Table<ListCategory>
   energyEntries!: Table<EnergyEntry>
   settings!: Table<Settings>
   budgetCategories!: Table<BudgetCategory>
@@ -273,6 +275,42 @@ export class AppDatabase extends Dexie {
     this.version(11).stores({
       manualTestResults: 'id, test_id',
     })
+    this.version(12)
+      .stores({
+        listItems: 'id, list_id, position, checked, category_id',
+        listCategories: 'id, list_id, position',
+      })
+      .upgrade(async (tx) => {
+        const now = new Date().toISOString()
+        const items = await tx.table('listItems').toArray()
+        const byList = new Map<string, typeof items>()
+        for (const item of items) {
+          const arr = byList.get(item.list_id) ?? []
+          arr.push(item)
+          byList.set(item.list_id, arr)
+        }
+
+        for (const [listId, listItems] of byList) {
+          const categoryIdByName = new Map<string, string>()
+          let position = 0
+          for (const item of listItems) {
+            const name = item.section ?? 'Général'
+            if (!categoryIdByName.has(name)) {
+              const id = migrationId()
+              categoryIdByName.set(name, id)
+              await tx.table('listCategories').add({ id, list_id: listId, name, position, created_at: now })
+              position += 1
+            }
+          }
+
+          const updated = listItems.map((item) => {
+            const name = item.section ?? 'Général'
+            const { section: _section, ...rest } = item
+            return { ...rest, category_id: categoryIdByName.get(name)! }
+          })
+          await tx.table('listItems').bulkPut(updated)
+        }
+      })
   }
 }
 

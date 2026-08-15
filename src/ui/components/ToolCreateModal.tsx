@@ -36,6 +36,24 @@ const inputStyle: React.CSSProperties = {
   background: 'var(--color-surface)',
 }
 
+const categoryRowStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '8px 12px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--color-border)',
+}
+
+const removeBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  color: 'var(--color-text-muted)',
+  cursor: 'pointer',
+  fontSize: '1.125rem',
+  lineHeight: 1,
+}
+
 const toolTypeOrder: ToolType[] = ['liste', 'tableau_comptage', 'liste_comptage', 'routine', 'tableau_previsions']
 
 interface ToolCreateModalProps {
@@ -45,16 +63,32 @@ interface ToolCreateModalProps {
 }
 
 export function ToolCreateModal({ folderId, onClose, onListCreated }: ToolCreateModalProps) {
-  const { createToolList } = useApp()
+  const { createToolList, createListCategory } = useApp()
   const [mode, setMode] = useState<'choice' | 'new-list'>('choice')
   const [name, setName] = useState('')
+  const [categories, setCategories] = useState<string[]>([])
+  const [categoryInput, setCategoryInput] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  function addCategoryEntry() {
+    const trimmed = categoryInput.trim()
+    if (!trimmed) return
+    setCategories((prev) => [...prev, trimmed])
+    setCategoryInput('')
+  }
+
+  function removeCategoryEntry(index: number) {
+    setCategories((prev) => prev.filter((_, i) => i !== index))
+  }
 
   async function handleCreateList() {
     const trimmed = name.trim()
-    if (!trimmed) return
+    if (!trimmed || categories.length === 0) return
     setSubmitting(true)
     const listId = await createToolList(trimmed, folderId)
+    for (const category of categories) {
+      await createListCategory(listId, category)
+    }
     setSubmitting(false)
     onListCreated(listId)
   }
@@ -96,8 +130,43 @@ export function ToolCreateModal({ folderId, onClose, onListCreated }: ToolCreate
               autoFocus
               style={inputStyle}
             />
+
+            <label style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Catégories</label>
+            {categories.map((category, i) => (
+              <div key={i} style={categoryRowStyle}>
+                <span>{category}</span>
+                <button
+                  type="button"
+                  aria-label={`Retirer ${category}`}
+                  style={removeBtnStyle}
+                  onClick={() => removeCategoryEntry(i)}
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-              <Button fullWidth disabled={!name.trim() || submitting} onClick={handleCreateList}>
+              <input
+                type="text"
+                value={categoryInput}
+                onChange={(e) => setCategoryInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    addCategoryEntry()
+                  }
+                }}
+                placeholder="Ajouter une catégorie"
+                aria-label="Nouvelle catégorie"
+                style={{ ...inputStyle, flex: 1 }}
+              />
+              <Button type="button" onClick={addCategoryEntry} disabled={!categoryInput.trim()}>
+                Ajouter
+              </Button>
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <Button fullWidth disabled={!name.trim() || categories.length === 0 || submitting} onClick={handleCreateList}>
                 Créer
               </Button>
               <Button fullWidth variant="secondary" onClick={onClose}>

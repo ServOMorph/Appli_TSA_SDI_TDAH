@@ -1,3 +1,21 @@
+## v5.36 — 2026-08-15
+
+### Ajouté
+- Catégories de listes : à la création d'une liste, définir une ou plusieurs catégories (au moins une obligatoire). Ouvrir une liste affiche d'abord ses catégories (avec le nombre d'éléments de chacune) ; toucher une catégorie affiche ses éléments. Possibilité d'ajouter une catégorie depuis cet écran. Le formulaire d'ajout d'élément range désormais automatiquement l'élément dans la catégorie ouverte (le champ « Rubrique » texte libre disparaît).
+
+### Modifié
+- Navigation par flèches du bandeau de dates (Planning) : passe d'un jour à l'autre en un pas d'une semaine, plus rapide pour naviguer loin dans le calendrier.
+- Budget, ajout d'une dépense : les catégories sont désormais regroupées sous « Semaine » et « Mois », plus lisible quand les deux périodicités sont utilisées.
+
+### Corrigé
+- Formulaire de création de tâche détaillée (E21) : les cadres des champs Date et Heure de début ne débordaient plus correctement de leur zone sur certaines largeurs d'écran.
+
+## v5.35 — 2026-08-15
+
+### Modifié
+- Accueil et Planning visuellement unifiés : le bandeau de dates (jours de la semaine, mois, année) est désormais toujours visible sur l'accueil, comme sur l'écran Planning déplié.
+- Poignée accueil/planning simplifiée : les libellés « Déplier »/« Replier » sont retirés, seul le trait gris reste visible. Le tap reste fonctionnel, complété par un geste de glissement vertical (glisser vers le bas ouvre le planning, vers le haut le referme).
+
 ## v5.34 — 2026-08-14
 
 ### Modifié

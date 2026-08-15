@@ -13,9 +13,9 @@ Gate commun : tests créés et verts · test manuel de la phase · doc à jour �
 - Sauvegarde régulière (fréquence à trancher Phase 2, proposition par défaut : au démarrage de l'app + au retour au premier plan, throttlé à au plus une fois par heure).
 - Ajout des nouveautés (`WHATS_NEW`) et du catalogue de tests manuels reste sur l'édition de fichiers actuelle — hors périmètre de cette roadmap.
 
-## Prérequis externe
+## Prérequis externe [FAIT — 2026-08-15]
 
-Backend Supabase (région UE, cf. `contexte.md`) — projet à créer par l'utilisateur (compte, région, clé API) avant la Phase 1 ; aucune dépendance Supabase présente dans `package.json` à ce jour.
+Backend Supabase (région UE, cf. `contexte.md`) — projet créé par l'utilisateur (`aslxfetpkuytrqwidxig`, région Frankfurt), API de données activée, RLS automatique activé, clés (URL + clé publiable) ajoutées à `.env` et aux variables d'environnement du site Netlify de prod. Site de test (dev) pas encore confirmé. Aucune dépendance Supabase présente dans `package.json` à ce jour — à ajouter en Phase 1.
 
 ---
 

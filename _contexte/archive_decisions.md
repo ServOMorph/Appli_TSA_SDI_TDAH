@@ -1,5 +1,11 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-14 (Phase 3 tests manuels Marie, bannière urgence) (archivé depuis contexte.md 2026-08-15, setup projet Supabase)
+- Format du journal projet tranché avec l'utilisateur — JSON structuré, `_contexte/marie_tests_journal.json`. `scripts/ingest_manual_tests.py` livré et testé (export factice, dédoublonnage par `id` vérifié). L'export existant de Marie (13/08) s'est révélé antérieur à la fonctionnalité (pas de `manual_test_results`), invalidant l'hypothèse qu'il pouvait servir au test réel de la Phase 3. Bannière urgente ajoutée sur l'accueil et « Tests à faire » pour obtenir un nouvel export après ce déploiement. `WHATS_NEW` mis à jour. `tsc -b`/tests verts, aucune régression.
+
+## 2026-08-14 (suite 8, déploiement v5.29) (archivé depuis contexte.md 2026-08-15, setup projet Supabase)
+- `/deploy` exécuté jusqu'au bout après confirmation explicite de l'utilisateur, malgré `tests_manuels.md` non vide — les 5 points en attente déjà couverts par le catalogue in-app `manualTestsCatalog.ts`. Build `dist/v5.29` déployé en prod, vérifié HTTP 200. `README.md` restructuré par l'utilisateur hors session.
+
 ## 2026-08-14 (tests manuels Marie, phases 1 et 2) (archivé depuis contexte.md 2026-08-15, cadrage sync automatique des données de Marie)
 - Décision actée que le catalogue en code est la référence exhaustive des tests à demander à Marie, distincte de `tests_manuels.md`. Migration Dexie v11 et table append-only `manualTestResults`, écran `E121`, accès TopBar et pastilles « nouveau » livrés. Une validation est enregistrée sans écrasement, l'historique est visible et l'export/import v3.2 restitue les 15 tables, dont les résultats. Validation manuelle de la phase 2 confirmée par l'utilisateur ; 543/543 tests, lint et build verts.
 

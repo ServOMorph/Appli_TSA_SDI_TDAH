@@ -1,3 +1,8 @@
+## v5.41 — 2026-08-17
+
+### Modifié
+- Clôture de session `/close` : synthèse du déploiement v5.40 (correctifs lint `db.ts:308`, test `E01Welcome.test.tsx` reformulé) consignée dans `_contexte/signals.md`/`contexte.md`, `README.md` aligné sur la version déployée.
+
 ## v5.40 — 2026-08-17
 
 ### Corrigé

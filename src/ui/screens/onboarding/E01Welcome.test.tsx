@@ -26,7 +26,9 @@ describe('E01Welcome', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('profile')
   })
 
-  it('n’affiche pas la modale Nouveautés quand WHATS_NEW est vide', () => {
+  it('n’affiche pas la modale Nouveautés déjà vue pour la version courante', () => {
+    const version = import.meta.env.VITE_APP_VERSION ?? 'dev'
+    localStorage.setItem('whats_new_seen_version', version)
     renderWithApp(<E01Welcome />)
     expect(screen.queryByRole('dialog', { name: 'Nouveautés' })).toBeNull()
   })

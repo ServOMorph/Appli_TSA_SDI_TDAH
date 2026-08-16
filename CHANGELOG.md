@@ -1,3 +1,9 @@
+## v5.40 — 2026-08-17
+
+### Corrigé
+- Lint global bloqué par une erreur préexistante dans `db.ts:308` (`_section` déstructuré jamais utilisé) : `eslint.config.js` ne couvrait que les paramètres de fonction (`argsIgnorePattern: '^_'`), pas les variables déstructurées — `varsIgnorePattern: '^_'` ajouté.
+- Test `E01Welcome.test.tsx` fragile (« n'affiche pas la modale Nouveautés quand WHATS_NEW est vide ») : dépendait du contenu réel du tableau `WHATS_NEW`, vide seulement juste après un déploiement — reformulé pour vérifier le comportement réel (modale déjà vue pour la version courante via `localStorage`), indépendant du contenu.
+
 ## v5.39 — 2026-08-16
 
 ### Modifié

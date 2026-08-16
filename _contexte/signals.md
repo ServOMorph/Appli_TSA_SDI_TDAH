@@ -14,16 +14,36 @@
 ## Questions ouvertes
 - [P1] Confirmer si les variables Supabase (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) ont aussi été ajoutées au site de test Netlify (dev, `appli-audhd-dev.netlify.app`), pas seulement à la prod — demandé explicitement par l'utilisateur à rediscuter en session suivante. — fait quand : confirmé fait ou décidé non nécessaire — réf : `roadmap_sync_marie.md` Prérequis externe
 - [P1] Démarrer la Phase 1 de `roadmap_sync_marie.md` (schéma de tables, client Supabase) — prérequis externe rempli, basculer sur le modèle Opus avant de démarrer (migration structurelle, cf. roadmap). — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1
-- [P1] L'utilisateur va valider lui-même les 8 points de `tests_manuels.md` (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, badge énergie fond couleur d'ambiance, import de sauvegarde JSON, accueil/planning fusionnés, catégories de listes) sur appareil réel avant de relancer `/deploy` (v5.36, tests/`tsc -b` vérifiés verts cette session — build jamais lancé, `dist/v5.36` n'existe pas). Puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase). — fait quand : les 8 points validés, `tests_manuels.md` vidé, v5.36 déployée — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
+- [P1] Transmettre `tests_manuels.md` à Marie : c'est elle qui valide les 8 points sur son appareil réel (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, badge énergie fond couleur d'ambiance, import de sauvegarde JSON, accueil/planning fusionnés, catégories de listes), pas l'utilisateur — correction actée cette session. Une fois validés, relancer `/deploy` (v5.36, tests/`tsc -b` vérifiés verts — build jamais lancé, `dist/v5.36` n'existe pas). Puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase). — fait quand : les 8 points validés par Marie, `tests_manuels.md` vidé, v5.36 déployée — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
 - [P1] Une fois v5.33 déployée, redemander à Marie de réimporter son fichier (Paramètres > Export et import — bannière urgente déjà en place) et de revalider dans « Tests à faire » les 4 tests en échec de son export du 2026-08-14 17h40 : « Retirer de l'argent d'un livret », « Utiliser le budget », « Importer une sauvegarde » (tous les trois « pas accès au budget » / « il manque le budget », cause commune déjà corrigée) et confirmer la réapparition du Budget. — fait quand : ces 4 tests validés dans un nouvel export ingéré — réf : `_contexte/marie_tests_journal.json`, `useSettingsState.ts`
-- [P1] Informer Marie que l'adresse de test a changé : `delightful-sunflower-836720.netlify.app` (qu'elle a utilisée) n'est plus à jour, le site officiel est désormais `https://appli-audhd.netlify.app` (déployé en v5.22). — fait quand : nouvelle adresse communiquée à Marie — réf : `.claude/commands/deploy.md`, `_contexte/dernier_deploiement.md`
-- [P1] Communiquer à Marie les points de `a_communiquer_v5.md` maintenant que la V5.0 complète est livrée (V5-0 à V5-3 close), puis recueillir son retour sur les 3 écarts assumés et sur la priorité « Comptage en premier » parmi les outils reportés. — fait quand : retour de Marie recueilli après livraison — réf : `a_communiquer_v5.md`
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-15 — setup projet Supabase)
+## Dernière session (2026-08-16 — clôture des points de communication Marie)
+
+## Décisions prises
+- Adresse de test communiquée à Marie confirmée faite (`appli-audhd.netlify.app` à la place de l'ancienne URL).
+- Points de `a_communiquer_v5.md` communiqués à Marie et retour sur les priorités recueilli — fichier devenu obsolète, supprimé (`git rm`).
+- Correction actée : les 8 points de `tests_manuels.md` sont à valider par Marie sur son appareil réel, pas par l'utilisateur.
+
+## Livrables produits ou modifiés
+- `a_communiquer_v5.md` : supprimé (staged `git rm`).
+
+## Hypothèses validées / invalidées
+- EN ATTENTE : validation par Marie des 8 points de `tests_manuels.md`, puis `/deploy` v5.36.
+- EN ATTENTE : confirmation des variables Supabase sur le site de test Netlify (dev).
+
+## Prochaine étape exacte
+Transmettre `tests_manuels.md` à Marie pour validation sur appareil réel ; une fois validé, `/deploy` v5.36. En parallèle, confirmer les variables Supabase sur le site dev avant de démarrer la Phase 1 de `roadmap_sync_marie.md`.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-15 — setup projet Supabase)
 
 ## Décisions prises
 - Projet Supabase créé (région Frankfurt/UE), réglages retenus : API de données activée, affichage automatique des nouvelles tables désactivé (contrôle manuel), RLS automatique activé — cohérent avec la politique d'accès stricte par secret d'appareil prévue Phase 1.

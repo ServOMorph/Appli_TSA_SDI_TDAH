@@ -1,3 +1,8 @@
+## v5.39 — 2026-08-16
+
+### Modifié
+- Roadmaps terminées (`roadmap_v5.1.md`, `roadmap_tests_marie.md`, `roadmap_categories_listes.md`) déplacées vers `Archives/`, suivant le classement déjà appliqué aux roadmaps V1-V5.0. Aucun changement fonctionnel.
+
 ## v5.38 — 2026-08-16
 
 ### Modifié

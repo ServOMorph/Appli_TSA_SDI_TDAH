@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-14 (suite 8, déploiement v5.29) (archivé depuis contexte.md 2026-08-16, archivage des roadmaps terminées)
+- `/deploy` exécuté jusqu'au bout après confirmation explicite de l'utilisateur, malgré `tests_manuels.md` non vide — les 5 points en attente ont été vérifiés comme déjà couverts par le catalogue in-app `manualTestsCatalog.ts` soumis à Marie, jugé suffisant pour ne pas bloquer. Build `dist/v5.29` déployé en prod (`https://appli-audhd.netlify.app`), vérifié HTTP 200. `README.md` restructuré par l'utilisateur hors session (commit `07483be`, hors périmètre de cette session).
+
 ## 2026-08-14 (Phase 3 tests manuels Marie, bannière urgence) (archivé depuis contexte.md 2026-08-16, dashboard + refonte E121 tests manuels)
 - Format du journal projet tranché avec l'utilisateur — JSON structuré, `_contexte/marie_tests_journal.json`. `scripts/ingest_manual_tests.py` livré et testé (export factice, dédoublonnage par `id` vérifié). L'export existant de Marie (13/08) s'est révélé antérieur à la fonctionnalité (pas de `manual_test_results`), invalidant l'hypothèse qu'il pouvait servir au test réel de la Phase 3. Bannière urgente ajoutée sur l'accueil et « Tests à faire » (« importe tes données, vérifie-les, puis exporte-les et envoie-les-moi ») pour obtenir un nouvel export après ce déploiement (bannière retirée depuis, devenue obsolète). `WHATS_NEW` de l'accueil mis à jour (delta depuis v5.24 : icône « Tests à faire »). `tsc -b`/tests verts, aucune régression.
 

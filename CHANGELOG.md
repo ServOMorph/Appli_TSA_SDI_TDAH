@@ -1,3 +1,13 @@
+## v5.38 — 2026-08-16
+
+### Modifié
+- Accueil : bouton « + » (ajout d'un outil) déplacé juste à côté du titre « Outils » et réduit ; espacement augmenté entre ce titre et les cases Comptes/To Do/À acheter/Budget, qui utilisent désormais une police plus arrondie.
+- « Tests à faire » : chaque test peut être déplié pour afficher ses étapes numérotées ou replié pour ne garder que le titre ; un test déjà validé disparaît de la liste affichée (le catalogue interne le conserve, comme suite de non-régression).
+- Catalogue de tests manuels (`manualTestsCatalog.ts`) : description de chaque test réécrite en étapes numérotées précises (libellés exacts des boutons/champs), sans étape implicite ; un gabarit de rédaction est documenté en tête du fichier pour les prochains ajouts.
+
+### Terminé
+- Phase V5.1-0 de `roadmap_v5.1.md` (refonte ergonomique du Budget) clôturée : gate entièrement validée, dernier point de `tests_manuels.md` (import JSON) confirmé par l'utilisateur.
+
 ## v5.37 — 2026-08-16
 
 ### Corrigé

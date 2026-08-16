@@ -45,7 +45,7 @@ const widgetBtnStyle: React.CSSProperties = {
   cursor: 'pointer',
   color: 'var(--color-text)',
   fontSize: '1rem',
-  fontFamily: 'var(--font-body)',
+  fontFamily: 'ui-rounded, "SF Pro Rounded", "Segoe UI Rounded", var(--font-body)',
   padding: 0,
 }
 
@@ -208,12 +208,23 @@ export function E10Dashboard() {
       {showSecondary && !overloadMode && (
         <section aria-label="Outils">
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-            <h2 style={{ fontSize: '1.1rem', flex: 1 }}>Outils</h2>
-            <Button onClick={() => setShowCreateTool(true)} aria-label="Ajouter un outil">
+            <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Outils</h2>
+            <Button
+              onClick={() => setShowCreateTool(true)}
+              aria-label="Ajouter un outil"
+              style={{ padding: '4px 10px', fontSize: '1rem', lineHeight: 1 }}
+            >
               +
             </Button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-sm)' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 'var(--spacing-sm)',
+              marginTop: 'var(--spacing-md)',
+            }}
+          >
             <Card>
               <button style={widgetBtnStyle} onClick={openExpenseForm}>
                 Comptes

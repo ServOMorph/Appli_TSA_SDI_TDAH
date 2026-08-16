@@ -35,9 +35,15 @@ export function E121ManualTests() {
   const [selectedTest, setSelectedTest] = useState<ManualTest | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<ManualTestStatus>('ok')
   const [comment, setComment] = useState('')
+  const [expandedTestIds, setExpandedTestIds] = useState<Set<string>>(new Set())
   const latestByTest = useMemo(
     () => new Map(manualTestsCatalog.map((test) => [test.id, latestResult(manualTestResults, test.id)])),
     [manualTestResults],
+  )
+
+  const visibleTests = useMemo(
+    () => manualTestsCatalog.filter((test) => latestByTest.get(test.id)?.status !== 'ok'),
+    [latestByTest],
   )
 
   const selectedResults = useMemo(
@@ -50,6 +56,15 @@ export function E121ManualTests() {
     [manualTestResults, selectedTest],
   )
   const canSubmit = selectedStatus === 'ok' || Boolean(comment.trim())
+
+  function toggleDescription(testId: string) {
+    setExpandedTestIds((previous) => {
+      const next = new Set(previous)
+      if (next.has(testId)) next.delete(testId)
+      else next.add(testId)
+      return next
+    })
+  }
 
   function openTest(test: ManualTest) {
     setSelectedTest(test)
@@ -90,29 +105,45 @@ export function E121ManualTests() {
         </p>
       </div>
       <ul aria-label="Liste des tests à faire" style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-        {manualTestsCatalog.map((test) => {
+        {visibleTests.map((test) => {
           const result = latestByTest.get(test.id)
           const isNew = !result
+          const isExpanded = expandedTestIds.has(test.id)
           return (
             <li key={test.id}>
-              <button
-                aria-label={`Ouvrir le test ${test.title}`}
-                onClick={() => openTest(test)}
-                style={{ width: '100%', padding: 0, border: 'none', background: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', textAlign: 'left' }}
-              >
-                <Card>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-sm)' }}>
-                    {isNew && <span aria-label="Nouveau test" style={{ width: 10, height: 10, marginTop: 5, borderRadius: '50%', backgroundColor: 'var(--color-error)', flexShrink: 0 }} />}
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 'var(--spacing-sm)' }}>
+              <Card>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-sm)' }}>
+                  {isNew && <span aria-label="Nouveau test" style={{ width: 10, height: 10, marginTop: 5, borderRadius: '50%', backgroundColor: 'var(--color-error)', flexShrink: 0 }} />}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                      <button
+                        aria-label={`Ouvrir le test ${test.title}`}
+                        onClick={() => openTest(test)}
+                        style={{ flex: 1, padding: 0, border: 'none', background: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', textAlign: 'left' }}
+                      >
                         <h2 style={{ margin: 0, fontSize: '1rem' }}>{test.title}</h2>
+                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flexShrink: 0 }}>
                         <span style={{ color: statusColor(result), fontSize: '0.8125rem', fontWeight: 600, whiteSpace: 'nowrap' }}>{statusLabel(result)}</span>
+                        <button
+                          aria-label={isExpanded ? `Replier la description de ${test.title}` : `Déplier la description de ${test.title}`}
+                          onClick={() => toggleDescription(test.id)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '0.9375rem', padding: 0, lineHeight: 1 }}
+                        >
+                          {isExpanded ? '▾' : '▸'}
+                        </button>
                       </div>
-                      <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>{test.description}</p>
                     </div>
+                    {isExpanded && (
+                      <ol style={{ margin: 'var(--spacing-sm) 0 0', paddingLeft: 'var(--spacing-lg)', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+                        {test.steps.map((step, index) => (
+                          <li key={index}>{step}</li>
+                        ))}
+                      </ol>
+                    )}
                   </div>
-                </Card>
-              </button>
+                </div>
+              </Card>
             </li>
           )
         })}
@@ -121,7 +152,11 @@ export function E121ManualTests() {
         <div role="dialog" aria-modal="true" aria-label={`Résultat du test ${selectedTest.title}`} style={modalOverlay}>
           <div style={modalBox}>
             <h2 style={{ margin: 0 }}>{selectedTest.title}</h2>
-            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>{selectedTest.description}</p>
+            <ol style={{ margin: 0, paddingLeft: 'var(--spacing-lg)', color: 'var(--color-text-muted)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+              {selectedTest.steps.map((step, index) => (
+                <li key={index}>{step}</li>
+              ))}
+            </ol>
             <fieldset style={{ border: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               <legend style={{ marginBottom: 'var(--spacing-sm)', fontWeight: 600 }}>Votre résultat</legend>
               <label>

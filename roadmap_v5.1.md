@@ -9,7 +9,7 @@ Note de cadrage : la Phase V5.1-0 ci-dessous est un chantier d'une seule phase �
 
 ---
 
-## Phase V5.1-0 — Refonte ergonomique de l'écran Budget [EN COURS]
+## Phase V5.1-0 — Refonte ergonomique de l'écran Budget [FAIT]
 
 > Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase.
 
@@ -52,7 +52,7 @@ Principe directeur : **séparer consulter de configurer**. L'écran principal r�
 - [x] `B10` — routes `budget-category-detail` (avec la date de la période consultée) et `budget-settings` ajoutées à la pile de navigation, retour contextuel par `back()` partout
 - [x] Tests : `budgetRules.test.ts` étendu (totaux de période, seuils de jauge), `E71Budget.test.tsx`/`E73CategoryDetail.test.tsx`/`E74BudgetSettings.test.tsx`, `e2e/08-tools-budget.spec.ts` adapté au nouveau parcours
 
-Gate : [x] tests verts (533/533 unitaires, `tsc -b` clean, e2e non relancé depuis v5.17) · [ ] test manuel (`tests_manuels.md`, 4 points en attente : création d'outil, suppression de liste, retrait sur livret, dialogue d'ajout d'élément — un 5ᵉ point sur l'import de sauvegarde a été ajouté au même fichier, hors périmètre de cette phase) · [x] doc (`CHANGELOG.md` v5.20) · [x] sortie — l'écran Budget répond à « combien il me reste » sans scroll ni calcul, toute la configuration est atteignable depuis l'écran dédié, aucun écran ni action existante n'a perdu son point d'entrée
+Gate : [x] tests verts (533/533 unitaires, `tsc -b` clean, e2e non relancé depuis v5.17) · [x] test manuel (`tests_manuels.md`, point Import JSON validé par l'utilisateur le 2026-08-16) · [x] doc (`CHANGELOG.md` v5.20) · [x] sortie — l'écran Budget répond à « combien il me reste » sans scroll ni calcul, toute la configuration est atteignable depuis l'écran dédié, aucun écran ni action existante n'a perdu son point d'entrée
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

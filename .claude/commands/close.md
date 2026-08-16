@@ -72,6 +72,17 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    les tests Marie encore pertinents à la fin de l'évolution, dans un langage clair et sans détails
    techniques ou chemins locaux. Ne pas y ajouter les validations internes réservées au développement.
 
+   Relire l'intégralité de la conversation de la session pour repérer tout test manuel dont la
+   nécessité a été actée en discussion (nouveau scénario à vérifier, comportement à valider) et qui
+   n'a pas encore été tracé dans un fichier. Pour chacun :
+   - s'il s'agit d'une vérification technique réservée au développeur (fichier local, détail
+     d'implémentation, contrôle de régression) : l'ajouter à `tests_manuels.md` (créer le fichier
+     avec la consigne standard s'il n'existe pas encore) ;
+   - s'il s'agit d'un comportement à valider par Marie sur son appareil réel : l'ajouter à
+     `manualTestsCatalog.ts`, en langage clair, sans jargon ni chemin local.
+   Ne rien ajouter si aucun test n'a été décidé dans la session — ne pas en inventer. Objectif : que
+   `/deploy` (avertissements 4.4 et 4.5) reflète l'état réel des tests décidés pendant la session.
+
 7. Mettre à jour `README.md` à la racine du projet :
    - Refléter l'état actuel du projet (section "État actuel" de `contexte.md`).
    - Ne pas modifier les sections stables (objectif, stack, structure) sauf changement explicite.

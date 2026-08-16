@@ -272,3 +272,6 @@
 
 ## 2026-08-07 (archivé depuis contexte.md 2026-08-14)
 - Validation manuelle de la Phase V5-3 : le widget Comptes de l’accueil, initialement silencieusement désactivé sans catégorie de dépense, a été corrigé puis revalidé. Phase V5-3 et roadmap V5.0 intégralement closes.
+
+## 2026-08-14 (archivé depuis contexte.md 2026-08-16)
+- Tests manuels Marie, phases 1 et 2 : décision actée que le catalogue en code est la référence exhaustive des tests à demander à Marie, distincte de `tests_manuels.md`. Migration Dexie v11 et table append-only `manualTestResults`, écran `E121`, accès TopBar et pastilles « nouveau » livrés. Une validation est enregistrée sans écrasement, l'historique est visible et l'export/import v3.2 restitue les 15 tables, dont les résultats. Validation manuelle de la phase 2 confirmée par l'utilisateur ; 543/543 tests, lint et build verts.

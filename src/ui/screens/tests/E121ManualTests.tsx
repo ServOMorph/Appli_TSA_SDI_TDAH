@@ -30,13 +30,8 @@ function formatResultDate(value: string): string {
   return new Date(value).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })
 }
 
-const URGENT_BANNER_STORAGE_KEY = 'urgent_banner_dismissed'
-
 export function E121ManualTests() {
   const { back, manualTestResults, submitManualTestResult } = useApp()
-  const [urgentBannerDismissed, setUrgentBannerDismissed] = useState(
-    () => localStorage.getItem(URGENT_BANNER_STORAGE_KEY) === 'true',
-  )
   const [selectedTest, setSelectedTest] = useState<ManualTest | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<ManualTestStatus>('ok')
   const [comment, setComment] = useState('')
@@ -88,42 +83,6 @@ export function E121ManualTests() {
       >
         ← Retour
       </button>
-      {!urgentBannerDismissed && (
-        <div
-          role="alert"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: 'var(--spacing-sm)',
-            padding: 'var(--spacing-sm)',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: 'var(--color-error)',
-            color: 'white',
-          }}
-        >
-          <p style={{ margin: 0, fontWeight: 600, textAlign: 'left', color: 'white' }}>
-            URGENCE : dans Paramètres, ouvre « Export et import » et réimporte le fichier que tu m'as envoyé — ça va réparer le bouton Budget disparu. Vérifie ensuite que tout est bien là.
-          </p>
-          <button
-            onClick={() => {
-              localStorage.setItem(URGENT_BANNER_STORAGE_KEY, 'true')
-              setUrgentBannerDismissed(true)
-            }}
-            style={{
-              background: 'none',
-              border: '1px solid white',
-              borderRadius: 'var(--radius-md)',
-              color: 'white',
-              fontWeight: 600,
-              padding: '6px 16px',
-              cursor: 'pointer',
-            }}
-          >
-            Fait
-          </button>
-        </div>
-      )}
       <div>
         <h1 style={{ margin: 0 }}>Tests à faire</h1>
         <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>

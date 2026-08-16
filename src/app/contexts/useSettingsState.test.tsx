@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { db, manualTestResultRepo, toolRepo } from '@/app/repositories'
+import { db, listItemRepo, manualTestResultRepo, toolRepo } from '@/app/repositories'
 import { useSettingsState } from './useSettingsState'
 
 function SettingsPanel() {
@@ -33,6 +33,20 @@ function SettingsPanel() {
         }
       >
         Importer sans outil Budget
+      </button>
+      <button
+        onClick={() =>
+          importData({
+            user: { id: 'imported-user', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+            lists: [{ id: 'list-1', name: 'À acheter', created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' }],
+            list_items: [
+              { id: 'item-1', list_id: 'list-1', title: 'Griffoir', position: 0, checked: false, section: null, created_at: '2026-01-01T00:00:00.000Z' },
+              { id: 'item-2', list_id: 'list-1', title: 'Poufs', position: 1, checked: false, section: 'Appartement', created_at: '2026-01-01T00:00:00.000Z' },
+            ],
+          })
+        }
+      >
+        Importer format sans catégories
       </button>
     </>
   )
@@ -66,7 +80,7 @@ describe('useSettingsState — résultats des tests manuels', () => {
     })
 
     const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
-    expect(payload.version).toBe('3.2')
+    expect(payload.version).toBe('3.3')
     expect(payload.manual_test_results).toEqual([
       { id: 'exported-result', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T09:00:00.000Z' },
     ])
@@ -91,6 +105,26 @@ describe('useSettingsState — résultats des tests manuels', () => {
     await waitFor(async () => {
       const tools = await toolRepo.getAll()
       expect(tools.some((t) => t.type === 'tableau_comptage')).toBe(true)
+    })
+  })
+
+  it('recrée une catégorie par section pour les éléments de liste importés sans category_id', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer format sans catégories' }))
+    })
+    await waitFor(async () => {
+      const items = await listItemRepo.getByListId('list-1')
+      expect(items).toHaveLength(2)
+      expect(items.every((item) => Boolean(item.category_id))).toBe(true)
+
+      const categories = await db.listCategories.where('list_id').equals('list-1').toArray()
+      expect(categories.map((c) => c.name).sort()).toEqual(['Appartement', 'Général'])
+
+      const griffoir = items.find((item) => item.title === 'Griffoir')
+      const poufs = items.find((item) => item.title === 'Poufs')
+      expect(categories.find((c) => c.id === griffoir?.category_id)?.name).toBe('Général')
+      expect(categories.find((c) => c.id === poufs?.category_id)?.name).toBe('Appartement')
     })
   })
 })

@@ -1,25 +1,58 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-15)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-16)
 
 ## Contexte chaud
-- `donnees_marie/export-audhd-2026-08-13.json` : export réel de Marie, stocké en local, gitignoré et déclaré donnée sensible dans `CLAUDE.md` — ne pas lire/écrire sans instruction explicite. Deux exports plus récents reçus hors de ce dossier (Downloads, 2026-08-14 15h10 et 17h40) ont été analysés et ingérés dans la session, non copiés dans `donnees_marie/`.
-- `_contexte/dernier_deploiement.md` : consigné par `/deploy` lui-même (version/date/URL), indépendamment de `/close`. Dernier déploiement prod : v5.31, 2026-08-14 — **le correctif Budget de cette session n'y est pas encore inclus**, ce `/deploy` va le publier.
-- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` désormais géré par cycle `/close` (ajoute une entrée en langage clair si changement visible pour Marie) / `/deploy` (vide le tableau après publication). Affichage de la modale conditionné à `VITE_APP_VERSION` (`localStorage`), ne se réaffiche plus une fois fermée pour une version donnée. `WHATS_NEW` contient 4 entrées en attente de publication (accueil/planning fusionnés, flèches en pas d'une semaine, catégories de listes, budget regroupé Semaine/Mois).
-- Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`, pour tester hors réseau local sans toucher la prod.
-- Panneau dev (haut à droite, visible uniquement en `npm run dev`) affiche la version courante, lue automatiquement dans `CHANGELOG.md` au build (`__APP_DEV_VERSION__`, `vite.config.ts`).
-- `/deploy` et `/deploy_dev` vérifient la fraîcheur de `src/domain/data/manualTestsCatalog.ts` avant le déploiement.
-- Bug « Budget disparu à l'import » : cause identifiée et corrigée dans `useSettingsState.ts` — la réparation des `tools` à l'import ne recréait que les entrées `liste` manquantes, jamais l'entrée globale `tableau_comptage` (celle qui pilote la carte Budget de `E70Tools.tsx`). Un compte qui en était déjà dépourvu (cas de Marie) ne la récupérait donc jamais. Corrigé : la réparation couvre maintenant aussi cette entrée.
+- Branche `sync-marie` : 4 commits non fusionnés dans `main` (roadmap sync Supabase créée, setup projet Supabase, clôture de la communication Marie V5.0 incluant la suppression de `a_communiquer_v5.md`). Le travail de cette session (sans rapport avec la sync) a été fait sur `main` pour ne pas mélanger les deux chantiers — `a_communiquer_v5.md` existe donc encore sur `main`, `roadmap_sync_marie.md` n'y existe pas encore. Réconciliation à faire à la prochaine reprise du chantier sync (fusion ou rebase).
+- `donnees_marie/` : deux exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13 et 2026-08-16, ce dernier analysé cette session — 0 nouveau résultat de test, suppression de 5 éléments de liste confirmée volontaire).
+- `tests_manuels.md` ne contient plus qu'un seul point (Import JSON, vérification dev sur fichier local) — les 7 autres points, dupliqués avec le catalogue Marie (`manualTestsCatalog.ts`), en ont été retirés. Le catalogue Marie compte désormais 10 tests (ajout du badge énergie/couleur d'ambiance), dont 7 déjà soumis par Marie (4 ok, 3 nok liés au bug Budget déjà corrigé) et 2 jamais testés (catégories de listes, glisser pour ouvrir le planning).
+- Bannières urgentes (accueil, Tests à faire) supprimées — leur rôle (demander la réimportation pour réparer le Budget) devenait obsolète une fois ce correctif publié.
+- Bug « catégories de listes perdues à l'export/import » corrigé dans `useSettingsState.ts` : `list_categories` n'était ni exporté, ni vidé, ni restauré ; tout cycle export/import (même récent, même sans changer de version d'app) perdait les catégories. Réparation ajoutée pour les anciens formats (regroupement par `section`, comme la migration Dexie v12). Export bumpé en v3.3.
+- Lint global (`npm run lint`) bloqué par une erreur préexistante dans `db.ts:308` (`_section` inutilisé), sans rapport avec les sessions récentes — **bloquera le prochain `/deploy` (étape 3.6)** si non corrigée avant.
+- `_contexte/dernier_deploiement.md` : consigné par `/deploy` lui-même, indépendamment de `/close`. Dernier déploiement prod : v5.31, 2026-08-14 — les correctifs Budget, catégories de listes et le nettoyage des tests manuels n'y sont pas encore inclus.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` géré par cycle `/close`/`/deploy`. Contient toujours 4 entrées en attente de publication (accueil/planning fusionnés, flèches en pas d'une semaine, catégories de listes, budget regroupé Semaine/Mois) — rien ajouté cette session (correctifs internes exclus du cycle).
+- Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
+- `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] L'utilisateur va valider lui-même les 8 points de `tests_manuels.md` (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, badge énergie fond couleur d'ambiance, import de sauvegarde JSON, accueil/planning fusionnés, catégories de listes) sur appareil réel avant de relancer `/deploy` (v5.36, tests/`tsc -b` vérifiés verts cette session — build jamais lancé, `dist/v5.36` n'existe pas). Puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase). — fait quand : les 8 points validés, `tests_manuels.md` vidé, v5.36 déployée — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
-- [P1] Une fois v5.33 déployée, redemander à Marie de réimporter son fichier (Paramètres > Export et import — bannière urgente déjà en place) et de revalider dans « Tests à faire » les 4 tests en échec de son export du 2026-08-14 17h40 : « Retirer de l'argent d'un livret », « Utiliser le budget », « Importer une sauvegarde » (tous les trois « pas accès au budget » / « il manque le budget », cause commune déjà corrigée) et confirmer la réapparition du Budget. — fait quand : ces 4 tests validés dans un nouvel export ingéré — réf : `_contexte/marie_tests_journal.json`, `useSettingsState.ts`
-- [P1] Informer Marie que l'adresse de test a changé : `delightful-sunflower-836720.netlify.app` (qu'elle a utilisée) n'est plus à jour, le site officiel est désormais `https://appli-audhd.netlify.app` (déployé en v5.22). — fait quand : nouvelle adresse communiquée à Marie — réf : `.claude/commands/deploy.md`, `_contexte/dernier_deploiement.md`
-- [P1] Communiquer à Marie les points de `a_communiquer_v5.md` maintenant que la V5.0 complète est livrée (V5-0 à V5-3 close), puis recueillir son retour sur les 3 écarts assumés et sur la priorité « Comptage en premier » parmi les outils reportés. — fait quand : retour de Marie recueilli après livraison — réf : `a_communiquer_v5.md`
+- [P1] Corriger l'erreur de lint préexistante dans `db.ts:308` (`_section` inutilisé) avant le prochain `/deploy`, sinon l'étape 3.6 bloquera. — fait quand : `npm run lint` clean — réf : `src/data/db.ts:308`
+- [P1] Valider le point restant de `tests_manuels.md` (Import JSON) puis clore la Phase V5.1-0 de `roadmap_v5.1.md`, en parallèle de la validation par Marie des tests du catalogue in-app (catégories de listes, glisser planning, badge énergie — jamais soumis). — fait quand : point Import JSON validé et catalogue Marie à jour, v5.37 déployée — réf : `tests_manuels.md`, `manualTestsCatalog.ts`, `roadmap_v5.1.md` Phase V5.1-0
+- [P1] Une fois v5.37 déployée, redemander à Marie de réimporter son fichier et de revalider dans « Tests à faire » les 3 tests en échec liés au bug Budget (« Retirer de l'argent d'un livret », « Utiliser le budget », « Importer une sauvegarde »). — fait quand : ces 3 tests validés dans un nouvel export ingéré — réf : `_contexte/marie_tests_journal.json`, `useSettingsState.ts`
+- [P1] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée cette session) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-15 — retouches diverses + feature Catégories de listes)
+## Dernière session (2026-08-16 — export Marie, nettoyage tests manuels, correctif catégories de listes à l'import)
+
+## Décisions prises
+- Suppression de 5 éléments de la liste « À acheter » (export du 16/08 vs 13/08) confirmée volontaire par l'utilisateur — pas un bug.
+- `tests_manuels.md` recentré : les 7 points déjà dupliqués dans `manualTestsCatalog.ts` en sont retirés, ne garde que l'import JSON (dev). Point manquant (badge énergie) ajouté au catalogue.
+- Bannières urgentes (accueil, Tests à faire) supprimées, devenues obsolètes.
+- `.claude/commands/close.md` étape 6 enrichie : analyse de la conversation pour tracer les tests manuels décidés en session.
+- Travail de cette session fait sur `main` (basculement depuis `sync-marie`, sans rapport avec ce chantier).
+
+## Livrables produits ou modifiés
+- `src/domain/data/manualTestsCatalog.ts` : test `badge-energie-couleur-ambiance` ajouté.
+- `tests_manuels.md` : vidé de 7 points, ne garde que l'import JSON.
+- `src/ui/screens/onboarding/E01Welcome.tsx`/`.test.tsx`, `src/ui/screens/tests/E121ManualTests.tsx`/`.test.tsx` : bannières urgentes retirées.
+- `src/app/contexts/useSettingsState.ts`/`.test.tsx` : bug catégories de listes à l'export/import corrigé, export v3.2 → v3.3.
+- `.claude/commands/close.md` : étape 6 enrichie.
+- `CHANGELOG.md` : v5.37. `README.md` : état actuel mis à jour.
+
+## Hypothèses validées / invalidées
+- VALIDE : bug catégories de listes reproduit et corrigé (nouveau test dédié), 552/553 tests unitaires (échec préexistant sans rapport), `tsc -b` clean, lint clean sur les fichiers modifiés.
+- INVALIDE : hypothèse que les 8 points de `tests_manuels.md` étaient tous propres au développeur -> pivot : 7/8 dupliquaient déjà le catalogue Marie.
+- EN ATTENTE : lint global bloqué par une erreur préexistante dans `db.ts:308`, sans rapport avec cette session.
+
+## Prochaine étape exacte
+Corriger l'erreur de lint préexistante dans `db.ts` avant le prochain `/deploy`. Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` après réconciliation des deux branches.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-15 — retouches diverses + feature Catégories de listes)
 
 ## Décisions prises
 - Feature « Catégories de listes » livrée en 4 phases sur roadmap dédiée (demande utilisateur : trop d'informations affichées à plat dans une liste, vouloir choisir une catégorie avant de voir ses éléments). Catégorie obligatoire pour chaque item (pas d'item « sans catégorie »), modifiables après création de la liste, champ « Rubrique » texte libre supprimé au profit du choix de catégorie.

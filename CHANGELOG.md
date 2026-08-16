@@ -1,3 +1,12 @@
+## v5.37 — 2026-08-16
+
+### Corrigé
+- Catégories de listes perdues à l'export/import : `list_categories` n'était jamais exporté ni vidé/restauré, laissant les éléments de liste importés inaccessibles (aucune catégorie pour les afficher), y compris sur un export/import fait avec cette version. Corrigé (`useSettingsState.ts`), avec réparation automatique par regroupement sur `section` pour les imports au format antérieur, comme le fait la migration Dexie v12 à l'installation.
+
+### Modifié
+- Bannières urgentes (accueil, « Tests à faire ») retirées, leur rôle (demander la réimportation pour réparer le Budget) devenu obsolète.
+- Catalogue de tests manuels Marie complété (badge énergie, fond en couleur d'ambiance) ; `tests_manuels.md` recentré sur les seules vérifications techniques internes (import JSON), les autres points étant désormais couverts par le catalogue Marie.
+
 ## v5.36 — 2026-08-15
 
 ### Ajouté

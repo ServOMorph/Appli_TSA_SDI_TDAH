@@ -59,4 +59,10 @@ export const manualTestsCatalog: ManualTest[] = [
     description:
       'Sur l’accueil, vous devez voir les jours de la semaine et le mois en cours, avec en dessous un petit trait gris. Glissez ce trait vers le bas avec le doigt : le planning doit s’agrandir. Glissez-le à nouveau vers le haut : le planning doit se refermer et revenir à l’accueil normal.',
   },
+  {
+    id: 'badge-energie-couleur-ambiance',
+    title: 'Badge énergie avec la couleur d’ambiance',
+    description:
+      'Dans Paramètres > Accessibilité, choisissez une couleur d’ambiance. Revenez à l’accueil : le fond du badge énergie, en haut de l’écran, doit être teinté avec cette couleur, et n’afficher que l’icône batterie avec les chiffres, sans les mots « planifié » ou « dispo ».',
+  },
 ]

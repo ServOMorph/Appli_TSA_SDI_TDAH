@@ -66,12 +66,4 @@ describe('E121ManualTests', () => {
     expect(within(screen.getByRole('region', { name: 'Historique du test' })).getByText('Validé')).toBeInTheDocument()
   })
 
-  it('masque la bannière urgente au clic sur Fait, de façon persistante', () => {
-    const { unmount } = renderWithApp(<E121ManualTests />)
-    expect(screen.getByRole('alert')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Fait' }))
-    unmount()
-    renderWithApp(<E121ManualTests />)
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-  })
 })

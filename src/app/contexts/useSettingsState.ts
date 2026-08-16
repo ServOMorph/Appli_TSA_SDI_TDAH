@@ -9,6 +9,7 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListCategory } from '@/domain/entities/listCategory'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
 import type { EnergyEntry } from '@/domain/entities/energyEntry'
@@ -96,6 +97,7 @@ export function useSettingsState() {
       taskExceptions,
       lists,
       listItems,
+      listCategories,
       folders,
       tools,
       energyEntries,
@@ -112,6 +114,7 @@ export function useSettingsState() {
       db.taskExceptions.toArray(),
       db.lists.toArray(),
       db.listItems.toArray(),
+      db.listCategories.toArray(),
       db.folders.toArray(),
       db.tools.toArray(),
       db.energyEntries.toArray(),
@@ -124,13 +127,14 @@ export function useSettingsState() {
     ])
     const payload = {
       export_date: new Date().toISOString(),
-      version: '3.2',
+      version: '3.3',
       user,
       tasks,
       task_recurrences: taskRecurrences,
       task_exceptions: taskExceptions,
       lists,
       list_items: listItems,
+      list_categories: listCategories,
       folders,
       tools,
       energy_entries: energyEntries,
@@ -158,6 +162,7 @@ export function useSettingsState() {
       db.settings.clear(),
       db.lists.clear(),
       db.listItems.clear(),
+      db.listCategories.clear(),
       db.budgetCategories.clear(),
       db.budgetEntries.clear(),
       db.budgetAccounts.clear(),
@@ -176,7 +181,9 @@ export function useSettingsState() {
    * l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export) en recréant
    * l'entrée Outil manquante pour chaque liste qui n'en a pas, ainsi que l'entrée Outil Budget
    * (`tableau_comptage`) si elle est absente. Les exports plus anciens sans résultats de tests
-   * manuels sont acceptés avec un historique vide.
+   * manuels sont acceptés avec un historique vide. Les exports antérieurs à v3.3 (avant l'ajout
+   * de `list_categories`) sont acceptés en recréant une catégorie par valeur de `section` sur
+   * les éléments de liste, comme le fait la migration Dexie v12 à l'installation.
    */
   async function importData(raw: unknown): Promise<ImportResult> {
     if (typeof raw !== 'object' || raw === null) {
@@ -197,7 +204,8 @@ export function useSettingsState() {
     const taskRecurrences = Array.isArray(data.task_recurrences) ? (data.task_recurrences as TaskRecurrence[]) : []
     const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
     const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
-    const listItems = Array.isArray(data.list_items) ? (data.list_items as ListItem[]) : []
+    const rawListItems = Array.isArray(data.list_items) ? (data.list_items as (ListItem & { section?: string | null })[]) : []
+    const listCategories = Array.isArray(data.list_categories) ? (data.list_categories as ListCategory[]) : []
     const folders = Array.isArray(data.folders) ? (data.folders as Folder[]) : []
     const tools = Array.isArray(data.tools) ? (data.tools as Tool[]) : []
     const energyEntries = Array.isArray(data.energy_entries) ? (data.energy_entries as EnergyEntry[]) : []
@@ -229,6 +237,44 @@ export function useSettingsState() {
       nextPosition += 1
     }
 
+    /**
+     * Les exports antérieurs à la migration Dexie v12 (catégories de listes) n'ont pas de
+     * `list_categories` et leurs éléments portent `section` au lieu de `category_id`. Comme
+     * l'upgrade Dexie qui fait cette réparation ne s'exécute que sur un changement de version
+     * de schéma (jamais lors d'un import qui vide puis réinsère les données), on reproduit ici
+     * la même logique : une catégorie par valeur de `section` (« Général » si absente), par liste.
+     */
+    const repairedCategories = [...listCategories]
+    const categoryPositionByList = new Map<string, number>()
+    for (const category of repairedCategories) {
+      const current = categoryPositionByList.get(category.list_id) ?? -1
+      if (category.position > current) categoryPositionByList.set(category.list_id, category.position)
+    }
+    const categoryIdByListAndName = new Map(repairedCategories.map((c) => [`${c.list_id}::${c.name}`, c.id]))
+
+    const repairedListItems: ListItem[] = rawListItems.map((item) => {
+      if (item.category_id) return item
+      const name = item.section ?? 'Général'
+      const key = `${item.list_id}::${name}`
+      let categoryId = categoryIdByListAndName.get(key)
+      if (!categoryId) {
+        categoryId = newId()
+        categoryIdByListAndName.set(key, categoryId)
+        const position = (categoryPositionByList.get(item.list_id) ?? -1) + 1
+        categoryPositionByList.set(item.list_id, position)
+        repairedCategories.push({ id: categoryId, list_id: item.list_id, name, position, created_at: now })
+      }
+      return {
+        id: item.id,
+        list_id: item.list_id,
+        title: item.title,
+        position: item.position,
+        checked: item.checked,
+        created_at: item.created_at,
+        category_id: categoryId,
+      }
+    })
+
     try {
       await clearDatabase()
       await db.users.add(user)
@@ -237,7 +283,8 @@ export function useSettingsState() {
         taskRecurrences.length ? db.taskRecurrences.bulkAdd(taskRecurrences) : Promise.resolve(),
         taskExceptions.length ? db.taskExceptions.bulkAdd(taskExceptions) : Promise.resolve(),
         lists.length ? db.lists.bulkAdd(lists) : Promise.resolve(),
-        listItems.length ? db.listItems.bulkAdd(listItems) : Promise.resolve(),
+        repairedListItems.length ? db.listItems.bulkAdd(repairedListItems) : Promise.resolve(),
+        repairedCategories.length ? db.listCategories.bulkAdd(repairedCategories) : Promise.resolve(),
         folders.length ? db.folders.bulkAdd(folders) : Promise.resolve(),
         repairedTools.length ? db.tools.bulkAdd(repairedTools) : Promise.resolve(),
         energyEntries.length ? db.energyEntries.bulkAdd(energyEntries) : Promise.resolve(),

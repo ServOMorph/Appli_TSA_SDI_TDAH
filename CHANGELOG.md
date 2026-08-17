@@ -1,3 +1,9 @@
+## v5.46 — 2026-08-17
+
+### Modifié
+- Déploiement de v5.45 en production (refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée), après analyse sans anomalie de l'export de Marie du 17/08.
+- `roadmap_budget_v2.md` (toutes phases terminées) archivée.
+
 ## v5.45 — 2026-08-17
 
 ### Ajouté

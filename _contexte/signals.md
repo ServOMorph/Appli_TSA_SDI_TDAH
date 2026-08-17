@@ -3,40 +3,44 @@
 ## Contexte chaud
 - Branche `sync-marie` : 4 commits non fusionnés dans `main` (roadmap sync Supabase créée, setup projet Supabase, clôture de la communication Marie V5.0 incluant la suppression de `a_communiquer_v5.md`). Le travail des dernières sessions (sans rapport avec la sync) a été fait sur `main` pour ne pas mélanger les deux chantiers — `a_communiquer_v5.md` existe donc encore sur `main`, `roadmap_sync_marie.md` n'y existe pas encore. Réconciliation à faire à la prochaine reprise du chantier sync (fusion ou rebase).
 - `donnees_marie/` : trois exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35). Export du 2026-08-17 11h13 analysé (étape 0 `/deploy`) mais pas encore copié dans `donnees_marie/` — usage normal (nouvelle dépense budget, nouvelle entrée d'énergie), 0 nouveau résultat de test, aucune perte ni friction.
-- `roadmap_budget_v2.md` : toutes phases `[FAIT]` — à archiver vers `Archives/` au prochain `/close` qui touchera ce fichier (non fait cette session, hors périmètre).
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
-- Refonte complète du concept Budget **terminée** (roadmap `roadmap_budget_v2.md`, 4 phases toutes `[FAIT]`) : « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
-- Poignée du planning (accueil) en drag continu façon bottom-sheet, Outils/bannière Mode surcharge toujours visibles (session précédente).
-- Cette session (retours utilisateur, captures annotées) : sélecteur mois/année du planning (`MonthYearPickerModal.tsx`), bandeau de dates recentré en permanence sur le jour actuel avec navigation uniquement par glissement (flèches semaine retirées, `PlanningBoard.tsx`), fiche de tâche planifiée passée en lecture seule avec un nouveau bouton « Modifier » ouvrant `E24EditTask.tsx` (nouvelle route `task-edit`) pré-rempli, fond de fiche teinté à la couleur d'ambiance, alignement énergie/sous-tâches et hauteur de ligne proportionnelle à la durée. Aucun de ces changements déployé — Budget, drag planning et ces correctifs UI s'accumulent tous en attente du prochain `/deploy`.
-- `manualTestsCatalog.ts` : deux tests ajoutés cette session (`naviguer-dans-le-planning`, `modifier-une-tache-planifiee`) ; test `montant-total-apres-migration-revenus` (Phase 4 Budget) toujours en attente de validation Marie.
+- `Archives/roadmap_budget_v2.md` : refonte complète du concept Budget terminée et déployée (v5.45) — « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
+- `manualTestsCatalog.ts` : tests `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning` tous en attente de validation Marie sur la v5.45 fraîchement déployée.
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
 - `E121ManualTests.tsx` : un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne) ; chaque test dépliable/repliable.
-- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17, prod vérifiée HTTP 200 — inchangé cette session (aucun déploiement, plusieurs sessions de correctifs/features prêts mais pas encore publiés).
+- `_contexte/dernier_deploiement.md` : v5.45, 2026-08-17, prod vérifiée HTTP 200 (déploiement de cette session).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Déployer l'ensemble accumulé depuis v5.40 : refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée (`E24EditTask.tsx`) — rien de tout cela jamais testé par Marie en conditions réelles. — fait quand : `/deploy` effectué et retour de Marie obtenu — réf : `roadmap_budget_v2.md`, `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`)
-- [P2] Redemander à Marie de réimporter et revalider « Utiliser le budget » et « Glisser pour ouvrir le planning » (steps du catalogue mis à jour pour refléter le nouveau comportement) une fois redéployé. — fait quand : ces tests validés dans un nouvel export ingéré — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P1] Redemander à Marie de tester en conditions réelles l'ensemble déployé en v5.45 : refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée — rien de tout cela jamais testé par elle avant ce déploiement. — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`), `_contexte/marie_tests_journal.json`
 - [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée depuis plusieurs sessions) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-17 — suite 5, traitement export Marie 11h13, préparation /deploy)
+## Dernière session (2026-08-17 — suite 6, déploiement v5.45)
 
 ## Décisions prises
-- Aucune décision de conception. Export de Marie du 17/08 11h13 analysé (étape 0 `/deploy`) : ni perte, ni incohérence, ni friction bloquante — poursuite normale du déploiement.
+- Export de Marie du 17/08 11h13 analysé avant déploiement : ni perte, ni incohérence, ni friction bloquante.
+- v5.45 déployée en production après confirmation utilisateur (cumule refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée).
+- `roadmap_budget_v2.md` (toutes phases `[FAIT]`) archivée vers `Archives/`, feature entièrement livrée et déployée.
 
 ## Livrables produits ou modifiés
-- Aucun fichier de code modifié. `_contexte/marie_tests_journal.json` : ingestion tentée, 0 nouvelle entrée (13 déjà présentes).
+- `dist/v5.45/` : build de production généré et déployé sur Netlify.
+- `_contexte/dernier_deploiement.md` : v5.45, 2026-08-17.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication.
+- `Archives/roadmap_budget_v2.md` : déplacée (`git mv`), contenu inchangé.
+- `README.md`, `_contexte/contexte.md` : état actuel mis à jour (v5.45 en prod).
 
 ## Hypothèses validées / invalidées
-- VALIDE : différences entre l'export du 17/08 et celui du 16/08 22h35 limitées à une dépense budget (Vacances, 28€, « Violetta ») et une entrée d'énergie (17/08, valeur 8) — usage normal, pas de bug.
+- VALIDE : déploiement v5.45 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
+- VALIDE : 566/566 tests unitaires, `tsc -b`/lint clean avant déploiement.
+- EN ATTENTE : aucun des changements de v5.45 (Budget, drag planning, navigation planning, édition de tâche) jamais testé par Marie en conditions réelles.
 
 ## Prochaine étape exacte
-Poursuivre `/deploy` (étapes 1 à 9) : cumule Budget + drag planning + sélecteur mois/année + navigation planning + édition de tâche, jamais testés par Marie en conditions réelles.
+Redemander à Marie de réimporter et retester la v5.45 via le catalogue (`montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`).
 
 ## Question bloquante pour la session suivante
 Aucune.

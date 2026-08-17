@@ -12,7 +12,6 @@ function makeCategory(overrides: Partial<BudgetCategory> = {}): BudgetCategory {
   return {
     id: 'category-1',
     name: 'Courses',
-    kind: 'expense',
     period: 'week',
     amount: 60,
     position: 0,
@@ -37,7 +36,6 @@ function makeDeposit(overrides: Partial<BudgetDeposit> = {}): BudgetDeposit {
     id: 'deposit-1',
     account_id: 'account-1',
     amount: 50,
-    period: 'month',
     date: todayDate(),
     created_at: '2026-07-21T10:00:00.000Z',
     ...overrides,
@@ -53,7 +51,7 @@ describe('E74BudgetSettings', () => {
     await userEvent.selectOptions(screen.getByLabelText('Périodicité'), 'month')
     await userEvent.type(screen.getByLabelText('Montant'), '600')
     await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
-    expect(createBudgetCategory).toHaveBeenCalledWith('Loyer', 'expense', 'month', 600)
+    expect(createBudgetCategory).toHaveBeenCalledWith('Loyer', 'month', 600)
   })
 
   it('ouvre la fiche d’une catégorie', async () => {
@@ -63,13 +61,15 @@ describe('E74BudgetSettings', () => {
     expect(ctx.goTo).toHaveBeenCalledWith({ name: 'budget-category-detail', categoryId: 'category-1', date: todayDate() })
   })
 
-  it('liste tous les dépôts d’un livret, pas seulement ceux de la période courante', () => {
-    renderWithApp(<E74BudgetSettings />, makeAppContext({
+  it('affiche le solde d’un livret et ouvre sa fiche détaillée', async () => {
+    const ctx = makeAppContext({
       budgetAccounts: [makeAccount()],
       budgetDeposits: [makeDeposit(), makeDeposit({ id: 'deposit-2', amount: 30, date: '2026-01-05' })],
-    }))
-    expect(screen.getByText(/Solde.*80,00/)).toBeDefined()
-    expect(screen.getByText(/05\/01\/2026.*Dépôt.*30,00/)).toBeDefined()
+    })
+    renderWithApp(<E74BudgetSettings />, ctx)
+    expect(screen.getByText(/80,00/)).toBeDefined()
+    await userEvent.click(screen.getByRole('button', { name: 'Ouvrir Livret A' }))
+    expect(ctx.goTo).toHaveBeenCalledWith({ name: 'budget-livret-detail', accountId: 'account-1' })
   })
 
   it('crée et renomme un livret', async () => {
@@ -88,73 +88,18 @@ describe('E74BudgetSettings', () => {
     expect(renameBudgetAccount).toHaveBeenCalledWith('account-1', 'Livret jeune')
   })
 
-  it('saisit un dépôt et supprime un livret après confirmation', async () => {
-    const createBudgetDeposit = vi.fn().mockResolvedValue(undefined)
+  it('supprime un livret après confirmation', async () => {
     const deleteBudgetAccount = vi.fn().mockResolvedValueOnce('needs_confirmation').mockResolvedValueOnce('deleted')
     renderWithApp(<E74BudgetSettings />, makeAppContext({
       budgetAccounts: [makeAccount()],
       budgetDeposits: [makeDeposit()],
-      createBudgetDeposit,
       deleteBudgetAccount,
     }))
-    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
-    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
-    await userEvent.type(within(dialog).getByLabelText('Montant'), '25')
-    await userEvent.selectOptions(within(dialog).getByLabelText('Périodicité'), 'week')
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
-    expect(createBudgetDeposit).toHaveBeenCalledWith('account-1', 25, 'week')
-
     await userEvent.click(screen.getByRole('button', { name: 'Supprimer Livret A' }))
     const confirm = screen.getByRole('dialog', { name: 'Supprimer le livret' })
     await userEvent.click(within(confirm).getByRole('button', { name: 'Supprimer' }))
     expect(deleteBudgetAccount).toHaveBeenNthCalledWith(1, 'account-1')
     expect(deleteBudgetAccount).toHaveBeenNthCalledWith(2, 'account-1', true)
-  })
-
-  it('retire de l’argent d’un livret, montant envoyé négatif', async () => {
-    const createBudgetDeposit = vi.fn().mockResolvedValue(undefined)
-    renderWithApp(<E74BudgetSettings />, makeAppContext({
-      budgetAccounts: [makeAccount()],
-      budgetDeposits: [makeDeposit()],
-      createBudgetDeposit,
-    }))
-    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
-    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
-    await userEvent.selectOptions(within(dialog).getByLabelText('Type'), 'withdrawal')
-    await userEvent.type(within(dialog).getByLabelText('Montant'), '20')
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
-    expect(createBudgetDeposit).toHaveBeenCalledWith('account-1', -20, 'month')
-  })
-
-  it('bloque un retrait qui dépasse le solde du livret', async () => {
-    renderWithApp(<E74BudgetSettings />, makeAppContext({
-      budgetAccounts: [makeAccount()],
-      budgetDeposits: [makeDeposit({ amount: 50 })],
-    }))
-    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
-    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
-    await userEvent.selectOptions(within(dialog).getByLabelText('Type'), 'withdrawal')
-    await userEvent.type(within(dialog).getByLabelText('Montant'), '80')
-    expect(within(dialog).getByRole('button', { name: 'Enregistrer' }).hasAttribute('disabled')).toBe(true)
-  })
-
-  it('affiche un retrait dans la liste des mouvements du livret', () => {
-    renderWithApp(<E74BudgetSettings />, makeAppContext({
-      budgetAccounts: [makeAccount()],
-      budgetDeposits: [makeDeposit({ id: 'deposit-2', amount: -20, date: '2026-01-05' })],
-    }))
-    expect(screen.getByText(/05\/01\/2026.*Retrait.*20,00/)).toBeDefined()
-  })
-
-  it('supprime un dépôt', async () => {
-    const deleteBudgetDeposit = vi.fn().mockResolvedValue(undefined)
-    renderWithApp(<E74BudgetSettings />, makeAppContext({
-      budgetAccounts: [makeAccount()],
-      budgetDeposits: [makeDeposit()],
-      deleteBudgetDeposit,
-    }))
-    await userEvent.click(screen.getByRole('button', { name: 'Supprimer le dépôt 50' }))
-    expect(deleteBudgetDeposit).toHaveBeenCalledWith('deposit-1')
   })
 
   it('le retour repart vers le Budget', async () => {

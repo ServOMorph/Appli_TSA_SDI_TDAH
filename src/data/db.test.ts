@@ -30,7 +30,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(14)
+    expect(db.verno).toBe(15)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -63,7 +63,7 @@ describe('AppDatabase', () => {
     await upgraded.delete()
   })
 
-  it('upgrades a version 5 database by migrating deposit periodicity and repairing orphaned data', async () => {
+  it('upgrades a version 5 database by repairing orphaned budget data', async () => {
     const name = `migration-v5-db-${++testCount}`
     const legacy = new Dexie(name)
     legacy.version(5).stores({
@@ -110,7 +110,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(await upgraded.budgetDeposits.get('deposit-valid')).toMatchObject({ period: 'month' })
+    expect(await upgraded.budgetDeposits.get('deposit-valid')).toBeDefined()
     expect(await upgraded.budgetDeposits.get('deposit-orphan')).toBeUndefined()
     expect(await upgraded.budgetEntries.get('entry-valid')).toBeDefined()
     expect(await upgraded.budgetEntries.get('entry-orphan')).toBeUndefined()
@@ -210,7 +210,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(14)
+    expect(upgraded.verno).toBe(15)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -294,7 +294,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(14)
+    expect(upgraded.verno).toBe(15)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -333,7 +333,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(14)
+    expect(upgraded.verno).toBe(15)
 
     const migratedItem = await upgraded.listItems.get('existing-item')
     expect(migratedItem).toMatchObject({ checked: false })
@@ -386,7 +386,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(14)
+    expect(upgraded.verno).toBe(15)
     const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
     expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
 
@@ -432,7 +432,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(14)
+    expect(upgraded.verno).toBe(15)
     expect(await upgraded.budgetCategories.get('income-1')).toBeUndefined()
     expect(await upgraded.budgetCategories.get('expense-1')).toBeDefined()
 

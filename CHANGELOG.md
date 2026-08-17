@@ -1,3 +1,14 @@
+## v5.49 — 2026-08-17
+
+### Ajouté
+- Refonte Budget v3 terminée (`roadmap_budget_v3.md`, Phases 1-6) : Montant total réparti entre Mon compte (drill-down par sous-catégorie Semaine/Mois) et Mes livrets (drill-down par livret, fiche dédiée avec mouvements ajoutables/modifiables/supprimables).
+
+### Modifié
+- Gestion des mouvements de livret déplacée de l'écran de configuration vers la nouvelle fiche par livret, pour un formulaire unique et cohérent (montant/motif/date).
+
+### Corrigé
+- Suppression de 5 fonctions mortes dans `budgetRules.ts` devenues obsolètes après la refonte.
+
 ## v5.48 — 2026-08-17
 
 ### Modifié

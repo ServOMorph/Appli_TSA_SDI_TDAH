@@ -24,6 +24,9 @@ import { E72FolderDetail } from '@/ui/screens/tools/E72FolderDetail'
 import { E71Budget } from '@/ui/screens/tools/E71Budget'
 import { E73CategoryDetail } from '@/ui/screens/tools/E73CategoryDetail'
 import { E74BudgetSettings } from '@/ui/screens/tools/E74BudgetSettings'
+import { E75BudgetAccount } from '@/ui/screens/tools/E75BudgetAccount'
+import { E76BudgetLivrets } from '@/ui/screens/tools/E76BudgetLivrets'
+import { E77BudgetLivretDetail } from '@/ui/screens/tools/E77BudgetLivretDetail'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
 import type { Screen } from '@/app/AppContext'
@@ -114,6 +117,12 @@ export function AppScreens() {
         return <E72FolderDetail />
       case 'budget':
         return <E71Budget />
+      case 'budget-account':
+        return <E75BudgetAccount />
+      case 'budget-livrets':
+        return <E76BudgetLivrets />
+      case 'budget-livret-detail':
+        return <E77BudgetLivretDetail />
       case 'budget-category-detail':
         return <E73CategoryDetail />
       case 'budget-settings':

@@ -57,10 +57,19 @@ export const manualTestsCatalog: ManualTest[] = [
     title: 'Retirer de l’argent d’un livret',
     category: 'Outils : Budget',
     steps: [
-      'Dans le Budget, touchez l’icône ⚙ en haut à droite pour ouvrir « Configurer le budget ».',
-      'Touchez « Ajouter un mouvement ».',
-      'Choisissez un livret qui contient déjà de l’argent, sélectionnez « Retrait » dans le champ Type, saisissez un montant inférieur au solde affiché, puis touchez « Enregistrer » : le solde du livret doit diminuer de ce montant.',
+      'Dans le Budget, touchez le bloc « Mes livrets », puis touchez un livret qui contient déjà de l’argent.',
+      'Touchez « Ajouter un mouvement », sélectionnez « Retrait » dans le champ Type, saisissez un montant inférieur au solde affiché, puis touchez « Enregistrer » : le solde du livret doit diminuer de ce montant.',
       'Recommencez avec un montant supérieur au solde : un message d’erreur doit s’afficher et le bouton « Enregistrer » doit rester désactivé.',
+    ],
+  },
+  {
+    id: 'modifier-un-mouvement-de-livret',
+    title: 'Modifier un mouvement de livret',
+    category: 'Outils : Budget',
+    steps: [
+      'Dans le Budget, touchez le bloc « Mes livrets », puis touchez un livret contenant déjà au moins un mouvement.',
+      'Touchez « Modifier » sur un mouvement, changez le montant ou la date, puis touchez « Enregistrer » : le mouvement et le solde du livret doivent se mettre à jour en conséquence.',
+      'Touchez « Supprimer » sur un mouvement : il doit disparaître de la liste et le solde doit revenir à sa valeur d’avant ce mouvement.',
     ],
   },
   {
@@ -98,12 +107,26 @@ export const manualTestsCatalog: ManualTest[] = [
     title: 'Utiliser le budget',
     category: 'Outils : Budget',
     steps: [
-      'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ».',
-      'Sur la carte « Montant total » en haut de l’écran, touchez « Ajouter un revenu », saisissez un montant, puis touchez « Enregistrer » : le montant total et le détail « ... de revenus » doivent augmenter.',
-      'Touchez l’onglet « Semaine » puis l’onglet « Mois » : le montant « Il me reste » et la jauge en dessous doivent changer.',
-      'Touchez une catégorie de dépense pour ouvrir sa fiche détaillée.',
-      'Revenez en arrière, touchez « Ajouter une dépense », remplissez le formulaire puis enregistrez : le montant dépensé de la catégorie doit augmenter, et le détail « ... mon compte » sur la carte « Montant total » doit apparaître ou augmenter.',
-      'Touchez enfin le bloc « Mes livrets » : vous devez arriver sur l’écran de configuration du budget.',
+      'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ». Si aucun revenu n’a encore été saisi, seul le bouton « Configurer le budget » doit être visible : touchez-le, saisissez un montant, puis touchez « Enregistrer ».',
+      'Si un revenu existe déjà, touchez « Modifier le budget » sur la carte « Montant total », puis « Ajouter un revenu », saisissez un montant, puis touchez « Enregistrer » : le montant total et le détail « ... de revenus » doivent augmenter.',
+      'Touchez le bloc « Mon compte » sous « Montant total » : vous devez arriver sur un écran affichant « Semaine » et « Mois » côte à côte, chacune avec ses sous-catégories (montant prévu et restant, avec une jauge).',
+      'Touchez les flèches ← et → sous « Semaine » : la période affichée doit changer sans modifier celle affichée sous « Mois ».',
+      'Touchez une sous-catégorie pour ouvrir sa fiche détaillée.',
+      'Revenez en arrière, touchez « Ajouter une dépense », remplissez le formulaire puis enregistrez : le montant dépensé de la catégorie doit augmenter.',
+      'Revenez au Budget avec la flèche ←, puis touchez le bloc « Mes livrets » : le détail « ... mon compte » sur la carte « Montant total » doit être apparu ou avoir augmenté, et l’écran « Mes livrets » doit afficher la liste des livrets ou une proposition de configuration si aucun n’existe.',
+      'Touchez un livret : vous devez arriver sur sa fiche détaillée avec son solde et la liste de ses mouvements.',
+      'Touchez « Ajouter un mouvement », remplissez montant/motif/date puis enregistrez : le mouvement doit apparaître dans la liste et le solde du livret doit se mettre à jour.',
+    ],
+  },
+  {
+    id: 'modifier-et-supprimer-un-revenu-du-montant-total',
+    title: 'Modifier et supprimer un revenu du Montant total',
+    category: 'Outils : Budget',
+    steps: [
+      'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget », puis « Modifier le budget » sur la carte « Montant total ».',
+      'Vérifiez que toutes les entrées de revenus déjà saisies apparaissent dans la liste, chacune avec sa date, son libellé et son montant.',
+      'Touchez « Modifier » sur une entrée, changez le montant, puis touchez « Enregistrer » : le montant total doit se mettre à jour en conséquence.',
+      'Touchez « Supprimer » sur une entrée : elle doit disparaître de la liste et le montant total doit diminuer du montant correspondant.',
     ],
   },
   {
@@ -136,8 +159,8 @@ export const manualTestsCatalog: ManualTest[] = [
     steps: [
       'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ».',
       'Sur la carte « Montant total » en haut de l’écran, vérifiez qu’elle affiche un montant et le détail « ... de revenus · ... livrets · ... mon compte ».',
-      'Touchez l’icône ⚙ pour ouvrir « Configurer le budget » et vérifiez que les anciennes catégories Mcdo, Maman, Livret jeune et APL n’apparaissent plus dans la liste des catégories.',
-      'Revenez au Budget, touchez « Ajouter un revenu », saisissez un montant et un libellé, enregistrez : ce revenu doit s’ajouter au « ... de revenus » affiché sur la carte « Montant total ».',
+      'Touchez l’icône ⚙ pour ouvrir « Paramètres du budget » et vérifiez que les anciennes catégories Mcdo, Maman, Livret jeune et APL n’apparaissent plus dans la liste des catégories.',
+      'Revenez au Budget, touchez « Modifier le budget » puis « Ajouter un revenu », saisissez un montant et un libellé, enregistrez : ce revenu doit s’ajouter au « ... de revenus » affiché sur la carte « Montant total ».',
     ],
   },
   {

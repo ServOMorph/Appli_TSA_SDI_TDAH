@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-16 (suite, dashboard + refonte E121 tests manuels, clôture Phase V5.1-0) (archivé depuis contexte.md 2026-08-17, clôture roadmap_budget_v3)
+- Accueil retouché sur demande utilisateur — bouton « + » (ajout d'outil) déplacé à côté du titre « Outils » et réduit, espacement accru avant la grille de widgets, police arrondie sur les widgets Comptes/To Do/À acheter/Budget. Dernier point de `tests_manuels.md` (import JSON) validé, fichier vidé intégralement ; Phase V5.1-0 de `Archives/roadmap_v5.1.md` passée `[FAIT]`. `E121ManualTests.tsx` : un test « Validé » disparaît de la liste affichée (catalogue conservé comme suite de non-régression) ; bouton déplier/replier ajouté par test. `ManualTest.description` remplacé par `steps: string[]`, gabarit de rédaction documenté en commentaire en tête de `manualTestsCatalog.ts`. 554/555 tests unitaires (échec préexistant sans rapport), `tsc -b` clean.
+
 ## 2026-08-16 (export Marie du 16/08, nettoyage tests manuels, correctif catégories de listes à l'import) (archivé depuis contexte.md 2026-08-17, déploiement v5.47)
 - Export de Marie analysé (7 résultats déjà connus, 0 nouveau ; suppression de 5 éléments de la liste « À acheter » confirmée volontaire, pas un bug). Croisement `tests_manuels.md`/`manualTestsCatalog.ts` : 7 des 8 points déjà dupliqués dans le catalogue Marie, retirés de `tests_manuels.md` (ne garde que l'import JSON dev) ; point manquant (badge énergie) ajouté au catalogue. Bannières urgentes supprimées. Bug distinct corrigé : `list_categories` jamais exporté/vidé/restauré dans `useSettingsState.ts` (réparation par `section` à l'import, export bumpé v3.3). 552/553 tests unitaires (échec préexistant sans rapport), `tsc -b` clean.
 

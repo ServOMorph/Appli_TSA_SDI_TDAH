@@ -4,14 +4,17 @@ import { Button } from '@/ui/components/Button'
 import { inputStyle, modalBox, modalOverlay } from '@/ui/styles/budget'
 
 interface BudgetIncomeModalProps {
+  title?: string
+  defaultAmount?: number
+  defaultLabel?: string
   defaultDate?: string
   onSubmit: (amount: number, label: string, date: string) => void | Promise<void>
   onClose: () => void
 }
 
-export function BudgetIncomeModal({ defaultDate, onSubmit, onClose }: BudgetIncomeModalProps) {
-  const [amount, setAmount] = useState('')
-  const [label, setLabel] = useState('')
+export function BudgetIncomeModal({ title, defaultAmount, defaultLabel, defaultDate, onSubmit, onClose }: BudgetIncomeModalProps) {
+  const [amount, setAmount] = useState(defaultAmount !== undefined ? String(defaultAmount) : '')
+  const [label, setLabel] = useState(defaultLabel ?? '')
   const [date, setDate] = useState(defaultDate ?? todayDate())
 
   const parsedAmount = Number(amount.replace(',', '.'))
@@ -22,10 +25,12 @@ export function BudgetIncomeModal({ defaultDate, onSubmit, onClose }: BudgetInco
     await onSubmit(parsedAmount, label, date)
   }
 
+  const dialogTitle = title ?? 'Ajouter un revenu'
+
   return (
-    <div role="dialog" aria-modal="true" aria-label="Ajouter un revenu" style={modalOverlay}>
+    <div role="dialog" aria-modal="true" aria-label={dialogTitle} style={modalOverlay}>
       <div style={modalBox}>
-        <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Ajouter un revenu</h2>
+        <h2 style={{ margin: 0, fontSize: '1.1rem' }}>{dialogTitle}</h2>
 
         <label htmlFor="budget-income-amount">Montant</label>
         <input

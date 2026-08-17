@@ -28,6 +28,9 @@ const SCREEN_CODES: Record<Screen, string> = {
   budget: 'E71',
   'budget-category-detail': 'E73',
   'budget-settings': 'E74',
+  'budget-account': 'E75',
+  'budget-livrets': 'E76',
+  'budget-livret-detail': 'E77',
 }
 
 export function DevResetButton() {

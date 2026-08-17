@@ -332,6 +332,25 @@ export class AppDatabase extends Dexie {
         )
         await tx.table('budgetCategories').bulkDelete(incomeCategories.map((category) => category.id))
       })
+    this.version(15)
+      .stores({
+        budgetCategories: 'id, period, position',
+        budgetDeposits: 'id, account_id, date',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('budgetCategories')
+          .toCollection()
+          .modify((category) => {
+            delete category.kind
+          })
+        await tx
+          .table('budgetDeposits')
+          .toCollection()
+          .modify((deposit) => {
+            delete deposit.period
+          })
+      })
   }
 }
 

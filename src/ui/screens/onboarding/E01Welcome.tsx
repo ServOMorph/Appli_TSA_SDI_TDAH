@@ -3,7 +3,10 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = []
+const WHATS_NEW: string[] = [
+  'Le Budget est réorganisé : sous le « Montant total », deux blocs « Mon compte » et « Mes livrets » affichent chacun leur propre total. Touchez « Mon compte » pour retrouver vos catégories (Semaine et Mois côte à côte), ou « Mes livrets » pour la liste de vos livrets.',
+  'Chaque livret a maintenant sa propre fiche : touchez-le pour voir son solde et la liste de ses mouvements (dépôts et retraits), avec un motif et une date. Vous pouvez modifier ou supprimer chaque mouvement.',
+]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

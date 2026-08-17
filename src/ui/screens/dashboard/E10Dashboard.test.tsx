@@ -206,7 +206,7 @@ describe('E10Dashboard', () => {
 
     it('le widget Comptes ouvre la saisie de dépense', async () => {
       const ctx = makeAppContext({
-        budgetCategories: [{ id: 'c1', name: 'Courses', kind: 'expense', period: 'month', amount: 100, position: 0, created_at: '', updated_at: '' }],
+        budgetCategories: [{ id: 'c1', name: 'Courses', period: 'month', amount: 100, position: 0, created_at: '', updated_at: '' }],
       })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Comptes' }))

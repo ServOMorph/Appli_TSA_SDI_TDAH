@@ -23,6 +23,9 @@ export type Route =
   | { name: 'tools' }
   | { name: 'folder-detail'; folderId?: string }
   | { name: 'budget' }
+  | { name: 'budget-account' }
+  | { name: 'budget-livrets' }
+  | { name: 'budget-livret-detail'; accountId?: string }
   | { name: 'budget-category-detail'; categoryId?: string; date?: string }
   | { name: 'budget-settings' }
 

@@ -10,7 +10,6 @@ describe('BudgetCategoryRepository', () => {
   const category = (overrides: Partial<BudgetCategory> = {}): BudgetCategory => ({
     id: 'category-1',
     name: 'Courses',
-    kind: 'expense',
     period: 'week',
     amount: 60,
     position: 0,
@@ -40,23 +39,21 @@ describe('BudgetCategoryRepository', () => {
     expect(await repo.getById('category-1')).toBeUndefined()
   })
 
-  it('retrieves categories by period, kind and position', async () => {
+  it('retrieves categories by period and position', async () => {
     await repo.create(
       category({
-        id: 'monthly-income',
+        id: 'monthly-category',
         name: 'Salaire',
-        kind: 'income',
         period: 'month',
         position: 1,
       }),
     )
-    await repo.create(category({ id: 'weekly-expense', position: 0 }))
+    await repo.create(category({ id: 'weekly-category', position: 0 }))
 
     expect((await repo.getAll()).map((item) => item.id)).toEqual([
-      'weekly-expense',
-      'monthly-income',
+      'weekly-category',
+      'monthly-category',
     ])
-    expect((await repo.getByPeriod('week')).map((item) => item.id)).toEqual(['weekly-expense'])
-    expect((await repo.getByKind('income')).map((item) => item.id)).toEqual(['monthly-income'])
+    expect((await repo.getByPeriod('week')).map((item) => item.id)).toEqual(['weekly-category'])
   })
 })

@@ -33,7 +33,7 @@ export function E73CategoryDetail() {
     return (
       <main style={pageStyle}>
         <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
-          <button aria-label="Retour" onClick={() => back('budget')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
+          <button aria-label="Retour" onClick={() => back('budget-account')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
             ←
           </button>
           <h1 style={{ margin: 0, fontSize: '1.25rem' }}>Catégorie</h1>
@@ -49,7 +49,6 @@ export function E73CategoryDetail() {
   const entries = budgetEntries
     .filter((entry) => entry.category_id === category.id && isDateInPeriod(entry.date, bounds))
     .sort((a, b) => b.date.localeCompare(a.date))
-  const isExpense = category.kind === 'expense'
 
   async function handleRename() {
     if (!category || !nameValue.trim()) return
@@ -71,20 +70,20 @@ export function E73CategoryDetail() {
       setConfirmingDelete(true)
       return
     }
-    back('budget')
+    back('budget-account')
   }
 
   async function confirmDelete() {
     if (!category) return
     await deleteBudgetCategory(category.id, true)
     setConfirmingDelete(false)
-    back('budget')
+    back('budget-account')
   }
 
   return (
     <main style={pageStyle}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
-        <button aria-label="Retour" onClick={() => back('budget')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
+        <button aria-label="Retour" onClick={() => back('budget-account')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ←
         </button>
         <h1 style={{ margin: 0, fontSize: '1.25rem' }}>{category.name}</h1>
@@ -92,48 +91,40 @@ export function E73CategoryDetail() {
 
       <Card>
         <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-          {isExpense ? 'Dépense' : 'Revenu'} · {category.period === 'week' ? 'À la semaine' : 'Au mois'}
+          {category.period === 'week' ? 'À la semaine' : 'Au mois'}
         </p>
-        {isExpense ? (
-          <>
-            <p style={{ margin: '4px 0', fontSize: '1.75rem', fontWeight: 700, color: remaining < 0 ? 'var(--color-error)' : 'var(--color-success)' }}>
-              {formatEuro(remaining)}
-            </p>
-            <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-              {formatEuro(spent)} dépensés sur {formatEuro(category.amount)}
-            </p>
-            <BudgetGauge spent={spent} budgeted={category.amount} label={`Budget consommé pour ${category.name}`} height={10} />
-          </>
-        ) : (
-          <p style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 700 }}>{formatEuro(category.amount)}</p>
-        )}
+        <p style={{ margin: '4px 0', fontSize: '1.75rem', fontWeight: 700, color: remaining < 0 ? 'var(--color-error)' : 'var(--color-success)' }}>
+          {formatEuro(remaining)}
+        </p>
+        <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+          {formatEuro(spent)} dépensés sur {formatEuro(category.amount)}
+        </p>
+        <BudgetGauge spent={spent} budgeted={category.amount} label={`Budget consommé pour ${category.name}`} height={10} />
       </Card>
 
-      {isExpense && (
-        <section aria-label="Dépenses de la période">
-          <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Dépenses de la période</h2>
-          {entries.length === 0 ? (
-            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Aucune dépense sur cette période.</p>
-          ) : (
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-              {entries.map((entry) => (
-                <li key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-sm)' }}>
-                  <span style={{ flex: 1, fontSize: '0.9375rem' }}>
-                    {formatFrenchDate(entry.date)} · {entry.label || 'Dépense'} · {formatEuro(entry.amount)}
-                  </span>
-                  <button
-                    aria-label={`Supprimer la dépense ${entry.label || entry.amount}`}
-                    onClick={() => deleteBudgetEntry(entry.id)}
-                    style={dangerLinkStyle}
-                  >
-                    Supprimer
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
+      <section aria-label="Dépenses de la période">
+        <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Dépenses de la période</h2>
+        {entries.length === 0 ? (
+          <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Aucune dépense sur cette période.</p>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+            {entries.map((entry) => (
+              <li key={entry.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-sm)' }}>
+                <span style={{ flex: 1, fontSize: '0.9375rem' }}>
+                  {formatFrenchDate(entry.date)} · {entry.label || 'Dépense'} · {formatEuro(entry.amount)}
+                </span>
+                <button
+                  aria-label={`Supprimer la dépense ${entry.label || entry.amount}`}
+                  onClick={() => deleteBudgetEntry(entry.id)}
+                  style={dangerLinkStyle}
+                >
+                  Supprimer
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
         <Button variant="secondary" fullWidth onClick={() => { setNameValue(category.name); setRenaming(true) }}>

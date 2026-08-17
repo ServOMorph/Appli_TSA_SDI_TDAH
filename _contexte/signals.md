@@ -2,19 +2,19 @@
 
 ## Contexte chaud
 - Branche `sync-marie` : 4 commits non fusionnés dans `main` (roadmap sync Supabase créée, setup projet Supabase, clôture de la communication Marie V5.0 incluant la suppression de `a_communiquer_v5.md`). Le travail des dernières sessions (sans rapport avec la sync) a été fait sur `main` pour ne pas mélanger les deux chantiers — `a_communiquer_v5.md` existe donc encore sur `main`, `roadmap_sync_marie.md` n'y existe pas encore. Réconciliation à faire à la prochaine reprise du chantier sync (fusion ou rebase).
-- `donnees_marie/` : quatre exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35, 2026-08-17 11h13). Dernier export traité et copié cette session — usage normal (nouvelle dépense budget, nouvelle entrée d'énergie), 0 nouveau résultat de test, aucune perte ni friction.
+- `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Traitement du dernier export (avant ce `/deploy`) effectué par l'utilisateur lui-même hors session — non analysé par l'agent cette fois.
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `message_marie_categories_travail.md`. Chaque nouvelle demande sera rattachée à l'une d'elles. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage (champ `category` sur chaque test, affichage groupé et pliable dans `E121ManualTests.tsx`) ; les autres roadmaps/communications ne l'appliquent pas encore.
-- `Archives/roadmap_budget_v2.md` : refonte complète du concept Budget terminée et déployée (v5.45) — « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
-- `manualTestsCatalog.ts` : tests `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `grouper-les-tests-par-categorie` tous en attente de validation Marie (v5.45 et le regroupement par catégorie sont désormais tous deux déployés en v5.47).
+- `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`) — « Montant total » distribué entre « Mon compte » (drill-down Semaine/Mois par sous-catégorie) et « Mes livrets » (drill-down par livret, fiche dédiée avec mouvements modifiables). Jamais déployée ni testée par Marie au moment de ce `/close`.
+- `manualTestsCatalog.ts` : tests `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `grouper-les-tests-par-categorie`, `retirer-de-l-argent-d-un-livret`, `modifier-un-mouvement-de-livret` tous en attente de validation Marie.
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
 - `E121ManualTests.tsx` : catégories repliées par défaut (nom en évidence, compteur de tests) ; dépliage à 3 niveaux — catégorie -> tests -> étapes. Un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne).
-- `_contexte/dernier_deploiement.md` : v5.47, 2026-08-17, prod vérifiée HTTP 200.
+- `_contexte/dernier_deploiement.md` : v5.47, 2026-08-17, prod vérifiée HTTP 200 (refonte Budget v3 pas encore déployée à cette date).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Redemander à Marie de tester en conditions réelles l'ensemble déployé en v5.45/v5.47 : refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée, regroupement des tests par catégorie — rien de tout cela jamais testé par elle avant ce déploiement. — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `grouper-les-tests-par-categorie`), `_contexte/marie_tests_journal.json`
+- [P1] Redemander à Marie de tester en conditions réelles l'ensemble à déployer (refonte Budget v3, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée, regroupement des tests par catégorie) — rien de tout cela jamais testé par elle avant ce déploiement. — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `grouper-les-tests-par-categorie`, `retirer-de-l-argent-d-un-livret`, `modifier-un-mouvement-de-livret`), `_contexte/marie_tests_journal.json`
 - [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `message_marie_categories_travail.md`
 - [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée depuis plusieurs sessions) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
@@ -23,7 +23,37 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-17 — suite 8, déploiement v5.47)
+## Dernière session (2026-08-17 — suite 9, Phases 5-6 roadmap_budget_v3, clôture avant /deploy)
+
+## Décisions prises
+- `roadmap_budget_v3.md` intégralement livrée (Phases 1-6, `[FAIT]`) : refonte de bout en bout du Budget (Montant total manuel réparti Mon compte/Livrets, drill-down par sous-catégorie et par livret).
+- Phase 5 : gestion des mouvements de livret (ajout/modification/suppression) déplacée de `E74BudgetSettings.tsx` vers un nouvel écran `E77BudgetLivretDetail.tsx` dédié, pour éviter deux formulaires incohérents (avec/sans date) — décision au-delà du libellé littéral de la roadmap, non contestée.
+- Phase 6 : 5 fonctions mortes supprimées de `budgetRules.ts` (`getCurrentPeriodBounds`, `getRemainingForCategory`, `getTotalBudgeted`, `getTotalSpent`, `getTotalRemaining`) ; aucun écran mort à retirer (E71/E73/E74 tous vivants) ; widget accueil « Comptes » confirmé non affecté.
+
+## Livrables produits ou modifiés
+- `src/ui/screens/tools/E77BudgetLivretDetail.tsx`(`.test.tsx`) : créé (fiche détaillée d'un livret, mouvements modifiables).
+- `src/app/contexts/useBudgetState.ts` : `updateBudgetDeposit` ajouté.
+- `src/ui/screens/tools/E76BudgetLivrets.tsx`(`.test.tsx`) : clic sur un livret ouvre sa fiche, icône ⚙ ajoutée.
+- `src/ui/screens/tools/E74BudgetSettings.tsx`(`.test.tsx`) : gestion des mouvements retirée, recentré sur la configuration des livrets.
+- `src/app/navigation.ts`, `src/App.tsx`, `src/ui/components/DevResetButton.tsx` : route `budget-livret-detail`.
+- `src/domain/rules/budgetRules.ts`(`.test.ts`) : nettoyage des fonctions mortes.
+- `src/domain/data/manualTestsCatalog.ts` : test `retirer-de-l-argent-d-un-livret` réécrit, `modifier-un-mouvement-de-livret` ajouté, `utiliser-le-budget` complété.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : 2 entrées `WHATS_NEW` ajoutées.
+- `roadmap_budget_v3.md` : Phases 5 et 6 `[FAIT]`.
+
+## Hypothèses validées / invalidées
+- VALIDE : 571/571 tests unitaires, `tsc -b`/lint clean après Phases 5 et 6.
+- EN ATTENTE : refonte Budget v3 jamais testée par Marie en conditions réelles.
+
+## Prochaine étape exacte
+`/deploy` en cours (exports de Marie déjà traités par l'utilisateur hors session).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 8, déploiement v5.47)
 
 ## Décisions prises
 - `/deploy` mené à terme après confirmation utilisateur : v5.47 déployée en production (cumule v5.45 + regroupement des tests par catégorie).

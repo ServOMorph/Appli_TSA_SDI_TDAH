@@ -108,7 +108,7 @@ export function E10Dashboard() {
     goTo('list-detail')
   }
 
-  const expenseCategories = budgetCategories.filter((category) => category.kind === 'expense')
+  const expenseCategories = budgetCategories
 
   function openExpenseForm() {
     if (expenseCategories.length === 0) {

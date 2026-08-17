@@ -34,8 +34,8 @@ function BudgetPanel() {
       <div data-testid="entry-count">{budgetEntries.length}</div>
       <div data-testid="deposit-count">{budgetDeposits.length}</div>
       <button onClick={() => deleteAllData()}>effacer</button>
-      <button onClick={() => createBudgetCategory('Courses', 'expense', 'week', 60)}>créer catégorie</button>
-      <button onClick={() => createBudgetCategory('Box', 'expense', 'month', 120)}>créer dépense mensuelle</button>
+      <button onClick={() => createBudgetCategory('Courses', 'week', 60)}>créer catégorie</button>
+      <button onClick={() => createBudgetCategory('Box', 'month', 120)}>créer dépense mensuelle</button>
       <button onClick={() => category && renameBudgetCategory(category.id, 'Courses')}>renommer catégorie</button>
       <button onClick={() => category && updateBudgetCategoryAmount(category.id, 75)}>modifier catégorie</button>
       <button onClick={() => category && deleteBudgetCategory(category.id, true)}>supprimer catégorie</button>

@@ -3,12 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = [
-  'Le budget change de logique : vous saisissez maintenant vous-même chaque revenu (bouton « Ajouter un revenu »), et la carte « Montant total » en haut de l’écran Budget affiche ce qu’il vous reste une fois vos dépenses et vos livrets déduits. Vos anciennes catégories de revenu (Mcdo, Maman, Livret jeune, APL) sont converties automatiquement en revenus déjà enregistrés, pour ne rien perdre.',
-  'Le petit trait gris de l’accueil se glisse maintenant progressivement : le planning s’agrandit ou se referme en suivant votre doigt, et reste à la taille où vous relâchez. Le reste de l’accueil (dont les Outils) ne disparaît plus quand le planning est ouvert.',
-  'Dans le bandeau des jours du planning, le jour actuel reste maintenant toujours centré : glissez simplement le doigt vers la gauche ou la droite pour changer de jour. Touchez le mois et l’année pour ouvrir une fenêtre et choisir directement un autre mois.',
-  'La fiche d’une tâche planifiée prend maintenant la couleur d’ambiance choisie dans les paramètres, et un nouveau bouton « Modifier » ouvre un écran dédié, pré-rempli, pour changer ses informations.',
-]
+const WHATS_NEW: string[] = []
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

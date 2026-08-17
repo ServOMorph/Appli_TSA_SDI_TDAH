@@ -7,6 +7,7 @@ import { E20Inbox } from '@/ui/screens/tasks/E20Inbox'
 import { E21CreateTaskV2 } from '@/ui/screens/tasks/E21CreateTaskV2'
 import { E22TaskDetail } from '@/ui/screens/tasks/E22TaskDetail'
 import { E23Decompose } from '@/ui/screens/tasks/E23Decompose'
+import { E24EditTask } from '@/ui/screens/tasks/E24EditTask'
 import { E30EnergyView } from '@/ui/screens/energy/E30EnergyView'
 import { E31EnergyCheckIn } from '@/ui/screens/energy/E31EnergyCheckIn'
 import { E90OverloadRecovery } from '@/ui/screens/overload/E90OverloadRecovery'
@@ -81,6 +82,8 @@ export function AppScreens() {
         return <E21CreateTaskV2 />
       case 'task-detail':
         return <E22TaskDetail />
+      case 'task-edit':
+        return <E24EditTask />
       case 'task-decompose':
         return <E23Decompose />
       case 'energy-view':

@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-14 (suite 14, étape 0 « exports de Marie » dans /deploy) (archivé depuis contexte.md 2026-08-17, sélecteur mois/année et édition de tâche)
+- `.claude/commands/deploy.md` modifié sur demande explicite : nouvelle étape 0, avant `/close`, imposant de traiter les derniers exports de Marie avant tout déploiement (rappel utilisateur, analyse du payload complet pour pertes/incohérences/frictions, ingestion via `scripts/ingest_manual_tests.py`, arrêt et proposition de traitement si problème détecté, sans jamais toucher aux fichiers d'export bruts ni à `donnees_marie/`). Étapes suivantes renumérotées 1 à 9, références internes corrigées. Changement de processus uniquement, aucun code applicatif touché.
+
 ## 2026-08-14 (suite 13, déploiement v5.33 reporté) (archivé depuis contexte.md 2026-08-17, drag continu du planning)
 - `/deploy` engagé jusqu'à l'étape des avertissements (2 vérifications bloquantes toutes passées), puis interrompu à la demande de l'utilisateur — il valide d'abord lui-même les 6 points de `tests_manuels.md` avant de relancer. Aucun build lancé, `dist/v5.33` n'existe pas. Aucun code applicatif modifié cette session ; pas de bump `CHANGELOG.md` (rien de fonctionnel n'a changé, l'entrée v5.33 déjà présente reste valable pour le prochain déploiement).
 

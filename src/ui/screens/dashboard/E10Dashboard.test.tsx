@@ -130,7 +130,7 @@ describe('E10Dashboard', () => {
     it('replié : affiche le bandeau de dates comme en mode déplié', async () => {
       const ctx = makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByRole('button', { name: /semaine précédente/i })).not.toBeNull()
+      expect(await screen.findByRole('region', { name: 'Planning du jour' })).not.toBeNull()
     })
 
     it('replié : affiche la zone widgets', async () => {
@@ -153,7 +153,7 @@ describe('E10Dashboard', () => {
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByRole('button', { name: /semaine précédente/i })).toBeDefined()
+      expect(await screen.findByRole('region', { name: 'Planning du jour' })).toBeDefined()
       expect(screen.getByRole('region', { name: 'Outils' })).toBeDefined()
     })
 

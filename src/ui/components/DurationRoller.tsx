@@ -8,6 +8,7 @@ const MAX_DAYS = 30
 const rowStyle: React.CSSProperties = {
   display: 'flex',
   gap: 'var(--spacing-sm)',
+  minWidth: 0,
 }
 
 const fieldStyle: React.CSSProperties = {
@@ -15,9 +16,11 @@ const fieldStyle: React.CSSProperties = {
   flexDirection: 'column',
   gap: '4px',
   flex: 1,
+  minWidth: 0,
 }
 
 const selectStyle: React.CSSProperties = {
+  width: '100%',
   padding: '10px',
   borderRadius: 'var(--radius-md)',
   border: '1px solid var(--color-border)',
@@ -25,6 +28,7 @@ const selectStyle: React.CSSProperties = {
   color: 'var(--color-text)',
   fontSize: '1rem',
   fontFamily: 'var(--font-body)',
+  boxSizing: 'border-box',
 }
 
 function toParts(minutes: number | null): { days: number; hours: number; mins: number } {

@@ -5,25 +5,55 @@
 - `donnees_marie/` : trois exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35).
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Refonte complète du concept Budget **terminée** (roadmap `roadmap_budget_v2.md`, 4 phases toutes `[FAIT]`) : « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
-- Poignée du planning (accueil) transformée cette session en drag continu façon bottom-sheet : la fenêtre du planning suit le doigt en temps réel au lieu de basculer sur un seuil, et reste à la hauteur relâchée (`E10Dashboard.tsx`, constantes `PLANNING_MIN_HEIGHT_PX`/`PLANNING_MAX_HEIGHT_PX`). La section Outils et la bannière Mode surcharge restent désormais **toujours visibles**, même planning ouvert (elles étaient masquées auparavant). Répond à la demande annexe restée en attente depuis 2026-08-15. `WHATS_NEW` mis à jour pour les deux changements (Budget + drag planning).
-- `manualTestsCatalog.ts` mis à jour cette session : `utiliser-le-budget` teste désormais aussi « Ajouter un revenu » / carte « Montant total » ; `glisser-pour-ouvrir-le-planning` décrit le nouveau comportement continu. Test `montant-total-apres-migration-revenus` (Phase 4 Budget) toujours en attente de validation Marie.
-- Corrigé au passage : `PlanningBoard.tsx` contenait une pollution non committée (caractère `e ` parasite en tête de fichier, cassait la compilation) — sans rapport avec la session, réparée pour débloquer les tests.
+- Poignée du planning (accueil) en drag continu façon bottom-sheet, Outils/bannière Mode surcharge toujours visibles (session précédente).
+- Cette session (retours utilisateur, captures annotées) : sélecteur mois/année du planning (`MonthYearPickerModal.tsx`), bandeau de dates recentré en permanence sur le jour actuel avec navigation uniquement par glissement (flèches semaine retirées, `PlanningBoard.tsx`), fiche de tâche planifiée passée en lecture seule avec un nouveau bouton « Modifier » ouvrant `E24EditTask.tsx` (nouvelle route `task-edit`) pré-rempli, fond de fiche teinté à la couleur d'ambiance, alignement énergie/sous-tâches et hauteur de ligne proportionnelle à la durée. Aucun de ces changements déployé — Budget, drag planning et ces correctifs UI s'accumulent tous en attente du prochain `/deploy`.
+- `manualTestsCatalog.ts` : deux tests ajoutés cette session (`naviguer-dans-le-planning`, `modifier-une-tache-planifiee`) ; test `montant-total-apres-migration-revenus` (Phase 4 Budget) toujours en attente de validation Marie.
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
 - `E121ManualTests.tsx` : un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne) ; chaque test dépliable/repliable.
-- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17, prod vérifiée HTTP 200 — inchangé cette session (aucun déploiement, Budget + drag planning prêts mais pas encore publiés).
+- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17, prod vérifiée HTTP 200 — inchangé cette session (aucun déploiement, plusieurs sessions de correctifs/features prêts mais pas encore publiés).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Déployer la refonte Budget + le drag continu du planning (`roadmap_budget_v2.md` intégralement `[FAIT]` ; `E10Dashboard.tsx` pour le drag) — aucun des deux jamais testé par Marie en conditions réelles. — fait quand : `/deploy` effectué et retour de Marie obtenu sur les deux — réf : `roadmap_budget_v2.md`, `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`)
-- [P2] Redemander à Marie de réimporter et revalider « Utiliser le budget » et « Glisser pour ouvrir le planning » (steps du catalogue mis à jour cette session pour refléter le nouveau comportement) une fois redéployé. — fait quand : ces tests validés dans un nouvel export ingéré — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P1] Déployer l'ensemble accumulé depuis v5.40 : refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée (`E24EditTask.tsx`) — rien de tout cela jamais testé par Marie en conditions réelles. — fait quand : `/deploy` effectué et retour de Marie obtenu — réf : `roadmap_budget_v2.md`, `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`)
+- [P2] Redemander à Marie de réimporter et revalider « Utiliser le budget » et « Glisser pour ouvrir le planning » (steps du catalogue mis à jour pour refléter le nouveau comportement) une fois redéployé. — fait quand : ces tests validés dans un nouvel export ingéré — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée depuis plusieurs sessions) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-17 — suite 3, drag continu du planning, mise à jour catalogue de tests)
+## Dernière session (2026-08-17 — suite 4, sélecteur mois/année, refonte navigation planning et édition de tâche)
+
+## Décisions prises
+- Sur retours utilisateur (captures annotées), 5 correctifs UI cumulés : clic sur le mois/année du planning ouvre désormais une fenêtre dédiée (année + grille des 12 mois) au lieu de l'ancien sélecteur de date natif ; le bandeau de dates garde le jour actuel toujours centré (navigation uniquement par glissement, flèches semaine retirées) ; badge sous-tâches placé avant le logo énergie sur chaque ligne planifiée pour un alignement vertical constant, hauteur de ligne rendue proportionnelle à la durée ; débordement visuel du cadre Durée dans le formulaire de tâche corrigé ; fiche de tâche planifiée passée en lecture seule (fond teinté à la couleur d'ambiance) avec un nouveau bouton « Modifier » ouvrant un écran d'édition dédié pré-rempli, au même gabarit que la création, avec le choix occurrence/série conservé pour les tâches récurrentes.
+
+## Livrables produits ou modifiés
+- `src/ui/components/MonthYearPickerModal.tsx` : créé (sélecteur mois/année).
+- `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`) : sélecteur mois/année câblé, bandeau recentré sur le jour actuel, flèches semaine retirées, ordre badge/énergie inversé, hauteur de ligne proportionnelle à la durée.
+- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : tests ajustés (bandeau de dates).
+- `src/ui/components/DurationRoller.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx` : correctif débordement visuel du cadre Durée.
+- `src/ui/screens/tasks/E22TaskDetail.tsx`(`.test.tsx`) : champs en lecture seule, fond teinté couleur d'ambiance, bouton « Modifier ».
+- `src/ui/screens/tasks/E24EditTask.tsx`(`.test.tsx`) : créé (écran d'édition de tâche dédié).
+- `src/app/navigation.ts`, `src/App.tsx`, `src/ui/components/DevResetButton.tsx` : nouvelle route `task-edit`.
+- `src/domain/data/manualTestsCatalog.ts` : tests `naviguer-dans-le-planning` et `modifier-une-tache-planifiee` ajoutés.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : 2 entrées `WHATS_NEW` ajoutées.
+- `CHANGELOG.md` : v5.45.
+
+## Hypothèses validées / invalidées
+- VALIDE : 566/566 tests unitaires, `tsc -b`/lint clean après l'ensemble des correctifs.
+- HYPOTHÈSE NON VÉRIFIÉE : cause du débordement du cadre Durée attribuée aux `<select>` natifs sans largeur contrainte (`minWidth:0` manquant) — corrigé sur cette base mais pas confirmé visuellement par l'utilisateur sur son appareil.
+- EN ATTENTE : aucun des changements de cette session (ni des sessions précédentes : Budget, drag planning) jamais testé par Marie en conditions réelles — aucun déploiement cette session.
+
+## Prochaine étape exacte
+`/deploy` (cumule Budget + drag planning + sélecteur mois/année + navigation planning + édition de tâche), puis redemander à Marie de tester les nouveaux comportements via le catalogue (`naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, plus les tests Budget/planning déjà en attente).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 3, drag continu du planning, mise à jour catalogue de tests)
 
 ## Décisions prises
 - Sur retour utilisateur (capture annotée) : la poignée du planning devient un drag continu façon bottom-sheet — la fenêtre suit le doigt en temps réel (au lieu du seuil binaire précédent qui basculait instantanément), reste à la hauteur relâchée au lieu de forcément s'ouvrir/fermer en entier, et la section Outils / la bannière Mode surcharge restent visibles en permanence (elles disparaissaient auparavant quand le planning était déplié).

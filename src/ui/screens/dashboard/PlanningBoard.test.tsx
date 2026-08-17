@@ -31,31 +31,43 @@ describe('PlanningBoard — déplié', () => {
     expect(screen.getByLabelText('2026-07-02')).toBeInTheDocument()
   })
 
-  it('navigation précédent charge la semaine précédente', async () => {
+  it('glisser vers la gauche charge le jour suivant', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    await userEvent.click(screen.getByRole('button', { name: /semaine précédente/i }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-23'))
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 100 }] })
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
   })
 
-  it('navigation suivant charge la semaine suivante', async () => {
+  it('glisser vers la droite charge le jour précédent', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    await userEvent.click(screen.getByRole('button', { name: /semaine suivante/i }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-07'))
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 100 }] })
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 200 }] })
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
   })
 
-  it('aller à une date via le sélecteur charge ce jour', async () => {
+  it('ne propose plus de flèches de navigation par semaine', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    expect(screen.queryByRole('button', { name: /semaine précédente/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /semaine suivante/i })).toBeNull()
+  })
+
+  it('choisir un mois via le sélecteur mois/année charge ce mois', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    fireEvent.change(screen.getByLabelText('Aller à une date'), { target: { value: '2026-09-15' } })
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-09-15'))
+    await userEvent.click(screen.getByRole('button', { name: /choisir un mois/i }))
+    await userEvent.click(screen.getByRole('button', { name: 'Sep' }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-09-30'))
   })
 
   it('affiche une tâche planifiée avec son horaire, son titre et son coût énergie', async () => {
@@ -215,7 +227,6 @@ describe('PlanningBoard — replié', () => {
   it('affiche le bandeau de dates comme en mode déplié', async () => {
     renderWithApp(<PlanningBoard collapsed />, makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await waitFor(() => expect(screen.queryByLabelText('2026-06-30')).not.toBeNull())
-    expect(screen.queryByRole('button', { name: /semaine précédente/i })).not.toBeNull()
   })
 
   it('charge toujours le jour courant, quelle que soit la navigation précédente', async () => {

@@ -82,7 +82,7 @@ const labelStyle: React.CSSProperties = {
   color: 'var(--color-text-muted)',
 }
 
-const fieldGroupStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }
+const fieldGroupStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)', minWidth: 0 }
 
 const energyGridStyle: React.CSSProperties = {
   display: 'grid',

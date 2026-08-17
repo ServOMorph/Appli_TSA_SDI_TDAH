@@ -1,3 +1,16 @@
+## v5.45 — 2026-08-17
+
+### Ajouté
+- Fiche de tâche planifiée : bouton « Modifier » ouvrant un écran d'édition dédié, pré-rempli au même gabarit que la création, avec choix occurrence/série pour les tâches récurrentes.
+
+### Modifié
+- Bandeau de dates du planning (accueil) : flèches de navigation par semaine retirées, le jour actuel reste toujours centré et seul le cadre du jour sélectionné se déplace ; navigation uniquement par glissement tactile.
+- Ligne d'une tâche planifiée : badge des sous-tâches désormais avant le logo d'énergie (alignement vertical constant entre les lignes), hauteur de ligne proportionnelle à la durée de la tâche.
+- Fiche d'une tâche planifiée : fond teinté avec la couleur d'ambiance des paramètres ; champs affichés en lecture seule (l'édition se fait via le bouton « Modifier »).
+
+### Corrigé
+- Formulaire de création de tâche : débordement visuel du cadre Durée à droite de l'écran (selects sans largeur contrainte).
+
 ## v5.44 — 2026-08-17
 
 ### Modifié

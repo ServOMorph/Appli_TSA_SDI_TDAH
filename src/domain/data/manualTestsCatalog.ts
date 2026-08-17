@@ -117,6 +117,26 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'naviguer-dans-le-planning',
+    title: 'Naviguer dans le planning de l’accueil',
+    steps: [
+      'Sur l’accueil, dans le bandeau des jours, posez le doigt sur un jour et glissez vers la gauche : le jour affiché doit avancer d’un jour, et le jour actuel doit rester à la même place dans le bandeau (seul le cadre du jour sélectionné se déplace).',
+      'Glissez maintenant vers la droite : le jour affiché doit reculer d’un jour.',
+      'Touchez le mois et l’année affichés au-dessus du bandeau (ex. « Août 2026 ») : une fenêtre doit s’ouvrir avec les flèches ‹ › pour changer d’année et les 12 mois à choisir.',
+      'Touchez un autre mois : la fenêtre doit se fermer et le planning doit afficher ce mois.',
+    ],
+  },
+  {
+    id: 'modifier-une-tache-planifiee',
+    title: 'Modifier une tâche planifiée',
+    steps: [
+      'Sur l’accueil, touchez une tâche planifiée dans le bandeau du planning : la fiche de la tâche s’ouvre, avec un fond légèrement teinté de la couleur d’ambiance choisie dans les paramètres.',
+      'Vérifiez que les champs Titre, Icône, Couleur, Date, Horaire et Coût en énergie sont uniquement affichés, sans réagir au toucher.',
+      'Touchez le bouton « Modifier » en bas de la fiche : un écran « Modifier la tâche » s’ouvre, avec tous les champs déjà remplis avec les valeurs actuelles de la tâche.',
+      'Changez un champ, par exemple le titre, puis touchez « Enregistrer » : vous devez revenir à la fiche de la tâche avec la nouvelle valeur affichée.',
+    ],
+  },
+  {
     id: 'badge-energie-couleur-ambiance',
     title: 'Badge énergie avec la couleur d’ambiance',
     steps: [

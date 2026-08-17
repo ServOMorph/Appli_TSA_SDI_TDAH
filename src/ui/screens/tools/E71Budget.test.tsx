@@ -136,6 +136,25 @@ describe('E71Budget', () => {
     expect(createBudgetEntry).toHaveBeenCalledWith('category-2', 15, 'Marché', todayDate())
   })
 
+  it('saisit un revenu avec son montant, son libellé et sa date', async () => {
+    const createBudgetIncomeEntry = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E71Budget />, makeAppContext({ createBudgetIncomeEntry }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un revenu' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter un revenu' })
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '500')
+    await userEvent.type(within(dialog).getByLabelText('Libellé (facultatif)'), 'Salaire')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
+    expect(createBudgetIncomeEntry).toHaveBeenCalledWith(500, 'Salaire', todayDate())
+  })
+
+  it('affiche le montant total des revenus saisis sur la période', () => {
+    renderWithApp(<E71Budget />, makeAppContext({
+      budgetIncomeEntries: [{ id: 'income-1', amount: 500, label: 'Salaire', date: todayDate(), created_at: todayDate() }],
+    }))
+    expect(screen.getByText('Montant total')).toBeDefined()
+    expect(screen.getByText(/500,00/)).toBeDefined()
+  })
+
   it('désactive la saisie de dépense tant qu’aucune catégorie de dépense n’existe', () => {
     renderWithApp(<E71Budget />, makeAppContext({ budgetCategories: [makeCategory({ kind: 'income', name: 'Salaire' })] }))
     expect(screen.getByRole('button', { name: 'Ajouter une dépense' }).hasAttribute('disabled')).toBe(true)

@@ -16,7 +16,9 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version **v5.40** est déployée en production (voir le [CHANGELOG](CHANGELOG.md)). La Phase V5.1-0 (refonte ergonomique du Budget) est close. Le parcours de tests manuels de Marie (catalogue in-app avec étapes numérotées, historique, archivage projet) est entièrement livré ; les tests déjà validés n'apparaissent plus dans la liste affichée. Les listes peuvent être organisées en catégories (création, sélection, navigation dédiée), avec export/import désormais complet (bug de perte des catégories corrigé).
+La version **v5.40** est déployée en production (voir le [CHANGELOG](CHANGELOG.md)), non encore mise à jour avec les changements ci-dessous. Le parcours de tests manuels de Marie (catalogue in-app avec étapes numérotées, historique, archivage projet) est entièrement livré ; les tests déjà validés n'apparaissent plus dans la liste affichée. Les listes peuvent être organisées en catégories, avec export/import complet.
+
+Refonte du Budget en cours (`roadmap_budget_v2.md`, 4 phases) : Phase 1 livrée — entité de revenus saisis manuellement (« Montant total ») avec son propre formulaire, non encore reliée aux catégories de dépense ni aux livrets (Phases 2-4 à venir).
 
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
 

@@ -4,6 +4,7 @@ import {
   budgetCategoryRepo,
   budgetDepositRepo,
   budgetEntryRepo,
+  budgetIncomeEntryRepo,
   newId,
   todayDate,
 } from '@/app/repositories'
@@ -11,24 +12,28 @@ import type { BudgetCategory, BudgetCategoryKind, BudgetPeriod } from '@/domain/
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 
 export function useBudgetState() {
   const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>([])
   const [budgetAccounts, setBudgetAccounts] = useState<BudgetAccount[]>([])
   const [budgetEntries, setBudgetEntries] = useState<BudgetEntry[]>([])
   const [budgetDeposits, setBudgetDeposits] = useState<BudgetDeposit[]>([])
+  const [budgetIncomeEntries, setBudgetIncomeEntries] = useState<BudgetIncomeEntry[]>([])
 
   async function load() {
-    const [categories, accounts, entries, deposits] = await Promise.all([
+    const [categories, accounts, entries, deposits, incomeEntries] = await Promise.all([
       budgetCategoryRepo.getAll(),
       budgetAccountRepo.getAll(),
       budgetEntryRepo.getAll(),
       budgetDepositRepo.getAll(),
+      budgetIncomeEntryRepo.getAll(),
     ])
     setBudgetCategories(categories)
     setBudgetAccounts(accounts)
     setBudgetEntries(entries)
     setBudgetDeposits(deposits)
+    setBudgetIncomeEntries(incomeEntries)
   }
 
   function reset() {
@@ -36,6 +41,7 @@ export function useBudgetState() {
     setBudgetAccounts([])
     setBudgetEntries([])
     setBudgetDeposits([])
+    setBudgetIncomeEntries([])
   }
 
   async function createBudgetCategory(
@@ -162,11 +168,30 @@ export function useBudgetState() {
     setBudgetDeposits(await budgetDepositRepo.getAll())
   }
 
+  async function createBudgetIncomeEntry(amount: number, label?: string, date = todayDate()) {
+    if (!Number.isFinite(amount) || amount <= 0) return
+    const entry: BudgetIncomeEntry = {
+      id: newId(),
+      amount,
+      label: label?.trim() || undefined,
+      date,
+      created_at: new Date().toISOString(),
+    }
+    await budgetIncomeEntryRepo.create(entry)
+    setBudgetIncomeEntries(await budgetIncomeEntryRepo.getAll())
+  }
+
+  async function deleteBudgetIncomeEntry(id: string) {
+    await budgetIncomeEntryRepo.delete(id)
+    setBudgetIncomeEntries(await budgetIncomeEntryRepo.getAll())
+  }
+
   return {
     budgetCategories,
     budgetAccounts,
     budgetEntries,
     budgetDeposits,
+    budgetIncomeEntries,
     createBudgetCategory,
     renameBudgetCategory,
     updateBudgetCategoryAmount,
@@ -178,6 +203,8 @@ export function useBudgetState() {
     deleteBudgetEntry,
     createBudgetDeposit,
     deleteBudgetDeposit,
+    createBudgetIncomeEntry,
+    deleteBudgetIncomeEntry,
     load,
     reset,
   }

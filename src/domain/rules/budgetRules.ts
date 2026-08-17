@@ -1,6 +1,7 @@
 import type { BudgetCategory, BudgetPeriod } from '@/domain/entities/budgetCategory'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 
 export interface BudgetPeriodBounds {
   startDate: string
@@ -130,6 +131,13 @@ export function getGaugeLevel(spent: number, budgeted: number): GaugeLevel {
   if (spent > budgeted) return 'over'
   if (budgeted <= 0) return 'ok'
   return spent / budgeted >= GAUGE_WARNING_RATIO ? 'warning' : 'ok'
+}
+
+/** Somme des revenus saisis par l'utilisateur dans la période donnée (Montant total). */
+export function getTotalIncomeEntries(entries: BudgetIncomeEntry[], bounds: BudgetPeriodBounds): number {
+  return entries
+    .filter((entry) => isDateInPeriod(entry.date, bounds))
+    .reduce((total, entry) => total + entry.amount, 0)
 }
 
 export function getAccountBalance(deposits: BudgetDeposit[], accountId: string): number {

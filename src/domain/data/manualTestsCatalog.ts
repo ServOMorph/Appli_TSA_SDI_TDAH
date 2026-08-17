@@ -77,7 +77,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'utiliser-le-budget',
     title: 'Utiliser le budget',
     steps: [
-      'Ouvrez le Budget depuis le widget « Comptes » de l’accueil.',
+      'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ».',
       'Touchez l’onglet « Semaine » puis l’onglet « Mois » : le montant « Il me reste » et la jauge en dessous doivent changer.',
       'Touchez une catégorie de dépense pour ouvrir sa fiche détaillée.',
       'Revenez en arrière, touchez « Ajouter une dépense », remplissez le formulaire puis enregistrez : le montant dépensé de la catégorie doit augmenter.',

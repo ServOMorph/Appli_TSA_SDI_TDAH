@@ -2,24 +2,62 @@
 
 ## Contexte chaud
 - Branche `sync-marie` : 4 commits non fusionnés dans `main` (roadmap sync Supabase créée, setup projet Supabase, clôture de la communication Marie V5.0 incluant la suppression de `a_communiquer_v5.md`). Le travail des dernières sessions (sans rapport avec la sync) a été fait sur `main` pour ne pas mélanger les deux chantiers — `a_communiquer_v5.md` existe donc encore sur `main`, `roadmap_sync_marie.md` n'y existe pas encore. Réconciliation à faire à la prochaine reprise du chantier sync (fusion ou rebase).
-- `donnees_marie/` : deux exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13 et 2026-08-16 ; 2026-08-16 reconfirmé comme dernier export disponible au `/deploy` du 17/08, rien de nouveau à ingérer).
-- `tests_manuels.md` vidé intégralement (dernier point, Import JSON, validé par l'utilisateur) — toutes les vérifications passent désormais par le catalogue in-app `manualTestsCatalog.ts` (10 tests, chacun réécrit en étapes numérotées `steps: string[]`, gabarit de rédaction documenté en tête du fichier).
-- `E121ManualTests.tsx` : un test dont le dernier résultat est « Validé » disparaît désormais de la liste affichée à Marie (le catalogue le garde en interne comme suite de non-régression, sur demande explicite de l'utilisateur) ; chaque test peut être déplié/replié (validé manuellement).
-- Sur les 10 tests du catalogue, 7 ont déjà été soumis par Marie (4 ok, 3 nok liés au bug Budget déjà corrigé) et 2 jamais testés (catégories de listes, glisser pour ouvrir le planning) — au prochain export de Marie, ces 3 tests « nok » n'apparaîtront plus tant qu'ils ne repassent pas par un nouveau résultat (filtrage par dernier statut, pas par identité de test).
-- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17, prod vérifiée HTTP 200 — à jour.
-- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication de v5.40 (cycle `/close`/`/deploy`), prêt à accumuler les prochains changements visibles pour Marie.
+- `donnees_marie/` : trois exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35 — ce dernier récupéré et traité cette session via `/traiter_export_marie`, jamais capturé avant malgré la reconfirmation erronée de la session précédente).
+- Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
+- Refonte complète du concept Budget en cours, demandée par Marie (« Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets »). Roadmap `roadmap_budget_v2.md` créée, 4 phases. Phase 1 livrée cette session (entité `BudgetIncomeEntry`, migration Dexie v13, formulaire de saisie, carte « Montant total » sur l'écran Budget) — **volontairement pas encore annoncée à Marie** (ni `WHATS_NEW`, ni `manualTestsCatalog.ts`) : la carte affichée est incohérente tant qu'elle n'est pas reliée aux catégories/livrets (Phases 2-4), la lui exposer maintenant la confondrait.
+- `manualTestsCatalog.ts` : formulation du test « Utiliser le budget » corrigée (l'étape 1 renvoyait vers le widget « Comptes » de l'accueil, qui n'ouvre qu'un formulaire de dépense — le chemin réel passe par Outils → Budget), confirmée par le commentaire de Marie elle-même sur l'export du 16/08 22h35.
+- `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts` (10 tests, étapes numérotées).
+- `E121ManualTests.tsx` : un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne) ; chaque test dépliable/repliable.
+- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17, prod vérifiée HTTP 200 — inchangé cette session (aucun déploiement).
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vide depuis v5.40, toujours vide (rien annoncé cette session, cf. ci-dessus).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Redemander à Marie de réimporter son fichier (v5.40 en prod) et de revalider dans « Tests à faire » les 3 tests en échec liés au bug Budget (« Retirer de l'argent d'un livret », « Utiliser le budget », « Importer une sauvegarde »), plus les 2 jamais testés (catégories de listes, glisser planning). — fait quand : ces tests validés dans un nouvel export ingéré — réf : `_contexte/marie_tests_journal.json`, `useSettingsState.ts`
-- [P1] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée depuis plusieurs sessions) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
+- [P1] Reprendre la Phase 2 de `roadmap_budget_v2.md` (rattachement des livrets au Montant total) — checkpoint atteint, confirmation utilisateur requise avant de continuer. — fait quand : Phase 2 livrée et testée — réf : `roadmap_budget_v2.md`
+- [P1] Sur l'export du 16/08 22h35 : le retrait d'un livret ne se répercute toujours pas sur « Il me reste » (nouveau nok distinct de l'ancien bug d'accès déjà corrigé) — sera résolu par les Phases 2-4 de la refonte budget, pas par un correctif isolé. — fait quand : Phase 2-3 de `roadmap_budget_v2.md` livrées — réf : `_contexte/marie_tests_journal.json` (entrée `6e32ace5`), `budgetRules.ts`
+- [P2] Redemander à Marie de réimporter et revalider « Utiliser le budget » (formulation corrigée) une fois redéployé, ainsi que « Glisser pour ouvrir le planning » (nok, demande de bottom-sheet continu déjà connue, non traitée). — fait quand : ces tests validés dans un nouvel export ingéré — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée depuis plusieurs sessions) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-17 — archivage des roadmaps terminées, déploiement v5.40)
+## Dernière session (2026-08-17 — suite, traitement export Marie 22h35, refonte Budget Phase 1)
+
+## Décisions prises
+- Commande `/traiter_export_marie` créée pour traiter l'arrivée d'un export de Marie indépendamment de `/deploy`.
+- Export du 16/08 22h35 (jamais récupéré) traité : 6 nouveaux résultats de tests ingérés, dont un bug budget distinct (retrait livret) et une formulation de test erronée (corrigée).
+- Marie a demandé une refonte complète du concept Budget (« Montant total » réparti entre « Mon compte » et « Livrets ») ; roadmap `roadmap_budget_v2.md` créée et validée, Phase 1 livrée.
+- `WHATS_NEW`/`manualTestsCatalog.ts` volontairement pas mis à jour pour la Phase 1 du budget : feature incomplète, exposer la carte « Montant total » à Marie maintenant serait trompeur.
+
+## Livrables produits ou modifiés
+- `.claude/commands/traiter_export_marie.md` : créée.
+- `src/domain/data/manualTestsCatalog.ts` : formulation du test « Utiliser le budget » corrigée.
+- `roadmap_budget_v2.md` : créée, Phase 1 [FAIT], Phases 2-4 [TODO].
+- `src/domain/entities/budgetIncomeEntry.ts`, `src/data/repositories/budgetIncomeEntryRepository.ts`(`.test.ts`) : nouvelle entité et repository.
+- `src/data/db.ts`(`.test.ts`) : migration Dexie v13.
+- `src/domain/rules/budgetRules.ts`(`.test.ts`) : `getTotalIncomeEntries`.
+- `src/app/contexts/useBudgetState.ts`, `src/app/repositories.ts` : câblage.
+- `src/ui/components/BudgetIncomeModal.tsx`, `src/ui/screens/tools/E71Budget.tsx`(`.test.tsx`) : carte « Montant total » + formulaire.
+- `src/app/contexts/useSettingsState.ts`(`.test.tsx`) : export/import `budget_income_entries`, version 3.4.
+- `_contexte/marie_tests_journal.json` : 6 entrées ajoutées.
+- `donnees_marie/export-audhd-2026-08-16-22h35.json` : copié (gitignoré, non commité).
+
+## Hypothèses validées / invalidées
+- INVALIDE : l'export du 16/08 était réputé le dernier disponible (affirmation de la session précédente) -> pivot : un export plus tardif du même jour existait, jamais capturé — commande `/traiter_export_marie` créée pour fiabiliser ce contrôle à l'avenir.
+- VALIDE : 560/560 tests unitaires, `tsc -b`/lint clean après la Phase 1 du budget.
+- EN ATTENTE : Phases 2-4 de la refonte budget non commencées (checkpoint roadmap, confirmation utilisateur requise).
+
+## Prochaine étape exacte
+Reprendre la Phase 2 de `roadmap_budget_v2.md` (rattachement des livrets au Montant total) après confirmation utilisateur.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — archivage des roadmaps terminées, déploiement v5.40)
 
 ## Décisions prises
 - Export de Marie du 16/08 reconfirmé comme dernier disponible (étape 0 de `/deploy`) — aucun nouvel élément à ingérer, `/deploy` poursuivi.

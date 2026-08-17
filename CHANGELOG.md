@@ -1,3 +1,12 @@
+## v5.42 — 2026-08-17
+
+### Ajouté
+- Commande `/traiter_export_marie` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, ingestion du journal de tests, détection de pertes/frictions).
+- Refonte du Budget (Phase 1/4, `roadmap_budget_v2.md`) : entité de revenus saisis manuellement (« Montant total »), avec formulaire dédié sur l'écran Budget — non encore reliée aux catégories de dépense ni aux livrets, pas encore annoncée à Marie.
+
+### Corrigé
+- `manualTestsCatalog.ts` : formulation du test « Utiliser le budget » (l'étape 1 renvoyait vers le widget « Comptes » de l'accueil, qui n'ouvre qu'un formulaire de dépense direct, pas l'écran Budget).
+
 ## v5.41 — 2026-08-17
 
 ### Modifié

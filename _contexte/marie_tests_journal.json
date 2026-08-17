@@ -48,6 +48,48 @@
       "status": "ok",
       "comment": null,
       "created_at": "2026-08-14T17:40:49.658Z"
+    },
+    {
+      "id": "1ddd16f2-5fff-4c0d-b47a-4642bc56b408",
+      "test_id": "categories-de-liste",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-16T22:18:03.208Z"
+    },
+    {
+      "id": "be0c10ef-5453-4357-a0c7-b6a72bd72bdb",
+      "test_id": "glisser-pour-ouvrir-le-planning",
+      "status": "nok",
+      "comment": "Il faut que le planning se déroule le long de la page d’accueil, en repoussant les éléments en dessous, tous les autres éléments doivent rester visible, c’est uniquement le planning qui s’étend plus ou moins selon comme on le déroule",
+      "created_at": "2026-08-16T22:19:56.405Z"
+    },
+    {
+      "id": "e8d88dc2-678b-4bb4-adfc-7e5958e200d4",
+      "test_id": "badge-energie-couleur-ambiance",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-16T22:20:34.507Z"
+    },
+    {
+      "id": "cde66529-aa32-4fe9-badc-b84698f15549",
+      "test_id": "importer-une-sauvegarde",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-16T22:21:02.439Z"
+    },
+    {
+      "id": "dba28c14-619b-4a7d-9507-22c7c78dfcb2",
+      "test_id": "utiliser-le-budget",
+      "status": "nok",
+      "comment": "1.quand je clique sur l’outils compte, cela ne me permet que de rentrer une dépense, c’est l’onglet « budget » que je dois ouvrir. Tu t’es juste trompé dans la formulation du test. Ne change pas l’appli. 2.ca c’est ok 3.ok 4.ok 5.ok",
+      "created_at": "2026-08-16T22:31:47.146Z"
+    },
+    {
+      "id": "6e32ace5-e37a-40e5-8ccf-ec46a14beeda",
+      "test_id": "retirer-de-l-argent-d-un-livret",
+      "status": "nok",
+      "comment": "Ca marche c’est bon, par contre où est censé apparaître l’argent retirer du livret ? Je l’ai retirer et choisi la catégorie mois, mais l’argent de mon mois n’augmente pas de cette somme.",
+      "created_at": "2026-08-16T22:35:46.131Z"
     }
   ]
 }

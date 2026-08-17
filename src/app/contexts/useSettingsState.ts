@@ -17,6 +17,7 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import type { ManualTestResult } from '@/domain/entities/manualTestResult'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
@@ -106,6 +107,7 @@ export function useSettingsState() {
       entries,
       accounts,
       deposits,
+      incomeEntries,
       manualTestResults,
     ] = await Promise.all([
       userRepo.getFirst(),
@@ -123,11 +125,12 @@ export function useSettingsState() {
       db.budgetEntries.toArray(),
       db.budgetAccounts.toArray(),
       db.budgetDeposits.toArray(),
+      db.budgetIncomeEntries.toArray(),
       db.manualTestResults.toArray(),
     ])
     const payload = {
       export_date: new Date().toISOString(),
-      version: '3.3',
+      version: '3.4',
       user,
       tasks,
       task_recurrences: taskRecurrences,
@@ -143,6 +146,7 @@ export function useSettingsState() {
       budget_entries: entries,
       budget_accounts: accounts,
       budget_deposits: deposits,
+      budget_income_entries: incomeEntries,
       manual_test_results: manualTestResults,
     }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
@@ -167,6 +171,7 @@ export function useSettingsState() {
       db.budgetEntries.clear(),
       db.budgetAccounts.clear(),
       db.budgetDeposits.clear(),
+      db.budgetIncomeEntries.clear(),
       db.folders.clear(),
       db.tools.clear(),
       db.taskRecurrences.clear(),
@@ -213,6 +218,7 @@ export function useSettingsState() {
     const entries = Array.isArray(data.budget_entries) ? (data.budget_entries as BudgetEntry[]) : []
     const accounts = Array.isArray(data.budget_accounts) ? (data.budget_accounts as BudgetAccount[]) : []
     const deposits = Array.isArray(data.budget_deposits) ? (data.budget_deposits as BudgetDeposit[]) : []
+    const incomeEntries = Array.isArray(data.budget_income_entries) ? (data.budget_income_entries as BudgetIncomeEntry[]) : []
     const manualTestResults = Array.isArray(data.manual_test_results) ? (data.manual_test_results as ManualTestResult[]) : []
 
     const importedSettings = data.settings
@@ -293,6 +299,7 @@ export function useSettingsState() {
         entries.length ? db.budgetEntries.bulkAdd(entries) : Promise.resolve(),
         accounts.length ? db.budgetAccounts.bulkAdd(accounts) : Promise.resolve(),
         deposits.length ? db.budgetDeposits.bulkAdd(deposits) : Promise.resolve(),
+        incomeEntries.length ? db.budgetIncomeEntries.bulkAdd(incomeEntries) : Promise.resolve(),
         manualTestResults.length ? db.manualTestResults.bulkAdd(manualTestResults) : Promise.resolve(),
       ])
     } catch (error) {

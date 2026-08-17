@@ -7,6 +7,7 @@ import {
   getPeriodBounds,
   getSpentForCategory,
   getTotalBudgeted,
+  getTotalIncomeEntries,
   getTotalRemaining,
   getTotalSpent,
 } from '@/domain/rules/budgetRules'
@@ -14,6 +15,7 @@ import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { BudgetGauge } from '@/ui/components/BudgetGauge'
 import { BudgetExpenseModal } from '@/ui/components/BudgetExpenseModal'
+import { BudgetIncomeModal } from '@/ui/components/BudgetIncomeModal'
 import { formatEuro, pageStyle } from '@/ui/styles/budget'
 
 function shiftPeriod(period: BudgetPeriod, date: string, offset: number): string {
@@ -39,10 +41,21 @@ function amountTone(value: number): string {
 }
 
 export function E71Budget() {
-  const { back, goTo, budgetCategories, budgetAccounts, budgetEntries, budgetDeposits, createBudgetEntry } = useApp()
+  const {
+    back,
+    goTo,
+    budgetCategories,
+    budgetAccounts,
+    budgetEntries,
+    budgetDeposits,
+    budgetIncomeEntries,
+    createBudgetEntry,
+    createBudgetIncomeEntry,
+  } = useApp()
   const [period, setPeriod] = useState<BudgetPeriod>('week')
   const [date, setDate] = useState(todayDate())
   const [showExpenseForm, setShowExpenseForm] = useState(false)
+  const [showIncomeForm, setShowIncomeForm] = useState(false)
 
   const bounds = getPeriodBounds(period, date)
   const periodCategories = budgetCategories.filter((category) => category.period === period)
@@ -53,6 +66,7 @@ export function E71Budget() {
   const spent = getTotalSpent(budgetCategories, budgetEntries, period, bounds)
   const remaining = getTotalRemaining(budgetCategories, budgetEntries, period, bounds)
   const accountsTotal = budgetAccounts.reduce((total, account) => total + getAccountBalance(budgetDeposits, account.id), 0)
+  const totalIncomeEntries = getTotalIncomeEntries(budgetIncomeEntries, bounds)
 
   function openCategory(category: BudgetCategory) {
     goTo({ name: 'budget-category-detail', categoryId: category.id, date })
@@ -61,6 +75,11 @@ export function E71Budget() {
   async function handleCreateExpense(categoryId: string, amount: number, label: string, entryDate: string) {
     await createBudgetEntry(categoryId, amount, label, entryDate)
     setShowExpenseForm(false)
+  }
+
+  async function handleCreateIncome(amount: number, label: string, entryDate: string) {
+    await createBudgetIncomeEntry(amount, label, entryDate)
+    setShowIncomeForm(false)
   }
 
   function tabStyle(value: BudgetPeriod): React.CSSProperties {
@@ -105,6 +124,17 @@ export function E71Budget() {
         <span aria-live="polite" style={{ fontSize: '0.9375rem' }}>{periodDescription(period, date)}</span>
         <button aria-label="Période suivante" onClick={() => setDate((previous) => shiftPeriod(period, previous, 1))} style={{ background: 'none', border: 'none', color: 'var(--color-secondary)', cursor: 'pointer', fontSize: '1.25rem' }}>→</button>
       </div>
+
+      <Card>
+        <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Montant total</p>
+        <p style={{ margin: '4px 0', fontSize: '1.5rem', fontWeight: 700, color: amountTone(totalIncomeEntries) }}>{formatEuro(totalIncomeEntries)}</p>
+        <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
+          Revenus saisis sur la période
+        </p>
+        <Button variant="secondary" onClick={() => setShowIncomeForm(true)}>
+          Ajouter un revenu
+        </Button>
+      </Card>
 
       <Card>
         <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Il me reste</p>
@@ -197,6 +227,10 @@ export function E71Budget() {
           onSubmit={handleCreateExpense}
           onClose={() => setShowExpenseForm(false)}
         />
+      )}
+
+      {showIncomeForm && (
+        <BudgetIncomeModal defaultDate={date} onSubmit={handleCreateIncome} onClose={() => setShowIncomeForm(false)} />
       )}
     </main>
   )

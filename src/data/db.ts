@@ -11,6 +11,7 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { Folder } from '@/domain/entities/folder'
@@ -39,6 +40,7 @@ export class AppDatabase extends Dexie {
   budgetEntries!: Table<BudgetEntry>
   budgetAccounts!: Table<BudgetAccount>
   budgetDeposits!: Table<BudgetDeposit>
+  budgetIncomeEntries!: Table<BudgetIncomeEntry>
   taskRecurrences!: Table<TaskRecurrence>
   taskExceptions!: Table<TaskException>
   folders!: Table<Folder>
@@ -311,6 +313,9 @@ export class AppDatabase extends Dexie {
           await tx.table('listItems').bulkPut(updated)
         }
       })
+    this.version(13).stores({
+      budgetIncomeEntries: 'id, date',
+    })
   }
 }
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import {
   getAccountBalance,
   getCurrentPeriodBounds,
@@ -13,6 +14,7 @@ import {
   getTotalBudgeted,
   getTotalDeposits,
   getTotalIncome,
+  getTotalIncomeEntries,
   getTotalRemaining,
   getTotalSpent,
   getUnbudgetedRemainder,
@@ -45,6 +47,14 @@ const deposit = (overrides: Partial<BudgetDeposit> = {}): BudgetDeposit => ({
   account_id: 'livret-a',
   amount: 50,
   period: 'month',
+  date: '2026-07-21',
+  created_at: '2026-07-21T00:00:00Z',
+  ...overrides,
+})
+
+const incomeEntry = (overrides: Partial<BudgetIncomeEntry> = {}): BudgetIncomeEntry => ({
+  id: 'income-1',
+  amount: 500,
   date: '2026-07-21',
   created_at: '2026-07-21T00:00:00Z',
   ...overrides,
@@ -135,6 +145,15 @@ describe('budgetRules', () => {
         deposit({ id: 'wrong-periodicity', amount: 999, period: 'week' }),
       ]
       expect(getTotalDeposits(deposits, 'month', bounds)).toBe(100)
+    })
+
+    it('sums income entries within the period, regardless of amount', () => {
+      const entries = [
+        incomeEntry({ amount: 500 }),
+        incomeEntry({ id: 'other', amount: 300, date: '2026-07-25' }),
+        incomeEntry({ id: 'outside', amount: 999, date: '2026-06-30' }),
+      ]
+      expect(getTotalIncomeEntries(entries, bounds)).toBe(800)
     })
 
     it('calculates the unbudgeted remainder', () => {

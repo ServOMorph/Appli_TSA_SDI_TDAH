@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-14 (suite 11, déploiement v5.31) (archivé depuis contexte.md 2026-08-17, refonte Budget Phase 1)
+- `/deploy` exécuté jusqu'au bout après confirmation explicite de l'utilisateur, malgré `tests_manuels.md` non vide (6 points). Build `dist/v5.31` déployé en prod (`https://appli-audhd.netlify.app`), vérifié HTTP 200. Avertissement chunk JS > 500 kB noté (`index-X6Xu4E-n.js`, 510.75 kB), non bloquant.
+
 ## 2026-08-14 (suite 10, badge énergie couleur d'ambiance) (archivé depuis contexte.md 2026-08-17, déploiement v5.40)
 - Retour de test manuel de Marie (screenshot annoté) traité — badge énergie de `TopBar.tsx` allégé (retrait du libellé « planifié / dispo ») et fond teinté avec `Settings.ambiance_color` (`pastelBackground`, réutilisé de `ambiance.ts`) plutôt qu'une couleur fixe, après correction explicite de l'utilisateur sur une première implémentation codée en dur. Point de test manuel visuel ajouté à `tests_manuels.md` (6 points désormais en attente). 67/67 tests du périmètre touché, `tsc -b` clean.
 

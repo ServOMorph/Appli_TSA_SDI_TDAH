@@ -3,9 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = [
-  'Dans « Tests à faire », les tests sont maintenant regroupés par catégorie (Budget, Listes, Planning...) : dépliez une catégorie pour voir ses tests, puis un test pour voir le détail.',
-]
+const WHATS_NEW: string[] = []
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

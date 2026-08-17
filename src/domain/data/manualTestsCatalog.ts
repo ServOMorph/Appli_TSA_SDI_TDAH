@@ -1,6 +1,19 @@
+export const MANUAL_TEST_CATEGORIES = [
+  'Accueil / Planning',
+  'Tâches',
+  'Outils : Budget',
+  'Outils : Listes',
+  'Outils : autres',
+  'Énergie',
+  'Paramètres / Profil',
+] as const
+
+export type ManualTestCategory = (typeof MANUAL_TEST_CATEGORIES)[number]
+
 export interface ManualTest {
   id: string
   title: string
+  category: ManualTestCategory
   steps: string[]
 }
 
@@ -8,6 +21,7 @@ export interface ManualTest {
 // {
 //   id: 'identifiant-en-kebab-case',
 //   title: 'Titre court à l’impératif',
+//   category: 'une des valeurs de MANUAL_TEST_CATEGORIES',
 //   steps: [
 //     'Une seule action par étape, avec le libellé exact du bouton/champ/écran tel qu’affiché.',
 //     'Si l’étape produit un résultat observable, l’indiquer dans la même étape après « : ».',
@@ -20,6 +34,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'creer-une-liste',
     title: 'Créer une liste',
+    category: 'Outils : Listes',
     steps: [
       'Sur l’accueil, dans la section « Outils », touchez le bouton « + » à côté du titre.',
       'Touchez « Nouvelle liste ».',
@@ -30,6 +45,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'supprimer-une-liste',
     title: 'Supprimer une liste',
+    category: 'Outils : Listes',
     steps: [
       'Ouvrez une liste, touchez le bouton « × » en haut à droite de l’écran.',
       'Dans la boîte de dialogue « Supprimer cette liste ? », touchez « Supprimer » : vous devez revenir à l’écran des outils et la liste ne doit plus y apparaître.',
@@ -39,6 +55,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'retirer-de-l-argent-d-un-livret',
     title: 'Retirer de l’argent d’un livret',
+    category: 'Outils : Budget',
     steps: [
       'Dans le Budget, touchez l’icône ⚙ en haut à droite pour ouvrir « Configurer le budget ».',
       'Touchez « Ajouter un mouvement ».',
@@ -49,6 +66,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'ajouter-un-element-a-une-liste',
     title: 'Ajouter un élément à une liste sur téléphone',
+    category: 'Outils : Listes',
     steps: [
       'Sur téléphone, ouvrez une liste, touchez une catégorie, puis touchez « Ajouter un élément ».',
       'Touchez le champ « Élément » pour faire apparaître le clavier du téléphone : le champ de saisie et les boutons « Ajouter » et « Annuler » doivent rester visibles et utilisables sans avoir à fermer le clavier au préalable.',
@@ -57,6 +75,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'categories-de-liste',
     title: 'Choisir et créer des catégories dans une liste',
+    category: 'Outils : Listes',
     steps: [
       'Ouvrez une liste : l’écran doit d’abord afficher ses catégories, chacune avec son nom et le nombre d’éléments qu’elle contient, jamais les éléments directement.',
       'Touchez une catégorie : seuls ses éléments doivent s’afficher.',
@@ -66,6 +85,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'importer-une-sauvegarde',
     title: 'Importer une sauvegarde',
+    category: 'Paramètres / Profil',
     steps: [
       'Allez dans Paramètres, touchez « Export et import ».',
       'Touchez « Importer un fichier JSON » et choisissez un fichier de sauvegarde déjà exporté.',
@@ -76,6 +96,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'utiliser-le-budget',
     title: 'Utiliser le budget',
+    category: 'Outils : Budget',
     steps: [
       'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ».',
       'Sur la carte « Montant total » en haut de l’écran, touchez « Ajouter un revenu », saisissez un montant, puis touchez « Enregistrer » : le montant total et le détail « ... de revenus » doivent augmenter.',
@@ -88,6 +109,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'enregistrer-un-resultat-de-test',
     title: 'Enregistrer un résultat de test',
+    category: 'Paramètres / Profil',
     steps: [
       'Dans « Tests à faire », touchez un test pour l’ouvrir.',
       'Choisissez « Non validé », saisissez un commentaire expliquant ce qui ne fonctionne pas, puis touchez « Enregistrer » : le résultat doit apparaître dans la section « Historique » de ce test.',
@@ -98,6 +120,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'glisser-pour-ouvrir-le-planning',
     title: 'Ouvrir le planning en glissant',
+    category: 'Accueil / Planning',
     steps: [
       'Sur l’accueil, sous le bandeau des jours de la semaine et du mois en cours, repérez le petit trait gris horizontal.',
       'Posez le doigt dessus et glissez lentement vers le bas sans relâcher : la fenêtre du planning doit s’agrandir progressivement en suivant le doigt, pendant que la section « Outils » et le reste de l’accueil restent visibles en dessous.',
@@ -109,6 +132,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'montant-total-apres-migration-revenus',
     title: 'Vérifier le Montant total après la migration des revenus de Marie',
+    category: 'Outils : Budget',
     steps: [
       'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ».',
       'Sur la carte « Montant total » en haut de l’écran, vérifiez qu’elle affiche un montant et le détail « ... de revenus · ... livrets · ... mon compte ».',
@@ -119,6 +143,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'naviguer-dans-le-planning',
     title: 'Naviguer dans le planning de l’accueil',
+    category: 'Accueil / Planning',
     steps: [
       'Sur l’accueil, dans le bandeau des jours, posez le doigt sur un jour et glissez vers la gauche : le jour affiché doit avancer d’un jour, et le jour actuel doit rester à la même place dans le bandeau (seul le cadre du jour sélectionné se déplace).',
       'Glissez maintenant vers la droite : le jour affiché doit reculer d’un jour.',
@@ -129,6 +154,7 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'modifier-une-tache-planifiee',
     title: 'Modifier une tâche planifiée',
+    category: 'Tâches',
     steps: [
       'Sur l’accueil, touchez une tâche planifiée dans le bandeau du planning : la fiche de la tâche s’ouvre, avec un fond légèrement teinté de la couleur d’ambiance choisie dans les paramètres.',
       'Vérifiez que les champs Titre, Icône, Couleur, Date, Horaire et Coût en énergie sont uniquement affichés, sans réagir au toucher.',
@@ -139,10 +165,22 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'badge-energie-couleur-ambiance',
     title: 'Badge énergie avec la couleur d’ambiance',
+    category: 'Énergie',
     steps: [
       'Allez dans Paramètres, touchez « Accessibilité ».',
       'Touchez le sélecteur « Couleur d’ambiance » et choisissez une couleur différente de celle actuelle.',
       'Revenez à l’accueil : le fond du badge d’énergie en haut de l’écran doit être teinté avec cette nouvelle couleur, et n’afficher que l’icône batterie suivie des chiffres, sans les mots « planifié » ni « dispo ».',
+    ],
+  },
+  {
+    id: 'grouper-les-tests-par-categorie',
+    title: 'Retrouver les tests à faire par catégorie',
+    category: 'Paramètres / Profil',
+    steps: [
+      'Allez dans « Tests à faire » : seuls les noms des catégories (par exemple « Outils : Budget », « Accueil / Planning ») doivent être visibles, chacun avec le nombre de tests qu’il contient.',
+      'Touchez le nom d’une catégorie : la liste des tests de cette catégorie doit se déplier en dessous.',
+      'Touchez un test de cette liste : ses étapes détaillées doivent se déplier.',
+      'Touchez à nouveau le nom de la catégorie : la liste de ses tests doit se replier.',
     ],
   },
 ]

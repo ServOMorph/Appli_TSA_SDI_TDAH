@@ -1,3 +1,12 @@
+## v5.47 — 2026-08-17
+
+### Ajouté
+- Catégorisation du travail validée avec Marie (7 catégories : Accueil/Planning, Tâches, Outils Budget, Outils Listes, Outils autres, Énergie, Paramètres/Profil).
+- Écran « Tests à faire » : tests regroupés par catégorie, repliées par défaut (nom de catégorie mis en valeur, pliage/dépliage à trois niveaux : catégorie -> test -> étapes).
+
+### Modifié
+- Export de Marie du 17/08 11h13 traité : copié dans `donnees_marie/`, journal de tests ré-ingéré (aucun nouveau résultat, aucune perte ni friction).
+
 ## v5.46 — 2026-08-17
 
 ### Modifié

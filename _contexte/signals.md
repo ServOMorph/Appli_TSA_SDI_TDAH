@@ -2,45 +2,48 @@
 
 ## Contexte chaud
 - Branche `sync-marie` : 4 commits non fusionnés dans `main` (roadmap sync Supabase créée, setup projet Supabase, clôture de la communication Marie V5.0 incluant la suppression de `a_communiquer_v5.md`). Le travail des dernières sessions (sans rapport avec la sync) a été fait sur `main` pour ne pas mélanger les deux chantiers — `a_communiquer_v5.md` existe donc encore sur `main`, `roadmap_sync_marie.md` n'y existe pas encore. Réconciliation à faire à la prochaine reprise du chantier sync (fusion ou rebase).
-- `donnees_marie/` : trois exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35). Export du 2026-08-17 11h13 analysé (étape 0 `/deploy`) mais pas encore copié dans `donnees_marie/` — usage normal (nouvelle dépense budget, nouvelle entrée d'énergie), 0 nouveau résultat de test, aucune perte ni friction.
+- `donnees_marie/` : quatre exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35, 2026-08-17 11h13). Dernier export traité et copié cette session — usage normal (nouvelle dépense budget, nouvelle entrée d'énergie), 0 nouveau résultat de test, aucune perte ni friction.
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
+- Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `message_marie_categories_travail.md`. Chaque nouvelle demande sera rattachée à l'une d'elles. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage (champ `category` sur chaque test, affichage groupé et pliable dans `E121ManualTests.tsx`) ; les autres roadmaps/communications ne l'appliquent pas encore.
 - `Archives/roadmap_budget_v2.md` : refonte complète du concept Budget terminée et déployée (v5.45) — « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
-- `manualTestsCatalog.ts` : tests `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning` tous en attente de validation Marie sur la v5.45 fraîchement déployée.
+- `manualTestsCatalog.ts` : tests `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `grouper-les-tests-par-categorie` tous en attente de validation Marie (v5.45 déployée + regroupement par catégorie pas encore déployé).
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
-- `E121ManualTests.tsx` : un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne) ; chaque test dépliable/repliable.
-- `_contexte/dernier_deploiement.md` : v5.45, 2026-08-17, prod vérifiée HTTP 200 (déploiement de cette session).
+- `E121ManualTests.tsx` : catégories repliées par défaut (nom en évidence, compteur de tests) ; dépliage à 3 niveaux — catégorie -> tests -> étapes. Un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne).
+- `_contexte/dernier_deploiement.md` : v5.45, 2026-08-17, prod vérifiée HTTP 200 — le regroupement par catégorie n'est pas encore déployé (fait après ce `/close`, dans la même session `/deploy`).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Redemander à Marie de tester en conditions réelles l'ensemble déployé en v5.45 : refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée — rien de tout cela jamais testé par elle avant ce déploiement. — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`), `_contexte/marie_tests_journal.json`
+- [P1] Redemander à Marie de tester en conditions réelles l'ensemble déployé en v5.45/v5.47 : refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée, regroupement des tests par catégorie — rien de tout cela jamais testé par elle avant ce déploiement. — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `grouper-les-tests-par-categorie`), `_contexte/marie_tests_journal.json`
+- [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `message_marie_categories_travail.md`
 - [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée depuis plusieurs sessions) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-17 — suite 6, déploiement v5.45)
+## Dernière session (2026-08-17 — suite 7, catégorisation du travail, regroupement du catalogue de tests)
 
 ## Décisions prises
-- Export de Marie du 17/08 11h13 analysé avant déploiement : ni perte, ni incohérence, ni friction bloquante.
-- v5.45 déployée en production après confirmation utilisateur (cumule refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée).
-- `roadmap_budget_v2.md` (toutes phases `[FAIT]`) archivée vers `Archives/`, feature entièrement livrée et déployée.
+- Sur demande de Marie (« je pars dans tous les sens »), découpage du travail validé en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil).
+- Écran « Tests à faire » restructuré : tests regroupés par catégorie, repliées par défaut (nom en évidence, compteur), pliage à 3 niveaux (catégorie -> tests -> étapes).
+- Export de Marie du 17/08 11h13 traité (étape 0 `/deploy`) : ni perte, ni incohérence, ni friction bloquante — usage normal.
 
 ## Livrables produits ou modifiés
-- `dist/v5.45/` : build de production généré et déployé sur Netlify.
-- `_contexte/dernier_deploiement.md` : v5.45, 2026-08-17.
-- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication.
-- `Archives/roadmap_budget_v2.md` : déplacée (`git mv`), contenu inchangé.
-- `README.md`, `_contexte/contexte.md` : état actuel mis à jour (v5.45 en prod).
+- `message_marie_categories_travail.md` : créé (proposition de découpage + validation de Marie).
+- `src/domain/data/manualTestsCatalog.ts` : type `ManualTestCategory` et champ `category` ajoutés, 13 tests classés, test `grouper-les-tests-par-categorie` ajouté.
+- `src/ui/screens/tests/E121ManualTests.tsx`(`.test.tsx`) : regroupement par catégorie, pliage/dépliage à 3 niveaux.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : entrée `WHATS_NEW` ajoutée.
+- `donnees_marie/export-audhd-2026-08-17-11h13.json` : copié (gitignoré).
+- `_contexte/marie_tests_journal.json` : ré-ingestion idempotente (0 ajout, 13 déjà connus).
+- `README.md`, `CHANGELOG.md` (v5.47) : mis à jour.
 
 ## Hypothèses validées / invalidées
-- VALIDE : déploiement v5.45 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
-- VALIDE : 566/566 tests unitaires, `tsc -b`/lint clean avant déploiement.
-- EN ATTENTE : aucun des changements de v5.45 (Budget, drag planning, navigation planning, édition de tâche) jamais testé par Marie en conditions réelles.
+- VALIDE : 568/568 tests unitaires, `tsc -b`/lint clean après la restructuration de l'écran de tests.
+- VALIDE : export du 17/08 11h13 sans perte ni incohérence (comparaison structurelle table par table avec le dernier export connu).
 
 ## Prochaine étape exacte
-Redemander à Marie de réimporter et retester la v5.45 via le catalogue (`montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`).
+Poursuivre `/deploy` en cours (vérifications bloquantes, build, déploiement Netlify de la version cumulant v5.45 + regroupement des tests par catégorie).
 
 ## Question bloquante pour la session suivante
 Aucune.

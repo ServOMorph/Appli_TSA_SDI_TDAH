@@ -1,3 +1,9 @@
+## v5.48 — 2026-08-17
+
+### Modifié
+- Déploiement de v5.47 en production (regroupement des tests par catégorie, cumulé avec la v5.45 déjà en prod), HTTP 200 vérifié.
+- Avertissement de build « chunk JS > 500 kB » laissé tel quel sur consigne explicite de l'utilisateur ; refacto (`React.lazy`/`Suspense`) à proposer seulement si le poids grossit nettement.
+
 ## v5.47 — 2026-08-17
 
 ### Ajouté

@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-16 (export Marie du 16/08, nettoyage tests manuels, correctif catégories de listes à l'import) (archivé depuis contexte.md 2026-08-17, déploiement v5.47)
+- Export de Marie analysé (7 résultats déjà connus, 0 nouveau ; suppression de 5 éléments de la liste « À acheter » confirmée volontaire, pas un bug). Croisement `tests_manuels.md`/`manualTestsCatalog.ts` : 7 des 8 points déjà dupliqués dans le catalogue Marie, retirés de `tests_manuels.md` (ne garde que l'import JSON dev) ; point manquant (badge énergie) ajouté au catalogue. Bannières urgentes supprimées. Bug distinct corrigé : `list_categories` jamais exporté/vidé/restauré dans `useSettingsState.ts` (réparation par `section` à l'import, export bumpé v3.3). 552/553 tests unitaires (échec préexistant sans rapport), `tsc -b` clean.
+
 ## 2026-08-15 (accueil/planning unifiés, /deploy_dev) (archivé depuis contexte.md 2026-08-17, catégorisation du travail)
 - Sur retour utilisateur (screenshot annoté), `E10Dashboard.tsx`/`PlanningBoard.tsx` alignés — bandeau de dates (jours, mois, année) désormais toujours visible sur l'accueil au lieu d'être masqué en mode replié ; poignée simplifiée (texte « Déplier »/« Replier » retiré, seul le trait gris reste), geste de glissement vertical ajouté en complément du tap (seuil 24px, `onPointerDown/Move/Up`) pour ouvrir/fermer le planning. Entrée ajoutée à `WHATS_NEW` et au catalogue `manualTestsCatalog.ts`, point 7 ajouté à `tests_manuels.md`. 547/547 tests unitaires, `tsc -b` clean. Le suivi continu façon bottom-sheet signalé comme non traité, non demandé explicitement.
 

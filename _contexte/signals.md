@@ -6,10 +6,10 @@
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `message_marie_categories_travail.md`. Chaque nouvelle demande sera rattachée à l'une d'elles. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage (champ `category` sur chaque test, affichage groupé et pliable dans `E121ManualTests.tsx`) ; les autres roadmaps/communications ne l'appliquent pas encore.
 - `Archives/roadmap_budget_v2.md` : refonte complète du concept Budget terminée et déployée (v5.45) — « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
-- `manualTestsCatalog.ts` : tests `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `grouper-les-tests-par-categorie` tous en attente de validation Marie (v5.45 déployée + regroupement par catégorie pas encore déployé).
+- `manualTestsCatalog.ts` : tests `naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`, `grouper-les-tests-par-categorie` tous en attente de validation Marie (v5.45 et le regroupement par catégorie sont désormais tous deux déployés en v5.47).
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
 - `E121ManualTests.tsx` : catégories repliées par défaut (nom en évidence, compteur de tests) ; dépliage à 3 niveaux — catégorie -> tests -> étapes. Un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne).
-- `_contexte/dernier_deploiement.md` : v5.45, 2026-08-17, prod vérifiée HTTP 200 — le regroupement par catégorie n'est pas encore déployé (fait après ce `/close`, dans la même session `/deploy`).
+- `_contexte/dernier_deploiement.md` : v5.47, 2026-08-17, prod vérifiée HTTP 200.
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
@@ -23,7 +23,32 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-17 — suite 7, catégorisation du travail, regroupement du catalogue de tests)
+## Dernière session (2026-08-17 — suite 8, déploiement v5.47)
+
+## Décisions prises
+- `/deploy` mené à terme après confirmation utilisateur : v5.47 déployée en production (cumule v5.45 + regroupement des tests par catégorie).
+- Avertissement de build « chunk JS > 500 kB » laissé tel quel sur consigne explicite de l'utilisateur : le refacto (`React.lazy`/`Suspense` par écran) sera proposé seulement si le poids grossit nettement — consigne de veille ajoutée aux questions ouvertes.
+
+## Livrables produits ou modifiés
+- `dist/v5.47/` : build de production généré et déployé sur Netlify.
+- `_contexte/dernier_deploiement.md` : v5.47, 2026-08-17.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication.
+- `README.md`, `CHANGELOG.md` (v5.48), `_contexte/contexte.md` : état actuel mis à jour (v5.47 en prod).
+
+## Hypothèses validées / invalidées
+- VALIDE : déploiement v5.47 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
+- VALIDE : 568/568 tests unitaires, `tsc -b`/lint clean avant déploiement.
+- EN ATTENTE : aucun des changements de v5.45/v5.47 (Budget, drag planning, navigation planning, édition de tâche, regroupement des tests) jamais testé par Marie en conditions réelles.
+
+## Prochaine étape exacte
+Redemander à Marie de réimporter et retester la v5.47 via le catalogue (voir liste complète en question ouverte P1).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 7, catégorisation du travail, regroupement du catalogue de tests)
 
 ## Décisions prises
 - Sur demande de Marie (« je pars dans tous les sens »), découpage du travail validé en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil).

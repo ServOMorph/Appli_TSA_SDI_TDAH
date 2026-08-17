@@ -2,7 +2,8 @@
 
 ## Contexte chaud
 - Branche `sync-marie` : 4 commits non fusionnés dans `main` (roadmap sync Supabase créée, setup projet Supabase, clôture de la communication Marie V5.0 incluant la suppression de `a_communiquer_v5.md`). Le travail des dernières sessions (sans rapport avec la sync) a été fait sur `main` pour ne pas mélanger les deux chantiers — `a_communiquer_v5.md` existe donc encore sur `main`, `roadmap_sync_marie.md` n'y existe pas encore. Réconciliation à faire à la prochaine reprise du chantier sync (fusion ou rebase).
-- `donnees_marie/` : trois exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35).
+- `donnees_marie/` : trois exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35). Export du 2026-08-17 11h13 analysé (étape 0 `/deploy`) mais pas encore copié dans `donnees_marie/` — usage normal (nouvelle dépense budget, nouvelle entrée d'énergie), 0 nouveau résultat de test, aucune perte ni friction.
+- `roadmap_budget_v2.md` : toutes phases `[FAIT]` — à archiver vers `Archives/` au prochain `/close` qui touchera ce fichier (non fait cette session, hors périmètre).
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Refonte complète du concept Budget **terminée** (roadmap `roadmap_budget_v2.md`, 4 phases toutes `[FAIT]`) : « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
 - Poignée du planning (accueil) en drag continu façon bottom-sheet, Outils/bannière Mode surcharge toujours visibles (session précédente).
@@ -23,7 +24,26 @@
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-17 — suite 4, sélecteur mois/année, refonte navigation planning et édition de tâche)
+## Dernière session (2026-08-17 — suite 5, traitement export Marie 11h13, préparation /deploy)
+
+## Décisions prises
+- Aucune décision de conception. Export de Marie du 17/08 11h13 analysé (étape 0 `/deploy`) : ni perte, ni incohérence, ni friction bloquante — poursuite normale du déploiement.
+
+## Livrables produits ou modifiés
+- Aucun fichier de code modifié. `_contexte/marie_tests_journal.json` : ingestion tentée, 0 nouvelle entrée (13 déjà présentes).
+
+## Hypothèses validées / invalidées
+- VALIDE : différences entre l'export du 17/08 et celui du 16/08 22h35 limitées à une dépense budget (Vacances, 28€, « Violetta ») et une entrée d'énergie (17/08, valeur 8) — usage normal, pas de bug.
+
+## Prochaine étape exacte
+Poursuivre `/deploy` (étapes 1 à 9) : cumule Budget + drag planning + sélecteur mois/année + navigation planning + édition de tâche, jamais testés par Marie en conditions réelles.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 4, sélecteur mois/année, refonte navigation planning et édition de tâche)
 
 ## Décisions prises
 - Sur retours utilisateur (captures annotées), 5 correctifs UI cumulés : clic sur le mois/année du planning ouvre désormais une fenêtre dédiée (année + grille des 12 mois) au lieu de l'ancien sélecteur de date natif ; le bandeau de dates garde le jour actuel toujours centré (navigation uniquement par glissement, flèches semaine retirées) ; badge sous-tâches placé avant le logo énergie sur chaque ligne planifiée pour un alignement vertical constant, hauteur de ligne rendue proportionnelle à la durée ; débordement visuel du cadre Durée dans le formulaire de tâche corrigé ; fiche de tâche planifiée passée en lecture seule (fond teinté à la couleur d'ambiance) avec un nouveau bouton « Modifier » ouvrant un écran d'édition dédié pré-rempli, au même gabarit que la création, avec le choix occurrence/série conservé pour les tâches récurrentes.

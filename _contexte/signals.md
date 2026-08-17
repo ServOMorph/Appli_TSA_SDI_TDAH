@@ -4,24 +4,50 @@
 - Branche `sync-marie` : 4 commits non fusionnés dans `main` (roadmap sync Supabase créée, setup projet Supabase, clôture de la communication Marie V5.0 incluant la suppression de `a_communiquer_v5.md`). Le travail des dernières sessions (sans rapport avec la sync) a été fait sur `main` pour ne pas mélanger les deux chantiers — `a_communiquer_v5.md` existe donc encore sur `main`, `roadmap_sync_marie.md` n'y existe pas encore. Réconciliation à faire à la prochaine reprise du chantier sync (fusion ou rebase).
 - `donnees_marie/` : trois exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md` (2026-08-13, 2026-08-16 18h27, 2026-08-16 22h35).
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, copie normalisée dans `donnees_marie/`, ingestion du journal, détection pertes/frictions). `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
-- Refonte complète du concept Budget **terminée** cette session, demandée par Marie (« Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets »). Roadmap `roadmap_budget_v2.md`, 4 phases toutes `[FAIT]`. Phase 4 : catégories `income` existantes de Marie (Mcdo, Maman, Livret jeune, APL) converties en revenus historiques ponctuels (migration Dexie v14) puis supprimées. En prolongement (hors roadmap, décidé par Marie elle-même via message dédié — `message_marie_categories_revenu.md`) : possibilité de créer de nouvelles catégories `income` retirée de l'écran de configuration, bloc « Non alloué » et fonctions de calcul associées (`getTotalIncome`, `getUnbudgetedRemainder`) supprimés. **`WHATS_NEW` mis à jour cette session** (feature complète, plus de raison de différer l'annonce) — à vérifier/ajuster au moment du `/deploy`.
-- `manualTestsCatalog.ts` : test `montant-total-apres-migration-revenus` (ajouté Phase 4) à faire valider par Marie après déploiement — nouveau système Budget jamais testé par elle en conditions réelles.
+- Refonte complète du concept Budget **terminée** (roadmap `roadmap_budget_v2.md`, 4 phases toutes `[FAIT]`) : « Montant total » distribué entre « Mon compte » (Semaine/Mois) et « Livrets », anciennes catégories `income` de Marie converties en revenus historiques puis supprimées.
+- Poignée du planning (accueil) transformée cette session en drag continu façon bottom-sheet : la fenêtre du planning suit le doigt en temps réel au lieu de basculer sur un seuil, et reste à la hauteur relâchée (`E10Dashboard.tsx`, constantes `PLANNING_MIN_HEIGHT_PX`/`PLANNING_MAX_HEIGHT_PX`). La section Outils et la bannière Mode surcharge restent désormais **toujours visibles**, même planning ouvert (elles étaient masquées auparavant). Répond à la demande annexe restée en attente depuis 2026-08-15. `WHATS_NEW` mis à jour pour les deux changements (Budget + drag planning).
+- `manualTestsCatalog.ts` mis à jour cette session : `utiliser-le-budget` teste désormais aussi « Ajouter un revenu » / carte « Montant total » ; `glisser-pour-ouvrir-le-planning` décrit le nouveau comportement continu. Test `montant-total-apres-migration-revenus` (Phase 4 Budget) toujours en attente de validation Marie.
+- Corrigé au passage : `PlanningBoard.tsx` contenait une pollution non committée (caractère `e ` parasite en tête de fichier, cassait la compilation) — sans rapport avec la session, réparée pour débloquer les tests.
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
 - `E121ManualTests.tsx` : un test « Validé » disparaît de la liste affichée à Marie (catalogue conservé en interne) ; chaque test dépliable/repliable.
-- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17, prod vérifiée HTTP 200 — inchangé cette session (aucun déploiement, refonte Budget prête mais pas encore publiée).
+- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17, prod vérifiée HTTP 200 — inchangé cette session (aucun déploiement, Budget + drag planning prêts mais pas encore publiés).
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Déployer la refonte Budget (`roadmap_budget_v2.md`, 4 phases toutes `[FAIT]`) — jamais testée par Marie en conditions réelles. — fait quand : `/deploy` effectué et retour de Marie sur le nouveau système obtenu — réf : `roadmap_budget_v2.md`, `manualTestsCatalog.ts` (test `montant-total-apres-migration-revenus`)
-- [P2] Redemander à Marie de réimporter et revalider « Utiliser le budget » (formulation corrigée) une fois redéployé, ainsi que « Glisser pour ouvrir le planning » (nok, demande de bottom-sheet continu déjà connue, non traitée). — fait quand : ces tests validés dans un nouvel export ingéré — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P1] Déployer la refonte Budget + le drag continu du planning (`roadmap_budget_v2.md` intégralement `[FAIT]` ; `E10Dashboard.tsx` pour le drag) — aucun des deux jamais testé par Marie en conditions réelles. — fait quand : `/deploy` effectué et retour de Marie obtenu sur les deux — réf : `roadmap_budget_v2.md`, `manualTestsCatalog.ts` (tests `montant-total-apres-migration-revenus`, `utiliser-le-budget`, `glisser-pour-ouvrir-le-planning`)
+- [P2] Redemander à Marie de réimporter et revalider « Utiliser le budget » et « Glisser pour ouvrir le planning » (steps du catalogue mis à jour cette session pour refléter le nouveau comportement) une fois redéployé. — fait quand : ces tests validés dans un nouvel export ingéré — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (non touchée depuis plusieurs sessions) — voir réconciliation de branche ci-dessus avant de continuer. — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
 - [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-17 — suite 2, clôture refonte Budget Phase 4, nettoyage catégories income)
+## Dernière session (2026-08-17 — suite 3, drag continu du planning, mise à jour catalogue de tests)
+
+## Décisions prises
+- Sur retour utilisateur (capture annotée) : la poignée du planning devient un drag continu façon bottom-sheet — la fenêtre suit le doigt en temps réel (au lieu du seuil binaire précédent qui basculait instantanément), reste à la hauteur relâchée au lieu de forcément s'ouvrir/fermer en entier, et la section Outils / la bannière Mode surcharge restent visibles en permanence (elles disparaissaient auparavant quand le planning était déplié).
+- Suite à cette évolution, les tests `utiliser-le-budget` et `glisser-pour-ouvrir-le-planning` du catalogue mis à jour : le premier teste désormais aussi « Ajouter un revenu » (jamais couvert alors que c'est le cœur de la refonte Budget) ; le second décrit le nouveau comportement continu au lieu de l'ancien « occupe l'écran ».
+
+## Livrables produits ou modifiés
+- `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`) : drag continu du planning (constantes `PLANNING_MIN_HEIGHT_PX`/`PLANNING_MAX_HEIGHT_PX`), Outils/bannière surcharge toujours visibles.
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : pollution non committée (caractère parasite ligne 1) corrigée, sans rapport avec la session.
+- `src/domain/data/manualTestsCatalog.ts` : steps de `utiliser-le-budget` et `glisser-pour-ouvrir-le-planning` mis à jour.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : entrée `WHATS_NEW` ajoutée (drag continu du planning).
+
+## Hypothèses validées / invalidées
+- VALIDE : 564/564 tests unitaires, `tsc -b`/lint clean après le changement de drag et la mise à jour du catalogue.
+- EN ATTENTE : refonte Budget et drag continu du planning tous deux jamais testés par Marie en conditions réelles — aucun déploiement cette session.
+
+## Prochaine étape exacte
+`/deploy` (cumule refonte Budget + drag continu du planning), puis redemander à Marie de tester « Utiliser le budget », « Ouvrir le planning en glissant » et « Vérifier le Montant total après la migration des revenus ».
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 2, clôture refonte Budget Phase 4, nettoyage catégories income)
 
 ## Décisions prises
 - Phase 4 de `roadmap_budget_v2.md` (dernière phase) livrée et confirmée par l'utilisateur : catégories `income` existantes de Marie converties en revenus historiques ponctuels via migration Dexie v14, puis supprimées. Roadmap intégralement `[FAIT]`.

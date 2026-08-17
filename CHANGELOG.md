@@ -1,3 +1,8 @@
+## v5.44 — 2026-08-17
+
+### Modifié
+- Planning de l'accueil : la poignée devient un drag continu façon bottom-sheet (la fenêtre suit le doigt et reste à la hauteur relâchée, au lieu d'un seuil binaire) ; la section Outils et la bannière Mode surcharge restent désormais toujours visibles.
+
 ## v5.43 — 2026-08-17
 
 ### Ajouté

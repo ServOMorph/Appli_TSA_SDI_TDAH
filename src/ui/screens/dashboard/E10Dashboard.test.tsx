@@ -146,7 +146,7 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 
-    it('déplié : affiche le bandeau de dates du planning et masque la zone widgets', async () => {
+    it('déplié : affiche le bandeau de dates du planning et garde la zone widgets visible', async () => {
       const ctx = makeAppContext({
         route: { name: 'planning' },
         screen: 'planning',
@@ -154,7 +154,7 @@ describe('E10Dashboard', () => {
       })
       renderWithApp(<E10Dashboard />, ctx)
       expect(await screen.findByRole('button', { name: /semaine précédente/i })).toBeDefined()
-      expect(screen.queryByRole('region', { name: 'Outils' })).toBeNull()
+      expect(screen.getByRole('region', { name: 'Outils' })).toBeDefined()
     })
 
     it('déplié : la poignée replie vers l\'accueil (E18)', async () => {

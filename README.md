@@ -18,7 +18,7 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 La version **v5.40** est déployée en production (voir le [CHANGELOG](CHANGELOG.md)), non encore mise à jour avec les changements ci-dessous. Le parcours de tests manuels de Marie (catalogue in-app avec étapes numérotées, historique, archivage projet) est entièrement livré ; les tests déjà validés n'apparaissent plus dans la liste affichée. Les listes peuvent être organisées en catégories, avec export/import complet.
 
-Refonte du Budget terminée (`roadmap_budget_v2.md`, 4 phases toutes livrées) : la carte « Montant total » répartit les revenus saisis manuellement entre « Mon compte » (catégories Semaine/Mois) et les livrets ; les anciennes catégories de revenu à montant fixe ont été converties en revenus historiques puis retirées de l'écran de configuration. Pas encore déployée en production.
+Refonte du Budget terminée (`roadmap_budget_v2.md`, 4 phases toutes livrées) : la carte « Montant total » répartit les revenus saisis manuellement entre « Mon compte » (catégories Semaine/Mois) et les livrets ; les anciennes catégories de revenu à montant fixe ont été converties en revenus historiques puis retirées de l'écran de configuration. La poignée du planning sur l'accueil est désormais un drag continu façon bottom-sheet, la section Outils restant toujours visible. Ni l'une ni l'autre pas encore déployées en production.
 
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
 

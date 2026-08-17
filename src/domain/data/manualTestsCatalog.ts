@@ -78,9 +78,10 @@ export const manualTestsCatalog: ManualTest[] = [
     title: 'Utiliser le budget',
     steps: [
       'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ».',
+      'Sur la carte « Montant total » en haut de l’écran, touchez « Ajouter un revenu », saisissez un montant, puis touchez « Enregistrer » : le montant total et le détail « ... de revenus » doivent augmenter.',
       'Touchez l’onglet « Semaine » puis l’onglet « Mois » : le montant « Il me reste » et la jauge en dessous doivent changer.',
       'Touchez une catégorie de dépense pour ouvrir sa fiche détaillée.',
-      'Revenez en arrière, touchez « Ajouter une dépense », remplissez le formulaire puis enregistrez : le montant dépensé de la catégorie doit augmenter.',
+      'Revenez en arrière, touchez « Ajouter une dépense », remplissez le formulaire puis enregistrez : le montant dépensé de la catégorie doit augmenter, et le détail « ... mon compte » sur la carte « Montant total » doit apparaître ou augmenter.',
       'Touchez enfin le bloc « Mes livrets » : vous devez arriver sur l’écran de configuration du budget.',
     ],
   },
@@ -99,9 +100,10 @@ export const manualTestsCatalog: ManualTest[] = [
     title: 'Ouvrir le planning en glissant',
     steps: [
       'Sur l’accueil, sous le bandeau des jours de la semaine et du mois en cours, repérez le petit trait gris horizontal.',
-      'Posez le doigt dessus et glissez fermement vers le bas : le planning doit s’agrandir et occuper l’écran.',
-      'Posez ensuite le doigt sur ce même trait et glissez fermement vers le haut : le planning doit se refermer et l’accueil normal doit réapparaître.',
-      'Vérifiez aussi qu’un simple appui (sans glisser) sur ce trait produit le même effet d’ouverture ou de fermeture.',
+      'Posez le doigt dessus et glissez lentement vers le bas sans relâcher : la fenêtre du planning doit s’agrandir progressivement en suivant le doigt, pendant que la section « Outils » et le reste de l’accueil restent visibles en dessous.',
+      'Relâchez le doigt : le planning doit rester à la taille atteinte, agrandie ou repliée selon jusqu’où vous avez glissé.',
+      'Posez ensuite le doigt sur ce même trait et glissez fermement vers le haut, puis relâchez : le planning doit se refermer à sa taille minimale.',
+      'Vérifiez aussi qu’un simple appui (sans glisser) sur ce trait bascule directement entre planning replié et déplié.',
     ],
   },
   {

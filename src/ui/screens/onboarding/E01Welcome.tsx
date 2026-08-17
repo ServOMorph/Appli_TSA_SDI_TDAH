@@ -5,6 +5,7 @@ import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
 const WHATS_NEW: string[] = [
   'Le budget change de logique : vous saisissez maintenant vous-même chaque revenu (bouton « Ajouter un revenu »), et la carte « Montant total » en haut de l’écran Budget affiche ce qu’il vous reste une fois vos dépenses et vos livrets déduits. Vos anciennes catégories de revenu (Mcdo, Maman, Livret jeune, APL) sont converties automatiquement en revenus déjà enregistrés, pour ne rien perdre.',
+  'Le petit trait gris de l’accueil se glisse maintenant progressivement : le planning s’agrandit ou se referme en suivant votre doigt, et reste à la taille où vous relâchez. Le reste de l’accueil (dont les Outils) ne disparaît plus quand le planning est ouvert.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

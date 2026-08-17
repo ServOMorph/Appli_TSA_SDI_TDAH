@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-14 (suite 13, déploiement v5.33 reporté) (archivé depuis contexte.md 2026-08-17, drag continu du planning)
+- `/deploy` engagé jusqu'à l'étape des avertissements (2 vérifications bloquantes toutes passées), puis interrompu à la demande de l'utilisateur — il valide d'abord lui-même les 6 points de `tests_manuels.md` avant de relancer. Aucun build lancé, `dist/v5.33` n'existe pas. Aucun code applicatif modifié cette session ; pas de bump `CHANGELOG.md` (rien de fonctionnel n'a changé, l'entrée v5.33 déjà présente reste valable pour le prochain déploiement).
+
 ## 2026-08-14 (suite 12, correctif Budget disparu à l'import, bannières et modale Nouveautés dynamiques, Phase 3 tests Marie close) (archivé depuis contexte.md 2026-08-17, clôture refonte Budget Phase 4)
 - Cause du bug « Budget disparu à l'import » identifiée par lecture de code et confirmée par les retours de Marie, puis corrigée : `useSettingsState.ts` recrée désormais aussi l'entrée `tableau_comptage` manquante à l'import, en plus des entrées `liste`. Bannières urgentes (accueil + Tests à faire) mises à jour pour demander la réimportation (répare le bug) au lieu d'un nouvel export, avec bouton « Fait » persistant (`localStorage`) et couleur de texte forcée en blanc. Modale Nouveautés rendue dynamique (ne s'affiche plus une fois fermée pour une version donnée, `VITE_APP_VERSION` en clé de comparaison), cycle formalisé dans `close.md`/`deploy.md`. Nouvel export de Marie (17h40) analysé et ingéré : 7 résultats, 4 échecs confirmant le bug Budget déjà corrigé — Phase 3 de `roadmap_tests_marie.md` close.
 

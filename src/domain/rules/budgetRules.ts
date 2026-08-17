@@ -60,12 +60,6 @@ export function getRemainingForCategory(
   return category.amount - getSpentForCategory(entries, category.id, bounds)
 }
 
-export function getTotalIncome(categories: BudgetCategory[], period: BudgetPeriod): number {
-  return categories
-    .filter((category) => category.kind === 'income' && category.period === period)
-    .reduce((total, category) => total + category.amount, 0)
-}
-
 export function getTotalBudgeted(categories: BudgetCategory[], period: BudgetPeriod): number {
   return categories
     .filter((category) => category.kind === 'expense' && category.period === period)
@@ -80,19 +74,6 @@ export function getTotalDeposits(
   return deposits
     .filter((deposit) => deposit.period === period && isDateInPeriod(deposit.date, bounds))
     .reduce((total, deposit) => total + deposit.amount, 0)
-}
-
-export function getUnbudgetedRemainder(
-  categories: BudgetCategory[],
-  deposits: BudgetDeposit[],
-  period: BudgetPeriod,
-  bounds: BudgetPeriodBounds,
-): number {
-  return (
-    getTotalIncome(categories, period) -
-    getTotalBudgeted(categories, period) -
-    getTotalDeposits(deposits, period, bounds)
-  )
 }
 
 /** Total dépensé sur les catégories de dépense d'une période. */
@@ -138,6 +119,54 @@ export function getTotalIncomeEntries(entries: BudgetIncomeEntry[], bounds: Budg
   return entries
     .filter((entry) => isDateInPeriod(entry.date, bounds))
     .reduce((total, entry) => total + entry.amount, 0)
+}
+
+/** Montant total après effet des livrets : dépôt soustrait, retrait recrédité (montant signé). */
+export function getTotalIncomeAfterDeposits(
+  incomeEntries: BudgetIncomeEntry[],
+  deposits: BudgetDeposit[],
+  period: BudgetPeriod,
+  bounds: BudgetPeriodBounds,
+): number {
+  return getTotalIncomeEntries(incomeEntries, bounds) - getTotalDeposits(deposits, period, bounds)
+}
+
+/** Nombre de semaines civiles (lundi-dimanche) débutant dans le mois de la date donnée. */
+export function getWeeksInMonth(date: string): number {
+  const bounds = getPeriodBounds('month', date)
+  const cursor = parseDate(bounds.startDate)
+  const end = parseDate(bounds.endDate)
+  let weeks = 0
+  while (cursor <= end) {
+    if (cursor.getUTCDay() === 1) weeks += 1
+    cursor.setUTCDate(cursor.getUTCDate() + 1)
+  }
+  return weeks
+}
+
+/**
+ * Montant utilisé par « Mon compte » sur la période : catégories Mois soustraites entières,
+ * catégories Semaine converties au nombre réel de semaines du mois affiché.
+ */
+export function getTotalAccountUsage(
+  categories: BudgetCategory[],
+  period: BudgetPeriod,
+  date: string,
+): number {
+  if (period === 'week') return getTotalBudgeted(categories, 'week')
+  return getTotalBudgeted(categories, 'month') + getTotalBudgeted(categories, 'week') * getWeeksInMonth(date)
+}
+
+/** Montant total après effet des livrets et de « Mon compte » (revenus - livrets - Mon compte). */
+export function getMontantTotal(
+  incomeEntries: BudgetIncomeEntry[],
+  deposits: BudgetDeposit[],
+  categories: BudgetCategory[],
+  period: BudgetPeriod,
+  bounds: BudgetPeriodBounds,
+  date: string,
+): number {
+  return getTotalIncomeAfterDeposits(incomeEntries, deposits, period, bounds) - getTotalAccountUsage(categories, period, date)
 }
 
 export function getAccountBalance(deposits: BudgetDeposit[], accountId: string): number {

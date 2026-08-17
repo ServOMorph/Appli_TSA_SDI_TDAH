@@ -4,9 +4,12 @@ import { todayDate } from '@/app/repositories'
 import type { BudgetCategory, BudgetPeriod } from '@/domain/entities/budgetCategory'
 import {
   getAccountBalance,
+  getMontantTotal,
   getPeriodBounds,
   getSpentForCategory,
+  getTotalAccountUsage,
   getTotalBudgeted,
+  getTotalDeposits,
   getTotalIncomeEntries,
   getTotalRemaining,
   getTotalSpent,
@@ -60,13 +63,15 @@ export function E71Budget() {
   const bounds = getPeriodBounds(period, date)
   const periodCategories = budgetCategories.filter((category) => category.period === period)
   const expenseCategories = periodCategories.filter((category) => category.kind === 'expense')
-  const incomeCategories = periodCategories.filter((category) => category.kind === 'income')
   const allExpenseCategories = budgetCategories.filter((category) => category.kind === 'expense')
   const budgeted = getTotalBudgeted(budgetCategories, period)
   const spent = getTotalSpent(budgetCategories, budgetEntries, period, bounds)
   const remaining = getTotalRemaining(budgetCategories, budgetEntries, period, bounds)
   const accountsTotal = budgetAccounts.reduce((total, account) => total + getAccountBalance(budgetDeposits, account.id), 0)
   const totalIncomeEntries = getTotalIncomeEntries(budgetIncomeEntries, bounds)
+  const totalDeposits = getTotalDeposits(budgetDeposits, period, bounds)
+  const totalAccountUsage = getTotalAccountUsage(budgetCategories, period, date)
+  const montantTotal = getMontantTotal(budgetIncomeEntries, budgetDeposits, budgetCategories, period, bounds, date)
 
   function openCategory(category: BudgetCategory) {
     goTo({ name: 'budget-category-detail', categoryId: category.id, date })
@@ -127,9 +132,9 @@ export function E71Budget() {
 
       <Card>
         <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Montant total</p>
-        <p style={{ margin: '4px 0', fontSize: '1.5rem', fontWeight: 700, color: amountTone(totalIncomeEntries) }}>{formatEuro(totalIncomeEntries)}</p>
+        <p style={{ margin: '4px 0', fontSize: '1.5rem', fontWeight: 700, color: amountTone(montantTotal) }}>{formatEuro(montantTotal)}</p>
         <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
-          Revenus saisis sur la période
+          {formatEuro(totalIncomeEntries)} de revenus{totalDeposits !== 0 ? ` · ${formatEuro(-totalDeposits)} livrets` : ''}{totalAccountUsage !== 0 ? ` · ${formatEuro(-totalAccountUsage)} mon compte` : ''}
         </p>
         <Button variant="secondary" onClick={() => setShowIncomeForm(true)}>
           Ajouter un revenu
@@ -181,26 +186,6 @@ export function E71Budget() {
           </ul>
         )}
       </section>
-
-      {incomeCategories.length > 0 && (
-        <section aria-label="Revenus">
-          <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Revenus</h2>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            {incomeCategories.map((category) => (
-              <li key={category.id}>
-                <button
-                  onClick={() => openCategory(category)}
-                  aria-label={`Ouvrir ${category.name}`}
-                  style={{ width: '100%', display: 'flex', justifyContent: 'space-between', appearance: 'none', background: 'none', border: 'none', padding: '6px 0', cursor: 'pointer', color: 'var(--color-text)', font: 'inherit' }}
-                >
-                  <span>{category.name}</span>
-                  <span style={{ fontWeight: 600 }}>{formatEuro(category.amount)}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       <section aria-label="Mes livrets">
         <button

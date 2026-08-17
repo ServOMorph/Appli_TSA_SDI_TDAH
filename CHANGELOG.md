@@ -1,3 +1,11 @@
+## v5.43 — 2026-08-17
+
+### Ajouté
+- Refonte du Budget (Phase 4/4, `roadmap_budget_v2.md`) — dernière phase, toutes livrées : anciennes catégories de revenu à montant fixe de Marie converties en revenus historiques ponctuels (migration Dexie v14) puis supprimées.
+
+### Modifié
+- Écran de configuration du Budget : possibilité de créer une nouvelle catégorie de type Revenu retirée, ainsi que le bloc « Non alloué » et la section « Revenus » de l'écran Budget, devenus incohérents avec le nouveau système « Montant total ».
+
 ## v5.42 — 2026-08-17
 
 ### Ajouté

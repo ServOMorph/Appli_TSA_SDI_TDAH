@@ -3,8 +3,8 @@ import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
-import type { BudgetCategoryKind, BudgetPeriod } from '@/domain/entities/budgetCategory'
-import { getAccountBalance, getPeriodBounds, getUnbudgetedRemainder } from '@/domain/rules/budgetRules'
+import type { BudgetPeriod } from '@/domain/entities/budgetCategory'
+import { getAccountBalance } from '@/domain/rules/budgetRules'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { dangerLinkStyle, formatEuro, inputStyle, modalBox, modalOverlay, neutralLinkStyle, pageStyle } from '@/ui/styles/budget'
@@ -30,7 +30,6 @@ export function E74BudgetSettings() {
 
   const [showCategoryForm, setShowCategoryForm] = useState(false)
   const [categoryName, setCategoryName] = useState('')
-  const [categoryKind, setCategoryKind] = useState<BudgetCategoryKind>('expense')
   const [categoryPeriod, setCategoryPeriod] = useState<BudgetPeriod>('month')
   const [categoryAmount, setCategoryAmount] = useState('')
   const [showAccountForm, setShowAccountForm] = useState(false)
@@ -48,7 +47,6 @@ export function E74BudgetSettings() {
 
   function resetCategoryForm() {
     setCategoryName('')
-    setCategoryKind('expense')
     setCategoryPeriod('month')
     setCategoryAmount('')
     setShowCategoryForm(false)
@@ -57,7 +55,7 @@ export function E74BudgetSettings() {
   async function handleCreateCategory() {
     const amount = Number(categoryAmount.replace(',', '.'))
     if (!categoryName.trim() || !Number.isFinite(amount) || amount <= 0) return
-    await createBudgetCategory(categoryName, categoryKind, categoryPeriod, amount)
+    await createBudgetCategory(categoryName, 'expense', categoryPeriod, amount)
     resetCategoryForm()
   }
 
@@ -115,24 +113,6 @@ export function E74BudgetSettings() {
         </button>
         <h1 style={{ margin: 0, fontSize: '1.25rem' }}>Configurer le budget</h1>
       </header>
-
-      <section aria-label="Non alloué">
-        <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Non alloué</h2>
-        <Card>
-          <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
-            Revenus moins budget des dépenses et dépôts sur la période en cours.
-          </p>
-          {(['week', 'month'] as BudgetPeriod[]).map((period) => {
-            const remainder = getUnbudgetedRemainder(budgetCategories, budgetDeposits, period, getPeriodBounds(period, reference))
-            return (
-              <p key={period} style={{ display: 'flex', justifyContent: 'space-between', margin: 'var(--spacing-sm) 0 0' }}>
-                <span>{periodLabel(period)}</span>
-                <strong style={{ color: remainder < 0 ? 'var(--color-error)' : 'var(--color-success)' }}>{formatEuro(remainder)}</strong>
-              </p>
-            )
-          })}
-        </Card>
-      </section>
 
       <section aria-label="Catégories">
         <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Catégories</h2>
@@ -207,22 +187,11 @@ export function E74BudgetSettings() {
             <h2 style={{ margin: 0 }}>Ajouter une catégorie</h2>
             <label htmlFor="budget-category-name">Nom</label>
             <input id="budget-category-name" autoFocus value={categoryName} onChange={(event) => setCategoryName(event.target.value)} style={inputStyle} />
-            <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label htmlFor="budget-category-kind">Type</label>
-                <select id="budget-category-kind" value={categoryKind} onChange={(event) => setCategoryKind(event.target.value as BudgetCategoryKind)} style={inputStyle}>
-                  <option value="expense">Dépense</option>
-                  <option value="income">Revenu</option>
-                </select>
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label htmlFor="budget-category-period">Périodicité</label>
-                <select id="budget-category-period" value={categoryPeriod} onChange={(event) => setCategoryPeriod(event.target.value as BudgetPeriod)} style={inputStyle}>
-                  <option value="week">À la semaine</option>
-                  <option value="month">Au mois</option>
-                </select>
-              </div>
-            </div>
+            <label htmlFor="budget-category-period">Périodicité</label>
+            <select id="budget-category-period" value={categoryPeriod} onChange={(event) => setCategoryPeriod(event.target.value as BudgetPeriod)} style={inputStyle}>
+              <option value="week">À la semaine</option>
+              <option value="month">Au mois</option>
+            </select>
             <label htmlFor="budget-category-amount">Montant</label>
             <input id="budget-category-amount" type="text" inputMode="decimal" value={categoryAmount} onChange={(event) => setCategoryAmount(event.target.value)} style={inputStyle} />
             <Button fullWidth onClick={handleCreateCategory} disabled={!categoryName.trim() || Number(categoryAmount.replace(',', '.')) <= 0}>Créer</Button>

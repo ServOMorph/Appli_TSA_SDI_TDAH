@@ -26,8 +26,8 @@ Règles validées :
 - Format d'une entrée de revenu : montant + date + libellé optionnel (calqué sur `BudgetEntry`
   existant). Assomption de conception, à valider avec Marie si le formulaire lui semble mal adapté.
 - Devenir des catégories `kind: 'income'` actuelles de Marie (Mcdo, Maman, Livret jeune, APL) :
-  supprimées, converties en revenus historiques ponctuels, ou laissées inertes ? À trancher en
-  Phase 4 avant la migration de ses données réelles.
+  tranché en Phase 4 — conversion en revenus historiques ponctuels (`BudgetIncomeEntry`) puis
+  suppression des catégories `income` (migration Dexie version 14).
 
 ## Phases
 
@@ -41,7 +41,7 @@ Règles validées :
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-### Phase 2 — Rattachement des livrets au Montant total [TODO]
+### Phase 2 — Rattachement des livrets au Montant total [FAIT]
 - Un dépôt sur un livret soustrait du Montant total du mois ; un retrait le recrédite (vérifier et
   adapter la logique de signe déjà existante sur `BudgetDeposit`).
 - Affichage du Montant total incluant l'effet des livrets sur l'écran Budget principal.
@@ -50,7 +50,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-### Phase 3 — Rattachement de « Mon compte » au Montant total [TODO]
+### Phase 3 — Rattachement de « Mon compte » au Montant total [FAIT]
 - Catégories « Mois » : leur montant budgété soustrait du Montant total du mois.
 - Catégories « Semaine » : leur montant budgété × nombre réel de semaines du mois affiché,
   soustrait du Montant total.
@@ -61,7 +61,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-### Phase 4 — Écran Budget principal et migration des données de Marie [TODO]
+### Phase 4 — Écran Budget principal et migration des données de Marie [FAIT]
 - Le Montant total (revenus − Mon compte − Livrets) devient l'indicateur central de l'écran
   Budget, en complément ou remplacement de « Il me reste ».
 - Décision tranchée sur le devenir des catégories `income` existantes (cf. Décisions ouvertes) et

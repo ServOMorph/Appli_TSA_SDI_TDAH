@@ -12,12 +12,14 @@ import {
   getRemainingForCategory,
   getSpentForCategory,
   getTotalBudgeted,
+  getMontantTotal,
+  getTotalAccountUsage,
   getTotalDeposits,
-  getTotalIncome,
+  getTotalIncomeAfterDeposits,
   getTotalIncomeEntries,
   getTotalRemaining,
   getTotalSpent,
-  getUnbudgetedRemainder,
+  getWeeksInMonth,
   isDateInPeriod,
 } from './budgetRules'
 
@@ -119,21 +121,12 @@ describe('budgetRules', () => {
 
   describe('budget totals', () => {
     const categories = [
-      category({ id: 'salary', name: 'Salaire', kind: 'income', period: 'month', amount: 1500 }),
-      category({
-        id: 'allowance',
-        name: 'Allocation',
-        kind: 'income',
-        period: 'month',
-        amount: 200,
-      }),
       category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
       category({ id: 'courses', period: 'week', amount: 60 }),
     ]
     const bounds = { startDate: '2026-07-20', endDate: '2026-07-26' }
 
-    it('sums incomes and budgeted expenses by their period', () => {
-      expect(getTotalIncome(categories, 'month')).toBe(1700)
+    it('sums budgeted expenses by their period', () => {
       expect(getTotalBudgeted(categories, 'month')).toBe(600)
       expect(getTotalBudgeted(categories, 'week')).toBe(60)
     })
@@ -156,9 +149,42 @@ describe('budgetRules', () => {
       expect(getTotalIncomeEntries(entries, bounds)).toBe(800)
     })
 
-    it('calculates the unbudgeted remainder', () => {
-      const deposits = [deposit({ amount: 300 })]
-      expect(getUnbudgetedRemainder(categories, deposits, 'month', bounds)).toBe(800)
+    it('soustrait les dépôts du montant total et recrédite les retraits', () => {
+      const entries = [incomeEntry({ amount: 800 })]
+      const deposits = [deposit({ amount: 100 })]
+      expect(getTotalIncomeAfterDeposits(entries, deposits, 'month', bounds)).toBe(700)
+
+      const withdrawal = [deposit({ amount: -100 })]
+      expect(getTotalIncomeAfterDeposits(entries, withdrawal, 'month', bounds)).toBe(900)
+    })
+
+    it('compte le nombre réel de semaines civiles d’un mois, y compris les cas à 4 et 5 semaines', () => {
+      expect(getWeeksInMonth('2026-07-15')).toBe(4)
+      expect(getWeeksInMonth('2026-08-15')).toBe(5)
+      expect(getWeeksInMonth('2028-02-15')).toBe(4)
+    })
+
+    it('calcule l’usage de « Mon compte » : catégories Semaine converties au nombre réel de semaines du mois', () => {
+      const accountCategories = [
+        category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+        category({ id: 'courses', period: 'week', amount: 60 }),
+      ]
+      expect(getTotalAccountUsage(accountCategories, 'week', '2026-08-15')).toBe(60)
+      expect(getTotalAccountUsage(accountCategories, 'month', '2026-08-15')).toBe(600 + 60 * 5)
+      expect(getTotalAccountUsage(accountCategories, 'month', '2026-07-15')).toBe(600 + 60 * 4)
+    })
+
+    it('déduit les livrets et « Mon compte » du montant total', () => {
+      const entries = [incomeEntry({ amount: 2000, date: '2026-08-05' })]
+      const deposits = [deposit({ amount: 100, date: '2026-08-05' })]
+      const accountCategories = [
+        category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+        category({ id: 'courses', period: 'week', amount: 60 }),
+      ]
+      const monthBounds = { startDate: '2026-08-01', endDate: '2026-08-31' }
+      expect(getMontantTotal(entries, deposits, accountCategories, 'month', monthBounds, '2026-08-15')).toBe(
+        2000 - 100 - (600 + 60 * 5),
+      )
     })
 
     it('calculates cumulative account balances', () => {

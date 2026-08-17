@@ -105,6 +105,16 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'montant-total-apres-migration-revenus',
+    title: 'Vérifier le Montant total après la migration des revenus de Marie',
+    steps: [
+      'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ».',
+      'Sur la carte « Montant total » en haut de l’écran, vérifiez qu’elle affiche un montant et le détail « ... de revenus · ... livrets · ... mon compte ».',
+      'Touchez l’icône ⚙ pour ouvrir « Configurer le budget » et vérifiez que les anciennes catégories Mcdo, Maman, Livret jeune et APL n’apparaissent plus dans la liste des catégories.',
+      'Revenez au Budget, touchez « Ajouter un revenu », saisissez un montant et un libellé, enregistrez : ce revenu doit s’ajouter au « ... de revenus » affiché sur la carte « Montant total ».',
+    ],
+  },
+  {
     id: 'badge-energie-couleur-ambiance',
     title: 'Badge énergie avec la couleur d’ambiance',
     steps: [

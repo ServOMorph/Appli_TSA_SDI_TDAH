@@ -316,6 +316,22 @@ export class AppDatabase extends Dexie {
     this.version(13).stores({
       budgetIncomeEntries: 'id, date',
     })
+    this.version(14)
+      .stores({})
+      .upgrade(async (tx) => {
+        const now = new Date().toISOString()
+        const incomeCategories = await tx.table('budgetCategories').where('kind').equals('income').toArray()
+        await tx.table('budgetIncomeEntries').bulkAdd(
+          incomeCategories.map((category) => ({
+            id: migrationId(),
+            amount: category.amount,
+            label: category.name,
+            date: now.slice(0, 10),
+            created_at: now,
+          })),
+        )
+        await tx.table('budgetCategories').bulkDelete(incomeCategories.map((category) => category.id))
+      })
   }
 }
 

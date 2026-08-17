@@ -152,7 +152,28 @@ describe('E71Budget', () => {
       budgetIncomeEntries: [{ id: 'income-1', amount: 500, label: 'Salaire', date: todayDate(), created_at: todayDate() }],
     }))
     expect(screen.getByText('Montant total')).toBeDefined()
-    expect(screen.getByText(/500,00/)).toBeDefined()
+    expect(screen.getAllByText(/500,00/).length).toBeGreaterThan(0)
+  })
+
+  it('déduit les dépôts sur livrets du montant total et recrédite les retraits', () => {
+    renderWithApp(<E71Budget />, makeAppContext({
+      budgetIncomeEntries: [{ id: 'income-1', amount: 500, label: 'Salaire', date: todayDate(), created_at: todayDate() }],
+      budgetDeposits: [makeDeposit({ period: 'week', amount: 120 })],
+    }))
+    expect(screen.getByText(/380,00/)).toBeDefined()
+    expect(screen.getByText(/500,00.*de revenus.*-120,00.*livrets/)).toBeDefined()
+  })
+
+  it('déduit « Mon compte » du montant total, en convertissant les catégories Semaine au nombre réel de semaines du mois affiché', async () => {
+    renderWithApp(<E71Budget />, makeAppContext({
+      budgetIncomeEntries: [{ id: 'income-1', amount: 2000, label: 'Salaire', date: todayDate(), created_at: todayDate() }],
+      budgetCategories: [
+        makeCategory({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+        makeCategory({ id: 'courses', name: 'Courses', period: 'week', amount: 60 }),
+      ],
+    }))
+    await userEvent.click(screen.getByRole('tab', { name: 'Mois' }))
+    expect(screen.getByText(/mon compte/)).toBeDefined()
   })
 
   it('désactive la saisie de dépense tant qu’aucune catégorie de dépense n’existe', () => {

@@ -45,29 +45,15 @@ function makeDeposit(overrides: Partial<BudgetDeposit> = {}): BudgetDeposit {
 }
 
 describe('E74BudgetSettings', () => {
-  it('revient au Budget et affiche le non alloué par période', () => {
-    const ctx = makeAppContext({
-      budgetCategories: [
-        makeCategory({ id: 'salary', name: 'Salaire', kind: 'income', period: 'month', amount: 1500 }),
-        makeCategory({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
-      ],
-    })
-    renderWithApp(<E74BudgetSettings />, ctx)
-    expect(screen.getByRole('heading', { name: 'Configurer le budget' })).toBeDefined()
-    const section = screen.getByRole('region', { name: 'Non alloué' })
-    expect(within(section).getByText(/900,00/)).toBeDefined()
-  })
-
   it('crée une catégorie avec ses paramètres', async () => {
     const createBudgetCategory = vi.fn().mockResolvedValue(undefined)
     renderWithApp(<E74BudgetSettings />, makeAppContext({ createBudgetCategory }))
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter une catégorie' }))
-    await userEvent.type(screen.getByLabelText('Nom'), 'Salaire')
-    await userEvent.selectOptions(screen.getByLabelText('Type'), 'income')
+    await userEvent.type(screen.getByLabelText('Nom'), 'Loyer')
     await userEvent.selectOptions(screen.getByLabelText('Périodicité'), 'month')
-    await userEvent.type(screen.getByLabelText('Montant'), '1500')
+    await userEvent.type(screen.getByLabelText('Montant'), '600')
     await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
-    expect(createBudgetCategory).toHaveBeenCalledWith('Salaire', 'income', 'month', 1500)
+    expect(createBudgetCategory).toHaveBeenCalledWith('Loyer', 'expense', 'month', 600)
   })
 
   it('ouvre la fiche d’une catégorie', async () => {

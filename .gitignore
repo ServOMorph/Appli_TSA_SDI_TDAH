@@ -55,3 +55,6 @@ ios/
 # Python
 __pycache__/
 *.pyc
+
+# Captures de calibration chatgpt-orchestrateur (ephemeres, jamais reinjectees)
+ROBERTO/_orchestrateur_ia/*/calibration/

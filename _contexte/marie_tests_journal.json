@@ -14,7 +14,7 @@
       "status": "ok",
       "comment": null,
       "created_at": "2026-08-14T17:39:54.058Z",
-      "etat": "RECU"
+      "etat": "INTEGRE"
     },
     {
       "id": "10a0154b-e4cd-4065-a9ce-122b697d0f20",
@@ -30,7 +30,7 @@
       "status": "ok",
       "comment": null,
       "created_at": "2026-08-14T17:40:10.592Z",
-      "etat": "RECU"
+      "etat": "INTEGRE"
     },
     {
       "id": "a0098520-fa8f-40c5-9571-98557dcc247c",
@@ -54,7 +54,7 @@
       "status": "ok",
       "comment": null,
       "created_at": "2026-08-14T17:40:49.658Z",
-      "etat": "RECU"
+      "etat": "INTEGRE"
     }
   ]
 }

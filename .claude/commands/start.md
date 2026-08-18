@@ -52,4 +52,10 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 <!-- Convention : toute règle liée à une étape précise de la Procédure ci-dessus doit la
      référencer explicitement par son numéro (ex: "Étape 3 : ..."), plutôt que compter sur la
      position physique de cette zone (toujours en fin de fichier). -->
+
+## Spécificités projet
+- Étape 3 : si la zone résolue est `roberto`, charger en plus, après les fichiers de la zone,
+  `_contexte/signals.md` et `_contexte/contexte.md` de la racine du projet (lecture seule) —
+  Roberto orchestre notamment le flux `sync-marie` dont l'état réel vit dans ces fichiers racine
+  (cf. `agent_role.md` de Roberto, section Périmètre).
 <!-- SPECIFICITES PROJET : FIN -->

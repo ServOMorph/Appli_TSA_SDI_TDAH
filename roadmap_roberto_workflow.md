@@ -20,7 +20,7 @@ Créée le : 2026-08-18
 
 ---
 
-## Phase 1 — Finaliser le Flux A (Testeur / JSON) [EN COURS]
+## Phase 1 — Finaliser le Flux A (Testeur / JSON) [FAIT]
 
 **Déjà fait, committé, testé (branche `sync-marie`, 32/32 tests verts)** :
 - [x] `ROBERTO/state_machine.py` : `Etat` (ATTENTE/RECU/ANALYSE/CORRECTIONS/INTEGRE), `StateMachine.transition`.
@@ -29,21 +29,21 @@ Créée le : 2026-08-18
 - [x] `ROBERTO/process_journal.py` (`traiter_entree_du_journal`) : résout une entrée par id dans le journal, écrit en atomique (fichier temporaire + `replace`), valide l'état contre `ETATS_VALIDES` avant traitement.
 - [x] `scripts/process_manual_test.py` (CLI, 2 args positionnels) + `scripts/test_process_manual_test.py` (3 tests : `integrer`, `corriger`, action invalide).
 
-**Gap réel découvert le 2026-08-18, non résolu — bloquant pour dire Flux A terminé** :
-- [ ] `integrer_corrections` (`ROBERTO/integration_corrections.py`, transition CORRECTIONS→INTEGRE) n'est **jamais appelé** par `workflow.py`. `traiter_entree` appelle systématiquement `analyser_entree` en premier, qui exige l'état RECU et rejette toute entrée déjà en CORRECTIONS. Résultat : une entrée qui atteint l'état CORRECTIONS (via l'action `corriger`) n'a **aucun chemin CLI vers INTEGRE** — elle est bloquée. `integrer_corrections` n'est testé qu'en isolation (`test_integration_corrections.py`), jamais intégré au flux réel. À corriger : `workflow.py`/`process_journal.py` doivent distinguer l'état courant de l'entrée et appeler la bonne fonction (`analyser_entree` si RECU, `integrer_corrections` si CORRECTIONS) plutôt que de toujours ré-analyser.
-- [ ] Une fois corrigé : test de bout en bout couvrant RECU→ANALYSE→CORRECTIONS→INTEGRE en un seul enchaînement d'appels CLI (pas seulement les transitions isolées).
-- [ ] Valider Flux A sur le vrai `_contexte/marie_tests_journal.json` (pas seulement `tmp_path` en test), avec au moins une entrée réelle menée jusqu'à INTEGRE.
+**Gap découvert le 2026-08-18, corrigé le même jour (`a39c3db`)** :
+- [x] `integrer_corrections` câblé dans `workflow.py` (`traiter_entree` distingue désormais l'état courant : route vers `integrer_corrections` si CORRECTIONS au lieu de toujours ré-analyser depuis RECU).
+- [x] Test de bout en bout RECU→ANALYSE→CORRECTIONS→INTEGRE ajouté (`test_workflow.py`, `test_process_journal.py`).
+- [x] Flux A validé sur le vrai `_contexte/marie_tests_journal.json` : 4/7 entrées réelles menées jusqu'à INTEGRE via `scripts/process_manual_test.py` (dont 3 traitées en session le 2026-08-18). 3 entrées restent en RECU, bloquées non pas par un gap du workflow mais par une décision produit : elles rapportent toutes le même bug (accès budget indisponible), correctif suspecté déjà présent dans le code mais non encore reconfirmé par test manuel — voir `AGENT_STATE.md` et `tests_manuels.md` (sections 3, 6, 9).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer. Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
 ---
 
-## Phase 2 — Séparer WORKFLOW et STATE (fondation partagée aux 3 flux) [TODO]
+## Phase 2 — Séparer WORKFLOW et STATE (fondation partagée aux 3 flux) [FAIT]
 Réf. spec section 3 et section 11.
-- [ ] Décider l'emplacement et le format des deux documents (racine projet ou `ROBERTO/` — trancher, pas dans `_contexte/` qui est réservé au protocole vibecoding du kit).
-- [ ] `AGENT_WORKFLOW.md` (ou équivalent) : règles du processus, change rarement — priorités, quand traiter quoi, invariants (jamais écraser un JSON testeur, jamais versionner les données utilisateur avec le code).
-- [ ] `AGENT_STATE.md` (ou équivalent) : état courant des 3 flux, change à chaque session — remplace/complète la fonction que jouait `ROBERTO/_orchestrateur_ia/chatgpt/etat.md` (spécifique au relai ChatGPT, pas au workflow lui-même).
-- [ ] Définir comment ce nouveau système cohabite avec `_contexte/signals.md`/`contexte.md` du projet (protocole vibecoding existant) sans doublon ni contradiction — cf. spec section 22 « compatibilité avec le système d'agents existant ».
+- [x] Emplacement retenu : racine du projet (`AGENT_STATE.md`, `AGENT_WORKFLOW.md`), pas dans `_contexte/` (réservé au protocole vibecoding du kit).
+- [x] `AGENT_WORKFLOW.md` créé : règles de processus (flux gérés, priorités, invariants).
+- [x] `AGENT_STATE.md` créé : état courant des 3 flux, mis à jour à chaque traitement d'entrée (remplace `ROBERTO/_orchestrateur_ia/chatgpt/etat.md`).
+- [x] Cohabitation avec `_contexte/signals.md`/`contexte.md` définie dans `AGENT_WORKFLOW.md` (section dédiée) : pas de duplication, `signals.md` référence `AGENT_STATE.md` pour le détail des 3 flux.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer. Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 

@@ -18,6 +18,8 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 La branche `sync-marie` (voir le [CHANGELOG](CHANGELOG.md)) livre une synchronisation automatique en arrière-plan des données de Marie vers Supabase, avec un indicateur de statut dans Paramètres — en remplacement progressif du flux manuel export/import. Cette branche est en retard sur `main` (dont la prod, plus avancée, intègre déjà le budget V3) ; un merge est nécessaire avant fusion.
 
+Côté outillage projet, le système d'orchestration ROBERTO (`ROBERTO/`, voir `roadmap_roberto_workflow.md`) gère le traitement des retours de test manuels de Marie ; son premier flux (testeur JSON) est opérationnel.
+
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
 
 ## Prérequis

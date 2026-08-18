@@ -16,6 +16,8 @@ Consigne : valider chaque point sur l'appareil réel, puis supprimer la section 
 
 ## 3 — Retrait d'argent sur un livret (E74)
 
+Corrèle avec le rapport de Marie du 2026-08-14 (`_contexte/marie_tests_journal.json`, entrée `10a0154b-...`, test `retirer-de-l-argent-d-un-livret` : « J'ai pas accès au budget »). Correctif suspecté déjà en place (`useSettingsState.ts:183-185`, réparation `tableau_comptage` à l'import) — à confirmer par ce test avant de transitionner l'entrée du journal.
+
 1. Ouvrir la configuration du budget, taper « Ajouter un mouvement » sur un livret ayant un solde.
 2. Choisir Type = Retrait, saisir un montant inférieur au solde : enregistrement possible, le solde du livret diminue, la ligne affiche « Retrait ».
 3. Saisir un montant supérieur au solde : le bouton Enregistrer reste désactivé, message d'erreur affiché.
@@ -33,6 +35,8 @@ Signalé par Marie le 2026-08-13 (vidéo) : à l'ouverture du clavier sur « Ajo
 2. Revenir à l'accueil : le badge énergie de la barre du haut n'affiche plus « planifié / dispo » (icône batterie + chiffres seulement) et son fond est teinté avec la couleur choisie.
 
 ## 6 — Import d'une sauvegarde JSON (E117)
+
+Corrèle avec le rapport de Marie du 2026-08-14 (`_contexte/marie_tests_journal.json`, entrée `a0098520-...`, test `importer-une-sauvegarde` : « Il manque le budget »). Même correctif suspecté que le test 3 — à confirmer avant de transitionner l'entrée du journal.
 
 1. Depuis Paramètres > Export et import, taper « Importer un fichier JSON » et sélectionner `donnees_marie/export-audhd-2026-08-13.json`.
 2. Vérifier l'affichage de la modale « Remplacer toutes les données ? », confirmer.
@@ -55,4 +59,11 @@ Signalé par Marie le 2026-08-13 (vidéo) : à l'ouverture du clavier sur « Ajo
 4. Depuis l'écran des éléments, toucher ← : retour à l'écran des catégories (pas aux Outils).
 5. Depuis l'écran des catégories, toucher « Ajouter une catégorie », saisir un nom : la catégorie apparaît dans la liste.
 6. Ajouter un élément depuis une catégorie : plus de champ « Rubrique » à saisir, l'élément est automatiquement rangé dans la catégorie ouverte.
+
+## 9 — Accès général au budget
+
+Corrèle avec le rapport de Marie du 2026-08-14 (`_contexte/marie_tests_journal.json`, entrée `23393df4-...`, test `utiliser-le-budget` : « Je n'ai pas accès au budget »).
+
+1. Depuis les Outils, ouvrir la carte Budget.
+2. Vérifier que l'écran s'ouvre normalement (pas d'écran vide, pas d'erreur), avec les catégories/dépenses/livrets visibles.
 

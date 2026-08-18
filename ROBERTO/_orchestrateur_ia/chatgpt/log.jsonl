@@ -18,3 +18,7 @@
 {"horodatage":"2026-08-18T15:03:11","agent":"chatgpt","type":"instruction","resume":"Audit ROBERTO recu (constats + script corrige)","fichier":"echanges/2026-08-18_15303_instruction.md"}
 {"horodatage":"2026-08-18T15:15:39","agent":"chatgpt","type":"rapport","resume":"Confirmation format + demande d\u0027ecriture des tests","fichier":"echanges/2026-08-18_15315_rapport.md"}
 {"horodatage":"2026-08-18T15:17:40","agent":"chatgpt","type":"instruction","resume":"Tests recus (5 cas), appliques et 5/5 verts","fichier":"echanges/2026-08-18_15317_instruction.md"}
+{"horodatage":"2026-08-18T15:21:53","agent":"chatgpt","type":"rapport","resume":"Rapport etape 1 terminee + demande etape suivante","fichier":"echanges/2026-08-18_15321_rapport.md"}
+{"horodatage":"2026-08-18T15:23:19","agent":"chatgpt","type":"instruction","resume":"Etape 2 : demontrer transition ATTENTE-\u003eRECU (test pytest)","fichier":"echanges/2026-08-18_15323_instruction.md"}
+{"horodatage":"2026-08-18T15:23:56","agent":"chatgpt","type":"rapport","resume":"Delegation ecriture state_machine.py + tests","fichier":"echanges/2026-08-18_15323_rapport.md"}
+{"horodatage":"2026-08-18T15:25:44","agent":"chatgpt","type":"instruction","resume":"state_machine.py + tests recus, appliques, 2/2 verts","fichier":"echanges/2026-08-18_15325_instruction.md"}

@@ -46,3 +46,8 @@
 {"horodatage":"2026-08-18T15:48:25","agent":"chatgpt","type":"instruction","resume":"process_journal.py + tests recus, appliques, 26/26 verts","fichier":"echanges/2026-08-18_15348_instruction.md"}
 {"horodatage":"2026-08-18T15:49:02","agent":"chatgpt","type":"rapport","resume":"Rapport etape 9 terminee + demande etape 10","fichier":"echanges/2026-08-18_15349_rapport.md"}
 {"horodatage":"2026-08-18T15:50:09","agent":"chatgpt","type":"instruction","resume":"Etape 10 : validation d\u0027etat dans process_journal.py","fichier":"echanges/2026-08-18_15350_instruction.md"}
+{"horodatage":"2026-08-18T15:51:56","agent":"chatgpt","type":"rapport","resume":"Rapport etape 10 terminee + demande etape 11","fichier":"echanges/2026-08-18_15351_rapport.md"}
+{"horodatage":"2026-08-18T15:53:13","agent":"chatgpt","type":"instruction","resume":"Etape 11 : commande CLI process_manual_test.py","fichier":"echanges/2026-08-18_15353_instruction.md"}
+{"horodatage":"2026-08-18T15:53:42","agent":"chatgpt","type":"rapport","resume":"Delegation ecriture process_manual_test.py (CLI)","fichier":"echanges/2026-08-18_15353_rapport.md"}
+{"horodatage":"2026-08-18T16:10:11","agent":"chatgpt","type":"instruction","resume":"process_manual_test.py + tests recus (etape 11)","fichier":"echanges/2026-08-18_16410_instruction.md"}
+{"horodatage":"2026-08-18T16:12:41","agent":"chatgpt","type":"rapport","resume":"Rapport etape 11 terminee + demande etape 12","fichier":"echanges/2026-08-18_16412_rapport.md"}

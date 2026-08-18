@@ -1,27 +1,3 @@
-# `ROBERTO/analyse.py`
-
-```python
-from ROBERTO.state_machine import Etat, StateMachine
-
-
-def analyser_entree(entree: dict) -> dict:
-    if entree.get("etat") != Etat.RECU.value:
-        raise ValueError(
-            f"Impossible d'analyser une entrée en état "
-            f"{entree.get('etat')!r} : état RECU attendu."
-        )
-
-    nouvel_etat = StateMachine().transition(Etat.RECU, "ANALYSER")
-
-    entree_modifiee = dict(entree)
-    entree_modifiee["etat"] = nouvel_etat.value
-
-    return entree_modifiee
-```
-
-# `ROBERTO/test_analyse.py`
-
-```python
 import pytest
 
 from ROBERTO.analyse import analyser_entree
@@ -68,4 +44,3 @@ def test_analyser_entree_refuse_un_etat_autre_que_recu(etat):
         analyser_entree(entree)
 
     assert entree == entree_originale
-```

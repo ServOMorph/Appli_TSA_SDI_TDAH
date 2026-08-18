@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-16 (suite 2, archivage des roadmaps terminées) (archivé depuis contexte.md 2026-08-18, déploiement v5.49)
+- Les 3 roadmaps dont toutes les phases sont `[FAIT]` (`roadmap_v5.1.md`, `roadmap_tests_marie.md`, `roadmap_categories_listes.md`) déplacées vers `Archives/` (`git mv`), suivant le précédent V1-V5.0. Références actives mises à jour dans `signals.md`/`contexte.md`. Aucun code applicatif modifié.
+
 ## 2026-08-16 (suite, dashboard + refonte E121 tests manuels, clôture Phase V5.1-0) (archivé depuis contexte.md 2026-08-17, clôture roadmap_budget_v3)
 - Accueil retouché sur demande utilisateur — bouton « + » (ajout d'outil) déplacé à côté du titre « Outils » et réduit, espacement accru avant la grille de widgets, police arrondie sur les widgets Comptes/To Do/À acheter/Budget. Dernier point de `tests_manuels.md` (import JSON) validé, fichier vidé intégralement ; Phase V5.1-0 de `Archives/roadmap_v5.1.md` passée `[FAIT]`. `E121ManualTests.tsx` : un test « Validé » disparaît de la liste affichée (catalogue conservé comme suite de non-régression) ; bouton déplier/replier ajouté par test. `ManualTest.description` remplacé par `steps: string[]`, gabarit de rédaction documenté en commentaire en tête de `manualTestsCatalog.ts`. 554/555 tests unitaires (échec préexistant sans rapport), `tsc -b` clean.
 

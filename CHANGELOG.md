@@ -1,3 +1,8 @@
+## v5.50 — 2026-08-18
+
+### Modifié
+- Déploiement de v5.49 en production (refonte Budget v3 complète, cumulée avec les changements déjà en attente depuis v5.47), HTTP 200 vérifié.
+
 ## v5.49 — 2026-08-17
 
 ### Ajouté

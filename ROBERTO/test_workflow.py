@@ -64,3 +64,33 @@ def test_workflow_refuse_action_invalide():
         traiter_entree(entree, "invalide")
 
     assert entree == entree_originale
+
+
+def test_workflow_corrections_vers_integre():
+    entree = valid_entry()
+    entree["etat"] = "CORRECTIONS"
+    entree_originale = dict(entree)
+
+    resultat = traiter_entree(entree, "integrer")
+
+    assert resultat["etat"] == "INTEGRE"
+    assert resultat is not entree
+    assert entree == entree_originale
+
+
+def test_workflow_corrections_refuse_action_corriger():
+    entree = valid_entry()
+    entree["etat"] = "CORRECTIONS"
+
+    with pytest.raises(ValueError, match="Action invalide"):
+        traiter_entree(entree, "corriger")
+
+
+def test_workflow_bout_en_bout_recu_analyse_corrections_integre():
+    entree = valid_entry()
+
+    apres_corrections = traiter_entree(entree, "corriger")
+    assert apres_corrections["etat"] == "CORRECTIONS"
+
+    apres_integration = traiter_entree(apres_corrections, "integrer")
+    assert apres_integration["etat"] == "INTEGRE"

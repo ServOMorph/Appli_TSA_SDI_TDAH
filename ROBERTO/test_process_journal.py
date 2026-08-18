@@ -61,6 +61,43 @@ def test_traiter_entree_du_journal_recu_vers_integre_sans_modifier_les_autres(
     assert journal_final["entries"][1] is not journal_final["entries"][0]
 
 
+def test_traiter_entree_du_journal_bout_en_bout_recu_corrections_integre(
+    tmp_path,
+):
+    journal_path = tmp_path / "marie_tests_journal.json"
+
+    entree_cible = {
+        "id": "id-cible",
+        "test_id": "creer-une-liste",
+        "status": "nok",
+        "comment": "Bug reproduit",
+        "created_at": "2026-08-18T12:00:00.000Z",
+        "etat": "RECU",
+    }
+
+    journal_path.write_text(
+        json.dumps({"entries": [entree_cible]}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    apres_corrections = traiter_entree_du_journal(
+        "id-cible",
+        "corriger",
+        journal_path=journal_path,
+    )
+    assert apres_corrections["etat"] == "CORRECTIONS"
+
+    apres_integration = traiter_entree_du_journal(
+        "id-cible",
+        "integrer",
+        journal_path=journal_path,
+    )
+    assert apres_integration["etat"] == "INTEGRE"
+
+    journal_final = json.loads(journal_path.read_text(encoding="utf-8"))
+    assert journal_final["entries"][0]["etat"] == "INTEGRE"
+
+
 def test_traiter_entree_du_journal_refuse_entree_absente(tmp_path):
     journal_path = tmp_path / "marie_tests_journal.json"
 

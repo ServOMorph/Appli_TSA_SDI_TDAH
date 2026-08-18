@@ -42,19 +42,26 @@ def test_validate_entry_invalid_status():
 def test_main_deduplicates_duplicate_ids(tmp_path, monkeypatch):
     journal_path = tmp_path / "marie_tests_journal.json"
     journal_path.write_text(
-        json.dumps({"entries": []}),
+        json.dumps(
+            {
+                "entries": [
+                    {
+                        **valid_entry(entry_id="duplicate-id"),
+                        "etat": "RECU",
+                    }
+                ]
+            }
+        ),
         encoding="utf-8",
     )
 
     export_path = tmp_path / "export.json"
-    duplicate_id = "duplicate-id"
-
     export_path.write_text(
         json.dumps(
             {
                 "manual_test_results": [
-                    valid_entry(entry_id=duplicate_id),
-                    valid_entry(entry_id=duplicate_id, status="nok"),
+                    valid_entry(entry_id="duplicate-id", status="nok"),
+                    valid_entry(entry_id="new-id", status="ok"),
                 ]
             }
         ),
@@ -75,35 +82,68 @@ def test_main_deduplicates_duplicate_ids(tmp_path, monkeypatch):
 
     journal = json.loads(journal_path.read_text(encoding="utf-8"))
 
-    assert len(journal["entries"]) == 1
-    assert journal["entries"][0]["id"] == duplicate_id
-    assert journal["entries"][0]["status"] == "ok"
+    assert len(journal["entries"]) == 2
+
+    existing = next(
+        entry for entry in journal["entries"] if entry["id"] == "duplicate-id"
+    )
+    new_entry = next(
+        entry for entry in journal["entries"] if entry["id"] == "new-id"
+    )
+
+    assert existing["status"] == "ok"
+    assert existing["etat"] == "RECU"
+
+    assert new_entry["status"] == "ok"
+    assert new_entry["etat"] == "RECU"
 
 
-def test_main_imports_valid_export_and_writes_journal(tmp_path, monkeypatch):
+def test_main_marks_new_entry_as_recu_and_preserves_existing_state(
+    tmp_path,
+    monkeypatch,
+):
     journal_path = tmp_path / "marie_tests_journal.json"
+
+    existing_entry = {
+        **valid_entry(
+            entry_id="existing-id",
+            status="nok",
+        ),
+        "comment": "Etat initial conservé",
+        "etat": "ANALYSE",
+    }
+
     journal_path.write_text(
-        json.dumps({"entries": []}),
+        json.dumps({"entries": [existing_entry]}),
         encoding="utf-8",
     )
 
-    export_path = tmp_path / "export.json"
-    entries = [
-        valid_entry(
-            entry_id="id-2",
-            status="nok",
-        ),
-        {
-            "id": "id-1",
-            "test_id": "test-2",
-            "status": "ok",
-            "comment": "Test réussi",
-            "created_at": "2026-08-18T11:00:00.000Z",
-        },
-    ]
+    new_entry = {
+        "id": "new-id",
+        "test_id": "test-nouveau",
+        "status": "ok",
+        "comment": "Nouveau résultat",
+        "created_at": "2026-08-18T13:00:00.000Z",
+    }
 
+    duplicate_entry = {
+        "id": "existing-id",
+        "test_id": "test-existant-modifie",
+        "status": "ok",
+        "comment": "Ne doit pas remplacer l'existant",
+        "created_at": "2026-08-18T14:00:00.000Z",
+    }
+
+    export_path = tmp_path / "export.json"
     export_path.write_text(
-        json.dumps({"manual_test_results": entries}),
+        json.dumps(
+            {
+                "manual_test_results": [
+                    new_entry,
+                    duplicate_entry,
+                ]
+            }
+        ),
         encoding="utf-8",
     )
 
@@ -121,21 +161,20 @@ def test_main_imports_valid_export_and_writes_journal(tmp_path, monkeypatch):
 
     journal = json.loads(journal_path.read_text(encoding="utf-8"))
 
-    assert journal == {
-        "entries": [
-            {
-                "id": "id-1",
-                "test_id": "test-2",
-                "status": "ok",
-                "comment": "Test réussi",
-                "created_at": "2026-08-18T11:00:00.000Z",
-            },
-            {
-                "id": "id-2",
-                "test_id": "test-1",
-                "status": "nok",
-                "comment": None,
-                "created_at": "2026-08-18T12:00:00.000Z",
-            },
-        ]
+    assert len(journal["entries"]) == 2
+
+    written_new_entry = next(
+        entry for entry in journal["entries"] if entry["id"] == "new-id"
+    )
+    written_existing_entry = next(
+        entry
+        for entry in journal["entries"]
+        if entry["id"] == "existing-id"
+    )
+
+    assert written_new_entry == {
+        **new_entry,
+        "etat": "RECU",
     }
+
+    assert written_existing_entry == existing_entry

@@ -16,7 +16,7 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version fonctionnelle documentée est **v5.36** (voir le [CHANGELOG](CHANGELOG.md)) ; la prod déployée reste en v5.31, v5.33+ en attente de validation manuelle avant déploiement. Le parcours de tests manuels de Marie (catalogue in-app, historique, archivage projet) est entièrement livré et validé sur des exports réels. Les listes peuvent désormais être organisées en catégories (création, sélection, navigation dédiée).
+La branche `sync-marie` (voir le [CHANGELOG](CHANGELOG.md)) livre une synchronisation automatique en arrière-plan des données de Marie vers Supabase, avec un indicateur de statut dans Paramètres — en remplacement progressif du flux manuel export/import. Cette branche est en retard sur `main` (dont la prod, plus avancée, intègre déjà le budget V3) ; un merge est nécessaire avant fusion.
 
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
 

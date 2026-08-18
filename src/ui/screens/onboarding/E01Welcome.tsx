@@ -8,6 +8,7 @@ const WHATS_NEW: string[] = [
   'Les flèches du bandeau de dates avancent maintenant d’une semaine à chaque clic, au lieu d’un jour.',
   'Vos listes peuvent maintenant être organisées en catégories : à la création, définissez-en une ou plusieurs. En ouvrant une liste, choisissez d’abord la catégorie, puis ses éléments s’affichent. Vous pouvez ajouter une catégorie à tout moment.',
   'Dans le budget, les catégories de dépenses sont maintenant regroupées sous « Semaine » et « Mois » pour s’y retrouver plus facilement.',
+  'Vos données de test sont désormais envoyées automatiquement au développeur en arrière-plan, sans action de votre part. Un indicateur dans Paramètres affiche la date de la dernière synchronisation.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

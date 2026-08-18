@@ -1,3 +1,9 @@
+## v5.37 — 2026-08-18
+
+### Ajouté
+- Synchronisation automatique des données de Marie vers Supabase, en arrière-plan (démarrage de l'app et retour au premier plan, throttlée). Un indicateur dans Paramètres affiche « vos données de test sont partagées avec le développeur » et la date de la dernière synchronisation réussie.
+- Accès développeur en lecture aux données synchronisées (`scripts/read_device_snapshots.py`).
+
 ## v5.36 — 2026-08-15
 
 ### Ajouté

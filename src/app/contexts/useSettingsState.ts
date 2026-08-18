@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/repositories'
+import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { createList } from '@/domain/rules/listRules'
 import { createTool } from '@/domain/rules/toolRules'
 import type { Settings } from '@/domain/entities/settings'
@@ -9,6 +10,7 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListCategory } from '@/domain/entities/listCategory'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
 import type { EnergyEntry } from '@/domain/entities/energyEntry'
@@ -89,58 +91,9 @@ export function useSettingsState() {
 
   async function exportData() {
     if (!currentUser) return
-    const [
-      user,
-      tasks,
-      taskRecurrences,
-      taskExceptions,
-      lists,
-      listItems,
-      folders,
-      tools,
-      energyEntries,
-      settingsData,
-      categories,
-      entries,
-      accounts,
-      deposits,
-      manualTestResults,
-    ] = await Promise.all([
-      userRepo.getFirst(),
-      db.tasks.toArray(),
-      db.taskRecurrences.toArray(),
-      db.taskExceptions.toArray(),
-      db.lists.toArray(),
-      db.listItems.toArray(),
-      db.folders.toArray(),
-      db.tools.toArray(),
-      db.energyEntries.toArray(),
-      settingsRepo.getByUserId(currentUser.id),
-      db.budgetCategories.toArray(),
-      db.budgetEntries.toArray(),
-      db.budgetAccounts.toArray(),
-      db.budgetDeposits.toArray(),
-      db.manualTestResults.toArray(),
-    ])
-    const payload = {
-      export_date: new Date().toISOString(),
-      version: '3.2',
-      user,
-      tasks,
-      task_recurrences: taskRecurrences,
-      task_exceptions: taskExceptions,
-      lists,
-      list_items: listItems,
-      folders,
-      tools,
-      energy_entries: energyEntries,
-      settings: settingsData,
-      budget_categories: categories,
-      budget_entries: entries,
-      budget_accounts: accounts,
-      budget_deposits: deposits,
-      manual_test_results: manualTestResults,
-    }
+    const snapshot = await buildSnapshotPayload()
+    if (!snapshot) return
+    const payload = { export_date: new Date().toISOString(), ...snapshot }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -158,6 +111,7 @@ export function useSettingsState() {
       db.settings.clear(),
       db.lists.clear(),
       db.listItems.clear(),
+      db.listCategories.clear(),
       db.budgetCategories.clear(),
       db.budgetEntries.clear(),
       db.budgetAccounts.clear(),
@@ -176,7 +130,9 @@ export function useSettingsState() {
    * l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export) en recréant
    * l'entrée Outil manquante pour chaque liste qui n'en a pas, ainsi que l'entrée Outil Budget
    * (`tableau_comptage`) si elle est absente. Les exports plus anciens sans résultats de tests
-   * manuels sont acceptés avec un historique vide.
+   * manuels sont acceptés avec un historique vide. Les exports antérieurs à v3.3 n'ont pas de
+   * catégories de listes : une catégorie « Général » par liste est recréée et les éléments
+   * orphelins y sont rattachés, faute de quoi ils resteraient invisibles.
    */
   async function importData(raw: unknown): Promise<ImportResult> {
     if (typeof raw !== 'object' || raw === null) {
@@ -198,6 +154,7 @@ export function useSettingsState() {
     const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
     const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
     const listItems = Array.isArray(data.list_items) ? (data.list_items as ListItem[]) : []
+    const listCategories = Array.isArray(data.list_categories) ? (data.list_categories as ListCategory[]) : []
     const folders = Array.isArray(data.folders) ? (data.folders as Folder[]) : []
     const tools = Array.isArray(data.tools) ? (data.tools as Tool[]) : []
     const energyEntries = Array.isArray(data.energy_entries) ? (data.energy_entries as EnergyEntry[]) : []
@@ -229,6 +186,26 @@ export function useSettingsState() {
       nextPosition += 1
     }
 
+    const repairedCategories = [...listCategories]
+    const knownCategoryIds = new Set(repairedCategories.map((c) => c.id))
+    const fallbackCategoryByList = new Map<string, string>()
+    const repairedListItems = listItems.map((item) => {
+      if (knownCategoryIds.has(item.category_id)) return item
+      let categoryId = fallbackCategoryByList.get(item.list_id)
+      if (!categoryId) {
+        categoryId = newId()
+        fallbackCategoryByList.set(item.list_id, categoryId)
+        repairedCategories.push({
+          id: categoryId,
+          list_id: item.list_id,
+          name: 'Général',
+          position: repairedCategories.filter((c) => c.list_id === item.list_id).length,
+          created_at: now,
+        })
+      }
+      return { ...item, category_id: categoryId }
+    })
+
     try {
       await clearDatabase()
       await db.users.add(user)
@@ -237,7 +214,8 @@ export function useSettingsState() {
         taskRecurrences.length ? db.taskRecurrences.bulkAdd(taskRecurrences) : Promise.resolve(),
         taskExceptions.length ? db.taskExceptions.bulkAdd(taskExceptions) : Promise.resolve(),
         lists.length ? db.lists.bulkAdd(lists) : Promise.resolve(),
-        listItems.length ? db.listItems.bulkAdd(listItems) : Promise.resolve(),
+        repairedListItems.length ? db.listItems.bulkAdd(repairedListItems) : Promise.resolve(),
+        repairedCategories.length ? db.listCategories.bulkAdd(repairedCategories) : Promise.resolve(),
         folders.length ? db.folders.bulkAdd(folders) : Promise.resolve(),
         repairedTools.length ? db.tools.bulkAdd(repairedTools) : Promise.resolve(),
         energyEntries.length ? db.energyEntries.bulkAdd(energyEntries) : Promise.resolve(),

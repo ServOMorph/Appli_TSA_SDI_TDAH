@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-14 (suite 10, badge énergie couleur d'ambiance) (archivé depuis contexte.md 2026-08-18, Phases 1-3 sync-marie)
+- Retour de test manuel de Marie (screenshot annoté) traité — badge énergie de `TopBar.tsx` allégé (retrait du libellé « planifié / dispo ») et fond teinté avec `Settings.ambiance_color` (`pastelBackground`, réutilisé de `ambiance.ts`) plutôt qu'une couleur fixe, après correction explicite de l'utilisateur sur une première implémentation codée en dur. Point de test manuel visuel ajouté à `tests_manuels.md`. 67/67 tests du périmètre touché, `tsc -b` clean.
+
 ## 2026-08-14 (Phase 3 tests manuels Marie, bannière urgence) (archivé depuis contexte.md 2026-08-15, setup projet Supabase)
 - Format du journal projet tranché avec l'utilisateur — JSON structuré, `_contexte/marie_tests_journal.json`. `scripts/ingest_manual_tests.py` livré et testé (export factice, dédoublonnage par `id` vérifié). L'export existant de Marie (13/08) s'est révélé antérieur à la fonctionnalité (pas de `manual_test_results`), invalidant l'hypothèse qu'il pouvait servir au test réel de la Phase 3. Bannière urgente ajoutée sur l'accueil et « Tests à faire » pour obtenir un nouvel export après ce déploiement. `WHATS_NEW` mis à jour. `tsc -b`/tests verts, aucune régression.
 

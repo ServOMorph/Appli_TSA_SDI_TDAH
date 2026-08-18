@@ -21,6 +21,7 @@ import { usePlanningState } from '@/app/contexts/usePlanningState'
 import { useManualTestsState } from '@/app/contexts/useManualTestsState'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
+import { syncNow } from '@/data/sync/syncClient'
 
 export type { Screen, Route } from '@/app/navigation'
 export type { PlannedSubTask } from '@/app/contexts/usePlanningState'
@@ -131,6 +132,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           const entry = await energyRepo.getByDate(todayDate())
           await loadAll()
           setStack([{ name: entry ? 'dashboard' : 'energy-checkin' }])
+          void syncNow()
         }
       } catch (error) {
         console.error("Échec de l'initialisation de l'application", error)
@@ -140,6 +142,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
     init()
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') void syncNow()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange)
   }, [])
 
   async function wipeAllData() {

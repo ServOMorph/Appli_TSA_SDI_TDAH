@@ -1,8 +1,8 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-15)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-18)
 
 ## Contexte chaud
-- Branche `sync-marie` créée : chantier de synchronisation automatique des données de Marie vers un backend Supabase (remplace le flux manuel export JSON/envoi/ingestion). Roadmap `roadmap_sync_marie.md` (4 phases, toutes `[TODO]`). Décisions actées : toutes les données applicatives de Marie concernées, pas d'écran de connexion (secret généré par appareil), statut visible dans Paramètres (« vos données de test sont partagées avec le développeur »), sauvegarde régulière (fréquence à trancher en Phase 2). Ajout des nouveautés/tests manuels reste sur l'édition de fichiers actuelle, hors périmètre.
-- Prérequis externe de `roadmap_sync_marie.md` rempli (2026-08-15) : projet Supabase créé par l'utilisateur (réf. projet `aslxfetpkuytrqwidxig`, région Frankfurt/UE), API de données activée, affichage automatique des nouvelles tables désactivé, RLS automatique activé (aligné avec la politique d'accès par secret d'appareil prévue Phase 1). Clés (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` — nouveau système de clés Supabase, clé publiable et non l'ancienne `anon`) ajoutées à `.env` et aux variables d'environnement du site Netlify de prod. Aucun code Phase 1 écrit cette session (guidage setup uniquement).
+- Branche `sync-marie` : Phases 1 à 3 de `roadmap_sync_marie.md` livrées et testées (schéma Supabase, client de sync throttlé, `SyncStatusCard` dans Paramètres). Phase 4 entamée partiellement (accès développeur en lecture `scripts/read_device_snapshots.py`) ; retrait des bannières et révision de `deploy.md` volontairement reportés — bloqués sur un test manuel de sync réelle avec l'appareil de Marie, hors de portée en session.
+- **Divergence critique `sync-marie` / `main`** : la branche n'a pas été mise à jour depuis sa création (base commune `8188371`, 2026-08-16). `main` a depuis livré l'intégralité de `roadmap_budget_v3` (6 phases) et déployé v5.47 puis v5.49 en prod — aucun de ces commits n'est sur `sync-marie`. Un merge/rebase de `main` dans `sync-marie` sera nécessaire avant toute fusion ou déploiement de la sync, avec conflits probables sur les fichiers touchés des deux côtés (`E110Settings.tsx`, `useSettingsState.ts`, `AppContext.tsx`, `package.json`, `CHANGELOG.md`, `db.ts`). Non traité cette session — hors périmètre du travail demandé.
 - `donnees_marie/export-audhd-2026-08-13.json` : export réel de Marie, stocké en local, gitignoré et déclaré donnée sensible dans `CLAUDE.md` — ne pas lire/écrire sans instruction explicite. Deux exports plus récents reçus hors de ce dossier (Downloads, 2026-08-14 15h10 et 17h40) ont été analysés et ingérés dans la session, non copiés dans `donnees_marie/`.
 - `_contexte/dernier_deploiement.md` : consigné par `/deploy` lui-même (version/date/URL), indépendamment de `/close`. Dernier déploiement prod : v5.31, 2026-08-14 — **le correctif Budget de cette session n'y est pas encore inclus**, ce `/deploy` va le publier.
 - `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` désormais géré par cycle `/close` (ajoute une entrée en langage clair si changement visible pour Marie) / `/deploy` (vide le tableau après publication). Affichage de la modale conditionné à `VITE_APP_VERSION` (`localStorage`), ne se réaffiche plus une fois fermée pour une version donnée. `WHATS_NEW` contient 4 entrées en attente de publication (accueil/planning fusionnés, flèches en pas d'une semaine, catégories de listes, budget regroupé Semaine/Mois).
@@ -12,8 +12,9 @@
 - Bug « Budget disparu à l'import » : cause identifiée et corrigée dans `useSettingsState.ts` — la réparation des `tools` à l'import ne recréait que les entrées `liste` manquantes, jamais l'entrée globale `tableau_comptage` (celle qui pilote la carte Budget de `E70Tools.tsx`). Un compte qui en était déjà dépourvu (cas de Marie) ne la récupérait donc jamais. Corrigé : la réparation couvre maintenant aussi cette entrée.
 
 ## Questions ouvertes
+- [P1] Séquence de validation Phase 4 `roadmap_sync_marie.md`, dans l'ordre : (1) exécuter `supabase/schema.sql` dans le SQL Editor du projet Supabase — jamais fait à ce jour, table `device_snapshots` inexistante côté serveur ; (2) compléter `.env` avec `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` (dashboard Supabase, section service_role) ; (3) régler la divergence `sync-marie`/`main` (voir Contexte chaud) avant fusion/déploiement ; (4) `/deploy` ; (5) faire ouvrir l'app à Marie ; (6) vérifier `SyncStatusCard` côté Marie et `python scripts/read_device_snapshots.py` côté développeur. — fait quand : ligne renvoyée par `read_device_snapshots.py` avec `device_id` de Marie et `synced_at` récent — réf : `roadmap_sync_marie.md` Phase 4, `supabase/schema.sql`
 - [P1] Confirmer si les variables Supabase (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) ont aussi été ajoutées au site de test Netlify (dev, `appli-audhd-dev.netlify.app`), pas seulement à la prod — demandé explicitement par l'utilisateur à rediscuter en session suivante. — fait quand : confirmé fait ou décidé non nécessaire — réf : `roadmap_sync_marie.md` Prérequis externe
-- [P1] Démarrer la Phase 1 de `roadmap_sync_marie.md` (schéma de tables, client Supabase) — prérequis externe rempli, basculer sur le modèle Opus avant de démarrer (migration structurelle, cf. roadmap). — fait quand : Phase 1 checklist complétée — réf : `roadmap_sync_marie.md` Phase 1
+- [P2] `npm run lint` échoue sur `src/data/db.ts:308` (`_section` assigné jamais utilisé) — code de migration Dexie v12 non modifié cette session, pré-existant, cause exacte (bump de dépendance ? config eslint durcie ?) non investiguée. — fait quand : lint corrigé ou cause identifiée et jugée non bloquante — réf : `src/data/db.ts:308`
 - [P1] Transmettre `tests_manuels.md` à Marie : c'est elle qui valide les 8 points sur son appareil réel (création d'outil sans dossier, suppression de liste, retrait sur livret, dialogue d'ajout d'élément, badge énergie fond couleur d'ambiance, import de sauvegarde JSON, accueil/planning fusionnés, catégories de listes), pas l'utilisateur — correction actée cette session. Une fois validés, relancer `/deploy` (v5.36, tests/`tsc -b` vérifiés verts — build jamais lancé, `dist/v5.36` n'existe pas). Puis clore la Phase V5.1-0 (les 4 premiers points seulement conditionnent la phase). — fait quand : les 8 points validés par Marie, `tests_manuels.md` vidé, v5.36 déployée — réf : `tests_manuels.md`, `roadmap_v5.1.md` Phase V5.1-0
 - [P1] Une fois v5.33 déployée, redemander à Marie de réimporter son fichier (Paramètres > Export et import — bannière urgente déjà en place) et de revalider dans « Tests à faire » les 4 tests en échec de son export du 2026-08-14 17h40 : « Retirer de l'argent d'un livret », « Utiliser le budget », « Importer une sauvegarde » (tous les trois « pas accès au budget » / « il manque le budget », cause commune déjà corrigée) et confirmer la réapparition du Budget. — fait quand : ces 4 tests validés dans un nouvel export ingéré — réf : `_contexte/marie_tests_journal.json`, `useSettingsState.ts`
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `roadmap_v5.1.md` § Q à trancher
@@ -21,7 +22,33 @@
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 
-## Dernière session (2026-08-16 — clôture des points de communication Marie)
+## Dernière session (2026-08-18 — Phases 1-3 sync-marie livrées, Phase 4 entamée partiellement)
+
+## Décisions prises
+- Phase 3 `roadmap_sync_marie.md` livrée : `SyncStatusCard` dans Paramètres, sans bascule marche/arrêt (hors périmètre de la phase, signalé à l'utilisateur).
+- Phase 4 réduite au point 1 seul (accès développeur en lecture) sur choix explicite de l'utilisateur : retrait des bannières et révision de `deploy.md` restent bloqués sur un test manuel de sync réelle avec l'appareil de Marie, hors de ma portée.
+
+## Livrables produits ou modifiés
+- `src/ui/components/SyncStatusCard.tsx`(`.test.tsx`) : créé, indicateur de statut + date de dernière sync.
+- `src/ui/screens/settings/E110Settings.tsx` : `SyncStatusCard` intégrée.
+- `src/data/sync/supabaseClient.ts` : export `isSyncEnabled()`.
+- `scripts/read_device_snapshots.py` : créé, lecture développeur de `device_snapshots` via clé service_role.
+- `.env.example` : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` ajoutées.
+
+## Hypothèses validées / invalidées
+- EN ATTENTE : `supabase/schema.sql` jamais exécuté côté projet Supabase — table `device_snapshots` inexistante à ce jour.
+- EN ATTENTE : sync réelle avec l'appareil de Marie non testée, bloque la suite de la Phase 4.
+- INVALIDE : hypothèse implicite que `sync-marie` pouvait être fusionnée simplement — la branche est très en retard sur `main` (roadmap_budget_v3 entier + v5.47/v5.49 manquants), un merge/rebase est nécessaire avant toute fusion.
+
+## Prochaine étape exacte
+Suivre la séquence en 6 points de la question ouverte P1 dédiée (SQL, `.env`, résolution de la divergence avec `main`, `/deploy`, usage réel par Marie, double vérification). Reprendre ensuite le reste de la Phase 4 (bannières, `deploy.md`).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-16 — clôture des points de communication Marie)
 
 ## Décisions prises
 - Adresse de test communiquée à Marie confirmée faite (`appli-audhd.netlify.app` à la place de l'ancienne URL).

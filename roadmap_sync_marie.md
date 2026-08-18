@@ -19,7 +19,7 @@ Backend Supabase (région UE, cf. `contexte.md`) — projet créé par l'utilisa
 
 ---
 
-## Phase 1 — Backend : schéma et projet Supabase [TODO]
+## Phase 1 — Backend : schéma et projet Supabase [FAIT]
 
 > Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase (migration structurelle).
 
@@ -33,7 +33,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — Client de synchronisation [TODO]
+## Phase 2 — Client de synchronisation [FAIT]
 
 - Génération et stockage local (`localStorage`) d'un secret d'appareil unique à la première ouverture.
 - Fonction de sync : sérialise les tables Dexie, pousse vers Supabase avec le secret en en-tête.
@@ -46,7 +46,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Statut visible côté Marie [TODO]
+## Phase 3 — Statut visible côté Marie [FAIT]
 
 - Nouvel indicateur dans Paramètres (zone à définir, cohérente avec l'écran existant) : « vos données de test sont partagées avec le développeur », avec date/heure de dernière synchronisation réussie.
 - Pas de bascule marche/arrêt dans le périmètre de cette phase (à signaler si l'utilisateur en veut une).
@@ -57,9 +57,9 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Bascule et retrait du flux manuel [TODO]
+## Phase 4 — Bascule et retrait du flux manuel [EN COURS]
 
-- Accès côté développeur pour lire les données remontées (script ou requête Supabase), en remplacement de l'ingestion des fichiers d'export (`scripts/ingest_manual_tests.py`, `_contexte/marie_tests_journal.json`).
+- [FAIT] Accès côté développeur pour lire les données remontées (script ou requête Supabase), en remplacement de l'ingestion des fichiers d'export (`scripts/ingest_manual_tests.py`, `_contexte/marie_tests_journal.json`). Livré : `scripts/read_device_snapshots.py`. Reste à exécuter `supabase/schema.sql` côté projet Supabase avant premier usage réel.
 - Retrait des bannières urgentes demandant réimport/réexport (`E01Welcome.tsx`, `E121ManualTests.tsx`) une fois la sync confirmée fonctionnelle en conditions réelles avec Marie.
 - `.claude/commands/deploy.md` étape 0 (traitement des exports de Marie) à réviser ou retirer en conséquence.
 - Test manuel : sync réelle depuis l'appareil de Marie confirmée reçue côté Supabase.

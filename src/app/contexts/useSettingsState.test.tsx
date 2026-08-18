@@ -34,6 +34,20 @@ function SettingsPanel() {
       >
         Importer sans outil Budget
       </button>
+      <button
+        onClick={() =>
+          importData({
+            user: { id: 'imported-user', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+            lists: [{ id: 'list-1', name: 'Courses', created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' }],
+            list_items: [
+              { id: 'item-1', list_id: 'list-1', title: 'Pain', position: 0, checked: false, category_id: 'categorie-disparue', created_at: '2026-01-01T00:00:00.000Z' },
+              { id: 'item-2', list_id: 'list-1', title: 'Lait', position: 1, checked: false, category_id: 'categorie-disparue', created_at: '2026-01-01T00:00:00.000Z' },
+            ],
+          })
+        }
+      >
+        Importer un export v3.2
+      </button>
     </>
   )
 }
@@ -66,7 +80,7 @@ describe('useSettingsState — résultats des tests manuels', () => {
     })
 
     const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
-    expect(payload.version).toBe('3.2')
+    expect(payload.version).toBe('3.3')
     expect(payload.manual_test_results).toEqual([
       { id: 'exported-result', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T09:00:00.000Z' },
     ])
@@ -91,6 +105,43 @@ describe('useSettingsState — résultats des tests manuels', () => {
     await waitFor(async () => {
       const tools = await toolRepo.getAll()
       expect(tools.some((t) => t.type === 'tableau_comptage')).toBe(true)
+    })
+  })
+
+  it('exporte les catégories de listes', async () => {
+    const createObjectURL = vi.fn().mockReturnValue('blob:test')
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL: vi.fn() })
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    await db.listCategories.add({ id: 'cat-1', list_id: 'list-1', name: 'Frais', position: 0, created_at: '2026-01-01T00:00:00.000Z' })
+
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Exporter' }))
+    })
+
+    const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
+    expect(payload.list_categories).toEqual([
+      { id: 'cat-1', list_id: 'list-1', name: 'Frais', position: 0, created_at: '2026-01-01T00:00:00.000Z' },
+    ])
+    clickSpy.mockRestore()
+    vi.unstubAllGlobals()
+  })
+
+  it('rattache les éléments orphelins à une catégorie recréée pour un export v3.2', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer un export v3.2' }))
+    })
+    await waitFor(async () => {
+      const categories = await db.listCategories.toArray()
+      expect(categories).toHaveLength(1)
+      expect(categories[0]).toMatchObject({ list_id: 'list-1', name: 'Général', position: 0 })
+
+      const items = await db.listItems.toArray()
+      expect(items).toHaveLength(2)
+      expect(items.every((i) => i.category_id === categories[0].id)).toBe(true)
     })
   })
 })

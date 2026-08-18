@@ -11,6 +11,8 @@ from ROBERTO.workflow import traiter_entree  # noqa: E402
 
 JOURNAL_PATH = PROJECT_ROOT / "_contexte" / "marie_tests_journal.json"
 
+ETATS_VALIDES = {"RECU", "ANALYSE", "CORRECTIONS", "INTEGRE"}
+
 
 def load_json(path: Path) -> dict:
     try:
@@ -59,6 +61,14 @@ def traiter_entree_du_journal(
         raise ValueError(f"Entrée introuvable dans le journal : {entry_id}")
 
     entree = journal["entries"][entry_index]
+
+    if entree.get("etat") not in ETATS_VALIDES:
+        raise ValueError(
+            f"État invalide pour l'entrée {entry_id!r} : "
+            f"{entree.get('etat')!r}. États acceptés : "
+            f"{sorted(ETATS_VALIDES)}."
+        )
+
     entree_modifiee = traiter_entree(entree, action)
 
     journal["entries"][entry_index] = entree_modifiee

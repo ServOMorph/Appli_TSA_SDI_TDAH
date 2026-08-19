@@ -54,10 +54,15 @@ const REPORTED_BADGE_STYLE: React.CSSProperties = {
   flexShrink: 0,
 }
 
-const dateStripStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
+function dateStripStyle(ambianceColor: string): React.CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    border: `2px solid ${ambianceColor}`,
+    borderRadius: 'var(--radius-md)',
+    padding: '2px',
+  }
 }
 
 function dayCellStyle(isDisplayed: boolean): React.CSSProperties {
@@ -288,6 +293,8 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   const effectiveDate = collapsed ? todayStr() : displayDate
   const displayDateRef = useRef(effectiveDate)
   const touchStartX = useRef<number | null>(null)
+  const [dragOffset, setDragOffset] = useState(0)
+  const [dragging, setDragging] = useState(false)
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
   const [stripCenter, setStripCenter] = useState(() =>
     route.name === 'planning' && route.date ? route.date : todayStr(),
@@ -366,9 +373,18 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
 
   function handleTouchStart(event: React.TouchEvent) {
     touchStartX.current = event.touches[0]?.clientX ?? null
+    setDragging(true)
+  }
+
+  function handleTouchMove(event: React.TouchEvent) {
+    if (touchStartX.current === null) return
+    const currentX = event.touches[0]?.clientX ?? touchStartX.current
+    setDragOffset(currentX - touchStartX.current)
   }
 
   function handleTouchEnd(event: React.TouchEvent) {
+    setDragging(false)
+    setDragOffset(0)
     if (touchStartX.current === null) return
     const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
     const delta = endX - touchStartX.current
@@ -411,7 +427,16 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
           </button>
         )}
       </div>
-      <div style={dateStripStyle} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div
+        style={{
+          ...dateStripStyle(ambianceColor),
+          transform: `translateX(${dragOffset}px)`,
+          transition: dragging ? 'none' : 'transform 0.2s ease-out',
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {dateStrip(stripCenter, DATE_STRIP_RADIUS).map((d) => {
           const badge = formatDayBadge(d)
           const isDisplayed = d === displayDate

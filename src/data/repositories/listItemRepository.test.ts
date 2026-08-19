@@ -24,7 +24,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     const id = await repo.create(item)
@@ -38,7 +38,7 @@ describe('ListItemRepository', () => {
       title: 'My item',
       position: 0,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -53,7 +53,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     const item2: ListItem = {
@@ -62,7 +62,7 @@ describe('ListItemRepository', () => {
       title: 'Item 2',
       position: 1,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     const item3: ListItem = {
@@ -71,7 +71,7 @@ describe('ListItemRepository', () => {
       title: 'Item 3',
       position: 0,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item1)
@@ -89,7 +89,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      category_id: 'cat-a',
+      category_id: 'cat-a', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     const item2: ListItem = {
@@ -98,7 +98,7 @@ describe('ListItemRepository', () => {
       title: 'Item 2',
       position: 1,
       checked: false,
-      category_id: 'cat-b',
+      category_id: 'cat-b', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item1)
@@ -115,7 +115,7 @@ describe('ListItemRepository', () => {
       title: 'Original',
       position: 0,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -132,7 +132,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item)
@@ -148,7 +148,7 @@ describe('ListItemRepository', () => {
       title: 'Item 1',
       position: 0,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     const item2: ListItem = {
@@ -157,7 +157,7 @@ describe('ListItemRepository', () => {
       title: 'Item 2',
       position: 1,
       checked: false,
-      category_id: 'cat-1',
+      category_id: 'cat-1', description: '',
       created_at: '2026-06-29T00:00:00Z',
     }
     await repo.create(item1)

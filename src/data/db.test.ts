@@ -30,7 +30,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(15)
+    expect(db.verno).toBe(17)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -210,7 +210,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(15)
+    expect(upgraded.verno).toBe(17)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -294,7 +294,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(15)
+    expect(upgraded.verno).toBe(17)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -333,7 +333,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(15)
+    expect(upgraded.verno).toBe(17)
 
     const migratedItem = await upgraded.listItems.get('existing-item')
     expect(migratedItem).toMatchObject({ checked: false })
@@ -386,7 +386,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(15)
+    expect(upgraded.verno).toBe(17)
     const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
     expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
 
@@ -432,13 +432,102 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(15)
+    expect(upgraded.verno).toBe(17)
     expect(await upgraded.budgetCategories.get('income-1')).toBeUndefined()
     expect(await upgraded.budgetCategories.get('expense-1')).toBeDefined()
 
     const incomeEntries = await upgraded.budgetIncomeEntries.toArray()
     expect(incomeEntries).toHaveLength(1)
     expect(incomeEntries[0]).toMatchObject({ amount: 1500, label: 'Salaire' })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 15 database by adding a default description to list items and a sub-tasks table', async () => {
+    const name = `migration-v16-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(15).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+      lists: 'id',
+      listItems: 'id, list_id, position, checked, category_id',
+      listCategories: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
+      budgetIncomeEntries: 'id, date',
+      taskRecurrences: 'id',
+      taskExceptions: 'id, recurrence_id',
+      folders: 'id, position',
+      tools: 'id, type, folder_id, position',
+      manualTestResults: 'id, test_id',
+    })
+    await legacy.open()
+    await legacy.table('lists').add({ id: 'list-1', name: 'À acheter', created_at: '2026-08-18T00:00:00Z', updated_at: '2026-08-18T00:00:00Z' })
+    await legacy.table('listItems').add({
+      id: 'item-1',
+      list_id: 'list-1',
+      title: 'Pain',
+      position: 0,
+      checked: false,
+      category_id: 'cat-1',
+      created_at: '2026-08-18T00:00:00Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(17)
+    expect(await upgraded.listItems.get('item-1')).toMatchObject({ description: '' })
+    expect(upgraded.listItemSubTasks).toBeDefined()
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 16 database by adding a default color to tools', async () => {
+    const name = `migration-v17-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(16).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+      lists: 'id',
+      listItems: 'id, list_id, position, checked, category_id',
+      listItemSubTasks: 'id, list_item_id, position',
+      listCategories: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
+      budgetIncomeEntries: 'id, date',
+      taskRecurrences: 'id',
+      taskExceptions: 'id, recurrence_id',
+      folders: 'id, position',
+      tools: 'id, type, folder_id, position',
+      manualTestResults: 'id, test_id',
+    })
+    await legacy.open()
+    await legacy.table('tools').add({
+      id: 'tool-1',
+      type: 'liste',
+      folder_id: null,
+      list_id: 'list-1',
+      position: 0,
+      created_at: '2026-08-18T00:00:00Z',
+      updated_at: '2026-08-18T00:00:00Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(17)
+    expect(await upgraded.tools.get('tool-1')).toMatchObject({ color: null })
 
     await upgraded.delete()
   })

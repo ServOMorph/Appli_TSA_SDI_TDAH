@@ -1,18 +1,22 @@
 import { useCallback, useState } from 'react'
-import { listCategoryRepo, listItemRepo, listRepo, newId } from '@/app/repositories'
+import { listCategoryRepo, listItemRepo, listItemSubTaskRepo, listRepo, newId } from '@/app/repositories'
 import {
   createList as createListRule,
   createListCategory as createListCategoryRule,
   createListItem as createListItemRule,
+  createListItemSubTask as createListItemSubTaskRule,
   toggleListItemChecked as toggleListItemCheckedRule,
+  toggleListItemSubTaskChecked as toggleListItemSubTaskCheckedRule,
 } from '@/domain/rules/listRules'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 import type { ListCategory } from '@/domain/entities/listCategory'
 
 export function useListsState() {
   const [lists, setLists] = useState<List[]>([])
   const [selectedListId, setSelectedListId] = useState<string | null>(null)
+  const [selectedListItemId, setSelectedListItemId] = useState<string | null>(null)
 
   async function load() {
     setLists(await listRepo.getAll())
@@ -21,6 +25,7 @@ export function useListsState() {
   function reset() {
     setLists([])
     setSelectedListId(null)
+    setSelectedListItemId(null)
   }
 
   async function createList(name: string): Promise<string> {
@@ -41,7 +46,7 @@ export function useListsState() {
 
   async function deleteList(id: string) {
     const items = await listItemRepo.getByListId(id)
-    await Promise.all(items.map((item) => listItemRepo.delete(item.id)))
+    await Promise.all(items.map((item) => deleteListItem(item.id)))
     const categories = await listCategoryRepo.getByListId(id)
     await Promise.all(categories.map((category) => listCategoryRepo.delete(category.id)))
     await listRepo.delete(id)
@@ -72,7 +77,7 @@ export function useListsState() {
 
   async function deleteListCategory(id: string) {
     const items = await listItemRepo.getByCategoryId(id)
-    await Promise.all(items.map((item) => listItemRepo.delete(item.id)))
+    await Promise.all(items.map((item) => deleteListItem(item.id)))
     await listCategoryRepo.delete(id)
   }
 
@@ -84,6 +89,8 @@ export function useListsState() {
   }
 
   async function deleteListItem(id: string) {
+    const subTasks = await listItemSubTaskRepo.getByListItemId(id)
+    await Promise.all(subTasks.map((subTask) => listItemSubTaskRepo.delete(subTask.id)))
     await listItemRepo.delete(id)
   }
 
@@ -93,14 +100,48 @@ export function useListsState() {
     await listItemRepo.update(toggleListItemCheckedRule(item))
   }
 
+  const getListItem = useCallback(async (id: string): Promise<ListItem | undefined> => {
+    return listItemRepo.getById(id)
+  }, [])
+
+  async function updateListItemDescription(id: string, description: string) {
+    const item = await listItemRepo.getById(id)
+    if (!item) return
+    await listItemRepo.update({ ...item, description })
+  }
+
+  const getListItemSubTasks = useCallback(async (listItemId: string): Promise<ListItemSubTask[]> => {
+    return listItemSubTaskRepo.getByListItemId(listItemId)
+  }, [])
+
+  async function addListItemSubTask(listItemId: string, title: string) {
+    const existing = await listItemSubTaskRepo.getByListItemId(listItemId)
+    const now = new Date().toISOString()
+    const subTask = createListItemSubTaskRule(newId(), listItemId, title, existing.length, now)
+    await listItemSubTaskRepo.create(subTask)
+  }
+
+  async function toggleListItemSubTask(id: string) {
+    const subTask = await listItemSubTaskRepo.getById(id)
+    if (!subTask) return
+    await listItemSubTaskRepo.update(toggleListItemSubTaskCheckedRule(subTask))
+  }
+
+  async function deleteListItemSubTask(id: string) {
+    await listItemSubTaskRepo.delete(id)
+  }
+
   return {
     lists,
     selectedListId,
     selectList: setSelectedListId,
+    selectedListItemId,
+    selectListItem: setSelectedListItemId,
     createList,
     renameList,
     deleteList,
     getListItems,
+    getListItem,
     getListCategories,
     createListCategory,
     renameListCategory,
@@ -108,6 +149,11 @@ export function useListsState() {
     addListItem,
     deleteListItem,
     toggleListItem,
+    updateListItemDescription,
+    getListItemSubTasks,
+    addListItemSubTask,
+    toggleListItemSubTask,
+    deleteListItemSubTask,
     load,
     reset,
   }

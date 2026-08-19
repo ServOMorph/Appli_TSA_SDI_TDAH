@@ -1,3 +1,15 @@
+## v5.51 — 2026-08-19
+
+### Ajouté
+- Détail d'un élément de liste (E62) : description et sous-tâches, ouvrable en touchant le titre d'un élément.
+- Chaque outil (liste, budget...) peut avoir sa propre couleur de fond (sélecteur sur la carte, `E70Tools`/`E72FolderDetail`).
+- Suppression d'une seule catégorie de liste, sans supprimer toute la liste.
+
+### Modifié
+- Une tâche sans couleur choisie n'est plus teintée par la couleur d'ambiance dans le planning.
+- Badge énergie de l'accueil : accès direct à l'écran de modification, sans écran de consultation intermédiaire.
+- Bandeau de dates du planning : encadré par la couleur d'ambiance, glissement tactile suivi en continu avec retour animé.
+
 ## v5.50 — 2026-08-18
 
 ### Modifié

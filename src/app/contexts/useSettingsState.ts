@@ -9,6 +9,7 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 import type { ListCategory } from '@/domain/entities/listCategory'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
@@ -98,6 +99,7 @@ export function useSettingsState() {
       taskExceptions,
       lists,
       listItems,
+      listItemSubTasks,
       listCategories,
       folders,
       tools,
@@ -116,6 +118,7 @@ export function useSettingsState() {
       db.taskExceptions.toArray(),
       db.lists.toArray(),
       db.listItems.toArray(),
+      db.listItemSubTasks.toArray(),
       db.listCategories.toArray(),
       db.folders.toArray(),
       db.tools.toArray(),
@@ -130,13 +133,14 @@ export function useSettingsState() {
     ])
     const payload = {
       export_date: new Date().toISOString(),
-      version: '3.4',
+      version: '3.5',
       user,
       tasks,
       task_recurrences: taskRecurrences,
       task_exceptions: taskExceptions,
       lists,
       list_items: listItems,
+      list_item_sub_tasks: listItemSubTasks,
       list_categories: listCategories,
       folders,
       tools,
@@ -166,6 +170,7 @@ export function useSettingsState() {
       db.settings.clear(),
       db.lists.clear(),
       db.listItems.clear(),
+      db.listItemSubTasks.clear(),
       db.listCategories.clear(),
       db.budgetCategories.clear(),
       db.budgetEntries.clear(),
@@ -188,7 +193,9 @@ export function useSettingsState() {
    * (`tableau_comptage`) si elle est absente. Les exports plus anciens sans résultats de tests
    * manuels sont acceptés avec un historique vide. Les exports antérieurs à v3.3 (avant l'ajout
    * de `list_categories`) sont acceptés en recréant une catégorie par valeur de `section` sur
-   * les éléments de liste, comme le fait la migration Dexie v12 à l'installation.
+   * les éléments de liste, comme le fait la migration Dexie v12 à l'installation. Les exports
+   * antérieurs à v3.5 (avant `description`/`list_item_sub_tasks`) sont acceptés avec une
+   * description vide par défaut et aucune sous-tâche.
    */
   async function importData(raw: unknown): Promise<ImportResult> {
     if (typeof raw !== 'object' || raw === null) {
@@ -210,6 +217,9 @@ export function useSettingsState() {
     const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
     const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
     const rawListItems = Array.isArray(data.list_items) ? (data.list_items as (ListItem & { section?: string | null })[]) : []
+    const listItemSubTasks = Array.isArray(data.list_item_sub_tasks)
+      ? (data.list_item_sub_tasks as ListItemSubTask[])
+      : []
     const listCategories = Array.isArray(data.list_categories) ? (data.list_categories as ListCategory[]) : []
     const folders = Array.isArray(data.folders) ? (data.folders as Folder[]) : []
     const tools = Array.isArray(data.tools) ? (data.tools as Tool[]) : []
@@ -259,7 +269,7 @@ export function useSettingsState() {
     const categoryIdByListAndName = new Map(repairedCategories.map((c) => [`${c.list_id}::${c.name}`, c.id]))
 
     const repairedListItems: ListItem[] = rawListItems.map((item) => {
-      if (item.category_id) return item
+      if (item.category_id) return { ...item, description: item.description ?? '' }
       const name = item.section ?? 'Général'
       const key = `${item.list_id}::${name}`
       let categoryId = categoryIdByListAndName.get(key)
@@ -278,6 +288,7 @@ export function useSettingsState() {
         checked: item.checked,
         created_at: item.created_at,
         category_id: categoryId,
+        description: item.description ?? '',
       }
     })
 
@@ -290,6 +301,7 @@ export function useSettingsState() {
         taskExceptions.length ? db.taskExceptions.bulkAdd(taskExceptions) : Promise.resolve(),
         lists.length ? db.lists.bulkAdd(lists) : Promise.resolve(),
         repairedListItems.length ? db.listItems.bulkAdd(repairedListItems) : Promise.resolve(),
+        listItemSubTasks.length ? db.listItemSubTasks.bulkAdd(listItemSubTasks) : Promise.resolve(),
         repairedCategories.length ? db.listCategories.bulkAdd(repairedCategories) : Promise.resolve(),
         folders.length ? db.folders.bulkAdd(folders) : Promise.resolve(),
         repairedTools.length ? db.tools.bulkAdd(repairedTools) : Promise.resolve(),

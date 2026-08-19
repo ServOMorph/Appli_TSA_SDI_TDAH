@@ -48,6 +48,20 @@ function SettingsPanel() {
       >
         Importer format sans catégories
       </button>
+      <button
+        onClick={() =>
+          importData({
+            user: { id: 'imported-user', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+            lists: [{ id: 'list-1', name: 'À acheter', created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' }],
+            list_categories: [{ id: 'cat-1', list_id: 'list-1', name: 'Général', position: 0, created_at: '2026-01-01T00:00:00.000Z' }],
+            list_items: [
+              { id: 'item-1', list_id: 'list-1', title: 'Griffoir', position: 0, checked: false, category_id: 'cat-1', created_at: '2026-01-01T00:00:00.000Z' },
+            ],
+          })
+        }
+      >
+        Importer format sans description ni sous-tâches
+      </button>
     </>
   )
 }
@@ -80,7 +94,7 @@ describe('useSettingsState — résultats des tests manuels', () => {
     })
 
     const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
-    expect(payload.version).toBe('3.4')
+    expect(payload.version).toBe('3.5')
     expect(payload.manual_test_results).toEqual([
       { id: 'exported-result', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T09:00:00.000Z' },
     ])
@@ -125,6 +139,19 @@ describe('useSettingsState — résultats des tests manuels', () => {
       const poufs = items.find((item) => item.title === 'Poufs')
       expect(categories.find((c) => c.id === griffoir?.category_id)?.name).toBe('Général')
       expect(categories.find((c) => c.id === poufs?.category_id)?.name).toBe('Appartement')
+    })
+  })
+
+  it('accepte un export antérieur à v3.5 sans description ni sous-tâches', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer format sans description ni sous-tâches' }))
+    })
+    await waitFor(async () => {
+      const items = await listItemRepo.getByListId('list-1')
+      expect(items).toHaveLength(1)
+      expect(items[0].description).toBe('')
+      expect(await db.listItemSubTasks.toArray()).toEqual([])
     })
   })
 })

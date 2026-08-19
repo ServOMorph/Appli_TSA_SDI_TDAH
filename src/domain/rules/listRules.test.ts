@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { createList, createListCategory, createListItem, toggleListItemChecked } from './listRules'
+import {
+  createList,
+  createListCategory,
+  createListItem,
+  toggleListItemChecked,
+  createListItemSubTask,
+  toggleListItemSubTaskChecked,
+} from './listRules'
 
 describe('createList', () => {
   it('crée une liste avec les champs attendus', () => {
@@ -59,6 +66,7 @@ describe('createListItem', () => {
     expect(item.position).toBe(0)
     expect(item.checked).toBe(false)
     expect(item.category_id).toBe('cat-1')
+    expect(item.description).toBe('')
     expect(item.created_at).toBe(now)
   })
 
@@ -72,5 +80,32 @@ describe('createListItem', () => {
     const now = '2026-06-30T10:00:00.000Z'
     const item = createListItem('item-1', 'list-42', 'Titre', 0, now, 'cat-1')
     expect(item.list_id).toBe('list-42')
+  })
+})
+
+describe('createListItemSubTask', () => {
+  it('crée une sous-tâche avec les champs attendus', () => {
+    const now = '2026-06-30T10:00:00.000Z'
+    const subTask = createListItemSubTask('sub-1', 'item-1', 'Étape 1', 0, now)
+    expect(subTask.id).toBe('sub-1')
+    expect(subTask.list_item_id).toBe('item-1')
+    expect(subTask.title).toBe('Étape 1')
+    expect(subTask.position).toBe(0)
+    expect(subTask.checked).toBe(false)
+    expect(subTask.created_at).toBe(now)
+  })
+})
+
+describe('toggleListItemSubTaskChecked', () => {
+  it('coche une sous-tâche non cochée', () => {
+    const now = '2026-06-30T10:00:00.000Z'
+    const subTask = createListItemSubTask('sub-1', 'item-1', 'Étape 1', 0, now)
+    expect(toggleListItemSubTaskChecked(subTask).checked).toBe(true)
+  })
+
+  it('décoche une sous-tâche cochée', () => {
+    const now = '2026-06-30T10:00:00.000Z'
+    const subTask = { ...createListItemSubTask('sub-1', 'item-1', 'Étape 1', 0, now), checked: true }
+    expect(toggleListItemSubTaskChecked(subTask).checked).toBe(false)
   })
 })

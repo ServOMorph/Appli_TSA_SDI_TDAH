@@ -206,4 +206,68 @@ export const manualTestsCatalog: ManualTest[] = [
       'Touchez à nouveau le nom de la catégorie : la liste de ses tests doit se replier.',
     ],
   },
+  {
+    id: 'couleur-tache-sans-couleur-choisie',
+    title: 'Couleur d’une tâche sans couleur choisie',
+    category: 'Tâches',
+    steps: [
+      'Allez dans Paramètres > Accessibilité, choisissez une couleur d’ambiance bien visible.',
+      'Créez une tâche planifiée sans lui choisir de couleur (« Aucune couleur ») : dans le planning, sa case doit rester avec un fond neutre, pas teintée par la couleur d’ambiance.',
+      'Créez une seconde tâche en lui choisissant une couleur : sa case dans le planning doit être teintée avec cette couleur.',
+    ],
+  },
+  {
+    id: 'supprimer-une-categorie-de-liste',
+    title: 'Supprimer une catégorie de liste',
+    category: 'Outils : Listes',
+    steps: [
+      'Ouvrez une liste ayant au moins deux catégories.',
+      'Sur l’écran des catégories, touchez la croix rouge à côté d’une catégorie : une confirmation « Supprimer « <nom> » ? » doit s’afficher, pas « Supprimer cette liste ».',
+      'Touchez « Supprimer » : seule cette catégorie et ses éléments disparaissent, les autres catégories et le reste de la liste restent intacts.',
+      'Recommencez sur une autre catégorie, mais touchez « Annuler » : la catégorie doit rester intacte.',
+    ],
+  },
+  {
+    id: 'detail-element-de-liste',
+    title: 'Description et sous-tâches d’un élément de liste',
+    category: 'Outils : Listes',
+    steps: [
+      'Ouvrez une liste, une catégorie, puis touchez le titre d’un élément (pas la coche ni les boutons à droite) : l’écran de détail de l’élément doit s’ouvrir.',
+      'Saisissez une description, touchez en dehors du champ pour en sortir, puis rouvrez l’élément : la description doit être conservée.',
+      'Ajoutez une sous-tâche : elle doit apparaître immédiatement dans la liste, toujours dépliée.',
+      'Cochez puis décochez la sous-tâche : le texte doit se barrer puis redevenir normal.',
+      'Supprimez la sous-tâche : elle doit disparaître.',
+      'Touchez « ← Retour » : vous devez revenir à l’écran des éléments de la catégorie.',
+    ],
+  },
+  {
+    id: 'acceder-directement-a-l-energie',
+    title: 'Accéder directement à la modification de l’énergie',
+    category: 'Énergie',
+    steps: [
+      'Depuis l’accueil, touchez le badge énergie en haut à gauche : l’écran pour choisir votre énergie du jour doit s’ouvrir directement, sans écran de consultation intermédiaire.',
+    ],
+  },
+  {
+    id: 'encadrement-et-glissement-du-planning',
+    title: 'Encadrement et glissement animé du bandeau de dates',
+    category: 'Accueil / Planning',
+    steps: [
+      'Allez dans Paramètres > Accessibilité, choisissez une couleur d’ambiance bien visible.',
+      'Sur l’accueil ou le planning, vérifiez que le bandeau des jours est entouré d’un cadre de cette couleur.',
+      'Posez le doigt sur le bandeau et glissez-le latéralement sans le relâcher : le bandeau doit suivre le doigt de façon fluide, sans saut brusque.',
+      'Relâchez le doigt : le bandeau doit revenir à sa place avec une animation douce, en changeant de jour si le glissement était assez ample.',
+    ],
+  },
+  {
+    id: 'couleur-de-fond-par-outil',
+    title: 'Couleur de fond par outil',
+    category: 'Outils : autres',
+    steps: [
+      'Depuis les Outils (ou un dossier), sur la carte d’un outil, touchez le sélecteur de couleur et choisissez une couleur : le fond de la carte doit se teinter aussitôt (fond adouci, pas la couleur brute).',
+      'Quittez cet écran puis revenez : la couleur choisie doit être conservée.',
+      'Touchez le bouton « × » à côté du sélecteur : la carte doit retrouver son fond neutre par défaut, et le bouton « × » doit disparaître.',
+      'Vérifiez que toucher le sélecteur de couleur n’ouvre pas l’outil : seul le titre ouvre l’outil.',
+    ],
+  },
 ]

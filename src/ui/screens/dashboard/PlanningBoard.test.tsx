@@ -53,6 +53,30 @@ describe('PlanningBoard — déplié', () => {
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
   })
 
+  it('encadre le bandeau de dates avec la couleur d’ambiance (AP2)', async () => {
+    const ctx = makeAppContext({
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#ff00aa' },
+    })
+    renderExpanded(ctx)
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    expect(strip.style.border).toContain('rgb(255, 0, 170)')
+  })
+
+  it('suit le doigt pendant le glissement du bandeau (AP2)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
+    fireEvent.touchMove(strip, { touches: [{ clientX: 170 }] })
+    expect(strip.style.transform).toBe('translateX(-30px)')
+
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 170 }] })
+    expect(strip.style.transform).toBe('translateX(0px)')
+  })
+
   it('ne propose plus de flèches de navigation par semaine', async () => {
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())

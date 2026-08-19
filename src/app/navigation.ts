@@ -20,6 +20,7 @@ export type Route =
   | { name: 'settings-privacy' }
   | { name: 'settings-export' }
   | { name: 'list-detail'; listId?: string }
+  | { name: 'list-item-detail'; itemId?: string }
   | { name: 'tools' }
   | { name: 'folder-detail'; folderId?: string }
   | { name: 'budget' }

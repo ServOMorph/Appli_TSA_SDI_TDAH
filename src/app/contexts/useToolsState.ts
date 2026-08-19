@@ -54,6 +54,14 @@ export function useToolsState(reloadLists: () => Promise<void>) {
     if (tool.type === 'liste') await reloadLists()
   }
 
+  async function updateToolColor(id: string, color: string | null) {
+    const tool = tools.find((t) => t.id === id)
+    if (!tool) return
+    const updated = { ...tool, color, updated_at: new Date().toISOString() }
+    await toolRepo.update(updated)
+    setTools((prev) => prev.map((t) => (t.id === id ? updated : t)))
+  }
+
   async function deleteFolder(id: string) {
     const contained = tools.filter((t) => t.folder_id === id)
     for (const tool of contained) {
@@ -69,6 +77,7 @@ export function useToolsState(reloadLists: () => Promise<void>) {
     createFolder,
     createToolList,
     deleteTool,
+    updateToolColor,
     deleteFolder,
     load,
     reset,

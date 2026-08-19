@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-17 (déploiement v5.40) (archivé depuis contexte.md 2026-08-19, import demandes Marie sur main)
+- Export de Marie du 16/08 reconfirmé dernier disponible (étape 0 `/deploy`, rien de nouveau). Erreur de lint préexistante `db.ts:308` corrigée à la racine (`varsIgnorePattern: '^_'` ajouté à `eslint.config.js`, ne couvrait jusque-là que les paramètres de fonction). Test `E01Welcome.test.tsx` fragile (dépendait du contenu réel de `WHATS_NEW`) reformulé pour vérifier le comportement réel (modale déjà vue pour la version, via `localStorage`), indépendant du contenu — évite la récurrence à chaque `/deploy`. v5.40 déployée en prod, vérifiée HTTP 200, `WHATS_NEW` vidé après publication. 555/555 tests unitaires, `tsc -b`/lint clean.
+
 ## 2026-08-16 (suite 2, archivage des roadmaps terminées) (archivé depuis contexte.md 2026-08-18, déploiement v5.49)
 - Les 3 roadmaps dont toutes les phases sont `[FAIT]` (`roadmap_v5.1.md`, `roadmap_tests_marie.md`, `roadmap_categories_listes.md`) déplacées vers `Archives/` (`git mv`), suivant le précédent V1-V5.0. Références actives mises à jour dans `signals.md`/`contexte.md`. Aucun code applicatif modifié.
 

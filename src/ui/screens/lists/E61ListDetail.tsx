@@ -35,9 +35,12 @@ export function E61ListDetail() {
     getListItems,
     getListCategories,
     createListCategory,
+    deleteListCategory,
     addListItem,
     deleteListItem,
     toggleListItem,
+    selectListItem,
+    goTo,
     back,
     createDetailedTask,
     deleteTool,
@@ -60,6 +63,7 @@ export function E61ListDetail() {
   const [alarmRecurring, setAlarmRecurring] = useState(false)
   const [alarmRecurrence, setAlarmRecurrence] = useState<RecurrenceRuleInput>(defaultRecurrence)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deletingCategory, setDeletingCategory] = useState<ListCategory | null>(null)
 
   useEffect(() => {
     if (!selectedListId) return
@@ -104,6 +108,11 @@ export function E61ListDetail() {
     await refresh()
   }
 
+  function openItemDetail(item: ListItem) {
+    selectListItem(item.id)
+    goTo('list-item-detail')
+  }
+
   function openAlarm(item: ListItem) {
     setAlarmItem(item)
     setAlarmDate(todayDate())
@@ -117,6 +126,15 @@ export function E61ListDetail() {
     await deleteTool(tool.id)
     setConfirmingDelete(false)
     back('tools')
+  }
+
+  async function handleConfirmDeleteCategory() {
+    if (!deletingCategory) return
+    await deleteListCategory(deletingCategory.id)
+    setCategories((prev) => prev.filter((c) => c.id !== deletingCategory.id))
+    if (selectedCategoryId === deletingCategory.id) setSelectedCategoryId(null)
+    setDeletingCategory(null)
+    await refresh()
   }
 
   async function handleConfirmAlarm() {
@@ -208,14 +226,22 @@ export function E61ListDetail() {
 
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
             {groups.map(({ category, items: categoryItems }) => (
-              <li key={category.id}>
+              <li
+                key={category.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-sm)',
+                }}
+              >
                 <button
                   onClick={() => setSelectedCategoryId(category.id)}
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    width: '100%',
+                    flex: 1,
+                    minWidth: 0,
                     gap: 'var(--spacing-sm)',
                     background: 'var(--color-surface)',
                     border: '1px solid var(--color-border)',
@@ -230,6 +256,21 @@ export function E61ListDetail() {
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
                     {categoryItems.length}
                   </span>
+                </button>
+                <button
+                  aria-label={`Supprimer la catégorie ${category.name}`}
+                  onClick={() => setDeletingCategory(category)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '1.1rem',
+                    color: 'var(--color-error)',
+                    padding: '0 4px',
+                    flexShrink: 0,
+                  }}
+                >
+                  ×
                 </button>
               </li>
             ))}
@@ -316,9 +357,23 @@ export function E61ListDetail() {
                     padding: 0,
                   }}
                 />
-                <span style={{ flex: 1, textDecoration: item.checked ? 'line-through' : 'none', color: item.checked ? 'var(--color-text-muted)' : 'var(--color-text)' }}>
+                <button
+                  onClick={() => openItemDetail(item)}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    textAlign: 'left',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    font: 'inherit',
+                    textDecoration: item.checked ? 'line-through' : 'none',
+                    color: item.checked ? 'var(--color-text-muted)' : 'var(--color-text)',
+                  }}
+                >
                   {item.title}
-                </span>
+                </button>
                 <button
                   aria-label={`Planifier ${item.title}`}
                   onClick={() => openAlarm(item)}
@@ -551,6 +606,49 @@ export function E61ListDetail() {
               Supprimer
             </Button>
             <Button variant="secondary" fullWidth onClick={() => setConfirmingDelete(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {deletingCategory && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Supprimer la catégorie"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.75)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'var(--spacing-xl)',
+              maxWidth: '360px',
+              width: '90%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--spacing-md)',
+            }}
+          >
+            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Supprimer « {deletingCategory.name} » ?</h2>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
+              Ses éléments seront définitivement supprimés. Le reste de la liste n'est pas affecté.
+            </p>
+            <Button fullWidth onClick={handleConfirmDeleteCategory} style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}>
+              Supprimer
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setDeletingCategory(null)}>
               Annuler
             </Button>
           </div>

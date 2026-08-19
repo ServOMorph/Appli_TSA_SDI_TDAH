@@ -31,7 +31,7 @@ describe('E121ManualTests', () => {
   it('affiche les tests nouveaux avec une pastille rouge', () => {
     renderWithApp(<E121ManualTests />)
 
-    for (const category of ['Accueil / Planning', 'Tâches', 'Outils : Budget', 'Outils : Listes', 'Énergie', 'Paramètres / Profil']) {
+    for (const category of ['Accueil / Planning', 'Tâches', 'Outils : Budget', 'Outils : Listes', 'Outils : autres', 'Énergie', 'Paramètres / Profil']) {
       expandCategory(category)
     }
 

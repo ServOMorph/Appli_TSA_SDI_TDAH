@@ -52,4 +52,14 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 <!-- Convention : toute règle liée à une étape précise de la Procédure ci-dessus doit la
      référencer explicitement par son numéro (ex: "Étape 3 : ..."), plutôt que compter sur la
      position physique de cette zone (toujours en fin de fichier). -->
+
+## Spécificités projet
+
+- Avant l'étape 3 (chargement du contexte) : vérifier `git branch --show-current` et
+  `git rev-list --count main..HEAD` (ou `origin/main..HEAD` si le remote existe). Si la branche
+  courante n'est pas `main` et diverge de `main` de plus de quelques commits ou de plusieurs
+  jours, le signaler explicitement à l'utilisateur avant de commencer tout travail — ne jamais
+  supposer qu'une branche non-`main` est à jour. Incident de référence : session du 2026-08-19,
+  plusieurs sessions de développement menées par erreur sur `sync-marie` (divergente de `main`
+  depuis le 2026-08-16) avant d'être détecté juste avant un `/deploy`.
 <!-- SPECIFICITES PROJET : FIN -->

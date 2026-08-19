@@ -14,7 +14,11 @@ Mis à jour : 2026-08-18
 
 ## Flux B — Google Drive
 
-État : non implémenté. Aucune tâche suivie à ce jour.
+État : développement, en cours (première exécution de `/traiter_demandes_marie`, 2026-08-18).
+- Fichier source archivé : `ROBERTO/flux_b_drive/entrees/2026-08-18_Modifications (1).pdf`.
+- Analyse : `ROBERTO/flux_b_drive/analyses/constats_2026-08-18.md`.
+- Roadmap active : `roadmap_demandes_marie_v1.md` (5 phases, toutes `[TODO]`) — détail des phases non dupliqué ici, cf. roadmap.
+- Section Budget du document source écartée (obsolète, antérieure à `roadmap_budget_v3`).
 
 ## Flux C — `sync-marie`
 

@@ -11,6 +11,7 @@ function makeItem(overrides: Partial<ListItem> = {}): ListItem {
     position: 0,
     checked: false,
     category_id: 'cat-ete',
+    description: '',
     created_at: '2026-08-06T00:00:00.000Z',
     ...overrides,
   }

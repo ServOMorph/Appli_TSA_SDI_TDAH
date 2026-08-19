@@ -1,3 +1,16 @@
+## v5.38 — 2026-08-18
+
+### Ajouté
+- Détail d'un élément de liste (E62) : description et sous-tâches, ouvrable en touchant le titre d'un élément.
+- Chaque outil (liste, budget...) peut avoir sa propre couleur de fond (sélecteur sur la carte, `E70Tools`/`E72FolderDetail`).
+- Menu d'une tâche simplifié : « Modifier » ouvre directement le titre en édition ; retrait de « Tâche du jour », « Planifier », « Liste », « Terminer ».
+- Suppression d'une seule catégorie de liste, sans supprimer toute la liste.
+
+### Modifié
+- Une tâche sans couleur choisie n'est plus teintée par la couleur d'ambiance dans le Planning.
+- Badge énergie de l'accueil : accès direct à l'écran de modification, sans écran de consultation intermédiaire.
+- Planning : hauteur de case selon la durée de la tâche, bandeau de dates encadré par la couleur d'ambiance et glissement tactile animé.
+
 ## v5.37 — 2026-08-18
 
 ### Ajouté

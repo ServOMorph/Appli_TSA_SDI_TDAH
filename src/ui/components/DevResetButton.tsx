@@ -22,6 +22,7 @@ const SCREEN_CODES: Record<Screen, string> = {
   'settings-privacy': 'E116',
   'settings-export': 'E117',
   'list-detail': 'E61',
+  'list-item-detail': 'E62',
   tools: 'E70',
   'folder-detail': 'E72',
   budget: 'E71',

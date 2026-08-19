@@ -4,6 +4,7 @@ import type { User } from '@/domain/entities/user'
 import type { Task } from '@/domain/entities/task'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 import type { ListCategory } from '@/domain/entities/listCategory'
 import type { EnergyEntry } from '@/domain/entities/energyEntry'
 import type { Settings } from '@/domain/entities/settings'
@@ -32,6 +33,7 @@ export class AppDatabase extends Dexie {
   tasks!: Table<Task>
   lists!: Table<List>
   listItems!: Table<ListItem>
+  listItemSubTasks!: Table<ListItemSubTask>
   listCategories!: Table<ListCategory>
   energyEntries!: Table<EnergyEntry>
   settings!: Table<Settings>
@@ -310,6 +312,28 @@ export class AppDatabase extends Dexie {
           })
           await tx.table('listItems').bulkPut(updated)
         }
+      })
+    this.version(13)
+      .stores({
+        listItemSubTasks: 'id, list_item_id, position',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('listItems')
+          .toCollection()
+          .modify((item) => {
+            item.description = ''
+          })
+      })
+    this.version(14)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table('tools')
+          .toCollection()
+          .modify((tool) => {
+            tool.color = null
+          })
       })
   }
 }

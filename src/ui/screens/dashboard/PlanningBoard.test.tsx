@@ -73,6 +73,59 @@ describe('PlanningBoard — déplié', () => {
     expect(screen.getByText('Sans horaire')).toBeInTheDocument()
   })
 
+  it('une tâche sans couleur n\'hérite pas de la couleur d\'ambiance (fond neutre)', async () => {
+    const task = makeTaskV2({ id: 't1', color: null, scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    const { container } = renderExpanded(
+      makeAppContext({
+        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#123456' },
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+
+    const tinted = screen.getByText('Médecin').closest('div[style]') as HTMLElement
+    expect(tinted.style.backgroundColor).not.toContain('#123456')
+    expect(container).toBeInTheDocument()
+  })
+
+  it('une tâche avec couleur applique sa propre couleur, pas celle d\'ambiance', async () => {
+    const task = makeTaskV2({ id: 't1', color: '#ff0000', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    renderExpanded(
+      makeAppContext({
+        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#123456' },
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+
+    const tinted = screen.getByText('Médecin').closest('div[style]') as HTMLElement
+    expect(tinted.style.backgroundColor).toContain('#ff0000')
+  })
+
+  it('une tâche courte (30 min) a une case plus fine qu\'une tâche longue (2h) (AP1)', async () => {
+    const short = makeTaskV2({ id: 't1', title: 'Courte', duration_minutes: 30, scheduled_date: '2026-06-30', scheduled_start: '09:00' })
+    const long = makeTaskV2({ id: 't2', title: 'Longue', duration_minutes: 120, scheduled_date: '2026-06-30', scheduled_start: '11:00' })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([short, long]) }))
+    await waitFor(() => expect(screen.getByText('Courte')).toBeInTheDocument())
+
+    const shortRow = screen.getByText('Courte').closest('div[style]') as HTMLElement
+    const longRow = screen.getByText('Longue').closest('div[style]') as HTMLElement
+    expect(shortRow.style.minHeight).toBe('40px')
+    expect(longRow.style.minHeight).toBe('76px')
+  })
+
+  it('le bandeau de dates est encadré par la couleur d\'ambiance (AP2)', async () => {
+    renderExpanded(
+      makeAppContext({
+        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#123456' },
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      }),
+    )
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    const strip = screen.getByLabelText('2026-06-30').closest('div[style]') as HTMLElement
+    expect(strip.style.border).toContain('rgb(18, 52, 86)')
+  })
+
   it('cliquer une tâche sélectionne la tâche et ouvre sa fiche', async () => {
     const selectTask = vi.fn()
     const goTo = vi.fn()

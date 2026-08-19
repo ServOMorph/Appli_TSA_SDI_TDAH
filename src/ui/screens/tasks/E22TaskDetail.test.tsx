@@ -41,15 +41,22 @@ describe('E22TaskDetail', () => {
     })
   })
 
-  it('Terminer appelle completeTask et navigue vers dashboard', async () => {
+  it('Modifier ouvre l\'édition du titre (TA2)', async () => {
     const task = makeTask()
     const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
     renderWithApp(<E22TaskDetail />, ctx)
-    await userEvent.click(screen.getByRole('button', { name: 'Terminer' }))
-    expect(ctx.completeTask).toHaveBeenCalledWith('task-1')
-    await waitFor(() => {
-      expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
-    })
+    await userEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+    expect(screen.getByLabelText('Modifier le titre')).toBeDefined()
+  })
+
+  it('le menu d\'actions ne propose plus Tâche du jour, Planifier, Liste ou Terminer (TA2)', () => {
+    const task = makeTask()
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+    renderWithApp(<E22TaskDetail />, ctx)
+    expect(screen.queryByRole('button', { name: 'Tâche du jour' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Planifier' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Liste' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Terminer' })).toBeNull()
   })
 
   it('donner un horaire à une sous-étape appelle scheduleSubTask (E9c)', async () => {
@@ -90,21 +97,6 @@ describe('E22TaskDetail', () => {
       expect(screen.getByText('Appeler le secrétariat')).toBeDefined()
     })
     expect(screen.queryByRole('dialog', { name: 'Renommer la sous-étape' })).toBeNull()
-  })
-
-  it('Planifier appelle planTaskToday sans avertissement même avec des sous-étapes', async () => {
-    const task = makeTask()
-    const subTask = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone' })
-    const ctx = makeAppContext({
-      selectedTaskId: 'task-1',
-      inboxTasks: [task],
-      getSubTasks: vi.fn().mockResolvedValue([subTask]),
-    })
-    renderWithApp(<E22TaskDetail />, ctx)
-    await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
-    await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
-    expect(ctx.planTaskToday).toHaveBeenCalledWith('task-1')
-    expect(screen.queryByRole('dialog', { name: 'Sous-tâches perdues' })).toBeNull()
   })
 
   it('Décomposer navigue vers task-decompose', async () => {

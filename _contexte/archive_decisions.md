@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-14 (suite 12, correctif Budget, bannières et modale Nouveautés dynamiques, Phase 3 tests Marie close) (archivé depuis contexte.md 2026-08-19, Phase 5 demandes Marie + déploiement v5.38)
+- Export de Marie du midi (15h10) analysé — `manual_test_results: []`, chemins de code vérifiés sains. Nouvel export du soir (17h40) confirmé rempli (7 résultats), ingéré dans `_contexte/marie_tests_journal.json` ; 4 échecs pointant tous vers le même symptôme (« pas accès au budget » / « il manque le budget »). Cause trouvée par lecture de `E70Tools.tsx`/`useSettingsState.ts` : la réparation des `tools` à l'import ne couvrait que les entrées `liste`, jamais l'entrée globale `tableau_comptage` qui pilote la carte Budget — corrigé, testé. Bannières urgentes (accueil + Tests à faire) adaptées (demande de réimportation plutôt que nouvel export) et rendues dismissibles (bouton « Fait », `localStorage`) ; couleur de texte forcée en blanc (le `color` global des `<p>` de `index.css` l'écrasait). Modale Nouveautés rendue dynamique par version (ne se réaffiche plus une fois fermée), cycle formalisé dans `close.md` (étape 6, ajout) et `deploy.md` (étape 7, vidage après publication) sur demande de l'utilisateur. 547/547 tests unitaires, `tsc -b` clean.
+
 ## 2026-08-14 (suite 11, déploiement v5.31) (archivé depuis contexte.md 2026-08-18, Flux A ROBERTO clos)
 - `/deploy` exécuté jusqu'au bout après confirmation explicite de l'utilisateur, malgré `tests_manuels.md` non vide (6 points). Build `dist/v5.31` déployé en prod (`https://appli-audhd.netlify.app`), vérifié HTTP 200. Avertissement chunk JS > 500 kB noté (`index-X6Xu4E-n.js`, 510.75 kB), non bloquant.
 

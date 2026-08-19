@@ -39,6 +39,7 @@ function makeListItem(overrides: Partial<ListItem> = {}): ListItem {
     position: 0,
     checked: false,
     category_id: 'cat-1',
+    description: '',
     created_at: '2026-06-30T10:00:00.000Z',
     ...overrides,
   }
@@ -229,6 +230,53 @@ describe('E61ListDetail', () => {
     })
   })
 
+  describe('suppression d\'une catégorie', () => {
+    it('demande confirmation puis appelle deleteListCategory sans supprimer la liste', async () => {
+      const deleteListCategory = vi.fn().mockResolvedValue(undefined)
+      const deleteTool = vi.fn().mockResolvedValue(undefined)
+      const categories = [makeCategory({ id: 'cat-ete', name: 'Été' }), makeCategory({ id: 'cat-hiver', name: 'Hiver', position: 1 })]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        tools: [makeTool()],
+        getListCategories: vi.fn().mockResolvedValue(categories),
+        deleteListCategory,
+        deleteTool,
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => screen.getByRole('button', { name: 'Supprimer la catégorie Été' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Supprimer la catégorie Été' }))
+      const dialog = screen.getByRole('dialog', { name: 'Supprimer la catégorie' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Supprimer' }))
+      expect(deleteListCategory).toHaveBeenCalledWith('cat-ete')
+      expect(deleteTool).not.toHaveBeenCalled()
+      await waitFor(() => {
+        expect(screen.queryByRole('button', { name: /^Été/ })).toBeNull()
+        expect(screen.getByRole('button', { name: /^Hiver/ })).toBeDefined()
+      })
+    })
+
+    it('annuler ferme la confirmation sans supprimer', async () => {
+      const deleteListCategory = vi.fn().mockResolvedValue(undefined)
+      const categories = [makeCategory({ id: 'cat-ete', name: 'Été' })]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        tools: [makeTool()],
+        getListCategories: vi.fn().mockResolvedValue(categories),
+        deleteListCategory,
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => screen.getByRole('button', { name: 'Supprimer la catégorie Été' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Supprimer la catégorie Été' }))
+      const dialog = screen.getByRole('dialog', { name: 'Supprimer la catégorie' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Annuler' }))
+      expect(screen.queryByRole('dialog', { name: 'Supprimer la catégorie' })).toBeNull()
+      expect(deleteListCategory).not.toHaveBeenCalled()
+      expect(screen.getByRole('button', { name: /^Été/ })).toBeDefined()
+    })
+  })
+
   describe('coche (E27)', () => {
     it('clic sur la coche appelle toggleListItem', async () => {
       const items = [makeListItem({ id: 'i1', title: 'Hotel California' })]
@@ -243,6 +291,22 @@ describe('E61ListDetail', () => {
       await waitFor(() => screen.getByRole('button', { name: 'Cocher Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Cocher Hotel California' }))
       expect(ctx.toggleListItem).toHaveBeenCalledWith('i1')
+    })
+
+    it('cliquer sur le titre d\'un élément ouvre son détail (LI2)', async () => {
+      const items = [makeListItem({ id: 'i1', title: 'Hotel California' })]
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue(items),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
+      await waitFor(() => screen.getByRole('button', { name: 'Hotel California' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Hotel California' }))
+      expect(ctx.selectListItem).toHaveBeenCalledWith('i1')
+      expect(ctx.goTo).toHaveBeenCalledWith('list-item-detail')
     })
 
     it('les items cochés apparaissent sous les non cochés', async () => {

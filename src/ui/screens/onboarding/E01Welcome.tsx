@@ -4,11 +4,14 @@ import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
 const WHATS_NEW: string[] = [
-  'La page d’accueil affiche maintenant les jours de la semaine et le mois, comme l’écran Planning. Le trait gris en bas de cette zone se glisse vers le bas pour agrandir le planning, ou vers le haut pour le refermer.',
-  'Les flèches du bandeau de dates avancent maintenant d’une semaine à chaque clic, au lieu d’un jour.',
-  'Vos listes peuvent maintenant être organisées en catégories : à la création, définissez-en une ou plusieurs. En ouvrant une liste, choisissez d’abord la catégorie, puis ses éléments s’affichent. Vous pouvez ajouter une catégorie à tout moment.',
-  'Dans le budget, les catégories de dépenses sont maintenant regroupées sous « Semaine » et « Mois » pour s’y retrouver plus facilement.',
-  'Vos données de test sont désormais envoyées automatiquement au développeur en arrière-plan, sans action de votre part. Un indicateur dans Paramètres affiche la date de la dernière synchronisation.',
+  'Une tâche sans couleur choisie n’est plus teintée avec la couleur d’ambiance dans le Planning : elle reste neutre, seules les tâches où vous choisissez une couleur l’affichent.',
+  'Dans une liste, vous pouvez maintenant supprimer une seule catégorie (croix rouge à côté de son nom) sans supprimer toute la liste.',
+  'Le badge énergie de l’accueil ouvre maintenant directement l’écran pour changer votre énergie, sans passer par un écran de consultation.',
+  'Le menu d’une tâche est simplifié : « Modifier » ouvre directement le titre en édition, « Décomposer », « Dupliquer » et « Supprimer » restent disponibles.',
+  'Dans le Planning, la hauteur de la case d’une tâche reflète maintenant sa durée : plus une tâche est longue, plus sa case est haute.',
+  'Le bandeau de dates du Planning est encadré par votre couleur d’ambiance, et glisse maintenant de façon animée et fluide au doigt.',
+  'En touchant le titre d’un élément de liste, un nouvel écran s’ouvre pour lui ajouter une description et des sous-tâches.',
+  'Chaque outil (liste, budget...) peut maintenant avoir sa propre couleur de fond : touchez le sélecteur de couleur sur sa carte.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

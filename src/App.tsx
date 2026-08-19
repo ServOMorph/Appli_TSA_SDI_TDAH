@@ -18,6 +18,7 @@ import { E112Accessibility } from '@/ui/screens/settings/E112Accessibility'
 import { E116Privacy } from '@/ui/screens/settings/E116Privacy'
 import { E117Export } from '@/ui/screens/settings/E117Export'
 import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
+import { E62ListItemDetail } from '@/ui/screens/lists/E62ListItemDetail'
 import { E70Tools } from '@/ui/screens/tools/E70Tools'
 import { E72FolderDetail } from '@/ui/screens/tools/E72FolderDetail'
 import { E71Budget } from '@/ui/screens/tools/E71Budget'
@@ -105,6 +106,8 @@ export function AppScreens() {
         return <E117Export />
       case 'list-detail':
         return <E61ListDetail />
+      case 'list-item-detail':
+        return <E62ListItemDetail />
       case 'tools':
         return <E70Tools />
       case 'folder-detail':

@@ -1,6 +1,7 @@
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { ListCategory } from '@/domain/entities/listCategory'
+import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 
 export function createList(id: string, name: string, now: string): List {
   return { id, name, created_at: now, updated_at: now }
@@ -24,9 +25,32 @@ export function createListItem(
   now: string,
   categoryId: string,
 ): ListItem {
-  return { id, list_id: listId, title, position, checked: false, category_id: categoryId, created_at: now }
+  return {
+    id,
+    list_id: listId,
+    title,
+    position,
+    checked: false,
+    category_id: categoryId,
+    description: '',
+    created_at: now,
+  }
 }
 
 export function toggleListItemChecked(item: ListItem): ListItem {
   return { ...item, checked: !item.checked }
+}
+
+export function createListItemSubTask(
+  id: string,
+  listItemId: string,
+  title: string,
+  position: number,
+  now: string,
+): ListItemSubTask {
+  return { id, list_item_id: listItemId, title, position, checked: false, created_at: now }
+}
+
+export function toggleListItemSubTaskChecked(subTask: ListItemSubTask): ListItemSubTask {
+  return { ...subTask, checked: !subTask.checked }
 }

@@ -16,9 +16,11 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La branche `sync-marie` (voir le [CHANGELOG](CHANGELOG.md)) livre une synchronisation automatique en arrière-plan des données de Marie vers Supabase, avec un indicateur de statut dans Paramètres — en remplacement progressif du flux manuel export/import. Cette branche est en retard sur `main` (dont la prod, plus avancée, intègre déjà le budget V3) ; un merge est nécessaire avant fusion.
+`main` (voir le [CHANGELOG](CHANGELOG.md)) livre les demandes de Marie traitées via le Flux B de ROBERTO (`roadmap_demandes_marie_v1.md`) : bugs prioritaires, tâches/planning, détail d'un élément de liste, couleur de fond par outil — version v5.38 en cours de déploiement.
 
-Côté outillage projet, le système d'orchestration ROBERTO (`ROBERTO/`, voir `roadmap_roberto_workflow.md`) gère le traitement des retours de test manuels de Marie ; son premier flux (testeur JSON) est opérationnel.
+La branche `sync-marie` livre une synchronisation automatique en arrière-plan des données de Marie vers Supabase, avec un indicateur de statut dans Paramètres — en remplacement progressif du flux manuel export/import. Cette branche est en retard sur `main` ; un merge est nécessaire avant fusion.
+
+Côté outillage projet, le système d'orchestration ROBERTO (`ROBERTO/`, voir `roadmap_roberto_workflow.md`) gère le traitement des retours de test manuels de Marie ; le Flux A (testeur JSON) est opérationnel, le Flux B (Google Drive) est actif.
 
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
 

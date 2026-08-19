@@ -27,18 +27,18 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('button', { name: 'Renseigner mon énergie' })).toBeDefined()
     })
 
-    it('clic sur la pill énergie navigue vers energy-view', async () => {
+    it('clic sur la pill énergie navigue directement vers energy-checkin', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Renseigner mon énergie' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+      expect(ctx.goTo).toHaveBeenCalledWith('energy-checkin')
     })
 
-    it('clic sur badge énergie navigue vers energy-view', async () => {
+    it('clic sur badge énergie navigue directement vers energy-checkin', async () => {
       const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByLabelText(/sur 7 disponible/i))
-      expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+      expect(ctx.goTo).toHaveBeenCalledWith('energy-checkin')
     })
 
     it('affiche énergie planifiée et énergie disponible côte à côte (E14, Q1)', () => {

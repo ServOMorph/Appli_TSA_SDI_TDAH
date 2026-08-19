@@ -67,3 +67,71 @@ Corrèle avec le rapport de Marie du 2026-08-14 (`_contexte/marie_tests_journal.
 1. Depuis les Outils, ouvrir la carte Budget.
 2. Vérifier que l'écran s'ouvre normalement (pas d'écran vide, pas d'erreur), avec les catégories/dépenses/livrets visibles.
 
+## 10 — Couleur d'une tâche sans couleur choisie (planning)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 1, TA3) : quand aucune couleur n'est choisie pour une tâche, sa case dans le planning ne doit plus être teintée par la couleur d'ambiance des paramètres.
+
+1. Choisir une couleur d'ambiance bien visible dans Paramètres > Accessibilité.
+2. Créer une tâche planifiée sans lui choisir de couleur (« Aucune couleur »).
+3. Vérifier dans le planning que la case de cette tâche reste neutre (fond clair standard), pas teintée par la couleur d'ambiance.
+4. Créer une seconde tâche avec une couleur choisie explicitement : vérifier que sa case est bien teintée par cette couleur.
+
+## 11 — Suppression d'une catégorie de liste (E61)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 1, LI1) : supprimer une catégorie ne doit plus supprimer toute la liste.
+
+1. Ouvrir une liste ayant au moins deux catégories.
+2. Sur l'écran des catégories, taper la croix rouge à côté d'une catégorie : une confirmation dédiée à cette catégorie s'affiche (pas « Supprimer cette liste »).
+3. Confirmer : seule cette catégorie disparaît, les autres catégories et le reste de la liste restent intacts, la liste elle-même reste accessible depuis les Outils.
+4. Annuler : la catégorie reste intacte.
+
+## 12 — Accès direct à la modification de l'énergie (accueil)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 1, EN1) : le badge énergie de l'accueil doit amener directement à l'écran de modification.
+
+1. Depuis l'accueil, taper le badge énergie (haut à gauche).
+2. Vérifier que l'écran de modification de l'énergie (choix du chiffre + Valider/Ignorer) s'ouvre directement, sans écran de consultation intermédiaire.
+
+## 13 — Menu d'actions d'une tâche simplifié (E22)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 2, TA2) : le menu d'actions d'une tâche est simplifié et propose un accès direct à la modification.
+
+1. Ouvrir le détail d'une tâche.
+2. Vérifier que le menu propose « Modifier », « Décomposer », « Dupliquer », « Supprimer » — plus de « Tâche du jour », « Planifier », « Liste » ni « Terminer ».
+3. Taper « Modifier » : le champ Titre s'ouvre en édition directe.
+
+## 14 — Hauteur de case selon la durée (planning)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 2, AP1) : dans le planning, la case d'une tâche reflète sa durée.
+
+1. Planifier une tâche de 30 minutes et une tâche de 2h.
+2. Vérifier dans le planning que la case de la tâche de 2h est visiblement plus haute que celle de 30 minutes.
+
+## 15 — Encadrement des jours et glissement animé (planning)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 2, AP2) : le bandeau de dates est encadré par la couleur d'ambiance et le glissement est animé.
+
+1. Choisir une couleur d'ambiance bien visible dans Paramètres > Accessibilité.
+2. Ouvrir le planning : vérifier que le bandeau de dates est encadré par cette couleur.
+3. Sur mobile, glisser le doigt latéralement sur le bandeau : vérifier que le bandeau suit le doigt de façon fluide (pas de saut brusque), puis revient à sa place une fois le doigt relâché, avec changement de jour si le glissement est assez ample.
+
+## 16 — Détail d'un élément de liste : description et sous-tâches (E62)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 3, LI2) : un élément de liste peut avoir une description et des sous-tâches.
+
+1. Ouvrir une liste, une catégorie, puis taper sur le titre d'un élément (zone blanche, pas la coche/⏰/×) : l'écran de détail de l'élément s'ouvre.
+2. Saisir une description, sortir du champ (perte de focus) : rouvrir l'élément et vérifier que la description est conservée.
+3. Ajouter une sous-tâche : elle apparaît immédiatement dans la liste, toujours dépliée (pas de bouton pour la replier).
+4. Cocher puis décocher une sous-tâche : l'état visuel (texte barré) suit.
+5. Supprimer une sous-tâche : elle disparaît.
+6. Taper « ← Retour » : retour à l'écran des éléments de la catégorie.
+
+## 17 — Couleur de fond par outil (E70/E72)
+
+Demande Marie (`roadmap_demandes_marie_v1.md` Phase 4, AP3) : chaque outil peut avoir sa propre couleur de fond.
+
+1. Depuis les Outils (ou un dossier), sur la carte d'un outil, toucher le sélecteur de couleur et choisir une couleur.
+2. Vérifier que le fond de la carte se teinte immédiatement avec cette couleur (fond adouci, pas la couleur brute).
+3. Revenir sur l'écran (navigation puis retour) : la couleur choisie est conservée.
+4. Toucher le bouton « × » à côté du sélecteur : la carte retrouve son fond neutre par défaut, le bouton « × » disparaît.
+5. Vérifier que toucher le sélecteur de couleur n'ouvre pas l'outil (le clic sur le titre reste le seul moyen d'ouvrir).

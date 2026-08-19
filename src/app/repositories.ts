@@ -5,6 +5,7 @@ import { EnergyEntryRepository } from '@/data/repositories/energyEntryRepository
 import { SettingsRepository } from '@/data/repositories/settingsRepository'
 import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
+import { ListItemSubTaskRepository } from '@/data/repositories/listItemSubTaskRepository'
 import { ListCategoryRepository } from '@/data/repositories/listCategoryRepository'
 import { BudgetCategoryRepository } from '@/data/repositories/budgetCategoryRepository'
 import { BudgetEntryRepository } from '@/data/repositories/budgetEntryRepository'
@@ -25,6 +26,7 @@ export const energyRepo = new EnergyEntryRepository(db)
 export const settingsRepo = new SettingsRepository(db)
 export const listRepo = new ListRepository(db)
 export const listItemRepo = new ListItemRepository(db)
+export const listItemSubTaskRepo = new ListItemSubTaskRepository(db)
 export const listCategoryRepo = new ListCategoryRepository(db)
 export const budgetCategoryRepo = new BudgetCategoryRepository(db)
 export const budgetEntryRepo = new BudgetEntryRepository(db)

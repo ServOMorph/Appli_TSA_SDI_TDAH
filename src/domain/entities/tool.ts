@@ -6,6 +6,7 @@ export interface Tool {
   folder_id: string | null
   list_id: string | null
   position: number
+  color?: string | null
   created_at: string
   updated_at: string
 }

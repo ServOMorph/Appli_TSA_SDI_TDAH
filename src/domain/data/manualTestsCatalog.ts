@@ -59,4 +59,46 @@ export const manualTestsCatalog: ManualTest[] = [
     description:
       'Sur l’accueil, vous devez voir les jours de la semaine et le mois en cours, avec en dessous un petit trait gris. Glissez ce trait vers le bas avec le doigt : le planning doit s’agrandir. Glissez-le à nouveau vers le haut : le planning doit se refermer et revenir à l’accueil normal.',
   },
+  {
+    id: 'couleur-tache-sans-couleur-choisie',
+    title: 'Couleur d’une tâche sans couleur choisie',
+    description:
+      'Choisissez une couleur d’ambiance bien visible dans Paramètres. Créez une tâche planifiée sans lui choisir de couleur : sa case dans le planning doit rester neutre. Créez-en une autre avec une couleur choisie : sa case doit être teintée avec cette couleur.',
+  },
+  {
+    id: 'supprimer-une-categorie-de-liste',
+    title: 'Supprimer une catégorie de liste',
+    description:
+      'Ouvrez une liste ayant au moins deux catégories. Touchez la croix rouge à côté d’une catégorie et confirmez : seule cette catégorie doit disparaître, le reste de la liste doit rester intact.',
+  },
+  {
+    id: 'acceder-directement-a-l-energie',
+    title: 'Accéder directement à la modification de l’énergie',
+    description:
+      'Depuis l’accueil, touchez le badge énergie en haut à gauche : l’écran pour choisir votre énergie doit s’ouvrir directement, sans écran intermédiaire.',
+  },
+  {
+    id: 'menu-tache-simplifie',
+    title: 'Menu d’actions d’une tâche',
+    description:
+      'Ouvrez le détail d’une tâche : le menu doit proposer « Modifier », « Décomposer », « Dupliquer » et « Supprimer ». Touchez « Modifier » : le titre doit s’ouvrir en édition directe.',
+  },
+  {
+    id: 'hauteur-case-planning',
+    title: 'Hauteur de case selon la durée',
+    description:
+      'Planifiez une tâche de 30 minutes et une tâche de 2h. Dans le planning, la case de la tâche de 2h doit être visiblement plus haute que celle de 30 minutes.',
+  },
+  {
+    id: 'detail-element-de-liste',
+    title: 'Description et sous-tâches d’un élément de liste',
+    description:
+      'Ouvrez une liste, une catégorie, puis touchez le titre d’un élément (pas la coche ni la croix) : l’écran de détail doit s’ouvrir. Ajoutez une description et une sous-tâche, cochez-la, puis revenez en arrière : tout doit être conservé.',
+  },
+  {
+    id: 'couleur-de-fond-par-outil',
+    title: 'Couleur de fond par outil',
+    description:
+      'Sur la carte d’un outil (dans les outils ou un dossier), touchez le sélecteur de couleur et choisissez une couleur : le fond de la carte doit se teinter aussitôt. Touchez le « × » à côté : la carte doit retrouver son fond neutre.',
+  },
 ]

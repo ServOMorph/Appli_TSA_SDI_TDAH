@@ -10,6 +10,7 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
+import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 import type { ListCategory } from '@/domain/entities/listCategory'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
@@ -111,6 +112,7 @@ export function useSettingsState() {
       db.settings.clear(),
       db.lists.clear(),
       db.listItems.clear(),
+      db.listItemSubTasks.clear(),
       db.listCategories.clear(),
       db.budgetCategories.clear(),
       db.budgetEntries.clear(),
@@ -154,6 +156,9 @@ export function useSettingsState() {
     const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
     const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
     const listItems = Array.isArray(data.list_items) ? (data.list_items as ListItem[]) : []
+    const listItemSubTasks = Array.isArray(data.list_item_sub_tasks)
+      ? (data.list_item_sub_tasks as ListItemSubTask[])
+      : []
     const listCategories = Array.isArray(data.list_categories) ? (data.list_categories as ListCategory[]) : []
     const folders = Array.isArray(data.folders) ? (data.folders as Folder[]) : []
     const tools = Array.isArray(data.tools) ? (data.tools as Tool[]) : []
@@ -204,7 +209,7 @@ export function useSettingsState() {
         })
       }
       return { ...item, category_id: categoryId }
-    })
+    }).map((item) => ({ ...item, description: item.description ?? '' }))
 
     try {
       await clearDatabase()
@@ -215,6 +220,7 @@ export function useSettingsState() {
         taskExceptions.length ? db.taskExceptions.bulkAdd(taskExceptions) : Promise.resolve(),
         lists.length ? db.lists.bulkAdd(lists) : Promise.resolve(),
         repairedListItems.length ? db.listItems.bulkAdd(repairedListItems) : Promise.resolve(),
+        listItemSubTasks.length ? db.listItemSubTasks.bulkAdd(listItemSubTasks) : Promise.resolve(),
         repairedCategories.length ? db.listCategories.bulkAdd(repairedCategories) : Promise.resolve(),
         folders.length ? db.folders.bulkAdd(folders) : Promise.resolve(),
         repairedTools.length ? db.tools.bulkAdd(repairedTools) : Promise.resolve(),

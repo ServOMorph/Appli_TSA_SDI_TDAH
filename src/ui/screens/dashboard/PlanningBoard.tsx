@@ -53,10 +53,15 @@ const REPORTED_BADGE_STYLE: React.CSSProperties = {
   flexShrink: 0,
 }
 
-const dateStripStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
+function dateStripStyle(ambianceColor: string): React.CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    border: `2px solid ${ambianceColor}`,
+    borderRadius: 'var(--radius-md)',
+    padding: '2px',
+  }
 }
 
 const iconBtnStyle: React.CSSProperties = {
@@ -178,7 +183,17 @@ const todayBtnStyle: React.CSSProperties = {
 }
 
 function rowTintStyle(block: PlanBlock, ambianceColor: string): React.CSSProperties {
-  return plannedTaskTintStyle(blockCompleted(block), block.kind === 'task' ? (block.item.color ?? ambianceColor) : ambianceColor)
+  if (block.kind === 'task') {
+    return plannedTaskTintStyle(blockCompleted(block), block.item.color ?? 'var(--color-surface)')
+  }
+  return plannedTaskTintStyle(blockCompleted(block), ambianceColor)
+}
+
+function blockHeightStyle(durationMinutes: number | null): React.CSSProperties {
+  const minutes = durationMinutes ?? 0
+  if (minutes > 90) return { minHeight: '76px' }
+  if (minutes > 30) return { minHeight: '56px' }
+  return { minHeight: '40px' }
 }
 
 const timeLabelStyle: React.CSSProperties = {
@@ -295,6 +310,8 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   const [scheduledSubTasks, setScheduledSubTasks] = useState<PlannedSubTask[]>([])
   const [subTasksByTask, setSubTasksByTask] = useState<Record<string, Task[]>>({})
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [dragOffset, setDragOffset] = useState(0)
+  const [dragging, setDragging] = useState(false)
 
   const effectiveDate = collapsed ? todayStr() : displayDate
   const displayDateRef = useRef(effectiveDate)
@@ -369,9 +386,18 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
 
   function handleTouchStart(event: React.TouchEvent) {
     touchStartX.current = event.touches[0]?.clientX ?? null
+    setDragging(true)
+  }
+
+  function handleTouchMove(event: React.TouchEvent) {
+    if (touchStartX.current === null) return
+    const currentX = event.touches[0]?.clientX ?? touchStartX.current
+    setDragOffset(currentX - touchStartX.current)
   }
 
   function handleTouchEnd(event: React.TouchEvent) {
+    setDragging(false)
+    setDragOffset(0)
     if (touchStartX.current === null) return
     const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
     const delta = endX - touchStartX.current
@@ -425,7 +451,16 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
           </button>
         )}
       </div>
-      <div style={dateStripStyle} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div
+        style={{
+          ...dateStripStyle(ambianceColor),
+          transform: `translateX(${dragOffset}px)`,
+          transition: dragging ? 'none' : 'transform 0.2s ease-out',
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, -7))} aria-label="Semaine précédente">
           &lsaquo;
         </button>
@@ -465,7 +500,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
           return (
             <div key={`${block.kind}-${block.item.id}`}>
               <button style={rowStyle} onClick={() => openDetail(block.item.id)}>
-                <div style={{ ...rowTintStyle(block, ambianceColor), display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flex: 1, borderRadius: 'var(--radius-md)', padding: '6px 8px' }}>
+                <div style={{ ...rowTintStyle(block, ambianceColor), ...blockHeightStyle(block.item.duration_minutes), display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flex: 1, borderRadius: 'var(--radius-md)', padding: '6px 8px', boxSizing: 'border-box' }}>
                   <span style={timeLabelStyle}>{block.item.scheduled_start ?? 'Sans horaire'}</span>
                   {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
                   <span style={titleColStyle}>

@@ -1,10 +1,8 @@
-export interface ListItem {
+export interface ListItemSubTask {
   id: string
-  list_id: string
+  list_item_id: string
   title: string
   position: number
   checked: boolean
-  category_id: string
-  description: string
   created_at: string
 }

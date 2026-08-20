@@ -51,3 +51,10 @@ coverage/
 # Capacitor
 android/
 ios/
+
+# Python
+__pycache__/
+*.pyc
+
+# Captures de calibration chatgpt-orchestrateur (éphémères, jamais réinjectées)
+ROBERTO/_orchestrateur_ia/*/calibration/

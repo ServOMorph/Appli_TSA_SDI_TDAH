@@ -1,5 +1,8 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-17 (suite, traitement export Marie 22h35, refonte Budget Phase 1) (archivé depuis contexte.md 2026-08-21, incident de branche clos et v5.51 déployée)
+- Commande `/traiter_export_marie` créée (traite l'arrivée d'un export indépendamment de `/deploy`, comparaison par `export_date`). Utilisée sur un export réel du 16/08 22h35, jamais récupéré malgré la reconfirmation erronée de la session précédente — 6 nouveaux résultats de tests ingérés, révélant un bug budget distinct (retrait de livret sans effet sur « Il me reste ») et une formulation de test erronée dans `manualTestsCatalog.ts` (corrigée, confirmée par le commentaire de Marie). Message rédigé pour lever 3 ambiguïtés avant conception ; Marie a répondu en demandant une refonte complète du concept Budget. Roadmap `roadmap_budget_v2.md` créée (4 phases) ; Phase 1 livrée (entité `BudgetIncomeEntry`, migration Dexie v13, formulaire de saisie, export v3.4). 560/560 tests unitaires, `tsc -b`/lint clean.
+
 ## 2026-08-17 (déploiement v5.40) (archivé depuis contexte.md 2026-08-19, import demandes Marie sur main)
 - Export de Marie du 16/08 reconfirmé dernier disponible (étape 0 `/deploy`, rien de nouveau). Erreur de lint préexistante `db.ts:308` corrigée à la racine (`varsIgnorePattern: '^_'` ajouté à `eslint.config.js`, ne couvrait jusque-là que les paramètres de fonction). Test `E01Welcome.test.tsx` fragile (dépendait du contenu réel de `WHATS_NEW`) reformulé pour vérifier le comportement réel (modale déjà vue pour la version, via `localStorage`), indépendant du contenu — évite la récurrence à chaque `/deploy`. v5.40 déployée en prod, vérifiée HTTP 200, `WHATS_NEW` vidé après publication. 555/555 tests unitaires, `tsc -b`/lint clean.
 

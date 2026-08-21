@@ -1,20 +1,20 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-19)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-21)
 
 ## Contexte chaud
-- **Incident de branche corrigé cette session** : plusieurs sessions de travail sur les demandes de Marie (Flux B ROBERTO, `roadmap_demandes_marie_v1.md`) avaient été faites par erreur sur `sync-marie` sans vérifier sa divergence avec `main`. Détecté avant tout `/deploy`/push. Sur décision explicite de l'utilisateur, le travail a été manuellement reporté sur `main` (fichier par fichier, en écartant tout ce qui est propre à `sync-marie`) ; `sync-marie` reste une branche de recherche isolée (sync Supabase), non fusionnée, non touchée par ce report. **Réflexe à appliquer en tout début de session désormais : `git branch --show-current` + `git rev-list --count main..HEAD`.**
-- `roadmap_demandes_marie_v1.md` (Phases 1-4) importée sur `main` : couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
-- `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Export du 2026-08-19 traité cette session (archivé, ingéré : 10 nouvelles entrées journal) — 3 frictions non bloquantes relevées (test IDs obsolètes en cache client, rejet du geste de glissement planning par Marie avec demande de comportement alternatif — pousser le contenu plutôt que superposer —, incompréhension retrait livret/catégorie budget qui est par design) : à traiter comme futures demandes, pas corrigées à chaud.
+- **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
+- **Incident de branche (2026-08-19) clos et corrigé préventivement** : plusieurs sessions de travail sur les demandes de Marie avaient été faites par erreur sur `sync-marie` sans vérifier sa divergence avec `main` (jamais fusionnée depuis le 2026-08-16). `.claude/commands/start.md` vérifie désormais la divergence de branche avant de charger le contexte ; `.claude/memory.md` porte la règle. `.gitignore` complété au passage (`__pycache__/`, captures de calibration ROBERTO — règles déjà sur `sync-marie`, jamais reportées).
+- `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Export du 2026-08-19 traité (archivé, ingéré : 10 nouvelles entrées journal) — 3 frictions non bloquantes relevées (test IDs obsolètes en cache client, rejet du geste de glissement planning par Marie avec demande de comportement alternatif, incompréhension retrait livret/catégorie budget qui est par design) : à traiter comme futures demandes, pas corrigées à chaud.
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy`. `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `message_marie_categories_travail.md`. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage ; les autres roadmaps/communications ne l'appliquent pas encore.
-- `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`) et déployée en v5.49 — jamais testée par Marie en conditions réelles.
-- `manualTestsCatalog.ts` : outre les tests Budget v3 déjà en attente, 7 nouveaux tests ajoutés cette session (`couleur-tache-sans-couleur-choisie`, `supprimer-une-categorie-de-liste`, `detail-element-de-liste`, `acceder-directement-a-l-energie`, `encadrement-et-glissement-du-planning`, `couleur-de-fond-par-outil`) tous en attente de validation Marie sur la prochaine build déployée.
+- `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles.
+- `manualTestsCatalog.ts` : outre les tests Budget v3 déjà en attente, 7 nouveaux tests (`couleur-tache-sans-couleur-choisie`, `supprimer-une-categorie-de-liste`, `detail-element-de-liste`, `acceder-directement-a-l-energie`, `encadrement-et-glissement-du-planning`, `couleur-de-fond-par-outil`) tous en attente de validation Marie sur la build v5.51 désormais en prod.
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
-- `_contexte/dernier_deploiement.md` : v5.49, 2026-08-17, prod vérifiée HTTP 200 — **v5.51 pas encore déployée à la fin de cette session**.
+- `_contexte/dernier_deploiement.md` : v5.51, 2026-08-20, prod vérifiée HTTP 200.
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Terminer `/deploy` v5.51 (build/publication/vidage `WHATS_NEW`), puis redemander à Marie de tester en conditions réelles tout ce qui est en attente (Budget v3 + tout le lot v5.51 : couleur tâche, suppression catégorie, détail élément de liste, énergie directe, encadrement/glissement planning, couleur de fond outil). — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P1] Redemander à Marie de tester en conditions réelles l'ensemble déployé en v5.51 (Budget v3 + demandes Marie : couleur tâche, suppression catégorie, détail élément de liste, énergie directe, encadrement/glissement planning, couleur de fond outil) — rien de tout cela jamais testé par elle avant ce déploiement. — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer — cohérent avec la demande initiale de Marie sur ce point, jamais satisfaite en l'état), clarifier avec Marie le lien retrait de livret/catégorie budget, vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
 - [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `message_marie_categories_travail.md`
 - [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (isolée, très en retard sur `main` — écart désormais encore plus grand après cette session). — fait quand : Phase 1 checklist complétée, après décision explicite sur le sort de cette branche (rebase complet ou reprise du chantier sync from scratch sur `main`) — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
@@ -24,7 +24,38 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-19 — incident de branche corrigé, import Flux B demandes Marie sur main, export 19/08 traité)
+## Dernière session (2026-08-21 — correctif préventif branche, déploiement v5.51)
+
+## Décisions prises
+- Correctif préventif ajouté suite à l'incident de branche du 2026-08-19 : `.claude/commands/start.md` vérifie désormais la divergence de branche avec `main` avant de charger le contexte ; `.claude/memory.md` recréé sur `main` (absent depuis le report) pour porter la règle durablement.
+- `.gitignore` complété (`__pycache__/`, captures de calibration ROBERTO) — résidus non suivis bloquant le gate 3.1 de `/deploy`, règles déjà présentes sur `sync-marie` mais jamais reportées sur `main`.
+- `/deploy` v5.51 mené à terme après confirmation utilisateur (push intermédiaire confirmé explicitement) : vérifications bloquantes toutes passées (600/600 tests, `tsc -b`/lint clean), build, déploiement Netlify, HTTP 200 vérifié.
+- Bug fonctionnel corrigé pendant les vérifications pré-fusion : `useSettingsState.ts` n'appliquait pas la description par défaut (`''`) aux éléments de liste importés qui avaient déjà un `category_id` (seule la branche de réparation de catégorie manquante le faisait) — corrigé, test dédié ajouté.
+
+## Livrables produits ou modifiés
+- `.claude/commands/start.md` : vérification de divergence de branche ajoutée avant l'étape 3.
+- `.claude/memory.md` : créé sur `main` (traitement des exports Marie + vérification de branche).
+- `.gitignore` : `__pycache__/`, captures de calibration ROBERTO.
+- `src/app/contexts/useSettingsState.ts`(`.test.tsx`) : correctif description par défaut à l'import.
+- `_contexte/dernier_deploiement.md` : v5.51, 2026-08-20.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication.
+- `roadmap_demandes_marie_v1.md` : Phase 5 `[FAIT]`.
+- `README.md`, `CHANGELOG.md`, `_contexte/contexte.md` : état actuel mis à jour (v5.51 en prod).
+
+## Hypothèses validées / invalidées
+- VALIDE : déploiement v5.51 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
+- VALIDE : 600/600 tests unitaires, `tsc -b`/lint clean avant déploiement.
+- EN ATTENTE : aucun des changements de v5.51 (Budget v3 + demandes Marie) jamais testé par Marie en conditions réelles.
+
+## Prochaine étape exacte
+Redemander à Marie de réimporter et retester la v5.51 via le catalogue (voir liste complète en question ouverte P1).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-19 — incident de branche corrigé, import Flux B demandes Marie sur main, export 19/08 traité)
 
 ## Décisions prises
 - Divergence critique `sync-marie`/`main` détectée avant tout `/deploy`/push (sessions précédentes menées par erreur sur `sync-marie`). Sur décision explicite de l'utilisateur : rien de `sync-marie` n'est importé, tout le travail Marie est reporté manuellement sur une branche neuve partant de `main`, `sync-marie` reste intacte comme branche de recherche.
@@ -42,9 +73,9 @@
 - `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`) : badge énergie -> `energy-checkin` direct.
 - `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`) : encadrement du bandeau + glissement animé continu.
 - `src/domain/data/manualTestsCatalog.ts` : 7 tests ajoutés au format catégorie/étapes de `main`.
-- `CHANGELOG.md` (v5.51), `WHATS_NEW`, `roadmap_demandes_marie_v1.md`, `AGENT_STATE.md`, `ROBERTO/flux_b_drive/` : importés/mis à jour sur `main`.
+- `CHANGELOG.md` (v5.51), `WHATS_NEW`, `roadmap_demandes_marie_v1.md`, `ROBERTO/flux_b_drive/` : importés/mis à jour sur `main`.
 - `donnees_marie/export-audhd-2026-08-19.json` : archivé. `_contexte/marie_tests_journal.json` : 10 entrées ajoutées.
-- `.claude/memory.md` : créé (traitement systématique des exports Marie).
+- `.claude/memory.md` : créé sur `sync-marie` (perdu au report, recréé sur `main` la session suivante).
 
 ## Hypothèses validées / invalidées
 - VALIDE : le report manuel fichier par fichier a permis de ne perdre ni le travail Marie ni les fonctionnalités déjà présentes sur `main` (Budget v3, drag continu, sélecteur mois/année) — vérifié par lecture de chaque diff avant application, pas par confiance dans `git apply --check` seul (qui valide le contexte, pas la pertinence).

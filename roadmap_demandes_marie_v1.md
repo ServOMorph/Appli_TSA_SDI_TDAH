@@ -93,16 +93,16 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 5 — Préparation de la dist pour Marie [EN COURS]
+## Phase 5 — Préparation de la dist pour Marie [FAIT]
 
 Ne duplique pas `/deploy` — vérifications spécifiques à cette roadmap avant de le lancer.
 
 - [x] Entrée `CHANGELOG.md` (v5.51, renumérotée depuis v5.38 lors du report sur `main`) couvrant l'ensemble des changements réellement importés.
-- [x] `WHATS_NEW` (`E01Welcome.tsx`) : 6 changements visibles par Marie (couleur tâche, suppression catégorie, énergie directe, détail élément liste, encadrement/animation planning, couleur de fond outil — TA2/AP1 exclus, déjà couverts autrement sur `main`).
+- [x] `WHATS_NEW` (`E01Welcome.tsx`) : 6 changements visibles par Marie (couleur tâche, suppression catégorie, énergie directe, détail élément liste, encadrement/animation planning, couleur de fond outil — TA2/AP1 exclus, déjà couverts autrement sur `main`). Vidé après publication (étape 7 `/deploy`).
 - [x] `src/domain/data/manualTestsCatalog.ts` : 7 nouveaux tests ajoutés au format catégorie/étapes de `main` (`couleur-tache-sans-couleur-choisie`, `supprimer-une-categorie-de-liste`, `detail-element-de-liste`, `acceder-directement-a-l-energie`, `encadrement-et-glissement-du-planning`, `couleur-de-fond-par-outil`).
-- [ ] Une fois cette phase `[FAIT]` : lancer `/deploy` pour livrer la dist à Marie.
+- [x] `/deploy` exécuté : v5.51 déployée en prod (2026-08-20, HTTP 200 vérifié).
 
-Gate : [ ] tests verts (suite complète à relancer sur la branche fusionnée) · [ ] test manuel (tests ajoutés à `manualTestsCatalog.ts`, à valider par Marie sur la prochaine build) · [x] doc (`CHANGELOG.md`, `WHATS_NEW`, `manualTestsCatalog.ts` à jour) · [ ] sortie côté code : `tsc -b`/lint/tests à revalider après fusion · [ ] sortie finale : `/deploy` non encore exécuté.
+Gate : [x] tests verts (600/600 sur la branche fusionnée) · [ ] test manuel (tests du catalogue à valider par Marie sur la build v5.51, désormais déployée — cf. gates des phases 1, 3, 4 qui restent ouvertes jusqu'à sa validation) · [x] doc (`CHANGELOG.md`, `WHATS_NEW`, `manualTestsCatalog.ts` à jour) · [x] sortie côté code : `tsc -b`/lint clean · [x] sortie finale : `/deploy` exécuté, v5.51 en prod.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

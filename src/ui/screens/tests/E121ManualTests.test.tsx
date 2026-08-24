@@ -8,9 +8,32 @@ afterEach(() => {
   localStorage.clear()
 })
 
+function expandCategory(category: string) {
+  fireEvent.click(screen.getByRole('button', { name: `Déplier la catégorie ${category}` }))
+}
+
 describe('E121ManualTests', () => {
+  it('n’affiche que les catégories, repliées, au chargement', () => {
+    renderWithApp(<E121ManualTests />)
+
+    expect(screen.getByRole('heading', { name: 'Outils : Listes' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Ouvrir le test Créer une liste' })).not.toBeInTheDocument()
+  })
+
+  it('déplie une catégorie pour afficher ses tests', () => {
+    renderWithApp(<E121ManualTests />)
+
+    expandCategory('Outils : Listes')
+
+    expect(screen.getByRole('button', { name: 'Ouvrir le test Créer une liste' })).toBeInTheDocument()
+  })
+
   it('affiche les tests nouveaux avec une pastille rouge', () => {
     renderWithApp(<E121ManualTests />)
+
+    for (const category of ['Accueil / Planning', 'Tâches', 'Outils : Budget', 'Outils : Listes', 'Outils : autres', 'Énergie', 'Paramètres / Profil']) {
+      expandCategory(category)
+    }
 
     expect(screen.getAllByLabelText('Nouveau test')).toHaveLength(manualTestsCatalog.length)
     expect(screen.getAllByText('Jamais testé')).toHaveLength(manualTestsCatalog.length)
@@ -20,18 +43,44 @@ describe('E121ManualTests', () => {
     const ctx = makeAppContext({
       manualTestResults: [
         { id: 'old', test_id: 'creer-une-liste', status: 'nok', comment: 'Ancien refus', created_at: '2026-08-14T09:00:00.000Z' },
+        { id: 'new', test_id: 'creer-une-liste', status: 'nok', comment: 'Toujours en échec', created_at: '2026-08-14T10:00:00.000Z' },
+      ],
+    })
+    renderWithApp(<E121ManualTests />, ctx)
+    expandCategory('Outils : Listes')
+
+    expect(screen.getByText('Non validé')).toBeInTheDocument()
+  })
+
+  it('retire un test valide de la liste affichée', () => {
+    const ctx = makeAppContext({
+      manualTestResults: [
         { id: 'new', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T10:00:00.000Z' },
       ],
     })
     renderWithApp(<E121ManualTests />, ctx)
+    expandCategory('Outils : Listes')
 
-    expect(screen.getByText('Validé')).toBeInTheDocument()
-    expect(screen.getAllByLabelText('Nouveau test')).toHaveLength(manualTestsCatalog.length - 1)
+    expect(screen.queryByRole('button', { name: 'Ouvrir le test Créer une liste' })).not.toBeInTheDocument()
+  })
+
+  it('masque un test dont le dernier résultat est validé après un échec', () => {
+    const ctx = makeAppContext({
+      manualTestResults: [
+        { id: 'old', test_id: 'creer-une-liste', status: 'nok', comment: 'Ancien échec', created_at: '2026-08-14T09:00:00.000Z' },
+        { id: 'new', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T10:00:00.000Z' },
+      ],
+    })
+    renderWithApp(<E121ManualTests />, ctx)
+    expandCategory('Outils : Listes')
+
+    expect(screen.queryByRole('button', { name: 'Ouvrir le test Créer une liste' })).not.toBeInTheDocument()
   })
 
   it('demande un commentaire avant d’enregistrer un résultat non validé', async () => {
     const submitManualTestResult = vi.fn().mockResolvedValue(undefined)
     renderWithApp(<E121ManualTests />, makeAppContext({ submitManualTestResult }))
+    expandCategory('Outils : Listes')
 
     fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le test Créer une liste' }))
     expect(screen.getByRole('dialog', { name: 'Résultat du test Créer une liste' })).toBeInTheDocument()
@@ -49,29 +98,37 @@ describe('E121ManualTests', () => {
     })
   })
 
+  it('déplie et replie les étapes d’un test depuis la liste', () => {
+    renderWithApp(<E121ManualTests />)
+    expandCategory('Outils : Listes')
+
+    const toggle = screen.getByRole('button', { name: 'Déplier la description de Créer une liste' })
+    const listCountBefore = screen.getAllByRole('list').length
+
+    fireEvent.click(toggle)
+    expect(screen.getAllByRole('list')).toHaveLength(listCountBefore + 1)
+    expect(screen.getByRole('button', { name: 'Replier la description de Créer une liste' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Replier la description de Créer une liste' }))
+    expect(screen.getAllByRole('list')).toHaveLength(listCountBefore)
+  })
+
   it('affiche l’historique complet du test ouvert', () => {
     renderWithApp(
       <E121ManualTests />,
       makeAppContext({
         manualTestResults: [
           { id: 'first', test_id: 'creer-une-liste', status: 'nok', comment: 'Le bouton est absent.', created_at: '2026-08-14T09:00:00.000Z' },
-          { id: 'second', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T10:00:00.000Z' },
+          { id: 'second', test_id: 'creer-une-liste', status: 'nok', comment: 'Toujours en échec', created_at: '2026-08-14T10:00:00.000Z' },
         ],
       }),
     )
+    expandCategory('Outils : Listes')
 
     fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le test Créer une liste' }))
     expect(screen.getByRole('heading', { name: 'Historique' })).toBeInTheDocument()
     expect(screen.getByText('Le bouton est absent.')).toBeInTheDocument()
-    expect(within(screen.getByRole('region', { name: 'Historique du test' })).getByText('Validé')).toBeInTheDocument()
+    expect(within(screen.getByRole('region', { name: 'Historique du test' })).getAllByText('Non validé')).toHaveLength(2)
   })
 
-  it('masque la bannière urgente au clic sur Fait, de façon persistante', () => {
-    const { unmount } = renderWithApp(<E121ManualTests />)
-    expect(screen.getByRole('alert')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Fait' }))
-    unmount()
-    renderWithApp(<E121ManualTests />)
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-  })
 })

@@ -35,7 +35,13 @@ const handleBarStyle: React.CSSProperties = {
   background: 'var(--color-border)',
 }
 
-const DRAG_EXPAND_THRESHOLD_PX = 24
+const PLANNING_MIN_HEIGHT_PX = 190
+const PLANNING_MAX_HEIGHT_PX = 460
+const DRAG_MOVE_EPSILON_PX = 6
+
+function clampPlanningHeight(value: number): number {
+  return Math.min(PLANNING_MAX_HEIGHT_PX, Math.max(PLANNING_MIN_HEIGHT_PX, value))
+}
 
 const widgetBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -45,7 +51,7 @@ const widgetBtnStyle: React.CSSProperties = {
   cursor: 'pointer',
   color: 'var(--color-text)',
   fontSize: '1rem',
-  fontFamily: 'var(--font-body)',
+  fontFamily: 'ui-rounded, "SF Pro Rounded", "Segoe UI Rounded", var(--font-body)',
   padding: 0,
 }
 
@@ -74,8 +80,11 @@ export function E10Dashboard() {
 
   const dragStartY = useRef<number | null>(null)
   const dragTriggered = useRef(false)
+  const [dragDeltaY, setDragDeltaY] = useState<number | null>(null)
 
-  const showSecondary = !expanded
+  const baseHeight = expanded ? PLANNING_MAX_HEIGHT_PX : PLANNING_MIN_HEIGHT_PX
+  const planningHeight = dragDeltaY === null ? baseHeight : clampPlanningHeight(baseHeight + dragDeltaY)
+
   const rootFolders = folders
   const rootTools = tools.filter((t) => t.folder_id === null)
   const hasNewManualTests = manualTestsCatalog.some(
@@ -99,7 +108,7 @@ export function E10Dashboard() {
     goTo('list-detail')
   }
 
-  const expenseCategories = budgetCategories.filter((category) => category.kind === 'expense')
+  const expenseCategories = budgetCategories
 
   function openExpenseForm() {
     if (expenseCategories.length === 0) {
@@ -117,22 +126,24 @@ export function E10Dashboard() {
   function handleHandlePointerDown(event: React.PointerEvent) {
     dragStartY.current = event.clientY
     dragTriggered.current = false
+    setDragDeltaY(0)
   }
 
   function handleHandlePointerMove(event: React.PointerEvent) {
-    if (dragStartY.current === null || dragTriggered.current) return
+    if (dragStartY.current === null) return
     const delta = event.clientY - dragStartY.current
-    if (!expanded && delta > DRAG_EXPAND_THRESHOLD_PX) {
-      dragTriggered.current = true
-      goTo('planning')
-    } else if (expanded && delta < -DRAG_EXPAND_THRESHOLD_PX) {
-      dragTriggered.current = true
-      goTo('dashboard')
-    }
+    if (!dragTriggered.current && Math.abs(delta) > DRAG_MOVE_EPSILON_PX) dragTriggered.current = true
+    setDragDeltaY(delta)
   }
 
   function handleHandlePointerUp() {
+    if (dragTriggered.current && dragStartY.current !== null) {
+      const releasedHeight = clampPlanningHeight(baseHeight + (dragDeltaY ?? 0))
+      const shouldExpand = releasedHeight > (PLANNING_MIN_HEIGHT_PX + PLANNING_MAX_HEIGHT_PX) / 2
+      if (shouldExpand !== expanded) goTo(shouldExpand ? 'planning' : 'dashboard')
+    }
     dragStartY.current = null
+    setDragDeltaY(null)
   }
 
   function handleHandleClick() {
@@ -173,7 +184,7 @@ export function E10Dashboard() {
         ambianceColor={settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR}
       />
 
-      {overloadMode && showSecondary && (
+      {overloadMode && (
         <Card style={{ borderColor: 'var(--color-warning)' }}>
           <p style={{ fontWeight: 600, margin: 0, color: 'var(--color-warning)' }}>
             Mode surcharge actif
@@ -192,28 +203,43 @@ export function E10Dashboard() {
         </Card>
       )}
 
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          ...(expanded ? { flex: 1 } : {}),
-        }}
-      >
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         {expanded && handle}
-        <PlanningBoard collapsed={!expanded} />
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+            height: `${planningHeight}px`,
+            overflowY: dragDeltaY === null ? 'auto' : 'hidden',
+            transition: dragDeltaY === null ? 'height 0.2s ease' : 'none',
+          }}
+        >
+          <PlanningBoard collapsed={!expanded} />
+        </div>
         {!expanded && handle}
       </div>
 
-      {showSecondary && !overloadMode && (
+      {!overloadMode && (
         <section aria-label="Outils">
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-            <h2 style={{ fontSize: '1.1rem', flex: 1 }}>Outils</h2>
-            <Button onClick={() => setShowCreateTool(true)} aria-label="Ajouter un outil">
+            <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Outils</h2>
+            <Button
+              onClick={() => setShowCreateTool(true)}
+              aria-label="Ajouter un outil"
+              style={{ padding: '4px 10px', fontSize: '1rem', lineHeight: 1 }}
+            >
               +
             </Button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-sm)' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 'var(--spacing-sm)',
+              marginTop: 'var(--spacing-md)',
+            }}
+          >
             <Card>
               <button style={widgetBtnStyle} onClick={openExpenseForm}>
                 Comptes

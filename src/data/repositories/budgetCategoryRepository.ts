@@ -1,9 +1,5 @@
 import type { AppDatabase } from '@/data/db'
-import type {
-  BudgetCategory,
-  BudgetCategoryKind,
-  BudgetPeriod,
-} from '@/domain/entities/budgetCategory'
+import type { BudgetCategory, BudgetPeriod } from '@/domain/entities/budgetCategory'
 
 export class BudgetCategoryRepository {
   private db: AppDatabase
@@ -25,10 +21,6 @@ export class BudgetCategoryRepository {
 
   async getByPeriod(period: BudgetPeriod): Promise<BudgetCategory[]> {
     return this.db.budgetCategories.where('period').equals(period).sortBy('position')
-  }
-
-  async getByKind(kind: BudgetCategoryKind): Promise<BudgetCategory[]> {
-    return this.db.budgetCategories.where('kind').equals(kind).sortBy('position')
   }
 
   async update(category: BudgetCategory): Promise<void> {

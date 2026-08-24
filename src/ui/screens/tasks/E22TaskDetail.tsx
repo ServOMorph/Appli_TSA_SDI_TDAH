@@ -2,15 +2,13 @@ import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
-import { IconPicker } from '@/ui/components/IconPicker'
-import { ColorPicker } from '@/ui/components/ColorPicker'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
 import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
 import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
-import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
+import { DEFAULT_AMBIANCE_COLOR, pastelBackground } from '@/ui/styles/ambiance'
 import type { Screen } from '@/app/AppContext'
-import type { TaskEditScope, TaskFieldEdit } from '@/app/contexts/usePlanningState'
+import type { TaskEditScope } from '@/app/contexts/usePlanningState'
 import {
   DndContext,
   PointerSensor,
@@ -260,50 +258,12 @@ const fieldRowStyle: React.CSSProperties = {
   padding: 'var(--spacing-md)',
   borderRadius: 'var(--radius-md)',
   border: '1px solid var(--color-border)',
-  cursor: 'pointer',
-  background: 'none',
-  textAlign: 'left',
   width: '100%',
   color: 'var(--color-text)',
   fontFamily: 'var(--font-body)',
 }
 
 const fieldLabelStyle: React.CSSProperties = { color: 'var(--color-text-muted)', fontSize: '0.875rem' }
-
-const energyGridStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(6, 1fr)',
-  gap: 'var(--spacing-xs)',
-}
-
-function energyGridButtonStyle(selected: boolean): React.CSSProperties {
-  return {
-    padding: '10px 0',
-    borderRadius: 'var(--radius-sm)',
-    border: 'none',
-    backgroundColor: selected ? 'var(--color-accent)' : 'var(--color-surface)',
-    color: selected ? '#fff' : 'var(--color-text)',
-    fontSize: '0.9375rem',
-    fontWeight: 600,
-    fontFamily: 'var(--font-body)',
-    cursor: 'pointer',
-  }
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px 12px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1px solid var(--color-border)',
-  backgroundColor: 'var(--color-surface)',
-  color: 'var(--color-text)',
-  fontFamily: 'var(--font-body)',
-  boxSizing: 'border-box',
-}
-
-const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
-
-type EditableField = 'title' | 'date' | 'time' | 'energy' | 'icon' | 'color' | null
 
 export function E22TaskDetail() {
   const {
@@ -323,8 +283,8 @@ export function E22TaskDetail() {
     scheduleSubTask,
     getTaskById,
     duplicateTaskById,
-    updateTaskFields,
     deleteTaskScoped,
+    settings,
   } = useApp()
 
   const [subTasks, setSubTasks] = useState<Task[]>([])
@@ -332,8 +292,6 @@ export function E22TaskDetail() {
   const [renamingSubTask, setRenamingSubTask] = useState<Task | null>(null)
   const [renameSubTaskTitle, setRenameSubTaskTitle] = useState('')
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
-  const [activeField, setActiveField] = useState<EditableField>(null)
-  const [pendingEdit, setPendingEdit] = useState<TaskFieldEdit | null>(null)
   const [pendingDelete, setPendingDelete] = useState(false)
 
   const taskFromLists = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
@@ -354,44 +312,19 @@ export function E22TaskDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTaskId, taskFromLists])
 
-  async function refreshFetchedTask() {
-    if (selectedTaskId) {
-      const t = await getTaskById(selectedTaskId)
-      setFetchedTask(t ?? null)
-    }
-  }
-
   function requiresScopeChoice(): boolean {
     return !!task?.recurrence_id
   }
 
-  async function handleFieldEdit(edit: TaskFieldEdit) {
-    if (!selectedTaskId) return
-    setActiveField(null)
-    if (requiresScopeChoice()) {
-      setPendingEdit(edit)
-    } else {
-      await updateTaskFields(selectedTaskId, edit, 'occurrence')
-      await refreshFetchedTask()
-    }
-  }
-
   async function confirmScope(scope: TaskEditScope) {
-    if (!selectedTaskId) return
-    if (pendingEdit) {
-      await updateTaskFields(selectedTaskId, pendingEdit, scope)
-      setPendingEdit(null)
-      await refreshFetchedTask()
-    } else if (pendingDelete) {
-      setPendingDelete(false)
-      await deleteTaskScoped(selectedTaskId, scope)
-      selectTask(null)
-      goTo(task ? backScreenForTask(task) : 'inbox')
-    }
+    if (!selectedTaskId || !pendingDelete) return
+    setPendingDelete(false)
+    await deleteTaskScoped(selectedTaskId, scope)
+    selectTask(null)
+    goTo(task ? backScreenForTask(task) : 'inbox')
   }
 
   function cancelScope() {
-    setPendingEdit(null)
     setPendingDelete(false)
   }
 
@@ -492,8 +425,13 @@ export function E22TaskDetail() {
   }
 
 
+  const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
+  const detailPageStyle: React.CSSProperties = task.scheduled_date
+    ? { ...pageStyle, backgroundColor: pastelBackground(ambianceColor) }
+    : pageStyle
+
   return (
-    <main style={pageStyle}>
+    <main style={detailPageStyle}>
       <button style={backBtnStyle} onClick={() => back(backScreenForTask(task))} aria-label="Retour">
         ← Retour
       </button>
@@ -501,112 +439,35 @@ export function E22TaskDetail() {
       <h1 style={{ margin: 0 }}>{task.title}</h1>
 
       <section aria-label="Détails" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-        <button
-          type="button"
-          style={fieldRowStyle}
-          onClick={() => setActiveField(activeField === 'title' ? null : 'title')}
-        >
+        <div style={fieldRowStyle}>
           <span style={fieldLabelStyle}>Titre</span>
           <span>{task.title}</span>
-        </button>
-        {activeField === 'title' && (
-          <input
-            type="text"
-            aria-label="Modifier le titre"
-            defaultValue={task.title}
-            onBlur={(e) => e.target.value.trim() && handleFieldEdit({ title: e.target.value.trim() })}
-            style={inputStyle}
-          />
-        )}
+        </div>
 
-        <button
-          type="button"
-          style={fieldRowStyle}
-          onClick={() => setActiveField(activeField === 'icon' ? null : 'icon')}
-        >
+        <div style={fieldRowStyle}>
           <span style={fieldLabelStyle}>Icône</span>
           <span>{task.icon ?? 'Aucune'}</span>
-        </button>
-        {activeField === 'icon' && (
-          <IconPicker value={task.icon} onChange={(icon) => handleFieldEdit({ icon })} />
-        )}
+        </div>
 
-        <button
-          type="button"
-          style={fieldRowStyle}
-          onClick={() => setActiveField(activeField === 'color' ? null : 'color')}
-        >
+        <div style={fieldRowStyle}>
           <span style={fieldLabelStyle}>Couleur</span>
           <span>{task.color ?? 'Aucune couleur'}</span>
-        </button>
-        {activeField === 'color' && (
-          <ColorPicker value={task.color} onChange={(color) => handleFieldEdit({ color })} />
-        )}
+        </div>
 
-        <button
-          type="button"
-          style={fieldRowStyle}
-          onClick={() => setActiveField(activeField === 'date' ? null : 'date')}
-        >
+        <div style={fieldRowStyle}>
           <span style={fieldLabelStyle}>Date</span>
           <span>{task.scheduled_date ? formatFrenchDate(task.scheduled_date) : 'Non planifiée'}</span>
-        </button>
-        {activeField === 'date' && (
-          <input
-            type="date"
-            aria-label="Modifier la date"
-            defaultValue={task.scheduled_date ?? ''}
-            onChange={(e) => handleFieldEdit({ date: e.target.value })}
-            style={inputStyle}
-          />
-        )}
+        </div>
 
-        <button
-          type="button"
-          style={fieldRowStyle}
-          onClick={() => setActiveField(activeField === 'time' ? null : 'time')}
-        >
+        <div style={fieldRowStyle}>
           <span style={fieldLabelStyle}>Horaire</span>
           <span>{task.scheduled_start ? `${task.scheduled_start} (${task.duration_minutes ?? 0} min)` : 'Non planifié'}</span>
-        </button>
-        {activeField === 'time' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            <input
-              type="time"
-              aria-label="Modifier l'heure de début"
-              defaultValue={task.scheduled_start ?? ''}
-              onChange={(e) => handleFieldEdit({ startTime: e.target.value })}
-              style={inputStyle}
-            />
-            <DurationRoller
-              minutes={task.duration_minutes}
-              onChange={(durationMinutes) => handleFieldEdit({ durationMinutes })}
-            />
-          </div>
-        )}
+        </div>
 
-        <button
-          type="button"
-          style={fieldRowStyle}
-          onClick={() => setActiveField(activeField === 'energy' ? null : 'energy')}
-        >
+        <div style={fieldRowStyle}>
           <span style={fieldLabelStyle}>Coût en énergie</span>
           <span>{task.energy_cost ?? 'Non défini'}</span>
-        </button>
-        {activeField === 'energy' && (
-          <div style={energyGridStyle} role="group" aria-label="Modifier le coût en énergie">
-            {ENERGY_OPTIONS.map((v) => (
-              <button
-                key={v}
-                type="button"
-                style={energyGridButtonStyle(task.energy_cost === v)}
-                onClick={() => handleFieldEdit({ energyCost: task.energy_cost === v ? null : v })}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-        )}
+        </div>
       </section>
 
       {subTasks.length > 0 && (
@@ -639,7 +500,7 @@ export function E22TaskDetail() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-        <Button fullWidth onClick={() => setActiveField('title')}>
+        <Button fullWidth onClick={() => goTo('task-edit')}>
           Modifier
         </Button>
         <Button fullWidth onClick={() => goTo('task-decompose')}>
@@ -653,13 +514,13 @@ export function E22TaskDetail() {
         </Button>
       </div>
 
-      {(pendingEdit || pendingDelete) && (
+      {pendingDelete && (
         <div role="dialog" aria-modal="true" aria-label="Modifier la série récurrente" style={modalOverlay}>
           <div style={modalBox}>
             <h2 style={{ margin: 0 }}>Tâche récurrente</h2>
             <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-              Appliquer {pendingDelete ? 'la suppression' : 'la modification'} à cette occurrence
-              seulement, ou à toutes les occurrences futures de la série ?
+              Appliquer la suppression à cette occurrence seulement, ou à toutes les occurrences
+              futures de la série ?
             </p>
             <Button fullWidth onClick={() => confirmScope('occurrence')}>
               Cette occurrence

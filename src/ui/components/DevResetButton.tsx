@@ -10,6 +10,7 @@ const SCREEN_CODES: Record<Screen, string> = {
   'task-create-v2': 'E21v2',
   planning: 'E40',
   'task-detail': 'E22',
+  'task-edit': 'E24',
   'task-decompose': 'E23',
   'energy-view': 'E30',
   'energy-checkin': 'E31',
@@ -28,6 +29,9 @@ const SCREEN_CODES: Record<Screen, string> = {
   budget: 'E71',
   'budget-category-detail': 'E73',
   'budget-settings': 'E74',
+  'budget-account': 'E75',
+  'budget-livrets': 'E76',
+  'budget-livret-detail': 'E77',
 }
 
 export function DevResetButton() {

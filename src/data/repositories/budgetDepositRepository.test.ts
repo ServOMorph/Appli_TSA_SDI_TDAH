@@ -11,7 +11,6 @@ describe('BudgetDepositRepository', () => {
     id: 'deposit-1',
     account_id: 'livret-a',
     amount: 50,
-    period: 'month',
     date: '2026-07-21',
     created_at: '2026-07-21T00:00:00Z',
     ...overrides,

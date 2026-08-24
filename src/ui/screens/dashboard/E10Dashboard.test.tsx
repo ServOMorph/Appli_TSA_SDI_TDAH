@@ -27,14 +27,14 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('button', { name: 'Renseigner mon énergie' })).toBeDefined()
     })
 
-    it('clic sur la pill énergie navigue directement vers energy-checkin', async () => {
+    it('clic sur la pill énergie navigue directement vers energy-checkin (EN1)', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Renseigner mon énergie' }))
       expect(ctx.goTo).toHaveBeenCalledWith('energy-checkin')
     })
 
-    it('clic sur badge énergie navigue directement vers energy-checkin', async () => {
+    it('clic sur badge énergie navigue directement vers energy-checkin (EN1)', async () => {
       const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByLabelText(/sur 7 disponible/i))
@@ -130,7 +130,7 @@ describe('E10Dashboard', () => {
     it('replié : affiche le bandeau de dates comme en mode déplié', async () => {
       const ctx = makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByRole('button', { name: /semaine précédente/i })).not.toBeNull()
+      expect(await screen.findByRole('region', { name: 'Planning du jour' })).not.toBeNull()
     })
 
     it('replié : affiche la zone widgets', async () => {
@@ -146,15 +146,15 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('planning')
     })
 
-    it('déplié : affiche le bandeau de dates du planning et masque la zone widgets', async () => {
+    it('déplié : affiche le bandeau de dates du planning et garde la zone widgets visible', async () => {
       const ctx = makeAppContext({
         route: { name: 'planning' },
         screen: 'planning',
         getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       })
       renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByRole('button', { name: /semaine précédente/i })).toBeDefined()
-      expect(screen.queryByRole('region', { name: 'Outils' })).toBeNull()
+      expect(await screen.findByRole('region', { name: 'Planning du jour' })).toBeDefined()
+      expect(screen.getByRole('region', { name: 'Outils' })).toBeDefined()
     })
 
     it('déplié : la poignée replie vers l\'accueil (E18)', async () => {
@@ -206,7 +206,7 @@ describe('E10Dashboard', () => {
 
     it('le widget Comptes ouvre la saisie de dépense', async () => {
       const ctx = makeAppContext({
-        budgetCategories: [{ id: 'c1', name: 'Courses', kind: 'expense', period: 'month', amount: 100, position: 0, created_at: '', updated_at: '' }],
+        budgetCategories: [{ id: 'c1', name: 'Courses', period: 'month', amount: 100, position: 0, created_at: '', updated_at: '' }],
       })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Comptes' }))

@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
-import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
-import type { BudgetCategoryKind, BudgetPeriod } from '@/domain/entities/budgetCategory'
-import { getAccountBalance, getPeriodBounds, getUnbudgetedRemainder } from '@/domain/rules/budgetRules'
+import type { BudgetPeriod } from '@/domain/entities/budgetCategory'
+import { getAccountBalance } from '@/domain/rules/budgetRules'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { dangerLinkStyle, formatEuro, inputStyle, modalBox, modalOverlay, neutralLinkStyle, pageStyle } from '@/ui/styles/budget'
@@ -24,13 +23,10 @@ export function E74BudgetSettings() {
     createBudgetAccount,
     renameBudgetAccount,
     deleteBudgetAccount,
-    createBudgetDeposit,
-    deleteBudgetDeposit,
   } = useApp()
 
   const [showCategoryForm, setShowCategoryForm] = useState(false)
   const [categoryName, setCategoryName] = useState('')
-  const [categoryKind, setCategoryKind] = useState<BudgetCategoryKind>('expense')
   const [categoryPeriod, setCategoryPeriod] = useState<BudgetPeriod>('month')
   const [categoryAmount, setCategoryAmount] = useState('')
   const [showAccountForm, setShowAccountForm] = useState(false)
@@ -38,17 +34,11 @@ export function E74BudgetSettings() {
   const [renamingAccount, setRenamingAccount] = useState<BudgetAccount | null>(null)
   const [accountRenameValue, setAccountRenameValue] = useState('')
   const [deletingAccount, setDeletingAccount] = useState<BudgetAccount | null>(null)
-  const [showDepositForm, setShowDepositForm] = useState(false)
-  const [depositAccountId, setDepositAccountId] = useState('')
-  const [depositKind, setDepositKind] = useState<'deposit' | 'withdrawal'>('deposit')
-  const [depositAmount, setDepositAmount] = useState('')
-  const [depositPeriod, setDepositPeriod] = useState<BudgetPeriod>('month')
 
   const reference = todayDate()
 
   function resetCategoryForm() {
     setCategoryName('')
-    setCategoryKind('expense')
     setCategoryPeriod('month')
     setCategoryAmount('')
     setShowCategoryForm(false)
@@ -57,7 +47,7 @@ export function E74BudgetSettings() {
   async function handleCreateCategory() {
     const amount = Number(categoryAmount.replace(',', '.'))
     if (!categoryName.trim() || !Number.isFinite(amount) || amount <= 0) return
-    await createBudgetCategory(categoryName, categoryKind, categoryPeriod, amount)
+    await createBudgetCategory(categoryName, categoryPeriod, amount)
     resetCategoryForm()
   }
 
@@ -85,28 +75,6 @@ export function E74BudgetSettings() {
     setDeletingAccount(null)
   }
 
-  function openDepositForm() {
-    const firstAccount = budgetAccounts[0]
-    if (!firstAccount) return
-    setDepositAccountId(firstAccount.id)
-    setDepositKind('deposit')
-    setDepositAmount('')
-    setDepositPeriod('month')
-    setShowDepositForm(true)
-  }
-
-  const depositAccountBalance = getAccountBalance(budgetDeposits, depositAccountId)
-  const parsedDepositAmount = Number(depositAmount.replace(',', '.'))
-  const depositExceedsBalance = depositKind === 'withdrawal' && parsedDepositAmount > depositAccountBalance
-  const canSubmitDeposit = Boolean(depositAccountId) && Number.isFinite(parsedDepositAmount) && parsedDepositAmount > 0 && !depositExceedsBalance
-
-  async function handleCreateDeposit() {
-    if (!canSubmitDeposit) return
-    const signedAmount = depositKind === 'withdrawal' ? -parsedDepositAmount : parsedDepositAmount
-    await createBudgetDeposit(depositAccountId, signedAmount, depositPeriod)
-    setShowDepositForm(false)
-  }
-
   return (
     <main style={pageStyle}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
@@ -115,24 +83,6 @@ export function E74BudgetSettings() {
         </button>
         <h1 style={{ margin: 0, fontSize: '1.25rem' }}>Configurer le budget</h1>
       </header>
-
-      <section aria-label="Non alloué">
-        <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Non alloué</h2>
-        <Card>
-          <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
-            Revenus moins budget des dépenses et dépôts sur la période en cours.
-          </p>
-          {(['week', 'month'] as BudgetPeriod[]).map((period) => {
-            const remainder = getUnbudgetedRemainder(budgetCategories, budgetDeposits, period, getPeriodBounds(period, reference))
-            return (
-              <p key={period} style={{ display: 'flex', justifyContent: 'space-between', margin: 'var(--spacing-sm) 0 0' }}>
-                <span>{periodLabel(period)}</span>
-                <strong style={{ color: remainder < 0 ? 'var(--color-error)' : 'var(--color-success)' }}>{formatEuro(remainder)}</strong>
-              </p>
-            )
-          })}
-        </Card>
-      </section>
 
       <section aria-label="Catégories">
         <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Catégories</h2>
@@ -149,7 +99,7 @@ export function E74BudgetSettings() {
                 >
                   <span>{category.name}</span>
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                    {category.kind === 'income' ? 'Revenu' : 'Dépense'} · {periodLabel(category.period)} · {formatEuro(category.amount)}
+                    {periodLabel(category.period)} · {formatEuro(category.amount)}
                   </span>
                 </button>
               </li>
@@ -167,25 +117,16 @@ export function E74BudgetSettings() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
               {budgetAccounts.map((account) => {
-                const deposits = budgetDeposits
-                  .filter((deposit) => deposit.account_id === account.id)
-                  .sort((a, b) => b.date.localeCompare(a.date))
                 return (
                   <li key={account.id}>
-                    <strong style={{ fontSize: '1rem' }}>{account.name}</strong>
-                    <p style={{ margin: '4px 0', fontWeight: 600, color: 'var(--color-success)' }}>
-                      Solde : {formatEuro(getAccountBalance(budgetDeposits, account.id))}
-                    </p>
-                    {deposits.map((deposit) => {
-                      const isWithdrawal = deposit.amount < 0
-                      const movementLabel = isWithdrawal ? 'Retrait' : 'Dépôt'
-                      return (
-                        <div key={deposit.id} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-sm)', fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
-                          <span style={{ flex: '1 1 180px' }}>{formatFrenchDate(deposit.date)} · {movementLabel} : {formatEuro(Math.abs(deposit.amount))}</span>
-                          <button aria-label={`Supprimer le ${movementLabel.toLowerCase()} ${Math.abs(deposit.amount)}`} onClick={() => deleteBudgetDeposit(deposit.id)} style={dangerLinkStyle}>Supprimer</button>
-                        </div>
-                      )
-                    })}
+                    <button
+                      aria-label={`Ouvrir ${account.name}`}
+                      onClick={() => goTo({ name: 'budget-livret-detail', accountId: account.id })}
+                      style={{ width: '100%', display: 'flex', justifyContent: 'space-between', gap: 'var(--spacing-sm)', appearance: 'none', background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-sm)', cursor: 'pointer', color: 'var(--color-text)', font: 'inherit', textAlign: 'left' }}
+                    >
+                      <span>{account.name}</span>
+                      <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>{formatEuro(getAccountBalance(budgetDeposits, account.id))}</span>
+                    </button>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginTop: '4px' }}>
                       <button aria-label={`Renommer ${account.name}`} onClick={() => { setRenamingAccount(account); setAccountRenameValue(account.name) }} style={neutralLinkStyle}>Renommer le livret</button>
                       <button aria-label={`Supprimer ${account.name}`} onClick={() => handleDeleteAccount(account)} style={{ ...dangerLinkStyle, marginLeft: 'auto' }}>Supprimer le livret</button>
@@ -198,7 +139,6 @@ export function E74BudgetSettings() {
         </Card>
       </section>
 
-      <Button fullWidth onClick={openDepositForm} disabled={budgetAccounts.length === 0}>Ajouter un mouvement</Button>
       <Button variant="secondary" fullWidth onClick={() => setShowAccountForm(true)}>Ajouter un livret</Button>
 
       {showCategoryForm && (
@@ -207,22 +147,11 @@ export function E74BudgetSettings() {
             <h2 style={{ margin: 0 }}>Ajouter une catégorie</h2>
             <label htmlFor="budget-category-name">Nom</label>
             <input id="budget-category-name" autoFocus value={categoryName} onChange={(event) => setCategoryName(event.target.value)} style={inputStyle} />
-            <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label htmlFor="budget-category-kind">Type</label>
-                <select id="budget-category-kind" value={categoryKind} onChange={(event) => setCategoryKind(event.target.value as BudgetCategoryKind)} style={inputStyle}>
-                  <option value="expense">Dépense</option>
-                  <option value="income">Revenu</option>
-                </select>
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label htmlFor="budget-category-period">Périodicité</label>
-                <select id="budget-category-period" value={categoryPeriod} onChange={(event) => setCategoryPeriod(event.target.value as BudgetPeriod)} style={inputStyle}>
-                  <option value="week">À la semaine</option>
-                  <option value="month">Au mois</option>
-                </select>
-              </div>
-            </div>
+            <label htmlFor="budget-category-period">Périodicité</label>
+            <select id="budget-category-period" value={categoryPeriod} onChange={(event) => setCategoryPeriod(event.target.value as BudgetPeriod)} style={inputStyle}>
+              <option value="week">À la semaine</option>
+              <option value="month">Au mois</option>
+            </select>
             <label htmlFor="budget-category-amount">Montant</label>
             <input id="budget-category-amount" type="text" inputMode="decimal" value={categoryAmount} onChange={(event) => setCategoryAmount(event.target.value)} style={inputStyle} />
             <Button fullWidth onClick={handleCreateCategory} disabled={!categoryName.trim() || Number(categoryAmount.replace(',', '.')) <= 0}>Créer</Button>
@@ -239,37 +168,6 @@ export function E74BudgetSettings() {
             <input id="budget-account-name" autoFocus value={accountName} onChange={(event) => setAccountName(event.target.value)} style={inputStyle} />
             <Button fullWidth onClick={handleCreateAccount} disabled={!accountName.trim()}>Créer</Button>
             <Button variant="secondary" fullWidth onClick={() => { setAccountName(''); setShowAccountForm(false) }}>Annuler</Button>
-          </div>
-        </div>
-      )}
-
-      {showDepositForm && (
-        <div role="dialog" aria-modal="true" aria-label="Ajouter un mouvement" style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Ajouter un mouvement</h2>
-            <label htmlFor="budget-deposit-account">Livret</label>
-            <select id="budget-deposit-account" value={depositAccountId} onChange={(event) => setDepositAccountId(event.target.value)} style={inputStyle}>
-              {budgetAccounts.map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
-            </select>
-            <label htmlFor="budget-deposit-kind">Type</label>
-            <select id="budget-deposit-kind" value={depositKind} onChange={(event) => setDepositKind(event.target.value as 'deposit' | 'withdrawal')} style={inputStyle}>
-              <option value="deposit">Dépôt</option>
-              <option value="withdrawal">Retrait</option>
-            </select>
-            <label htmlFor="budget-deposit-amount">Montant</label>
-            <input id="budget-deposit-amount" type="text" inputMode="decimal" value={depositAmount} onChange={(event) => setDepositAmount(event.target.value)} style={inputStyle} />
-            {depositExceedsBalance && (
-              <p style={{ margin: 0, color: 'var(--color-error)', fontSize: '0.8125rem' }}>
-                Le retrait dépasse le solde du livret ({formatEuro(depositAccountBalance)}).
-              </p>
-            )}
-            <label htmlFor="budget-deposit-period">Périodicité</label>
-            <select id="budget-deposit-period" value={depositPeriod} onChange={(event) => setDepositPeriod(event.target.value as BudgetPeriod)} style={inputStyle}>
-              <option value="week">À la semaine</option>
-              <option value="month">Au mois</option>
-            </select>
-            <Button fullWidth onClick={handleCreateDeposit} disabled={!canSubmitDeposit}>Enregistrer</Button>
-            <Button variant="secondary" fullWidth onClick={() => setShowDepositForm(false)}>Annuler</Button>
           </div>
         </div>
       )}

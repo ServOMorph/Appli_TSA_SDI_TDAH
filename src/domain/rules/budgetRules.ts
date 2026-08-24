@@ -1,6 +1,7 @@
 import type { BudgetCategory, BudgetPeriod } from '@/domain/entities/budgetCategory'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 
 export interface BudgetPeriodBounds {
   startDate: string
@@ -33,10 +34,6 @@ export function getPeriodBounds(period: BudgetPeriod, date: string): BudgetPerio
   return { startDate: toDateString(start), endDate: toDateString(end) }
 }
 
-export function getCurrentPeriodBounds(period: BudgetPeriod, now: string): BudgetPeriodBounds {
-  return getPeriodBounds(period, now.slice(0, 10))
-}
-
 export function isDateInPeriod(date: string, bounds: BudgetPeriodBounds): boolean {
   return date >= bounds.startDate && date <= bounds.endDate
 }
@@ -51,69 +48,9 @@ export function getSpentForCategory(
     .reduce((total, entry) => total + entry.amount, 0)
 }
 
-export function getRemainingForCategory(
-  category: BudgetCategory,
-  entries: BudgetEntry[],
-  bounds: BudgetPeriodBounds,
-): number {
-  return category.amount - getSpentForCategory(entries, category.id, bounds)
-}
-
-export function getTotalIncome(categories: BudgetCategory[], period: BudgetPeriod): number {
-  return categories
-    .filter((category) => category.kind === 'income' && category.period === period)
-    .reduce((total, category) => total + category.amount, 0)
-}
-
-export function getTotalBudgeted(categories: BudgetCategory[], period: BudgetPeriod): number {
-  return categories
-    .filter((category) => category.kind === 'expense' && category.period === period)
-    .reduce((total, category) => total + category.amount, 0)
-}
-
-export function getTotalDeposits(
-  deposits: BudgetDeposit[],
-  period: BudgetPeriod,
-  bounds: BudgetPeriodBounds,
-): number {
-  return deposits
-    .filter((deposit) => deposit.period === period && isDateInPeriod(deposit.date, bounds))
-    .reduce((total, deposit) => total + deposit.amount, 0)
-}
-
-export function getUnbudgetedRemainder(
-  categories: BudgetCategory[],
-  deposits: BudgetDeposit[],
-  period: BudgetPeriod,
-  bounds: BudgetPeriodBounds,
-): number {
-  return (
-    getTotalIncome(categories, period) -
-    getTotalBudgeted(categories, period) -
-    getTotalDeposits(deposits, period, bounds)
-  )
-}
-
-/** Total dépensé sur les catégories de dépense d'une période. */
-export function getTotalSpent(
-  categories: BudgetCategory[],
-  entries: BudgetEntry[],
-  period: BudgetPeriod,
-  bounds: BudgetPeriodBounds,
-): number {
-  return categories
-    .filter((category) => category.kind === 'expense' && category.period === period)
-    .reduce((total, category) => total + getSpentForCategory(entries, category.id, bounds), 0)
-}
-
-/** Ce qu'il reste à dépenser sur une période : budgétisé en dépense moins dépensé. */
-export function getTotalRemaining(
-  categories: BudgetCategory[],
-  entries: BudgetEntry[],
-  period: BudgetPeriod,
-  bounds: BudgetPeriodBounds,
-): number {
-  return getTotalBudgeted(categories, period) - getTotalSpent(categories, entries, period, bounds)
+/** Somme de tous les mouvements de livrets, tous livrets confondus (montant signé). */
+export function getTotalDeposits(deposits: BudgetDeposit[]): number {
+  return deposits.reduce((total, deposit) => total + deposit.amount, 0)
 }
 
 export const GAUGE_WARNING_RATIO = 0.8
@@ -130,6 +67,40 @@ export function getGaugeLevel(spent: number, budgeted: number): GaugeLevel {
   if (spent > budgeted) return 'over'
   if (budgeted <= 0) return 'ok'
   return spent / budgeted >= GAUGE_WARNING_RATIO ? 'warning' : 'ok'
+}
+
+/** Somme de tous les revenus saisis par l'utilisateur (Montant total). */
+export function getTotalIncomeEntries(entries: BudgetIncomeEntry[]): number {
+  return entries.reduce((total, entry) => total + entry.amount, 0)
+}
+
+/** Poids appliqué à une dépense « Mon compte » sur le Montant total selon la périodicité de sa sous-catégorie. */
+export function getMonCompteWeight(period: BudgetPeriod): number {
+  return period === 'week' ? 4 : 1
+}
+
+/**
+ * Montant retiré du Montant total par les dépenses de « Mon compte » : chaque dépense d'une
+ * sous-catégorie « mois » compte une fois, chaque dépense d'une sous-catégorie « semaine »
+ * compte quatre fois.
+ */
+export function getMonCompteUsage(categories: BudgetCategory[], entries: BudgetEntry[]): number {
+  const periodByCategoryId = new Map(categories.map((category) => [category.id, category.period]))
+  return entries.reduce((total, entry) => {
+    const period = periodByCategoryId.get(entry.category_id)
+    if (!period) return total
+    return total + entry.amount * getMonCompteWeight(period)
+  }, 0)
+}
+
+/** Montant total après effet des livrets et de « Mon compte » (revenus - livrets - Mon compte). */
+export function getMontantTotal(
+  incomeEntries: BudgetIncomeEntry[],
+  deposits: BudgetDeposit[],
+  categories: BudgetCategory[],
+  entries: BudgetEntry[],
+): number {
+  return getTotalIncomeEntries(incomeEntries) - getTotalDeposits(deposits) - getMonCompteUsage(categories, entries)
 }
 
 export function getAccountBalance(deposits: BudgetDeposit[], accountId: string): number {

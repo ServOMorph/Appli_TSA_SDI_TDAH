@@ -12,6 +12,7 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { Folder } from '@/domain/entities/folder'
@@ -41,6 +42,7 @@ export class AppDatabase extends Dexie {
   budgetEntries!: Table<BudgetEntry>
   budgetAccounts!: Table<BudgetAccount>
   budgetDeposits!: Table<BudgetDeposit>
+  budgetIncomeEntries!: Table<BudgetIncomeEntry>
   taskRecurrences!: Table<TaskRecurrence>
   taskExceptions!: Table<TaskException>
   folders!: Table<Folder>
@@ -313,7 +315,45 @@ export class AppDatabase extends Dexie {
           await tx.table('listItems').bulkPut(updated)
         }
       })
-    this.version(13)
+    this.version(13).stores({
+      budgetIncomeEntries: 'id, date',
+    })
+    this.version(14)
+      .stores({})
+      .upgrade(async (tx) => {
+        const now = new Date().toISOString()
+        const incomeCategories = await tx.table('budgetCategories').where('kind').equals('income').toArray()
+        await tx.table('budgetIncomeEntries').bulkAdd(
+          incomeCategories.map((category) => ({
+            id: migrationId(),
+            amount: category.amount,
+            label: category.name,
+            date: now.slice(0, 10),
+            created_at: now,
+          })),
+        )
+        await tx.table('budgetCategories').bulkDelete(incomeCategories.map((category) => category.id))
+      })
+    this.version(15)
+      .stores({
+        budgetCategories: 'id, period, position',
+        budgetDeposits: 'id, account_id, date',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('budgetCategories')
+          .toCollection()
+          .modify((category) => {
+            delete category.kind
+          })
+        await tx
+          .table('budgetDeposits')
+          .toCollection()
+          .modify((deposit) => {
+            delete deposit.period
+          })
+      })
+    this.version(16)
       .stores({
         listItemSubTasks: 'id, list_item_id, position',
       })
@@ -325,7 +365,7 @@ export class AppDatabase extends Dexie {
             item.description = ''
           })
       })
-    this.version(14)
+    this.version(17)
       .stores({})
       .upgrade(async (tx) => {
         await tx

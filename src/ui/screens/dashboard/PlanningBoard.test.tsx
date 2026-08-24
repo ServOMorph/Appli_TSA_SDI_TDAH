@@ -31,31 +31,67 @@ describe('PlanningBoard — déplié', () => {
     expect(screen.getByLabelText('2026-07-02')).toBeInTheDocument()
   })
 
-  it('navigation précédent charge la semaine précédente', async () => {
+  it('glisser vers la gauche charge le jour suivant', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    await userEvent.click(screen.getByRole('button', { name: /semaine précédente/i }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-23'))
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 100 }] })
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
   })
 
-  it('navigation suivant charge la semaine suivante', async () => {
+  it('glisser vers la droite charge le jour précédent', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    await userEvent.click(screen.getByRole('button', { name: /semaine suivante/i }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-07'))
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 100 }] })
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 200 }] })
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
   })
 
-  it('aller à une date via le sélecteur charge ce jour', async () => {
+  it('encadre le bandeau de dates avec la couleur d’ambiance (AP2)', async () => {
+    const ctx = makeAppContext({
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#ff00aa' },
+    })
+    renderExpanded(ctx)
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    expect(strip.style.border).toContain('rgb(255, 0, 170)')
+  })
+
+  it('suit le doigt pendant le glissement du bandeau (AP2)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
+    fireEvent.touchMove(strip, { touches: [{ clientX: 170 }] })
+    expect(strip.style.transform).toBe('translateX(-30px)')
+
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 170 }] })
+    expect(strip.style.transform).toBe('translateX(0px)')
+  })
+
+  it('ne propose plus de flèches de navigation par semaine', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    expect(screen.queryByRole('button', { name: /semaine précédente/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /semaine suivante/i })).toBeNull()
+  })
+
+  it('choisir un mois via le sélecteur mois/année charge ce mois', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    fireEvent.change(screen.getByLabelText('Aller à une date'), { target: { value: '2026-09-15' } })
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-09-15'))
+    await userEvent.click(screen.getByRole('button', { name: /choisir un mois/i }))
+    await userEvent.click(screen.getByRole('button', { name: 'Sep' }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-09-30'))
   })
 
   it('affiche une tâche planifiée avec son horaire, son titre et son coût énergie', async () => {
@@ -66,64 +102,25 @@ describe('PlanningBoard — déplié', () => {
     expect(screen.getByLabelText('7 énergie')).toBeInTheDocument()
   })
 
+  it('utilise un fond neutre quand une tâche n’a pas de couleur', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', color: null })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+    expect((title.closest('div[style*="background-color"]') as HTMLElement | null)?.style.backgroundColor).toContain('var(--color-surface)')
+  })
+
+  it('utilise la couleur choisie quand une tâche est colorée', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', color: '#ff8800' })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+    expect((title.closest('div[style*="background-color"]') as HTMLElement | null)?.style.backgroundColor).toContain('#ff8800')
+  })
+
   it('affiche une tâche sans horaire en tête de liste', async () => {
     const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: null, scheduled_end: null })
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
     expect(screen.getByText('Sans horaire')).toBeInTheDocument()
-  })
-
-  it('une tâche sans couleur n\'hérite pas de la couleur d\'ambiance (fond neutre)', async () => {
-    const task = makeTaskV2({ id: 't1', color: null, scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
-    const { container } = renderExpanded(
-      makeAppContext({
-        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#123456' },
-        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
-      }),
-    )
-    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
-
-    const tinted = screen.getByText('Médecin').closest('div[style]') as HTMLElement
-    expect(tinted.style.backgroundColor).not.toContain('#123456')
-    expect(container).toBeInTheDocument()
-  })
-
-  it('une tâche avec couleur applique sa propre couleur, pas celle d\'ambiance', async () => {
-    const task = makeTaskV2({ id: 't1', color: '#ff0000', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
-    renderExpanded(
-      makeAppContext({
-        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#123456' },
-        getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
-      }),
-    )
-    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
-
-    const tinted = screen.getByText('Médecin').closest('div[style]') as HTMLElement
-    expect(tinted.style.backgroundColor).toContain('#ff0000')
-  })
-
-  it('une tâche courte (30 min) a une case plus fine qu\'une tâche longue (2h) (AP1)', async () => {
-    const short = makeTaskV2({ id: 't1', title: 'Courte', duration_minutes: 30, scheduled_date: '2026-06-30', scheduled_start: '09:00' })
-    const long = makeTaskV2({ id: 't2', title: 'Longue', duration_minutes: 120, scheduled_date: '2026-06-30', scheduled_start: '11:00' })
-    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([short, long]) }))
-    await waitFor(() => expect(screen.getByText('Courte')).toBeInTheDocument())
-
-    const shortRow = screen.getByText('Courte').closest('div[style]') as HTMLElement
-    const longRow = screen.getByText('Longue').closest('div[style]') as HTMLElement
-    expect(shortRow.style.minHeight).toBe('40px')
-    expect(longRow.style.minHeight).toBe('76px')
-  })
-
-  it('le bandeau de dates est encadré par la couleur d\'ambiance (AP2)', async () => {
-    renderExpanded(
-      makeAppContext({
-        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#123456' },
-        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
-      }),
-    )
-    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-    const strip = screen.getByLabelText('2026-06-30').closest('div[style]') as HTMLElement
-    expect(strip.style.border).toContain('rgb(18, 52, 86)')
   })
 
   it('cliquer une tâche sélectionne la tâche et ouvre sa fiche', async () => {
@@ -268,7 +265,6 @@ describe('PlanningBoard — replié', () => {
   it('affiche le bandeau de dates comme en mode déplié', async () => {
     renderWithApp(<PlanningBoard collapsed />, makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await waitFor(() => expect(screen.queryByLabelText('2026-06-30')).not.toBeNull())
-    expect(screen.queryByRole('button', { name: /semaine précédente/i })).not.toBeNull()
   })
 
   it('charge toujours le jour courant, quelle que soit la navigation précédente', async () => {

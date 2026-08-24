@@ -24,7 +24,7 @@ Backend Supabase (région UE, cf. `contexte.md`) — projet créé par l'utilisa
 > Basculer sur le modèle Opus (/model opus) avant de démarrer cette phase (migration structurelle).
 
 - Projet Supabase créé par l'utilisateur, région UE, clés (URL + clé anonyme) ajoutées à `.env` (jamais commitées).
-- Schéma de tables miroir des 15 tables Dexie actuelles (`db.ts`), une ligne par appareil identifié par son secret.
+- Schéma de snapshot miroir des données Dexie, une ligne par appareil identifié par son secret.
 - Politique d'accès : écriture seule depuis l'appareil avec son propre secret, pas de lecture croisée entre appareils.
 - Client Supabase ajouté aux dépendances (`@supabase/supabase-js`).
 
@@ -60,6 +60,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 ## Phase 4 — Bascule et retrait du flux manuel [EN COURS]
 
 - [FAIT] Accès côté développeur pour lire les données remontées (script ou requête Supabase), en remplacement de l'ingestion des fichiers d'export (`scripts/ingest_manual_tests.py`, `_contexte/marie_tests_journal.json`). Livré : `scripts/read_device_snapshots.py`. Reste à exécuter `supabase/schema.sql` côté projet Supabase avant premier usage réel.
+- [FAIT] `main` intégré dans `sync-marie` le 2026-08-24 ; snapshot Supabase et export manuel alignés sur le schéma 3.5, incluant `budget_income_entries`.
 - Retrait des bannières urgentes demandant réimport/réexport (`E01Welcome.tsx`, `E121ManualTests.tsx`) une fois la sync confirmée fonctionnelle en conditions réelles avec Marie.
 - `.claude/commands/deploy.md` étape 0 (traitement des exports de Marie) à réviser ou retirer en conséquence.
 - Test manuel : sync réelle depuis l'appareil de Marie confirmée reçue côté Supabase.

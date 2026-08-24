@@ -13,7 +13,6 @@ function makeCategory(overrides: Partial<BudgetCategory> = {}): BudgetCategory {
   return {
     id: 'category-1',
     name: 'Courses',
-    kind: 'expense',
     period: 'week',
     amount: 60,
     position: 0,
@@ -85,7 +84,7 @@ describe('E73CategoryDetail', () => {
     await userEvent.click(within(dialog).getByRole('button', { name: 'Supprimer' }))
     expect(deleteBudgetCategory).toHaveBeenNthCalledWith(1, 'category-1')
     expect(deleteBudgetCategory).toHaveBeenNthCalledWith(2, 'category-1', true)
-    expect(ctx.back).toHaveBeenCalledWith('budget')
+    expect(ctx.back).toHaveBeenCalledWith('budget-account')
   })
 
   it('supprime une dépense de l’historique', async () => {
@@ -98,15 +97,5 @@ describe('E73CategoryDetail', () => {
     }))
     await userEvent.click(screen.getByRole('button', { name: 'Supprimer la dépense Intermarché' }))
     expect(deleteBudgetEntry).toHaveBeenCalledWith('entry-1')
-  })
-
-  it('affiche un revenu sans jauge ni historique de dépenses', () => {
-    renderWithApp(<E73CategoryDetail />, makeAppContext({
-      route,
-      budgetCategories: [makeCategory({ kind: 'income', name: 'Salaire', amount: 1500 })],
-    }))
-    expect(screen.getByText(/1.*500,00/)).toBeDefined()
-    expect(screen.queryByRole('progressbar')).toBeNull()
-    expect(screen.queryByText('Dépenses de la période')).toBeNull()
   })
 })

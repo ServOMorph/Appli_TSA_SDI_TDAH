@@ -7,6 +7,7 @@ export type Route =
   | { name: 'task-create-v2' }
   | { name: 'planning'; date?: string }
   | { name: 'task-detail'; taskId?: string }
+  | { name: 'task-edit' }
   | { name: 'task-decompose' }
   | { name: 'energy-view' }
   | { name: 'energy-checkin' }
@@ -18,11 +19,14 @@ export type Route =
   | { name: 'settings-accessibility' }
   | { name: 'settings-privacy' }
   | { name: 'settings-export' }
-  | { name: 'list-detail'; listId?: string }
+  | { name: 'list-detail'; listId?: string; categoryId?: string }
   | { name: 'list-item-detail'; itemId?: string }
   | { name: 'tools' }
   | { name: 'folder-detail'; folderId?: string }
   | { name: 'budget' }
+  | { name: 'budget-account' }
+  | { name: 'budget-livrets' }
+  | { name: 'budget-livret-detail'; accountId?: string }
   | { name: 'budget-category-detail'; categoryId?: string; date?: string }
   | { name: 'budget-settings' }
 

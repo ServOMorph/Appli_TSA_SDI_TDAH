@@ -4,6 +4,7 @@ import type { Task } from '@/domain/entities/task'
 import type { PlannedSubTask } from '@/app/AppContext'
 import { BatteryCost } from '@/ui/components/BatteryCost'
 import { TaskIcon } from '@/ui/components/TaskIcon'
+import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
 import { DEFAULT_AMBIANCE_COLOR, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import { isCompleted } from '@/domain/rules/taskRules'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@/domain/rules/planningSlotRules'
@@ -64,18 +65,6 @@ function dateStripStyle(ambianceColor: string): React.CSSProperties {
   }
 }
 
-const iconBtnStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  color: 'var(--color-text)',
-  fontSize: '1.25rem',
-  padding: '4px 6px',
-  lineHeight: 1,
-  borderRadius: 'var(--radius-sm)',
-  flexShrink: 0,
-}
-
 function dayCellStyle(isDisplayed: boolean): React.CSSProperties {
   return {
     flex: 1,
@@ -120,17 +109,6 @@ const dayDotPlaceholderStyle: React.CSSProperties = {
   height: '4px',
 }
 
-const jumpInputStyle: React.CSSProperties = {
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  padding: 0,
-  border: 'none',
-  opacity: 0,
-  pointerEvents: 'none',
-  overflow: 'hidden',
-}
-
 const monthButtonStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -146,21 +124,32 @@ const monthButtonStyle: React.CSSProperties = {
   minHeight: '44px',
 }
 
-const rowStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 'var(--spacing-sm)',
-  padding: '10px 12px',
-  borderRadius: 'var(--radius-md)',
-  cursor: 'pointer',
-  border: 'none',
-  outline: 'none',
-  background: 'none',
-  appearance: 'none',
-  WebkitAppearance: 'none',
-  width: '100%',
-  textAlign: 'left',
-  fontFamily: 'var(--font-body)',
+const ROW_MIN_HEIGHT = 44
+const ROW_MAX_HEIGHT = 160
+const ROW_HEIGHT_PER_MINUTE = 0.6
+
+function rowStyle(durationMinutes: number | null | undefined): React.CSSProperties {
+  const minHeight = Math.min(
+    ROW_MAX_HEIGHT,
+    Math.max(ROW_MIN_HEIGHT, ROW_MIN_HEIGHT + (durationMinutes ?? 0) * ROW_HEIGHT_PER_MINUTE),
+  )
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--spacing-sm)',
+    padding: '10px 12px',
+    borderRadius: 'var(--radius-md)',
+    cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+    background: 'none',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    width: '100%',
+    minHeight: `${minHeight}px`,
+    textAlign: 'left',
+    fontFamily: 'var(--font-body)',
+  }
 }
 
 const monthBarStyle: React.CSSProperties = {
@@ -183,17 +172,7 @@ const todayBtnStyle: React.CSSProperties = {
 }
 
 function rowTintStyle(block: PlanBlock, ambianceColor: string): React.CSSProperties {
-  if (block.kind === 'task') {
-    return plannedTaskTintStyle(blockCompleted(block), block.item.color ?? 'var(--color-surface)')
-  }
-  return plannedTaskTintStyle(blockCompleted(block), ambianceColor)
-}
-
-function blockHeightStyle(durationMinutes: number | null): React.CSSProperties {
-  const minutes = durationMinutes ?? 0
-  if (minutes > 90) return { minHeight: '76px' }
-  if (minutes > 30) return { minHeight: '56px' }
-  return { minHeight: '40px' }
+  return plannedTaskTintStyle(blockCompleted(block), block.kind === 'task' ? (block.item.color ?? 'var(--color-surface)') : ambianceColor)
 }
 
 const timeLabelStyle: React.CSSProperties = {
@@ -310,13 +289,16 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   const [scheduledSubTasks, setScheduledSubTasks] = useState<PlannedSubTask[]>([])
   const [subTasksByTask, setSubTasksByTask] = useState<Record<string, Task[]>>({})
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
-  const [dragOffset, setDragOffset] = useState(0)
-  const [dragging, setDragging] = useState(false)
 
   const effectiveDate = collapsed ? todayStr() : displayDate
   const displayDateRef = useRef(effectiveDate)
   const touchStartX = useRef<number | null>(null)
-  const dateJumpRef = useRef<HTMLInputElement>(null)
+  const [dragOffset, setDragOffset] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false)
+  const [stripCenter, setStripCenter] = useState(() =>
+    route.name === 'planning' && route.date ? route.date : todayStr(),
+  )
 
   useEffect(() => {
     displayDateRef.current = effectiveDate
@@ -328,6 +310,11 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
       if (!collapsed) replace({ name: 'planning', date: next })
       return next
     })
+  }
+
+  function jumpTo(date: string) {
+    setStripCenter(date)
+    updateDisplayDate(date)
   }
 
   async function reload() {
@@ -403,7 +390,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
     const delta = endX - touchStartX.current
     touchStartX.current = null
     if (Math.abs(delta) < SWIPE_THRESHOLD_PX) return
-    updateDisplayDate((d) => addDays(d, delta < 0 ? 1 : -1))
+    jumpTo(addDays(displayDate, delta < 0 ? 1 : -1))
   }
 
   const isToday = effectiveDate === todayStr()
@@ -413,7 +400,10 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   ])
   if (collapsed) blocks = blocks.slice(0, COLLAPSED_ROW_LIMIT)
 
+  const displayDateObj = new Date(displayDate + 'T12:00:00')
+
   return (
+    <>
     <section
       aria-label="Planning du jour"
       style={{ display: 'flex', flexDirection: 'column', minHeight: 0, gap: 'var(--spacing-sm)' }}
@@ -422,13 +412,8 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
         <button
           type="button"
           style={monthButtonStyle}
-          aria-label={`${formatMonthYear(displayDate)}, aller à une date`}
-          onClick={() => {
-            const input = dateJumpRef.current
-            if (!input) return
-            if (typeof input.showPicker === 'function') input.showPicker()
-            else input.focus()
-          }}
+          aria-label={`${formatMonthYear(displayDate)}, choisir un mois`}
+          onClick={() => setMonthPickerOpen(true)}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -436,17 +421,8 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
           </svg>
           {formatMonthYear(displayDate)}
         </button>
-        <input
-          ref={dateJumpRef}
-          type="date"
-          aria-label="Aller à une date"
-          value={displayDate}
-          onChange={(e) => e.target.value && updateDisplayDate(e.target.value)}
-          style={jumpInputStyle}
-          tabIndex={-1}
-        />
         {!isToday && (
-          <button style={todayBtnStyle} onClick={() => updateDisplayDate(todayStr())}>
+          <button style={todayBtnStyle} onClick={() => jumpTo(todayStr())}>
             Aujourd'hui
           </button>
         )}
@@ -461,10 +437,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, -7))} aria-label="Semaine précédente">
-          &lsaquo;
-        </button>
-        {dateStrip(displayDate, DATE_STRIP_RADIUS).map((d) => {
+        {dateStrip(stripCenter, DATE_STRIP_RADIUS).map((d) => {
           const badge = formatDayBadge(d)
           const isDisplayed = d === displayDate
           return (
@@ -481,9 +454,6 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
             </button>
           )
         })}
-        <button style={iconBtnStyle} onClick={() => updateDisplayDate((d) => addDays(d, 7))} aria-label="Semaine suivante">
-          &rsaquo;
-        </button>
       </div>
 
       <div style={collapsed ? undefined : { flex: 1, minHeight: 0, overflowY: 'auto' }}>
@@ -499,15 +469,14 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
 
           return (
             <div key={`${block.kind}-${block.item.id}`}>
-              <button style={rowStyle} onClick={() => openDetail(block.item.id)}>
-                <div style={{ ...rowTintStyle(block, ambianceColor), ...blockHeightStyle(block.item.duration_minutes), display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flex: 1, borderRadius: 'var(--radius-md)', padding: '6px 8px', boxSizing: 'border-box' }}>
+              <button style={rowStyle(block.item.duration_minutes)} onClick={() => openDetail(block.item.id)}>
+                <div style={{ ...rowTintStyle(block, ambianceColor), display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flex: 1, borderRadius: 'var(--radius-md)', padding: '6px 8px' }}>
                   <span style={timeLabelStyle}>{block.item.scheduled_start ?? 'Sans horaire'}</span>
                   {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
                   <span style={titleColStyle}>
                     <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
                     {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
                   </span>
-                  {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
                   {hasSubs && (
                     <span
                       role="button"
@@ -522,6 +491,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
                       {done}/{subs.length} {expanded ? '▾' : '▸'}
                     </span>
                   )}
+                  {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
                   <input
                     type="checkbox"
                     checked={completed}
@@ -568,5 +538,22 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
         })}
       </div>
     </section>
+    {monthPickerOpen && (
+      <MonthYearPickerModal
+        year={displayDateObj.getFullYear()}
+        month={displayDateObj.getMonth()}
+        onSelect={(year, month) => {
+          const daysInMonth = new Date(year, month + 1, 0).getDate()
+          const day = Math.min(displayDateObj.getDate(), daysInMonth)
+          const yyyy = String(year).padStart(4, '0')
+          const mm = String(month + 1).padStart(2, '0')
+          const dd = String(day).padStart(2, '0')
+          jumpTo(`${yyyy}-${mm}-${dd}`)
+          setMonthPickerOpen(false)
+        }}
+        onClose={() => setMonthPickerOpen(false)}
+      />
+    )}
+    </>
   )
 }

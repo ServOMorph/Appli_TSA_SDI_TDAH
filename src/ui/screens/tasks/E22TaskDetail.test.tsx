@@ -41,12 +41,12 @@ describe('E22TaskDetail', () => {
     })
   })
 
-  it('Modifier ouvre l\'édition du titre (TA2)', async () => {
+  it('Modifier ouvre l\'écran d\'édition (TA2)', async () => {
     const task = makeTask()
     const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
     renderWithApp(<E22TaskDetail />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Modifier' }))
-    expect(screen.getByLabelText('Modifier le titre')).toBeDefined()
+    expect(ctx.goTo).toHaveBeenCalledWith('task-edit')
   })
 
   it('le menu d\'actions ne propose plus Tâche du jour, Planifier, Liste ou Terminer (TA2)', () => {
@@ -175,44 +175,23 @@ describe('E22TaskDetail', () => {
     })
   })
 
-  describe('champs éditables (M4)', () => {
-    it('affiche et modifie l\'icône', async () => {
-      const task = makeTask({ icon: null })
+  describe('champs en lecture seule (M4)', () => {
+    it('affiche les champs sans les rendre éditables au clic', async () => {
+      const task = makeTask({ icon: 'sport', energy_cost: 5 })
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Icône Aucune' }))
-      await userEvent.click(screen.getByRole('button', { name: 'Sport' }))
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { icon: 'sport' }, 'occurrence')
+      expect(screen.getByText('sport')).toBeDefined()
+      expect(screen.getByText('5')).toBeDefined()
+      expect(screen.queryByRole('button', { name: /Icône/i })).toBeNull()
+      expect(screen.queryByRole('button', { name: /Coût en énergie/i })).toBeNull()
     })
 
-    it('modifie l\'heure de début', async () => {
-      const task = makeTask({ scheduled_date: '2026-08-10', scheduled_start: null })
+    it('le bouton Modifier navigue vers l\'écran d\'édition', async () => {
+      const task = makeTask()
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Horaire Non planifié' }))
-      await userEvent.type(screen.getByLabelText("Modifier l'heure de début"), '09:00')
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { startTime: '09:00' }, 'occurrence')
-    })
-
-    it('modifie le coût en énergie', async () => {
-      const task = makeTask({ energy_cost: null })
-      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
-      renderWithApp(<E22TaskDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Coût en énergie Non défini' }))
-      await userEvent.click(screen.getByRole('group', { name: 'Modifier le coût en énergie' }).querySelector('button:nth-child(5)')!)
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { energyCost: 5 }, 'occurrence')
-    })
-
-    it('une tâche récurrente ouvre le choix occurrence/série avant d\'appliquer une modification', async () => {
-      const task = makeTask({ recurrence_id: 'rec-1', energy_cost: null })
-      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
-      renderWithApp(<E22TaskDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Coût en énergie Non défini' }))
-      await userEvent.click(screen.getByRole('group', { name: 'Modifier le coût en énergie' }).querySelector('button:nth-child(5)')!)
-      expect(ctx.updateTaskFields).not.toHaveBeenCalled()
-      expect(screen.getByRole('dialog', { name: 'Modifier la série récurrente' })).toBeDefined()
-      await userEvent.click(screen.getByRole('button', { name: 'Toutes les occurrences' }))
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { energyCost: 5 }, 'series')
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('task-edit')
     })
 
     it('une tâche récurrente ouvre le choix occurrence/série avant la suppression', async () => {

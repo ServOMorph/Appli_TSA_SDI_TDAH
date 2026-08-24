@@ -146,6 +146,19 @@ describe('E61ListDetail', () => {
   })
 
   describe('éléments d\'une catégorie', () => {
+    it('restaure la catégorie indiquée par la route après le retour du détail', async () => {
+      const ctx = makeAppContext({
+        route: { name: 'list-detail', categoryId: 'cat-1' },
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue([makeListItem()]),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+
+      expect(await screen.findByText('Hotel California')).toBeInTheDocument()
+    })
+
     it('affiche les titres des éléments de la catégorie sélectionnée', async () => {
       const items = [
         makeListItem({ id: 'i1', title: 'Hotel California' }),

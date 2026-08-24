@@ -95,6 +95,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     budgetAccounts: [],
     budgetEntries: [],
     budgetDeposits: [],
+    budgetIncomeEntries: [],
     manualTestResults: [],
     submitManualTestResult: vi.fn().mockResolvedValue(undefined),
     createBudgetCategory: vi.fn().mockResolvedValue(undefined),
@@ -107,7 +108,11 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     createBudgetEntry: vi.fn().mockResolvedValue(undefined),
     deleteBudgetEntry: vi.fn().mockResolvedValue(undefined),
     createBudgetDeposit: vi.fn().mockResolvedValue(undefined),
+    updateBudgetDeposit: vi.fn().mockResolvedValue(undefined),
     deleteBudgetDeposit: vi.fn().mockResolvedValue(undefined),
+    createBudgetIncomeEntry: vi.fn().mockResolvedValue(undefined),
+    updateBudgetIncomeEntry: vi.fn().mockResolvedValue(undefined),
+    deleteBudgetIncomeEntry: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }

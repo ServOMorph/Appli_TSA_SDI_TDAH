@@ -1,134 +1,440 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-19)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-24)
 
 ## Contexte chaud
-- Flux B ROBERTO (`roadmap_demandes_marie_v1.md`) : Phases 1 à 4 livrées et testées (bugs prioritaires, tâches/planning, détail élément de liste, couleur de fond par outil). Phase 5 (préparation dist) livrée cette session : `CHANGELOG.md` v5.38, `WHATS_NEW` (8 entrées), `manualTestsCatalog.ts` (8 tests ajoutés). `/deploy` engagé cette session (voir question ouverte P1 dédiée pour l'état exact au moment de la coupure).
-- Décision actée : `/deploy` lancé malgré le gate « test manuel » ouvert des Phases 4/5 — les points 10-17 de `tests_manuels.md` nécessitent la build déployée pour être testables par Marie (dépendance circulaire assumée), les critères code/doc étant eux fermés.
-- Export de Marie du 2026-08-19 traité (étape 0 de `/deploy`) : archivé (`donnees_marie/export-audhd-2026-08-19.json`), ingéré dans le journal (10 nouvelles entrées, 7 déjà présentes). 3 frictions non bloquantes identifiées, à traiter comme futures demandes plutôt qu'à chaud : (a) test IDs `grouper-les-tests-par-categorie`/`modifier-une-tache-planifiee` obsolètes, absents du catalogue actuel, probablement mis en cache côté client ; (b) rejet explicite du geste de glissement du planning (2 commentaires : superposition non désirée, demande que le planning pousse le contenu de la page plutôt que de le recouvrir) ; (c) incompréhension du lien retrait de livret / catégorie budget — vérifié dans le code (`E74BudgetSettings.tsx`), les deux modèles sont indépendants par design, pas un bug.
-- Mission ROBERTO globale : Flux A (testeur/JSON) `[FAIT]`, journal à 4/7 entrées INTEGRE (3 RECU bloquées sur retest manuel budget, voir question ouverte dédiée). Flux C (`sync-marie`) non repris cette session.
-- **Divergence critique `sync-marie` / `main`** : la branche n'a pas été mise à jour depuis sa création (base commune `8188371`, 2026-08-16). `main` a depuis livré `roadmap_budget_v3`, `roadmap_categories_listes.md`, `roadmap_demandes_marie_v1.md` et plusieurs déploiements prod — aucun de ces commits n'est sur `sync-marie`. Un merge/rebase de `main` dans `sync-marie` sera nécessaire avant toute fusion ou déploiement de la sync, avec conflits probables sur les fichiers touchés des deux côtés (`E110Settings.tsx`, `useSettingsState.ts`, `AppContext.tsx`, `package.json`, `CHANGELOG.md`, `db.ts`). Non traité cette session — hors périmètre du travail demandé.
-- `_contexte/dernier_deploiement.md` : consigné par `/deploy` lui-même (version/date/URL), indépendamment de `/close`. À vérifier pour connaître le dernier déploiement prod confirmé (v5.38 en cours cette session).
-- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` désormais géré par cycle `/close` (ajoute une entrée en langage clair si changement visible pour Marie) / `/deploy` (vide le tableau après publication confirmée). Affichage de la modale conditionné à `VITE_APP_VERSION` (`localStorage`), ne se réaffiche plus une fois fermée pour une version donnée. `WHATS_NEW` contient actuellement 8 entrées (phases 1-4 de `roadmap_demandes_marie_v1.md`) en attente de publication/vidage par `/deploy`.
-- Mémoire projet créée (`.claude/memory.md`, via `/create_memory`) : à chaque partage d'export Marie, le traiter puis l'archiver dans le projet.
-- Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`, pour tester hors réseau local sans toucher la prod.
-- Panneau dev (haut à droite, visible uniquement en `npm run dev`) affiche la version courante, lue automatiquement dans `CHANGELOG.md` au build (`__APP_DEV_VERSION__`, `vite.config.ts`).
-- `/deploy` et `/deploy_dev` vérifient la fraîcheur de `src/domain/data/manualTestsCatalog.ts` avant le déploiement.
+- **v5.52 déployée en prod le 2026-08-24** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie.
+- **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
+- **Incident de branche (2026-08-19) clos et corrigé préventivement** : plusieurs sessions de travail sur les demandes de Marie avaient été faites par erreur sur `sync-marie` sans vérifier sa divergence avec `main` (jamais fusionnée depuis le 2026-08-16). `.claude/commands/start.md` vérifie désormais la divergence de branche avant de charger le contexte ; `.claude/memory.md` porte la règle. `.gitignore` complété au passage (`__pycache__/`, captures de calibration ROBERTO — règles déjà sur `sync-marie`, jamais reportées).
+- `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Export du 2026-08-19 traité (archivé, ingéré : 10 nouvelles entrées journal) — 3 frictions non bloquantes relevées (test IDs obsolètes en cache client, rejet du geste de glissement planning par Marie avec demande de comportement alternatif, incompréhension retrait livret/catégorie budget qui est par design) : à traiter comme futures demandes, pas corrigées à chaud.
+- Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy`. `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
+- Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `message_marie_categories_travail.md`. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage ; les autres roadmaps/communications ne l'appliquent pas encore.
+- `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles.
+- `manualTestsCatalog.ts` : outre les tests Budget v3 déjà en attente, 7 nouveaux tests (`couleur-tache-sans-couleur-choisie`, `supprimer-une-categorie-de-liste`, `detail-element-de-liste`, `acceder-directement-a-l-energie`, `encadrement-et-glissement-du-planning`, `couleur-de-fond-par-outil`) tous en attente de validation Marie sur la build v5.51 désormais en prod.
+- `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
+- `_contexte/dernier_deploiement.md` : v5.51, 2026-08-20, prod vérifiée HTTP 200.
+- Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
+- `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Terminer `/deploy` v5.38 en cours (étapes build/publication/vidage `WHATS_NEW` restant à confirmer selon le point exact de la coupure de session), puis redemander à Marie de tester et valider les points 10-17 de `tests_manuels.md` sur la nouvelle build. — fait quand : v5.38 confirmée en prod (HTTP 200, `_contexte/dernier_deploiement.md` à jour) et points 10-17 validés par Marie — réf : `roadmap_demandes_marie_v1.md` Phase 5, `tests_manuels.md`
-- [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer), clarifier avec Marie le lien retrait de livret/catégorie budget (comportement par design à expliquer, pas un bug), vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
-- [P1] Poursuivre la mission ROBERTO (système d'orchestration de workflow multi-flux : testeur JSON / Google Drive / sync-marie, décrit dans `ROBERTO/_docs/`). Flux B actif (roadmap ci-dessus). Flux A terminé. Flux C (sync-marie) en pause. — fait quand : chaque flux tranché jusqu'à FAIT ou décision explicite d'arrêt — réf : `roadmap_roberto_workflow.md`
-- [P1] Séquence de validation Phase 4 `roadmap_sync_marie.md`, dans l'ordre : (1) exécuter `supabase/schema.sql` dans le SQL Editor du projet Supabase — jamais fait à ce jour, table `device_snapshots` inexistante côté serveur ; (2) compléter `.env` avec `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` (dashboard Supabase, section service_role) ; (3) régler la divergence `sync-marie`/`main` (voir Contexte chaud) avant fusion/déploiement ; (4) `/deploy` ; (5) faire ouvrir l'app à Marie ; (6) vérifier `SyncStatusCard` côté Marie et `python scripts/read_device_snapshots.py` côté développeur. — fait quand : ligne renvoyée par `read_device_snapshots.py` avec `device_id` de Marie et `synced_at` récent — réf : `roadmap_sync_marie.md` Phase 4, `supabase/schema.sql`
-- [P1] Confirmer si les variables Supabase (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) ont aussi été ajoutées au site de test Netlify (dev, `appli-audhd-dev.netlify.app`), pas seulement à la prod. — fait quand : confirmé fait ou décidé non nécessaire — réf : `roadmap_sync_marie.md` Prérequis externe
-- [P2] `npm run lint` échoue sur `src/data/db.ts:310` (`_section` assigné jamais utilisé) — pré-existant, ligne décalée par les migrations Dexie ajoutées depuis (v13, v14), cause exacte non investiguée. — fait quand : lint corrigé ou cause identifiée et jugée non bloquante — réf : `src/data/db.ts:310`
-- [P1] Confirmer par retest manuel le correctif budget avant de transitionner les 3 entrées RECU restantes du journal testeur (`10a0154b-...`, `a0098520-...`, `23393df4-...`). Correctif suspecté déjà présent (`useSettingsState.ts:183-185`), jamais reconfirmé depuis le 14/08. 3 points de test dans `tests_manuels.md` (sections 3, 6, 9). — fait quand : les 3 entrées passées à INTEGRE dans `marie_tests_journal.json` — réf : `_contexte/marie_tests_journal.json`, `AGENT_STATE.md`, `tests_manuels.md`
-- [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `roadmap_v5.1.md` § Q à trancher
-- [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise — réf : `E112Accessibility.tsx`
-- [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
-- [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold. — fait quand : titre corrigé — réf : `index.html`
+- [P1] Demander à Marie de tester en conditions réelles les trois corrections v5.52 : tâche sans couleur, retour vers une catégorie de liste et couleur d’outil. — fait quand : nouvel export de Marie ingéré avec ces trois tests validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer — cohérent avec la demande initiale de Marie sur ce point, jamais satisfaite en l'état), clarifier avec Marie le lien retrait de livret/catégorie budget, vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
+- [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `message_marie_categories_travail.md`
+- [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (isolée, très en retard sur `main` — écart désormais encore plus grand après cette session). — fait quand : Phase 1 checklist complétée, après décision explicite sur le sort de cette branche (rebase complet ou reprise du chantier sync from scratch sur `main`) — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
+- [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
+- [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
+- [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
+- [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
+- [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-19 — Phase 5 demandes Marie, export du 19/08 traité, /deploy v5.38 en cours)
+## Dernière session (2026-08-24 — standardisation du message de déploiement)
 
 ## Décisions prises
-- Phase 4 (`roadmap_demandes_marie_v1.md`, couleur de fond par outil) close côté code après checkpoint confirmé par l'utilisateur.
-- Phase 5 (préparation dist) livrée : `CHANGELOG.md` v5.38, `WHATS_NEW` (8 entrées), `manualTestsCatalog.ts` (8 tests ajoutés).
-- `/deploy` lancé malgré le gate « test manuel » ouvert — argumenté et validé avec l'utilisateur : les tests manuels nécessitent la build déployée pour être exécutables par Marie.
-- Export Marie du 2026-08-19 : archivé dans `donnees_marie/`, ingéré, 3 frictions non bloquantes détaillées et validées comme non bloquantes avec l'utilisateur — reportées en futures demandes plutôt que traitées à chaud.
-- Mémoire projet créée (`.claude/memory.md`) sur demande explicite : traitement systématique des exports Marie.
+- La commande `/deploy` rédige désormais un message WhatsApp pour Marie, contenant systématiquement le lien de production et encadré par `💻🤖`.
 
 ## Livrables produits ou modifiés
-- `src/domain/entities/tool.ts`, `toolRules.ts`(`.test.ts`), `db.ts`(`.test.ts`) v14, `useToolsState.ts`, `ToolWidgetCard.tsx`(`.test.tsx`), `testUtils.tsx` : couleur de fond par outil.
-- `tests_manuels.md` : point 17 ajouté.
-- `roadmap_demandes_marie_v1.md` : Phases 4 et 5 mises à jour.
-- `CHANGELOG.md` : entrée v5.38.
-- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` remplacé (8 entrées).
-- `src/domain/data/manualTestsCatalog.ts` : 8 tests ajoutés.
-- `.claude/memory.md` : créé.
-- `donnees_marie/export-audhd-2026-08-19.json` : archivé.
-- `_contexte/marie_tests_journal.json` : 10 entrées ajoutées.
+- `.claude/commands/deploy.md` : étape 10 ajoutée.
+- `CHANGELOG.md` : v5.53.
 
 ## Hypothèses validées / invalidées
-- VALIDE : rendre `Tool.color` optionnel a évité la dette de fixtures rencontrée en Phase 3 (`ListItem.description` obligatoire).
-- EN ATTENTE : validation manuelle par Marie des points 10-17 de `tests_manuels.md`, possible seulement après déploiement de la build actuelle.
-- EN ATTENTE : issue exacte de `/deploy` (build/publication/vidage `WHATS_NEW`) au moment de la coupure de session — à vérifier via `_contexte/dernier_deploiement.md` et `git log`.
+- VALIDE : aucune modification applicative ni test manuel supplémentaire requis.
 
 ## Prochaine étape exacte
-Vérifier l'état exact de `/deploy` (terminé ou interrompu), terminer si besoin, puis redemander à Marie de valider les points 10-17 de `tests_manuels.md` sur la nouvelle build.
+Utiliser le nouveau format WhatsApp lors du prochain déploiement.
 
 ## Question bloquante pour la session suivante
 Aucune.
 
 ---
 
-## Dernière session archivée (2026-08-18 — Phases 1-3 sync-marie livrées, Phase 4 entamée partiellement)
+## Dernière session archivée (2026-08-24 — retours Marie et préparation v5.52)
 
 ## Décisions prises
-- Phase 3 `roadmap_sync_marie.md` livrée : `SyncStatusCard` dans Paramètres, sans bascule marche/arrêt (hors périmètre de la phase, signalé à l'utilisateur).
-- Phase 4 réduite au point 1 seul (accès développeur en lecture) sur choix explicite de l'utilisateur : retrait des bannières et révision de `deploy.md` restent bloqués sur un test manuel de sync réelle avec l'appareil de Marie, hors de ma portée.
+- L’export de Marie du 23 août a été archivé et analysé ; les demandes encore pertinentes ont été intégrées à `roadmap_retours_marie_2026-08-23.md`.
+- Trois corrections sont livrées : fond neutre des tâches sans couleur, conservation de la catégorie de liste au retour du détail et sélecteur de couleur d’outil explicite.
+- Le test d’import `E117Export.test.tsx` a été stabilisé ; la suite complète est verte.
 
 ## Livrables produits ou modifiés
-- `src/ui/components/SyncStatusCard.tsx`(`.test.tsx`) : créé, indicateur de statut + date de dernière sync.
-- `src/ui/screens/settings/E110Settings.tsx` : `SyncStatusCard` intégrée.
-- `src/data/sync/supabaseClient.ts` : export `isSyncEnabled()`.
-- `scripts/read_device_snapshots.py` : créé, lecture développeur de `device_snapshots` via clé service_role.
-- `.env.example` : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` ajoutées.
+- `roadmap_retours_marie_2026-08-23.md`, `.claude/commands/analyser_modifications_marie_pdf.md` : analyse et procédure de traitement des demandes PDF de Marie.
+- `PlanningBoard.tsx`, `E61ListDetail.tsx`, `ToolWidgetCard.tsx` et leurs tests : corrections v5.52.
+- `manualTestsCatalog.ts` : parcours Marie précisés pour les corrections publiées.
 
 ## Hypothèses validées / invalidées
-- EN ATTENTE : `supabase/schema.sql` jamais exécuté côté projet Supabase — table `device_snapshots` inexistante à ce jour.
-- EN ATTENTE : sync réelle avec l'appareil de Marie non testée, bloque la suite de la Phase 4.
-- INVALIDE : hypothèse implicite que `sync-marie` pouvait être fusionnée simplement — la branche est très en retard sur `main` (roadmap_budget_v3 entier + v5.47/v5.49 manquants), un merge/rebase est nécessaire avant toute fusion.
+- VALIDE : 605/605 tests, TypeScript et lint verts.
+- EN ATTENTE : validation des trois parcours par Marie sur son appareil après publication.
 
 ## Prochaine étape exacte
-Suivre la séquence en 6 points de la question ouverte P1 dédiée (SQL, `.env`, résolution de la divergence avec `main`, `/deploy`, usage réel par Marie, double vérification). Reprendre ensuite le reste de la Phase 4 (bannières, `deploy.md`).
+Demander à Marie de rejouer les trois tests v5.52 du catalogue, puis traiter son prochain export.
 
 ## Question bloquante pour la session suivante
 Aucune.
 
 ---
 
-## Dernière session archivée (2026-08-16 — clôture des points de communication Marie)
+## Dernière session archivée (2026-08-21 — correctif préventif branche, déploiement v5.51)
 
 ## Décisions prises
-- Adresse de test communiquée à Marie confirmée faite (`appli-audhd.netlify.app` à la place de l'ancienne URL).
-- Points de `a_communiquer_v5.md` communiqués à Marie et retour sur les priorités recueilli — fichier devenu obsolète, supprimé (`git rm`).
-- Correction actée : les 8 points de `tests_manuels.md` sont à valider par Marie sur son appareil réel, pas par l'utilisateur.
+- Correctif préventif ajouté suite à l'incident de branche du 2026-08-19 : `.claude/commands/start.md` vérifie désormais la divergence de branche avec `main` avant de charger le contexte ; `.claude/memory.md` recréé sur `main` (absent depuis le report) pour porter la règle durablement.
+- `.gitignore` complété (`__pycache__/`, captures de calibration ROBERTO) — résidus non suivis bloquant le gate 3.1 de `/deploy`, règles déjà présentes sur `sync-marie` mais jamais reportées sur `main`.
+- `/deploy` v5.51 mené à terme après confirmation utilisateur (push intermédiaire confirmé explicitement) : vérifications bloquantes toutes passées (600/600 tests, `tsc -b`/lint clean), build, déploiement Netlify, HTTP 200 vérifié.
+- Bug fonctionnel corrigé pendant les vérifications pré-fusion : `useSettingsState.ts` n'appliquait pas la description par défaut (`''`) aux éléments de liste importés qui avaient déjà un `category_id` (seule la branche de réparation de catégorie manquante le faisait) — corrigé, test dédié ajouté.
 
 ## Livrables produits ou modifiés
-- `a_communiquer_v5.md` : supprimé (staged `git rm`).
+- `.claude/commands/start.md` : vérification de divergence de branche ajoutée avant l'étape 3.
+- `.claude/memory.md` : créé sur `main` (traitement des exports Marie + vérification de branche).
+- `.gitignore` : `__pycache__/`, captures de calibration ROBERTO.
+- `src/app/contexts/useSettingsState.ts`(`.test.tsx`) : correctif description par défaut à l'import.
+- `_contexte/dernier_deploiement.md` : v5.51, 2026-08-20.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication.
+- `roadmap_demandes_marie_v1.md` : Phase 5 `[FAIT]`.
+- `README.md`, `CHANGELOG.md`, `_contexte/contexte.md` : état actuel mis à jour (v5.51 en prod).
 
 ## Hypothèses validées / invalidées
-- EN ATTENTE : validation par Marie des 8 points de `tests_manuels.md`, puis `/deploy` v5.36.
-- EN ATTENTE : confirmation des variables Supabase sur le site de test Netlify (dev).
+- VALIDE : déploiement v5.51 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
+- VALIDE : 600/600 tests unitaires, `tsc -b`/lint clean avant déploiement.
+- EN ATTENTE : aucun des changements de v5.51 (Budget v3 + demandes Marie) jamais testé par Marie en conditions réelles.
 
 ## Prochaine étape exacte
-Transmettre `tests_manuels.md` à Marie pour validation sur appareil réel ; une fois validé, `/deploy` v5.36. En parallèle, confirmer les variables Supabase sur le site dev avant de démarrer la Phase 1 de `roadmap_sync_marie.md`.
+Redemander à Marie de réimporter et retester la v5.51 via le catalogue (voir liste complète en question ouverte P1).
 
 ## Question bloquante pour la session suivante
 Aucune.
 
 ---
 
-## Dernière session archivée (2026-08-15 — setup projet Supabase)
+## Dernière session archivée (2026-08-19 — incident de branche corrigé, import Flux B demandes Marie sur main, export 19/08 traité)
 
 ## Décisions prises
-- Projet Supabase créé (région Frankfurt/UE), réglages retenus : API de données activée, affichage automatique des nouvelles tables désactivé (contrôle manuel), RLS automatique activé — cohérent avec la politique d'accès stricte par secret d'appareil prévue Phase 1.
-- Nouveau système de clés Supabase (publiable/secrète) utilisé plutôt que l'ancien anon/service_role ; clé publiable retenue côté client, clé secrète jamais exposée.
-- Confirmé compatible avec l'hébergement Netlify existant : SPA statique sans fonctions serverless, Supabase appelé en client-side via `@supabase/supabase-js`, aucun conflit d'architecture.
+- Divergence critique `sync-marie`/`main` détectée avant tout `/deploy`/push (sessions précédentes menées par erreur sur `sync-marie`). Sur décision explicite de l'utilisateur : rien de `sync-marie` n'est importé, tout le travail Marie est reporté manuellement sur une branche neuve partant de `main`, `sync-marie` reste intacte comme branche de recherche.
+- TA2 (menu tâche simplifié) et AP1 (hauteur de case selon durée) de `roadmap_demandes_marie_v1.md` non reportés : `main` avait indépendamment une implémentation plus aboutie du même besoin.
+- `db.ts` : migrations v13/v14 de `sync-marie` renumérotées v16/v17 (collision avec les v13/14/15 déjà prises par `roadmap_budget_v3` sur `main`).
+- Export Marie du 2026-08-19 traité (étape 0 `/deploy`) : archivé, ingéré, 3 frictions non bloquantes identifiées et reportées comme futures demandes plutôt que traitées à chaud.
 
 ## Livrables produits ou modifiés
-- `.env` (utilisateur, hors dépôt git) : `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` ajoutées.
-- Variables d'environnement Netlify (site prod) : mêmes clés ajoutées.
-- `roadmap_sync_marie.md` : section Prérequis externe marquée `[FAIT]`.
-- Aucun fichier de code applicatif modifié cette session (guidage setup externe uniquement).
+- `src/domain/entities/tool.ts` (color), `listItem.ts` (description), `listItemSubTask.ts` : entités.
+- `src/data/db.ts`(`.test.ts`) : migrations v16 (sous-tâches d'éléments de liste), v17 (couleur d'outil).
+- `src/app/contexts/useListsState.ts`, `useToolsState.ts`, `useSettingsState.ts`(`.test.tsx`) : nouvelles fonctions, export/import étendus (`list_item_sub_tasks`, version 3.5) sans perdre `budget_income_entries`.
+- `src/ui/screens/lists/E62ListItemDetail.tsx`(`.test.tsx`) : nouvel écran.
+- `src/ui/components/ToolWidgetCard.tsx`(`.test.tsx`) : sélecteur de couleur par outil.
+- `src/ui/screens/lists/E61ListDetail.tsx`(`.test.tsx`) : suppression de catégorie, navigation vers le détail d'élément.
+- `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`) : badge énergie -> `energy-checkin` direct.
+- `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`) : encadrement du bandeau + glissement animé continu.
+- `src/domain/data/manualTestsCatalog.ts` : 7 tests ajoutés au format catégorie/étapes de `main`.
+- `CHANGELOG.md` (v5.51), `WHATS_NEW`, `roadmap_demandes_marie_v1.md`, `ROBERTO/flux_b_drive/` : importés/mis à jour sur `main`.
+- `donnees_marie/export-audhd-2026-08-19.json` : archivé. `_contexte/marie_tests_journal.json` : 10 entrées ajoutées.
+- `.claude/memory.md` : créé sur `sync-marie` (perdu au report, recréé sur `main` la session suivante).
 
 ## Hypothèses validées / invalidées
-- VALIDE : ajouter des variables d'environnement sur Netlify ne casse pas le dist actuel en prod (pas de rebuild automatique, variables non encore utilisées par le code tant que la Phase 1 n'est pas codée).
-- EN ATTENTE : variables Supabase pas confirmées sur le site de test Netlify (dev).
+- VALIDE : le report manuel fichier par fichier a permis de ne perdre ni le travail Marie ni les fonctionnalités déjà présentes sur `main` (Budget v3, drag continu, sélecteur mois/année) — vérifié par lecture de chaque diff avant application, pas par confiance dans `git apply --check` seul (qui valide le contexte, pas la pertinence).
+- EN ATTENTE : suite de tests complète pas encore relancée sur la branche fusionnée au moment de cette synthèse — à confirmer avant tout déploiement.
+- EN ATTENTE : aucun des changements de cette session jamais testé par Marie en conditions réelles.
 
 ## Prochaine étape exacte
-Confirmer les variables sur le site de test Netlify (dev), puis démarrer la Phase 1 de `roadmap_sync_marie.md` (schéma de tables, client Supabase) en basculant sur le modèle Opus au préalable.
+Lancer `tsc -b`/`vitest run`/lint sur la branche fusionnée, corriger les écarts, fusionner dans `main`, puis reprendre `/deploy` (v5.51) en repartant de l'étape des vérifications bloquantes.
 
 ## Question bloquante pour la session suivante
-Les variables Supabase ont-elles aussi été ajoutées sur le site de test Netlify (dev) ?
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 10, déploiement v5.49)
+
+## Décisions prises
+- `/deploy` mené à terme après confirmation utilisateur : v5.49 déployée en production, cumulant `roadmap_budget_v3.md` (Phases 1-6) avec les changements déjà en attente depuis v5.47.
+- Étape 0 (exports de Marie) traitée par l'utilisateur lui-même hors session, sur sa confirmation explicite — non analysée par l'agent cette fois.
+
+## Livrables produits ou modifiés
+- `dist/v5.49/` : build de production généré et déployé sur Netlify.
+- `_contexte/dernier_deploiement.md` : v5.49, 2026-08-17.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication.
+- `README.md`, `CHANGELOG.md`, `_contexte/contexte.md` : état actuel mis à jour (v5.49 en prod).
+
+## Hypothèses validées / invalidées
+- VALIDE : déploiement v5.49 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
+- VALIDE : 571/571 tests unitaires, `tsc -b`/lint clean avant déploiement.
+- EN ATTENTE : refonte Budget v3 et les autres changements cumulés jamais testés par Marie en conditions réelles.
+
+## Prochaine étape exacte
+Redemander à Marie de réimporter et retester la v5.49 via le catalogue (voir liste complète en question ouverte P1).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 9, Phases 5-6 roadmap_budget_v3, clôture avant /deploy)
+
+## Décisions prises
+- `roadmap_budget_v3.md` intégralement livrée (Phases 1-6, `[FAIT]`) : refonte de bout en bout du Budget (Montant total manuel réparti Mon compte/Livrets, drill-down par sous-catégorie et par livret).
+- Phase 5 : gestion des mouvements de livret (ajout/modification/suppression) déplacée de `E74BudgetSettings.tsx` vers un nouvel écran `E77BudgetLivretDetail.tsx` dédié, pour éviter deux formulaires incohérents (avec/sans date) — décision au-delà du libellé littéral de la roadmap, non contestée.
+- Phase 6 : 5 fonctions mortes supprimées de `budgetRules.ts` (`getCurrentPeriodBounds`, `getRemainingForCategory`, `getTotalBudgeted`, `getTotalSpent`, `getTotalRemaining`) ; aucun écran mort à retirer (E71/E73/E74 tous vivants) ; widget accueil « Comptes » confirmé non affecté.
+
+## Livrables produits ou modifiés
+- `src/ui/screens/tools/E77BudgetLivretDetail.tsx`(`.test.tsx`) : créé (fiche détaillée d'un livret, mouvements modifiables).
+- `src/app/contexts/useBudgetState.ts` : `updateBudgetDeposit` ajouté.
+- `src/ui/screens/tools/E76BudgetLivrets.tsx`(`.test.tsx`) : clic sur un livret ouvre sa fiche, icône ⚙ ajoutée.
+- `src/ui/screens/tools/E74BudgetSettings.tsx`(`.test.tsx`) : gestion des mouvements retirée, recentré sur la configuration des livrets.
+- `src/app/navigation.ts`, `src/App.tsx`, `src/ui/components/DevResetButton.tsx` : route `budget-livret-detail`.
+- `src/domain/rules/budgetRules.ts`(`.test.ts`) : nettoyage des fonctions mortes.
+- `src/domain/data/manualTestsCatalog.ts` : test `retirer-de-l-argent-d-un-livret` réécrit, `modifier-un-mouvement-de-livret` ajouté, `utiliser-le-budget` complété.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : 2 entrées `WHATS_NEW` ajoutées.
+- `roadmap_budget_v3.md` : Phases 5 et 6 `[FAIT]`.
+
+## Hypothèses validées / invalidées
+- VALIDE : 571/571 tests unitaires, `tsc -b`/lint clean après Phases 5 et 6.
+- EN ATTENTE : refonte Budget v3 jamais testée par Marie en conditions réelles.
+
+## Prochaine étape exacte
+`/deploy` en cours (exports de Marie déjà traités par l'utilisateur hors session).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 8, déploiement v5.47)
+
+## Décisions prises
+- `/deploy` mené à terme après confirmation utilisateur : v5.47 déployée en production (cumule v5.45 + regroupement des tests par catégorie).
+- Avertissement de build « chunk JS > 500 kB » laissé tel quel sur consigne explicite de l'utilisateur : le refacto (`React.lazy`/`Suspense` par écran) sera proposé seulement si le poids grossit nettement — consigne de veille ajoutée aux questions ouvertes.
+
+## Livrables produits ou modifiés
+- `dist/v5.47/` : build de production généré et déployé sur Netlify.
+- `_contexte/dernier_deploiement.md` : v5.47, 2026-08-17.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après publication.
+- `README.md`, `CHANGELOG.md` (v5.48), `_contexte/contexte.md` : état actuel mis à jour (v5.47 en prod).
+
+## Hypothèses validées / invalidées
+- VALIDE : déploiement v5.47 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
+- VALIDE : 568/568 tests unitaires, `tsc -b`/lint clean avant déploiement.
+- EN ATTENTE : aucun des changements de v5.45/v5.47 (Budget, drag planning, navigation planning, édition de tâche, regroupement des tests) jamais testé par Marie en conditions réelles.
+
+## Prochaine étape exacte
+Redemander à Marie de réimporter et retester la v5.47 via le catalogue (voir liste complète en question ouverte P1).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 7, catégorisation du travail, regroupement du catalogue de tests)
+
+## Décisions prises
+- Sur demande de Marie (« je pars dans tous les sens »), découpage du travail validé en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil).
+- Écran « Tests à faire » restructuré : tests regroupés par catégorie, repliées par défaut (nom en évidence, compteur), pliage à 3 niveaux (catégorie -> tests -> étapes).
+- Export de Marie du 17/08 11h13 traité (étape 0 `/deploy`) : ni perte, ni incohérence, ni friction bloquante — usage normal.
+
+## Livrables produits ou modifiés
+- `message_marie_categories_travail.md` : créé (proposition de découpage + validation de Marie).
+- `src/domain/data/manualTestsCatalog.ts` : type `ManualTestCategory` et champ `category` ajoutés, 13 tests classés, test `grouper-les-tests-par-categorie` ajouté.
+- `src/ui/screens/tests/E121ManualTests.tsx`(`.test.tsx`) : regroupement par catégorie, pliage/dépliage à 3 niveaux.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : entrée `WHATS_NEW` ajoutée.
+- `donnees_marie/export-audhd-2026-08-17-11h13.json` : copié (gitignoré).
+- `_contexte/marie_tests_journal.json` : ré-ingestion idempotente (0 ajout, 13 déjà connus).
+- `README.md`, `CHANGELOG.md` (v5.47) : mis à jour.
+
+## Hypothèses validées / invalidées
+- VALIDE : 568/568 tests unitaires, `tsc -b`/lint clean après la restructuration de l'écran de tests.
+- VALIDE : export du 17/08 11h13 sans perte ni incohérence (comparaison structurelle table par table avec le dernier export connu).
+
+## Prochaine étape exacte
+Poursuivre `/deploy` en cours (vérifications bloquantes, build, déploiement Netlify de la version cumulant v5.45 + regroupement des tests par catégorie).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 4, sélecteur mois/année, refonte navigation planning et édition de tâche)
+
+## Décisions prises
+- Sur retours utilisateur (captures annotées), 5 correctifs UI cumulés : clic sur le mois/année du planning ouvre désormais une fenêtre dédiée (année + grille des 12 mois) au lieu de l'ancien sélecteur de date natif ; le bandeau de dates garde le jour actuel toujours centré (navigation uniquement par glissement, flèches semaine retirées) ; badge sous-tâches placé avant le logo énergie sur chaque ligne planifiée pour un alignement vertical constant, hauteur de ligne rendue proportionnelle à la durée ; débordement visuel du cadre Durée dans le formulaire de tâche corrigé ; fiche de tâche planifiée passée en lecture seule (fond teinté à la couleur d'ambiance) avec un nouveau bouton « Modifier » ouvrant un écran d'édition dédié pré-rempli, au même gabarit que la création, avec le choix occurrence/série conservé pour les tâches récurrentes.
+
+## Livrables produits ou modifiés
+- `src/ui/components/MonthYearPickerModal.tsx` : créé (sélecteur mois/année).
+- `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`) : sélecteur mois/année câblé, bandeau recentré sur le jour actuel, flèches semaine retirées, ordre badge/énergie inversé, hauteur de ligne proportionnelle à la durée.
+- `src/ui/screens/dashboard/E10Dashboard.test.tsx` : tests ajustés (bandeau de dates).
+- `src/ui/components/DurationRoller.tsx`, `src/ui/screens/tasks/E21CreateTaskV2.tsx` : correctif débordement visuel du cadre Durée.
+- `src/ui/screens/tasks/E22TaskDetail.tsx`(`.test.tsx`) : champs en lecture seule, fond teinté couleur d'ambiance, bouton « Modifier ».
+- `src/ui/screens/tasks/E24EditTask.tsx`(`.test.tsx`) : créé (écran d'édition de tâche dédié).
+- `src/app/navigation.ts`, `src/App.tsx`, `src/ui/components/DevResetButton.tsx` : nouvelle route `task-edit`.
+- `src/domain/data/manualTestsCatalog.ts` : tests `naviguer-dans-le-planning` et `modifier-une-tache-planifiee` ajoutés.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : 2 entrées `WHATS_NEW` ajoutées.
+- `CHANGELOG.md` : v5.45.
+
+## Hypothèses validées / invalidées
+- VALIDE : 566/566 tests unitaires, `tsc -b`/lint clean après l'ensemble des correctifs.
+- HYPOTHÈSE NON VÉRIFIÉE : cause du débordement du cadre Durée attribuée aux `<select>` natifs sans largeur contrainte (`minWidth:0` manquant) — corrigé sur cette base mais pas confirmé visuellement par l'utilisateur sur son appareil.
+- EN ATTENTE : aucun des changements de cette session (ni des sessions précédentes : Budget, drag planning) jamais testé par Marie en conditions réelles — aucun déploiement cette session.
+
+## Prochaine étape exacte
+`/deploy` (cumule Budget + drag planning + sélecteur mois/année + navigation planning + édition de tâche), puis redemander à Marie de tester les nouveaux comportements via le catalogue (`naviguer-dans-le-planning`, `modifier-une-tache-planifiee`, plus les tests Budget/planning déjà en attente).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 3, drag continu du planning, mise à jour catalogue de tests)
+
+## Décisions prises
+- Sur retour utilisateur (capture annotée) : la poignée du planning devient un drag continu façon bottom-sheet — la fenêtre suit le doigt en temps réel (au lieu du seuil binaire précédent qui basculait instantanément), reste à la hauteur relâchée au lieu de forcément s'ouvrir/fermer en entier, et la section Outils / la bannière Mode surcharge restent visibles en permanence (elles disparaissaient auparavant quand le planning était déplié).
+- Suite à cette évolution, les tests `utiliser-le-budget` et `glisser-pour-ouvrir-le-planning` du catalogue mis à jour : le premier teste désormais aussi « Ajouter un revenu » (jamais couvert alors que c'est le cœur de la refonte Budget) ; le second décrit le nouveau comportement continu au lieu de l'ancien « occupe l'écran ».
+
+## Livrables produits ou modifiés
+- `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`) : drag continu du planning (constantes `PLANNING_MIN_HEIGHT_PX`/`PLANNING_MAX_HEIGHT_PX`), Outils/bannière surcharge toujours visibles.
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : pollution non committée (caractère parasite ligne 1) corrigée, sans rapport avec la session.
+- `src/domain/data/manualTestsCatalog.ts` : steps de `utiliser-le-budget` et `glisser-pour-ouvrir-le-planning` mis à jour.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : entrée `WHATS_NEW` ajoutée (drag continu du planning).
+
+## Hypothèses validées / invalidées
+- VALIDE : 564/564 tests unitaires, `tsc -b`/lint clean après le changement de drag et la mise à jour du catalogue.
+- EN ATTENTE : refonte Budget et drag continu du planning tous deux jamais testés par Marie en conditions réelles — aucun déploiement cette session.
+
+## Prochaine étape exacte
+`/deploy` (cumule refonte Budget + drag continu du planning), puis redemander à Marie de tester « Utiliser le budget », « Ouvrir le planning en glissant » et « Vérifier le Montant total après la migration des revenus ».
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — suite 2, clôture refonte Budget Phase 4, nettoyage catégories income)
+
+## Décisions prises
+- Phase 4 de `roadmap_budget_v2.md` (dernière phase) livrée et confirmée par l'utilisateur : catégories `income` existantes de Marie converties en revenus historiques ponctuels via migration Dexie v14, puis supprimées. Roadmap intégralement `[FAIT]`.
+- Angle mort signalé par l'agent (hors périmètre de la roadmap) : l'écran de configuration permettait encore de créer de nouvelles catégories `income`, contredisant la nouvelle règle « Marie saisit elle-même chaque revenu ». Message rédigé pour trancher avec Marie plutôt que décidé unilatéralement.
+- Marie a répondu (relayé par l'utilisateur) : option 1, suppression complète — option « Revenu » du formulaire de catégorie, bloc « Non alloué », section « Revenus » de l'écran Budget et fonctions de calcul mortes associées, tous retirés.
+- `WHATS_NEW` mis à jour : la refonte Budget est désormais complète et cohérente de bout en bout, plus de raison de différer l'annonce à Marie (contrairement à la Phase 1 seule).
+
+## Livrables produits ou modifiés
+- `src/data/db.ts`(`.test.ts`) : migration Dexie v14 (conversion catégories income → `BudgetIncomeEntry`, suppression des catégories).
+- `src/domain/data/manualTestsCatalog.ts` : test `montant-total-apres-migration-revenus` ajouté.
+- `roadmap_budget_v2.md` : décision « Devenir des catégories income » actée, Phase 4 `[FAIT]`.
+- `src/domain/rules/budgetRules.ts`(`.test.ts`) : `getTotalIncome`, `getUnbudgetedRemainder` supprimées (mortes après le nettoyage).
+- `src/ui/screens/tools/E74BudgetSettings.tsx`(`.test.tsx`) : option « Revenu » et bloc « Non alloué » retirés.
+- `src/ui/screens/tools/E71Budget.tsx`(`.test.tsx`) : section « Revenus » (catégories income) retirée.
+- `src/app/AppContextBudget.test.tsx` : nettoyé des scénarios liés aux fonctions supprimées.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : entrée `WHATS_NEW` ajoutée (nouveau système Budget).
+- `message_marie_categories_revenu.md` : message rédigé pour Marie (non committé, réponse déjà obtenue).
+
+## Hypothèses validées / invalidées
+- VALIDE : 564/564 tests unitaires, `tsc -b`/lint clean après la Phase 4 et le nettoyage des catégories income.
+- EN ATTENTE : refonte Budget jamais testée par Marie en conditions réelles — premier `/deploy` de cette feature à venir.
+
+## Prochaine étape exacte
+Déployer la refonte Budget (`/deploy`), puis redemander à Marie de tester le nouveau système (« Ajouter un revenu », carte « Montant total », absence des anciennes catégories) via le test `montant-total-apres-migration-revenus` du catalogue.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-17 — archivage des roadmaps terminées, déploiement v5.40)
+
+## Décisions prises
+- Export de Marie du 16/08 reconfirmé comme dernier disponible (étape 0 de `/deploy`) — aucun nouvel élément à ingérer, `/deploy` poursuivi.
+- Erreur de lint préexistante `db.ts:308` (`_section` déstructuré jamais utilisé) corrigée à la racine : `eslint.config.js` ne couvrait que les paramètres de fonction (`argsIgnorePattern: '^_'`), pas les variables déstructurées — `varsIgnorePattern: '^_'` ajouté.
+- Test `E01Welcome.test.tsx` fragile (dépendait du contenu réel, non vide, du tableau `WHATS_NEW`) reformulé pour vérifier le comportement réel (modale déjà vue pour la version courante via `localStorage`), indépendant du contenu — évite la récurrence à chaque cycle `/deploy`.
+- v5.40 déployée en prod après confirmation utilisateur (cumule tous les correctifs/retouches depuis v5.31 : Budget, catégories de listes, nettoyage tests manuels, retouches accueil/E121, archivage roadmaps, correctifs lint/test).
+
+## Livrables produits ou modifiés
+- `roadmap_v5.1.md`, `roadmap_tests_marie.md`, `roadmap_categories_listes.md` → `Archives/` (`git mv`).
+- `eslint.config.js` : `varsIgnorePattern: '^_'` ajouté.
+- `src/ui/screens/onboarding/E01Welcome.test.tsx` : test reformulé (indépendant du contenu de `WHATS_NEW`).
+- `src/ui/screens/onboarding/E01Welcome.tsx` : `WHATS_NEW` vidé après déploiement.
+- `_contexte/dernier_deploiement.md` : v5.40, 2026-08-17.
+- `CHANGELOG.md` : v5.39 (archivage), v5.40 (correctifs lint/test).
+
+## Hypothèses validées / invalidées
+- VALIDE : correctifs lint/test confirmés par vérifications bloquantes vertes (555/555 tests, `tsc -b` clean, `npm run lint` clean).
+- VALIDE : déploiement v5.40 confirmé HTTP 200 sur `https://appli-audhd.netlify.app`.
+
+## Prochaine étape exacte
+Redemander à Marie de réimporter et revalider ses tests en attente (Budget ×3, catégories de listes, glisser planning).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-16 — suite 2, archivage des roadmaps terminées)
+
+## Décisions prises
+- Les 3 roadmaps dont toutes les phases sont `[FAIT]` (`roadmap_v5.1.md`, `roadmap_tests_marie.md`, `roadmap_categories_listes.md`) déplacées vers `Archives/`, suivant le précédent déjà appliqué aux roadmaps V1-V5.0.
+- Références actives (hors journal historique) mises à jour dans `_contexte/signals.md` et `_contexte/contexte.md` pour pointer vers `Archives/`.
+
+## Livrables produits ou modifiés
+- `Archives/roadmap_v5.1.md`, `Archives/roadmap_tests_marie.md`, `Archives/roadmap_categories_listes.md` : déplacés (`git mv`), contenu inchangé.
+- `_contexte/signals.md`, `_contexte/contexte.md` : références mises à jour.
+
+## Hypothèses validées / invalidées
+- VALIDE : critère d'archivage (toutes phases `[FAIT]`, aucun `[TODO]`/`[EN COURS]` restant) cohérent avec les roadmaps déjà archivées.
+- EN ATTENTE : lint global bloqué par une erreur préexistante dans `db.ts:308`, sans rapport avec cette session. Aucun déploiement depuis v5.31.
+
+## Prochaine étape exacte
+Corriger l'erreur de lint préexistante dans `db.ts:308` avant le `/deploy` en cours, puis terminer le déploiement (cumule tous les correctifs/retouches depuis v5.31) et redemander à Marie de réimporter et revalider ses tests en attente.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-16 — suite, dashboard + refonte E121 tests manuels, clôture Phase V5.1-0)
+
+## Décisions prises
+- Dernier point de `tests_manuels.md` (Import JSON) validé par l'utilisateur ; fichier vidé intégralement. Phase V5.1-0 de `Archives/roadmap_v5.1.md` passée `[FAIT]`.
+- Accueil retouché sur demande utilisateur : bouton « + » Outils déplacé à côté du titre et réduit, espacement accru avant la grille de widgets, police arrondie sur les widgets (fallback OS `ui-rounded`/`SF Pro Rounded`/`Segoe UI Rounded`, aucun fichier de police chargé — contrainte offline-first préservée).
+- Sur E121, un test dont le dernier résultat est « Validé » n'apparaît plus dans la liste affichée à Marie ; le catalogue interne le garde intact comme suite de non-régression (décision explicite de l'utilisateur : ne pas supprimer l'archive, seulement filtrer l'UI).
+- Chaque test dispose désormais d'un bouton déplier/replier (validé manuellement par l'utilisateur) ; `ManualTest.description` remplacé par `steps: string[]`, chaque test réécrit en étapes numérotées précises (libellés exacts des boutons/champs/écrans, aucun implicite). Gabarit de rédaction documenté en commentaire en tête de `manualTestsCatalog.ts` pour les prochains ajouts.
+
+## Livrables produits ou modifiés
+- `src/ui/screens/dashboard/E10Dashboard.tsx` : bouton « + » Outils repositionné/réduit, espacement grille, police arrondie widgets.
+- `src/ui/screens/tests/E121ManualTests.tsx`/`.test.tsx` : filtrage des tests validés, déplier/replier, rendu `steps` en liste numérotée.
+- `src/domain/data/manualTestsCatalog.ts` : `steps: string[]` remplace `description`, gabarit en commentaire, 10 tests réécrits.
+- `tests_manuels.md` : vidé intégralement (plus aucun point en attente).
+- `roadmap_v5.1.md` : Phase V5.1-0 `[FAIT]`.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : 2 entrées `WHATS_NEW` ajoutées.
+- `CHANGELOG.md` : v5.38. `README.md` : état actuel mis à jour.
+
+## Hypothèses validées / invalidées
+- VALIDE : déplier/replier les étapes d'un test, confirmé par l'utilisateur en test manuel réel.
+- INVALIDE : hypothèse initiale qu'un test « Validé » pouvait être supprimé du catalogue -> pivot : catalogue conservé comme suite de non-régression, seul l'affichage à Marie est filtré.
+- EN ATTENTE : lint global bloqué par une erreur préexistante dans `db.ts:308`, sans rapport avec cette session. Aucun déploiement depuis v5.31.
+
+## Prochaine étape exacte
+Corriger l'erreur de lint préexistante dans `db.ts` avant le prochain `/deploy`, puis déployer (v5.38, cumule tous les correctifs/retouches depuis v5.31) et redemander à Marie de réimporter et revalider ses tests en attente.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-16 — export Marie, nettoyage tests manuels, correctif catégories de listes à l'import)
+
+## Décisions prises
+- Suppression de 5 éléments de la liste « À acheter » (export du 16/08 vs 13/08) confirmée volontaire par l'utilisateur — pas un bug.
+- `tests_manuels.md` recentré : les 7 points déjà dupliqués dans `manualTestsCatalog.ts` en sont retirés, ne garde que l'import JSON (dev). Point manquant (badge énergie) ajouté au catalogue.
+- Bannières urgentes (accueil, Tests à faire) supprimées, devenues obsolètes.
+- `.claude/commands/close.md` étape 6 enrichie : analyse de la conversation pour tracer les tests manuels décidés en session.
+- Travail de cette session fait sur `main` (basculement depuis `sync-marie`, sans rapport avec ce chantier).
+
+## Livrables produits ou modifiés
+- `src/domain/data/manualTestsCatalog.ts` : test `badge-energie-couleur-ambiance` ajouté.
+- `tests_manuels.md` : vidé de 7 points, ne garde que l'import JSON.
+- `src/ui/screens/onboarding/E01Welcome.tsx`/`.test.tsx`, `src/ui/screens/tests/E121ManualTests.tsx`/`.test.tsx` : bannières urgentes retirées.
+- `src/app/contexts/useSettingsState.ts`/`.test.tsx` : bug catégories de listes à l'export/import corrigé, export v3.2 → v3.3.
+- `.claude/commands/close.md` : étape 6 enrichie.
+- `CHANGELOG.md` : v5.37. `README.md` : état actuel mis à jour.
+
+## Hypothèses validées / invalidées
+- VALIDE : bug catégories de listes reproduit et corrigé (nouveau test dédié), 552/553 tests unitaires (échec préexistant sans rapport), `tsc -b` clean, lint clean sur les fichiers modifiés.
+- INVALIDE : hypothèse que les 8 points de `tests_manuels.md` étaient tous propres au développeur -> pivot : 7/8 dupliquaient déjà le catalogue Marie.
+- EN ATTENTE : lint global bloqué par une erreur préexistante dans `db.ts:308`, sans rapport avec cette session.
+
+## Prochaine étape exacte
+Corriger l'erreur de lint préexistante dans `db.ts` avant le prochain `/deploy`. Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` après réconciliation des deux branches.
+
+## Question bloquante pour la session suivante
+Aucune.
 
 ---
 

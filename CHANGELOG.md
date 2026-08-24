@@ -1,21 +1,133 @@
-## v5.38 — 2026-08-18
+## v5.53 — 2026-08-24
+
+### Modifié
+- Commande de déploiement : le bilan inclut désormais un message WhatsApp prêt à envoyer à Marie, avec le lien de production et les marqueurs `💻🤖`.
+
+## v5.52 — 2026-08-24
+
+### Corrigé
+- Planning : une tâche sans couleur explicite utilise désormais un fond neutre, indépendamment de la couleur d’ambiance.
+- Listes : le retour depuis le détail d’un élément restaure la catégorie précédemment ouverte.
+- Outils : le sélecteur de couleur porte désormais un libellé visible.
+
+## v5.51 — 2026-08-19
 
 ### Ajouté
 - Détail d'un élément de liste (E62) : description et sous-tâches, ouvrable en touchant le titre d'un élément.
 - Chaque outil (liste, budget...) peut avoir sa propre couleur de fond (sélecteur sur la carte, `E70Tools`/`E72FolderDetail`).
-- Menu d'une tâche simplifié : « Modifier » ouvre directement le titre en édition ; retrait de « Tâche du jour », « Planifier », « Liste », « Terminer ».
 - Suppression d'une seule catégorie de liste, sans supprimer toute la liste.
 
 ### Modifié
-- Une tâche sans couleur choisie n'est plus teintée par la couleur d'ambiance dans le Planning.
+- Une tâche sans couleur choisie n'est plus teintée par la couleur d'ambiance dans le planning.
 - Badge énergie de l'accueil : accès direct à l'écran de modification, sans écran de consultation intermédiaire.
-- Planning : hauteur de case selon la durée de la tâche, bandeau de dates encadré par la couleur d'ambiance et glissement tactile animé.
+- Bandeau de dates du planning : encadré par la couleur d'ambiance, glissement tactile suivi en continu avec retour animé.
 
-## v5.37 — 2026-08-18
+## v5.50 — 2026-08-18
+
+### Modifié
+- Déploiement de v5.49 en production (refonte Budget v3 complète, cumulée avec les changements déjà en attente depuis v5.47), HTTP 200 vérifié.
+
+## v5.49 — 2026-08-17
 
 ### Ajouté
-- Synchronisation automatique des données de Marie vers Supabase, en arrière-plan (démarrage de l'app et retour au premier plan, throttlée). Un indicateur dans Paramètres affiche « vos données de test sont partagées avec le développeur » et la date de la dernière synchronisation réussie.
-- Accès développeur en lecture aux données synchronisées (`scripts/read_device_snapshots.py`).
+- Refonte Budget v3 terminée (`roadmap_budget_v3.md`, Phases 1-6) : Montant total réparti entre Mon compte (drill-down par sous-catégorie Semaine/Mois) et Mes livrets (drill-down par livret, fiche dédiée avec mouvements ajoutables/modifiables/supprimables).
+
+### Modifié
+- Gestion des mouvements de livret déplacée de l'écran de configuration vers la nouvelle fiche par livret, pour un formulaire unique et cohérent (montant/motif/date).
+
+### Corrigé
+- Suppression de 5 fonctions mortes dans `budgetRules.ts` devenues obsolètes après la refonte.
+
+## v5.48 — 2026-08-17
+
+### Modifié
+- Déploiement de v5.47 en production (regroupement des tests par catégorie, cumulé avec la v5.45 déjà en prod), HTTP 200 vérifié.
+- Avertissement de build « chunk JS > 500 kB » laissé tel quel sur consigne explicite de l'utilisateur ; refacto (`React.lazy`/`Suspense`) à proposer seulement si le poids grossit nettement.
+
+## v5.47 — 2026-08-17
+
+### Ajouté
+- Catégorisation du travail validée avec Marie (7 catégories : Accueil/Planning, Tâches, Outils Budget, Outils Listes, Outils autres, Énergie, Paramètres/Profil).
+- Écran « Tests à faire » : tests regroupés par catégorie, repliées par défaut (nom de catégorie mis en valeur, pliage/dépliage à trois niveaux : catégorie -> test -> étapes).
+
+### Modifié
+- Export de Marie du 17/08 11h13 traité : copié dans `donnees_marie/`, journal de tests ré-ingéré (aucun nouveau résultat, aucune perte ni friction).
+
+## v5.46 — 2026-08-17
+
+### Modifié
+- Déploiement de v5.45 en production (refonte Budget, drag continu du planning, sélecteur mois/année, navigation planning par glissement, édition de tâche dédiée), après analyse sans anomalie de l'export de Marie du 17/08.
+- `roadmap_budget_v2.md` (toutes phases terminées) archivée.
+
+## v5.45 — 2026-08-17
+
+### Ajouté
+- Fiche de tâche planifiée : bouton « Modifier » ouvrant un écran d'édition dédié, pré-rempli au même gabarit que la création, avec choix occurrence/série pour les tâches récurrentes.
+
+### Modifié
+- Bandeau de dates du planning (accueil) : flèches de navigation par semaine retirées, le jour actuel reste toujours centré et seul le cadre du jour sélectionné se déplace ; navigation uniquement par glissement tactile.
+- Ligne d'une tâche planifiée : badge des sous-tâches désormais avant le logo d'énergie (alignement vertical constant entre les lignes), hauteur de ligne proportionnelle à la durée de la tâche.
+- Fiche d'une tâche planifiée : fond teinté avec la couleur d'ambiance des paramètres ; champs affichés en lecture seule (l'édition se fait via le bouton « Modifier »).
+
+### Corrigé
+- Formulaire de création de tâche : débordement visuel du cadre Durée à droite de l'écran (selects sans largeur contrainte).
+
+## v5.44 — 2026-08-17
+
+### Modifié
+- Planning de l'accueil : la poignée devient un drag continu façon bottom-sheet (la fenêtre suit le doigt et reste à la hauteur relâchée, au lieu d'un seuil binaire) ; la section Outils et la bannière Mode surcharge restent désormais toujours visibles.
+
+## v5.43 — 2026-08-17
+
+### Ajouté
+- Refonte du Budget (Phase 4/4, `roadmap_budget_v2.md`) — dernière phase, toutes livrées : anciennes catégories de revenu à montant fixe de Marie converties en revenus historiques ponctuels (migration Dexie v14) puis supprimées.
+
+### Modifié
+- Écran de configuration du Budget : possibilité de créer une nouvelle catégorie de type Revenu retirée, ainsi que le bloc « Non alloué » et la section « Revenus » de l'écran Budget, devenus incohérents avec le nouveau système « Montant total ».
+
+## v5.42 — 2026-08-17
+
+### Ajouté
+- Commande `/traiter_export_marie` : traite l'arrivée d'un export de Marie indépendamment de `/deploy` (comparaison par `export_date`, ingestion du journal de tests, détection de pertes/frictions).
+- Refonte du Budget (Phase 1/4, `roadmap_budget_v2.md`) : entité de revenus saisis manuellement (« Montant total »), avec formulaire dédié sur l'écran Budget — non encore reliée aux catégories de dépense ni aux livrets, pas encore annoncée à Marie.
+
+### Corrigé
+- `manualTestsCatalog.ts` : formulation du test « Utiliser le budget » (l'étape 1 renvoyait vers le widget « Comptes » de l'accueil, qui n'ouvre qu'un formulaire de dépense direct, pas l'écran Budget).
+
+## v5.41 — 2026-08-17
+
+### Modifié
+- Clôture de session `/close` : synthèse du déploiement v5.40 (correctifs lint `db.ts:308`, test `E01Welcome.test.tsx` reformulé) consignée dans `_contexte/signals.md`/`contexte.md`, `README.md` aligné sur la version déployée.
+
+## v5.40 — 2026-08-17
+
+### Corrigé
+- Lint global bloqué par une erreur préexistante dans `db.ts:308` (`_section` déstructuré jamais utilisé) : `eslint.config.js` ne couvrait que les paramètres de fonction (`argsIgnorePattern: '^_'`), pas les variables déstructurées — `varsIgnorePattern: '^_'` ajouté.
+- Test `E01Welcome.test.tsx` fragile (« n'affiche pas la modale Nouveautés quand WHATS_NEW est vide ») : dépendait du contenu réel du tableau `WHATS_NEW`, vide seulement juste après un déploiement — reformulé pour vérifier le comportement réel (modale déjà vue pour la version courante via `localStorage`), indépendant du contenu.
+
+## v5.39 — 2026-08-16
+
+### Modifié
+- Roadmaps terminées (`roadmap_v5.1.md`, `roadmap_tests_marie.md`, `roadmap_categories_listes.md`) déplacées vers `Archives/`, suivant le classement déjà appliqué aux roadmaps V1-V5.0. Aucun changement fonctionnel.
+
+## v5.38 — 2026-08-16
+
+### Modifié
+- Accueil : bouton « + » (ajout d'un outil) déplacé juste à côté du titre « Outils » et réduit ; espacement augmenté entre ce titre et les cases Comptes/To Do/À acheter/Budget, qui utilisent désormais une police plus arrondie.
+- « Tests à faire » : chaque test peut être déplié pour afficher ses étapes numérotées ou replié pour ne garder que le titre ; un test déjà validé disparaît de la liste affichée (le catalogue interne le conserve, comme suite de non-régression).
+- Catalogue de tests manuels (`manualTestsCatalog.ts`) : description de chaque test réécrite en étapes numérotées précises (libellés exacts des boutons/champs), sans étape implicite ; un gabarit de rédaction est documenté en tête du fichier pour les prochains ajouts.
+
+### Terminé
+- Phase V5.1-0 de `roadmap_v5.1.md` (refonte ergonomique du Budget) clôturée : gate entièrement validée, dernier point de `tests_manuels.md` (import JSON) confirmé par l'utilisateur.
+
+## v5.37 — 2026-08-16
+
+### Corrigé
+- Catégories de listes perdues à l'export/import : `list_categories` n'était jamais exporté ni vidé/restauré, laissant les éléments de liste importés inaccessibles (aucune catégorie pour les afficher), y compris sur un export/import fait avec cette version. Corrigé (`useSettingsState.ts`), avec réparation automatique par regroupement sur `section` pour les imports au format antérieur, comme le fait la migration Dexie v12 à l'installation.
+
+### Modifié
+- Bannières urgentes (accueil, « Tests à faire ») retirées, leur rôle (demander la réimportation pour réparer le Budget) devenu obsolète.
+- Catalogue de tests manuels Marie complété (badge énergie, fond en couleur d'ambiance) ; `tests_manuels.md` recentré sur les seules vérifications techniques internes (import JSON), les autres points étant désormais couverts par le catalogue Marie.
 
 ## v5.36 — 2026-08-15
 

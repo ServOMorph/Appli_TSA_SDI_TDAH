@@ -7,6 +7,7 @@ node_modules/
 dist/
 dist-ssr/
 build/
+tmp/
 
 # Tests e2e
 e2e/playwright-report/
@@ -56,5 +57,5 @@ ios/
 __pycache__/
 *.pyc
 
-# Captures de calibration chatgpt-orchestrateur (ephemeres, jamais reinjectees)
+# Captures de calibration chatgpt-orchestrateur (éphémères, jamais réinjectées)
 ROBERTO/_orchestrateur_ia/*/calibration/

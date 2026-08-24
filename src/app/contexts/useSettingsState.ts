@@ -19,6 +19,7 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import type { ManualTestResult } from '@/domain/entities/manualTestResult'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
@@ -118,6 +119,7 @@ export function useSettingsState() {
       db.budgetEntries.clear(),
       db.budgetAccounts.clear(),
       db.budgetDeposits.clear(),
+      db.budgetIncomeEntries.clear(),
       db.folders.clear(),
       db.tools.clear(),
       db.taskRecurrences.clear(),
@@ -132,9 +134,11 @@ export function useSettingsState() {
    * l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export) en recréant
    * l'entrée Outil manquante pour chaque liste qui n'en a pas, ainsi que l'entrée Outil Budget
    * (`tableau_comptage`) si elle est absente. Les exports plus anciens sans résultats de tests
-   * manuels sont acceptés avec un historique vide. Les exports antérieurs à v3.3 n'ont pas de
-   * catégories de listes : une catégorie « Général » par liste est recréée et les éléments
-   * orphelins y sont rattachés, faute de quoi ils resteraient invisibles.
+   * manuels sont acceptés avec un historique vide. Les exports antérieurs à v3.3 (avant l'ajout
+   * de `list_categories`) sont acceptés en recréant une catégorie par valeur de `section` sur
+   * les éléments de liste, comme le fait la migration Dexie v12 à l'installation. Les exports
+   * antérieurs à v3.5 (avant `description`/`list_item_sub_tasks`) sont acceptés avec une
+   * description vide par défaut et aucune sous-tâche.
    */
   async function importData(raw: unknown): Promise<ImportResult> {
     if (typeof raw !== 'object' || raw === null) {
@@ -155,7 +159,7 @@ export function useSettingsState() {
     const taskRecurrences = Array.isArray(data.task_recurrences) ? (data.task_recurrences as TaskRecurrence[]) : []
     const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
     const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
-    const listItems = Array.isArray(data.list_items) ? (data.list_items as ListItem[]) : []
+    const rawListItems = Array.isArray(data.list_items) ? (data.list_items as (ListItem & { section?: string | null })[]) : []
     const listItemSubTasks = Array.isArray(data.list_item_sub_tasks)
       ? (data.list_item_sub_tasks as ListItemSubTask[])
       : []
@@ -167,6 +171,7 @@ export function useSettingsState() {
     const entries = Array.isArray(data.budget_entries) ? (data.budget_entries as BudgetEntry[]) : []
     const accounts = Array.isArray(data.budget_accounts) ? (data.budget_accounts as BudgetAccount[]) : []
     const deposits = Array.isArray(data.budget_deposits) ? (data.budget_deposits as BudgetDeposit[]) : []
+    const incomeEntries = Array.isArray(data.budget_income_entries) ? (data.budget_income_entries as BudgetIncomeEntry[]) : []
     const manualTestResults = Array.isArray(data.manual_test_results) ? (data.manual_test_results as ManualTestResult[]) : []
 
     const importedSettings = data.settings
@@ -191,25 +196,44 @@ export function useSettingsState() {
       nextPosition += 1
     }
 
+    /**
+     * Les exports antérieurs à la migration Dexie v12 (catégories de listes) n'ont pas de
+     * `list_categories` et leurs éléments portent `section` au lieu de `category_id`. Comme
+     * l'upgrade Dexie qui fait cette réparation ne s'exécute que sur un changement de version
+     * de schéma (jamais lors d'un import qui vide puis réinsère les données), on reproduit ici
+     * la même logique : une catégorie par valeur de `section` (« Général » si absente), par liste.
+     */
     const repairedCategories = [...listCategories]
-    const knownCategoryIds = new Set(repairedCategories.map((c) => c.id))
-    const fallbackCategoryByList = new Map<string, string>()
-    const repairedListItems = listItems.map((item) => {
-      if (knownCategoryIds.has(item.category_id)) return item
-      let categoryId = fallbackCategoryByList.get(item.list_id)
+    const categoryPositionByList = new Map<string, number>()
+    for (const category of repairedCategories) {
+      const current = categoryPositionByList.get(category.list_id) ?? -1
+      if (category.position > current) categoryPositionByList.set(category.list_id, category.position)
+    }
+    const categoryIdByListAndName = new Map(repairedCategories.map((c) => [`${c.list_id}::${c.name}`, c.id]))
+
+    const repairedListItems: ListItem[] = rawListItems.map((item) => {
+      if (item.category_id) return { ...item, description: item.description ?? '' }
+      const name = item.section ?? 'Général'
+      const key = `${item.list_id}::${name}`
+      let categoryId = categoryIdByListAndName.get(key)
       if (!categoryId) {
         categoryId = newId()
-        fallbackCategoryByList.set(item.list_id, categoryId)
-        repairedCategories.push({
-          id: categoryId,
-          list_id: item.list_id,
-          name: 'Général',
-          position: repairedCategories.filter((c) => c.list_id === item.list_id).length,
-          created_at: now,
-        })
+        categoryIdByListAndName.set(key, categoryId)
+        const position = (categoryPositionByList.get(item.list_id) ?? -1) + 1
+        categoryPositionByList.set(item.list_id, position)
+        repairedCategories.push({ id: categoryId, list_id: item.list_id, name, position, created_at: now })
       }
-      return { ...item, category_id: categoryId }
-    }).map((item) => ({ ...item, description: item.description ?? '' }))
+      return {
+        id: item.id,
+        list_id: item.list_id,
+        title: item.title,
+        position: item.position,
+        checked: item.checked,
+        created_at: item.created_at,
+        category_id: categoryId,
+        description: item.description ?? '',
+      }
+    })
 
     try {
       await clearDatabase()
@@ -230,6 +254,7 @@ export function useSettingsState() {
         entries.length ? db.budgetEntries.bulkAdd(entries) : Promise.resolve(),
         accounts.length ? db.budgetAccounts.bulkAdd(accounts) : Promise.resolve(),
         deposits.length ? db.budgetDeposits.bulkAdd(deposits) : Promise.resolve(),
+        incomeEntries.length ? db.budgetIncomeEntries.bulkAdd(incomeEntries) : Promise.resolve(),
         manualTestResults.length ? db.manualTestResults.bulkAdd(manualTestResults) : Promise.resolve(),
       ])
     } catch (error) {

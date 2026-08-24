@@ -2,27 +2,23 @@ import { describe, expect, it } from 'vitest'
 import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
+import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import {
   getAccountBalance,
-  getCurrentPeriodBounds,
   getGaugeLevel,
   getGaugeRatio,
+  getMonCompteUsage,
   getPeriodBounds,
-  getRemainingForCategory,
   getSpentForCategory,
-  getTotalBudgeted,
+  getMontantTotal,
   getTotalDeposits,
-  getTotalIncome,
-  getTotalRemaining,
-  getTotalSpent,
-  getUnbudgetedRemainder,
+  getTotalIncomeEntries,
   isDateInPeriod,
 } from './budgetRules'
 
 const category = (overrides: Partial<BudgetCategory> = {}): BudgetCategory => ({
   id: 'courses',
   name: 'Courses',
-  kind: 'expense',
   period: 'week',
   amount: 60,
   position: 0,
@@ -44,7 +40,14 @@ const deposit = (overrides: Partial<BudgetDeposit> = {}): BudgetDeposit => ({
   id: 'deposit-1',
   account_id: 'livret-a',
   amount: 50,
-  period: 'month',
+  date: '2026-07-21',
+  created_at: '2026-07-21T00:00:00Z',
+  ...overrides,
+})
+
+const incomeEntry = (overrides: Partial<BudgetIncomeEntry> = {}): BudgetIncomeEntry => ({
+  id: 'income-1',
+  amount: 500,
   date: '2026-07-21',
   created_at: '2026-07-21T00:00:00Z',
   ...overrides,
@@ -73,13 +76,6 @@ describe('budgetRules', () => {
       })
     })
 
-    it('derives current bounds from injected now', () => {
-      expect(getCurrentPeriodBounds('month', '2026-12-31T22:30:00Z')).toEqual({
-        startDate: '2026-12-01',
-        endDate: '2026-12-31',
-      })
-    })
-
     it('includes both period bounds', () => {
       const bounds = getPeriodBounds('week', '2026-07-22')
       expect(isDateInPeriod('2026-07-20', bounds)).toBe(true)
@@ -91,7 +87,7 @@ describe('budgetRules', () => {
   describe('category amounts', () => {
     const bounds = { startDate: '2026-07-20', endDate: '2026-07-26' }
 
-    it('calculates spent and remaining amounts for a category in one period', () => {
+    it('calculates spent amounts for a category in one period', () => {
       const entries = [
         entry({ amount: 15 }),
         entry({ id: 'outside', amount: 30, date: '2026-07-27' }),
@@ -99,47 +95,54 @@ describe('budgetRules', () => {
       ]
 
       expect(getSpentForCategory(entries, 'courses', bounds)).toBe(15)
-      expect(getRemainingForCategory(category(), entries, bounds)).toBe(45)
-    })
-
-    it('allows a negative remaining amount when a category is exceeded', () => {
-      expect(getRemainingForCategory(category(), [entry({ amount: 75 })], bounds)).toBe(-15)
     })
   })
 
   describe('budget totals', () => {
-    const categories = [
-      category({ id: 'salary', name: 'Salaire', kind: 'income', period: 'month', amount: 1500 }),
-      category({
-        id: 'allowance',
-        name: 'Allocation',
-        kind: 'income',
-        period: 'month',
-        amount: 200,
-      }),
-      category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
-      category({ id: 'courses', period: 'week', amount: 60 }),
-    ]
-    const bounds = { startDate: '2026-07-20', endDate: '2026-07-26' }
-
-    it('sums incomes and budgeted expenses by their period', () => {
-      expect(getTotalIncome(categories, 'month')).toBe(1700)
-      expect(getTotalBudgeted(categories, 'month')).toBe(600)
-      expect(getTotalBudgeted(categories, 'week')).toBe(60)
-    })
-
-    it('sums only deposits from the selected period and periodicity', () => {
+    it('sums all deposits and withdrawals, tous livrets confondus', () => {
       const deposits = [
         deposit({ amount: 100 }),
-        deposit({ id: 'outside', amount: 50, date: '2026-07-27' }),
-        deposit({ id: 'wrong-periodicity', amount: 999, period: 'week' }),
+        deposit({ id: 'other-date', amount: 50, date: '2026-07-27' }),
+        deposit({ id: 'withdrawal', amount: -30 }),
       ]
-      expect(getTotalDeposits(deposits, 'month', bounds)).toBe(100)
+      expect(getTotalDeposits(deposits)).toBe(120)
     })
 
-    it('calculates the unbudgeted remainder', () => {
-      const deposits = [deposit({ amount: 300 })]
-      expect(getUnbudgetedRemainder(categories, deposits, 'month', bounds)).toBe(800)
+    it('sums all income entries, regardless of date', () => {
+      const entries = [
+        incomeEntry({ amount: 500 }),
+        incomeEntry({ id: 'other', amount: 300, date: '2026-07-25' }),
+        incomeEntry({ id: 'older', amount: 999, date: '2026-06-30' }),
+      ]
+      expect(getTotalIncomeEntries(entries)).toBe(1799)
+    })
+
+    it('calcule l’usage de « Mon compte » : chaque dépense « semaine » compte ×4, chaque dépense « mois » compte ×1', () => {
+      const accountCategories = [
+        category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+        category({ id: 'courses', period: 'week', amount: 60 }),
+      ]
+      const accountEntries = [
+        entry({ id: 'rent-entry', category_id: 'rent', amount: 600 }),
+        entry({ id: 'courses-entry', category_id: 'courses', amount: 20 }),
+      ]
+      expect(getMonCompteUsage(accountCategories, accountEntries)).toBe(600 + 20 * 4)
+    })
+
+    it('déduit les livrets et « Mon compte » du montant total', () => {
+      const entries = [incomeEntry({ amount: 2000 })]
+      const deposits = [deposit({ amount: 100 })]
+      const accountCategories = [
+        category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+        category({ id: 'courses', period: 'week', amount: 60 }),
+      ]
+      const accountEntries = [
+        entry({ id: 'rent-entry', category_id: 'rent', amount: 600 }),
+        entry({ id: 'courses-entry', category_id: 'courses', amount: 20 }),
+      ]
+      expect(getMontantTotal(entries, deposits, accountCategories, accountEntries)).toBe(
+        2000 - 100 - (600 + 20 * 4),
+      )
     })
 
     it('calculates cumulative account balances', () => {
@@ -149,35 +152,6 @@ describe('budgetRules', () => {
         deposit({ id: 'other', account_id: 'livret-jeune', amount: 30 }),
       ]
       expect(getAccountBalance(deposits, 'livret-a')).toBe(150)
-    })
-  })
-
-  describe('totaux de période', () => {
-    const categories = [
-      category({ id: 'salary', name: 'Salaire', kind: 'income', period: 'week', amount: 400 }),
-      category({ id: 'courses', period: 'week', amount: 60 }),
-      category({ id: 'plaisir', name: 'Plaisir', period: 'week', amount: 40 }),
-      category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
-    ]
-    const bounds = { startDate: '2026-07-20', endDate: '2026-07-26' }
-    const entries = [
-      entry({ id: 'e1', category_id: 'courses', amount: 15 }),
-      entry({ id: 'e2', category_id: 'plaisir', amount: 10 }),
-      entry({ id: 'e3', category_id: 'courses', amount: 30, date: '2026-07-27' }),
-      entry({ id: 'e4', category_id: 'rent', amount: 600 }),
-    ]
-
-    it('additionne les dépenses de la période, en ignorant les autres périodicités et les autres dates', () => {
-      expect(getTotalSpent(categories, entries, 'week', bounds)).toBe(25)
-    })
-
-    it('ne compte pas les revenus dans le restant à dépenser', () => {
-      expect(getTotalRemaining(categories, entries, 'week', bounds)).toBe(75)
-    })
-
-    it('rend un restant négatif quand la période est dépassée', () => {
-      const overspent = [entry({ id: 'e5', category_id: 'courses', amount: 200 })]
-      expect(getTotalRemaining(categories, overspent, 'week', bounds)).toBe(-100)
     })
   })
 

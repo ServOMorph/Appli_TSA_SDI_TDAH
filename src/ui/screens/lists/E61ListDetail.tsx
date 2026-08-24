@@ -41,7 +41,9 @@ export function E61ListDetail() {
     toggleListItem,
     selectListItem,
     goTo,
+    replace,
     back,
+    route,
     createDetailedTask,
     deleteTool,
   } = useApp()
@@ -50,7 +52,9 @@ export function E61ListDetail() {
 
   const [items, setItems] = useState<ListItem[]>([])
   const [categories, setCategories] = useState<ListCategory[]>([])
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    route.name === 'list-detail' ? route.categoryId ?? null : null,
+  )
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false)
   const [addCategoryName, setAddCategoryName] = useState('')
   const [addingCategory, setAddingCategory] = useState(false)
@@ -111,6 +115,11 @@ export function E61ListDetail() {
   function openItemDetail(item: ListItem) {
     selectListItem(item.id)
     goTo('list-item-detail')
+  }
+
+  function selectCategory(categoryId: string | null) {
+    setSelectedCategoryId(categoryId)
+    replace(categoryId ? { name: 'list-detail', categoryId } : 'list-detail')
   }
 
   function openAlarm(item: ListItem) {
@@ -176,7 +185,7 @@ export function E61ListDetail() {
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
         <button
           aria-label="Retour"
-          onClick={() => (selectedCategory ? setSelectedCategoryId(null) : back('tools'))}
+          onClick={() => (selectedCategory ? selectCategory(null) : back('tools'))}
           style={{
             background: 'none',
             border: 'none',
@@ -235,7 +244,7 @@ export function E61ListDetail() {
                 }}
               >
                 <button
-                  onClick={() => setSelectedCategoryId(category.id)}
+                  onClick={() => selectCategory(category.id)}
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',

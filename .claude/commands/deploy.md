@@ -114,3 +114,9 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    résultat de la vérification de fumée, et l'avertissement de taille de chunk le cas échéant.
    Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et attendre une nouvelle
    confirmation explicite.
+
+10. Rédiger un message WhatsApp prêt à envoyer à Marie. Il doit indiquer brièvement que la nouvelle version est disponible,
+    résumer les changements effectivement déployés et inviter Marie à rejouer les tests concernés. Ajouter systématiquement
+    ce lien, sur sa propre ligne :
+    `https://appli-audhd.netlify.app/`
+    Encadrer systématiquement le message par `💻🤖` : une occurrence au début du message et une autre à la fin.

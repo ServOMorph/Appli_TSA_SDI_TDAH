@@ -26,16 +26,9 @@ describe('E01Welcome', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('profile')
   })
 
-  it('masque la bannière urgente au clic sur Fait, de façon persistante', async () => {
-    const { unmount } = renderWithApp(<E01Welcome />)
-    expect(screen.getByRole('alert')).toBeDefined()
-    await userEvent.click(screen.getByRole('button', { name: 'Fait' }))
-    unmount()
-    renderWithApp(<E01Welcome />)
-    expect(screen.queryByRole('alert')).toBeNull()
-  })
-
-  it('n’affiche pas la modale Nouveautés quand WHATS_NEW est vide', () => {
+  it('n’affiche pas la modale Nouveautés déjà vue pour la version courante', () => {
+    const version = import.meta.env.VITE_APP_VERSION ?? 'dev'
+    localStorage.setItem('whats_new_seen_version', version)
     renderWithApp(<E01Welcome />)
     expect(screen.queryByRole('dialog', { name: 'Nouveautés' })).toBeNull()
   })

@@ -97,4 +97,4 @@ Marie demande la suppression de cette fonctionnalité, mais l’export contient 
 
 Critère de sortie : contrôles automatisés verts, tests manuels rejoués, documentation alignée et aucune régression de navigation.
 
-État : build, lint et suite complète verts. Les tests manuels restent à rejouer avant déploiement ; aucun déploiement n’est engagé.
+État : build, lint et suite complète verts. v5.52 est déployée ; les tests manuels restent à rejouer par Marie.

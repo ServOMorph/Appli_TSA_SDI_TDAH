@@ -42,7 +42,7 @@
 - EN ATTENTE : validation des trois parcours par Marie sur son appareil après publication.
 
 ## Prochaine étape exacte
-Déployer v5.52 sur Netlify, puis demander à Marie de rejouer les tests du catalogue concernés.
+Demander à Marie de rejouer les trois tests v5.52 du catalogue, puis traiter son prochain export.
 
 ## Question bloquante pour la session suivante
 Aucune.

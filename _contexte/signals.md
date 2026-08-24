@@ -25,7 +25,27 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-24 — retours Marie et préparation v5.52)
+## Dernière session (2026-08-24 — standardisation du message de déploiement)
+
+## Décisions prises
+- La commande `/deploy` rédige désormais un message WhatsApp pour Marie, contenant systématiquement le lien de production et encadré par `💻🤖`.
+
+## Livrables produits ou modifiés
+- `.claude/commands/deploy.md` : étape 10 ajoutée.
+- `CHANGELOG.md` : v5.53.
+
+## Hypothèses validées / invalidées
+- VALIDE : aucune modification applicative ni test manuel supplémentaire requis.
+
+## Prochaine étape exacte
+Utiliser le nouveau format WhatsApp lors du prochain déploiement.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-24 — retours Marie et préparation v5.52)
 
 ## Décisions prises
 - L’export de Marie du 23 août a été archivé et analysé ; les demandes encore pertinentes ont été intégrées à `roadmap_retours_marie_2026-08-23.md`.

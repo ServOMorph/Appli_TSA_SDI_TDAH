@@ -1,3 +1,8 @@
+## v5.53 — 2026-08-24
+
+### Modifié
+- Commande de déploiement : le bilan inclut désormais un message WhatsApp prêt à envoyer à Marie, avec le lien de production et les marqueurs `💻🤖`.
+
 ## v5.52 — 2026-08-24
 
 ### Corrigé

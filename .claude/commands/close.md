@@ -21,7 +21,19 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
      et s'arrêter.
    - Si présent et reconnu : résoudre le dossier via la table.
 
-2. Résoudre le dossier réel via la table (ou utiliser le working directory si pas d'argument).
+2. Résoudre le dossier réel via la table (ou utiliser le working directory si pas d'argument),
+   puis identifier la branche Git courante.
+   - Sur `main`, définir `<contexte>` comme `<dossier>/_contexte` et appliquer la procédure
+     complète.
+   - Sur `sync-marie`, définir `<contexte>` comme
+     `<dossier>/_contexte/branches/sync-marie`. Cette branche est limitée à l'authentification,
+     Supabase et la synchronisation : ne pas modifier `CHANGELOG.md`, `README.md`, `WHATS_NEW`,
+     `manualTestsCatalog.ts`, `tests_manuels.md` et ne jamais lancer `/deploy`.
+   - Sur toute autre branche, s'arrêter et demander le périmètre avant d'écrire ou de committer.
+
+   Sur `sync-marie`, afficher aussi `git rev-list --left-right --count main...HEAD`. Si `main`
+   a avancé, signaler l'intégration à planifier ; ne jamais lancer un merge ou un rebase
+   automatiquement.
 
 3. Produire une synthèse de session (< 25 lignes) au format suivant :
 
@@ -46,7 +58,7 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 [1 question, ou "Aucune"]
 ```
 
-4. Mettre à jour `<dossier>/_contexte/signals.md` :
+4. Mettre à jour `<contexte>/signals.md` :
    - Lire le fichier existant. Reporter tout élément non résolu.
    - Écraser la section "Dernière session" avec la synthèse de l'étape 3 (date du jour dans le titre).
    - Mettre à jour les priorités [P1/P2] sur les actions ouvertes.
@@ -57,7 +69,7 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
      - `réf: <fichier(s) ou contexte clé>` — où trouver le contexte nécessaire
      Si le contexte est introuvable dans la session, écrire `réf: [à préciser]` plutôt qu'omettre le champ.
 
-5. Mettre à jour `<dossier>/_contexte/contexte.md` :
+5. Mettre à jour `<contexte>/contexte.md` :
    - Réécrire intégralement la section "État actuel" (5 lignes max).
    - Ajouter les décisions actées à "Décisions structurantes" (append only, 5 lignes max par entrée — le détail va dans `archive_decisions.md` ou le commit).
    - Si la liste dépasse 10 entrées : archiver les plus anciennes dans `_contexte/archive_decisions.md`.
@@ -67,7 +79,7 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 6. Si une `roadmap*.md` existe dans `<dossier>` : vérifier qu'elle reflète fidèlement l'état après
    session (statuts des tâches et phases). Mettre à jour si périmée.
    Invariant : ce que lira le prochain `/start` doit être vrai.
-   Si `src/domain/data/manualTestsCatalog.ts` existe : examiner les évolutions de la session et
+   Sur `main` uniquement, si `src/domain/data/manualTestsCatalog.ts` existe : examiner les évolutions de la session et
    mettre à jour ce catalogue pour chaque test à demander à Marie. Le catalogue doit couvrir tous
    les tests Marie encore pertinents à la fin de l'évolution, dans un langage clair et sans détails
    techniques ou chemins locaux. Ne pas y ajouter les validations internes réservées au développement.
@@ -83,12 +95,12 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    Ne rien ajouter si aucun test n'a été décidé dans la session — ne pas en inventer. Objectif : que
    `/deploy` (avertissements 4.4 et 4.5) reflète l'état réel des tests décidés pendant la session.
 
-7. Mettre à jour `README.md` à la racine du projet :
+7. Sur `main` uniquement, mettre à jour `README.md` à la racine du projet :
    - Refléter l'état actuel du projet (section "État actuel" de `contexte.md`).
    - Ne pas modifier les sections stables (objectif, stack, structure) sauf changement explicite.
    - Si le README n'existe pas encore : le créer avec les sections standard (objectif, stack, structure, état actuel).
 
-8. Bumper la version dans `CHANGELOG.md` :
+8. Sur `main` uniquement, bumper la version dans `CHANGELOG.md` :
    - Lire la dernière entrée de `CHANGELOG.md` pour extraire la version actuelle (ex: `v2.2`).
    - Déterminer le type de bump à partir de la synthèse de l'étape 3 :
      - **major** si : structure de `_contexte/` modifiée, placeholder renommé ou supprimé, commande supprimée
@@ -112,7 +124,7 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
     ```bash
     git diff --name-only          # vérifier tous les fichiers modifiés pendant la session
     git status                    # confirmer l'état du repo
-    git add <dossier>/_contexte/ CHANGELOG.md [autres fichiers modifiés identifiés ci-dessus]
+    git add <contexte>/ [CHANGELOG.md sur main uniquement] [autres fichiers modifiés identifiés ci-dessus]
     git commit -m "close(<alias>): session AAAA-MM-JJ — <résumé 1 ligne>"
     ```
     - Le résumé reprend la première décision actée, ou la prochaine étape si aucune décision.
@@ -146,7 +158,7 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
      référencer explicitement par son numéro (ex: "Étape 6 : ..."), plutôt que compter sur la
      position physique de cette zone (toujours en fin de fichier). -->
 
-Étape 6 : si la session a introduit un changement visible pour Marie (nouvelle fonctionnalité,
+Étape 6, sur `main` uniquement : si la session a introduit un changement visible pour Marie (nouvelle fonctionnalité,
 écran, comportement modifié — pas un correctif interne ni un refacto), ajouter une entrée en
 langage clair et sans jargon technique au tableau `WHATS_NEW` de
 `src/ui/screens/onboarding/E01Welcome.tsx`. Ajout uniquement, ne jamais réécrire ni supprimer les

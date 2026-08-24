@@ -172,7 +172,7 @@ const todayBtnStyle: React.CSSProperties = {
 }
 
 function rowTintStyle(block: PlanBlock, ambianceColor: string): React.CSSProperties {
-  return plannedTaskTintStyle(blockCompleted(block), block.kind === 'task' ? (block.item.color ?? ambianceColor) : ambianceColor)
+  return plannedTaskTintStyle(blockCompleted(block), block.kind === 'task' ? (block.item.color ?? 'var(--color-surface)') : ambianceColor)
 }
 
 const timeLabelStyle: React.CSSProperties = {

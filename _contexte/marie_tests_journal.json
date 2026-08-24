@@ -90,6 +90,132 @@
       "status": "nok",
       "comment": "Ca marche c’est bon, par contre où est censé apparaître l’argent retirer du livret ? Je l’ai retirer et choisi la catégorie mois, mais l’argent de mon mois n’augmente pas de cette somme.",
       "created_at": "2026-08-16T22:35:46.131Z"
+    },
+    {
+      "id": "44f24c63-3c6c-46bd-9eec-0a4fbd510f00",
+      "test_id": "glisser-pour-ouvrir-le-planning",
+      "status": "nok",
+      "comment": "Ça marche mais enlève cette fonctionnalité ça ne me plaît pas",
+      "created_at": "2026-08-18T09:07:07.163Z"
+    },
+    {
+      "id": "b2c47c5f-023d-48ff-a3ae-efbff0fc4211",
+      "test_id": "naviguer-dans-le-planning",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-18T09:07:59.499Z"
+    },
+    {
+      "id": "77039b45-0f2b-4794-8cd8-e77a73d407a0",
+      "test_id": "modifier-une-tache-planifiee",
+      "status": "nok",
+      "comment": "J’ai déjà validé ce test tu n’aurai pas dû me l’afficher",
+      "created_at": "2026-08-18T09:08:34.671Z"
+    },
+    {
+      "id": "74eacd21-14d7-4f1d-a678-634b6e592307",
+      "test_id": "grouper-les-tests-par-categorie",
+      "status": "nok",
+      "comment": "J’ai déjà validé ce test",
+      "created_at": "2026-08-18T09:09:00.174Z"
+    },
+    {
+      "id": "4dc1872d-9203-44a4-899d-133f166d15a7",
+      "test_id": "acceder-directement-a-l-energie",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-22T14:47:04.896Z"
+    },
+    {
+      "id": "518cbbc3-3858-4968-9a47-1a783d8966f5",
+      "test_id": "grouper-les-tests-par-categorie",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-22T14:47:08.726Z"
+    },
+    {
+      "id": "08dfdcc2-a192-4dd6-9cf4-7749f3fb8bd2",
+      "test_id": "couleur-de-fond-par-outil",
+      "status": "nok",
+      "comment": "Je ne trouve pas le sélecteur de couleur",
+      "created_at": "2026-08-22T14:47:28.564Z"
+    },
+    {
+      "id": "32c6c2c6-51a9-4a6b-83be-0d5fc839dc7e",
+      "test_id": "supprimer-une-categorie-de-liste",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-22T14:47:38.308Z"
+    },
+    {
+      "id": "c8ee22e1-d1cc-433d-80ac-e9c3ebe0604b",
+      "test_id": "detail-element-de-liste",
+      "status": "nok",
+      "comment": "Quand je reviens en arrière, au 6, je retombe sur la page « To Do » et pas dans la catégorie avec la liste des autres éléments",
+      "created_at": "2026-08-22T22:51:58.681Z"
+    },
+    {
+      "id": "db4756d7-b0d9-4823-85e2-519d54d2b629",
+      "test_id": "glisser-pour-ouvrir-le-planning",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:46:04.808Z"
+    },
+    {
+      "id": "bd307960-9616-4dd8-9813-ff114da340e5",
+      "test_id": "encadrement-et-glissement-du-planning",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:46:28.202Z"
+    },
+    {
+      "id": "1631c499-564c-45cd-a63e-f5a69bc060e4",
+      "test_id": "modifier-une-tache-planifiee",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:46:38.696Z"
+    },
+    {
+      "id": "49a1028d-be18-4400-af89-5a133bb26870",
+      "test_id": "couleur-tache-sans-couleur-choisie",
+      "status": "nok",
+      "comment": "Non, quand je laisse aucune couleur, la tache apparaît dans le planning de la couleur d’ambiance que j’ai définie dans les paramètres",
+      "created_at": "2026-08-23T18:48:07.873Z"
+    },
+    {
+      "id": "df98face-eab2-46d9-95fc-392ce7bb2a6b",
+      "test_id": "retirer-de-l-argent-d-un-livret",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:48:20.929Z"
+    },
+    {
+      "id": "12b87685-512f-48ac-a878-69b574bd6aab",
+      "test_id": "modifier-un-mouvement-de-livret",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:49:36.515Z"
+    },
+    {
+      "id": "dc45dbd0-017e-4b89-b272-f638cfa233bc",
+      "test_id": "utiliser-le-budget",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:50:15.062Z"
+    },
+    {
+      "id": "83cf1b76-f6ee-492c-be2d-5640b9790697",
+      "test_id": "modifier-et-supprimer-un-revenu-du-montant-total",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:51:40.031Z"
+    },
+    {
+      "id": "58e14ff3-8c4c-4e0a-931b-7a286cd04a2f",
+      "test_id": "montant-total-apres-migration-revenus",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-23T18:52:38.583Z"
     }
   ]
 }

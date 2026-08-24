@@ -237,7 +237,7 @@ export const manualTestsCatalog: ManualTest[] = [
       'Ajoutez une sous-tâche : elle doit apparaître immédiatement dans la liste, toujours dépliée.',
       'Cochez puis décochez la sous-tâche : le texte doit se barrer puis redevenir normal.',
       'Supprimez la sous-tâche : elle doit disparaître.',
-      'Touchez « ← Retour » : vous devez revenir à l’écran des éléments de la catégorie.',
+      'Touchez « ← Retour » : vous devez revenir à l’écran des éléments de la même catégorie que celle ouverte avant le détail.',
     ],
   },
   {
@@ -264,7 +264,7 @@ export const manualTestsCatalog: ManualTest[] = [
     title: 'Couleur de fond par outil',
     category: 'Outils : autres',
     steps: [
-      'Depuis les Outils (ou un dossier), sur la carte d’un outil, touchez le sélecteur de couleur et choisissez une couleur : le fond de la carte doit se teinter aussitôt (fond adouci, pas la couleur brute).',
+      'Depuis les Outils (ou un dossier), repérez le libellé « Couleur » sur la carte d’un outil, touchez son sélecteur et choisissez une couleur : le fond de la carte doit se teinter aussitôt (fond adouci, pas la couleur brute).',
       'Quittez cet écran puis revenez : la couleur choisie doit être conservée.',
       'Touchez le bouton « × » à côté du sélecteur : la carte doit retrouver son fond neutre par défaut, et le bouton « × » doit disparaître.',
       'Vérifiez que toucher le sélecteur de couleur n’ouvre pas l’outil : seul le titre ouvre l’outil.',

@@ -1,3 +1,10 @@
+## v5.52 — 2026-08-24
+
+### Corrigé
+- Planning : une tâche sans couleur explicite utilise désormais un fond neutre, indépendamment de la couleur d’ambiance.
+- Listes : le retour depuis le détail d’un élément restaure la catégorie précédemment ouverte.
+- Outils : le sélecteur de couleur porte désormais un libellé visible.
+
 ## v5.51 — 2026-08-19
 
 ### Ajouté

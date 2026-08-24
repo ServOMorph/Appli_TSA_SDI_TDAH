@@ -19,7 +19,7 @@ export type Route =
   | { name: 'settings-accessibility' }
   | { name: 'settings-privacy' }
   | { name: 'settings-export' }
-  | { name: 'list-detail'; listId?: string }
+  | { name: 'list-detail'; listId?: string; categoryId?: string }
   | { name: 'list-item-detail'; itemId?: string }
   | { name: 'tools' }
   | { name: 'folder-detail'; folderId?: string }

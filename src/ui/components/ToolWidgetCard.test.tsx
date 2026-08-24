@@ -33,6 +33,12 @@ describe('ToolCard', () => {
     expect(ctx.updateToolColor).toHaveBeenCalledWith('tool-1', '#ff8800')
   })
 
+  it('affiche un libellé visible pour le sélecteur de couleur', () => {
+    const ctx = makeAppContext({ lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }] })
+    renderWithApp(<ToolCard tool={makeTool()} onOpen={() => {}} />, ctx)
+    expect(screen.getByText('Couleur')).toBeInTheDocument()
+  })
+
   it('retire la couleur choisie', async () => {
     const ctx = makeAppContext({ lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }] })
     renderWithApp(<ToolCard tool={makeTool({ color: '#ff8800' })} onOpen={() => {}} />, ctx)

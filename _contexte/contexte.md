@@ -12,7 +12,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-**v5.51 déployée en prod** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-20) — cumule `roadmap_budget_v3.md` (Phases 1-6, déjà en v5.49) et `roadmap_demandes_marie_v1.md` Phases 1-5 (couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct badge énergie, détail d'un élément de liste — description + sous-tâches, écran `E62` —, encadrement + glissement animé du bandeau de dates, couleur de fond par outil). Aucun de ces changements testé par Marie en conditions réelles. TA2/AP1 de `roadmap_demandes_marie_v1.md` non repris : `main` avait déjà une meilleure implémentation du même besoin.
+**v5.52 prête au déploiement** : retours Marie du 23 août traités — fond neutre des tâches sans couleur, retour vers la catégorie d’origine depuis le détail d’un élément, sélecteur « Couleur » visible sur les outils. Tests unitaires, TypeScript et lint verts ; tests manuels à faire par Marie après publication.
 Réflexe préventif ajouté suite à l'incident de branche du 2026-08-19 (voir décision dédiée) : `.claude/commands/start.md` vérifie la divergence de branche avec `main` avant de charger le contexte ; `.claude/memory.md` porte la règle.
 Marie a validé un découpage du travail en 7 catégories ; le catalogue de tests manuels (`manualTestsCatalog.ts`, `E121ManualTests.tsx`) l'applique (tests groupés, pliables à 3 niveaux).
 Avertissement de build « chunk JS > 500 kB » (554 kB) laissé tel quel sur consigne explicite de l'utilisateur — refacto (`React.lazy`/`Suspense`) à proposer seulement si le poids grossit nettement.

@@ -64,6 +64,19 @@ describe('E121ManualTests', () => {
     expect(screen.queryByRole('button', { name: 'Ouvrir le test Créer une liste' })).not.toBeInTheDocument()
   })
 
+  it('masque un test dont le dernier résultat est validé après un échec', () => {
+    const ctx = makeAppContext({
+      manualTestResults: [
+        { id: 'old', test_id: 'creer-une-liste', status: 'nok', comment: 'Ancien échec', created_at: '2026-08-14T09:00:00.000Z' },
+        { id: 'new', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T10:00:00.000Z' },
+      ],
+    })
+    renderWithApp(<E121ManualTests />, ctx)
+    expandCategory('Outils : Listes')
+
+    expect(screen.queryByRole('button', { name: 'Ouvrir le test Créer une liste' })).not.toBeInTheDocument()
+  })
+
   it('demande un commentaire avant d’enregistrer un résultat non validé', async () => {
     const submitManualTestResult = vi.fn().mockResolvedValue(undefined)
     renderWithApp(<E121ManualTests />, makeAppContext({ submitManualTestResult }))

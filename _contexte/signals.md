@@ -1,6 +1,7 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-21)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-24)
 
 ## Contexte chaud
+- **v5.52 prête au déploiement** : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie après publication.
 - **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
 - **Incident de branche (2026-08-19) clos et corrigé préventivement** : plusieurs sessions de travail sur les demandes de Marie avaient été faites par erreur sur `sync-marie` sans vérifier sa divergence avec `main` (jamais fusionnée depuis le 2026-08-16). `.claude/commands/start.md` vérifie désormais la divergence de branche avant de charger le contexte ; `.claude/memory.md` porte la règle. `.gitignore` complété au passage (`__pycache__/`, captures de calibration ROBERTO — règles déjà sur `sync-marie`, jamais reportées).
 - `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Export du 2026-08-19 traité (archivé, ingéré : 10 nouvelles entrées journal) — 3 frictions non bloquantes relevées (test IDs obsolètes en cache client, rejet du geste de glissement planning par Marie avec demande de comportement alternatif, incompréhension retrait livret/catégorie budget qui est par design) : à traiter comme futures demandes, pas corrigées à chaud.
@@ -14,7 +15,7 @@
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Redemander à Marie de tester en conditions réelles l'ensemble déployé en v5.51 (Budget v3 + demandes Marie : couleur tâche, suppression catégorie, détail élément de liste, énergie directe, encadrement/glissement planning, couleur de fond outil) — rien de tout cela jamais testé par elle avant ce déploiement. — fait quand : nouvel export de Marie ingéré avec ces tests validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P1] Demander à Marie de tester en conditions réelles les trois corrections v5.52 : tâche sans couleur, retour vers une catégorie de liste et couleur d’outil. — fait quand : nouvel export de Marie ingéré avec ces trois tests validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer — cohérent avec la demande initiale de Marie sur ce point, jamais satisfaite en l'état), clarifier avec Marie le lien retrait de livret/catégorie budget, vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
 - [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `message_marie_categories_travail.md`
 - [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (isolée, très en retard sur `main` — écart désormais encore plus grand après cette session). — fait quand : Phase 1 checklist complétée, après décision explicite sur le sort de cette branche (rebase complet ou reprise du chantier sync from scratch sur `main`) — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
@@ -24,7 +25,31 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-21 — correctif préventif branche, déploiement v5.51)
+## Dernière session (2026-08-24 — retours Marie et préparation v5.52)
+
+## Décisions prises
+- L’export de Marie du 23 août a été archivé et analysé ; les demandes encore pertinentes ont été intégrées à `roadmap_retours_marie_2026-08-23.md`.
+- Trois corrections sont livrées : fond neutre des tâches sans couleur, conservation de la catégorie de liste au retour du détail et sélecteur de couleur d’outil explicite.
+- Le test d’import `E117Export.test.tsx` a été stabilisé ; la suite complète est verte.
+
+## Livrables produits ou modifiés
+- `roadmap_retours_marie_2026-08-23.md`, `.claude/commands/analyser_modifications_marie_pdf.md` : analyse et procédure de traitement des demandes PDF de Marie.
+- `PlanningBoard.tsx`, `E61ListDetail.tsx`, `ToolWidgetCard.tsx` et leurs tests : corrections v5.52.
+- `manualTestsCatalog.ts` : parcours Marie précisés pour les corrections publiées.
+
+## Hypothèses validées / invalidées
+- VALIDE : 605/605 tests, TypeScript et lint verts.
+- EN ATTENTE : validation des trois parcours par Marie sur son appareil après publication.
+
+## Prochaine étape exacte
+Déployer v5.52 sur Netlify, puis demander à Marie de rejouer les tests du catalogue concernés.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-21 — correctif préventif branche, déploiement v5.51)
 
 ## Décisions prises
 - Correctif préventif ajouté suite à l'incident de branche du 2026-08-19 : `.claude/commands/start.md` vérifie désormais la divergence de branche avec `main` avant de charger le contexte ; `.claude/memory.md` recréé sur `main` (absent depuis le report) pour porter la règle durablement.

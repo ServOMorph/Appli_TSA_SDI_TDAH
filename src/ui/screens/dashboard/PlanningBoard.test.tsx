@@ -102,6 +102,20 @@ describe('PlanningBoard — déplié', () => {
     expect(screen.getByLabelText('7 énergie')).toBeInTheDocument()
   })
 
+  it('utilise un fond neutre quand une tâche n’a pas de couleur', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', color: null })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+    expect((title.closest('div[style*="background-color"]') as HTMLElement | null)?.style.backgroundColor).toContain('var(--color-surface)')
+  })
+
+  it('utilise la couleur choisie quand une tâche est colorée', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', color: '#ff8800' })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+    expect((title.closest('div[style*="background-color"]') as HTMLElement | null)?.style.backgroundColor).toContain('#ff8800')
+  })
+
   it('affiche une tâche sans horaire en tête de liste', async () => {
     const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: null, scheduled_end: null })
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))

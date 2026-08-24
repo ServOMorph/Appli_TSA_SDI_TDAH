@@ -32,6 +32,15 @@ const colorInputStyle: React.CSSProperties = {
   flexShrink: 0,
 }
 
+const colorControlStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 'var(--spacing-xs)',
+  color: 'var(--color-text-muted)',
+  fontSize: '0.8125rem',
+  flexShrink: 0,
+}
+
 const resetColorBtnStyle: React.CSSProperties = {
   background: 'none',
   border: 'none',
@@ -69,13 +78,16 @@ export function ToolCard({ tool, onOpen }: { tool: Tool; onOpen: () => void }) {
         <button style={{ ...entryBtnStyle, flex: 1 }} onClick={onOpen}>
           {toolLabel(tool, list?.name)}
         </button>
-        <input
-          type="color"
-          aria-label={`Couleur de fond pour ${toolLabel(tool, list?.name)}`}
-          value={tool.color ?? DEFAULT_TOOL_COLOR}
-          onChange={(e) => updateToolColor(tool.id, e.target.value)}
-          style={colorInputStyle}
-        />
+        <label style={colorControlStyle}>
+          Couleur
+          <input
+            type="color"
+            aria-label={`Couleur de fond pour ${toolLabel(tool, list?.name)}`}
+            value={tool.color ?? DEFAULT_TOOL_COLOR}
+            onChange={(e) => updateToolColor(tool.id, e.target.value)}
+            style={colorInputStyle}
+          />
+        </label>
         {tool.color && (
           <button
             type="button"

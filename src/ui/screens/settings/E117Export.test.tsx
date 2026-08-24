@@ -67,9 +67,7 @@ describe('E117Export', () => {
   it('affiche la modal de confirmation après sélection d\'un fichier JSON valide', async () => {
     renderE117()
     selectFile('{"user":{"id":"u1","profile_type":"student"}}')
-    await vi.waitFor(() => {
-      expect(screen.getByText('Remplacer toutes les données ?')).toBeInTheDocument()
-    })
+    expect(await screen.findByText('Remplacer toutes les données ?', {}, { timeout: 3_000 })).toBeInTheDocument()
   })
 
   it('affiche une erreur si le fichier sélectionné n\'est pas un JSON valide', async () => {
@@ -84,7 +82,7 @@ describe('E117Export', () => {
     const importData = vi.fn().mockResolvedValue({ ok: true })
     renderE117({ importData })
     selectFile('{"user":{"id":"u1","profile_type":"student"}}')
-    await vi.waitFor(() => screen.getByText('Remplacer toutes les données ?'))
+    await screen.findByText('Remplacer toutes les données ?', {}, { timeout: 3_000 })
     await act(async () => {
       fireEvent.click(screen.getByText('Remplacer'))
     })
@@ -98,7 +96,7 @@ describe('E117Export', () => {
     const importData = vi.fn().mockResolvedValue({ ok: false, error: 'Fichier invalide.' })
     renderE117({ importData })
     selectFile('{"user":{"id":"u1","profile_type":"student"}}')
-    await vi.waitFor(() => screen.getByText('Remplacer toutes les données ?'))
+    await screen.findByText('Remplacer toutes les données ?', {}, { timeout: 3_000 })
     await act(async () => {
       fireEvent.click(screen.getByText('Remplacer'))
     })

@@ -1,7 +1,7 @@
 # Roadmap — V4.1 (rubrique « Outils » : Todo / Listes épinglées / Budget)
 
 Version : 4.1 — créée 2026-07-21. Succède à `Archives/roadmap_v4.md` (V4 close).
-Source : constat E3 (`Note de réunion/2026-07-16/constats_2026-07-18.md`, transcription l.140-278) + cadrage utilisateur du 2026-07-21 (session courante).
+Source : constat E3 (`COMMUNICATION/Note de réunion/2026-07-16/constats_2026-07-18.md`, transcription l.140-278) + cadrage utilisateur du 2026-07-21 (session courante).
 Branche : `v4.1`.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.

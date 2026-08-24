@@ -1,7 +1,7 @@
 # Roadmap — V3 (post-visio Marie 2026-07-06)
 
 Version : 3.0 — créée 2026-07-06. Succède à `roadmap_v2.md` (V2-10 close).
-Source : `constats_2026-07-06.md` (dossier `Note de réunion/2026-06-07/`). Les IDs (B1, E1, D3…) renvoient à ce fichier. Ne couvre que les évolutions issues de cette visio.
+Source : `constats_2026-07-06.md` (dossier `COMMUNICATION/Note de réunion/2026-06-07/`). Les IDs (B1, E1, D3…) renvoient à ce fichier. Ne couvre que les évolutions issues de cette visio.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.
 Gate commun : tests créés et verts · test manuel de la phase · doc à jour · aucun écran ne perd son point d'entrée · critère de sortie.
@@ -75,9 +75,9 @@ Gate : [x] tests verts (342/342) · [x] test manuel (2026-07-07, tous cas OK) ·
 
 - [x] E4 — Check-in énergie routé à l'ouverture si aucune saisie du jour (`AppContext.tsx` `init()` → `energy-checkin`) ; échelle corrigée à 1-12 (`E31EnergyCheckIn.tsx`, était 1-10) ; re-saisie autorisée à tout moment via le bouton « Modifier » existant (`E30EnergyView.tsx`) — décision actée avec l'utilisateur
 - [x] E5 — Surcharge dérivée : `overloadMode` calculé en direct via `isOverloaded(todayEnergy, getRemainingPlannedCost(todayPlannedTasks))` (`AppContext.tsx`), recalculé après chaque mutation de planning (`refreshTodayPlanned`) ; `Settings.overload_mode` et `setOverloadMode` retirés intégralement (champ mort supprimé, pas masqué)
-- [x] E5 — Bouton TopBar informatif (`TopBar.tsx`) : désactivé (grisé, non cliquable) quand pas de surcharge ; actif (coloré, cliquable) affiche au clic le détail chiffré (« X énergie planifiée pour Y disponible aujourd'hui ») — décision actée avec l'utilisateur. **Mise à jour 2026-07-07 :** bouton désormais masqué (au lieu de grisé) hors surcharge, sur demande de l'utilisateur — écart avec la demande initiale de Marie citée ci-dessus, à reconfirmer (voir `Note de réunion/a demander a Marie.md`)
+- [x] E5 — Bouton TopBar informatif (`TopBar.tsx`) : désactivé (grisé, non cliquable) quand pas de surcharge ; actif (coloré, cliquable) affiche au clic le détail chiffré (« X énergie planifiée pour Y disponible aujourd'hui ») — décision actée avec l'utilisateur. **Mise à jour 2026-07-07 :** bouton désormais masqué (au lieu de grisé) hors surcharge, sur demande de l'utilisateur — écart avec la demande initiale de Marie citée ci-dessus, à reconfirmer (voir `COMMUNICATION/Note de réunion/a demander a Marie.md`)
 - [x] E6 — En surcharge : « Planning du jour » reste visible (Dashboard et Planning du jour courant uniquement) avec obligatoires en pastel et non-obligatoires grisées (`E40Planning.tsx`, `E10Dashboard.tsx`) — résout l'effet de bord D1 (voir Phase V3-1)
-- [x] E6 — Action « Reporter » sur les tâches non-obligatoires grisées : implémentée comme **replanification automatique au lendemain, même créneau horaire** (`postponeTaskV2` dans `taskRulesV2.ts`, `postponeTask` dans `AppContext.tsx`, bouton « Reporter » dans `E10Dashboard.tsx` et `E40Planning.tsx`, visible uniquement en surcharge sur les tâches non-obligatoires du jour non terminées). Piste écartée : renvoyer au statut `todo` (aucun écran n'affiche ce statut aujourd'hui, créerait un orphelin comme B1). **Décision provisoire, non validée explicitement par Marie pour ce cas précis** — à reconfirmer avec elle (note dans `Note de réunion/a demander a Marie.md`).
+- [x] E6 — Action « Reporter » sur les tâches non-obligatoires grisées : implémentée comme **replanification automatique au lendemain, même créneau horaire** (`postponeTaskV2` dans `taskRulesV2.ts`, `postponeTask` dans `AppContext.tsx`, bouton « Reporter » dans `E10Dashboard.tsx` et `E40Planning.tsx`, visible uniquement en surcharge sur les tâches non-obligatoires du jour non terminées). Piste écartée : renvoyer au statut `todo` (aucun écran n'affiche ce statut aujourd'hui, créerait un orphelin comme B1). **Décision provisoire, non validée explicitement par Marie pour ce cas précis** — à reconfirmer avec elle (note dans `COMMUNICATION/Note de réunion/a demander a Marie.md`).
 - [x] `E90OverloadRecovery.tsx` : bouton « Désactiver le mode surcharge » (devenu invalide, la surcharge n'est plus désactivable manuellement) remplacé par « Retour au tableau de bord » ; `BottomNav.tsx` : bouton « Sortir du mode surcharge » retiré (même raison)
 - [x] Navigation en surcharge : `BottomNav.tsx:55,60` masque le bouton « Ajouter une tâche » et le groupe segmenté Todo/Planning/Listes en surcharge — **confirmé intentionnel par l'utilisateur lors du test manuel (2026-07-07)**, pas un bug. En surcharge, seuls le Dashboard et le Centre récupération restent accessibles, cohérent avec l'objectif de simplification de l'UI en cas de surcharge.
 
@@ -149,5 +149,5 @@ Gate : [x] tests verts (374/374 : `BottomNav.test.tsx` et `App.test.tsx` créés
 ## Sortie V3
 
 - [x] V3 stable, tests verts, validée par test manuel complet (7 phases V3-0 à V3-6 closes, 374/374 tests unitaires)
-- [ ] Session test suivante avec Marie sur énergie/surcharge (reconfirmer « Reporter », fréquence check-in, rythme « Répéter demain » — voir `Note de réunion/a demander a Marie.md`)
+- [ ] Session test suivante avec Marie sur énergie/surcharge (reconfirmer « Reporter », fréquence check-in, rythme « Répéter demain » — voir `COMMUNICATION/Note de réunion/a demander a Marie.md`)
 - [ ] V2 toujours restaurable (stratégie de rollback inchangée)

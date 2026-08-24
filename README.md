@@ -68,7 +68,7 @@ L'interface React reste séparée des règles métier et de la persistance. Les 
 ## Documentation
 
 - [Changelog](CHANGELOG.md) : historique versionné des évolutions.
-- [Roadmap des tests manuels](roadmap_tests_marie.md) : état du recueil des retours d'usage.
+- [Roadmap des tests manuels](Archives/roadmap_tests_marie.md) : état du recueil des retours d'usage.
 - [Décisions d'architecture](_docs/adr/) : choix techniques structurants.
 - [Guide pour agents et IA](llms.txt) : synthèse du projet et de ses points d'entrée.
 

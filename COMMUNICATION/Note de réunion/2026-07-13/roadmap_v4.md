@@ -1,7 +1,7 @@
 # Roadmap — V4 (post-visio Marie 2026-07-13)
 
 Version : 4.0 — créée 2026-07-13. Succède à `roadmap_v3.md` (V3 close).
-Source : `constats_2026-07-13.md` (dossier `Note de réunion/2026-07-13/`). Les IDs (B1, E1, D2…) renvoient à ce fichier. Ne couvre que les évolutions issues de cette visio.
+Source : `constats_2026-07-13.md` (dossier `COMMUNICATION/Note de réunion/2026-07-13/`). Les IDs (B1, E1, D2…) renvoient à ce fichier. Ne couvre que les évolutions issues de cette visio.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.
 Gate commun : tests créés et verts · test manuel de la phase · doc à jour · aucun écran ne perd son point d'entrée · critère de sortie.

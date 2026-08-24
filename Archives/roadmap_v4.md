@@ -1,7 +1,7 @@
 # Roadmap — V4 (post-visio Marie 2026-07-16)
 
 Version : 4.0 — créée 2026-07-18. Succède à `roadmap_v3.md` (V3 close).
-Supersède le brouillon `Note de réunion/2026-07-13/roadmap_v4.md` (jamais promu à la racine) : cette visio en révise plusieurs items (E1 sans la veille, D1 rendu caduc par E3, Q1 tranchée).
+Supersède le brouillon `COMMUNICATION/Note de réunion/2026-07-13/roadmap_v4.md` (jamais promu à la racine) : cette visio en révise plusieurs items (E1 sans la veille, D1 rendu caduc par E3, Q1 tranchée).
 Source : `constats_2026-07-18.md` (même dossier). Les IDs renvoient à ce fichier.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.

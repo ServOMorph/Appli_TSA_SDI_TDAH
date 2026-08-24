@@ -2,7 +2,7 @@
 
 Version : 5.0 — créée 2026-07-28. Succède à `roadmap_v4.1.md` (V4.1 close). Branche : `v5.0`.
 **Close le 2026-08-07 — V5-0 à V5-3 `[FAIT]`. Successeur : `roadmap_v5.1.md`**, qui reprend le backlog outils et les Q non tranchées listés en fin de fichier.
-Source : `constats_2026-07-28.md` et `captures_2026-07-28.md` (dossier `Note de réunion/2026-07-28/`). Ne couvre que les évolutions issues de cette visio.
+Source : `constats_2026-07-28.md` et `captures_2026-07-28.md` (dossier `COMMUNICATION/Note de réunion/2026-07-28/`). Ne couvre que les évolutions issues de cette visio.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.
 Gate commun : tests créés et verts · test manuel de la phase · doc à jour · aucun écran ne perd son point d'entrée · critère de sortie.
@@ -15,7 +15,7 @@ Tranchés avec l'utilisateur après production des constats. Ils priment sur la 
 - **Q8 — Accueil et planning** : un seul écran à deux états. `E10Dashboard` absorbe `E40Planning`. Replié : planning à l'heure courante + bloc widgets. Déplié : planning entier scrollable, widgets masqués.
 - **Q5 — Budget V4.1** : rebranché tel quel comme outil de type « tableau comptage » v1, posé sur l'accueil. Aucune refonte du modèle de données en V5.0 ; les colonnes configurables décrites par Marie (`E32`) sont traitées en V5.1 avec son retour d'usage.
 - **Q9 — Arborescence** : un seul niveau de dossier (racine → dossier → outils). Pas de sous-dossier. Motif : la maquette de Marie (`C27`, `F1`, `C29`) contient huit outils tous à la racine et aucun dossier ; son seul exemple de sous-dossier est verbal et hypothétique.
-- **Q10 — Grille du planning et modification d'une tâche** : révisé le 2026-07-28 (post-communication) — pas de glisser-déposer. Cases et lignes supprimées définitivement, comme dans l'application de référence. Une tâche se modifie en cliquant dessus pour ouvrir sa fiche, où chaque champ (date, horaire, alerte, énergie...) est cliquable et ouvre son propre sélecteur — cf. `Note de réunion/2026-07-28/Capture pendant la visio/Capture d'écran 2026-07-28 160841.png`. Tranché directement avec l'utilisateur.
+- **Q10 — Grille du planning et modification d'une tâche** : révisé le 2026-07-28 (post-communication) — pas de glisser-déposer. Cases et lignes supprimées définitivement, comme dans l'application de référence. Une tâche se modifie en cliquant dessus pour ouvrir sa fiche, où chaque champ (date, horaire, alerte, énergie...) est cliquable et ouvre son propre sélecteur — cf. `COMMUNICATION/Note de réunion/2026-07-28/Capture pendant la visio/Capture d'écran 2026-07-28 160841.png`. Tranché directement avec l'utilisateur.
 - **Q11 — Récurrence** : modèle Google Agenda complet. Toute modification d'une occurrence pose la question « cette occurrence » / « toutes les occurrences ». Implique une entité d'exception.
 - **Q12 — Bouton « + »** : crée directement une tâche, sans écran de choix. La saisie de dépense passe par le widget Comptes de l'accueil, en un tap. Motif : la phase V4.1-5 vient de supprimer exactement cette étape intermédiaire, et Marie a elle-même identifié que la profondeur d'accès tue l'usage (`E38`, l.1112-1113).
 - **Q1 — Énergie** : sans objet. `energyRules.ts` implémente déjà la sémantique décrite par Marie (`EnergyEntry.value` = énergie disponible du jour, `plannedCost` = somme des coûts planifiés, `isOverloaded` quand le second dépasse le premier). Reste à afficher les deux nombres côte à côte.

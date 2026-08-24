@@ -1,7 +1,7 @@
 # Roadmap — Refonte Budget v3
 
 Catégorie Marie : **Outils : Budget**
-Demande initiale et confirmation intégrale : `message_marie_budget_refonte.md`
+Demande initiale et confirmation intégrale : `Archives/message_marie_budget_refonte.md`
 
 ## Résumé du besoin confirmé par Marie
 - Accueil inchangé : dossiers « Budget » et « Comptes » séparés.

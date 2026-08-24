@@ -1,7 +1,7 @@
 # Roadmap — V2 (refonte UX post-test Marie)
 
 Version : 2.1 — MAJ 2026-06-29 (reset données accepté par Marie)
-Source : `Note de réunion/` (synthèse + note_marie + maquettes dessinées + analyse visio)
+Source : `COMMUNICATION/Note de réunion/` (synthèse + note_marie + maquettes dessinées + analyse visio)
 
 ## Clarification de vocabulaire (prioritaire)
 
@@ -165,7 +165,7 @@ Maquette : capture 183750. Dépend des phases planning + listes.
 - [x] **[2026-07-06]** Plan de test manuel V2 (`plan_test_manuel_v2.md`) rédigé et passé intégralement — écarts consolidés ci-dessus (§ "Constats test manuel V2-10")
 - [x] Corriger les 4 bugs confirmés issus du test manuel (2026-07-06) : tri "Planning du jour" par `scheduled_start` (`AppContext.getPlannedTasksForDate`) ; rattachement de la tâche à une liste créée à la volée (`createList` retourne l'id, création inline dans le sélecteur `E20Inbox`/`E21CreateTaskV2`) ; détection de conflit de créneau dans Planning (`E40Planning.handleAssign` refuse + message, décision produit actée : refuser plutôt que remplacer ou superposer) ; avertissement avant perte de sous-tâches lors de conversion Todo → Planifier/Liste (modale de confirmation `E20Inbox`, pas de migration du modèle de données — item séparé ajouté ci-dessous pour la planification indépendante des sous-tâches). 346/346 tests unitaires, `tsc -b` clean.
 - [x] **[2026-07-06]** Retest manuel intégral des corrections et ajouts de la session (13 points) : modale de conflit de créneau, navigation directe vers le détail de liste après ajout (Todo/création/détail tâche), bouton "Ajouter une tâche" sur Aujourd'hui, bouton "Terminer" sur Planning du jour (Dashboard), retrait icône Planning TopBar, grille Planning 0h-23h, message "Rien à faire aujourd'hui", renommer/supprimer une liste, section Organisation retirée, libellé profil corrigé — tous validés par l'utilisateur
-- [x] **[2026-07-06]** Décision profil actée : `E111Profile` reste en lecture seule. Décision énergie remontée à Marie (`Note de réunion/a traiter prochaine reunion.txt`), en attente de son retour.
+- [x] **[2026-07-06]** Décision profil actée : `E111Profile` reste en lecture seule. Décision énergie remontée à Marie (`COMMUNICATION/Note de réunion/a traiter prochaine reunion.txt`), en attente de son retour.
 - [x] **[2026-07-06]** E2E relancés après les changements onboarding du jour — 45/45 passent, aucune régression.
 - [x] **[2026-07-06]** Planning : créneaux par demi-heure (`E40Planning.tsx`, 48 créneaux de 30 min au lieu de 24 créneaux d'1h). Durée par défaut à l'assignation ramenée à 30 min (cohérent avec la granularité). 339/339 tests, `tsc -b` clean.
 - [ ] Doc V2 : README, schéma données v2, ADR migration
@@ -190,7 +190,7 @@ Issus du passage du plan de test manuel (`plan_test_manuel_v2.md`) avant déploi
 
 ### Décisions produit à prendre
 
-- Revoir à quoi sert l'énergie dans l'appli (test manuel 10.2) — actuellement une seule valeur par jour (`todayEnergy`/`todayEnergyStatus`), écrasée à chaque nouvelle saisie (`saveTodayEnergy`, `AppContext.tsx`), affichée uniquement dans le chip de la TopBar, sans historique ni aucun autre effet dans l'app (pas de lien avec le mode surcharge, pas de filtrage). **[2026-07-06]** Question posée à Marie pour la prochaine réunion (contexte consigné dans `Note de réunion/a traiter prochaine reunion.txt`) — décision toujours en attente de son retour.
+- Revoir à quoi sert l'énergie dans l'appli (test manuel 10.2) — actuellement une seule valeur par jour (`todayEnergy`/`todayEnergyStatus`), écrasée à chaque nouvelle saisie (`saveTodayEnergy`, `AppContext.tsx`), affichée uniquement dans le chip de la TopBar, sans historique ni aucun autre effet dans l'app (pas de lien avec le mode surcharge, pas de filtrage). **[2026-07-06]** Question posée à Marie pour la prochaine réunion (contexte consigné dans `COMMUNICATION/Note de réunion/a traiter prochaine reunion.txt`) — décision toujours en attente de son retour.
 - [x] **[2026-07-06]** Planning sans tâche planifiable (test manuel 6.3) — décision actée : garder le comportement actuel tel quel ("Placer à Xh00" + "Aucune tâche à planifier. Ajoutez une tâche et choisissez 'Planifier'.").
 
 ### Fonctionnalités manquantes / à implémenter

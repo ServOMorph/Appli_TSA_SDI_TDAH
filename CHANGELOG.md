@@ -1,3 +1,9 @@
+## v5.55 — 2026-08-24
+
+### Modifié
+- Documentation : les roadmaps et messages clôturés sont archivés ; les notes de réunion et la convention de catégorisation sont regroupées dans `COMMUNICATION/`.
+- Documentation : les références internes ont été mises à jour vers ces nouveaux emplacements.
+
 ## v5.54 — 2026-08-24
 
 ### Modifié
@@ -606,7 +612,7 @@ Phase V5-1 — navigation et écran d'accueil fusionné. Validation manuelle en 
 
 ### Ajouté
 - `.claude/commands/analyse_visio.md` : commande corrigée en profondeur après échec constaté en exécution — appariement horodaté du `.jsonl` remplacé par un appariement ordinal par annonce vérifié image par image (le premier avait un retard cumulatif de ~20 min sur ce jeu de données) ; garde-fou d'intégrité systématisé ; étape d'arbitrage interactif ajoutée avant l'écriture de la roadmap ; lecture conditionnelle des documents non lisibles (`.docx`) ; étape finale d'archivage/promotion de roadmap.
-- `roadmap_v5.0.md` (racine) : roadmap V5.0 issue de la visio testeuse du 2026-07-28 (`Note de réunion/2026-07-28/`), 4 phases socle (V5-0 à V5-3), 7 arbitrages tranchés avec l'utilisateur. `Note de réunion/2026-07-28/captures_2026-07-28.md`, `constats_2026-07-28.md`, `a_communiquer_2026-07-28.md` produits en amont.
+- `roadmap_v5.0.md` (racine) : roadmap V5.0 issue de la visio testeuse du 2026-07-28 (`COMMUNICATION/Note de réunion/2026-07-28/`), 4 phases socle (V5-0 à V5-3), 7 arbitrages tranchés avec l'utilisateur. `COMMUNICATION/Note de réunion/2026-07-28/captures_2026-07-28.md`, `constats_2026-07-28.md`, `a_communiquer_2026-07-28.md` produits en amont.
 
 ### Modifié
 - Branche `v5.0` créée depuis `v4.1`.
@@ -735,7 +741,7 @@ Phase V5-1 — navigation et écran d'accueil fusionné. Validation manuelle en 
 ## v4.10 — 2026-07-21
 
 ### Modifié
-- Ménage complet de la racine du projet (8 points validés par l'utilisateur) : `docs/adr/` fusionné dans `_docs/adr/`, scripts regroupés dans `scripts/`, `SERVEURS.md` fusionné dans `README.md`, `validation_manuelle.md` archivé, `Retours/` fusionné dans `Note de réunion/`, `dist/v1`/`dist/v2` supprimés (`dist/v3` conservée), `.gitignore` ignore `dist/` entier.
+- Ménage complet de la racine du projet (8 points validés par l'utilisateur) : `docs/adr/` fusionné dans `_docs/adr/`, scripts regroupés dans `scripts/`, `SERVEURS.md` fusionné dans `README.md`, `validation_manuelle.md` archivé, `Retours/` fusionné dans `COMMUNICATION/Note de réunion/`, `dist/v1`/`dist/v2` supprimés (`dist/v3` conservée), `.gitignore` ignore `dist/` entier.
 - `roadmap_v4.md` archivé (`Archives/roadmap_v4.md`) — plus aucune roadmap active à la racine.
 
 ### Ajouté
@@ -826,14 +832,14 @@ Phase V5-1 — navigation et écran d'accueil fusionné. Validation manuelle en 
 Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, intégralement close) archivé dans `Archives/`.
 
 ### Ajouté
-- Analyse de la visio Marie du 2026-07-16 : `Note de réunion/2026-07-16/constats_2026-07-18.md` (17 constats). Répond aux 4 points V3 en attente (Reporter, fréquence check-in, bouton surcharge, sous-tâches).
+- Analyse de la visio Marie du 2026-07-16 : `COMMUNICATION/Note de réunion/2026-07-16/constats_2026-07-18.md` (17 constats). Répond aux 4 points V3 en attente (Reporter, fréquence check-in, bouton surcharge, sous-tâches).
 - Roadmap V4 (`roadmap_v4.md`, racine, 6 phases V4-0 à V4-5), supersédant le brouillon du 2026-07-13 — ordre des phases revu (multi-créneaux/récurrence avant interactions sur une tâche), retrait de « Répéter demain » regroupé avec son remplaçant. Aucune phase codée.
 - Branche `v4` créée depuis `v3` et activée.
 
 ## v3.16 — 2026-07-13
 
 ### Ajouté
-- Analyse de la visio Marie du 2026-07-13 (écourtée) : `Note de réunion/2026-07-13/constats_2026-07-13.md` (7 constats) et `Note de réunion/2026-07-13/roadmap_v4.md` (brouillon, 4 phases) — non promue à la racine, aucun code touché.
+- Analyse de la visio Marie du 2026-07-13 (écourtée) : `COMMUNICATION/Note de réunion/2026-07-13/constats_2026-07-13.md` (7 constats) et `COMMUNICATION/Note de réunion/2026-07-13/roadmap_v4.md` (brouillon, 4 phases) — non promue à la racine, aucun code touché.
 
 ## v3.15 — 2026-07-09
 
@@ -863,7 +869,7 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 ## v3.13 — 2026-07-07
 
 ### Modifié
-- Bouton « Mode surcharge désactivé » de la TopBar retiré hors surcharge (`TopBar.tsx`) — n'apparaît plus que quand la surcharge est active. Écart assumé avec une demande explicite antérieure de Marie (bouton visible, grisé, informatif hors surcharge) ; point ajouté à `Note de réunion/a demander a Marie.md` pour reconfirmation.
+- Bouton « Mode surcharge désactivé » de la TopBar retiré hors surcharge (`TopBar.tsx`) — n'apparaît plus que quand la surcharge est active. Écart assumé avec une demande explicite antérieure de Marie (bouton visible, grisé, informatif hors surcharge) ; point ajouté à `COMMUNICATION/Note de réunion/a demander a Marie.md` pour reconfirmation.
 
 ### Validé
 - 29/29 tests (`E10Dashboard.test.tsx`) verts, `tsc -b` clean.
@@ -901,7 +907,7 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 - **Phase V3-6 close, roadmap V3 (7 phases, V3-0 à V3-6) intégralement close** : gate intégral (374/374 tests, `tsc -b` clean, eslint 0 erreur, test manuel, doc).
 
 ### Reporté
-- Comportement de l'action « Reporter », fréquence du check-in énergie et rythme du bouton « Répéter demain » : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
+- Comportement de l'action « Reporter », fréquence du check-in énergie et rythme du bouton « Répéter demain » : à reconfirmer avec Marie — consigné dans `COMMUNICATION/Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
 - V2-10 (mode offline, doc V2, déploiement Netlify) : reste en suspens sur la branche `v2`.
 
 ## v3.9 — 2026-07-07
@@ -918,7 +924,7 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 - **Phase V3-5 close** : gate intégral (367/367 tests, `tsc -b` clean, eslint 0 erreur, test manuel, doc).
 
 ### Reporté
-- Rythme du bouton « Répéter demain », comportement de l'action « Reporter » et fréquence du check-in énergie : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
+- Rythme du bouton « Répéter demain », comportement de l'action « Reporter » et fréquence du check-in énergie : à reconfirmer avec Marie — consigné dans `COMMUNICATION/Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
 
 ### Supprimé
 - `plan_test_manuel_v3-4.md` (nettoyage intentionnel, phase déjà close).
@@ -937,7 +943,7 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 - P6 : une première version (avance automatique au jour suivant après chaque tâche planifiée, sans bouton dédié) a été testée manuellement et invalidée — elle masquait la tâche qu'on venait de placer, lue comme un bug. Remplacée par le bouton explicite « Répéter demain » ci-dessus.
 
 ### Reporté
-- Rythme du bouton « Répéter demain » (1 clic par jour), comportement de l'action « Reporter » et fréquence du check-in énergie : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
+- Rythme du bouton « Répéter demain » (1 clic par jour), comportement de l'action « Reporter » et fréquence du check-in énergie : à reconfirmer avec Marie — consigné dans `COMMUNICATION/Note de réunion/a demander a Marie.md` et `_contexte/signals.md`.
 
 ### Supprimé
 - `plan_test_manuel_v3-3.md` (nettoyage intentionnel, phase déjà close).
@@ -952,7 +958,7 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 - **Phase V3-3 close** : gate intégral (353/353 tests, `tsc -b` clean, eslint 0 erreur, test manuel, doc). Navigation restreinte au Dashboard/Centre récupération en mode surcharge confirmée intentionnelle par l'utilisateur (initialement suspectée à tort comme un bug bloquant, vérifiée puis levée).
 
 ### Reporté
-- Comportement de l'action « Reporter » et fréquence du check-in énergie (une fois/jour vs chaque ouverture) : à reconfirmer avec Marie — consigné dans `Note de réunion/a demander a Marie.md`.
+- Comportement de l'action « Reporter » et fréquence du check-in énergie (une fois/jour vs chaque ouverture) : à reconfirmer avec Marie — consigné dans `COMMUNICATION/Note de réunion/a demander a Marie.md`.
 
 ### Supprimé
 - `plan_test_manuel_v3-1.md`, `plan_test_manuel_v3-2.md` (nettoyage intentionnel, phases déjà closes).
@@ -1032,7 +1038,7 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 
 ### Ajouté
 - Commande `/analyse_visio <dossier-réunion>` (`.claude/commands/analyse_visio.md`) : automatise l'analyse d'une visio testeur (transcription + captures + code) et génère constats, analyse de code, plan d'implémentation et roadmap versionnée (bump auto du numéro de version, format à cases à cocher).
-- Roadmap V3 (`Note de réunion/2026-06-07/roadmap_v3.md`) créée à partir de la visio Marie du 2026-07-06 : refonte énergie (coût par tâche, "cuillères"), tâches obligatoires, surcharge automatique, nettoyage dashboard/planning/listes, navigation persistante. 10 phases, aucune démarrée.
+- Roadmap V3 (`COMMUNICATION/Note de réunion/2026-06-07/roadmap_v3.md`) créée à partir de la visio Marie du 2026-07-06 : refonte énergie (coût par tâche, "cuillères"), tâches obligatoires, surcharge automatique, nettoyage dashboard/planning/listes, navigation persistante. 10 phases, aucune démarrée.
 
 ## v0.44 — 2026-07-06
 
@@ -1050,7 +1056,7 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 ## v0.43 — 2026-07-06
 
 ### Ajouté
-- Contexte complet de la question énergie consigné pour la prochaine réunion Marie (`Note de réunion/a traiter prochaine reunion.txt`).
+- Contexte complet de la question énergie consigné pour la prochaine réunion Marie (`COMMUNICATION/Note de réunion/a traiter prochaine reunion.txt`).
 
 ### Modifié
 - Tests manuels 2.4, 2.6, 6.7, 6.10, 7.3, mode sombre et 11.2 validés (`roadmap_v2.md`).
@@ -1384,8 +1390,8 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 ### Ajouté
 - `roadmap_v2.md` : roadmap V2 complète (11 phases, pilotée par retours Marie).
 - `Archives/roadmap_v1.md` : roadmap V1 archivée.
-- `Note de réunion/synthese_reunion_marie_2026-06-29.md` : synthèse session test utilisateur.
-- `Note de réunion/analyse_conduite_visio_marie.md` : méthodo prochaines visios.
+- `COMMUNICATION/Note de réunion/synthese_reunion_marie_2026-06-29.md` : synthèse session test utilisateur.
+- `COMMUNICATION/Note de réunion/analyse_conduite_visio_marie.md` : méthodo prochaines visios.
 
 ### Modifié
 - `_contexte/signals.md`, `contexte.md` : état V2 prête à démarrer, reset données acté.

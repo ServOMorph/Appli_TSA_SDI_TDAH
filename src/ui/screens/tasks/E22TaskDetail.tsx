@@ -270,7 +270,6 @@ export function E22TaskDetail() {
     selectedTaskId,
     inboxTasks,
     todayTasks,
-    lists,
     getSubTasks,
     deleteSubTask,
     toggleSubTask,
@@ -278,17 +277,11 @@ export function E22TaskDetail() {
     completeTask,
     deleteTask,
     selectTask,
-    selectList,
-    goToPath,
     reorderSubTasks,
     refreshDashboard,
     back,
     goTo,
-    moveTask,
-    planTaskToday,
     scheduleSubTask,
-    moveTodoTaskToList,
-    createToolList,
     getTaskById,
     duplicateTaskById,
     deleteTaskScoped,
@@ -297,9 +290,6 @@ export function E22TaskDetail() {
 
   const [subTasks, setSubTasks] = useState<Task[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [showListPicker, setShowListPicker] = useState(false)
-  const [newListName, setNewListName] = useState('')
-  const [subtaskWarningAction, setSubtaskWarningAction] = useState<'list' | null>(null)
   const [renamingSubTask, setRenamingSubTask] = useState<Task | null>(null)
   const [renameSubTaskTitle, setRenameSubTaskTitle] = useState('')
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
@@ -322,13 +312,6 @@ export function E22TaskDetail() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTaskId, taskFromLists])
-
-  async function refreshFetchedTask() {
-    if (selectedTaskId) {
-      const t = await getTaskById(selectedTaskId)
-      setFetchedTask(t ?? null)
-    }
-  }
 
   function requiresScopeChoice(): boolean {
     return !!task?.recurrence_id
@@ -412,17 +395,6 @@ export function E22TaskDetail() {
     goTo(task ? backScreenForTask(task) : 'inbox')
   }
 
-  async function handleMoveToToday() {
-    if (!selectedTaskId) return
-    await moveTask(selectedTaskId, 'today')
-  }
-
-  async function handlePlan() {
-    if (!selectedTaskId) return
-    await planTaskToday(selectedTaskId)
-    await refreshFetchedTask()
-  }
-
   async function handleScheduleSubTask(subTask: Task, date: string, start: string, durationMinutes: number | null) {
     const end = addMinutesToTime(start, durationMinutes ?? 0)
     await scheduleSubTask(subTask.id, date, start, end)
@@ -447,37 +419,6 @@ export function E22TaskDetail() {
       const updated = await getSubTasks(selectedTaskId)
       setSubTasks(updated)
     }
-  }
-
-  async function handleChooseList(listId: string) {
-    if (!selectedTaskId) return
-    await moveTodoTaskToList(selectedTaskId, listId)
-    selectTask(null)
-    selectList(listId)
-    goToPath(['tools', 'list-detail'])
-  }
-
-  async function handleCreateList() {
-    if (!selectedTaskId || !newListName.trim()) return
-    const listId = await createToolList(newListName.trim(), null)
-    await moveTodoTaskToList(selectedTaskId, listId)
-    setNewListName('')
-    selectTask(null)
-    selectList(listId)
-    goToPath(['tools', 'list-detail'])
-  }
-
-  function handleClickList() {
-    if (subTasks.length > 0) {
-      setSubtaskWarningAction('list')
-    } else {
-      setShowListPicker(true)
-    }
-  }
-
-  function confirmSubtaskWarning() {
-    setSubtaskWarningAction(null)
-    setShowListPicker(true)
   }
 
   if (!task) {
@@ -573,17 +514,6 @@ export function E22TaskDetail() {
         <Button fullWidth onClick={() => goTo('task-decompose')}>
           Décomposer
         </Button>
-        {task.status !== 'today' && (
-          <Button fullWidth onClick={handleMoveToToday}>
-            Tâche du jour
-          </Button>
-        )}
-        <Button fullWidth onClick={handlePlan}>
-          Planifier
-        </Button>
-        <Button fullWidth onClick={handleClickList}>
-          Liste
-        </Button>
         <Button fullWidth onClick={handleComplete}>
           Terminer
         </Button>
@@ -633,46 +563,6 @@ export function E22TaskDetail() {
         </div>
       )}
 
-      {showListPicker && (
-        <div role="dialog" aria-modal="true" aria-label="Choisir une liste" style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Ajouter à une liste</h2>
-            {lists.length === 0 ? (
-              <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>Aucune liste pour l'instant.</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-                {lists.map((l) => (
-                  <button
-                    key={l.id}
-                    aria-label={`Ajouter à ${l.name}`}
-                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', textAlign: 'left' }}
-                    onClick={() => handleChooseList(l.id)}
-                  >
-                    {l.name}
-                  </button>
-                ))}
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-              <input
-                type="text"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                placeholder="Nouvelle liste"
-                aria-label="Nom de la nouvelle liste"
-                style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
-              />
-              <Button onClick={handleCreateList} disabled={!newListName.trim()}>
-                Créer
-              </Button>
-            </div>
-            <Button variant="secondary" fullWidth onClick={() => setShowListPicker(false)}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
       {renamingSubTask && (
         <div role="dialog" aria-modal="true" aria-label="Renommer la sous-étape" style={modalOverlay}>
           <div style={modalBox}>
@@ -689,25 +579,6 @@ export function E22TaskDetail() {
               Enregistrer
             </Button>
             <Button variant="secondary" fullWidth onClick={() => setRenamingSubTask(null)}>
-              Annuler
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {subtaskWarningAction && (
-        <div role="dialog" aria-modal="true" aria-label="Sous-tâches perdues" style={modalOverlay}>
-          <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Sous-tâches non conservées</h2>
-            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-              {`« ${task.title} » a ${subTasks.length} sous-tâche${subTasks.length > 1 ? 's' : ''}. ${
-                subTasks.length > 1 ? 'Elles seront' : 'Elle sera'
-              } supprimée${subTasks.length > 1 ? 's' : ''} et ne sera pas reportée sur la nouvelle destination. Continuer ?`}
-            </p>
-            <Button fullWidth onClick={confirmSubtaskWarning}>
-              Continuer
-            </Button>
-            <Button variant="secondary" fullWidth onClick={() => setSubtaskWarningAction(null)}>
               Annuler
             </Button>
           </div>

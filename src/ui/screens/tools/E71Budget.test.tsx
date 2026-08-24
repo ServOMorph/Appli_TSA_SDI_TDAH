@@ -115,30 +115,38 @@ describe('E71Budget', () => {
     expect(screen.getByText(/500,00.*de revenus.*-120,00.*livrets/)).toBeDefined()
   })
 
-  it('déduit « Mon compte » du montant total, en comptant ×4 chaque dépense d’une sous-catégorie Semaine', () => {
+  it('déduit « Mon compte » du montant total, en comptant ×4 le montant prévu d’une sous-catégorie Semaine', () => {
     renderWithApp(<E71Budget />, makeAppContext({
       budgetIncomeEntries: [makeIncomeEntry({ amount: 2000 })],
       budgetCategories: [
         makeCategory({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
         makeCategory({ id: 'courses', name: 'Courses', period: 'week', amount: 60 }),
       ],
-      budgetEntries: [makeEntry({ category_id: 'courses', amount: 20 })],
     }))
     expect(screen.getByText(/mon compte/)).toBeDefined()
+    expect(screen.getByText(/2 000,00.*de revenus.*-840,00.*mon compte/)).toBeDefined()
+  })
+
+  it('ignore les dépenses déjà saisies dans le calcul du montant total (basé sur les prévisions)', () => {
+    renderWithApp(<E71Budget />, makeAppContext({
+      budgetIncomeEntries: [makeIncomeEntry({ amount: 2000 })],
+      budgetCategories: [makeCategory({ id: 'courses', name: 'Courses', period: 'week', amount: 60 })],
+      budgetEntries: [makeEntry({ category_id: 'courses', amount: 999 })],
+    }))
+    expect(screen.getByText(/-240,00.*mon compte/)).toBeDefined()
   })
 
   it('navigue vers Mon compte et Mes livrets avec leurs totaux respectifs', async () => {
     const ctx = makeAppContext({
       budgetIncomeEntries: [makeIncomeEntry()],
       budgetCategories: [makeCategory()],
-      budgetEntries: [makeEntry()],
       budgetAccounts: [makeAccount()],
       budgetDeposits: [makeDeposit()],
     })
     renderWithApp(<E71Budget />, ctx)
     expect(within(screen.getByRole('button', { name: 'Ouvrir Mes livrets' })).getByText(/50,00/)).toBeDefined()
     await userEvent.click(screen.getByRole('button', { name: 'Ouvrir Mon compte' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('budget-account')
+    expect(ctx.goTo).toHaveBeenCalledWith('budget-previsions')
     await userEvent.click(screen.getByRole('button', { name: 'Ouvrir Mes livrets' }))
     expect(ctx.goTo).toHaveBeenCalledWith('budget-livrets')
   })

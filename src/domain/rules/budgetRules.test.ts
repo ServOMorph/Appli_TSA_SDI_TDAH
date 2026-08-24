@@ -7,7 +7,7 @@ import {
   getAccountBalance,
   getGaugeLevel,
   getGaugeRatio,
-  getMonCompteUsage,
+  getMonComptePrevisions,
   getPeriodBounds,
   getSpentForCategory,
   getMontantTotal,
@@ -117,31 +117,23 @@ describe('budgetRules', () => {
       expect(getTotalIncomeEntries(entries)).toBe(1799)
     })
 
-    it('calcule l’usage de « Mon compte » : chaque dépense « semaine » compte ×4, chaque dépense « mois » compte ×1', () => {
+    it('calcule les prévisions de « Mon compte » : chaque sous-catégorie « semaine » compte ×4, chaque sous-catégorie « mois » compte ×1', () => {
       const accountCategories = [
         category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
         category({ id: 'courses', period: 'week', amount: 60 }),
       ]
-      const accountEntries = [
-        entry({ id: 'rent-entry', category_id: 'rent', amount: 600 }),
-        entry({ id: 'courses-entry', category_id: 'courses', amount: 20 }),
-      ]
-      expect(getMonCompteUsage(accountCategories, accountEntries)).toBe(600 + 20 * 4)
+      expect(getMonComptePrevisions(accountCategories)).toBe(600 + 60 * 4)
     })
 
-    it('déduit les livrets et « Mon compte » du montant total', () => {
+    it('déduit les livrets et les prévisions de « Mon compte » du montant total', () => {
       const entries = [incomeEntry({ amount: 2000 })]
       const deposits = [deposit({ amount: 100 })]
       const accountCategories = [
         category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
         category({ id: 'courses', period: 'week', amount: 60 }),
       ]
-      const accountEntries = [
-        entry({ id: 'rent-entry', category_id: 'rent', amount: 600 }),
-        entry({ id: 'courses-entry', category_id: 'courses', amount: 20 }),
-      ]
-      expect(getMontantTotal(entries, deposits, accountCategories, accountEntries)).toBe(
-        2000 - 100 - (600 + 20 * 4),
+      expect(getMontantTotal(entries, deposits, accountCategories)).toBe(
+        2000 - 100 - (600 + 60 * 4),
       )
     })
 

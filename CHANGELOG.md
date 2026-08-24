@@ -1,3 +1,11 @@
+## v5.54 — 2026-08-24
+
+### Modifié
+- Tâches : la fiche d'une tâche ne propose plus que Décomposer, Dupliquer, Modifier, Terminer et Supprimer.
+- Budget : « Montant total » et « Mon compte » reflètent désormais les montants prévus plutôt que les dépenses déjà effectuées.
+- Budget : le suivi prévu/dépensé/jauge par catégorie devient l'écran « Comptes » (accessible depuis le widget du même nom sur l'accueil) ; « Mon compte » (dans l'outil Budget) n'affiche que les prévisions.
+- Budget : ajouter une dépense se fait désormais depuis la fiche d'une catégorie, sans resélectionner la catégorie dans un formulaire séparé.
+
 ## v5.53 — 2026-08-24
 
 ### Modifié

@@ -3,9 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import type { BudgetCategory, BudgetPeriod } from '@/domain/entities/budgetCategory'
 import { getPeriodBounds, getSpentForCategory } from '@/domain/rules/budgetRules'
-import { Button } from '@/ui/components/Button'
 import { BudgetGauge } from '@/ui/components/BudgetGauge'
-import { BudgetExpenseModal } from '@/ui/components/BudgetExpenseModal'
 import { formatEuro, pageStyle } from '@/ui/styles/budget'
 
 function shiftPeriod(period: BudgetPeriod, date: string, offset: number): string {
@@ -81,10 +79,9 @@ function PeriodColumn({ title, period, date, onShift, categories, onOpenCategory
 }
 
 export function E75BudgetAccount() {
-  const { back, goTo, budgetCategories, budgetEntries, createBudgetEntry } = useApp()
+  const { back, goTo, budgetCategories, budgetEntries } = useApp()
   const [weekDate, setWeekDate] = useState(todayDate())
   const [monthDate, setMonthDate] = useState(todayDate())
-  const [showExpenseForm, setShowExpenseForm] = useState(false)
 
   const weekCategories = budgetCategories.filter((category) => category.period === 'week')
   const monthCategories = budgetCategories.filter((category) => category.period === 'month')
@@ -93,18 +90,13 @@ export function E75BudgetAccount() {
     goTo({ name: 'budget-category-detail', categoryId: category.id, date })
   }
 
-  async function handleCreateExpense(categoryId: string, amount: number, label: string, entryDate: string) {
-    await createBudgetEntry(categoryId, amount, label, entryDate)
-    setShowExpenseForm(false)
-  }
-
   return (
     <main style={pageStyle}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
-        <button aria-label="Retour" onClick={() => back('budget')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
+        <button aria-label="Retour" onClick={() => back('dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ←
         </button>
-        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Mon compte</h1>
+        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Comptes</h1>
         <button aria-label="Paramètres du budget" onClick={() => goTo('budget-settings')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ⚙
         </button>
@@ -130,20 +122,6 @@ export function E75BudgetAccount() {
           entries={budgetEntries}
         />
       </div>
-
-      <Button fullWidth onClick={() => setShowExpenseForm(true)} disabled={budgetCategories.length === 0}>
-        Ajouter une dépense
-      </Button>
-
-      {showExpenseForm && (
-        <BudgetExpenseModal
-          categories={budgetCategories}
-          defaultCategoryId={weekCategories[0]?.id ?? monthCategories[0]?.id}
-          defaultDate={todayDate()}
-          onSubmit={handleCreateExpense}
-          onClose={() => setShowExpenseForm(false)}
-        />
-      )}
     </main>
   )
 }

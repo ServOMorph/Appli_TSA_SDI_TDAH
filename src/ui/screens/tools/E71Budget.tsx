@@ -3,7 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
-import { getAccountBalance, getMonCompteUsage, getMontantTotal, getTotalDeposits, getTotalIncomeEntries } from '@/domain/rules/budgetRules'
+import { getAccountBalance, getMonComptePrevisions, getMontantTotal, getTotalDeposits, getTotalIncomeEntries } from '@/domain/rules/budgetRules'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { BudgetIncomeModal } from '@/ui/components/BudgetIncomeModal'
@@ -19,7 +19,6 @@ export function E71Budget() {
     goTo,
     budgetAccounts,
     budgetCategories,
-    budgetEntries,
     budgetDeposits,
     budgetIncomeEntries,
     createBudgetIncomeEntry,
@@ -35,8 +34,8 @@ export function E71Budget() {
   const accountsTotal = budgetAccounts.reduce((total, account) => total + getAccountBalance(budgetDeposits, account.id), 0)
   const totalIncomeEntries = getTotalIncomeEntries(budgetIncomeEntries)
   const totalDeposits = getTotalDeposits(budgetDeposits)
-  const totalAccountUsage = getMonCompteUsage(budgetCategories, budgetEntries)
-  const montantTotal = getMontantTotal(budgetIncomeEntries, budgetDeposits, budgetCategories, budgetEntries)
+  const monComptePrevisions = getMonComptePrevisions(budgetCategories)
+  const montantTotal = getMontantTotal(budgetIncomeEntries, budgetDeposits, budgetCategories)
   const sortedIncomeEntries = [...budgetIncomeEntries].sort((a, b) => b.date.localeCompare(a.date))
 
   async function handleCreateIncome(amount: number, label: string, entryDate: string) {
@@ -91,7 +90,7 @@ export function E71Budget() {
         <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem', textAlign: 'center' }}>Montant total</p>
         <p style={{ margin: '4px 0', fontSize: '2rem', fontWeight: 700, color: amountTone(montantTotal), textAlign: 'center' }}>{formatEuro(montantTotal)}</p>
         <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)', fontSize: '0.8125rem', textAlign: 'center' }}>
-          {formatEuro(totalIncomeEntries)} de revenus{totalDeposits !== 0 ? ` · ${formatEuro(-totalDeposits)} livrets` : ''}{totalAccountUsage !== 0 ? ` · ${formatEuro(-totalAccountUsage)} mon compte` : ''}
+          {formatEuro(totalIncomeEntries)} de revenus{totalDeposits !== 0 ? ` · ${formatEuro(-totalDeposits)} livrets` : ''}{monComptePrevisions !== 0 ? ` · ${formatEuro(-monComptePrevisions)} mon compte` : ''}
         </p>
         <Button variant="secondary" fullWidth onClick={() => setShowIncomeManager(true)}>
           Modifier le budget
@@ -100,13 +99,13 @@ export function E71Budget() {
 
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
         <button
-          onClick={() => goTo('budget-account')}
+          onClick={() => goTo('budget-previsions')}
           aria-label="Ouvrir Mon compte"
           style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', appearance: 'none', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', font: 'inherit', textAlign: 'left' }}
         >
           <span>Mon compte</span>
-          <span style={{ fontWeight: 600, color: amountTone(-totalAccountUsage) }}>
-            {budgetCategories.length === 0 ? 'Non configuré' : formatEuro(-totalAccountUsage)}
+          <span style={{ fontWeight: 600, color: amountTone(-monComptePrevisions) }}>
+            {budgetCategories.length === 0 ? 'Non configuré' : formatEuro(-monComptePrevisions)}
           </span>
         </button>
         <button

@@ -6,6 +6,7 @@ import { getPeriodBounds, getSpentForCategory, isDateInPeriod } from '@/domain/r
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { BudgetGauge } from '@/ui/components/BudgetGauge'
+import { BudgetExpenseModal } from '@/ui/components/BudgetExpenseModal'
 import { dangerLinkStyle, formatEuro, inputStyle, modalBox, modalOverlay, pageStyle } from '@/ui/styles/budget'
 
 export function E73CategoryDetail() {
@@ -18,6 +19,7 @@ export function E73CategoryDetail() {
     updateBudgetCategoryAmount,
     deleteBudgetCategory,
     deleteBudgetEntry,
+    createBudgetEntry,
   } = useApp()
   const categoryId = route.name === 'budget-category-detail' ? (route.categoryId ?? null) : null
   const referenceDate = (route.name === 'budget-category-detail' ? route.date : undefined) ?? todayDate()
@@ -28,6 +30,7 @@ export function E73CategoryDetail() {
   const [editingAmount, setEditingAmount] = useState(false)
   const [amountValue, setAmountValue] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [showExpenseForm, setShowExpenseForm] = useState(false)
 
   if (!category) {
     return (
@@ -80,6 +83,12 @@ export function E73CategoryDetail() {
     back('budget-account')
   }
 
+  async function handleCreateExpense(amount: number, label: string, entryDate: string) {
+    if (!category) return
+    await createBudgetEntry(category.id, amount, label, entryDate)
+    setShowExpenseForm(false)
+  }
+
   return (
     <main style={pageStyle}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
@@ -101,6 +110,10 @@ export function E73CategoryDetail() {
         </p>
         <BudgetGauge spent={spent} budgeted={category.amount} label={`Budget consommé pour ${category.name}`} height={10} />
       </Card>
+
+      <Button fullWidth onClick={() => setShowExpenseForm(true)}>
+        Ajouter une dépense
+      </Button>
 
       <section aria-label="Dépenses de la période">
         <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Dépenses de la période</h2>
@@ -169,6 +182,15 @@ export function E73CategoryDetail() {
             <Button variant="secondary" fullWidth onClick={() => setConfirmingDelete(false)}>Annuler</Button>
           </div>
         </div>
+      )}
+
+      {showExpenseForm && (
+        <BudgetExpenseModal
+          category={category}
+          defaultDate={referenceDate}
+          onSubmit={handleCreateExpense}
+          onClose={() => setShowExpenseForm(false)}
+        />
       )}
     </main>
   )

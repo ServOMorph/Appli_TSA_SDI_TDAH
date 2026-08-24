@@ -19,6 +19,9 @@ e2e/test-results/
 .env.local
 .env.*.local
 
+# rclone (jetons OAuth Google Drive locaux au projet)
+.claude/rclone.conf
+
 # Données personnelles réelles (testeurs)
 donnees_marie/
 

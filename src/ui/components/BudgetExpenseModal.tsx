@@ -5,74 +5,34 @@ import { Button } from '@/ui/components/Button'
 import { inputStyle, modalBox, modalOverlay } from '@/ui/styles/budget'
 
 interface BudgetExpenseModalProps {
-  categories: BudgetCategory[]
-  defaultCategoryId?: string
+  category: BudgetCategory
   defaultDate?: string
-  onSubmit: (categoryId: string, amount: number, label: string, date: string) => void | Promise<void>
+  onSubmit: (amount: number, label: string, date: string) => void | Promise<void>
   onClose: () => void
 }
 
 export function BudgetExpenseModal({
-  categories,
-  defaultCategoryId,
+  category,
   defaultDate,
   onSubmit,
   onClose,
 }: BudgetExpenseModalProps) {
-  const [categoryId, setCategoryId] = useState(defaultCategoryId ?? categories[0]?.id ?? '')
   const [amount, setAmount] = useState('')
   const [label, setLabel] = useState('')
   const [date, setDate] = useState(defaultDate ?? todayDate())
 
   const parsedAmount = Number(amount.replace(',', '.'))
-  const canSubmit = Boolean(categoryId) && Number.isFinite(parsedAmount) && parsedAmount > 0
+  const canSubmit = Number.isFinite(parsedAmount) && parsedAmount > 0
 
   async function handleSubmit() {
     if (!canSubmit) return
-    await onSubmit(categoryId, parsedAmount, label, date)
+    await onSubmit(parsedAmount, label, date)
   }
 
   return (
     <div role="dialog" aria-modal="true" aria-label="Ajouter une dépense" style={modalOverlay}>
       <div style={modalBox}>
-        <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Ajouter une dépense</h2>
-
-        {(['week', 'month'] as const).map((period) => {
-          const periodCategories = categories.filter((category) => category.period === period)
-          if (periodCategories.length === 0) return null
-          return (
-            <div key={period} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-              <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                {period === 'week' ? 'Semaine' : 'Mois'}
-              </span>
-              <div role="group" aria-label={period === 'week' ? 'Catégorie semaine' : 'Catégorie mois'} style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
-                {periodCategories.map((category) => {
-                  const selected = category.id === categoryId
-                  return (
-                    <button
-                      key={category.id}
-                      type="button"
-                      aria-pressed={selected}
-                      onClick={() => setCategoryId(category.id)}
-                      style={{
-                        padding: '8px 14px',
-                        borderRadius: '999px',
-                        border: `1px solid ${selected ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                        backgroundColor: selected ? 'var(--color-accent)' : 'transparent',
-                        color: selected ? '#ffffff' : 'var(--color-text)',
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '0.9375rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {category.name}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })}
+        <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Ajouter une dépense pour {category.name}</h2>
 
         <label htmlFor="budget-expense-amount">Montant</label>
         <input

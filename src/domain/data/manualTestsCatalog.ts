@@ -109,13 +109,22 @@ export const manualTestsCatalog: ManualTest[] = [
     steps: [
       'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ». Si aucun revenu n’a encore été saisi, seul le bouton « Configurer le budget » doit être visible : touchez-le, saisissez un montant, puis touchez « Enregistrer ».',
       'Si un revenu existe déjà, touchez « Modifier le budget » sur la carte « Montant total », puis « Ajouter un revenu », saisissez un montant, puis touchez « Enregistrer » : le montant total et le détail « ... de revenus » doivent augmenter.',
-      'Touchez le bloc « Mon compte » sous « Montant total » : vous devez arriver sur un écran affichant « Semaine » et « Mois » côte à côte, chacune avec ses sous-catégories (montant prévu et restant, avec une jauge).',
-      'Touchez les flèches ← et → sous « Semaine » : la période affichée doit changer sans modifier celle affichée sous « Mois ».',
-      'Touchez une sous-catégorie pour ouvrir sa fiche détaillée.',
-      'Revenez en arrière, touchez « Ajouter une dépense », remplissez le formulaire puis enregistrez : le montant dépensé de la catégorie doit augmenter.',
-      'Revenez au Budget avec la flèche ←, puis touchez le bloc « Mes livrets » : le détail « ... mon compte » sur la carte « Montant total » doit être apparu ou avoir augmenté, et l’écran « Mes livrets » doit afficher la liste des livrets ou une proposition de configuration si aucun n’existe.',
+      'Touchez le bloc « Mon compte » sous « Montant total » : vous devez arriver sur un écran affichant « Semaine » et « Mois » côte à côte, avec pour chaque sous-catégorie uniquement le montant prévu (aucune dépense, aucune jauge).',
+      'Revenez au Budget avec la flèche ←, puis touchez le bloc « Mes livrets » : l’écran « Mes livrets » doit afficher la liste des livrets ou une proposition de configuration si aucun n’existe.',
       'Touchez un livret : vous devez arriver sur sa fiche détaillée avec son solde et la liste de ses mouvements.',
       'Touchez « Ajouter un mouvement », remplissez montant/motif/date puis enregistrez : le mouvement doit apparaître dans la liste et le solde du livret doit se mettre à jour.',
+    ],
+  },
+  {
+    id: 'utiliser-comptes',
+    title: 'Suivre ses dépenses avec Comptes',
+    category: 'Outils : Budget',
+    steps: [
+      'Depuis l’accueil, touchez le widget « Comptes » (dans la grille sous le planning) : vous devez arriver sur un écran affichant « Semaine » et « Mois » côte à côte, chacune avec ses sous-catégories (montant prévu, montant restant et une jauge).',
+      'Touchez les flèches ← et → sous « Semaine » : la période affichée doit changer sans modifier celle affichée sous « Mois ».',
+      'Touchez une sous-catégorie pour ouvrir sa fiche détaillée : vous devez arriver directement sur cette catégorie, sans avoir à la resélectionner.',
+      'Sur la fiche de la catégorie, touchez « Ajouter une dépense », remplissez montant/libellé/date puis enregistrez : le montant restant et la jauge de la catégorie doivent se mettre à jour.',
+      'Retournez à l’accueil, ouvrez « Outils » puis touchez la carte « Budget » : vérifiez que le « Montant total » et le détail « ... mon compte » n’ont pas changé suite à cette dépense (ils reflètent les montants prévus, pas les dépenses déjà faites).',
     ],
   },
   {
@@ -268,6 +277,16 @@ export const manualTestsCatalog: ManualTest[] = [
       'Quittez cet écran puis revenez : la couleur choisie doit être conservée.',
       'Touchez le bouton « × » à côté du sélecteur : la carte doit retrouver son fond neutre par défaut, et le bouton « × » doit disparaître.',
       'Vérifiez que toucher le sélecteur de couleur n’ouvre pas l’outil : seul le titre ouvre l’outil.',
+    ],
+  },
+  {
+    id: 'menu-actions-tache-simplifie',
+    title: 'Menu d’actions simplifié sur la fiche d’une tâche',
+    category: 'Tâches',
+    steps: [
+      'Ouvrez la fiche de détail d’une tâche (depuis Réception ou le planning).',
+      'Vérifiez que seuls les boutons « Modifier », « Décomposer », « Terminer », « Dupliquer » et « Supprimer » sont affichés : « Tâche du jour », « Planifier » et « Liste » ne doivent plus apparaître.',
+      'Touchez « Terminer » : la tâche doit être marquée terminée et vous devez revenir à l’accueil.',
     ],
   },
 ]

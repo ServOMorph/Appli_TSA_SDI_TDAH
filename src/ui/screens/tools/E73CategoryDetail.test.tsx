@@ -75,6 +75,22 @@ describe('E73CategoryDetail', () => {
     expect(updateBudgetCategoryAmount).toHaveBeenCalledWith('category-1', 75)
   })
 
+  it('saisit une dépense pour la catégorie affichée, sans champ de sélection', async () => {
+    const createBudgetEntry = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E73CategoryDetail />, makeAppContext({
+      route,
+      budgetCategories: [makeCategory()],
+      createBudgetEntry,
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter une dépense' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter une dépense' })
+    expect(within(dialog).queryByRole('group')).toBeNull()
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '15')
+    await userEvent.type(within(dialog).getByLabelText('Libellé (facultatif)'), 'Marché')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
+    expect(createBudgetEntry).toHaveBeenCalledWith('category-1', 15, 'Marché', '2026-07-22')
+  })
+
   it('demande confirmation puis revient au Budget après suppression', async () => {
     const deleteBudgetCategory = vi.fn().mockResolvedValueOnce('needs_confirmation').mockResolvedValueOnce('deleted')
     const ctx = makeAppContext({ route, budgetCategories: [makeCategory()], deleteBudgetCategory })

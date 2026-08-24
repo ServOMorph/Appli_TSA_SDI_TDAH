@@ -92,19 +92,13 @@ describe('E22TaskDetail', () => {
     expect(screen.queryByRole('dialog', { name: 'Renommer la sous-étape' })).toBeNull()
   })
 
-  it('Planifier appelle planTaskToday sans avertissement même avec des sous-étapes', async () => {
+  it('affiche uniquement le menu simplifié (Modifier/Décomposer/Terminer/Dupliquer/Supprimer)', async () => {
     const task = makeTask()
-    const subTask = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone' })
-    const ctx = makeAppContext({
-      selectedTaskId: 'task-1',
-      inboxTasks: [task],
-      getSubTasks: vi.fn().mockResolvedValue([subTask]),
-    })
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
     renderWithApp(<E22TaskDetail />, ctx)
-    await waitFor(() => expect(screen.getByText('Prendre le téléphone')).toBeDefined())
-    await userEvent.click(screen.getByRole('button', { name: 'Planifier' }))
-    expect(ctx.planTaskToday).toHaveBeenCalledWith('task-1')
-    expect(screen.queryByRole('dialog', { name: 'Sous-tâches perdues' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Tâche du jour' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Planifier' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Liste' })).toBeNull()
   })
 
   it('Décomposer navigue vers task-decompose', async () => {

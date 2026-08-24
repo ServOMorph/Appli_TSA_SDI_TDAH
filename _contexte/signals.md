@@ -1,13 +1,14 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-24)
 
 ## Contexte chaud
-- **v5.52 déployée en prod le 2026-08-24** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie.
+- **`roadmap_demandes_marie_2026-08-24.md` en cours** (Phases 1-3 `[FAIT]` en local, non déployées ; Phases 4-6 `[TODO]`) : menu de fiche de tâche simplifié, Budget repassé sur les montants prévus (reversal assumé et confirmé face à `roadmap_budget_v3.md`, qui avait délibérément livré l'inverse le 17/08), écran « Comptes » (prévu/dépensé/jauge) séparé du nouvel écran « Mon compte » (`E78BudgetPrevisions.tsx`, prévisions seules), ajout de dépense déplacé de « Comptes » vers la fiche de catégorie (`E73CategoryDetail.tsx`, sans resélection). 610/610 tests, `tsc -b`/lint clean. Écarts assumés non traités : #7 (contenu du clic « Montant total »), #11 (montant prévu modifiable pour une seule semaine) — documentés dans `commentaires_marie_2026-08-24.md`.
+- **v5.52 déployée en prod le 2026-08-24** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie. Aucun redéploiement depuis.
 - **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
 - **Incident de branche (2026-08-19) clos et corrigé préventivement** : plusieurs sessions de travail sur les demandes de Marie avaient été faites par erreur sur `sync-marie` sans vérifier sa divergence avec `main` (jamais fusionnée depuis le 2026-08-16). `.claude/commands/start.md` vérifie désormais la divergence de branche avant de charger le contexte ; `.claude/memory.md` porte la règle. `.gitignore` complété au passage (`__pycache__/`, captures de calibration ROBERTO — règles déjà sur `sync-marie`, jamais reportées).
 - `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Export du 2026-08-19 traité (archivé, ingéré : 10 nouvelles entrées journal) — 3 frictions non bloquantes relevées (test IDs obsolètes en cache client, rejet du geste de glissement planning par Marie avec demande de comportement alternatif, incompréhension retrait livret/catégorie budget qui est par design) : à traiter comme futures demandes, pas corrigées à chaud.
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy`. `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `message_marie_categories_travail.md`. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage ; les autres roadmaps/communications ne l'appliquent pas encore.
-- `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles.
+- `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles. Son choix structurant (Montant total/Mon compte basés sur les dépenses réelles) a été explicitement inversé le 2026-08-24 par `roadmap_demandes_marie_2026-08-24.md` (retour aux prévisions), sur confirmation de l'utilisateur — cette roadmap reste un historique valide de ce qui a été livré et pourquoi, pas l'état actuel du calcul.
 - `manualTestsCatalog.ts` : outre les tests Budget v3 déjà en attente, 7 nouveaux tests (`couleur-tache-sans-couleur-choisie`, `supprimer-une-categorie-de-liste`, `detail-element-de-liste`, `acceder-directement-a-l-energie`, `encadrement-et-glissement-du-planning`, `couleur-de-fond-par-outil`) tous en attente de validation Marie sur la build v5.51 désormais en prod.
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
 - `_contexte/dernier_deploiement.md` : v5.51, 2026-08-20, prod vérifiée HTTP 200.
@@ -15,6 +16,8 @@
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
+- [P1] Poursuivre `roadmap_demandes_marie_2026-08-24.md` : Phase 4 (Listes, reproduction de l'écran « ajouter une catégorie » tronqué), Phase 5 (Énergie, fermeture directe après validation), Phase 6 (validation finale et `/deploy`). — fait quand : les 3 phases passées `[FAIT]` et déploiement effectué — réf : `roadmap_demandes_marie_2026-08-24.md` Phases 4-6
+- [P2] Décision produit #7 (contenu du clic sur « Montant total ») et #11 (montant prévu modifiable pour une seule semaine, scope à qualifier) restent non tranchées — hors périmètre de `roadmap_demandes_marie_2026-08-24.md`. — fait quand : décision actée avec l'utilisateur ou confirmée non prioritaire par Marie — réf : `roadmap_demandes_marie_2026-08-24.md` § Décisions produit non tranchées, `commentaires_marie_2026-08-24.md`
 - [P1] Demander à Marie de tester en conditions réelles les trois corrections v5.52 : tâche sans couleur, retour vers une catégorie de liste et couleur d’outil. — fait quand : nouvel export de Marie ingéré avec ces trois tests validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer — cohérent avec la demande initiale de Marie sur ce point, jamais satisfaite en l'état), clarifier avec Marie le lien retrait de livret/catégorie budget, vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
 - [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `message_marie_categories_travail.md`
@@ -25,7 +28,34 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-24 — standardisation du message de déploiement)
+## Dernière session (2026-08-24 — roadmap_demandes_marie_2026-08-24, Phases 1-3)
+
+## Décisions prises
+- Budget repassé sur les prévisions plutôt que les dépenses réelles — reversal assumé face à `roadmap_budget_v3.md` (livrée et confirmée le 17/08), confirmé explicitement par l'utilisateur au vu du document Marie du 24/08.
+- Architecture Comptes/Mon compte tranchée : widget accueil « Comptes » repointé vers l'écran prévu/dépensé/jauge existant (`E75BudgetAccount.tsx`) plutôt qu'un nouveau tool ; nouvel écran dédié `E78BudgetPrevisions.tsx` pour « Mon compte » (prévisions seules).
+- Ajout de dépense déplacé du bouton indépendant de « Comptes » vers la fiche de catégorie (`E73CategoryDetail.tsx`), catégorie déjà déterminée, sans resélection.
+- « Terminer » gardé sur la fiche de tâche malgré la demande de retrait de Marie (Phase 1) : seul moyen restant de terminer une tâche sans date planifiée.
+
+## Livrables produits ou modifiés
+- `budgetRules.ts`(`.test.ts`), `E71Budget.tsx`(`.test.tsx`), `E75BudgetAccount.tsx`(`.test.tsx`), `E78BudgetPrevisions.tsx`(`.test.tsx`, nouveau), `E73CategoryDetail.tsx`(`.test.tsx`), `E10Dashboard.tsx`(`.test.tsx`), `BudgetExpenseModal.tsx`, `navigation.ts`, `DevResetButton.tsx`, `App.tsx` : Budget Phases 2-3.
+- `E22TaskDetail.tsx`(`.test.tsx`) : Phase 1 (menu de tâche simplifié).
+- `roadmap_demandes_marie_2026-08-24.md`, `commentaires_marie_2026-08-24.md`, `manualTestsCatalog.ts` : mis à jour phase par phase.
+- `E01Welcome.tsx` (`WHATS_NEW`, 4 entrées), `README.md`, `CHANGELOG.md` (v5.54), `_contexte/contexte.md`, `_contexte/archive_decisions.md` : état actuel et historique.
+- `.claude/commands/analyser_googledoc.md` (renommée depuis `analyser_modifications_marie_pdf.md`), `.claude/commands/deploy.md`, `.gitignore` : support de l'analyse par Google Doc et de la publication du fichier de commentaires sur Drive (`rclone`).
+
+## Hypothèses validées / invalidées
+- VALIDE : 610/610 tests unitaires, `tsc -b`/lint clean après chaque phase.
+- EN ATTENTE : aucun changement de cette session testé par Marie en conditions réelles — rien déployé.
+
+## Prochaine étape exacte
+Reprendre la Phase 4 (Listes, reproduction de l'écran « ajouter une catégorie ») de `roadmap_demandes_marie_2026-08-24.md`, après confirmation explicite de l'utilisateur (checkpoint roadmap déjà posé).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-24 — standardisation du message de déploiement)
 
 ## Décisions prises
 - La commande `/deploy` rédige désormais un message WhatsApp pour Marie, contenant systématiquement le lien de production et encadré par `💻🤖`.

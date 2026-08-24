@@ -30,6 +30,7 @@ const SCREEN_CODES: Record<Screen, string> = {
   'budget-category-detail': 'E73',
   'budget-settings': 'E74',
   'budget-account': 'E75',
+  'budget-previsions': 'E78',
   'budget-livrets': 'E76',
   'budget-livret-detail': 'E77',
 }

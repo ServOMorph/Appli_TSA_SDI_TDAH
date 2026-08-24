@@ -3,7 +3,12 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = []
+const WHATS_NEW: string[] = [
+  'La fiche d’une tâche est simplifiée : seuls Décomposer, Dupliquer, Modifier, Terminer et Supprimer restent proposés.',
+  'Budget : « Montant total » et « Mon compte » reflètent maintenant ce que tu as prévu de dépenser, pas les dépenses déjà faites.',
+  'Le suivi de tes dépenses avec jauge s’appelle désormais « Comptes », accessible depuis le widget du même nom sur l’accueil.',
+  'Pour ajouter une dépense, touche une catégorie puis « Ajouter une dépense » sur sa fiche : plus besoin de la resélectionner dans le formulaire.',
+]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

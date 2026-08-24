@@ -120,3 +120,14 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     ce lien, sur sa propre ligne :
     `https://appli-audhd.netlify.app/`
     Encadrer systématiquement le message par `💻🤖` : une occurrence au début du message et une autre à la fin.
+
+11. Publier le fichier de commentaires pour Marie sur Google Drive, si présent.
+    - Chercher à la racine du projet un fichier `commentaires_marie_*.md` modifié par la roadmap qui vient d'être
+      déployée (issu de `/analyser_googledoc`).
+    - Si absent : ne rien faire, ne pas le signaler comme un problème (aucune roadmap de ce type traitée cette fois).
+    - Si présent : le convertir en `.docx` puis l'envoyer dans le dossier Drive déjà utilisé pour ce projet :
+      ```
+      pandoc commentaires_marie_<sujet>.md -o commentaires_marie_<sujet>.docx
+      rclone copy commentaires_marie_<sujet>.docx "tsa_gdrive:Projets/Appli/" --config .claude/rclone.conf
+      ```
+    - Rapporter le nom du fichier envoyé dans le rapport final de l'étape 9.

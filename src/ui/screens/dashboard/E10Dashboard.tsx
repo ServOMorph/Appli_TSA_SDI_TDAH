@@ -7,7 +7,6 @@ import { TopBar } from '@/ui/components/TopBar'
 import { AppShell } from '@/ui/components/AppShell'
 import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
-import { BudgetExpenseModal } from '@/ui/components/BudgetExpenseModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
 import { DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
@@ -67,13 +66,9 @@ export function E10Dashboard() {
     tools,
     lists,
     selectList,
-    budgetCategories,
-    createBudgetEntry,
     manualTestResults,
     settings,
   } = useApp()
-  const [showExpenseForm, setShowExpenseForm] = useState(false)
-  const [showNoExpenseCategory, setShowNoExpenseCategory] = useState(false)
   const [showCreateTool, setShowCreateTool] = useState(false)
 
   const expanded = route.name === 'planning'
@@ -106,21 +101,6 @@ export function E10Dashboard() {
     setShowCreateTool(false)
     selectList(listId)
     goTo('list-detail')
-  }
-
-  const expenseCategories = budgetCategories
-
-  function openExpenseForm() {
-    if (expenseCategories.length === 0) {
-      setShowNoExpenseCategory(true)
-      return
-    }
-    setShowExpenseForm(true)
-  }
-
-  async function handleCreateExpense(categoryId: string, amount: number, label: string, date: string) {
-    await createBudgetEntry(categoryId, amount, label, date)
-    setShowExpenseForm(false)
   }
 
   function handleHandlePointerDown(event: React.PointerEvent) {
@@ -241,7 +221,7 @@ export function E10Dashboard() {
             }}
           >
             <Card>
-              <button style={widgetBtnStyle} onClick={openExpenseForm}>
+              <button style={widgetBtnStyle} onClick={() => goTo('budget-account')}>
                 Comptes
               </button>
             </Card>
@@ -274,51 +254,6 @@ export function E10Dashboard() {
         />
       )}
 
-      {showExpenseForm && (
-        <BudgetExpenseModal
-          categories={expenseCategories}
-          onSubmit={handleCreateExpense}
-          onClose={() => setShowExpenseForm(false)}
-        />
-      )}
-      {showNoExpenseCategory && (
-        <div
-          role="dialog"
-          aria-label="Aucune catégorie de dépense"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.75)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
-              borderRadius: 'var(--radius-lg)',
-              padding: 'var(--spacing-xl)',
-              maxWidth: '360px',
-              width: '90%',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 'var(--spacing-md)',
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Aucune catégorie de dépense</h2>
-            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
-              Créez d'abord une catégorie de type « dépense » dans le Budget pour pouvoir saisir une dépense depuis ce widget.
-            </p>
-            <Button fullWidth onClick={() => setShowNoExpenseCategory(false)}>
-              Fermer
-            </Button>
-          </div>
-        </div>
-      )}
     </AppShell>
   )
 }

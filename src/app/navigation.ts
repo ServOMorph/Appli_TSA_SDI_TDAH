@@ -25,6 +25,7 @@ export type Route =
   | { name: 'folder-detail'; folderId?: string }
   | { name: 'budget' }
   | { name: 'budget-account' }
+  | { name: 'budget-previsions' }
   | { name: 'budget-livrets' }
   | { name: 'budget-livret-detail'; accountId?: string }
   | { name: 'budget-category-detail'; categoryId?: string; date?: string }

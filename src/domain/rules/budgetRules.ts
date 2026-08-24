@@ -80,27 +80,21 @@ export function getMonCompteWeight(period: BudgetPeriod): number {
 }
 
 /**
- * Montant retiré du Montant total par les dépenses de « Mon compte » : chaque dépense d'une
- * sous-catégorie « mois » compte une fois, chaque dépense d'une sous-catégorie « semaine »
- * compte quatre fois.
+ * Montant retiré du Montant total par les prévisions de « Mon compte » : chaque sous-catégorie
+ * « mois » compte son montant prévu une fois, chaque sous-catégorie « semaine » compte son
+ * montant prévu quatre fois.
  */
-export function getMonCompteUsage(categories: BudgetCategory[], entries: BudgetEntry[]): number {
-  const periodByCategoryId = new Map(categories.map((category) => [category.id, category.period]))
-  return entries.reduce((total, entry) => {
-    const period = periodByCategoryId.get(entry.category_id)
-    if (!period) return total
-    return total + entry.amount * getMonCompteWeight(period)
-  }, 0)
+export function getMonComptePrevisions(categories: BudgetCategory[]): number {
+  return categories.reduce((total, category) => total + category.amount * getMonCompteWeight(category.period), 0)
 }
 
-/** Montant total après effet des livrets et de « Mon compte » (revenus - livrets - Mon compte). */
+/** Montant total après effet des livrets et des prévisions de « Mon compte » (revenus - livrets - prévisions). */
 export function getMontantTotal(
   incomeEntries: BudgetIncomeEntry[],
   deposits: BudgetDeposit[],
   categories: BudgetCategory[],
-  entries: BudgetEntry[],
 ): number {
-  return getTotalIncomeEntries(incomeEntries) - getTotalDeposits(deposits) - getMonCompteUsage(categories, entries)
+  return getTotalIncomeEntries(incomeEntries) - getTotalDeposits(deposits) - getMonComptePrevisions(categories)
 }
 
 export function getAccountBalance(deposits: BudgetDeposit[], accountId: string): number {

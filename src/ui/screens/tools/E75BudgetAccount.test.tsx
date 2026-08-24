@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
 import { todayDate } from '@/app/repositories'
 import type { BudgetCategory } from '@/domain/entities/budgetCategory'
@@ -33,11 +33,16 @@ function makeEntry(overrides: Partial<BudgetEntry> = {}): BudgetEntry {
 }
 
 describe('E75BudgetAccount', () => {
-  it('le retour utilise back("budget")', async () => {
+  it('le retour utilise back("dashboard")', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E75BudgetAccount />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-    expect(ctx.back).toHaveBeenCalledWith('budget')
+    expect(ctx.back).toHaveBeenCalledWith('dashboard')
+  })
+
+  it('affiche le titre « Comptes »', () => {
+    renderWithApp(<E75BudgetAccount />, makeAppContext())
+    expect(screen.getByRole('heading', { name: 'Comptes' })).toBeDefined()
   })
 
   it('ouvre les paramètres du budget', async () => {
@@ -81,23 +86,8 @@ describe('E75BudgetAccount', () => {
     expect(ctx.goTo).toHaveBeenCalledWith({ name: 'budget-category-detail', categoryId: 'category-1', date: todayDate() })
   })
 
-  it('saisit une dépense avec sa catégorie en pastille et sa date', async () => {
-    const createBudgetEntry = vi.fn().mockResolvedValue(undefined)
-    renderWithApp(<E75BudgetAccount />, makeAppContext({
-      budgetCategories: [makeCategory(), makeCategory({ id: 'category-2', name: 'Plaisir', amount: 40 })],
-      createBudgetEntry,
-    }))
-    await userEvent.click(screen.getByRole('button', { name: 'Ajouter une dépense' }))
-    const dialog = screen.getByRole('dialog', { name: 'Ajouter une dépense' })
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Plaisir' }))
-    await userEvent.type(within(dialog).getByLabelText('Montant'), '15')
-    await userEvent.type(within(dialog).getByLabelText('Libellé (facultatif)'), 'Marché')
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
-    expect(createBudgetEntry).toHaveBeenCalledWith('category-2', 15, 'Marché', todayDate())
-  })
-
-  it('désactive la saisie de dépense tant qu’aucune catégorie n’existe', () => {
-    renderWithApp(<E75BudgetAccount />, makeAppContext({ budgetCategories: [] }))
-    expect(screen.getByRole('button', { name: 'Ajouter une dépense' }).hasAttribute('disabled')).toBe(true)
+  it('n’affiche plus de bouton « Ajouter une dépense » indépendant', () => {
+    renderWithApp(<E75BudgetAccount />, makeAppContext({ budgetCategories: [makeCategory()] }))
+    expect(screen.queryByRole('button', { name: 'Ajouter une dépense' })).toBeNull()
   })
 })

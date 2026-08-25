@@ -1,3 +1,10 @@
+## v5.56 — 2026-08-25
+
+### Modifié
+- Tâches : le menu de la fiche est simplifié, en conservant les actions Modifier, Décomposer, Terminer, Dupliquer et Supprimer.
+- Budget et Comptes : les montants prévus et les dépenses réelles sont présentés dans des écrans distincts ; l'ajout d'une dépense se fait depuis la catégorie concernée.
+- Listes et énergie : le formulaire d'ajout de catégorie reste utilisable sur mobile avec le clavier ouvert, et la validation de l'énergie ramène directement à l'accueil.
+
 ## v5.55 — 2026-08-24
 
 ### Modifié

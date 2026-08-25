@@ -5,6 +5,8 @@ import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
 const WHATS_NEW: string[] = [
   'La fiche d’une tâche ne propose plus « Terminer » : cochez la tâche directement dans le planning.',
+  'La couleur de fond des outils se règle maintenant dans Paramètres > Accessibilité.',
+  'Le badge énergie de l’accueil ouvre directement l’écran de modification.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

@@ -6,7 +6,7 @@ Ce fichier est la source unique des messages en attente pour Marie. Il est rédi
 
 ### Tâches
 
-#4, #5 — Le menu de la fiche d'une tâche est simplifié : les boutons « Tâche du jour », « Planifier » et « Liste » ont été retirés. « Décomposer » et « Dupliquer » sont conservés comme demandé.
+#4, #5 — Le bouton « Terminer » a été retiré de la fiche d'une tâche. Pour terminer une tâche planifiée, coche-la directement dans le planning. Les boutons « Modifier », « Décomposer », « Dupliquer » et « Supprimer » restent disponibles.
 
 ### Budget et Comptes
 
@@ -22,17 +22,20 @@ Le reset automatique des prévisions au 1er du mois n'a pas été ajouté : les 
 
 ### Énergie
 
-#17 — Après avoir choisi ton énergie et touché « Valider », tu reviens directement à l’accueil. Le badge énergie de l’accueil ouvre « Mon énergie » pour consulter ou modifier ton choix.
+#17 — Le badge énergie de l’accueil ouvre directement l’écran « Mon énergie maintenant ». Après avoir choisi ton énergie et touché « Valider », tu reviens directement à l’accueil.
+
+### Outils
+
+Le choix de couleur des outils est maintenant dans Paramètres > Accessibilité, juste après « Couleur d’ambiance ». Il n’apparaît plus sur les cartes d’outils.
 
 ## Tests à refaire
 
 - Tester le menu simplifié d'une fiche de tâche.
 - Tester « Utiliser le budget » et « Utiliser Comptes ».
 - Sur téléphone, ajouter une catégorie dans une liste avec le clavier ouvert.
-- Consulter puis modifier l'énergie depuis le badge de l'accueil.
-- Vérifier que le contrôle « Couleur » est visible sur une carte d'outil.
-- À traiter avant de rejouer : déplacer le sélecteur de couleur des outils dans Paramètres, après « Couleur d’ambiance ».
-- À traiter avant de rejouer : le badge énergie doit ouvrir directement l’écran de modification, sans passer par « Mon énergie ».
+- Depuis une fiche de tâche, vérifier que « Terminer » n’apparaît plus et terminer une tâche planifiée depuis le planning.
+- Dans Paramètres > Accessibilité, choisir puis retirer une couleur pour un outil.
+- Toucher le badge énergie de l’accueil, choisir une valeur et vérifier le retour direct à l’accueil après validation.
 
 ## Décisions reçues
 
@@ -46,4 +49,4 @@ Le reset automatique des prévisions au 1er du mois n'a pas été ajouté : les 
 
 ## Retour d'export déjà corrigé
 
-Le retour « je ne trouve pas le libellé Couleur » a été pris en compte : le contrôle est maintenant identifié par le libellé « Couleur ». Le test correspondant est à refaire.
+Le retour « je ne trouve pas le libellé Couleur » a été pris en compte : le contrôle de couleur est désormais dans Paramètres > Accessibilité, après « Couleur d’ambiance ». Le test correspondant est à refaire.

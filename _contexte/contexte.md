@@ -12,10 +12,10 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-**v5.56 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-25) ; les changements suivants ne sont pas encore déployés.
+**v5.56 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-25) ; v5.58 est prête à être déployée.
 L’export de Marie du 25/08 est traité sans perte ni incohérence ; cinq résultats ont été ajoutés au journal.
-Les roadmaps des 23 et 24 août sont archivées ; `roadmap_retours_marie_2026-08-25.md` est la roadmap active.
-« Terminer » est retiré de la fiche de tâche ; les phases Couleur des outils et Badge énergie restent à réaliser.
+`roadmap_retours_marie_2026-08-25.md` est entièrement terminée : retrait de « Terminer », couleur des outils dans Paramètres et accès direct à l’énergie.
+Le catalogue de tests manuels et la communication à Marie sont prêts pour v5.58.
 #11 attend le choix de Marie pour les catégories mensuelles ; `main` est la branche active.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)

@@ -43,32 +43,32 @@ Critère de sortie : la fiche affiche uniquement Modifier, Décomposer, Duplique
 **⏸ Checkpoint** — Demander à l’utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 2 — Couleur des outils dans Paramètres [ ]
+## Phase 2 — Couleur des outils dans Paramètres [x]
 
-- [ ] Identifier l’écran Paramètres qui porte « Couleur d’ambiance » et y déplacer le contrôle de couleur des outils, sans perdre le choix ni le retrait de couleur par outil.
-- [ ] Retirer le contrôle de couleur des cartes d’outils.
-- [ ] Ajouter les tests automatisés et mettre à jour le test manuel.
+- [x] Déplacer le contrôle de couleur des outils dans Paramètres > Accessibilité, après « Couleur d’ambiance », sans perdre le choix ni le retrait de couleur par outil.
+- [x] Retirer le contrôle de couleur des cartes d’outils.
+- [x] Ajouter les tests automatisés et mettre à jour le test manuel.
 
 Critère de sortie : la couleur de chaque outil est réglable depuis Paramètres, immédiatement après « Couleur d’ambiance », et reste persistante.
 
 **⏸ Checkpoint** — Demander à l’utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 3 — Badge énergie direct [ ]
+## Phase 3 — Badge énergie direct [x]
 
-- [ ] Depuis l’accueil, faire ouvrir le badge énergie directement sur l’écran de modification.
-- [ ] Conserver le retour direct vers l’accueil après validation.
-- [ ] Ajouter les tests automatisés et mettre à jour le test manuel.
+- [x] Depuis l’accueil, faire ouvrir le badge énergie directement sur l’écran de modification.
+- [x] Conserver le retour direct vers l’accueil après validation.
+- [x] Ajouter les tests automatisés et mettre à jour le test manuel.
 
 Critère de sortie : toucher le badge énergie ouvre directement la modification de l’état du jour ; valider revient à l’accueil.
 
 **⏸ Checkpoint** — Demander à l’utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 4 — Validation et préparation de livraison [ ]
+## Phase 4 — Validation et préparation de livraison [x]
 
-- [ ] Exécuter les tests ciblés, la suite complète, TypeScript et le lint.
-- [ ] Mettre à jour le catalogue de tests manuels, le changelog et le message à Marie.
-- [ ] Demander l’autorisation avant tout déploiement.
+- [x] Exécuter les tests ciblés, la suite complète, TypeScript et le lint.
+- [x] Mettre à jour le catalogue de tests manuels, le changelog et le message à Marie.
+- [x] Autorisation de déploiement reçue.
 
 Critère de sortie : contrôles automatisés verts, documentation alignée et communication Marie prête.

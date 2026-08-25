@@ -1,6 +1,7 @@
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+import { toolLabel } from '@/ui/components/ToolWidgetCard'
 import type { FontSize } from '@/domain/entities/settings'
 import { DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
 
@@ -20,8 +21,10 @@ const fontSizeLabels: Record<FontSize, string> = {
   large: 'Grande',
 }
 
+const DEFAULT_TOOL_COLOR = '#4a7c99'
+
 export function E112Accessibility() {
-  const { settings, updateSettings, goTo } = useApp()
+  const { settings, updateSettings, goTo, tools, lists, updateToolColor } = useApp()
 
   const fontSize: FontSize = settings?.font_size ?? 'medium'
   const reducedMotion = settings?.reduced_motion ?? false
@@ -108,6 +111,46 @@ export function E112Accessibility() {
             style={{ width: '40px', height: '32px', cursor: 'pointer', border: 'none', padding: 0 }}
           />
         </label>
+      </Card>
+
+      <Card>
+        <p style={{ margin: '0 0 var(--spacing-sm)', fontWeight: 600, color: 'var(--color-text)' }}>
+          Couleur des outils
+        </p>
+        {tools.length === 0 ? (
+          <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Aucun outil à personnaliser.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+            {tools.map((tool) => {
+              const list = tool.list_id ? lists.find((item) => item.id === tool.list_id) : undefined
+              const label = toolLabel(tool, list?.name)
+              return (
+                <div key={tool.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--spacing-sm)' }}>
+                  <span style={{ color: 'var(--color-text)' }}>{label}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                    <input
+                      type="color"
+                      aria-label={`Couleur de fond pour ${label}`}
+                      value={tool.color ?? DEFAULT_TOOL_COLOR}
+                      onChange={(e) => updateToolColor(tool.id, e.target.value)}
+                      style={{ width: '40px', height: '32px', cursor: 'pointer', border: 'none', padding: 0 }}
+                    />
+                    {tool.color && (
+                      <button
+                        type="button"
+                        aria-label={`Retirer la couleur de ${label}`}
+                        onClick={() => updateToolColor(tool.id, null)}
+                        style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '1.125rem', lineHeight: 1, padding: 0 }}
+                      >
+                        &times;
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </Card>
 
     </main>

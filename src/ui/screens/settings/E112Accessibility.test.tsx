@@ -4,6 +4,7 @@ import { E112Accessibility } from './E112Accessibility'
 import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
 import type { Settings } from '@/domain/entities/settings'
+import type { Tool } from '@/domain/entities/tool'
 
 const defaultSettings: Settings = {
   id: 's1',
@@ -11,6 +12,11 @@ const defaultSettings: Settings = {
   dark_mode: false,
   font_size: 'medium',
   reduced_motion: false,
+}
+
+const defaultTool: Tool = {
+  id: 'tool-1', type: 'liste', folder_id: null, list_id: 'list-1', position: 0,
+  created_at: '2026-08-25T00:00:00.000Z', updated_at: '2026-08-25T00:00:00.000Z',
 }
 
 function renderE112(overrides = {}) {
@@ -73,5 +79,19 @@ describe('E112Accessibility', () => {
   it('affiche la couleur par défaut si ambiance_color non défini', () => {
     renderE112()
     expect(screen.getByLabelText("Couleur d'ambiance")).toHaveValue('#4a7c99')
+  })
+
+  it('permet de choisir et retirer la couleur d’un outil depuis les paramètres', () => {
+    const updateToolColor = vi.fn().mockResolvedValue(undefined)
+    renderE112({ tools: [defaultTool], lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }], updateToolColor })
+    fireEvent.change(screen.getByLabelText('Couleur de fond pour Courses'), { target: { value: '#ff8800' } })
+    expect(updateToolColor).toHaveBeenCalledWith('tool-1', '#ff8800')
+  })
+
+  it('retire la couleur d’un outil depuis les paramètres', () => {
+    const updateToolColor = vi.fn().mockResolvedValue(undefined)
+    renderE112({ tools: [{ ...defaultTool, color: '#ff8800' }], lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }], updateToolColor })
+    fireEvent.click(screen.getByRole('button', { name: 'Retirer la couleur de Courses' }))
+    expect(updateToolColor).toHaveBeenCalledWith('tool-1', null)
   })
 })

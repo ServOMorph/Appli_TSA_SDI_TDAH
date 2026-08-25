@@ -154,7 +154,7 @@ export function E10Dashboard() {
         title="AuDHD"
         energyStatus={todayEnergyStatus}
         energyValue={todayEnergy}
-        onEnergyClick={() => goTo('energy-view')}
+        onEnergyClick={() => goTo('energy-checkin')}
         overloadActive={overloadMode}
         plannedCost={getRemainingPlannedCost(todayPlannedTasks)}
         onResourcesClick={() => goTo('resources')}

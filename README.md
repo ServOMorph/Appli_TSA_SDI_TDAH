@@ -16,9 +16,9 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version **v5.56** est en production. Les changements de la roadmap du 25 août sont prêts mais non déployés.
+La version **v5.56** est en production. La version **v5.58** est prête au déploiement.
 
-Les roadmaps des 23 et 24 août sont archivées ; la roadmap active couvre le retrait de « Terminer », la couleur des outils dans Paramètres et l’accès direct à la modification d’énergie. La décision #11 reste à confirmer avec Marie pour les catégories mensuelles.
+Les roadmaps des 23 et 24 août sont archivées ; la roadmap du 25 août est terminée : retrait de « Terminer », couleur des outils dans Paramètres et accès direct à la modification d’énergie. La décision #11 reste à confirmer avec Marie pour les catégories mensuelles.
 
 La version **v5.56** est déployée en production (voir le [CHANGELOG](CHANGELOG.md), HTTP 200 vérifié le 25 août 2026). Le parcours de tests manuels de Marie (catalogue in-app avec étapes numérotées, historique, archivage projet) est entièrement livré ; les tests sont regroupés en 7 catégories (Accueil/Planning, Tâches, Outils Budget, Outils Listes, Outils autres, Énergie, Paramètres/Profil), repliées par défaut, à déplier pour voir les tests puis leurs étapes.
 

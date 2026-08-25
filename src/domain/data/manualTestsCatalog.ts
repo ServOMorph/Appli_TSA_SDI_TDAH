@@ -262,11 +262,11 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'consulter-et-modifier-l-energie',
-    title: 'Consulter et modifier l’énergie',
+    title: 'Modifier l’énergie depuis l’accueil',
     category: 'Énergie',
     steps: [
-      'Depuis l’accueil, touchez le badge énergie en haut à gauche : l’écran « Mon énergie » doit s’ouvrir et afficher l’état de l’énergie du jour.',
-      'Touchez « Modifier », choisissez une valeur puis touchez « Valider » : vous devez revenir directement à l’accueil.',
+      'Depuis l’accueil, touchez le badge énergie en haut à gauche : l’écran « Mon énergie maintenant » doit s’ouvrir directement.',
+      'Choisissez une valeur puis touchez « Valider » : vous devez revenir directement à l’accueil.',
     ],
   },
   {
@@ -283,12 +283,12 @@ export const manualTestsCatalog: ManualTest[] = [
   {
     id: 'couleur-de-fond-par-outil',
     title: 'Couleur de fond par outil',
-    category: 'Outils : autres',
+    category: 'Paramètres / Profil',
     steps: [
-      'Depuis les Outils (ou un dossier), repérez le libellé « Couleur » sur la carte d’un outil, touchez son sélecteur et choisissez une couleur : le fond de la carte doit se teinter aussitôt (fond adouci, pas la couleur brute).',
-      'Quittez cet écran puis revenez : la couleur choisie doit être conservée.',
-      'Touchez le bouton « × » à côté du sélecteur : la carte doit retrouver son fond neutre par défaut, et le bouton « × » doit disparaître.',
-      'Vérifiez que toucher le sélecteur de couleur n’ouvre pas l’outil : seul le titre ouvre l’outil.',
+      'Allez dans Paramètres, puis touchez « Accessibilité ».',
+      'Après « Couleur d’ambiance », repérez la section « Couleur des outils », puis choisissez une couleur pour un outil : le fond de sa carte doit se teinter aussitôt (fond adouci, pas la couleur brute).',
+      'Quittez les Paramètres puis revenez : la couleur choisie doit être conservée.',
+      'Touchez le bouton « × » à côté de la couleur : la carte de l’outil doit retrouver son fond neutre par défaut, et le bouton « × » doit disparaître.',
     ],
   },
   {

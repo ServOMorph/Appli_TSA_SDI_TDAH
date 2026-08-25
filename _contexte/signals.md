@@ -19,6 +19,7 @@
 ## Questions ouvertes
 - [P1] #11 : confirmer avec Marie si l’ajustement temporaire de montant concerne aussi les catégories mensuelles. — fait quand : réponse de Marie reçue et consignée — réf : `roadmap_retours_marie_2026-08-25.md`, `COMMUNICATION/Marie/a_transmettre.md`
 - [P1] Demander à Marie de tester en conditions réelles les parcours v5.56 signalés dans le catalogue in-app. — fait quand : nouvel export de Marie ingéré avec les tests v5.56 validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
+- [P1] Optimiser en urgence le bundle JavaScript principal (553 kB minifié, au-dessus du seuil Vite de 500 kB), notamment par chargement différé des écrans. — fait quand : build sous le seuil ou découpage justifié et validé — réf : `src/App.tsx`, `vite.config.ts`
 - [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer — cohérent avec la demande initiale de Marie sur ce point, jamais satisfaite en l'état), clarifier avec Marie le lien retrait de livret/catégorie budget, vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
 - [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `COMMUNICATION/message_marie_categories_travail.md`
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
@@ -26,28 +27,28 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-25 — traitement export, décisions Marie et préparation des retours)
+## Dernière session (2026-08-25 — finalisation de la roadmap de retours Marie)
 
 ## Décisions prises
-- #7 ne modifie pas « Montant total » ; #11 reste en attente du choix de Marie pour les catégories mensuelles.
 - « Terminer » est retiré de la fiche de tâche ; la terminaison passe par la coche du planning.
-- Les roadmaps des 23 et 24 août sont archivées ; la roadmap des retours du 25 août est créée.
+- La couleur des outils se règle dans Paramètres > Accessibilité, après « Couleur d’ambiance ».
+- Le badge énergie ouvre directement l’écran de modification, puis « Valider » ramène à l’accueil.
 
 ## Livrables produits ou modifiés
-- `roadmap_retours_marie_2026-08-25.md` : roadmap active ; phase 1 terminée, phases Couleur et Énergie à faire.
-- `Archives/roadmap_retours_marie_2026-08-23.md`, `Archives/roadmap_demandes_marie_2026-08-24.md` : roadmaps clôturées archivées.
-- `E22TaskDetail.tsx`, son test et `manualTestsCatalog.ts` : retrait de « Terminer ».
-- `_contexte/marie_tests_journal.json` : 5 résultats d’export ingérés.
+- `roadmap_retours_marie_2026-08-25.md` : toutes les phases terminées.
+- `E112Accessibility.tsx`, `ToolWidgetCard.tsx` et leurs tests : déplacement du réglage de couleur des outils.
+- `E10Dashboard.tsx` et son test : accès direct à la modification de l’énergie.
+- `manualTestsCatalog.ts`, `COMMUNICATION/Marie/a_transmettre.md`, `CHANGELOG.md` : communication v5.58 prête.
 
 ## Hypothèses validées / invalidées
-- VALIDE : l’export du 25/08 ne présente ni perte de données ni changement de schéma ; 75 fichiers et 610 tests sont verts.
+- VALIDE : 75 fichiers et 608 tests sont verts ; TypeScript et lint sont verts.
 - EN ATTENTE : périmètre #11 pour les catégories mensuelles.
 
 ## Prochaine étape exacte
-Après `/compact`, commencer la phase Couleur des outils dans Paramètres, puis l’accès direct depuis le badge énergie.
+Déployer v5.58, puis communiquer la livraison à Marie.
 
 ## Question bloquante pour la session suivante
-Marie doit préciser si #11 concerne les catégories mensuelles.
+Aucune.
 
 ---
 

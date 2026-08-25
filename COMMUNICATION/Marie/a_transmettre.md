@@ -31,16 +31,18 @@ Le reset automatique des prévisions au 1er du mois n'a pas été ajouté : les 
 - Sur téléphone, ajouter une catégorie dans une liste avec le clavier ouvert.
 - Consulter puis modifier l'énergie depuis le badge de l'accueil.
 - Vérifier que le contrôle « Couleur » est visible sur une carte d'outil.
+- À traiter avant de rejouer : déplacer le sélecteur de couleur des outils dans Paramètres, après « Couleur d’ambiance ».
+- À traiter avant de rejouer : le badge énergie doit ouvrir directement l’écran de modification, sans passer par « Mon énergie ».
+
+## Décisions reçues
+
+#7 — Le contenu de « Montant total » ne change pas.
+
+#11 — Une modification de montant prévu sur une catégorie doit s'appliquer uniquement jusqu'à la fin de la semaine de la catégorie sélectionnée.
 
 ## Questions où nous avons besoin de ton choix
 
-#7 — Quand tu touches « Montant total », quelles informations veux-tu voir : uniquement les revenus, ou aussi les mouvements vers les livrets et les montants prévus de « Mon compte » ?
-
-#11 — Quand tu modifies un montant prévu pour une catégorie, veux-tu que ce changement ne s'applique qu'à la semaine en cours ? Si oui, que doit-il se passer au début de la semaine suivante ?
-
-## Écart assumé
-
-#4 — Le bouton « Terminer » est gardé, contrairement à la demande initiale : sans lui, certaines tâches sans date précise n'auraient plus de moyen d'être terminées. Si tu veux le retirer, il faut d'abord choisir un autre moyen de terminer ces tâches.
+#11 — Cette modification temporaire doit-elle concerner seulement les catégories hebdomadaires ? Pour les catégories mensuelles, le comportement n'est pas défini : nous avons besoin de ton choix avant de le développer.
 
 ## Retour d'export déjà corrigé
 

@@ -274,7 +274,6 @@ export function E22TaskDetail() {
     deleteSubTask,
     toggleSubTask,
     renameSubTask,
-    completeTask,
     deleteTask,
     selectTask,
     reorderSubTasks,
@@ -374,13 +373,6 @@ export function E22TaskDetail() {
       const updated = await getSubTasks(selectedTaskId)
       setSubTasks(updated)
     }
-  }
-
-  async function handleComplete() {
-    if (!selectedTaskId) return
-    await completeTask(selectedTaskId)
-    selectTask(null)
-    goTo('dashboard')
   }
 
   async function handleDelete() {
@@ -513,9 +505,6 @@ export function E22TaskDetail() {
         </Button>
         <Button fullWidth onClick={() => goTo('task-decompose')}>
           Décomposer
-        </Button>
-        <Button fullWidth onClick={handleComplete}>
-          Terminer
         </Button>
         <Button fullWidth onClick={handleDuplicate}>
           Dupliquer

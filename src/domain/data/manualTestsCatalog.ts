@@ -297,8 +297,8 @@ export const manualTestsCatalog: ManualTest[] = [
     category: 'Tâches',
     steps: [
       'Ouvrez la fiche de détail d’une tâche (depuis Réception ou le planning).',
-      'Vérifiez que seuls les boutons « Modifier », « Décomposer », « Terminer », « Dupliquer » et « Supprimer » sont affichés : « Tâche du jour », « Planifier » et « Liste » ne doivent plus apparaître.',
-      'Touchez « Terminer » : la tâche doit être marquée terminée et vous devez revenir à l’accueil.',
+      'Vérifiez que seuls les boutons « Modifier », « Décomposer », « Dupliquer » et « Supprimer » sont affichés : « Tâche du jour », « Planifier », « Liste » et « Terminer » ne doivent plus apparaître.',
+      'Pour terminer la tâche, cochez-la directement dans le planning.',
     ],
   },
 ]

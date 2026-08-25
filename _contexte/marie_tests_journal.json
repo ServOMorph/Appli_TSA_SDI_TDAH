@@ -237,6 +237,41 @@
       "status": "nok",
       "comment": "Je ne trouve pas le libellé « couleur »",
       "created_at": "2026-08-24T11:46:21.859Z"
+    },
+    {
+      "id": "bcf16dff-d39d-4aca-a85b-b95dec7bbc7e",
+      "test_id": "consulter-et-modifier-l-energie",
+      "status": "nok",
+      "comment": "1.Il faut que quand je touche le badge énergie, l’écran « mon énergie » ne doit pas apparaître. On doit directement tomber sur l’écran de modification de l’état énergie. \n2. C’est bon quand je valide je retombe bien sûr l’accueil",
+      "created_at": "2026-08-25T15:58:37.574Z"
+    },
+    {
+      "id": "781de6f7-4f68-4367-9239-8ce31a17be24",
+      "test_id": "couleur-de-fond-par-outil",
+      "status": "nok",
+      "comment": "Il faut que le sélecteur de couleurs des cartes outils apparaisse dans les paramètre, après « couleur d’ambiance », car là il n’apparaît nul part",
+      "created_at": "2026-08-25T16:00:16.667Z"
+    },
+    {
+      "id": "551fef4d-bdf7-41d8-92f6-84ca5d07a76d",
+      "test_id": "ajouter-une-categorie-de-liste-sur-mobile",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-25T16:01:42.609Z"
+    },
+    {
+      "id": "519d0549-f04e-4088-897b-5cab913c1d8f",
+      "test_id": "utiliser-comptes",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-25T16:09:56.929Z"
+    },
+    {
+      "id": "76c2652a-c776-469c-a218-8167e8f910db",
+      "test_id": "menu-actions-tache-simplifie",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-25T16:11:25.470Z"
     }
   ]
 }

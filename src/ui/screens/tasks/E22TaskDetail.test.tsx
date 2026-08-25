@@ -41,17 +41,6 @@ describe('E22TaskDetail', () => {
     })
   })
 
-  it('Terminer appelle completeTask et navigue vers dashboard', async () => {
-    const task = makeTask()
-    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
-    renderWithApp(<E22TaskDetail />, ctx)
-    await userEvent.click(screen.getByRole('button', { name: 'Terminer' }))
-    expect(ctx.completeTask).toHaveBeenCalledWith('task-1')
-    await waitFor(() => {
-      expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
-    })
-  })
-
   it('donner un horaire à une sous-étape appelle scheduleSubTask (E9c)', async () => {
     const task = makeTask()
     const subTask = makeSubTask({ id: 'st-1', title: 'Prendre le téléphone', scheduled_date: null, scheduled_start: null })
@@ -92,13 +81,14 @@ describe('E22TaskDetail', () => {
     expect(screen.queryByRole('dialog', { name: 'Renommer la sous-étape' })).toBeNull()
   })
 
-  it('affiche uniquement le menu simplifié (Modifier/Décomposer/Terminer/Dupliquer/Supprimer)', async () => {
+  it('affiche uniquement le menu simplifié (Modifier/Décomposer/Dupliquer/Supprimer)', async () => {
     const task = makeTask()
     const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
     renderWithApp(<E22TaskDetail />, ctx)
     expect(screen.queryByRole('button', { name: 'Tâche du jour' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Planifier' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Liste' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Terminer' })).toBeNull()
   })
 
   it('Décomposer navigue vers task-decompose', async () => {

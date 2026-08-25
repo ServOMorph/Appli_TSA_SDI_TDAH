@@ -41,7 +41,7 @@ Hors numérotation (déjà livré, retiré du document par Marie lors de la renu
 
 ## Décisions produit non tranchées
 
-- **#7 — Contenu de « cliquer sur Montant total »** : Marie veut accéder « à ces transactions » en cliquant sur la case. Le modal actuel ne montre que les revenus. Faut-il y ajouter aussi les mouvements vers les livrets et l'usage de « mon compte » (vue consolidée), ou seulement les revenus comme aujourd'hui ? Non planifié tant que non tranché.
+- **#7 — Contenu de « cliquer sur Montant total »** : décision reçue le 25/08 : ne rien changer. Le modal conserve son contenu actuel.
 - **#12/#14 — Séparation Budget (prévisions pures) / Comptes (prévisions − dépenses)** : le document distingue « Outils : Budget » et « Outils : Comptes » comme deux espaces différents, avec une jauge sur « Comptes ». Le code actuel n'a qu'un seul tool Budget avec un sous-écran « Mon compte » — l'existence et la cible de navigation d'un tool « Comptes » séparé ne sont pas confirmées. Phase 2 clarifiera l'architecture cible avant de coder.
 
 ## Ordre et dépendances
@@ -61,13 +61,11 @@ Phase 6 (validation et préparation de livraison) ── dépend de 1 à 5
 
 - [x] Sur `E22TaskDetail.tsx`, retirer les boutons « Tâche du jour », « Planifier », « Liste » de la fiche de détail d'une tâche.
 - [x] Conserver « Décomposer », « Dupliquer », « Modifier », « Supprimer ». Décision utilisateur : « Supprimer » (non mentionné par Marie) est conservé.
-- [x] Vérifié qu'aucune des actions retirées ne perd son point d'entrée : « Tâche du jour » et « Planifier » sont dupliqués dans `E20Inbox.tsx:153-166`. « Terminer » n'a **pas** d'autre point d'entrée pour les tâches inbox/today-sans-date (pas de checkbox équivalente hors planning) — décision utilisateur : le bouton « Terminer » est donc **conservé** dans `E22TaskDetail.tsx`, en écart avec la demande initiale de Marie (#4).
-- [x] Tests de `E22TaskDetail.tsx` mis à jour (suppression du test « Planifier », ajout d'un test vérifiant l'absence des 3 boutons retirés). Suite complète verte (74 fichiers, 605 tests), `tsc -b` et lint clean.
+- [x] Vérifié qu'aucune des actions retirées ne perd son point d'entrée : « Tâche du jour » et « Planifier » sont dupliqués dans `E20Inbox.tsx:153-166`. Décision reçue le 25/08 : « Terminer » est retiré ; les tâches concernées sont planifiées et se terminent en les cochant dans le planning.
+- [x] Tests de `E22TaskDetail.tsx` mis à jour (suppression du test « Planifier », ajout d'un test vérifiant l'absence des 4 boutons retirés). Suite complète verte (74 fichiers, 605 tests), `tsc -b` et lint clean.
 - [x] Test manuel ajouté au catalogue (`menu-actions-tache-simplifie`).
 
-Critère de sortie : la fiche de détail d'une tâche n'affiche que Décomposer/Dupliquer/Modifier/Terminer/Supprimer ; aucune fonctionnalité perdue ailleurs dans l'app.
-
-Écart assumé par rapport à la demande #4 de Marie : « Terminer » reste affiché (motif ci-dessus), à mentionner dans le fichier de commentaires.
+Critère de sortie : la fiche de détail d'une tâche n'affiche que Décomposer/Dupliquer/Modifier/Supprimer ; aucune fonctionnalité perdue ailleurs dans l'app.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -86,13 +84,13 @@ Bloc le plus lourd de cette roadmap — touche le cœur du calcul Budget (`budge
 - [x] `E75BudgetAccount.tsx` renommé « Comptes », reste inchangé sur le fond (prévu/restant/jauge par sous-catégorie, ajout de dépense), reste la cible du widget dashboard « Comptes » (#12, #14).
 - [x] `E10Dashboard.tsx` : widget « Comptes » navigue vers l'écran au lieu d'ouvrir la saisie rapide ; code mort retiré (modale de saisie rapide, message « aucune catégorie »).
 - [x] #9 (reset des prévisions au 1er du mois) résolu comme effet de bord du passage aux prévisions : les montants prévus sont des valeurs statiques par catégorie, recalculées à chaque affichage, sans aucune accumulation dans le temps — il n'y a donc plus rien à remettre à zéro. Aucun mécanisme de reset séparé n'a été ajouté (aurait été de la sur-ingénierie sans utilité).
-- [x] **#11 non traité, écart assumé** : « modifier le montant prévu, valable seulement pour la semaine en cours » demande un stockage par semaine (nouvelle entité/migration), non qualifié par la roadmap elle-même (« à qualifier »). Laissé en l'état : modifier le montant prévu (`E73CategoryDetail.tsx`, inchangé) reste global, pas limité à la semaine en cours. À reprendre dans une phase dédiée si Marie confirme le besoin.
+- [x] **#11 transféré** : décision reçue le 25/08 : une modification de montant prévu doit s'appliquer jusqu'à la fin de la semaine de la catégorie sélectionnée, puis le montant habituel doit reprendre. Le périmètre des catégories mensuelles reste à confirmer avec Marie ; la décision et l'implémentation sont transférées à la roadmap des retours du 25/08.
 - [x] Tests : `budgetRules.test.ts`, `E71Budget.test.tsx`, `E75BudgetAccount.test.tsx`, `E10Dashboard.test.tsx` mis à jour ; nouveau `E78BudgetPrevisions.test.tsx`. Suite complète verte (75 fichiers, 610 tests), `tsc -b` et lint clean.
 - [x] Tests manuels : `utiliser-le-budget` mis à jour (Mon compte = prévisions seules) ; nouveau test `utiliser-comptes` (widget Comptes, vérifie explicitement que le Montant total ne bouge pas après une dépense).
 
 Critère de sortie : « Montant total » et « Mon compte » reflètent les prévisions (pas les dépenses réelles) ; rien à remettre à zéro chaque mois, les prévisions étant déjà statiques.
 
-Écarts assumés à mentionner dans le fichier de commentaires : #7 reste non traité (décision produit toujours non tranchée, hors périmètre de cette phase) ; #9 satisfait sans mécanisme dédié (explication ci-dessus) ; #11 non implémenté (scope par semaine non qualifié) ; le choix « Comptes = widget inchangé » de `roadmap_budget_v3.md` est explicitement abandonné au profit du document du 24/08.
+Écarts assumés à mentionner dans le fichier de commentaires : #7 ne change pas (décision reçue le 25/08) ; #9 satisfait sans mécanisme dédié (explication ci-dessus) ; #11 reste à implémenter dans une phase dédiée ; le choix « Comptes = widget inchangé » de `roadmap_budget_v3.md` est explicitement abandonné au profit du document du 24/08.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

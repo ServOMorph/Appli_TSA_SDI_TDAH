@@ -1704,3 +1704,9 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 - Distinction notification push / suggestion in-app établie dans Design System et User Flows
 - Règle de skip du check-in énergie (statut `skipped`) dans Modèle de données
 - Sync cloud définie comme post-MVP (Supabase région UE)
+## v5.58 — 2026-08-25
+
+### Modifié
+- Tâches : le bouton « Terminer » est retiré de la fiche ; les tâches planifiées se terminent depuis le planning.
+- Suivi Marie : l’export du 25 août est ingéré, les roadmaps clôturées sont archivées et une roadmap de retours est ouverte.
+- Commande : l’analyse du Google Doc utilise la source configurée et s’arrête lorsqu’elle n’a pas changé depuis la dernière distribution.

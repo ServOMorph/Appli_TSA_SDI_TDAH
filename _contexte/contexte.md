@@ -12,8 +12,8 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-**v5.52 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-24) ; v5.56 est prête au déploiement.
-`roadmap_demandes_marie_2026-08-24.md` est terminée en local : 611 tests, TypeScript et lint verts ; #7 et #11 attendent une décision de Marie.
+**v5.56 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-25).
+`roadmap_demandes_marie_2026-08-24.md` est livrée : 611 tests, TypeScript et lint verts ; #7 et #11 attendent une décision de Marie.
 L’export de Marie du 24/08 à 11:46 est traité sans perte ni incohérence ; trois résultats ont été ajoutés au journal.
 Les communications en attente sont centralisées dans `COMMUNICATION/Marie/a_transmettre.md` ; chaque livraison sera figée dans `COMMUNICATION/Marie/livraisons/`, publiée sur Drive et liée dans WhatsApp.
 Branche courante : `main`. `sync-marie` reste isolée et très en retard sur `main`.

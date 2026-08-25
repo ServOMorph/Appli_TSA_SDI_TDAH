@@ -16,9 +16,9 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version **v5.52** est déployée en production (voir le [CHANGELOG](CHANGELOG.md)) ; la **v5.56** est prête au déploiement. Le parcours de tests manuels de Marie (catalogue in-app avec étapes numérotées, historique, archivage projet) est entièrement livré ; les tests sont regroupés en 7 catégories (Accueil/Planning, Tâches, Outils Budget, Outils Listes, Outils autres, Énergie, Paramètres/Profil), repliées par défaut, à déplier pour voir les tests puis leurs étapes.
+La version **v5.56** est déployée en production (voir le [CHANGELOG](CHANGELOG.md), HTTP 200 vérifié le 25 août 2026). Le parcours de tests manuels de Marie (catalogue in-app avec étapes numérotées, historique, archivage projet) est entièrement livré ; les tests sont regroupés en 7 catégories (Accueil/Planning, Tâches, Outils Budget, Outils Listes, Outils autres, Énergie, Paramètres/Profil), repliées par défaut, à déplier pour voir les tests puis leurs étapes.
 
-`roadmap_demandes_marie_2026-08-24.md` (17 demandes numérotées) est terminée en local et prête à être déployée : menu de fiche de tâche simplifié, Budget repassé sur les montants prévus, ajout de dépense via la fiche de catégorie, formulaire de catégorie de liste corrigé sur mobile et retour direct à l’accueil après validation de l’énergie. Les décisions #7 (contenu de « Montant total ») et #11 (prévision limitée à une semaine) restent à clarifier avec Marie.
+`roadmap_demandes_marie_2026-08-24.md` (17 demandes numérotées) est livrée avec v5.56 : menu de fiche de tâche simplifié, Budget repassé sur les montants prévus, ajout de dépense via la fiche de catégorie, formulaire de catégorie de liste corrigé sur mobile et retour direct à l’accueil après validation de l’énergie. Les décisions #7 (contenu de « Montant total ») et #11 (prévision limitée à une semaine) restent à clarifier avec Marie.
 
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
 

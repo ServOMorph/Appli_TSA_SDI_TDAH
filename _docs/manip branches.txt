@@ -1,0 +1,16 @@
+git switch main
+git switch sync-marie
+
+Avant de changer de branche :
+
+1. Vérifier s'il y a des modifications en cours :
+   git status
+
+2. Si Git affiche des fichiers modifiés que tu ne veux pas emmener sur l'autre branche, les mettre temporairement de côté :
+   git stash push -m "WIP avant changement de branche"
+
+3. Changer de branche :
+   git switch nom-de-la-branche
+
+Pour récupérer les modifications mises de côté :
+   git stash pop

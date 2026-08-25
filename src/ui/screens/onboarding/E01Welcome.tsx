@@ -8,6 +8,8 @@ const WHATS_NEW: string[] = [
   'Budget : « Montant total » et « Mon compte » reflètent maintenant ce que tu as prévu de dépenser, pas les dépenses déjà faites.',
   'Le suivi de tes dépenses avec jauge s’appelle désormais « Comptes », accessible depuis le widget du même nom sur l’accueil.',
   'Pour ajouter une dépense, touche une catégorie puis « Ajouter une dépense » sur sa fiche : plus besoin de la resélectionner dans le formulaire.',
+  'Dans les listes, le formulaire pour ajouter une catégorie reste visible sur téléphone, même avec le clavier ouvert.',
+  'Après avoir validé ton énergie, tu reviens directement à l’accueil.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

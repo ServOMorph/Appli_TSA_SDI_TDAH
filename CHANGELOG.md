@@ -1692,3 +1692,16 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 - Distinction notification push / suggestion in-app établie dans Design System et User Flows
 - Règle de skip du check-in énergie (statut `skipped`) dans Modèle de données
 - Sync cloud définie comme post-MVP (Supabase région UE)
+## v5.56 — 2026-08-25
+
+### Modifié
+- Tâches : la fiche de détail ne conserve que les actions utiles ; les actions « Tâche du jour », « Planifier » et « Liste » sont retirées.
+- Budget : « Montant total » et « Mon compte » utilisent les prévisions ; l’écran « Comptes » conserve le suivi prévu/dépensé et l’ajout de dépense passe par une catégorie.
+- Listes : le formulaire d’ajout de catégorie reste utilisable sur mobile, même avec le clavier affiché.
+- Énergie : après validation du check-in, le retour se fait directement à l’accueil ; le badge énergie ouvre l’écran de consultation et de modification.
+## v5.56 — 2026-08-25
+
+### Modifié
+- Listes : le formulaire d’ajout de catégorie reste utilisable sur mobile, même avec le clavier affiché.
+- Énergie : après validation du check-in, le retour se fait directement à l’accueil ; le badge énergie ouvre l’écran de consultation et de modification.
+- Communication : les éléments destinés à Marie sont centralisés, versionnés à chaque livraison, publiés sur Drive et liés dans le message WhatsApp.

@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*)
 ---
 
 # /deploy [version]
@@ -56,22 +56,33 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    4. **Tests unitaires verts** : `npx vitest run`.
    5. **Compilation TypeScript clean** : `npx tsc -b`.
    6. **Lint clean** : `npm run lint`.
+   7. **Communication prête** : vérifier l'existence de `COMMUNICATION/Marie/a_transmettre.md` et de
+      `.claude/rclone.conf`, puis vérifier que `pandoc` et `rclone` sont disponibles. Vérifier enfin l'accès
+      en lecture au dossier Drive cible, sans afficher son contenu :
+      ```
+      test -f COMMUNICATION/Marie/a_transmettre.md && test -f .claude/rclone.conf
+      pandoc --version
+      rclone version
+      rclone lsd tsa_gdrive:Projets/Appli --config .claude/rclone.conf > /dev/null
+      ```
+      Si l'un de ces contrôles échoue, s'arrêter avant le build : la livraison ne peut pas être communiquée
+      correctement à Marie.
+   8. **Branche de production** : `git branch --show-current` doit retourner `main`. Sinon, s'arrêter : un
+      déploiement de production depuis une autre branche n'est pas autorisé.
 
 4. Avertissements — signaler chacun s'il est détecté, puis demander une confirmation explicite unique
    avant de poursuivre (ne pas bloquer seul, ne pas continuer sans réponse de l'utilisateur).
 
-   1. **Branche git attendue** : `git branch --show-current`, comparer à la branche mentionnée comme active
-      dans `_contexte/contexte.md`. Si différente, signaler l'écart.
-   2. **Commits locaux non poussés** : si un remote de suivi existe
+   1. **Commits locaux non poussés** : si un remote de suivi existe
       (`git rev-parse --abbrev-ref --symbolic-full-name @{u}` réussit), compter
       `git rev-list --count @{u}..HEAD`. Si > 0, signaler que le déploiement embarquerait du code qui
       n'existe pas encore sur le remote (le déploiement Netlify envoie `dist/` directement, indépendamment
       de git). Ne jamais pousser automatiquement.
-   3. **Version déjà présente dans `dist/`** : `test -d dist/<version>`. Si le dossier existe déjà, signaler
+   2. **Version déjà présente dans `dist/`** : `test -d dist/<version>`. Si le dossier existe déjà, signaler
       qu'il sera écrasé par ce build.
-   4. **Tests manuels en attente** : lire `tests_manuels.md`. S'il contient autre chose que le fichier vide,
+   3. **Tests manuels en attente** : lire `tests_manuels.md`. S'il contient autre chose que le fichier vide,
       lister les points en attente et signaler qu'un déploiement prod interviendrait avant leur validation.
-   5. **Catalogue des tests manuels pour Marie à jour** : `test -f src/domain/data/manualTestsCatalog.ts`
+   4. **Catalogue des tests manuels pour Marie à jour** : `test -f src/domain/data/manualTestsCatalog.ts`
       (cf. `roadmap_tests_marie.md`). Si absent, ignorer silencieusement — fonctionnalité pas encore livrée.
       S'il existe, lire son contenu et le comparer aux changements de la version en cours de déploiement
       (`CHANGELOG.md`) : si une fonctionnalité soumise à Marie a changé sans que le catalogue n'ait été mis à
@@ -110,24 +121,47 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    le réafficher aux versions suivantes. Committer ce vidage séparément après le déploiement (le build
    `dist/<version>` a déjà embarqué le contenu avant le vidage).
 
-9. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par la commande Netlify,
-   résultat de la vérification de fumée, et l'avertissement de taille de chunk le cas échéant.
-   Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et attendre une nouvelle
-   confirmation explicite.
+9. Préparer les éléments du rapport final : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify,
+   résultat de la vérification de fumée et avertissement de taille de chunk éventuel. Le rapport est envoyé après
+   les étapes de communication ci-dessous.
 
-10. Rédiger un message WhatsApp prêt à envoyer à Marie. Il doit indiquer brièvement que la nouvelle version est disponible,
-    résumer les changements effectivement déployés et inviter Marie à rejouer les tests concernés. Ajouter systématiquement
-    ce lien, sur sa propre ligne :
-    `https://appli-audhd.netlify.app/`
+10. Constituer l'inventaire de communication de la livraison. Avant toute rédaction pour Marie, lire et croiser :
+    - les changements de la version cible dans `CHANGELOG.md` et `WHATS_NEW` ;
+    - les roadmaps terminées ou modifiées par cette livraison, y compris leurs écarts assumés et décisions non tranchées ;
+    - `COMMUNICATION/Marie/a_transmettre.md` ;
+    - les tests Marie ajoutés ou modifiés dans `manualTestsCatalog.ts` ;
+    - les retours nouveaux du dernier export de Marie et les actions encore ouvertes dans la partie active de `_contexte/signals.md`.
+
+    L'inventaire doit distinguer explicitement : ce qui est livré, ce que Marie doit tester, les choix attendus d'elle,
+    les écarts assumés et les retours de ses exports déjà corrigés. Ne pas reprendre les archives ou les signaux
+    historiques clos comme des demandes encore actives.
+
+11. Figer puis publier systématiquement le commentaire de livraison sur Google Drive et obtenir un lien partageable.
+    - Prendre `COMMUNICATION/Marie/a_transmettre.md`. S'il n'existe pas, créer avant le déploiement un fichier
+      avec l'inventaire de l'étape 10, en langage simple.
+    - Copier son contenu dans `COMMUNICATION/Marie/livraisons/<version>.md`, précédé de la version et de la date.
+      Ce fichier est l'historique immuable de ce qui a été préparé pour Marie à cette livraison.
+    - La disponibilité de `pandoc`, `rclone`, de la configuration et du dossier Drive a déjà été validée à l'étape 3.7.
+    - Convertir le commentaire en `.docx`, le publier sous un nom versionné, puis produire son lien :
+      ```
+      pandoc COMMUNICATION/Marie/livraisons/<version>.md -o commentaires_marie_<version>.docx
+      rclone copyto commentaires_marie_<version>.docx "tsa_gdrive:Projets/Appli/commentaires_marie_<version>.docx" --config .claude/rclone.conf
+      rclone link "tsa_gdrive:Projets/Appli/commentaires_marie_<version>.docx" --config .claude/rclone.conf
+      ```
+    - Si la publication ou l'obtention du lien échoue, ne pas prétendre que Marie peut consulter le document ;
+      signaler précisément l'échec et attendre une instruction.
+
+12. Rédiger un message WhatsApp prêt à envoyer à Marie à partir de l'inventaire. Il doit toujours contenir :
+    - une annonce brève de la version disponible ;
+    - les changements effectivement livrés ;
+    - les tests précis à rejouer ;
+    - les choix ou questions encore attendus, ainsi que les écarts assumés s'ils la concernent ;
+    - le lien de production, sur sa propre ligne : `https://appli-audhd.netlify.app/` ;
+    - le lien partageable du commentaire Drive, sur sa propre ligne, introduit par « Détail des changements et questions : ».
+
     Encadrer systématiquement le message par `💻🤖` : une occurrence au début du message et une autre à la fin.
 
-11. Publier le fichier de commentaires pour Marie sur Google Drive, si présent.
-    - Chercher à la racine du projet un fichier `commentaires_marie_*.md` modifié par la roadmap qui vient d'être
-      déployée (issu de `/analyser_googledoc`).
-    - Si absent : ne rien faire, ne pas le signaler comme un problème (aucune roadmap de ce type traitée cette fois).
-    - Si présent : le convertir en `.docx` puis l'envoyer dans le dossier Drive déjà utilisé pour ce projet :
-      ```
-      pandoc commentaires_marie_<sujet>.md -o commentaires_marie_<sujet>.docx
-      rclone copy commentaires_marie_<sujet>.docx "tsa_gdrive:Projets/Appli/" --config .claude/rclone.conf
-      ```
-    - Rapporter le nom du fichier envoyé dans le rapport final de l'étape 9.
+13. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify, résultat de la
+    vérification de fumée, avertissement de taille de chunk éventuel, nom et lien du document Drive, inventaire
+    synthétique et message WhatsApp complet. Ne jamais relancer le déploiement automatiquement en cas d'échec —
+    signaler l'erreur et attendre une confirmation explicite.

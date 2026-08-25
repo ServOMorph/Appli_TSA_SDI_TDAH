@@ -39,8 +39,9 @@ allowed-tools: Bash(rclone:*), Bash(pandoc:*), Bash(git log:*), Bash(git diff:*)
    - Isoler les décisions produit non tranchées dans une section dédiée ; ne pas les convertir en tâches de code.
    - Si une nouvelle roadmap est créée, indiquer la source (URL du Google Doc) et la date d'analyse.
 
-6. Fichier de commentaires pour Marie.
-   - À chaque phase de la roadmap passée à `[FAIT]`, mettre à jour (ou créer) `commentaires_marie_<sujet>.md` à la racine du projet — même `<sujet>` que la roadmap associée.
+6. File de communication pour Marie.
+   - À chaque phase de la roadmap passée à `[FAIT]`, mettre à jour (ou créer) `COMMUNICATION/Marie/a_transmettre.md`.
+   - Ce fichier est la source unique des éléments encore à transmettre à Marie. Ranger chaque élément sous l'une des sections : « Changements livrés », « Tests à refaire », « Questions où nous avons besoin de ton choix », « Écart assumé » ou « Retour d'export déjà corrigé ».
    - Une entrée par phase livrée, rédigée en français simple, sans aucun jargon technique (pas de nom de fichier, composant, fonction ou terme de code) : décrire uniquement ce qui change concrètement pour Marie dans son usage de l'application.
    - Si le document source numérote ses demandes, faire précéder chaque entrée du ou des numéros concernés (ex : « #4, #5 — ... ») pour qu'elle puisse relier le commentaire à sa propre liste.
 
@@ -49,4 +50,4 @@ allowed-tools: Bash(rclone:*), Bash(pandoc:*), Bash(git log:*), Bash(git diff:*)
 8. Vérifier et rapporter.
    - Exécuter `git diff --check` et afficher les fichiers modifiés.
    - Ne modifier aucun code applicatif, donnée personnelle, export Marie ou journal de tests.
-   - Rapporter le chemin de la roadmap et du fichier de commentaires, les demandes ajoutées, celles écartées avec leur motif, et les décisions encore attendues.
+   - Rapporter le chemin de la roadmap et de `COMMUNICATION/Marie/a_transmettre.md`, les demandes ajoutées, celles écartées avec leur motif, et les décisions encore attendues.

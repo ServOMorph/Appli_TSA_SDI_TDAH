@@ -1,8 +1,9 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-24)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-25)
 
 ## Contexte chaud
-- **`roadmap_demandes_marie_2026-08-24.md` en cours** (Phases 1-3 `[FAIT]` en local, non déployées ; Phases 4-6 `[TODO]`) : menu de fiche de tâche simplifié, Budget repassé sur les montants prévus (reversal assumé et confirmé face à `roadmap_budget_v3.md`, qui avait délibérément livré l'inverse le 17/08), écran « Comptes » (prévu/dépensé/jauge) séparé du nouvel écran « Mon compte » (`E78BudgetPrevisions.tsx`, prévisions seules), ajout de dépense déplacé de « Comptes » vers la fiche de catégorie (`E73CategoryDetail.tsx`, sans resélection). 610/610 tests, `tsc -b`/lint clean. Écarts assumés non traités : #7 (contenu du clic « Montant total »), #11 (montant prévu modifiable pour une seule semaine) — documentés dans `commentaires_marie_2026-08-24.md`.
+- **`roadmap_demandes_marie_2026-08-24.md` terminée en local** (Phases 1-6 `[FAIT]`, non déployée) : menu de fiche de tâche simplifié, Budget repassé sur les montants prévus (reversal assumé et confirmé face à `roadmap_budget_v3.md`, qui avait délibérément livré l'inverse le 17/08), écran « Comptes » (prévu/dépensé/jauge) séparé du nouvel écran « Mon compte » (`E78BudgetPrevisions.tsx`, prévisions seules), ajout de dépense déplacé de « Comptes » vers la fiche de catégorie (`E73CategoryDetail.tsx`, sans resélection). Phase 4 : formulaire d'ajout de catégorie de liste corrigé sur mobile (320/375/430 px, hauteur réduite simulant le clavier). Phase 5 : validation de l'énergie retourne directement à l'accueil ; le badge énergie ouvre « Mon énergie » pour consultation et modification. Suite complète : 611 tests verts, TypeScript et lint verts. Écarts assumés non traités : #7 (contenu du clic « Montant total »), #11 (montant prévu modifiable pour une seule semaine) — documentés dans `COMMUNICATION/Marie/a_transmettre.md`.
 - **v5.52 déployée en prod le 2026-08-24** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie. Aucun redéploiement depuis.
+- **Export de Marie du 2026-08-24 11:46 traité** : aucune perte ni incohérence comparé à celui du 23 août ; 3 résultats de tests ajoutés au journal. Le seul retour nouveau (« libellé Couleur introuvable ») correspond au correctif déjà présent dans la version à déployer.
 - **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
 - **Incident de branche (2026-08-19) clos et corrigé préventivement** : plusieurs sessions de travail sur les demandes de Marie avaient été faites par erreur sur `sync-marie` sans vérifier sa divergence avec `main` (jamais fusionnée depuis le 2026-08-16). `.claude/commands/start.md` vérifie désormais la divergence de branche avant de charger le contexte ; `.claude/memory.md` porte la règle. `.gitignore` complété au passage (`__pycache__/`, captures de calibration ROBERTO — règles déjà sur `sync-marie`, jamais reportées).
 - `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Export du 2026-08-19 traité (archivé, ingéré : 10 nouvelles entrées journal) — 3 frictions non bloquantes relevées (test IDs obsolètes en cache client, rejet du geste de glissement planning par Marie avec demande de comportement alternatif, incompréhension retrait livret/catégorie budget qui est par design) : à traiter comme futures demandes, pas corrigées à chaud.
@@ -16,34 +17,35 @@
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] Poursuivre `roadmap_demandes_marie_2026-08-24.md` : Phase 4 (Listes, reproduction de l'écran « ajouter une catégorie » tronqué), Phase 5 (Énergie, fermeture directe après validation), Phase 6 (validation finale et `/deploy`). — fait quand : les 3 phases passées `[FAIT]` et déploiement effectué — réf : `roadmap_demandes_marie_2026-08-24.md` Phases 4-6
-- [P2] Décision produit #7 (contenu du clic sur « Montant total ») et #11 (montant prévu modifiable pour une seule semaine, scope à qualifier) restent non tranchées — hors périmètre de `roadmap_demandes_marie_2026-08-24.md`. — fait quand : décision actée avec l'utilisateur ou confirmée non prioritaire par Marie — réf : `roadmap_demandes_marie_2026-08-24.md` § Décisions produit non tranchées, `commentaires_marie_2026-08-24.md`
+- [P1] Déployer `roadmap_demandes_marie_2026-08-24.md` et transmettre à Marie l’inventaire complet, le document Drive et le message WhatsApp. — fait quand : déploiement effectué, lien Drive obtenu et message prêt à envoyer — réf : `.claude/commands/deploy.md`, `COMMUNICATION/Marie/a_transmettre.md`
+- [P2] Décision produit #7 (contenu du clic sur « Montant total ») et #11 (montant prévu modifiable pour une seule semaine, scope à qualifier) restent non tranchées — hors périmètre de `roadmap_demandes_marie_2026-08-24.md`. — fait quand : décision actée avec l'utilisateur ou confirmée non prioritaire par Marie — réf : `roadmap_demandes_marie_2026-08-24.md` § Décisions produit non tranchées, `COMMUNICATION/Marie/a_transmettre.md`
 - [P1] Demander à Marie de tester en conditions réelles les trois corrections v5.52 : tâche sans couleur, retour vers une catégorie de liste et couleur d’outil. — fait quand : nouvel export de Marie ingéré avec ces trois tests validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer — cohérent avec la demande initiale de Marie sur ce point, jamais satisfaite en l'état), clarifier avec Marie le lien retrait de livret/catégorie budget, vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
 - [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `COMMUNICATION/message_marie_categories_travail.md`
-- [P2] Reprendre la Phase 1 de `roadmap_sync_marie.md` sur la branche `sync-marie` (isolée, très en retard sur `main` — écart désormais encore plus grand après cette session). — fait quand : Phase 1 checklist complétée, après décision explicite sur le sort de cette branche (rebase complet ou reprise du chantier sync from scratch sur `main`) — réf : `roadmap_sync_marie.md` Phase 1 (branche `sync-marie`)
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
-- [P3] Réglage « Réduire les animations » quasi sans effet visible faute d'animations à réduire dans l'interface actuelle — angle mort produit, pas une régression. — fait quand : décision prise (enrichir l'UI d'animations ou accepter l'état actuel) — réf : `roadmap_v5.0.md` § Reporté hors V5, `E112Accessibility.tsx`
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-24 — nettoyage documentaire)
+## Dernière session (2026-08-25 — finalisation roadmap Marie et communication de livraison)
 
 ## Décisions prises
-- Les roadmaps et messages clôturés sont archivés ; les retours de réunion sont regroupés dans `COMMUNICATION/Note de réunion/`.
+- La roadmap des 17 demandes de Marie est terminée en local ; v5.56 est prête au déploiement.
+- Les communications à transmettre à Marie sont centralisées et versionnées par livraison.
 
 ## Livrables produits ou modifiés
-- `Archives/` : roadmaps Budget v3 et Demandes Marie v1, ainsi que les messages Budget et catégories Revenu archivés.
-- `COMMUNICATION/` : notes de réunion et message de catégorisation du travail déplacés.
-- Références dans les roadmaps, le contexte et l'historique : corrigées vers les nouveaux emplacements.
+- `E61ListDetail.tsx` et `E31EnergyCheckIn.tsx` : corrections mobile Listes et retour direct après validation de l’énergie.
+- `COMMUNICATION/Marie/a_transmettre.md` : source unique des éléments destinés à Marie.
+- `.claude/commands/analyser_googledoc.md`, `traiter_export_marie.md`, `close.md`, `deploy.md` : alimentation, contrôle et publication du message de livraison.
+- `_contexte/marie_tests_journal.json` : export du 24/08 ingéré (3 résultats ajoutés).
 
 ## Hypothèses validées / invalidées
-- VALIDE : aucune référence ne pointe encore vers l'ancien dossier `Note de réunion/`.
-- EN ATTENTE : les phases 4 à 6 de `roadmap_demandes_marie_2026-08-24.md` restent inchangées.
+- VALIDE : 611 tests, TypeScript et lint verts ; le formulaire de catégorie de liste ne déborde plus aux largeurs mobiles testées.
+- VALIDE : les contrôles pré-build couvrent aussi la communication Drive et la branche `main`.
+- EN ATTENTE : décisions Marie #7 et #11 ; déploiement v5.56.
 
 ## Prochaine étape exacte
-Reprendre la Phase 4 de `roadmap_demandes_marie_2026-08-24.md`.
+Lancer `/deploy` pour v5.56 après confirmation que le dernier export disponible de Marie a bien été fourni.
 
 ## Question bloquante pour la session suivante
 Aucune.

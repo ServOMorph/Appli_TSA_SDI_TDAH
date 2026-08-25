@@ -20,48 +20,53 @@ function makeTaskV2(overrides: Partial<Task> = {}): Task {
   })
 }
 
+async function renderDashboard(ctx = makeAppContext()) {
+  renderWithApp(<E10Dashboard />, ctx)
+  await screen.findByText('Rien de planifié ce jour-là.')
+}
+
 describe('E10Dashboard', () => {
   describe('énergie (intégration)', () => {
-    it('affiche la pill Mon énergie si todayEnergyStatus null', () => {
-      renderWithApp(<E10Dashboard />)
+    it('affiche la pill Mon énergie si todayEnergyStatus null', async () => {
+      await renderDashboard()
       expect(screen.getByRole('button', { name: 'Renseigner mon énergie' })).toBeDefined()
     })
 
-    it('clic sur la pill énergie navigue directement vers energy-checkin (EN1)', async () => {
+    it('clic sur la pill énergie navigue vers la consultation de l’énergie', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Renseigner mon énergie' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('energy-checkin')
+      expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
     })
 
-    it('clic sur badge énergie navigue directement vers energy-checkin (EN1)', async () => {
+    it('clic sur badge énergie navigue vers la consultation de l’énergie', async () => {
       const ctx = makeAppContext({ todayEnergy: 7, todayEnergyStatus: 'filled' })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByLabelText(/sur 7 disponible/i))
-      expect(ctx.goTo).toHaveBeenCalledWith('energy-checkin')
+      expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
     })
 
-    it('affiche énergie planifiée et énergie disponible côte à côte (E14, Q1)', () => {
+    it('affiche énergie planifiée et énergie disponible côte à côte (E14, Q1)', async () => {
       const ctx = makeAppContext({
         todayEnergy: 7,
         todayEnergyStatus: 'filled',
         todayPlannedTasks: [makeTaskV2({ energy_cost: 5 })],
       })
-      renderWithApp(<E10Dashboard />, ctx)
+      await renderDashboard(ctx)
       expect(screen.getByLabelText("5 énergie planifiée sur 7 disponible aujourd'hui")).toBeDefined()
       expect(screen.getByText('5 / 7')).toBeDefined()
     })
 
-    it('affiche "Énergie ignorée" si todayEnergyStatus skipped', () => {
+    it('affiche "Énergie ignorée" si todayEnergyStatus skipped', async () => {
       const ctx = makeAppContext({ todayEnergyStatus: 'skipped' })
-      renderWithApp(<E10Dashboard />, ctx)
+      await renderDashboard(ctx)
       expect(screen.getByText('Énergie ignorée')).toBeDefined()
     })
   })
 
   describe('activation surcharge (D10C)', () => {
-    it('affiche le bouton Mode surcharge grisé en mode normal (E7)', () => {
-      renderWithApp(<E10Dashboard />)
+    it('affiche le bouton Mode surcharge grisé en mode normal (E7)', async () => {
+      await renderDashboard()
       expect(screen.getByRole('button', { name: 'Détail du mode surcharge' }).textContent).toBe('Mode surcharge')
     })
 
@@ -76,8 +81,8 @@ describe('E10Dashboard', () => {
   })
 
   describe('navigation top bar', () => {
-    it('affiche le titre AuDHD', () => {
-      renderWithApp(<E10Dashboard />)
+    it('affiche le titre AuDHD', async () => {
+      await renderDashboard()
       expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     })
 
@@ -96,7 +101,7 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('manual-tests')
     })
 
-    it('masque la pastille des tests quand tous les tests ont déjà été vus', () => {
+    it('masque la pastille des tests quand tous les tests ont déjà été vus', async () => {
       const ctx = makeAppContext({
         manualTestResults: manualTestsCatalog.map((test) => ({
           id: `result-${test.id}`,
@@ -106,13 +111,13 @@ describe('E10Dashboard', () => {
           created_at: '2026-08-14T10:00:00.000Z',
         })),
       })
-      renderWithApp(<E10Dashboard />, ctx)
+      await renderDashboard(ctx)
       expect(screen.queryByLabelText('Nouveaux tests disponibles')).toBeNull()
       expect(screen.getByRole('button', { name: 'Tests à faire' })).toBeDefined()
     })
 
-    it('n\'affiche pas d\'icône Planning dans la TopBar', () => {
-      renderWithApp(<E10Dashboard />)
+    it('n\'affiche pas d\'icône Planning dans la TopBar', async () => {
+      await renderDashboard()
       const header = screen.getByRole('banner')
       expect(within(header).queryByRole('button', { name: 'Planning' })).toBeNull()
     })
@@ -213,16 +218,16 @@ describe('E10Dashboard', () => {
   })
 
   describe('mode surcharge (D10B)', () => {
-    it('affiche le bandeau Mode surcharge actif sans changer de page', () => {
+    it('affiche le bandeau Mode surcharge actif sans changer de page', async () => {
       const ctx = makeAppContext({ overloadMode: true })
-      renderWithApp(<E10Dashboard />, ctx)
+      await renderDashboard(ctx)
       expect(screen.getByText('Mode surcharge actif', { selector: 'p' })).toBeDefined()
       expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     })
 
-    it('affiche la pastille de surcharge active et cliquable (E21)', () => {
+    it('affiche la pastille de surcharge active et cliquable (E21)', async () => {
       const ctx = makeAppContext({ overloadMode: true })
-      renderWithApp(<E10Dashboard />, ctx)
+      await renderDashboard(ctx)
       const btn = screen.getByRole('button', {
         name: 'Mode surcharge actif, ouvrir le centre récupération',
       }) as HTMLButtonElement

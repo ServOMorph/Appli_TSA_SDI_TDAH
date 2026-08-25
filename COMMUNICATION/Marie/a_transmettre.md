@@ -1,0 +1,47 @@
+# À transmettre à Marie
+
+Ce fichier est la source unique des messages en attente pour Marie. Il est rédigé simplement, sans détails techniques. À chaque déploiement, son contenu est figé dans `livraisons/vX.Y.md`, publié sur Drive et repris dans le message WhatsApp.
+
+## Changements livrés
+
+### Tâches
+
+#4, #5 — Le menu de la fiche d'une tâche est simplifié : les boutons « Tâche du jour », « Planifier » et « Liste » ont été retirés. « Décomposer » et « Dupliquer » sont conservés comme demandé.
+
+### Budget et Comptes
+
+#6, #8, #9, #10, #12, #14 — Le Budget est repassé sur les montants prévus plutôt que les dépenses déjà faites : « Montant total » et « Mon compte » reflètent ce que tu as prévu de dépenser. « Mon compte » affiche les prévisions ; le suivi avec dépenses et jauge s'appelle maintenant « Comptes » et s'ouvre depuis l'accueil.
+
+Le reset automatique des prévisions au 1er du mois n'a pas été ajouté : les prévisions ne bougent plus seules, donc il n'y a rien à remettre à zéro.
+
+#13 — Sur « Comptes », le bouton « Ajouter une dépense » indépendant a été retiré. Pour ajouter une dépense, touche une sous-catégorie, puis « Ajouter une dépense » sur sa fiche : la catégorie est déjà choisie.
+
+### Listes
+
+#16 — Sur téléphone, quand tu ajoutes une catégorie dans une liste, le champ et les boutons restent visibles même avec le clavier ouvert.
+
+### Énergie
+
+#17 — Après avoir choisi ton énergie et touché « Valider », tu reviens directement à l’accueil. Le badge énergie de l’accueil ouvre « Mon énergie » pour consulter ou modifier ton choix.
+
+## Tests à refaire
+
+- Tester le menu simplifié d'une fiche de tâche.
+- Tester « Utiliser le budget » et « Utiliser Comptes ».
+- Sur téléphone, ajouter une catégorie dans une liste avec le clavier ouvert.
+- Consulter puis modifier l'énergie depuis le badge de l'accueil.
+- Vérifier que le contrôle « Couleur » est visible sur une carte d'outil.
+
+## Questions où nous avons besoin de ton choix
+
+#7 — Quand tu touches « Montant total », quelles informations veux-tu voir : uniquement les revenus, ou aussi les mouvements vers les livrets et les montants prévus de « Mon compte » ?
+
+#11 — Quand tu modifies un montant prévu pour une catégorie, veux-tu que ce changement ne s'applique qu'à la semaine en cours ? Si oui, que doit-il se passer au début de la semaine suivante ?
+
+## Écart assumé
+
+#4 — Le bouton « Terminer » est gardé, contrairement à la demande initiale : sans lui, certaines tâches sans date précise n'auraient plus de moyen d'être terminées. Si tu veux le retirer, il faut d'abord choisir un autre moyen de terminer ces tâches.
+
+## Retour d'export déjà corrigé
+
+Le retour « je ne trouve pas le libellé Couleur » a été pris en compte : le contrôle est maintenant identifié par le libellé « Couleur ». Le test correspondant est à refaire.

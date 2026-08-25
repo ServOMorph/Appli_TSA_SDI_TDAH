@@ -177,6 +177,7 @@ export function E61ListDetail() {
         padding: 'var(--spacing-xl)',
         gap: 'var(--spacing-lg)',
         maxWidth: '480px',
+        width: '100%',
         margin: '0 auto',
         minHeight: '100svh',
         paddingBottom: 'var(--bottomnav-h)',
@@ -286,7 +287,7 @@ export function E61ListDetail() {
           </ul>
 
           {showAddCategoryForm ? (
-            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               <input
                 type="text"
                 value={addCategoryName}
@@ -297,20 +298,23 @@ export function E61ListDetail() {
                 autoFocus
                 placeholder="Nom de la catégorie…"
                 aria-label="Nom de la catégorie"
-                style={{ ...fieldInputStyle, flex: 1 }}
+                style={{ ...fieldInputStyle, width: '100%' }}
               />
-              <Button onClick={handleAddCategory} disabled={!addCategoryName.trim() || addingCategory}>
-                Ajouter
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setShowAddCategoryForm(false)
-                  setAddCategoryName('')
-                }}
-              >
-                Annuler
-              </Button>
+              <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+                <Button fullWidth onClick={handleAddCategory} disabled={!addCategoryName.trim() || addingCategory}>
+                  Ajouter
+                </Button>
+                <Button
+                  fullWidth
+                  variant="secondary"
+                  onClick={() => {
+                    setShowAddCategoryForm(false)
+                    setAddCategoryName('')
+                  }}
+                >
+                  Annuler
+                </Button>
+              </div>
             </div>
           ) : (
             <Button fullWidth variant="secondary" onClick={() => setShowAddCategoryForm(true)}>

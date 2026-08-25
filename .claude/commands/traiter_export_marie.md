@@ -45,6 +45,9 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
      avant ingestion), déterminer s'il décrit un bug applicatif réel, un problème de formulation du
      test dans `manualTestsCatalog.ts`, ou une demande d'évolution — sans corriger le code ni le
      catalogue automatiquement.
+   - Pour chaque nouveau retour qui reste utile à communiquer, ajouter une entrée courte dans
+     `COMMUNICATION/Marie/a_transmettre.md`, sous « Retour d'export déjà corrigé », « Questions où nous avons besoin
+     de ton choix » ou « Tests à refaire ». Ne pas y recopier les retours déjà clos ou invalidés.
 
 6. Ingérer les résultats de tests :
    ```

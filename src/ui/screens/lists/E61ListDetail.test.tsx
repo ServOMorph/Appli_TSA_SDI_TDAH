@@ -116,6 +116,19 @@ describe('E61ListDetail', () => {
         expect(screen.getByRole('button', { name: /^Automne/ })).toBeDefined()
       })
     })
+
+    it('garde le formulaire d’ajout de catégorie dans la largeur de l’écran', async () => {
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter une catégorie' }))
+
+      expect(screen.getByRole('main')).toHaveStyle({ width: '100%' })
+      expect(screen.getByLabelText('Nom de la catégorie')).toHaveStyle({ width: '100%' })
+    })
   })
 
   describe('bouton retour', () => {

@@ -18,9 +18,11 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 La version **v5.52** est déployée en production (voir le [CHANGELOG](CHANGELOG.md)) ; aucun nouveau déploiement n'a eu lieu depuis. Le parcours de tests manuels de Marie (catalogue in-app avec étapes numérotées, historique, archivage projet) est entièrement livré ; les tests sont regroupés en 7 catégories (Accueil/Planning, Tâches, Outils Budget, Outils Listes, Outils autres, Énergie, Paramètres/Profil), repliées par défaut, à déplier pour voir les tests puis leurs étapes.
 
-`roadmap_demandes_marie_2026-08-24.md` (17 demandes numérotées) : Phases 1-3 livrées en local, non encore déployées — menu de fiche de tâche simplifié, Budget repassé sur les montants prévus plutôt que les dépenses réelles (« Montant total » et « Mon compte » ne bougent plus à la saisie d'une dépense), suivi prévu/dépensé/jauge déplacé sur un écran « Comptes » distinct, ajout de dépense désormais via la fiche de catégorie sans resélection. Phases 4 (Listes), 5 (Énergie) et 6 (validation/livraison) restent à faire.
+`roadmap_demandes_marie_2026-08-24.md` (17 demandes numérotées) est terminée en local et prête à être déployée : menu de fiche de tâche simplifié, Budget repassé sur les montants prévus, ajout de dépense via la fiche de catégorie, formulaire de catégorie de liste corrigé sur mobile et retour direct à l’accueil après validation de l’énergie. Les décisions #7 (contenu de « Montant total ») et #11 (prévision limitée à une semaine) restent à clarifier avec Marie.
 
 Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appli-audhd.netlify.app).
+
+Les éléments à transmettre à Marie sont centralisés dans [COMMUNICATION/Marie/a_transmettre.md](COMMUNICATION/Marie/a_transmettre.md) ; chaque déploiement en conserve une copie versionnée et la publie sur Drive.
 
 ## Prérequis
 

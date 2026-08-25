@@ -116,27 +116,27 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Listes : écran « ajouter une catégorie » (reproduction) [TODO]
+## Phase 4 — Listes : écran « ajouter une catégorie » (reproduction) [FAIT]
 
 Point déjà classé « probablement obsolète » dans `roadmap_demandes_marie_v1.md` (écran plein-page du PDF remplacé par un formulaire inline) mais jamais reconfirmé par Marie depuis. Reproduction uniquement, pas de correctif à l'aveugle.
 
-- [ ] Rejouer le parcours « Ajouter une catégorie » dans un outil de type liste sur mobile (clavier virtuel ouvert), avec plusieurs tailles d'écran.
-- [ ] Si un débordement/troncature est reproduit : corriger (`E61ListDetail.tsx:288-319`) et ajouter un test de régression.
-- [ ] Si non reproduit : consigner l'absence de correctif, considérer le point comme résolu par le passage au formulaire inline.
+- [x] Rejouer le parcours « Ajouter une catégorie » dans un outil de type liste sur mobile (clavier virtuel ouvert), avec plusieurs tailles d'écran.
+- [x] Débordement reproduit à 320, 375 et 430 px : l'écran conservait une largeur de 480 px et tronquait le formulaire. `E61ListDetail.tsx` contraint maintenant l'écran à la largeur disponible et empile le champ puis les actions.
+- [x] Test de régression ajouté dans `E61ListDetail.test.tsx` ; test manuel `ajouter-une-categorie-de-liste-sur-mobile` ajouté au catalogue.
 
-Critère de sortie : le point est classé reproductible-et-corrigé, ou non reproductible-et-documenté.
+Critère de sortie : reproductible et corrigé. Le formulaire ne déborde plus à 320, 375 et 430 px, y compris avec une hauteur d'écran réduite simulant le clavier ouvert.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
 ---
 
-## Phase 5 — Énergie : fermeture directe après validation [TODO]
+## Phase 5 — Énergie : fermeture directe après validation [FAIT]
 
-- [ ] Dans `E31EnergyCheckIn.tsx`, après `confirm()`/`saveTodayEnergy`, naviguer directement vers le dashboard au lieu de `energy-view`.
-- [ ] Vérifier qu'`E30EnergyView.tsx` (« Mon énergie ») garde un point d'entrée ailleurs si Marie veut encore consulter/modifier son énergie sans repasser par le check-in (sinon, écran mort à signaler).
-- [ ] Mettre à jour les tests concernés.
-- [ ] Ajouter/mettre à jour un test manuel.
+- [x] Dans `E31EnergyCheckIn.tsx`, après `confirm()`/`saveTodayEnergy`, naviguer directement vers le dashboard au lieu de `energy-view`.
+- [x] `E30EnergyView.tsx` (« Mon énergie ») garde un point d'entrée via le badge énergie de l'accueil. Il permet de consulter l'état du jour puis de choisir « Modifier » ; l'écran n'est pas mort.
+- [x] Tests de `E31EnergyCheckIn.tsx` et `E10Dashboard.tsx` mis à jour.
+- [x] Test manuel `consulter-et-modifier-l-energie` mis à jour.
 
 Critère de sortie : cliquer sur « Valider » lors du choix d'énergie ramène directement à l'accueil.
 
@@ -145,12 +145,12 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 6 — Validation et préparation de livraison [TODO]
+## Phase 6 — Validation et préparation de livraison [FAIT]
 
-- [ ] Exécuter la suite de tests complète, `tsc -b`, le lint.
-- [ ] Mettre à jour `manualTestsCatalog.ts` pour tous les tests dont le comportement a changé.
-- [ ] Mettre à jour `commentaires_marie_2026-08-24.md` (une entrée par phase livrée, langage simple).
-- [ ] Ajouter une entrée de changelog décrivant les correctifs effectivement livrés.
-- [ ] Proposer `/deploy` à l'utilisateur.
+- [x] Suite complète exécutée : 75 fichiers, 611 tests verts ; `tsc -b` et lint verts.
+- [x] `manualTestsCatalog.ts` est à jour pour les comportements modifiés (actions de tâche, Budget/Comptes, ajout de catégorie de liste sur mobile, énergie).
+- [x] `COMMUNICATION/Marie/a_transmettre.md` mis à jour, une entrée simple par demande livrée.
+- [x] Entrée `v5.56` ajoutée au changelog.
+- [x] `/deploy` à proposer à l'utilisateur.
 
 Critère de sortie : contrôles automatisés verts, tests manuels rejoués, documentation alignée, fichier de commentaires Marie à jour.

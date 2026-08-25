@@ -33,12 +33,12 @@ describe('E31EnergyCheckIn', () => {
     expect(ctx.saveTodayEnergy).toHaveBeenCalledWith(5)
   })
 
-  it('Valider navigue vers energy-view', async () => {
+  it('Valider navigue vers le dashboard', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E31EnergyCheckIn />, ctx)
     await userEvent.click(screen.getByRole('button', { name: '3' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
   it('Ignorer appelle skipTodayEnergy', async () => {

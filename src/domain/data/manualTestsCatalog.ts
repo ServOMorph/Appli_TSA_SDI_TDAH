@@ -237,6 +237,17 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'ajouter-une-categorie-de-liste-sur-mobile',
+    title: 'Ajouter une catégorie de liste sur mobile',
+    category: 'Outils : Listes',
+    steps: [
+      'Sur un téléphone, ouvrez une liste puis touchez « Ajouter une catégorie ».',
+      'Touchez le champ « Nom de la catégorie » pour ouvrir le clavier, puis saisissez un nom.',
+      'Vérifiez que le champ et les boutons « Ajouter » et « Annuler » restent entièrement visibles et utilisables.',
+      'Touchez « Ajouter » : la nouvelle catégorie doit apparaître dans la liste.',
+    ],
+  },
+  {
     id: 'detail-element-de-liste',
     title: 'Description et sous-tâches d’un élément de liste',
     category: 'Outils : Listes',
@@ -250,11 +261,12 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
-    id: 'acceder-directement-a-l-energie',
-    title: 'Accéder directement à la modification de l’énergie',
+    id: 'consulter-et-modifier-l-energie',
+    title: 'Consulter et modifier l’énergie',
     category: 'Énergie',
     steps: [
-      'Depuis l’accueil, touchez le badge énergie en haut à gauche : l’écran pour choisir votre énergie du jour doit s’ouvrir directement, sans écran de consultation intermédiaire.',
+      'Depuis l’accueil, touchez le badge énergie en haut à gauche : l’écran « Mon énergie » doit s’ouvrir et afficher l’état de l’énergie du jour.',
+      'Touchez « Modifier », choisissez une valeur puis touchez « Valider » : vous devez revenir directement à l’accueil.',
     ],
   },
   {

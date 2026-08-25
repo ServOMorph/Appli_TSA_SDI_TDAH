@@ -25,7 +25,7 @@ export function E31EnergyCheckIn() {
     if (selected !== null) {
       await saveTodayEnergy(selected)
     }
-    goTo('energy-view')
+    goTo('dashboard')
   }
 
   async function skip() {

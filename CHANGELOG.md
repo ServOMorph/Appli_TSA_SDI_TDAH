@@ -1,3 +1,9 @@
+## v5.59 — 2026-08-25
+
+### Modifié
+- Suivi : v5.58 est déployée en production, son commentaire de livraison est archivé et publié sur Drive.
+- Contexte : les actions prioritaires de la prochaine session portent sur les liens Drive, le rangement des fichiers de commentaires et l’archivage contrôlé des roadmaps après déploiement.
+
 ## v5.58 — 2026-08-25
 
 ### Modifié

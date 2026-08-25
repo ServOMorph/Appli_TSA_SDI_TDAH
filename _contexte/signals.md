@@ -1,7 +1,7 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-25)
 
 ## Contexte chaud
-- **v5.56 déployée en prod le 2026-08-25** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : `roadmap_demandes_marie_2026-08-24.md` livrée (Phases 1-6 `[FAIT]`) : menu de fiche de tâche simplifié, Budget repassé sur les montants prévus, écran « Comptes » séparé de « Mon compte », ajout de dépense depuis la fiche de catégorie, formulaire de catégorie de liste corrigé sur mobile et retour direct après validation de l'énergie. Suite complète : 611 tests verts, TypeScript et lint verts. Écarts assumés : #7 et #11, documentés dans `COMMUNICATION/Marie/livraisons/v5.56.md`.
+- **v5.58 déployée en prod le 2026-08-25** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : `roadmap_retours_marie_2026-08-25.md` livrée : retrait de « Terminer » de la fiche de tâche, réglage de couleur des outils dans Paramètres > Accessibilité et accès direct à la modification de l’énergie depuis l’accueil. Suite complète : 608 tests verts, TypeScript et lint verts. Commentaire de livraison publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.58.md`.
 - **v5.52 déployée en prod le 2026-08-24** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie. Aucun redéploiement depuis.
 - **Export de Marie du 2026-08-24 11:46 traité** : aucune perte ni incohérence comparé à celui du 23 août ; 3 résultats de tests ajoutés au journal. Le seul retour nouveau (« libellé Couleur introuvable ») correspond au correctif déjà présent dans la version à déployer.
 - **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
@@ -10,13 +10,16 @@
 - Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy`. `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `COMMUNICATION/message_marie_categories_travail.md`. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage ; les autres roadmaps/communications ne l'appliquent pas encore.
 - `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles. Son choix structurant (Montant total/Mon compte basés sur les dépenses réelles) a été explicitement inversé le 2026-08-24 par `roadmap_demandes_marie_2026-08-24.md` (retour aux prévisions), sur confirmation de l'utilisateur — cette roadmap reste un historique valide de ce qui a été livré et pourquoi, pas l'état actuel du calcul.
-- `manualTestsCatalog.ts` : les tests demandés à Marie couvrent v5.56, dont le menu simplifié des tâches, Budget/Comptes, l'ajout de catégorie de liste sur mobile, l'énergie et le contrôle « Couleur ».
+- `manualTestsCatalog.ts` : les tests demandés à Marie couvrent v5.56 et v5.58, dont le menu simplifié des tâches, Budget/Comptes, l'ajout de catégorie de liste sur mobile, l'énergie et le contrôle « Couleur ».
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
-- `_contexte/dernier_deploiement.md` : v5.56, 2026-08-25, prod vérifiée HTTP 200.
+- `_contexte/dernier_deploiement.md` : v5.58, 2026-08-25, prod vérifiée HTTP 200.
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
+- [P1] Retirer du dépôt le lien Google Drive du commentaire de livraison v5.58 et le stocker dans `.env` ; ne jamais versionner ce lien. — fait quand : le lien n’est plus suivi par Git et est lu depuis `.env` — réf : `COMMUNICATION/Marie/livraisons/v5.58.md`, `.env.example`, `.gitignore`
+- [P1] Définir puis appliquer le rangement des fichiers `commentaires_marie_vX.Y.docx` créés à la racine après publication Drive. — fait quand : aucun fichier de commentaire de livraison ne reste à la racine et son emplacement d’archive est documenté — réf : `commentaires_marie_v5.58.docx`, `.claude/commands/deploy.md`
+- [P1] Fiabiliser la clôture des roadmaps dans `/deploy` : analyser la roadmap active avant le build et annuler le déploiement si elle n’est pas terminée ; archiver la roadmap après un déploiement réussi. — fait quand : la procédure bloque une roadmap incomplète et archive une roadmap livrée — réf : `.claude/commands/deploy.md`, `roadmap_retours_marie_2026-08-25.md`, `Archives/`
 - [P1] #11 : confirmer avec Marie si l’ajustement temporaire de montant concerne aussi les catégories mensuelles. — fait quand : réponse de Marie reçue et consignée — réf : `roadmap_retours_marie_2026-08-25.md`, `COMMUNICATION/Marie/a_transmettre.md`
 - [P1] Demander à Marie de tester en conditions réelles les parcours v5.56 signalés dans le catalogue in-app. — fait quand : nouvel export de Marie ingéré avec les tests v5.56 validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P1] Optimiser en urgence le bundle JavaScript principal (553 kB minifié, au-dessus du seuil Vite de 500 kB), notamment par chargement différé des écrans. — fait quand : build sous le seuil ou découpage justifié et validé — réf : `src/App.tsx`, `vite.config.ts`
@@ -27,25 +30,23 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-25 — finalisation de la roadmap de retours Marie)
+## Dernière session (2026-08-25 — déploiement v5.58 et préparation de la suite)
 
 ## Décisions prises
-- « Terminer » est retiré de la fiche de tâche ; la terminaison passe par la coche du planning.
-- La couleur des outils se règle dans Paramètres > Accessibilité, après « Couleur d’ambiance ».
-- Le badge énergie ouvre directement l’écran de modification, puis « Valider » ramène à l’accueil.
+- v5.58 est déployée après les contrôles automatisés et une vérification HTTP 200.
+- Les améliorations de procédure demandées pour la prochaine session sont prioritaires avant tout nouveau développement.
 
 ## Livrables produits ou modifiés
-- `roadmap_retours_marie_2026-08-25.md` : toutes les phases terminées.
-- `E112Accessibility.tsx`, `ToolWidgetCard.tsx` et leurs tests : déplacement du réglage de couleur des outils.
-- `E10Dashboard.tsx` et son test : accès direct à la modification de l’énergie.
-- `manualTestsCatalog.ts`, `COMMUNICATION/Marie/a_transmettre.md`, `CHANGELOG.md` : communication v5.58 prête.
+- `dist/v5.58/` : build déployé sur Netlify.
+- `COMMUNICATION/Marie/livraisons/v5.58.md` et `commentaires_marie_v5.58.docx` : commentaire publié sur Drive.
+- `_contexte/signals.md` : trois priorités de procédure ajoutées pour la prochaine session.
 
 ## Hypothèses validées / invalidées
-- VALIDE : 75 fichiers et 608 tests sont verts ; TypeScript et lint sont verts.
+- VALIDE : 608 tests, TypeScript et lint sont verts ; production répond HTTP 200.
 - EN ATTENTE : périmètre #11 pour les catégories mensuelles.
 
 ## Prochaine étape exacte
-Déployer v5.58, puis communiquer la livraison à Marie.
+Traiter d’abord les trois priorités P1 de procédure, puis reprendre les retours de Marie.
 
 ## Question bloquante pour la session suivante
 Aucune.

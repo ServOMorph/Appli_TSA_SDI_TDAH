@@ -12,9 +12,9 @@ Traiter les retours nouveaux de Marie après v5.56, sans modifier « Montant tot
 
 | Catégorie | Demande | État | Traitement |
 | --- | --- | --- | --- |
-| Tâches | Retirer « Terminer » de la fiche de tâche | Corrigé localement, non encore livré | Phase 1 |
-| Outils : autres | Déplacer le sélecteur de couleur des outils dans Paramètres, après « Couleur d’ambiance » | À concevoir | Phase 2 |
-| Énergie | Le badge énergie doit ouvrir directement la modification | Bug confirmé par le retour de test | Phase 3 |
+| Tâches | Retirer « Terminer » de la fiche de tâche | Livré dans v5.58 | Phase 1 |
+| Outils : autres | Déplacer le sélecteur de couleur des outils dans Paramètres, après « Couleur d’ambiance » | Livré dans v5.58 | Phase 2 |
+| Énergie | Le badge énergie doit ouvrir directement la modification | Livré dans v5.58 | Phase 3 |
 | Outils : Budget | Montant temporaire jusqu’à la fin de semaine | Décision incomplète pour les catégories mensuelles | Décision en attente |
 
 ## Décision en attente

@@ -16,7 +16,7 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version **v5.60** est en production. La v5.61 est prête à être déployée : elle ajoute les montants temporaires par catégorie et période.
+La version **v5.61** est en production : elle ajoute les montants temporaires par catégorie et période.
 
 Les roadmaps des 23 et 24 août sont archivées ; la roadmap du 25 août est livrée : retrait de « Terminer », couleur des outils dans Paramètres et accès direct à la modification d’énergie. La décision #11 reste à confirmer avec Marie pour les catégories mensuelles.
 

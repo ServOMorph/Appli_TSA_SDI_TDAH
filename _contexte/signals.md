@@ -3,7 +3,7 @@
 ## Contexte chaud
 - **v5.58 déployée en prod le 2026-08-25** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : `roadmap_retours_marie_2026-08-25.md` livrée : retrait de « Terminer » de la fiche de tâche, réglage de couleur des outils dans Paramètres > Accessibilité et accès direct à la modification de l’énergie depuis l’accueil. Suite complète : 608 tests verts, TypeScript et lint verts. Commentaire de livraison publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.58.md`.
 - **v5.60 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : le catalogue versionne désormais les tests modifiés. Le test « Menu d’actions simplifié sur la fiche d’une tâche », validé avant le retrait de « Terminer », est de nouveau visible jusqu’à sa validation sur la nouvelle version. Suite complète : 610 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.60.md`.
-- **v5.61 prête à être déployée** : la modification d’un montant Budget est temporaire sur la catégorie et la période affichées ; le montant habituel reste modifiable. Export Marie du 27/08 analysé sans perte ni friction : 3 tests validés. Suite complète : 612 tests verts, TypeScript et lint verts.
+- **v5.61 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : la modification d’un montant Budget est temporaire sur la catégorie et la période affichées ; le montant habituel reste modifiable. Export Marie du 27/08 analysé sans perte ni friction : 3 tests validés. Suite complète : 612 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.61.md`.
 - **v5.52 déployée en prod le 2026-08-24** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie. Aucun redéploiement depuis.
 - **Export de Marie du 2026-08-24 11:46 traité** : aucune perte ni incohérence comparé à celui du 23 août ; 3 résultats de tests ajoutés au journal. Le seul retour nouveau (« libellé Couleur introuvable ») correspond au correctif déjà présent dans la version à déployer.
 - **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
@@ -42,10 +42,10 @@
 
 ## Hypothèses validées / invalidées
 - VALIDE : 612 tests, TypeScript et lint sont verts.
-- EN ATTENTE : déploiement v5.61 et test Marie de « Suivre ses dépenses avec Comptes ».
+- EN ATTENTE : test Marie de « Suivre ses dépenses avec Comptes ».
 
 ## Prochaine étape exacte
-Déployer v5.61, puis demander à Marie de rejouer le test Budget.
+Demander à Marie de rejouer le test Budget, puis traiter son prochain export.
 
 ## Question bloquante pour la session suivante
 Aucune.

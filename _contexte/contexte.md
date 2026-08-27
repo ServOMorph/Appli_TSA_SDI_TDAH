@@ -12,8 +12,8 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-**v5.60 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-27).
-La v5.61 est prête : montant temporaire par catégorie, limité à la semaine ou au mois affiché.
+**v5.61 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-27).
+Montant temporaire par catégorie, limité à la semaine ou au mois affiché.
 L’export de Marie du 27/08 est traité sans perte ni incohérence ; trois tests sont validés.
 Le test « Suivre ses dépenses avec Comptes » est à rejouer après déploiement.
 La décision #11 est entièrement implémentée.

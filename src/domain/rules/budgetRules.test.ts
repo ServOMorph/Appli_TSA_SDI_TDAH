@@ -9,6 +9,7 @@ import {
   getGaugeRatio,
   getMonComptePrevisions,
   getPeriodBounds,
+  getBudgetedAmount,
   getSpentForCategory,
   getMontantTotal,
   getTotalDeposits,
@@ -96,6 +97,12 @@ describe('budgetRules', () => {
 
       expect(getSpentForCategory(entries, 'courses', bounds)).toBe(15)
     })
+  })
+
+  it('applique une modification temporaire uniquement à la période de la catégorie', () => {
+    const temporary = category({ temporary_amount: 90, temporary_start_date: '2026-07-20', temporary_end_date: '2026-07-26' })
+    expect(getBudgetedAmount(temporary, '2026-07-22')).toBe(90)
+    expect(getBudgetedAmount(temporary, '2026-07-27')).toBe(60)
   })
 
   describe('budget totals', () => {

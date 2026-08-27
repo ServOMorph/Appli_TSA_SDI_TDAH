@@ -1,3 +1,8 @@
+## v5.61 — 2026-08-27
+
+### Ajouté
+- Budget : modifier le montant d’une catégorie s’applique temporairement à la semaine ou au mois affiché, sans modifier les autres catégories ni le montant habituel.
+
 ## v5.60 — 2026-08-27
 
 ### Corrigé

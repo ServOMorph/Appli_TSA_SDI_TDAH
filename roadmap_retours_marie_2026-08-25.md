@@ -15,11 +15,12 @@ Traiter les retours nouveaux de Marie après v5.56, sans modifier « Montant tot
 | Tâches | Retirer « Terminer » de la fiche de tâche | Livré dans v5.58 | Phase 1 |
 | Outils : autres | Déplacer le sélecteur de couleur des outils dans Paramètres, après « Couleur d’ambiance » | Livré dans v5.58 | Phase 2 |
 | Énergie | Le badge énergie doit ouvrir directement la modification | Livré dans v5.58 | Phase 3 |
-| Outils : Budget | Montant temporaire jusqu’à la fin de semaine | Décision incomplète pour les catégories mensuelles | Décision en attente |
+| Outils : Budget | Montant temporaire sur la catégorie sélectionnée | Livré, à valider | Phase 5 |
 
-## Décision en attente
+## Décision reçue
 
-- **#11 — Catégories mensuelles** : confirmer avec Marie si une modification temporaire jusqu’à la fin de semaine concerne seulement les catégories hebdomadaires, ou aussi les catégories mensuelles. Aucun développement avant cette réponse.
+- **#11 — Portée** : la modification concerne uniquement la catégorie sélectionnée.
+- **#11 — Durée** : elle s’applique jusqu’à la fin de la semaine pour une catégorie hebdomadaire, ou jusqu’à la fin du mois pour une catégorie mensuelle ; le montant habituel reprend ensuite.
 
 ## Ordre et dépendances
 
@@ -28,6 +29,7 @@ Phase 1 — Retrait de « Terminer »
 Phase 2 — Couleur des outils dans Paramètres
 Phase 3 — Badge énergie direct
 Phase 4 — Validation et préparation de livraison
+Phase 5 — Montant temporaire par catégorie
 ```
 
 Les phases 1 à 3 sont indépendantes. La phase 4 dépend des trois premières.
@@ -72,3 +74,12 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - [x] Autorisation de déploiement reçue.
 
 Critère de sortie : contrôles automatisés verts, documentation alignée et communication Marie prête.
+
+## Phase 5 — Montant temporaire par catégorie [x]
+
+- [x] Enregistrer un montant temporaire avec les bornes de la période affichée, sans modifier le montant habituel de la catégorie.
+- [x] Appliquer ce montant uniquement dans « Comptes » et la fiche de la catégorie sélectionnée.
+- [x] Faire reprendre automatiquement le montant habituel à la période suivante.
+- [x] Ajouter les tests automatisés et le parcours manuel Marie.
+
+Critère de sortie : modifier une catégorie hebdomadaire affecte seulement sa semaine affichée ; modifier une catégorie mensuelle affecte seulement son mois affiché ; les autres catégories restent inchangées.

@@ -272,6 +272,28 @@
       "status": "ok",
       "comment": null,
       "created_at": "2026-08-25T16:11:25.470Z"
+    },
+    {
+      "id": "37fcd7bf-cebb-4fd4-9558-ff8a163f21b5",
+      "test_id": "couleur-de-fond-par-outil",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-26T21:22:34.260Z"
+    },
+    {
+      "id": "edaeb71e-4fb6-4cf5-8772-d681ca3227e8",
+      "test_id": "consulter-et-modifier-l-energie",
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-26T21:22:39.341Z"
+    },
+    {
+      "id": "c74104e7-76fc-4729-93ed-1150b095b83a",
+      "test_id": "menu-actions-tache-simplifie",
+      "test_revision": 2,
+      "status": "ok",
+      "comment": null,
+      "created_at": "2026-08-27T07:44:53.614Z"
     }
   ]
 }

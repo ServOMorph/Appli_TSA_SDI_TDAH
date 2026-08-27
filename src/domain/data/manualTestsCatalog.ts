@@ -118,6 +118,7 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'utiliser-comptes',
+    revision: 2,
     title: 'Suivre ses dépenses avec Comptes',
     category: 'Outils : Budget',
     steps: [
@@ -125,6 +126,7 @@ export const manualTestsCatalog: ManualTest[] = [
       'Touchez les flèches ← et → sous « Semaine » : la période affichée doit changer sans modifier celle affichée sous « Mois ».',
       'Touchez une sous-catégorie pour ouvrir sa fiche détaillée : vous devez arriver directement sur cette catégorie, sans avoir à la resélectionner.',
       'Sur la fiche de la catégorie, touchez « Ajouter une dépense », remplissez montant/libellé/date puis enregistrez : le montant restant et la jauge de la catégorie doivent se mettre à jour.',
+      'Touchez le bouton « Modifier le montant pour cette semaine » ou « Modifier le montant pour ce mois », saisissez un montant puis enregistrez : le nouveau montant doit s’appliquer uniquement à cette catégorie et à la période affichée ; le montant habituel doit revenir à la période suivante.',
       'Retournez à l’accueil, ouvrez « Outils » puis touchez la carte « Budget » : vérifiez que le « Montant total » et le détail « ... mon compte » n’ont pas changé suite à cette dépense (ils reflètent les montants prévus, pas les dépenses déjà faites).',
     ],
   },

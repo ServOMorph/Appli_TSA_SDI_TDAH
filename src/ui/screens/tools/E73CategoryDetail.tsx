@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
-import { getPeriodBounds, getSpentForCategory, isDateInPeriod } from '@/domain/rules/budgetRules'
+import { getBudgetedAmount, getPeriodBounds, getSpentForCategory, isDateInPeriod } from '@/domain/rules/budgetRules'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { BudgetGauge } from '@/ui/components/BudgetGauge'
@@ -17,6 +17,7 @@ export function E73CategoryDetail() {
     budgetEntries,
     renameBudgetCategory,
     updateBudgetCategoryAmount,
+    updateBudgetCategoryTemporaryAmount,
     deleteBudgetCategory,
     deleteBudgetEntry,
     createBudgetEntry,
@@ -27,7 +28,7 @@ export function E73CategoryDetail() {
 
   const [renaming, setRenaming] = useState(false)
   const [nameValue, setNameValue] = useState('')
-  const [editingAmount, setEditingAmount] = useState(false)
+  const [editingAmount, setEditingAmount] = useState<'temporary' | 'usual' | null>(null)
   const [amountValue, setAmountValue] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [showExpenseForm, setShowExpenseForm] = useState(false)
@@ -47,8 +48,9 @@ export function E73CategoryDetail() {
   }
 
   const bounds = getPeriodBounds(category.period, referenceDate)
+  const budgeted = getBudgetedAmount(category, referenceDate)
   const spent = getSpentForCategory(budgetEntries, category.id, bounds)
-  const remaining = category.amount - spent
+  const remaining = budgeted - spent
   const entries = budgetEntries
     .filter((entry) => entry.category_id === category.id && isDateInPeriod(entry.date, bounds))
     .sort((a, b) => b.date.localeCompare(a.date))
@@ -62,8 +64,9 @@ export function E73CategoryDetail() {
   async function handleUpdateAmount() {
     const amount = Number(amountValue.replace(',', '.'))
     if (!category || !Number.isFinite(amount) || amount <= 0) return
-    await updateBudgetCategoryAmount(category.id, amount)
-    setEditingAmount(false)
+    if (editingAmount === 'temporary') await updateBudgetCategoryTemporaryAmount(category.id, amount, referenceDate)
+    else await updateBudgetCategoryAmount(category.id, amount)
+    setEditingAmount(null)
   }
 
   async function handleDelete() {
@@ -106,9 +109,9 @@ export function E73CategoryDetail() {
           {formatEuro(remaining)}
         </p>
         <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-          {formatEuro(spent)} dépensés sur {formatEuro(category.amount)}
+          {formatEuro(spent)} dépensés sur {formatEuro(budgeted)}
         </p>
-        <BudgetGauge spent={spent} budgeted={category.amount} label={`Budget consommé pour ${category.name}`} height={10} />
+        <BudgetGauge spent={spent} budgeted={budgeted} label={`Budget consommé pour ${category.name}`} height={10} />
       </Card>
 
       <Button fullWidth onClick={() => setShowExpenseForm(true)}>
@@ -143,8 +146,11 @@ export function E73CategoryDetail() {
         <Button variant="secondary" fullWidth onClick={() => { setNameValue(category.name); setRenaming(true) }}>
           Renommer
         </Button>
-        <Button variant="secondary" fullWidth onClick={() => { setAmountValue(String(category.amount)); setEditingAmount(true) }}>
-          Modifier le montant
+        <Button variant="secondary" fullWidth onClick={() => { setAmountValue(String(budgeted)); setEditingAmount('temporary') }}>
+          Modifier le montant pour {category.period === 'week' ? 'cette semaine' : 'ce mois'}
+        </Button>
+        <Button variant="secondary" fullWidth onClick={() => { setAmountValue(String(category.amount)); setEditingAmount('usual') }}>
+          Modifier le montant habituel
         </Button>
         <Button fullWidth onClick={handleDelete} style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}>
           Supprimer la catégorie
@@ -163,12 +169,13 @@ export function E73CategoryDetail() {
       )}
 
       {editingAmount && (
-        <div role="dialog" aria-modal="true" aria-label="Modifier le montant" style={modalOverlay}>
+        <div role="dialog" aria-modal="true" aria-label={editingAmount === 'temporary' ? 'Modifier le montant temporairement' : 'Modifier le montant habituel'} style={modalOverlay}>
           <div style={modalBox}>
-            <h2 style={{ margin: 0 }}>Modifier le montant</h2>
+            <h2 style={{ margin: 0 }}>{editingAmount === 'temporary' ? `Modifier le montant pour ${category.period === 'week' ? 'cette semaine' : 'ce mois'}` : 'Modifier le montant habituel'}</h2>
+            {editingAmount === 'temporary' && <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Le montant habituel reprendra ensuite.</p>}
             <input aria-label="Nouveau montant" type="text" inputMode="decimal" autoFocus value={amountValue} onChange={(event) => setAmountValue(event.target.value)} style={inputStyle} />
             <Button fullWidth onClick={handleUpdateAmount} disabled={Number(amountValue.replace(',', '.')) <= 0}>Enregistrer</Button>
-            <Button variant="secondary" fullWidth onClick={() => setEditingAmount(false)}>Annuler</Button>
+            <Button variant="secondary" fullWidth onClick={() => setEditingAmount(null)}>Annuler</Button>
           </div>
         </div>
       )}

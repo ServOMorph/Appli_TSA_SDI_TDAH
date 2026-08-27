@@ -56,11 +56,13 @@ describe('E73CategoryDetail', () => {
   it('renomme et modifie le montant depuis la fiche', async () => {
     const renameBudgetCategory = vi.fn().mockResolvedValue(undefined)
     const updateBudgetCategoryAmount = vi.fn().mockResolvedValue(undefined)
+    const updateBudgetCategoryTemporaryAmount = vi.fn().mockResolvedValue(undefined)
     renderWithApp(<E73CategoryDetail />, makeAppContext({
       route,
       budgetCategories: [makeCategory()],
       renameBudgetCategory,
       updateBudgetCategoryAmount,
+      updateBudgetCategoryTemporaryAmount,
     }))
     await userEvent.click(screen.getByRole('button', { name: 'Renommer' }))
     await userEvent.clear(screen.getByLabelText('Nouveau nom de la catégorie'))
@@ -68,11 +70,17 @@ describe('E73CategoryDetail', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
     expect(renameBudgetCategory).toHaveBeenCalledWith('category-1', 'Courses maison')
 
-    await userEvent.click(screen.getByRole('button', { name: 'Modifier le montant' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Modifier le montant pour cette semaine' }))
     await userEvent.clear(screen.getByLabelText('Nouveau montant'))
     await userEvent.type(screen.getByLabelText('Nouveau montant'), '75')
     await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
-    expect(updateBudgetCategoryAmount).toHaveBeenCalledWith('category-1', 75)
+    expect(updateBudgetCategoryTemporaryAmount).toHaveBeenCalledWith('category-1', 75, '2026-07-22')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Modifier le montant habituel' }))
+    await userEvent.clear(screen.getByLabelText('Nouveau montant'))
+    await userEvent.type(screen.getByLabelText('Nouveau montant'), '80')
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    expect(updateBudgetCategoryAmount).toHaveBeenCalledWith('category-1', 80)
   })
 
   it('saisit une dépense pour la catégorie affichée, sans champ de sélection', async () => {

@@ -13,10 +13,10 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 
 ## État actuel (réécrit intégralement à chaque /close)
 **v5.60 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-27).
-Un test manuel modifié se réaffiche, même si sa version antérieure avait été validée.
-Le test « Menu d’actions simplifié sur la fiche d’une tâche » doit être rejoué par Marie après déploiement.
-L’export de Marie du 25/08 est traité sans perte ni incohérence.
-#11 attend toujours le choix de Marie pour les catégories mensuelles.
+La v5.61 est prête : montant temporaire par catégorie, limité à la semaine ou au mois affiché.
+L’export de Marie du 27/08 est traité sans perte ni incohérence ; trois tests sont validés.
+Le test « Suivre ses dépenses avec Comptes » est à rejouer après déploiement.
+La décision #11 est entièrement implémentée.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)
 - 2026-08-17 (suite 4, sélecteur mois/année, refonte navigation planning et édition de tâche) : sur demande utilisateur (captures annotées), plusieurs correctifs UI cumulés sur `PlanningBoard.tsx`/`E22TaskDetail.tsx`. (1) Clic sur le mois/année du planning : nouvelle fenêtre `MonthYearPickerModal.tsx` (navigation par année, grille des 12 mois) remplace l'ancien sélecteur de date natif caché. (2) Bandeau de dates : le jour actuel reste désormais toujours centré (état `stripCenter` distinct du jour sélectionné `displayDate`), les flèches « semaine précédente/suivante » retirées, navigation uniquement par glissement tactile sur le bandeau. (3) Ligne de tâche planifiée : badge sous-tâches déplacé avant le logo énergie (alignement vertical constant), hauteur de ligne proportionnelle à `duration_minutes` (44-160px). (4) Débordement visuel du cadre Durée dans `E21CreateTaskV2.tsx`/`DurationRoller.tsx` corrigé (`minWidth:0` sur les selects, cause probable du bug signalé). (5) Fiche de tâche (`E22TaskDetail.tsx`) : fond teinté à la couleur d'ambiance des paramètres pour une tâche planifiée ; les champs (Titre, Icône, Couleur, Date, Horaire, Énergie) ne sont plus éditables inline au clic — nouveau bouton « Modifier » ouvrant un écran dédié `E24EditTask.tsx` (nouvelle route `task-edit`), pré-rempli au même gabarit que la création de tâche, avec le choix occurrence/série conservé pour les tâches récurrentes. `manualTestsCatalog.ts` : deux tests ajoutés (`naviguer-dans-le-planning`, `modifier-une-tache-planifiee`). `WHATS_NEW` mis à jour (3 entrées). 566/566 tests unitaires, `tsc -b`/lint clean. Aucun déploiement cette session.

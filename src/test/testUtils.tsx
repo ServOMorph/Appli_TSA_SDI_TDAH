@@ -101,6 +101,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     createBudgetCategory: vi.fn().mockResolvedValue(undefined),
     renameBudgetCategory: vi.fn().mockResolvedValue(undefined),
     updateBudgetCategoryAmount: vi.fn().mockResolvedValue(undefined),
+    updateBudgetCategoryTemporaryAmount: vi.fn().mockResolvedValue(undefined),
     deleteBudgetCategory: vi.fn().mockResolvedValue('deleted'),
     createBudgetAccount: vi.fn().mockResolvedValue(undefined),
     renameBudgetAccount: vi.fn().mockResolvedValue(undefined),

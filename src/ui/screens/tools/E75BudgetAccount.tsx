@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import type { BudgetCategory, BudgetPeriod } from '@/domain/entities/budgetCategory'
-import { getPeriodBounds, getSpentForCategory } from '@/domain/rules/budgetRules'
+import { getBudgetedAmount, getPeriodBounds, getSpentForCategory } from '@/domain/rules/budgetRules'
 import { BudgetGauge } from '@/ui/components/BudgetGauge'
 import { formatEuro, pageStyle } from '@/ui/styles/budget'
 
@@ -56,7 +56,8 @@ function PeriodColumn({ title, period, date, onShift, categories, onOpenCategory
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
           {categories.map((category) => {
             const spent = getSpentForCategory(entries, category.id, bounds)
-            const remaining = category.amount - spent
+            const budgeted = getBudgetedAmount(category, date)
+            const remaining = budgeted - spent
             return (
               <li key={category.id}>
                 <button
@@ -66,8 +67,8 @@ function PeriodColumn({ title, period, date, onShift, categories, onOpenCategory
                 >
                   <strong style={{ display: 'block', fontSize: '0.875rem' }}>{category.name}</strong>
                   <span style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: amountTone(remaining) }}>{formatEuro(remaining)} restant</span>
-                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>prévu {formatEuro(category.amount)}</span>
-                  <BudgetGauge spent={spent} budgeted={category.amount} label={`Budget consommé pour ${category.name}`} />
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>prévu {formatEuro(budgeted)}</span>
+                  <BudgetGauge spent={spent} budgeted={budgeted} label={`Budget consommé pour ${category.name}`} />
                 </button>
               </li>
             )

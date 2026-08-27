@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
 import { todayDate } from '@/app/repositories'
+import { getPeriodBounds } from '@/domain/rules/budgetRules'
 import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import { E75BudgetAccount } from './E75BudgetAccount'
@@ -77,6 +78,17 @@ describe('E75BudgetAccount', () => {
     expect(within(courses).getByText(/60,00.*restant/)).toBeDefined()
     const loyer = screen.getByRole('button', { name: 'Ouvrir Loyer' })
     expect(within(loyer).getByText('prévu 600,00 €')).toBeDefined()
+  })
+
+  it('applique le montant temporaire uniquement à la semaine concernée', async () => {
+    const bounds = getPeriodBounds('week', todayDate())
+    renderWithApp(<E75BudgetAccount />, makeAppContext({
+      budgetCategories: [makeCategory({ temporary_amount: 90, temporary_start_date: bounds.startDate, temporary_end_date: bounds.endDate })],
+    }))
+    const courses = screen.getByRole('button', { name: 'Ouvrir Courses' })
+    expect(within(courses).getByText('prévu 90,00 €')).toBeDefined()
+    await userEvent.click(screen.getByRole('button', { name: 'Période précédente (Semaine)' }))
+    expect(within(screen.getByRole('button', { name: 'Ouvrir Courses' })).getByText('prévu 60,00 €')).toBeDefined()
   })
 
   it('ouvre la fiche d’une catégorie avec la période consultée', async () => {

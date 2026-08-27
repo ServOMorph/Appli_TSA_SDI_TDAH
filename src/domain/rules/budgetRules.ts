@@ -38,6 +38,19 @@ export function isDateInPeriod(date: string, bounds: BudgetPeriodBounds): boolea
   return date >= bounds.startDate && date <= bounds.endDate
 }
 
+/** Montant prévu pour la période affichée, avec une modification temporaire éventuelle. */
+export function getBudgetedAmount(category: BudgetCategory, referenceDate: string): number {
+  const bounds = getPeriodBounds(category.period, referenceDate)
+  if (
+    category.temporary_amount !== undefined &&
+    category.temporary_start_date === bounds.startDate &&
+    category.temporary_end_date === bounds.endDate
+  ) {
+    return category.temporary_amount
+  }
+  return category.amount
+}
+
 export function getSpentForCategory(
   entries: BudgetEntry[],
   categoryId: string,

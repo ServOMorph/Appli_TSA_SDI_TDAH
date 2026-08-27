@@ -13,6 +13,7 @@ import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
+import { getPeriodBounds } from '@/domain/rules/budgetRules'
 
 export function useBudgetState() {
   const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>([])
@@ -80,6 +81,22 @@ export function useBudgetState() {
     const category = budgetCategories.find((item) => item.id === id)
     if (!category) return
     const updated = { ...category, amount, updated_at: new Date().toISOString() }
+    await budgetCategoryRepo.update(updated)
+    setBudgetCategories((previous) => previous.map((item) => (item.id === id ? updated : item)))
+  }
+
+  async function updateBudgetCategoryTemporaryAmount(id: string, amount: number, referenceDate: string) {
+    if (!Number.isFinite(amount) || amount <= 0) return
+    const category = budgetCategories.find((item) => item.id === id)
+    if (!category) return
+    const bounds = getPeriodBounds(category.period, referenceDate)
+    const updated = {
+      ...category,
+      temporary_amount: amount,
+      temporary_start_date: bounds.startDate,
+      temporary_end_date: bounds.endDate,
+      updated_at: new Date().toISOString(),
+    }
     await budgetCategoryRepo.update(updated)
     setBudgetCategories((previous) => previous.map((item) => (item.id === id ? updated : item)))
   }
@@ -221,6 +238,7 @@ export function useBudgetState() {
     createBudgetCategory,
     renameBudgetCategory,
     updateBudgetCategoryAmount,
+    updateBudgetCategoryTemporaryAmount,
     deleteBudgetCategory,
     createBudgetAccount,
     renameBudgetAccount,

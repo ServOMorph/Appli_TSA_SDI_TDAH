@@ -2,6 +2,6 @@
 
 Mis à jour automatiquement par `/deploy` (étape 7). Ne pas éditer manuellement.
 
-- Version : v5.58
-- Date : 2026-08-25
+- Version : v5.60
+- Date : 2026-08-27
 - URL de production : https://appli-audhd.netlify.app

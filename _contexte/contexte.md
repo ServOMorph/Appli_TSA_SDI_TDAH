@@ -12,8 +12,8 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Offline-first strict : fonctionne sans serveur ni compte en V1
 
 ## État actuel (réécrit intégralement à chaque /close)
-**v5.58 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-25).
-La v5.60 est prête à être déployée : un test manuel modifié se réaffiche, même si sa version antérieure avait été validée.
+**v5.60 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-27).
+Un test manuel modifié se réaffiche, même si sa version antérieure avait été validée.
 Le test « Menu d’actions simplifié sur la fiche d’une tâche » doit être rejoué par Marie après déploiement.
 L’export de Marie du 25/08 est traité sans perte ni incohérence.
 #11 attend toujours le choix de Marie pour les catégories mensuelles.

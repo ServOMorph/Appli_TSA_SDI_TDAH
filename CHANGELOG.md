@@ -1,3 +1,8 @@
+## v5.60 — 2026-08-27
+
+### Corrigé
+- Tests à faire : un test modifié réapparaît désormais même s’il avait été validé avant la modification ; sa nouvelle validation le masque à nouveau.
+
 ## v5.59 — 2026-08-25
 
 ### Modifié

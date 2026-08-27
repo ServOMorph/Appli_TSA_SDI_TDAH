@@ -77,6 +77,30 @@ describe('E121ManualTests', () => {
     expect(screen.queryByRole('button', { name: 'Ouvrir le test Créer une liste' })).not.toBeInTheDocument()
   })
 
+  it('réaffiche un test quand sa révision est plus récente que son dernier résultat validé', () => {
+    const ctx = makeAppContext({
+      manualTestResults: [
+        { id: 'old', test_id: 'menu-actions-tache-simplifie', status: 'ok', comment: null, created_at: '2026-08-25T16:11:25.470Z' },
+      ],
+    })
+    renderWithApp(<E121ManualTests />, ctx)
+    expandCategory('Tâches')
+
+    expect(screen.getByRole('button', { name: 'Ouvrir le test Menu d’actions simplifié sur la fiche d’une tâche' })).toBeInTheDocument()
+  })
+
+  it('masque un test révisé après sa validation dans la révision courante', () => {
+    const ctx = makeAppContext({
+      manualTestResults: [
+        { id: 'current', test_id: 'menu-actions-tache-simplifie', test_revision: 2, status: 'ok', comment: null, created_at: '2026-08-25T18:00:00.000Z' },
+      ],
+    })
+    renderWithApp(<E121ManualTests />, ctx)
+    expandCategory('Tâches')
+
+    expect(screen.queryByRole('button', { name: 'Ouvrir le test Menu d’actions simplifié sur la fiche d’une tâche' })).not.toBeInTheDocument()
+  })
+
   it('demande un commentaire avant d’enregistrer un résultat non validé', async () => {
     const submitManualTestResult = vi.fn().mockResolvedValue(undefined)
     renderWithApp(<E121ManualTests />, makeAppContext({ submitManualTestResult }))
@@ -93,7 +117,7 @@ describe('E121ManualTests', () => {
     fireEvent.click(save)
 
     await waitFor(() => {
-      expect(submitManualTestResult).toHaveBeenCalledWith('creer-une-liste', 'nok', 'Le bouton est absent.')
+      expect(submitManualTestResult).toHaveBeenCalledWith('creer-une-liste', 'nok', 'Le bouton est absent.', undefined)
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
   })

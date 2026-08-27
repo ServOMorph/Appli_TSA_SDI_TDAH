@@ -12,6 +12,7 @@ export type ManualTestCategory = (typeof MANUAL_TEST_CATEGORIES)[number]
 
 export interface ManualTest {
   id: string
+  revision?: number
   title: string
   category: ManualTestCategory
   steps: string[]
@@ -293,6 +294,7 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'menu-actions-tache-simplifie',
+    revision: 2,
     title: 'Menu d’actions simplifié sur la fiche d’une tâche',
     category: 'Tâches',
     steps: [

@@ -16,6 +16,10 @@ function latestResult(results: ManualTestResult[], testId: string): ManualTestRe
     )
 }
 
+function isCurrentValidResult(result: ManualTestResult | undefined, test: ManualTest): boolean {
+  return result?.status === 'ok' && (test.revision === undefined || result.test_revision === test.revision)
+}
+
 function statusLabel(result: ManualTestResult | undefined): string {
   if (!result) return 'Jamais testé'
   return result.status === 'ok' ? 'Validé' : 'Non validé'
@@ -43,7 +47,7 @@ export function E121ManualTests() {
   )
 
   const visibleTests = useMemo(
-    () => manualTestsCatalog.filter((test) => latestByTest.get(test.id)?.status !== 'ok'),
+    () => manualTestsCatalog.filter((test) => !isCurrentValidResult(latestByTest.get(test.id), test)),
     [latestByTest],
   )
 
@@ -97,7 +101,7 @@ export function E121ManualTests() {
 
   async function saveResult() {
     if (!selectedTest || !canSubmit) return
-    await submitManualTestResult(selectedTest.id, selectedStatus, comment)
+    await submitManualTestResult(selectedTest.id, selectedStatus, comment, selectedTest.revision)
     setSelectedTest(null)
   }
 

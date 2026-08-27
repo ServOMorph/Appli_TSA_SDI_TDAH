@@ -1,7 +1,8 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-25)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-27)
 
 ## Contexte chaud
 - **v5.58 déployée en prod le 2026-08-25** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : `roadmap_retours_marie_2026-08-25.md` livrée : retrait de « Terminer » de la fiche de tâche, réglage de couleur des outils dans Paramètres > Accessibilité et accès direct à la modification de l’énergie depuis l’accueil. Suite complète : 608 tests verts, TypeScript et lint verts. Commentaire de livraison publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.58.md`.
+- **v5.60 prête à être déployée** : le catalogue versionne désormais les tests modifiés. Le test « Menu d’actions simplifié sur la fiche d’une tâche », validé avant le retrait de « Terminer », est de nouveau visible jusqu’à sa validation sur la nouvelle version. Suite complète : 610 tests verts, TypeScript et lint verts.
 - **v5.52 déployée en prod le 2026-08-24** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : export de Marie du 23 août traité, trois retours corrigés (fond neutre des tâches sans couleur, retour vers la catégorie d’origine d’un élément de liste, contrôle « Couleur » visible sur les outils). Suite complète : 605 tests verts. Les trois parcours sont présents dans le catalogue in-app pour validation par Marie. Aucun redéploiement depuis.
 - **Export de Marie du 2026-08-24 11:46 traité** : aucune perte ni incohérence comparé à celui du 23 août ; 3 résultats de tests ajoutés au journal. Le seul retour nouveau (« libellé Couleur introuvable ») correspond au correctif déjà présent dans la version à déployer.
 - **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
@@ -30,23 +31,22 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-25 — déploiement v5.58 et préparation de la suite)
+## Dernière session (2026-08-27 — correction de visibilité des tests manuels)
 
 ## Décisions prises
-- v5.58 est déployée après les contrôles automatisés et une vérification HTTP 200.
-- Les améliorations de procédure demandées pour la prochaine session sont prioritaires avant tout nouveau développement.
+- Une validation de test est désormais liée à la révision du test concerné.
 
 ## Livrables produits ou modifiés
-- `dist/v5.58/` : build déployé sur Netlify.
-- `COMMUNICATION/Marie/livraisons/v5.58.md` et `commentaires_marie_v5.58.docx` : commentaire publié sur Drive.
-- `_contexte/signals.md` : trois priorités de procédure ajoutées pour la prochaine session.
+- `manualTestResult.ts`, `useManualTestsState.ts`, `manualTestsCatalog.ts`, `E121ManualTests.tsx` : révisions de tests prises en charge.
+- `E121ManualTests.test.tsx` : affichage puis masquage d’une révision validés.
+- `COMMUNICATION/Marie/a_transmettre.md` : message et test à refaire préparés.
 
 ## Hypothèses validées / invalidées
-- VALIDE : 608 tests, TypeScript et lint sont verts ; production répond HTTP 200.
-- EN ATTENTE : périmètre #11 pour les catégories mensuelles.
+- VALIDE : 610 tests, TypeScript et lint sont verts.
+- EN ATTENTE : déploiement v5.60 et périmètre #11 pour les catégories mensuelles.
 
 ## Prochaine étape exacte
-Traiter d’abord les trois priorités P1 de procédure, puis reprendre les retours de Marie.
+Confirmer la disponibilité du dernier export de Marie, puis déployer v5.60.
 
 ## Question bloquante pour la session suivante
 Aucune.

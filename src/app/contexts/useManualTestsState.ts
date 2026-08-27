@@ -9,10 +9,11 @@ export function useManualTestsState() {
     setManualTestResults(await manualTestResultRepo.getAll())
   }, [])
 
-  async function submitManualTestResult(testId: string, status: ManualTestStatus, comment: string) {
+  async function submitManualTestResult(testId: string, status: ManualTestStatus, comment: string, testRevision?: number) {
     const result: ManualTestResult = {
       id: newId(),
       test_id: testId,
+      test_revision: testRevision,
       status,
       comment: status === 'nok' ? comment.trim() : null,
       created_at: new Date().toISOString(),

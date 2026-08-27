@@ -31,21 +31,20 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-27 — montant temporaire Budget)
+## Dernière session (2026-08-27 — raccordement ROBERTO)
 
 ## Décisions prises
-- #11 est implémentée : seul le montant de la catégorie sélectionnée change temporairement, jusqu’à la fin de sa semaine ou de son mois.
+- Le raccordement TSA au bridge vocal ROBERTO partagé est documenté ; les processus partagés sont actifs.
 
 ## Livrables produits ou modifiés
-- `budgetCategory.ts`, `budgetRules.ts`, `useBudgetState.ts`, `E73CategoryDetail.tsx`, `E75BudgetAccount.tsx` : montant temporaire par période.
-- Tests Budget et catalogue manuel : parcours mis à jour.
+- `.claude/commands/roberto.md`, `ROBERTO/com_telephone/README.md`, `.claude/CLAUDE.md` : procédure et règles du bridge TSA.
 
 ## Hypothèses validées / invalidées
-- VALIDE : 612 tests, TypeScript et lint sont verts.
-- EN ATTENTE : test Marie de « Suivre ses dépenses avec Comptes ».
+- VALIDE : les trois processus partagés ROBERTO sont actifs.
+- EN ATTENTE : surveillance persistante du log indisponible dans cet environnement.
 
 ## Prochaine étape exacte
-Demander à Marie de rejouer le test Budget, puis traiter son prochain export.
+Activer la surveillance persistante du log TSA depuis une session exposant Monitor/TaskStop.
 
 ## Question bloquante pour la session suivante
 Aucune.

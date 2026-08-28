@@ -136,6 +136,30 @@ Style attendu par Marie (préférence explicite du 28/08) : **hyper synthétique
 politesse** — pas de salutation, pas de remerciement, pas de formule de clôture. Aller droit à
 l'information : ce qui est fait, ce qu'elle doit vérifier, une idée par phrase.
 
+**Gabarit du message de livraison** (préférence du 28/08) :
+
+```
+💻🤖
+
+Version <X.Y> en ligne.
+
+<N> tests à faire, correspondant aux modifications :
+• <n° de modification du Google Doc>
+• <n° …>
+
+<lien de l'appli sur sa propre ligne>
+
+💻🤖
+```
+
+`<N>` = nombre de parcours actuellement à faire dans l'écran « Tests à faire » (parcours non
+validés sur la version déployée). Les puces reprennent les numéros de modification du Google Doc
+`Modifications` couverts par ces parcours (champ `docRefs` de `src/domain/data/manualTestsCatalog.ts`,
+recoupé avec `_contexte/marie_modifications_suivi.md`). Un parcours sans numéro de modification
+(retour hors Doc) est listé par son titre. Le lien du commentaire Drive est ajouté sur sa propre
+ligne, introduit par « Détail des changements et questions : », uniquement s'il y a un commentaire
+utile pour cette livraison.
+
 ### Tests à faire pour Marie : uniquement dans l'appli
 Tous les tests que Marie doit effectuer vivent dans le catalogue in-app
 (`src/domain/data/manualTestsCatalog.ts`, écran « Tests à faire »). Ne jamais lister de tests à

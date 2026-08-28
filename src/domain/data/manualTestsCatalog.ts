@@ -16,6 +16,9 @@ export interface ManualTest {
   title: string
   category: ManualTestCategory
   steps: string[]
+  // Numéros de modification du Google Doc « Modifications » de Marie que ce parcours vérifie.
+  // Voir _contexte/marie_modifications_suivi.md. Absent = parcours hors Doc (retour WhatsApp, contrôle générique).
+  docRefs?: number[]
 }
 
 // Template à suivre pour chaque nouveau test :
@@ -107,6 +110,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'utiliser-le-budget',
     title: 'Utiliser le budget',
     category: 'Outils : Budget',
+    docRefs: [6, 8, 10],
     steps: [
       'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget ». Si aucun revenu n’a encore été saisi, seul le bouton « Configurer le budget » doit être visible : touchez-le, saisissez un montant, puis touchez « Enregistrer ».',
       'Si un revenu existe déjà, touchez « Modifier le budget » sur la carte « Montant total », puis « Ajouter un revenu », saisissez un montant, puis touchez « Enregistrer » : le montant total et le détail « ... de revenus » doivent augmenter.',
@@ -121,6 +125,7 @@ export const manualTestsCatalog: ManualTest[] = [
     revision: 2,
     title: 'Suivre ses dépenses avec Comptes',
     category: 'Outils : Budget',
+    docRefs: [11, 12, 13, 14],
     steps: [
       'Depuis l’accueil, touchez le widget « Comptes » (dans la grille sous le planning) : vous devez arriver sur un écran affichant « Semaine » et « Mois » côte à côte, chacune avec ses sous-catégories (montant prévu, montant restant et une jauge).',
       'Touchez les flèches ← et → sous « Semaine » : la période affichée doit changer sans modifier celle affichée sous « Mois ».',
@@ -134,6 +139,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'modifier-et-supprimer-un-revenu-du-montant-total',
     title: 'Modifier et supprimer un revenu du Montant total',
     category: 'Outils : Budget',
+    docRefs: [6, 7],
     steps: [
       'Depuis l’accueil, ouvrez « Outils » puis touchez la carte « Budget », puis « Modifier le budget » sur la carte « Montant total ».',
       'Vérifiez que toutes les entrées de revenus déjà saisies apparaissent dans la liste, chacune avec sa date, son libellé et son montant.',
@@ -232,6 +238,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'cadre-date-heure-dans-l-ecran',
     title: 'Cadre Date et Heure bien dans l’écran',
     category: 'Tâches',
+    docRefs: [3],
     steps: [
       'Sur téléphone, commencez la création d’une tâche et activez sa planification pour faire apparaître les champs « Date » et « Heure de début ».',
       'Vérifiez que les cadres « Date » et « Heure de début » tiennent entièrement dans l’écran, sans dépasser sur le bord droit, avec la même marge à gauche et à droite.',
@@ -252,6 +259,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'supprimer-une-categorie-de-liste',
     title: 'Supprimer une catégorie de liste',
     category: 'Outils : Listes',
+    docRefs: [15],
     steps: [
       'Ouvrez une liste ayant au moins deux catégories.',
       'Sur l’écran des catégories, touchez la croix rouge à côté d’une catégorie : une confirmation « Supprimer « <nom> » ? » doit s’afficher, pas « Supprimer cette liste ».',
@@ -263,6 +271,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'ajouter-une-categorie-de-liste-sur-mobile',
     title: 'Ajouter une catégorie de liste sur mobile',
     category: 'Outils : Listes',
+    docRefs: [16],
     steps: [
       'Sur un téléphone, ouvrez une liste puis touchez « Ajouter une catégorie ».',
       'Touchez le champ « Nom de la catégorie » pour ouvrir le clavier, puis saisissez un nom.',
@@ -287,6 +296,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'consulter-et-modifier-l-energie',
     title: 'Modifier l’énergie depuis l’accueil',
     category: 'Énergie',
+    docRefs: [17],
     steps: [
       'Depuis l’accueil, touchez le badge énergie en haut à gauche : l’écran « Mon énergie maintenant » doit s’ouvrir directement.',
       'Choisissez une valeur puis touchez « Valider » : vous devez revenir directement à l’accueil.',
@@ -307,6 +317,7 @@ export const manualTestsCatalog: ManualTest[] = [
     id: 'couleur-de-fond-par-outil',
     title: 'Couleur de fond par outil',
     category: 'Paramètres / Profil',
+    docRefs: [2],
     steps: [
       'Allez dans Paramètres, puis touchez « Accessibilité ».',
       'Après « Couleur d’ambiance », repérez la section « Couleur des outils », puis choisissez une couleur pour un outil : le fond de sa carte doit se teinter aussitôt (fond adouci, pas la couleur brute).',
@@ -319,6 +330,7 @@ export const manualTestsCatalog: ManualTest[] = [
     revision: 2,
     title: 'Menu d’actions simplifié sur la fiche d’une tâche',
     category: 'Tâches',
+    docRefs: [4, 5],
     steps: [
       'Ouvrez la fiche de détail d’une tâche (depuis Réception ou le planning).',
       'Vérifiez que seuls les boutons « Modifier », « Décomposer », « Dupliquer » et « Supprimer » sont affichés : « Tâche du jour », « Planifier », « Liste » et « Terminer » ne doivent plus apparaître.',

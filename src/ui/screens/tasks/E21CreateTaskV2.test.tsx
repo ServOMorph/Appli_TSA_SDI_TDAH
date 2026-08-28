@@ -88,6 +88,18 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('planning')
   })
 
+  it('le formulaire et les champs Date/Heure gardent des contraintes de largeur (évite le débordement à droite)', async () => {
+    const ctx = makeAppContext({ originScreen: 'planning' })
+    renderWithApp(<E21CreateTaskV2 />, ctx)
+    const form = screen.getByLabelText('Date').closest('form') as HTMLFormElement
+    expect(form.style.minWidth).toBe('0')
+    for (const label of ['Date', 'Heure de début']) {
+      const input = screen.getByLabelText(label) as HTMLInputElement
+      expect(input.style.maxWidth).toBe('100%')
+      expect(input.style.minWidth).toBe('0')
+    }
+  })
+
   it("depuis Accueil (originScreen 'dashboard') : planifie directement la tâche", async () => {
     const ctx = makeAppContext({ originScreen: 'dashboard' })
     renderWithApp(<E21CreateTaskV2 />, ctx)

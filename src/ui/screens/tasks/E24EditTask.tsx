@@ -188,7 +188,7 @@ export function E24EditTask() {
 
       <h1 style={{ margin: 0 }}>Modifier la tâche</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', minWidth: 0 }}>
         <div style={fieldGroupStyle}>
           <span style={labelStyle}>Icône</span>
           <IconPicker value={icon} onChange={setIcon} />

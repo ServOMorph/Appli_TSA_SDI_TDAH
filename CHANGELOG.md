@@ -1,3 +1,8 @@
+## v5.64 — 2026-08-28
+
+### Corrigé
+- Formulaire de tâche : les cadres « Date » et « Heure de début » ne débordent plus sur le bord droit de l’écran (demande #3 de Marie). Le `<form>` était un enfant flex sans `min-width: 0`, donc il ne pouvait pas rétrécir sous la largeur intrinsèque des sélecteurs natifs date/heure sur mobile. Corrigé sur les écrans de création (`E21CreateTaskV2.tsx`) et de modification (`E24EditTask.tsx`).
+
 ## v5.63 — 2026-08-28
 
 ### Ajouté

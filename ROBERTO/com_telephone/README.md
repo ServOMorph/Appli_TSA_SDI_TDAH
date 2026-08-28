@@ -59,6 +59,11 @@ curl -X POST http://127.0.0.1:5000/send -H "Content-Type: application/json" -d '
 PowerShell (clé `text`, pas `message`) :
 
 ```
-$body = @{ text = "Deploiement termine, la version est en ligne."; project = "tsa" } | ConvertTo-Json
-Invoke-RestMethod -Uri "http://127.0.0.1:5000/send" -Method Post -ContentType "application/json" -Body $body
+$body = @{ text = "Déploiement terminé, la version est en ligne."; project = "tsa" } | ConvertTo-Json -Compress
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($body)
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/send" -Method Post -ContentType "application/json; charset=utf-8" -Body $bytes
 ```
+
+Toujours envoyer le corps en octets UTF-8 avec `charset=utf-8` : sans cela, Windows PowerShell 5.1
+sérialise le corps en ISO-8859-1 et les accents comme les emoji hors BMP (💻 🤖) arrivent en `?`
+dans l'appli.

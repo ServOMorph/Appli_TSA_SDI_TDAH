@@ -106,6 +106,7 @@ describe('E10Dashboard', () => {
         manualTestResults: manualTestsCatalog.map((test) => ({
           id: `result-${test.id}`,
           test_id: test.id,
+          test_revision: test.revision,
           status: 'ok' as const,
           comment: null,
           created_at: '2026-08-14T10:00:00.000Z',
@@ -114,6 +115,22 @@ describe('E10Dashboard', () => {
       await renderDashboard(ctx)
       expect(screen.queryByLabelText('Nouveaux tests disponibles')).toBeNull()
       expect(screen.getByRole('button', { name: 'Tests à faire' })).toBeDefined()
+    })
+
+    it('affiche la pastille quand un test révisé n’a été validé que sur une ancienne révision', async () => {
+      const revised = manualTestsCatalog.find((test) => test.revision !== undefined)!
+      const ctx = makeAppContext({
+        manualTestResults: manualTestsCatalog.map((test) => ({
+          id: `result-${test.id}`,
+          test_id: test.id,
+          test_revision: test.id === revised.id ? (revised.revision ?? 0) - 1 : test.revision,
+          status: 'ok' as const,
+          comment: null,
+          created_at: '2026-08-14T10:00:00.000Z',
+        })),
+      })
+      await renderDashboard(ctx)
+      expect(screen.getByLabelText('Nouveaux tests disponibles')).toBeDefined()
     })
 
     it('n\'affiche pas d\'icône Planning dans la TopBar', async () => {

@@ -3,22 +3,10 @@ import { useApp } from '@/app/AppContext'
 import { MANUAL_TEST_CATEGORIES, manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 import type { ManualTestResult, ManualTestStatus } from '@/domain/entities/manualTestResult'
 import type { ManualTest, ManualTestCategory } from '@/domain/data/manualTestsCatalog'
+import { isManualTestValidated, latestManualTestResult } from '@/domain/rules/manualTestRules'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { inputStyle, modalBox, modalOverlay } from '@/ui/styles/budget'
-
-function latestResult(results: ManualTestResult[], testId: string): ManualTestResult | undefined {
-  return results
-    .filter((result) => result.test_id === testId)
-    .reduce<ManualTestResult | undefined>(
-      (latest, result) => (!latest || result.created_at > latest.created_at ? result : latest),
-      undefined,
-    )
-}
-
-function isCurrentValidResult(result: ManualTestResult | undefined, test: ManualTest): boolean {
-  return result?.status === 'ok' && (test.revision === undefined || result.test_revision === test.revision)
-}
 
 function statusLabel(result: ManualTestResult | undefined): string {
   if (!result) return 'Jamais testé'
@@ -42,12 +30,12 @@ export function E121ManualTests() {
   const [expandedTestIds, setExpandedTestIds] = useState<Set<string>>(new Set())
   const [expandedCategories, setExpandedCategories] = useState<Set<ManualTestCategory>>(new Set())
   const latestByTest = useMemo(
-    () => new Map(manualTestsCatalog.map((test) => [test.id, latestResult(manualTestResults, test.id)])),
+    () => new Map(manualTestsCatalog.map((test) => [test.id, latestManualTestResult(manualTestResults, test.id)])),
     [manualTestResults],
   )
 
   const visibleTests = useMemo(
-    () => manualTestsCatalog.filter((test) => !isCurrentValidResult(latestByTest.get(test.id), test)),
+    () => manualTestsCatalog.filter((test) => !isManualTestValidated(test, latestByTest.get(test.id))),
     [latestByTest],
   )
 

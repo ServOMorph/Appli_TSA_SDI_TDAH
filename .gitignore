@@ -62,3 +62,6 @@ __pycache__/
 
 # Captures de calibration chatgpt-orchestrateur (éphémères, jamais réinjectées)
 ROBERTO/_orchestrateur_ia/*/calibration/
+
+# Captures reçues via le bridge ROBERTO (éphémères)
+_docs/captures/

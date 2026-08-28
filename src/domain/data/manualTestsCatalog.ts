@@ -219,6 +219,16 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'pastille-nouveaux-tests',
+    title: 'Pastille rouge quand il y a des tests à faire',
+    category: 'Paramètres / Profil',
+    steps: [
+      'Sur l’accueil, regardez l’icône en forme de coche en haut à droite : tant qu’il reste des tests non validés, un point rouge doit être affiché dessus.',
+      'Touchez cette icône, ouvrez un test et enregistrez-le comme « Validé ».',
+      'Recommencez jusqu’à ce que plus aucun test n’apparaisse dans « Tests à faire » : le point rouge sur l’icône de l’accueil doit alors disparaître.',
+    ],
+  },
+  {
     id: 'couleur-tache-sans-couleur-choisie',
     title: 'Couleur d’une tâche sans couleur choisie',
     category: 'Tâches',

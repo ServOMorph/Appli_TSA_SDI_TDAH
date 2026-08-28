@@ -1,6 +1,7 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-27)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-28)
 
 ## Contexte chaud
+- **v5.62 déployée en prod le 2026-08-28** : la pastille rouge de l'icône « Tests à faire » (accueil) suit désormais exactement la liste de l'écran E121 — un test jamais validé, en échec ou validé sur une révision antérieure la rallume. Logique commune extraite dans `src/domain/rules/manualTestRules.ts`. Retour Marie du 27/08 traité (demande « remettre la pastille »). Suite complète : 623 tests verts, TypeScript et lint verts.
 - **v5.58 déployée en prod le 2026-08-25** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : `roadmap_retours_marie_2026-08-25.md` livrée : retrait de « Terminer » de la fiche de tâche, réglage de couleur des outils dans Paramètres > Accessibilité et accès direct à la modification de l’énergie depuis l’accueil. Suite complète : 608 tests verts, TypeScript et lint verts. Commentaire de livraison publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.58.md`.
 - **v5.60 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : le catalogue versionne désormais les tests modifiés. Le test « Menu d’actions simplifié sur la fiche d’une tâche », validé avant le retrait de « Terminer », est de nouveau visible jusqu’à sa validation sur la nouvelle version. Suite complète : 610 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.60.md`.
 - **v5.61 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : la modification d’un montant Budget est temporaire sur la catégorie et la période affichées ; le montant habituel reste modifiable. Export Marie du 27/08 analysé sans perte ni friction : 3 tests validés. Suite complète : 612 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.61.md`.
@@ -14,7 +15,7 @@
 - `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles. Son choix structurant (Montant total/Mon compte basés sur les dépenses réelles) a été explicitement inversé le 2026-08-24 par `roadmap_demandes_marie_2026-08-24.md` (retour aux prévisions), sur confirmation de l'utilisateur — cette roadmap reste un historique valide de ce qui a été livré et pourquoi, pas l'état actuel du calcul.
 - `manualTestsCatalog.ts` : les tests demandés à Marie couvrent v5.56 et v5.58, dont le menu simplifié des tâches, Budget/Comptes, l'ajout de catégorie de liste sur mobile, l'énergie et le contrôle « Couleur ».
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
-- `_contexte/dernier_deploiement.md` : v5.58, 2026-08-25, prod vérifiée HTTP 200.
+- `_contexte/dernier_deploiement.md` : v5.62, 2026-08-28, prod vérifiée HTTP 200.
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
@@ -31,20 +32,25 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-27 — raccordement ROBERTO)
+## Dernière session (2026-08-28 — pastille « Tests à faire » alignée sur les tests en attente)
 
 ## Décisions prises
-- Le raccordement TSA au bridge vocal ROBERTO partagé est documenté ; les processus partagés sont actifs.
+- Retour Marie du 27/08 (WhatsApp) : montant temporaire Budget confirmé conforme ; demande « remettre la pastille rouge quand il y a de nouveaux tests » traitée immédiatement sur instruction `!deploy`.
+- La pastille rouge de l'icône « Tests à faire » (accueil) suit désormais exactement la liste de l'écran E121 : un test jamais validé, en échec, ou validé sur une révision antérieure la rallume. Auparavant elle ne réagissait qu'aux tests jamais ouverts.
+- Bridge ROBERTO : chemin corrigé en séance par l'utilisateur dans `.claude/CLAUDE.md` — `D:\ServOMorph\Roberto\...` (le chemin `IA_Life` n'existe plus).
 
 ## Livrables produits ou modifiés
-- `.claude/commands/roberto.md`, `ROBERTO/com_telephone/README.md`, `.claude/CLAUDE.md` : procédure et règles du bridge TSA.
+- `src/domain/rules/manualTestRules.ts`(`.test.ts`) : créé — `latestManualTestResult`, `isManualTestValidated`, `pendingManualTests`, `hasPendingManualTests` (logique commune extraite de E121).
+- `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`) : `hasNewManualTests` basé sur `hasPendingManualTests` ; test ajouté pour la révision antérieure.
+- `src/ui/screens/tests/E121ManualTests.tsx` : consomme le module partagé.
+- `src/domain/data/manualTestsCatalog.ts` : parcours `pastille-nouveaux-tests` ajouté.
+- `E01Welcome.tsx` (`WHATS_NEW`), `CHANGELOG.md` (v5.62), `.gitignore` (`_docs/captures/`).
 
 ## Hypothèses validées / invalidées
-- VALIDE : les trois processus partagés ROBERTO sont actifs.
-- EN ATTENTE : surveillance persistante du log indisponible dans cet environnement.
+- VALIDE : 623 tests, `tsc -b` et lint verts.
 
 ## Prochaine étape exacte
-Activer la surveillance persistante du log TSA depuis une session exposant Monitor/TaskStop.
+Déploiement v5.62 mené dans la foulée de ce `/close`.
 
 ## Question bloquante pour la session suivante
 Aucune.

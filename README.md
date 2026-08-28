@@ -16,7 +16,9 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version **v5.61** est en production : elle ajoute les montants temporaires par catégorie et période.
+La version **v5.62** est en production : le point rouge de l’icône « Tests à faire » de l’accueil se rallume dès qu’un test reste à valider (révision comprise), en suivant exactement la liste de l’écran « Tests à faire ».
+
+La version **v5.61** ajoute les montants temporaires par catégorie et période ; le parcours « Suivre ses dépenses avec Comptes » reste à rejouer par Marie.
 
 Les roadmaps des 23 et 24 août sont archivées ; la roadmap du 25 août est livrée : retrait de « Terminer », couleur des outils dans Paramètres et accès direct à la modification d’énergie. La décision #11 reste à confirmer avec Marie pour les catégories mensuelles.
 

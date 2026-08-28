@@ -10,6 +10,7 @@ import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
 import { DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
+import { hasPendingManualTests } from '@/domain/rules/manualTestRules'
 
 const handleStyle: React.CSSProperties = {
   display: 'flex',
@@ -82,9 +83,7 @@ export function E10Dashboard() {
 
   const rootFolders = folders
   const rootTools = tools.filter((t) => t.folder_id === null)
-  const hasNewManualTests = manualTestsCatalog.some(
-    (test) => !manualTestResults.some((result) => result.test_id === test.id),
-  )
+  const hasNewManualTests = hasPendingManualTests(manualTestsCatalog, manualTestResults)
 
   function openTool(toolId: string) {
     const tool = rootTools.find((t) => t.id === toolId)

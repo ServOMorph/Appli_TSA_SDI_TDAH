@@ -3,7 +3,9 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = []
+const WHATS_NEW: string[] = [
+  'Le point rouge sur l’icône « Tests à faire » revient dès qu’un test reste à valider, y compris après une mise à jour d’un test déjà validé.',
+]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

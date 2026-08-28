@@ -1,3 +1,11 @@
+## v5.62 — 2026-08-28
+
+### Corrigé
+- Accueil : le point rouge sur l’icône « Tests à faire » reparaît dès qu’un test reste à valider, y compris lorsqu’un test déjà validé a été modifié depuis. Auparavant il ne s’affichait que pour les tests jamais ouverts.
+
+### Ajouté
+- Tests à faire : parcours manuel « Pastille rouge quand il y a des tests à faire ».
+
 ## v5.61 — 2026-08-27
 
 ### Ajouté

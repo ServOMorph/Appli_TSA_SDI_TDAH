@@ -1,3 +1,11 @@
+## v5.63 — 2026-08-28
+
+### Ajouté
+- Suivi Marie : registre `_contexte/marie_modifications_suivi.md` des demandes du Google Doc « Modifications », réconcilié par `/analyser_googledoc` et par une revue commune à `/deploy` (étape 0) et `/traiter_export_marie`. `/deploy` avertit désormais si une demande « en attente » n’est rattachée à aucune roadmap ni décision.
+
+### Modifié
+- Bridge ROBERTO : l’exemple `POST /send` envoie le corps en octets UTF-8 avec `charset=utf-8` — accents et emoji ne sont plus remplacés par des « ? ».
+
 ## v5.62 — 2026-08-28
 
 ### Corrigé

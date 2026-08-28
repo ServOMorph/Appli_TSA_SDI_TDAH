@@ -1,7 +1,8 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-28)
 
 ## Contexte chaud
-- **v5.62 déployée en prod le 2026-08-28** : la pastille rouge de l'icône « Tests à faire » (accueil) suit désormais exactement la liste de l'écran E121 — un test jamais validé, en échec ou validé sur une révision antérieure la rallume. Logique commune extraite dans `src/domain/rules/manualTestRules.ts`. Retour Marie du 27/08 traité (demande « remettre la pastille »). Suite complète : 623 tests verts, TypeScript et lint verts.
+- **v5.62 déployée en prod le 2026-08-28** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : la pastille rouge de l'icône « Tests à faire » (accueil) suit désormais exactement la liste de l'écran E121 — un test jamais validé, en échec ou validé sur une révision antérieure la rallume. Logique commune extraite dans `src/domain/rules/manualTestRules.ts`. Retour Marie du 27/08 traité (demande « remettre la pastille »). Suite complète : 623 tests verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.62.md`.
+- **Suivi des demandes du Google Doc de Marie** : registre durable `_contexte/marie_modifications_suivi.md` (17 demandes, états `livrée`/`en attente`/`écartée`), réconcilié par `/analyser_googledoc` (étape 6) et par la revue commune `.claude/revue_googledoc.md` câblée dans `/deploy` étape 0 et `/traiter_export_marie`. La revue s'arrête à un contrôle de date tant que le Doc n'a pas changé depuis 2026-08-24. Demande **#3** (cadre Date/Heure) `en attente` et non planifiée — signalée par l'avertissement 4.5 de `/deploy`.
 - **v5.58 déployée en prod le 2026-08-25** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : `roadmap_retours_marie_2026-08-25.md` livrée : retrait de « Terminer » de la fiche de tâche, réglage de couleur des outils dans Paramètres > Accessibilité et accès direct à la modification de l’énergie depuis l’accueil. Suite complète : 608 tests verts, TypeScript et lint verts. Commentaire de livraison publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.58.md`.
 - **v5.60 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : le catalogue versionne désormais les tests modifiés. Le test « Menu d’actions simplifié sur la fiche d’une tâche », validé avant le retrait de « Terminer », est de nouveau visible jusqu’à sa validation sur la nouvelle version. Suite complète : 610 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.60.md`.
 - **v5.61 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : la modification d’un montant Budget est temporaire sur la catégorie et la période affichées ; le montant habituel reste modifiable. Export Marie du 27/08 analysé sans perte ni friction : 3 tests validés. Suite complète : 612 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.61.md`.
@@ -10,7 +11,7 @@
 - **v5.51 déployée en prod le 2026-08-20** (HTTP 200 vérifié) : `roadmap_demandes_marie_v1.md` Phases 1-5 — couleur de tâche neutre par défaut, suppression d'une catégorie de liste, accès direct énergie, détail d'élément de liste (description + sous-tâches), encadrement + glissement animé du bandeau de dates, couleur de fond par outil. TA2 et AP1 de cette roadmap non importés : `main` avait déjà, indépendamment, une meilleure implémentation du même besoin.
 - **Incident de branche (2026-08-19) clos et corrigé préventivement** : plusieurs sessions de travail sur les demandes de Marie avaient été faites par erreur sur `sync-marie` sans vérifier sa divergence avec `main` (jamais fusionnée depuis le 2026-08-16). `.claude/commands/start.md` vérifie désormais la divergence de branche avant de charger le contexte ; `.claude/memory.md` porte la règle. `.gitignore` complété au passage (`__pycache__/`, captures de calibration ROBERTO — règles déjà sur `sync-marie`, jamais reportées).
 - `donnees_marie/` : exports réels de Marie stockés en local, gitignorés, donnée sensible déclarée dans `CLAUDE.md`. Export du 2026-08-19 traité (archivé, ingéré : 10 nouvelles entrées journal) — 3 frictions non bloquantes relevées (test IDs obsolètes en cache client, rejet du geste de glissement planning par Marie avec demande de comportement alternatif, incompréhension retrait livret/catégorie budget qui est par design) : à traiter comme futures demandes, pas corrigées à chaud.
-- Nouvelle commande `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy`. `/deploy` étape 0 fait toujours le même travail en interne, redondance non retirée — à évaluer si gênant.
+- `.claude/commands/traiter_export_marie.md` : traite l'arrivée d'un export de Marie indépendamment de `/deploy`, et exécute désormais aussi la revue du Google Doc (étape 7). `/deploy` étape 0 fait le même travail en interne, redondance non retirée — à évaluer si gênant.
 - Marie a validé un découpage du travail en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil) — `COMMUNICATION/message_marie_categories_travail.md`. Le catalogue de tests manuels (`manualTestsCatalog.ts`) applique déjà ce découpage ; les autres roadmaps/communications ne l'appliquent pas encore.
 - `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles. Son choix structurant (Montant total/Mon compte basés sur les dépenses réelles) a été explicitement inversé le 2026-08-24 par `roadmap_demandes_marie_2026-08-24.md` (retour aux prévisions), sur confirmation de l'utilisateur — cette roadmap reste un historique valide de ce qui a été livré et pourquoi, pas l'état actuel du calcul.
 - `manualTestsCatalog.ts` : les tests demandés à Marie couvrent v5.56 et v5.58, dont le menu simplifié des tâches, Budget/Comptes, l'ajout de catégorie de liste sur mobile, l'énergie et le contrôle « Couleur ».
@@ -22,9 +23,10 @@
 ## Questions ouvertes
 - [P1] Retirer du dépôt le lien Google Drive du commentaire de livraison v5.58 et le stocker dans `.env` ; ne jamais versionner ce lien. — fait quand : le lien n’est plus suivi par Git et est lu depuis `.env` — réf : `COMMUNICATION/Marie/livraisons/v5.58.md`, `.env.example`, `.gitignore`
 - [P1] Définir puis appliquer le rangement des fichiers `commentaires_marie_vX.Y.docx` créés à la racine après publication Drive. — fait quand : aucun fichier de commentaire de livraison ne reste à la racine et son emplacement d’archive est documenté — réf : `commentaires_marie_v5.58.docx`, `.claude/commands/deploy.md`
-- [P1] Fiabiliser la clôture des roadmaps dans `/deploy` : analyser la roadmap active avant le build et annuler le déploiement si elle n’est pas terminée ; archiver la roadmap après un déploiement réussi. — fait quand : la procédure bloque une roadmap incomplète et archive une roadmap livrée — réf : `.claude/commands/deploy.md`, `roadmap_retours_marie_2026-08-25.md`, `Archives/`
+- [P1] Fiabiliser la clôture des roadmaps dans `/deploy` : analyser la roadmap active avant le build et annuler le déploiement si elle n’est pas terminée ; archiver la roadmap après un déploiement réussi. — fait quand : la procédure bloque une roadmap incomplète et archive une roadmap livrée — réf : `.claude/commands/deploy.md`, `Archives/roadmap_retours_marie_2026-08-25.md`, `Archives/`
 - [P1] Demander à Marie de tester en conditions réelles les parcours v5.56 signalés dans le catalogue in-app. — fait quand : nouvel export de Marie ingéré avec les tests v5.56 validés — réf : `manualTestsCatalog.ts`, `_contexte/marie_tests_journal.json`
 - [P1] Optimiser en urgence le bundle JavaScript principal (553 kB minifié, au-dessus du seuil Vite de 500 kB), notamment par chargement différé des écrans. — fait quand : build sous le seuil ou découpage justifié et validé — réf : `src/App.tsx`, `vite.config.ts`
+- [P2] Trancher ou planifier la demande #3 de Marie (le cadre Date/Heure du formulaire de tâche déborde à droite ; Marie a annoté « à réfléchir »). — fait quand : #3 reproduite puis corrigée, ou classée `écartée` avec motif dans le registre — réf : `_contexte/marie_modifications_suivi.md`, `Archives/roadmap_demandes_marie_2026-08-24.md` (ligne 24)
 - [P2] Traiter les 3 frictions du 2026-08-19 comme nouvelles demandes lors du prochain `/traiter_demandes_marie` : geste de glissement planning à revoir (pousser le contenu plutôt que superposer — cohérent avec la demande initiale de Marie sur ce point, jamais satisfaite en l'état), clarifier avec Marie le lien retrait de livret/catégorie budget, vérifier la disparition des test IDs obsolètes après le nouveau déploiement. — fait quand : les 3 points tranchés ou intégrés à une roadmap — réf : `_contexte/marie_tests_journal.json` (entrées `44f24c63`, `be0c10ef`, `6e32ace5`)
 - [P2] Appliquer le découpage en 7 catégories validé par Marie aux autres communications/roadmaps (pas seulement le catalogue de tests). — fait quand : convention explicite adoptée pour les prochaines roadmaps/communications — réf : `COMMUNICATION/message_marie_categories_travail.md`
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
@@ -32,25 +34,48 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-28 — pastille « Tests à faire » alignée sur les tests en attente)
+## Dernière session (2026-08-28 — déploiement v5.62 et système de suivi des modifications Marie)
 
 ## Décisions prises
-- Retour Marie du 27/08 (WhatsApp) : montant temporaire Budget confirmé conforme ; demande « remettre la pastille rouge quand il y a de nouveaux tests » traitée immédiatement sur instruction `!deploy`.
-- La pastille rouge de l'icône « Tests à faire » (accueil) suit désormais exactement la liste de l'écran E121 : un test jamais validé, en échec, ou validé sur une révision antérieure la rallume. Auparavant elle ne réagissait qu'aux tests jamais ouverts.
-- Bridge ROBERTO : chemin corrigé en séance par l'utilisateur dans `.claude/CLAUDE.md` — `D:\ServOMorph\Roberto\...` (le chemin `IA_Life` n'existe plus).
+- v5.62 déployée en prod (HTTP 200 vérifié) : pastille « Tests à faire » alignée sur la liste réelle des tests en attente. Commentaire de livraison publié sur Drive.
+- Bridge ROBERTO : envoi `POST /send` en octets UTF-8 avec `charset=utf-8` (sinon Windows PowerShell sérialise en ISO-8859-1, accents et emoji cassés). Exemple corrigé dans `ROBERTO/com_telephone/README.md`. Chemin du bridge corrigé par l'utilisateur : `D:\ServOMorph\Roberto\...`.
+- Nouveau système de suivi des demandes de Marie inscrites dans son Google Doc « Modifications » (`roadmap_suivi_modifications_marie.md`, 3 phases livrées) : registre durable + réconciliation automatique par `/analyser_googledoc` + revue commune câblée dans `/deploy` étape 0 et `/traiter_export_marie`.
 
 ## Livrables produits ou modifiés
-- `src/domain/rules/manualTestRules.ts`(`.test.ts`) : créé — `latestManualTestResult`, `isManualTestValidated`, `pendingManualTests`, `hasPendingManualTests` (logique commune extraite de E121).
-- `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`) : `hasNewManualTests` basé sur `hasPendingManualTests` ; test ajouté pour la révision antérieure.
-- `src/ui/screens/tests/E121ManualTests.tsx` : consomme le module partagé.
-- `src/domain/data/manualTestsCatalog.ts` : parcours `pastille-nouveaux-tests` ajouté.
-- `E01Welcome.tsx` (`WHATS_NEW`), `CHANGELOG.md` (v5.62), `.gitignore` (`_docs/captures/`).
+- `_contexte/marie_modifications_suivi.md` : créé — registre des 17 demandes du Google Doc avec leur état (15 livrées, 1 écartée #7, 1 en attente #3).
+- `.claude/revue_googledoc.md` : créé — fragment partagé « revue du Google Doc » (export, comparaison de date, réconciliation du registre, compte-rendu ; ne crée pas de roadmap).
+- `.claude/commands/analyser_googledoc.md` : étape 6 ajoutée (réconciliation du registre), renumérotation 1→10.
+- `.claude/commands/deploy.md` : étape 0.4 (revue du Doc), avertissement 4.5 (demandes `en attente` non planifiées).
+- `.claude/commands/traiter_export_marie.md` : étape 7 (revue du Doc), renumérotation, `allowed-tools` + `rclone`.
+- `src/domain/rules/manualTestRules.ts`(`.test.ts`), `E10Dashboard`, `E121ManualTests`, `manualTestsCatalog.ts` (`pastille-nouveaux-tests`), `E01Welcome` (`WHATS_NEW` vidé après déploiement), `CHANGELOG.md` (v5.62), `.gitignore` (`_docs/captures/`).
+
+## Hypothèses validées / invalidées
+- VALIDE : 623 tests, `tsc -b` et lint verts ; v5.62 en prod HTTP 200.
+- EN ATTENTE : la revue commune du Google Doc (Phase 3) n'a pas pu être exercée en live — le Doc n'a pas changé depuis 2026-08-24 (`/analyser_googledoc` s'arrête alors à l'étape 2). Vérifiée par revue de procédure ; le registre est déjà à jour.
+
+## Prochaine étape exacte
+Trancher ou planifier la demande #3 de Marie (débordement du cadre Date/Heure, `en attente`) : le prochain `/deploy` la signalera via l'avertissement 4.5 tant qu'elle n'est rattachée à rien.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-28 — pastille « Tests à faire » alignée sur les tests en attente)
+
+## Décisions prises
+- Retour Marie du 27/08 (WhatsApp) : montant temporaire Budget confirmé conforme ; demande « remettre la pastille rouge quand il y a de nouveaux tests » traitée immédiatement.
+- La pastille rouge de l'icône « Tests à faire » (accueil) suit désormais exactement la liste de l'écran E121 : un test jamais validé, en échec, ou validé sur une révision antérieure la rallume.
+
+## Livrables produits ou modifiés
+- `src/domain/rules/manualTestRules.ts`(`.test.ts`) : créé (logique commune extraite de E121).
+- `E10Dashboard.tsx`(`.test.tsx`), `E121ManualTests.tsx`, `manualTestsCatalog.ts` (`pastille-nouveaux-tests`).
 
 ## Hypothèses validées / invalidées
 - VALIDE : 623 tests, `tsc -b` et lint verts.
 
 ## Prochaine étape exacte
-Déploiement v5.62 mené dans la foulée de ce `/close`.
+Déploiement v5.62.
 
 ## Question bloquante pour la session suivante
 Aucune.

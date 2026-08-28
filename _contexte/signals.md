@@ -2,7 +2,10 @@
 
 ## Contexte chaud
 - **v5.62 déployée en prod le 2026-08-28** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : la pastille rouge de l'icône « Tests à faire » (accueil) suit désormais exactement la liste de l'écran E121 — un test jamais validé, en échec ou validé sur une révision antérieure la rallume. Logique commune extraite dans `src/domain/rules/manualTestRules.ts`. Retour Marie du 27/08 traité (demande « remettre la pastille »). Suite complète : 623 tests verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.62.md`.
-- **Suivi des demandes du Google Doc de Marie** : registre durable `_contexte/marie_modifications_suivi.md` (17 demandes : 16 livrées, #7 écartée), réconcilié par `/analyser_googledoc` (étape 6) et par la revue commune `.claude/revue_googledoc.md` câblée dans `/deploy` étape 0 et `/traiter_export_marie`. La revue s'arrête à un contrôle de date tant que le Doc n'a pas changé depuis 2026-08-24. Aucune demande `en attente` : l'avertissement 4.5 de `/deploy` ne se déclenche pas.
+- **v5.63 déployée en prod le 2026-08-28** : nouveau parcours de test `cadre-date-heure-dans-l-ecran` (demande #3, cadre Date/Heure à reconfirmer par Marie) ; côté outillage, système de suivi des demandes du Google Doc et correctif d'encodage ROBERTO. Suite complète : 623 tests verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.63.md`.
+- **Suivi des demandes du Google Doc de Marie** : registre durable `_contexte/marie_modifications_suivi.md` (17 demandes : 16 livrées, #7 écartée), réconcilié par `/analyser_googledoc` (étape 6) et par la revue commune `.claude/revue_googledoc.md` câblée dans `/deploy` étape 0 et `/traiter_export_marie`. La revue s'arrête à un contrôle de date tant que le Doc n'a pas changé depuis 2026-08-24. Aucune demande `en attente` : l'avertissement 4.5 de `/deploy` ne se déclenche pas. Re-vérification complète des 17 demandes contre le code le 28/08 : aucun écart.
+- **Export de Marie du 2026-08-28 09:42 traité** : aucune perte, aucune friction nouvelle ; 2 validations (`utiliser-comptes` rev 2 le 27/08, `pastille-nouveaux-tests` le 28/08). Ces deux tests disparaissent de la liste de Marie.
+- **Règles durables (utilisateur, 28/08) sur les messages pour Marie** (`CLAUDE.md` § Spécificités projet) : prêt à copier-coller, encadré `💻🤖`, hyper synthétique sans formule de politesse, isolé dans son propre `POST /send` (aucun commentaire dans la même bulle). Techniquement, les emoji astraux passés par `ConvertTo-Json` de PowerShell 5.1 provoquent un HTTP 400 sur `/send` — les insérer dans la chaîne JSON après sérialisation, puis encoder en octets UTF-8.
 - **v5.58 déployée en prod le 2026-08-25** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : `roadmap_retours_marie_2026-08-25.md` livrée : retrait de « Terminer » de la fiche de tâche, réglage de couleur des outils dans Paramètres > Accessibilité et accès direct à la modification de l’énergie depuis l’accueil. Suite complète : 608 tests verts, TypeScript et lint verts. Commentaire de livraison publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.58.md`.
 - **v5.60 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : le catalogue versionne désormais les tests modifiés. Le test « Menu d’actions simplifié sur la fiche d’une tâche », validé avant le retrait de « Terminer », est de nouveau visible jusqu’à sa validation sur la nouvelle version. Suite complète : 610 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.60.md`.
 - **v5.61 déployée en prod le 2026-08-27** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : la modification d’un montant Budget est temporaire sur la catégorie et la période affichées ; le montant habituel reste modifiable. Export Marie du 27/08 analysé sans perte ni friction : 3 tests validés. Suite complète : 612 tests verts, TypeScript et lint verts. Commentaire publié sur Drive : `COMMUNICATION/Marie/livraisons/v5.61.md`.
@@ -16,7 +19,7 @@
 - `roadmap_budget_v3.md` : deuxième refonte complète du concept Budget, intégralement livrée (Phases 1-6 `[FAIT]`), déployée avec v5.49 puis v5.51 — jamais testée par Marie en conditions réelles. Son choix structurant (Montant total/Mon compte basés sur les dépenses réelles) a été explicitement inversé le 2026-08-24 par `roadmap_demandes_marie_2026-08-24.md` (retour aux prévisions), sur confirmation de l'utilisateur — cette roadmap reste un historique valide de ce qui a été livré et pourquoi, pas l'état actuel du calcul.
 - `manualTestsCatalog.ts` : les tests demandés à Marie couvrent v5.56 et v5.58, dont le menu simplifié des tâches, Budget/Comptes, l'ajout de catégorie de liste sur mobile, l'énergie et le contrôle « Couleur ».
 - `tests_manuels.md` vide — toutes les vérifications passent par le catalogue in-app `manualTestsCatalog.ts`.
-- `_contexte/dernier_deploiement.md` : v5.62, 2026-08-28, prod vérifiée HTTP 200.
+- `_contexte/dernier_deploiement.md` : v5.63, 2026-08-28, prod vérifiée HTTP 200.
 - Site de test `appli-audhd-dev.netlify.app` (`NETLIFY_SITE_ID_DEV` dans `.env`) : déployable via `/deploy_dev`.
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
@@ -34,7 +37,7 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-28 — déploiement v5.62 et système de suivi des modifications Marie)
+## Dernière session (2026-08-28 — déploiements v5.62 puis v5.63, suivi des modifications Marie, règles de communication)
 
 ## Décisions prises
 - v5.62 déployée en prod (HTTP 200 vérifié) : pastille « Tests à faire » alignée sur la liste réelle des tests en attente. Commentaire de livraison publié sur Drive.
@@ -42,6 +45,10 @@
 - Nouveau système de suivi des demandes de Marie inscrites dans son Google Doc « Modifications » (`roadmap_suivi_modifications_marie.md`, 3 phases livrées) : registre durable + réconciliation automatique par `/analyser_googledoc` + revue commune câblée dans `/deploy` étape 0 et `/traiter_export_marie`.
 - **Règle durable (utilisateur, 28/08)** : tous les tests à faire par Marie vivent uniquement dans le catalogue in-app (`manualTestsCatalog.ts`, écran « Tests à faire »). `a_transmettre.md` et les `livraisons/vX.Y.md` ne portent que des commentaires de livraison, jamais de liste de tests. Consignée dans `CLAUDE.md` § Spécificités projet et répercutée dans `/deploy`, `/close`, `/analyser_googledoc`, `/traiter_export_marie`.
 - #3 (cadre Date/Heure) marquée `livrée v5.45` ; parcours `cadre-date-heure-dans-l-ecran` ajouté au catalogue pour reconfirmation par Marie.
+- Re-vérification complète des 17 demandes du Google Doc contre le code courant : 16 livrées, 1 écartée (#7), aucun écart. Preuves code dans le registre.
+- Export de Marie du 28/08 traité : aucune perte, aucune friction nouvelle ; 2 validations (`utiliser-comptes` rev 2, `pastille-nouveaux-tests`).
+- Règles durables sur les messages pour Marie : prêt à copier-coller, encadré `💻🤖`, hyper synthétique sans politesse, isolé dans son propre `POST /send`.
+- v5.63 déployée en prod pour publier le parcours #3 et l'outillage de suivi.
 
 ## Livrables produits ou modifiés
 - `_contexte/marie_modifications_suivi.md` : créé — registre des 17 demandes du Google Doc (16 livrées, 1 écartée #7).
@@ -50,7 +57,7 @@
 - `.claude/commands/deploy.md` : étape 0.4 (revue du Doc), avertissement 4.5 (demandes `en attente` non planifiées), étapes 10 et 12 recentrées (renvoi vers l'écran « Tests à faire », plus d'énumération de tests dans les docs Drive).
 - `.claude/commands/traiter_export_marie.md` : étape 7 (revue du Doc), `allowed-tools` + `rclone`, plus de rubrique « Tests à refaire ».
 - `.claude/commands/close.md` : étape 6 précisée (a_transmettre.md sans liste de tests).
-- `.claude/CLAUDE.md` : § Spécificités projet — règle « Tests à faire pour Marie : uniquement dans l'appli ».
+- `.claude/CLAUDE.md` : § Spécificités projet — règles « Tests à faire pour Marie : uniquement dans l'appli » et « Messages pour Marie » (copier-coller, `💻🤖`, hyper synthétique, `/send` isolé).
 - `COMMUNICATION/Marie/a_transmettre.md` : section « Tests à refaire » retirée, recentré sur le commentaire de livraison.
 - `src/domain/data/manualTestsCatalog.ts` : `pastille-nouveaux-tests`, `cadre-date-heure-dans-l-ecran`.
 - `src/domain/rules/manualTestRules.ts`(`.test.ts`), `E10Dashboard`, `E121ManualTests`, `E01Welcome` (`WHATS_NEW` vidé), `CHANGELOG.md` (v5.62, v5.63), `.gitignore` (`_docs/captures/`).
@@ -60,7 +67,7 @@
 - EN ATTENTE : la revue commune du Google Doc (Phase 3) n'a pas pu être exercée en live — le Doc n'a pas changé depuis 2026-08-24 (`/analyser_googledoc` s'arrête alors à l'étape 2). Vérifiée par revue de procédure ; le registre est déjà à jour.
 
 ## Prochaine étape exacte
-Déployer v5.63 (`/deploy`) pour publier le suivi Marie et le parcours #3 ; Marie revalide le cadre Date/Heure via l'écran « Tests à faire ». Aucune autre action en attente.
+Attendre le retour de Marie sur le parcours `cadre-date-heure-dans-l-ecran` (#3) via l'écran « Tests à faire » de la v5.63. Aucune autre action en attente.
 
 ## Question bloquante pour la session suivante
 Aucune.

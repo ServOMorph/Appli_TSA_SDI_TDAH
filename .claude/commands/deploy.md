@@ -141,9 +141,14 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - les tests Marie ajoutés ou modifiés dans `manualTestsCatalog.ts` ;
     - les retours nouveaux du dernier export de Marie et les actions encore ouvertes dans la partie active de `_contexte/signals.md`.
 
-    L'inventaire doit distinguer explicitement : ce qui est livré, ce que Marie doit tester, les choix attendus d'elle,
-    les écarts assumés et les retours de ses exports déjà corrigés. Ne pas reprendre les archives ou les signaux
-    historiques clos comme des demandes encore actives.
+    L'inventaire doit distinguer explicitement : ce qui est livré, les choix attendus d'elle, les écarts assumés
+    et les retours de ses exports déjà corrigés. Ne pas reprendre les archives ou les signaux historiques clos
+    comme des demandes encore actives.
+
+    Les tests que Marie doit refaire ne figurent PAS dans l'inventaire de communication : ils vivent uniquement
+    dans le catalogue in-app (`manualTestsCatalog.ts`, écran « Tests à faire »). Vérifier ici que tout nouveau
+    comportement à valider par Marie y a bien été ajouté (sinon l'ajouter avant de poursuivre), sans le recopier
+    dans les documents Drive (cf. `CLAUDE.md` § Spécificités projet, « Tests à faire pour Marie : uniquement dans l'appli »).
 
 11. Figer puis publier systématiquement le commentaire de livraison sur Google Drive et obtenir un lien partageable.
     - Prendre `COMMUNICATION/Marie/a_transmettre.md`. S'il n'existe pas, créer avant le déploiement un fichier
@@ -163,7 +168,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 12. Rédiger un message WhatsApp prêt à envoyer à Marie à partir de l'inventaire. Il doit toujours contenir :
     - une annonce brève de la version disponible ;
     - les changements effectivement livrés ;
-    - les tests précis à rejouer ;
+    - un renvoi vers l'écran « Tests à faire » de l'appli pour les tests à rejouer — sans les énumérer ;
     - les choix ou questions encore attendus, ainsi que les écarts assumés s'ils la concernent ;
     - le lien de production, sur sa propre ligne : `https://appli-audhd.netlify.app/` ;
     - le lien partageable du commentaire Drive, sur sa propre ligne, introduit par « Détail des changements et questions : ».

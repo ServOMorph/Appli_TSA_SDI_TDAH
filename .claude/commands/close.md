@@ -96,9 +96,10 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
     `/deploy` (avertissements 4.4 et 4.5) reflète l'état réel des tests décidés pendant la session.
 
    Avant de continuer, vérifier aussi `COMMUNICATION/Marie/a_transmettre.md` : chaque changement visible pour Marie,
-   test à refaire, décision attendue, écart assumé ou retour d'export encore pertinent de la session doit y être
-   présent, en langage simple. Ne pas déplacer les documents de `COMMUNICATION/Marie/livraisons/`, qui sont l'historique
-   figé des messages déjà publiés.
+   décision attendue, écart assumé ou retour d'export encore pertinent de la session doit y être présent, en langage
+   simple. Ce fichier ne contient jamais de liste de tests : les tests à refaire par Marie vivent uniquement dans le
+   catalogue in-app (cf. `CLAUDE.md` § Spécificités projet). Ne pas déplacer les documents de
+   `COMMUNICATION/Marie/livraisons/`, qui sont l'historique figé des messages déjà publiés.
 
 7. Sur `main` uniquement, mettre à jour `README.md` à la racine du projet :
    - Refléter l'état actuel du projet (section "État actuel" de `contexte.md`).

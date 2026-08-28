@@ -58,7 +58,7 @@ allowed-tools: Bash(rclone:*), Bash(pandoc:*), Bash(git log:*), Bash(git diff:*)
 
 8. File de communication pour Marie.
    - À chaque phase de la roadmap passée à `[FAIT]`, mettre à jour (ou créer) `COMMUNICATION/Marie/a_transmettre.md`.
-   - Ce fichier est la source unique des éléments encore à transmettre à Marie. Ranger chaque élément sous l'une des sections : « Changements livrés », « Tests à refaire », « Questions où nous avons besoin de ton choix », « Écart assumé » ou « Retour d'export déjà corrigé ».
+   - Ce fichier est la source unique des **commentaires de livraison** encore à transmettre à Marie. Ranger chaque élément sous l'une des sections : « Changements livrés », « Questions où nous avons besoin de ton choix », « Écart assumé » ou « Retour d'export déjà corrigé ». **Aucune liste de tests** : les comportements à valider par Marie sont ajoutés au catalogue in-app `src/domain/data/manualTestsCatalog.ts` (écran « Tests à faire »), jamais dans ce fichier (cf. `CLAUDE.md` § Spécificités projet).
    - Une entrée par phase livrée, rédigée en français simple, sans aucun jargon technique (pas de nom de fichier, composant, fonction ou terme de code) : décrire uniquement ce qui change concrètement pour Marie dans son usage de l'application.
    - Si le document source numérote ses demandes, faire précéder chaque entrée du ou des numéros concernés (ex : « #4, #5 — ... ») pour qu'elle puisse relier le commentaire à sa propre liste.
 

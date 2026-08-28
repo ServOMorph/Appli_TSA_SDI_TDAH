@@ -6,6 +6,7 @@
 
 ### Modifié
 - Bridge ROBERTO : l’exemple `POST /send` envoie le corps en octets UTF-8 avec `charset=utf-8` — accents et emoji ne sont plus remplacés par des « ? ».
+- Communication Marie : les tests à refaire ne sont plus listés dans les commentaires de livraison ni le message WhatsApp ; ils vivent uniquement dans l’écran « Tests à faire » de l’appli (règle consignée dans `CLAUDE.md`, répercutée dans `/deploy`, `/close`, `/analyser_googledoc`, `/traiter_export_marie`).
 
 ## v5.62 — 2026-08-28
 

@@ -40,21 +40,27 @@
 - v5.62 déployée en prod (HTTP 200 vérifié) : pastille « Tests à faire » alignée sur la liste réelle des tests en attente. Commentaire de livraison publié sur Drive.
 - Bridge ROBERTO : envoi `POST /send` en octets UTF-8 avec `charset=utf-8` (sinon Windows PowerShell sérialise en ISO-8859-1, accents et emoji cassés). Exemple corrigé dans `ROBERTO/com_telephone/README.md`. Chemin du bridge corrigé par l'utilisateur : `D:\ServOMorph\Roberto\...`.
 - Nouveau système de suivi des demandes de Marie inscrites dans son Google Doc « Modifications » (`roadmap_suivi_modifications_marie.md`, 3 phases livrées) : registre durable + réconciliation automatique par `/analyser_googledoc` + revue commune câblée dans `/deploy` étape 0 et `/traiter_export_marie`.
+- **Règle durable (utilisateur, 28/08)** : tous les tests à faire par Marie vivent uniquement dans le catalogue in-app (`manualTestsCatalog.ts`, écran « Tests à faire »). `a_transmettre.md` et les `livraisons/vX.Y.md` ne portent que des commentaires de livraison, jamais de liste de tests. Consignée dans `CLAUDE.md` § Spécificités projet et répercutée dans `/deploy`, `/close`, `/analyser_googledoc`, `/traiter_export_marie`.
+- #3 (cadre Date/Heure) marquée `livrée v5.45` ; parcours `cadre-date-heure-dans-l-ecran` ajouté au catalogue pour reconfirmation par Marie.
 
 ## Livrables produits ou modifiés
-- `_contexte/marie_modifications_suivi.md` : créé — registre des 17 demandes du Google Doc avec leur état (15 livrées, 1 écartée #7, 1 en attente #3).
+- `_contexte/marie_modifications_suivi.md` : créé — registre des 17 demandes du Google Doc (16 livrées, 1 écartée #7).
 - `.claude/revue_googledoc.md` : créé — fragment partagé « revue du Google Doc » (export, comparaison de date, réconciliation du registre, compte-rendu ; ne crée pas de roadmap).
-- `.claude/commands/analyser_googledoc.md` : étape 6 ajoutée (réconciliation du registre), renumérotation 1→10.
-- `.claude/commands/deploy.md` : étape 0.4 (revue du Doc), avertissement 4.5 (demandes `en attente` non planifiées).
-- `.claude/commands/traiter_export_marie.md` : étape 7 (revue du Doc), renumérotation, `allowed-tools` + `rclone`.
-- `src/domain/rules/manualTestRules.ts`(`.test.ts`), `E10Dashboard`, `E121ManualTests`, `manualTestsCatalog.ts` (`pastille-nouveaux-tests`), `E01Welcome` (`WHATS_NEW` vidé après déploiement), `CHANGELOG.md` (v5.62), `.gitignore` (`_docs/captures/`).
+- `.claude/commands/analyser_googledoc.md` : étape 6 (réconciliation du registre) ; étape 8 (comm Marie) recentrée sur les commentaires, plus de rubrique « Tests à refaire ».
+- `.claude/commands/deploy.md` : étape 0.4 (revue du Doc), avertissement 4.5 (demandes `en attente` non planifiées), étapes 10 et 12 recentrées (renvoi vers l'écran « Tests à faire », plus d'énumération de tests dans les docs Drive).
+- `.claude/commands/traiter_export_marie.md` : étape 7 (revue du Doc), `allowed-tools` + `rclone`, plus de rubrique « Tests à refaire ».
+- `.claude/commands/close.md` : étape 6 précisée (a_transmettre.md sans liste de tests).
+- `.claude/CLAUDE.md` : § Spécificités projet — règle « Tests à faire pour Marie : uniquement dans l'appli ».
+- `COMMUNICATION/Marie/a_transmettre.md` : section « Tests à refaire » retirée, recentré sur le commentaire de livraison.
+- `src/domain/data/manualTestsCatalog.ts` : `pastille-nouveaux-tests`, `cadre-date-heure-dans-l-ecran`.
+- `src/domain/rules/manualTestRules.ts`(`.test.ts`), `E10Dashboard`, `E121ManualTests`, `E01Welcome` (`WHATS_NEW` vidé), `CHANGELOG.md` (v5.62, v5.63), `.gitignore` (`_docs/captures/`).
 
 ## Hypothèses validées / invalidées
 - VALIDE : 623 tests, `tsc -b` et lint verts ; v5.62 en prod HTTP 200.
 - EN ATTENTE : la revue commune du Google Doc (Phase 3) n'a pas pu être exercée en live — le Doc n'a pas changé depuis 2026-08-24 (`/analyser_googledoc` s'arrête alors à l'étape 2). Vérifiée par revue de procédure ; le registre est déjà à jour.
 
 ## Prochaine étape exacte
-Faire reconfirmer visuellement par Marie l'absence de débordement du cadre Date/Heure (#3, marquée `livrée v5.45` le 28/08 sur la base du code). Aucune autre action en attente.
+Déployer v5.63 (`/deploy`) pour publier le suivi Marie et le parcours #3 ; Marie revalide le cadre Date/Heure via l'écran « Tests à faire ». Aucune autre action en attente.
 
 ## Question bloquante pour la session suivante
 Aucune.

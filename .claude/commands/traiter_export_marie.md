@@ -46,8 +46,10 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
      test dans `manualTestsCatalog.ts`, ou une demande d'évolution — sans corriger le code ni le
      catalogue automatiquement.
    - Pour chaque nouveau retour qui reste utile à communiquer, ajouter une entrée courte dans
-     `COMMUNICATION/Marie/a_transmettre.md`, sous « Retour d'export déjà corrigé », « Questions où nous avons besoin
-     de ton choix » ou « Tests à refaire ». Ne pas y recopier les retours déjà clos ou invalidés.
+     `COMMUNICATION/Marie/a_transmettre.md`, sous « Retour d'export déjà corrigé » ou « Questions où nous avons
+     besoin de ton choix ». Ne pas y recopier les retours déjà clos ou invalidés. Un comportement à faire
+     revalider par Marie va dans le catalogue in-app `manualTestsCatalog.ts`, jamais dans ce fichier
+     (cf. `CLAUDE.md` § Spécificités projet).
 
 6. Ingérer les résultats de tests :
    ```

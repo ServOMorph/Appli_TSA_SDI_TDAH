@@ -120,3 +120,17 @@ qui met la session en écoute du log TSA.
   téléphone vaut confirmation). Commande inconnue : le signaler par `POST /send` plutôt que deviner.
 - Prérequis : les 3 process partagés doivent tourner (démarrés côté Roberto via
   `com_manager.py start`). Rien à lancer depuis ce projet.
+
+### Tests à faire pour Marie : uniquement dans l'appli
+Tous les tests que Marie doit effectuer vivent dans le catalogue in-app
+(`src/domain/data/manualTestsCatalog.ts`, écran « Tests à faire »). Ne jamais lister de tests à
+refaire ailleurs :
+- `COMMUNICATION/Marie/a_transmettre.md` et les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md`
+  ne contiennent que des **commentaires de livraison** (ce qui change, décisions attendues, écarts
+  assumés) — aucune liste de tests, aucune étape de test.
+- Le message WhatsApp généré par `/deploy` renvoie vers l'écran « Tests à faire » de l'appli pour
+  les tests, sans les énumérer.
+Chaque comportement à valider par Marie doit donc être ajouté au catalogue in-app (Section « Tests
+manuels » : le catalogue, pas `tests_manuels.md`, qui reste réservé aux contrôles développeur).
+Cette règle prime sur toute étape de `/deploy`, `/close` ou `/analyser_googledoc` qui mentionnerait
+une rubrique « Tests à refaire » dans les documents de communication.

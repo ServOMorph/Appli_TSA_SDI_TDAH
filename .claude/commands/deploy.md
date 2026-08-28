@@ -23,9 +23,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
         `manual_test_results`).
    3. Ingérer les résultats de tests via `python scripts/ingest_manual_tests.py <export>`
       (dédoublonnage par `id`, jamais d'écrasement d'une entrée existante).
-   4. Si l'analyse ne révèle ni perte, ni incohérence, ni friction bloquante : continuer normalement
-      à l'étape 1.
-   5. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
+   4. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
+      réconcilie `_contexte/marie_modifications_suivi.md`. Si elle rapporte que le Google Doc est
+      plus récent que la dernière revue du registre : s'arrêter après la réconciliation et demander
+      à l'utilisateur de lancer `/analyser_googledoc` avant de reprendre `/deploy`.
+   5. Si l'analyse (exports + revue du Doc) ne révèle ni perte, ni incohérence, ni friction
+      bloquante, ni changement non revu du Google Doc : continuer normalement à l'étape 1.
+   6. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
       les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
       fichiers d'export bruts ou `donnees_marie/` pour « résoudre » un problème constaté — toute
       correction porte sur le code ou le journal projet, jamais sur les données sources de Marie.
@@ -87,6 +91,11 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       S'il existe, lire son contenu et le comparer aux changements de la version en cours de déploiement
       (`CHANGELOG.md`) : si une fonctionnalité soumise à Marie a changé sans que le catalogue n'ait été mis à
       jour, le signaler. Ne pas modifier le catalogue automatiquement.
+   5. **Demandes Marie en attente non planifiées** : lire `_contexte/marie_modifications_suivi.md`. Si absent,
+      ignorer silencieusement. S'il existe, lister toute demande à l'état `en attente` qui n'est rattachée ni à
+      une roadmap active (fichier `roadmap_*.md` à la racine avec une phase la couvrant) ni à une décision
+      tracée. S'il y en a, les signaler et demander une confirmation explicite avant de poursuivre. Ne pas
+      modifier le registre automatiquement.
 
 5. Build :
    ```

@@ -2,7 +2,7 @@
 description: Traite l'arrivée d'un nouvel export de Marie — analyse, détection de pertes/frictions, ingestion du journal de tests
 argument-hint: [chemin de l'export JSON]
 model: sonnet
-allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(mv:*), Bash(ls:*), Bash(test -f:*), Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*)
+allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(mv:*), Bash(ls:*), Bash(test -f:*), Bash(rclone:*), Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # /traiter_export_marie [chemin]
@@ -37,7 +37,7 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
      vérifier qu'ils correspondent à une évolution connue du code (`git log`, `CHANGELOG.md`) —
      sinon les signaler comme incohérence ;
    - toute perte ou incohérence trouvée : la documenter précisément (table, identifiant, nature de
-     l'écart) pour le rapport de l'étape 7.
+     l'écart) pour le rapport de l'étape 8.
 
 5. Repérer les frictions signalées par Marie :
    - tous les commentaires non vides des résultats `nok` de `manual_test_results` ;
@@ -55,14 +55,20 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
    ```
    Rapporter le nombre d'entrées ajoutées et déjà connues (sortie du script).
 
-7. Rapporter à l'utilisateur, sans corriger automatiquement :
+7. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Reprendre son
+   compte-rendu dans le rapport de l'étape 8. Cette revue ne bloque pas la commande : elle détecte
+   un éventuel changement du Doc et réconcilie le registre, sans créer de roadmap.
+
+8. Rapporter à l'utilisateur, sans corriger automatiquement :
    - version et date de l'export traité, nom du fichier créé dans `donnees_marie/` ;
    - résultat de l'ingestion (ajoutés / déjà connus) ;
    - toute perte ou incohérence de données détectée à l'étape 4 ;
    - chaque friction détectée à l'étape 5, avec sa nature (bug applicatif / formulation de test /
      demande d'évolution) et une proposition de traitement ;
+   - le compte-rendu de la revue du Google Doc (étape 7) : Doc inchangé, ou différentiel d'états du
+     registre et nouvelles demandes ;
    - si rien à signaler : le dire explicitement plutôt que rester silencieux sur ce point.
 
-8. Ne jamais committer `donnees_marie/` (gitignoré). Si `_contexte/marie_tests_journal.json` a été
-   modifié par l'ingestion, ne pas le committer automatiquement — le signaler dans le rapport et
-   laisser le commit à la charge du prochain `/close`.
+9. Ne jamais committer `donnees_marie/` (gitignoré). Si `_contexte/marie_tests_journal.json` ou
+   `_contexte/marie_modifications_suivi.md` ont été modifiés, ne pas les committer automatiquement —
+   le signaler dans le rapport et laisser le commit à la charge du prochain `/close`.

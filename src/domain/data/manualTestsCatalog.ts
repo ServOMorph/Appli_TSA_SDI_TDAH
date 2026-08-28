@@ -229,6 +229,16 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'cadre-date-heure-dans-l-ecran',
+    title: 'Cadre Date et Heure bien dans l’écran',
+    category: 'Tâches',
+    steps: [
+      'Sur téléphone, commencez la création d’une tâche et activez sa planification pour faire apparaître les champs « Date » et « Heure de début ».',
+      'Vérifiez que les cadres « Date » et « Heure de début » tiennent entièrement dans l’écran, sans dépasser sur le bord droit, avec la même marge à gauche et à droite.',
+      'Ouvrez ensuite une tâche déjà planifiée, touchez « Modifier » : faites la même vérification sur les cadres « Date » et « Heure de début » de l’écran de modification.',
+    ],
+  },
+  {
     id: 'couleur-tache-sans-couleur-choisie',
     title: 'Couleur d’une tâche sans couleur choisie',
     category: 'Tâches',

@@ -21,21 +21,29 @@ Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.
    Google Doc, avec son état (`livrée vX.Y` / `en attente` / `en cours <roadmap>` / `écartée : motif`)
    et la date de dernière revue. Indépendant des roadmaps, jamais archivé.
 2. `/analyser_googledoc` réconcilie ce registre à chaque analyse.
-3. `/deploy` étape 0 : arrêt si le Google Doc a changé depuis la dernière revue du registre ;
-   avertissement listé si des demandes `en attente` ne sont rattachées à aucune roadmap ni décision.
+3. Une étape commune « revue du Google Doc » : détecter si le Doc a changé depuis la dernière revue
+   du registre, l'exporter, le relire et réconcilier le registre — puis s'arrêter pour présenter les
+   nouveautés. Aucune création de roadmap ni décision produit dans cette étape : elles restent
+   manuelles via `/analyser_googledoc`.
+4. Cette étape commune est déclenchée à chaque traitement de données de Marie : `/deploy` étape 0
+   **et** `/traiter_export_marie`. Sur `/deploy`, en plus : avertissement listé si des demandes
+   `en attente` ne sont rattachées à aucune roadmap active ni décision tracée.
 
 ## Périmètre exclu
 
 - Aucune modification de code applicatif.
 - Aucun planificateur automatique (cron / routine) dans une première version — la cadence reste
-  celle de `/deploy` et des invocations manuelles de `/analyser_googledoc`.
+  celle de `/deploy`, `/traiter_export_marie` et des invocations manuelles de `/analyser_googledoc`.
+- L'étape commune ne crée ni ne modifie de roadmap et ne tranche aucune décision produit : elle
+  détecte, relit et réconcilie le registre, puis rend la main.
 
 ## Ordre et dépendances
 
 ```
 Phase 1 — Format du registre + peuplement initial
-Phase 2 — Réconciliation du registre par /analyser_googledoc   (dépend de Phase 1)
-Phase 3 — Garde du registre dans /deploy étape 0               (dépend de Phase 1 et 2)
+Phase 2 — Réconciliation du registre par /analyser_googledoc      (dépend de Phase 1)
+Phase 3 — Étape commune « revue du Google Doc » câblée dans        (dépend de Phase 1 et 2)
+          /deploy étape 0 et /traiter_export_marie
 ```
 
 ## Phase 1 — Format du registre et peuplement initial [ ]
@@ -73,17 +81,26 @@ sans changement du doc est idempotente.
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 3 — Garde du registre dans /deploy étape 0 [ ]
+## Phase 3 — Étape commune « revue du Google Doc » câblée dans /deploy et /traiter_export_marie [ ]
 
-- [ ] Dans `.claude/commands/deploy.md`, étendre l'étape 0 : après le traitement des exports, comparer
-      la date de modification du Google Doc (procédure `/analyser_googledoc` étape 2) à la date de
-      dernière revue du registre. Si le doc est plus récent : s'arrêter, demander de lancer
-      `/analyser_googledoc` avant de reprendre `/deploy`.
-- [ ] Ajouter un avertissement de type étape 4 (non bloquant seul, confirmation explicite requise) :
-      lister toute demande `en attente` du registre non rattachée à une roadmap active ni à une
-      décision tracée.
-- [ ] Ajuster la numérotation interne des sous-étapes et les renvois si nécessaire.
+- [ ] Rédiger la procédure commune « revue du Google Doc » (dans un fichier dédié réutilisable, par
+      exemple `.claude/commands/_revue_googledoc.md`, ou une section citée par les deux commandes) :
+      1. comparer la date de modification du Google Doc (procédure `/analyser_googledoc` étape 2) à la
+         date de dernière revue du registre ;
+      2. si le Doc n'a pas changé : le noter et rendre la main ;
+      3. s'il a changé : l'exporter, le relire, réconcilier `_contexte/marie_modifications_suivi.md`
+         (mêmes règles qu'en Phase 2 : jamais de suppression de ligne, états recalculés, date de revue
+         mise à jour), puis présenter le différentiel d'états et s'arrêter. Ne créer aucune roadmap,
+         ne trancher aucune décision.
+- [ ] Câbler cette procédure dans `.claude/commands/traiter_export_marie.md` : l'exécuter juste après
+      l'ingestion du journal de tests, avant le rapport final.
+- [ ] Câbler cette procédure dans `.claude/commands/deploy.md` étape 0 : l'exécuter après le
+      traitement des exports. En plus, ajouter un avertissement de type étape 4 (non bloquant seul,
+      confirmation explicite requise) listant toute demande `en attente` du registre non rattachée à
+      une roadmap active ni à une décision tracée.
+- [ ] Ajuster la numérotation interne des sous-étapes et les renvois des deux commandes si nécessaire.
 
-Critère de sortie : `/deploy` s'arrête sur un Google Doc plus récent que la dernière revue du
-registre ; il signale les demandes `en attente` orphelines et attend une confirmation avant le build.
-Vérification par simulation des deux cas.
+Critère de sortie : `/traiter_export_marie` et `/deploy` étape 0 déclenchent tous deux la revue du
+Google Doc ; sur un Doc inchangé, la revue est silencieuse ; sur un Doc modifié, le registre est
+réconcilié et la commande s'arrête pour présentation ; `/deploy` signale en plus les demandes
+`en attente` orphelines avant le build. Vérification par simulation des trois cas.

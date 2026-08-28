@@ -124,8 +124,12 @@ qui met la session en écoute du log TSA.
 ### Messages pour Marie : prêts à copier-coller, avec emojis
 Tout message rédigé à l'intention de Marie (pas seulement celui de `/deploy`) doit être livré prêt
 à copier-coller tel quel : un bloc unique, encadré par `💻🤖` — une occurrence au tout début, une à
-la toute fin — rien à retoucher avant l'envoi. Style oral simple (une idée par phrase). Ne jamais
-demander à l'utilisateur d'ajouter les emojis ou de reformater lui-même.
+la toute fin — rien à retoucher avant l'envoi. Ne jamais demander à l'utilisateur d'ajouter les
+emojis ou de reformater lui-même.
+
+Style attendu par Marie (préférence explicite du 28/08) : **hyper synthétique, aucune formule de
+politesse** — pas de salutation, pas de remerciement, pas de formule de clôture. Aller droit à
+l'information : ce qui est fait, ce qu'elle doit vérifier, une idée par phrase.
 
 ### Tests à faire pour Marie : uniquement dans l'appli
 Tous les tests que Marie doit effectuer vivent dans le catalogue in-app

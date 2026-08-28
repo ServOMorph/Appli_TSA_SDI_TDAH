@@ -43,21 +43,28 @@ allowed-tools: Bash(rclone:*), Bash(pandoc:*), Bash(git log:*), Bash(git diff:*)
    - Ne jamais conclure « déjà livrée » sans avoir lu le code correspondant dans cette session ; citer le fichier et les lignes qui le prouvent.
    - Ne pas considérer une capture d'un ancien écran comme preuve que son modèle doit être réintroduit ; vérifier l'architecture actuelle et signaler l'écart.
 
-6. Mettre à jour la roadmap choisie ou en créer une, en respectant le format défini dans `CLAUDE.md` § Roadmap (une seule phase `[EN COURS]` à la fois, checkpoint `/compact` en fin de chaque phase, tests inclus dans la phase qui les motive).
+6. Réconcilier le registre de suivi `_contexte/marie_modifications_suivi.md`.
+   - Ce fichier est la **source de vérité durable** du suivi des demandes de Marie ; les roadmaps `roadmap_*marie*` n'en sont qu'une vue de travail éphémère, archivée après livraison. Le créer selon le format existant s'il est absent.
+   - Pour chaque demande numérotée du Google Doc lu à l'étape 4 : créer sa ligne si absente, sinon recalculer son état à partir de l'analyse de l'étape 5. États autorisés : `livrée vX.Y` (avec la preuve code de l'étape 5), `en attente`, `en cours <roadmap>`, `écartée : <motif>`.
+   - **Ne jamais supprimer une ligne existante.** Une demande qui a disparu du Google Doc passe à `écartée : retirée du Google Doc le AAAA-MM-JJ`, sans perdre son historique.
+   - Mettre la colonne « Revue le » de chaque ligne touchée, ainsi que l'en-tête (« Dernière revue du Doc », « Dernière mise à jour de ce registre »), à la date de modification du Google Doc ; ajouter une ligne à « Historique des revues ».
+   - Ne pas traiter ce registre comme une liste de tâches : il ne déclenche aucune écriture de code.
+
+7. Mettre à jour la roadmap choisie ou en créer une, en respectant le format défini dans `CLAUDE.md` § Roadmap (une seule phase `[EN COURS]` à la fois, checkpoint `/compact` en fin de chaque phase, tests inclus dans la phase qui les motive).
    - Ajouter une section « Analyse du Google Doc » avec la traçabilité catégorie → demande → état → traitement.
    - Ajouter uniquement les demandes encore pertinentes sous forme de phases indépendantes, avec dépendances, fichiers pressentis, tests automatisés, test manuel et critère de sortie.
    - Isoler les décisions produit non tranchées dans une section dédiée ; ne pas les convertir en tâches de code.
    - Si une nouvelle roadmap est créée, indiquer la source (URL du Google Doc) et la date d'analyse.
 
-7. File de communication pour Marie.
+8. File de communication pour Marie.
    - À chaque phase de la roadmap passée à `[FAIT]`, mettre à jour (ou créer) `COMMUNICATION/Marie/a_transmettre.md`.
    - Ce fichier est la source unique des éléments encore à transmettre à Marie. Ranger chaque élément sous l'une des sections : « Changements livrés », « Tests à refaire », « Questions où nous avons besoin de ton choix », « Écart assumé » ou « Retour d'export déjà corrigé ».
    - Une entrée par phase livrée, rédigée en français simple, sans aucun jargon technique (pas de nom de fichier, composant, fonction ou terme de code) : décrire uniquement ce qui change concrètement pour Marie dans son usage de l'application.
    - Si le document source numérote ses demandes, faire précéder chaque entrée du ou des numéros concernés (ex : « #4, #5 — ... ») pour qu'elle puisse relier le commentaire à sa propre liste.
 
-8. Une fois toutes les phases de la roadmap passées à `[FAIT]`, proposer explicitement à l'utilisateur de lancer `/deploy`. Ne jamais le lancer automatiquement.
+9. Une fois toutes les phases de la roadmap passées à `[FAIT]`, proposer explicitement à l'utilisateur de lancer `/deploy`. Ne jamais le lancer automatiquement.
 
-9. Vérifier et rapporter.
+10. Vérifier et rapporter.
    - Exécuter `git diff --check` et afficher les fichiers modifiés.
    - Ne modifier aucun code applicatif, donnée personnelle, export Marie ou journal de tests.
-   - Rapporter le chemin de la roadmap et de `COMMUNICATION/Marie/a_transmettre.md`, les demandes ajoutées, celles écartées avec leur motif, et les décisions encore attendues.
+   - Rapporter le chemin de la roadmap, de `COMMUNICATION/Marie/a_transmettre.md` et du registre `_contexte/marie_modifications_suivi.md`, les demandes ajoutées, celles écartées avec leur motif, le différentiel d'états du registre (avant → après), et les décisions encore attendues.

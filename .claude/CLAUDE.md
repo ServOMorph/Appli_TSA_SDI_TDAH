@@ -121,6 +121,12 @@ qui met la session en écoute du log TSA.
 - Prérequis : les 3 process partagés doivent tourner (démarrés côté Roberto via
   `com_manager.py start`). Rien à lancer depuis ce projet.
 
+### Messages pour Marie : prêts à copier-coller, avec emojis
+Tout message rédigé à l'intention de Marie (pas seulement celui de `/deploy`) doit être livré prêt
+à copier-coller tel quel : un bloc unique, encadré par `💻🤖` — une occurrence au tout début, une à
+la toute fin — rien à retoucher avant l'envoi. Style oral simple (une idée par phrase). Ne jamais
+demander à l'utilisateur d'ajouter les emojis ou de reformater lui-même.
+
 ### Tests à faire pour Marie : uniquement dans l'appli
 Tous les tests que Marie doit effectuer vivent dans le catalogue in-app
 (`src/domain/data/manualTestsCatalog.ts`, écran « Tests à faire »). Ne jamais lister de tests à

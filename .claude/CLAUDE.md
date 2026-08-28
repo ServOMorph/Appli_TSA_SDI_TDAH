@@ -127,6 +127,11 @@ Tout message rédigé à l'intention de Marie (pas seulement celui de `/deploy`)
 la toute fin — rien à retoucher avant l'envoi. Ne jamais demander à l'utilisateur d'ajouter les
 emojis ou de reformater lui-même.
 
+Le message pour Marie part dans son propre `POST /send`, isolé : ce `/send` ne contient QUE le bloc
+`💻🤖 … 💻🤖`, aucun texte avant ou après. Tout commentaire à l'utilisateur (ce qui a été fait,
+pourquoi, prochaine étape) part dans un `/send` distinct ou reste dans le terminal — jamais dans la
+même bulle que le message Marie, sinon il n'est plus copiable d'un bloc.
+
 Style attendu par Marie (préférence explicite du 28/08) : **hyper synthétique, aucune formule de
 politesse** — pas de salutation, pas de remerciement, pas de formule de clôture. Aller droit à
 l'information : ce qui est fait, ce qu'elle doit vérifier, une idée par phrase.

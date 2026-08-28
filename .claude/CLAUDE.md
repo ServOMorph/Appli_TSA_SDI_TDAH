@@ -100,12 +100,12 @@ Pour les tâches répétitives et templated (commits, posts, changelogs, donnée
 Section réservée aux règles propres à ce projet, hors périmètre du kit. Cette section est préservée intégralement par `/update` (jamais écrasée ni fusionnée avec le contenu du kit). Convention : toute règle liée à une section précise du fichier doit la référencer explicitement par son titre (ex: "Section Roadmap : ..."), plutôt que compter sur la position physique de cette section (toujours en fin de fichier).
 
 ### Bridge ROBERTO (assistant vocal téléphone, partagé)
-Le bridge assistant vocal est partagé et hébergé par le projet IA_Life
-(`D:\ServOMorph\IA_Life\ROBERTO\com_telephone\`). Ce projet n'en contient qu'un raccordement léger :
+Le bridge assistant vocal est partagé et hébergé par le projet Roberto
+(`D:\ServOMorph\Roberto\com_telephone\`). Ce projet n'en contient qu'un raccordement léger :
 `ROBERTO/com_telephone/README.md` (détail) et la commande `/roberto` (`.claude/commands/roberto.md`)
 qui met la session en écoute du log TSA.
 
-- **Log surveillé** : `D:\ServOMorph\IA_Life\ROBERTO\com_telephone\voice-code-bridge\server\logs\messages_tsa.log`.
+- **Log surveillé** : `D:\ServOMorph\Roberto\com_telephone\voice-code-bridge\server\logs\messages_tsa.log`.
   Le verrou du Monitor actif est `ROBERTO/com_telephone/_commands/monitor_tsa.lock` (se fier à ce
   fichier, jamais à la mémoire de conversation).
 - **`POST /send` obligatoirement avec `"project": "tsa"`** (`http://127.0.0.1:5000/send`, loopback
@@ -118,5 +118,5 @@ qui met la session en écoute du log TSA.
   instruction directe — appliquer `.claude/commands/<commande>.md` de ce projet, reste du message =
   arguments, actions git incluses sans confirmation terminal supplémentaire (l'envoi depuis le
   téléphone vaut confirmation). Commande inconnue : le signaler par `POST /send` plutôt que deviner.
-- Prérequis : les 3 process partagés doivent tourner (démarrés côté IA_Life via
+- Prérequis : les 3 process partagés doivent tourner (démarrés côté Roberto via
   `com_manager.py start`). Rien à lancer depuis ce projet.

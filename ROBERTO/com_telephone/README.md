@@ -1,20 +1,20 @@
 # com_telephone — raccordement TSA au bridge ROBERTO partagé
 
 Ce projet ne contient **aucune copie** du serveur de l'assistant vocal. Le bridge (serveur Node
-port 5000, STT port 5001, TTS port 5002, tunnel, PWA) est **hébergé par le projet IA_Life** :
+port 5000, STT port 5001, TTS port 5002, tunnel, PWA) est **hébergé par le projet Roberto** :
 
-    D:\ServOMorph\IA_Life\ROBERTO\com_telephone\
+    D:\ServOMorph\Roberto\com_telephone\
 
-Un seul pont dessert les deux projets. La PWA téléphone affiche un sélecteur `IA_Life` / `TSA` ;
+Un seul pont dessert plusieurs projets. La PWA téléphone affiche un sélecteur de projet ;
 chaque message est routé vers le projet choisi.
 
 ## Ce dont TSA a besoin
 
-- **Les 3 process partagés doivent tourner.** Ils sont démarrés côté IA_Life :
-  `python D:\ServOMorph\IA_Life\ROBERTO\com_telephone\_commands\com_manager.py start`.
+- **Les 3 process partagés doivent tourner.** Ils sont démarrés côté Roberto :
+  `py -3.11 D:\ServOMorph\Roberto\com_telephone\_commands\com_manager.py start`.
   Rien à lancer depuis TSA.
 - **Une surveillance du log TSA.** La session Claude Code TSA doit surveiller en continu
-  `D:\ServOMorph\IA_Life\ROBERTO\com_telephone\voice-code-bridge\server\logs\messages_tsa.log`.
+  `D:\ServOMorph\Roberto\com_telephone\voice-code-bridge\server\logs\messages_tsa.log`.
   Commande dédiée : `/roberto` (cf. `.claude/commands/roberto.md`) — (re)lance ce Monitor et
   écrit le `task_id` dans `_commands/monitor_tsa.lock` de ce dossier.
 
@@ -22,8 +22,9 @@ chaque message est routé vers le projet choisi.
 
 - **Deux canaux étanches.** Toute réponse à un message venu du log doit repartir par
   `POST http://127.0.0.1:5000/send`, même si elle est déjà écrite dans la conversation Claude Code.
-- **Champ `project` obligatoire.** Tout `POST /send` doit contenir `"project": "tsa"` — une requête
-  sans `project` valide est rejetée (HTTP 400). `POST /send` n'est accessible que depuis `127.0.0.1`.
+- **Corps `POST /send` : clés `text` et `project`.** La clé du message est `text` (pas `message`,
+  pas `body`). Tout `POST /send` doit contenir `"project": "tsa"` et un `"text"` non vide — sinon
+  HTTP 400. `POST /send` n'est accessible que depuis `127.0.0.1`.
 - **Questions à l'utilisateur.** Dès que le bridge est actif, toute décision/choix/validation
   destinée à l'utilisateur passe par `POST /send` (avec `options` / `recommended` si choix fermé),
   jamais par une question bloquante terminal.
@@ -53,4 +54,11 @@ curl -X POST http://127.0.0.1:5000/send -H "Content-Type: application/json" -d '
   "options": ["Oui, option A", "Non, option B"],
   "recommended": "Oui, option A"
 }'
+```
+
+PowerShell (clé `text`, pas `message`) :
+
+```
+$body = @{ text = "Deploiement termine, la version est en ligne."; project = "tsa" } | ConvertTo-Json
+Invoke-RestMethod -Uri "http://127.0.0.1:5000/send" -Method Post -ContentType "application/json" -Body $body
 ```

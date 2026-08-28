@@ -6,7 +6,7 @@ archivée après livraison).
 
 - Google Doc : `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
 - Dernière revue du Doc : 2026-08-24 (date de modification du Doc au moment de l'analyse)
-- Dernière mise à jour de ce registre : 2026-08-28
+- Dernière mise à jour de ce registre : 2026-08-28 (réévaluation de #3)
 
 États autorisés : `livrée vX.Y` · `en attente` · `en cours <roadmap>` · `écartée : <motif>`.
 
@@ -14,7 +14,7 @@ archivée après livraison).
 | --- | --- | --- | --- | --- |
 | 1 | Accueil / Planning | Hauteur de case proportionnelle à la durée de la tâche | livrée v5.45 | 2026-08-24 |
 | 2 | Accueil / Planning | Couleur des cases outils réglable outil par outil, depuis Paramètres > Accessibilité après « Couleur d'ambiance » | livrée v5.58 | 2026-08-24 |
-| 3 | Tâches | Le cadre Date/Heure déborde à droite ; marges à équilibrer | en attente | 2026-08-24 |
+| 3 | Tâches | Le cadre Date/Heure déborde à droite ; marges à équilibrer | livrée v5.45 | 2026-08-28 |
 | 4 | Tâches | Retirer « Tâche du jour », « Planifier », « Liste », « Terminer » de la fiche de tâche | livrée v5.58 | 2026-08-24 |
 | 5 | Tâches | Conserver « Décomposer » et « Dupliquer » | livrée v5.56 | 2026-08-24 |
 | 6 | Outils : Budget | « Montant total » = revenus − prévisions « Mon compte » − transferts livrets | livrée v5.56 | 2026-08-24 |
@@ -35,9 +35,10 @@ archivée après livraison).
 - **#7** — Décision reçue de Marie le 25/08 : ne rien changer, le modal « Montant total » conserve son contenu actuel. Demande close sans développement.
 - **#9** — Satisfaite sans mécanisme dédié : les montants prévus sont des valeurs statiques par catégorie, recalculées à chaque affichage, sans accumulation dans le temps — il n'y a rien à remettre à zéro.
 - **#11** — Décision de portée reçue le 25/08 : la modification s'applique jusqu'à la fin de la semaine (catégorie hebdomadaire) ou du mois (catégorie mensuelle) affiché ; livrée en v5.61, parcours « Suivre ses dépenses avec Comptes » encore à rejouer par Marie.
-- **#3** — Le code actuel du cadre Date/Heure est symétrique et contraint ; Marie a annoté « à réfléchir », sans confirmer que le défaut persiste. À reproduire visuellement sur son appareil avant tout correctif.
+- **#3** — Réévaluée le 28/08 : les formulaires de tâche (création `E21CreateTaskV2.tsx`, modification `E24EditTask.tsx`) contraignent déjà le cadre Date/Heure (padding symétrique, `box-sizing: border-box`, `width: 100%`, `min-width: 0`, `max-width: 100%` sur les champs). Correctif de largeur introduit en v5.45. Marquée `livrée v5.45` sur décision de l'utilisateur ; reste à reconfirmer visuellement par Marie. Si le débordement persiste sur son appareil, rouvrir avec une capture récente (rendu natif des sélecteurs date/heure).
 
 ## Historique des revues
 
 - 2026-08-24 : analyse initiale du Doc (`Archives/roadmap_demandes_marie_2026-08-24.md`) — 17 demandes numérotées.
 - 2026-08-28 : création de ce registre, réconciliation des états avec le code après les livraisons v5.56, v5.58, v5.60, v5.61, v5.62.
+- 2026-08-28 : #3 réévaluée à partir du code et marquée `livrée v5.45` (cadre Date/Heure déjà contraint) ; à reconfirmer visuellement par Marie.

@@ -14,7 +14,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 ## État actuel (réécrit intégralement à chaque /close)
 **v5.62 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-28).
 La pastille rouge « Tests à faire » de l’accueil se rallume dès qu’un test reste à valider, révision comprise.
-Les demandes du Google Doc « Modifications » de Marie sont suivies dans `_contexte/marie_modifications_suivi.md` (17 demandes : 15 livrées, #7 écartée, #3 en attente), réconcilié par `/analyser_googledoc` et par la revue commune de `/deploy` et `/traiter_export_marie`.
+Les demandes du Google Doc « Modifications » de Marie sont suivies dans `_contexte/marie_modifications_suivi.md` (17 demandes : 16 livrées, #7 écartée), réconcilié par `/analyser_googledoc` et par la revue commune de `/deploy` et `/traiter_export_marie`.
 Le test « Suivre ses dépenses avec Comptes » (montant temporaire par catégorie, livré en v5.61) reste à rejouer par Marie.
 La décision #11 est entièrement implémentée.
 

@@ -5,8 +5,9 @@ Source de vérité du suivi Marie, indépendante des roadmaps (qui sont une vue 
 archivée après livraison).
 
 - Google Doc : `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
-- Dernière revue du Doc : 2026-08-24 (date de modification du Doc au moment de l'analyse)
-- Dernière mise à jour de ce registre : 2026-08-28 (#3 rouverte — bug confirmé par Marie)
+- Dernière revue du Doc : 2026-08-24 (date de modification analysée)
+- **Doc modifié le 2026-08-28 23:28 — non encore analysé.** Marie a retiré les demandes 1 à 17 (toutes traitées) et ajouté 18 à 22 (toutes « Accueil / Planning »). À analyser via `/analyser_googledoc` en début de prochaine session.
+- Dernière mise à jour de ce registre : 2026-08-29 (constat du changement du Doc, demandes 18-22 ajoutées `à analyser`)
 
 États autorisés : `livrée vX.Y` · `en attente` · `en cours <roadmap>` · `écartée : <motif>`.
 
@@ -29,6 +30,13 @@ archivée après livraison).
 | 15 | Outils : Listes | La croix rouge supprime seulement la catégorie visée, pas tout l'outil | livrée v5.51 | 2026-08-24 |
 | 16 | Outils : Listes | Écran « Ajouter une catégorie » tronqué sur mobile | livrée v5.56 | 2026-08-24 |
 | 17 | Énergie | « Valider » ferme « Mon énergie maintenant » et revient directement à l'accueil | livrée v5.56 | 2026-08-24 |
+| 18 | Accueil / Planning | Fond des cases de tâches du planning coloré sur toute la hauteur ; sous-tâches dépliées incluses dans la case colorée | à analyser | 2026-08-29 |
+| 19 | Accueil / Planning | Fond de la case des jours de la semaine (haut du planning) pleinement coloré de la couleur choisie, pas seulement le contour | à analyser | 2026-08-29 |
+| 20 | Accueil / Planning | Retirer le plier/déplier du planning et le trait gris ; taille du planning fixe, à mi-chemin pile entre replié et déplié | à analyser | 2026-08-29 |
+| 21 | Accueil / Planning | Glissement des jours à l'intérieur (les jours défilent par rapport au fond de la case) + effet de grossissement sur le jour au niveau du sélecteur | à analyser | 2026-08-29 |
+| 22 | Accueil / Planning | À gauche de la sélection du mois, logo planning cliquable ouvrant le planning complet en pleine page (vue semaine, cases en logos, même navigation que l'accueil) | à analyser | 2026-08-29 |
+
+> Note : les demandes 1 à 17 ont été retirées du Google Doc par Marie le 28/08 (elles étaient toutes livrées ou écartées). Leurs lignes restent ici comme historique du traitement. État « à analyser » = pas encore passé par `/analyser_googledoc` (à faire prochaine session).
 
 ## Précisions
 
@@ -44,4 +52,5 @@ archivée après livraison).
 - 2026-08-28 : #3 réévaluée à partir du code et marquée `livrée v5.45` (cadre Date/Heure déjà contraint) ; à reconfirmer visuellement par Marie.
 - 2026-08-28 : export de Marie du 28/08 (export_date 2026-08-28 09:42) traité — aucune perte, aucune friction nouvelle ; 2 validations (`utiliser-comptes` rev 2 le 27/08, `pastille-nouveaux-tests` le 28/08). Revue du Google Doc : inchangé depuis le 24/08, registre non modifié sur ce point.
 - 2026-08-28 : export de Marie du 28/08 20:34 traité — aucune perte. 1 nouveau résultat : `cadre-date-heure-dans-l-ecran` **nok** (« ça dépasse toujours »). #3 rouverte. Capture du Doc (image4.jpg) analysée, cause identifiée (`<form>` flex sans `min-width: 0`), correctif appliqué en v5.64.
+- 2026-08-29 : constaté après le déploiement v5.64 que le Google Doc avait été modifié à 23h28 le 28/08 (l'étape 0.4 de `/deploy` a été sautée par erreur). Marie a retiré 1-17 et ajouté 18-22 (toutes « Accueil / Planning »). Lignes 18-22 ajoutées au registre à l'état `à analyser`. **À faire prochaine session : `/analyser_googledoc` pour analyser 18-22 et bâtir la roadmap.**
 - 2026-08-28 : re-vérification complète des 17 demandes contre le code courant (voir ancres ci-dessous). Aucun écart au moment de la revue : 16 livrées, #7 écartée. Preuves — #1 `PlanningBoard.tsx:131-149,472` (hauteur ∝ durée) ; #2 `E112Accessibility.tsx:105-138` ; #3 `E21CreateTaskV2.tsx:291-321` + `E24EditTask.tsx:250-271` ; #4-#5 `E22TaskDetail.tsx:504-513` (Modifier/Décomposer/Dupliquer/Supprimer seulement) ; #6/#8/#10 `budgetRules.ts:100,110` (`getMonComptePrevisions`, `getMontantTotal` = revenus − livrets − prévisions) ; #9 sans mécanisme (prévisions statiques) ; #11 `budgetRules.ts:41-49` (`temporary_amount`) ; #12 `E10Dashboard.tsx:223` (widget « Comptes » → `budget-account`) ; #13 `E75BudgetAccount.tsx` (plus de bouton générique) + `E73CategoryDetail.tsx:118,195` ; #14 architecture Budget/Comptes ; #15 `E61ListDetail.tsx:38,142` (`deleteListCategory`) ; #16 `E61ListDetail.tsx:179-180` (largeur contrainte) ; #17 `E31EnergyCheckIn.tsx:28` (`goTo('dashboard')`).

@@ -1,3 +1,8 @@
+## v5.65 — 2026-08-29
+
+### Modifié
+- Suivi Marie : constaté après le déploiement v5.64 que le Google Doc « Modifications » avait été réécrit le 28/08 (l'étape 0.4 de `/deploy` a été sautée). Demandes 1-17 retirées, 18-22 ajoutées (toutes « Accueil / Planning »), inscrites dans `_contexte/marie_modifications_suivi.md` à l'état « à analyser ». `/analyser_googledoc` à lancer en début de prochaine session.
+
 ## v5.64 — 2026-08-29
 
 ### Corrigé

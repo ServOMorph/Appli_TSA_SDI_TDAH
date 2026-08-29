@@ -1,3 +1,11 @@
+## v5.66 — 2026-08-29
+
+### Ajouté
+- Suivi Marie : demandes 18-22 du Google Doc « Modifications » (toutes « Accueil / Planning ») analysées via `/analyser_googledoc`. Aucune déjà livrée ; roadmap `roadmap_planning_accueil_2026-08-29.md` créée (5 phases) : hauteur de planning fixe sans plier/déplier (#20), cases de tâches colorées sur toute la hauteur avec sous-tâches incluses (#18), bandeau des jours pleinement coloré (#19), défilement interne des jours avec grossissement au sélecteur (#21), vue planning de la semaine en pleine page (#22). Registre `_contexte/marie_modifications_suivi.md` réconcilié (18-22 → « en cours »).
+
+### Modifié
+- `/deploy` : la revue du Google Doc de Marie ne peut plus être sautée. Titre de l'étape 0 explicite, compte-rendu de la revue obligatoire avant le build, jalon daté « Dernière exécution de la revue » écrit dans le registre à chaque passage de `.claude/revue_googledoc.md`, et vérification bloquante 3.9 qui contrôle ce jalon.
+
 ## v5.65 — 2026-08-29
 
 ### Modifié

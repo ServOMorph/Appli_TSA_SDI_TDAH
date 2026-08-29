@@ -21,8 +21,14 @@ relit le Doc, réconcilie le registre, puis rend la main avec un compte-rendu.
 2. Comparer la date de modification du fichier exporté (rclone conserve celle du Google Doc) à la
    date « Dernière revue du Doc » de l'en-tête du registre.
    - Doc antérieur ou égal : compte-rendu « Google Doc inchangé depuis la dernière revue du
-     registre », rendre la main, ne rien modifier.
-   - Doc plus récent : poursuivre.
+     registre », ne rien modifier d'autre.
+   - Doc plus récent : poursuivre aux étapes 3 et suivantes.
+
+   Dans les deux cas, mettre à jour dans l'en-tête du registre la ligne
+   `- Dernière exécution de la revue : <date du jour>` (la créer si absente). Cette ligne est
+   distincte de « Dernière revue du Doc » (qui reste la date de modification du Doc analysée) et
+   sert de jalon vérifié par `/deploy` étape 3.9. Puis, si le Doc est antérieur ou égal, rendre la
+   main.
 
 3. Lire le contenu exporté intégralement. Relever chaque demande numérotée sans la reformuler de
    manière trompeuse (catégorie, comportement demandé, contraintes exprimées). Signaler tout

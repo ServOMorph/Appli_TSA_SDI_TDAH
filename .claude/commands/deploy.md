@@ -9,7 +9,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 
 ## Procédure
 
-0. Traiter les exports de Marie avant toute chose.
+0. Traiter les exports de Marie et revoir le Google Doc avant toute chose.
    1. Rappeler explicitement à l'utilisateur, avant de poursuivre, qu'il faut d'abord récupérer les
       derniers exports de Marie disponibles. Ne pas continuer tant que confirmation n'est pas donnée
       qu'ils sont fournis (fichiers reçus hors dépôt — jamais copiés automatiquement dans
@@ -24,9 +24,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    3. Ingérer les résultats de tests via `python scripts/ingest_manual_tests.py <export>`
       (dédoublonnage par `id`, jamais d'écrasement d'une entrée existante).
    4. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
-      réconcilie `_contexte/marie_modifications_suivi.md`. Si elle rapporte que le Google Doc est
-      plus récent que la dernière revue du registre : s'arrêter après la réconciliation et demander
-      à l'utilisateur de lancer `/analyser_googledoc` avant de reprendre `/deploy`.
+      réconcilie `_contexte/marie_modifications_suivi.md` et pose le jalon daté « Dernière exécution
+      de la revue » dans l'en-tête du registre (contrôlé à l'étape 3.9). Présenter ensuite à
+      l'utilisateur le compte-rendu qu'elle rend (différentiel d'états du registre, ou « Doc
+      inchangé depuis <date> » avec la date comparée) : ne jamais enchaîner à l'étape 1 sans l'avoir
+      affiché. Si elle rapporte que le Google Doc est plus récent que la dernière revue du registre :
+      s'arrêter après la réconciliation et demander à l'utilisateur de lancer `/analyser_googledoc`
+      avant de reprendre `/deploy`.
    5. Si l'analyse (exports + revue du Doc) ne révèle ni perte, ni incohérence, ni friction
       bloquante, ni changement non revu du Google Doc : continuer normalement à l'étape 1.
    6. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
@@ -73,6 +77,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       correctement à Marie.
    8. **Branche de production** : `git branch --show-current` doit retourner `main`. Sinon, s'arrêter : un
       déploiement de production depuis une autre branche n'est pas autorisé.
+   9. **Revue du Google Doc exécutée cette session** :
+      `grep -m1 '^- Dernière exécution de la revue :' _contexte/marie_modifications_suivi.md`. La date
+      qui suit doit être celle du jour. Sinon, s'arrêter — l'étape 0.4 a été sautée : exécuter
+      `.claude/revue_googledoc.md` (et présenter son compte-rendu) avant de reprendre.
 
 4. Avertissements — signaler chacun s'il est détecté, puis demander une confirmation explicite unique
    avant de poursuivre (ne pas bloquer seul, ne pas continuer sans réponse de l'utilisateur).

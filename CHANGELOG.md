@@ -1,3 +1,9 @@
+## v5.68 — 2026-08-29
+
+### Modifié
+- Suivi de la phase 5 du planning : réponse de Marie attendue pour choisir la navigation de la vue semaine et sa route. Le message de demande a été rédigé sans envoi.
+- Instructions agents : `AGENTS.md` aligné sur `.claude/CLAUDE.md`.
+
 ## v5.67 — 2026-08-29
 
 ### Modifié

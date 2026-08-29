@@ -183,6 +183,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ## Phase 5 — #22 : écran planning pleine page, vue semaine [TODO]
 
+- [ ] Attendre la réponse de Marie sur les décisions 4 et 5 ; le message de demande a été rédigé le 2026-08-29, sans envoi.
 - [ ] Trancher les décisions 4 et 5 (granularité de navigation, route) avant de coder.
 - [ ] Ajouter un bouton « logo planning » à gauche du libellé du mois dans la barre du mois
   (`PlanningBoard.tsx:411-429`), cliquable.

@@ -26,7 +26,7 @@
 
 ## Questions ouvertes
 - [P1] **Poursuivre `roadmap_planning_accueil_2026-08-29.md`** : Phases 1-2 `[FAIT]`, Phase 3 (#19, fond du bandeau de dates pleinement coloré) `[EN COURS]`, Phases 4-5 `[TODO]`. Phase par phase avec checkpoint `/compact`. — fait quand : les 5 phases `[FAIT]`, `/deploy` proposé — réf : `roadmap_planning_accueil_2026-08-29.md`, `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx`
-- [P1] **Décisions produit à obtenir de Marie avant la Phase 5 (#22)** : (a) le glissement de la vue semaine défile d'une semaine ou d'un jour ? (b) la route `planning` (dépliage inline, vidée par la Phase 1) est-elle réaffectée à la vue semaine ou faut-il une route `planning-week` distincte ? — fait quand : les deux points tranchés (avec Marie ou en implémentation validée) — réf : `roadmap_planning_accueil_2026-08-29.md` § Décisions produit non tranchées (points 4 et 5)
+- [P1] **Réponse de Marie attendue avant la Phase 5 (#22)** : le message WhatsApp demandant (a) une navigation par semaine ou par jour et (b) la réutilisation de `planning` ou la création de `planning-week` a été préparé, sans envoi. — fait quand : Marie tranche les deux points — réf : `roadmap_planning_accueil_2026-08-29.md` § Décisions produit non tranchées (points 4 et 5)
 - [P2] `/deploy` étape 0.4 (revue du Doc) : mécanisme anti-contournement posé le 29/08 (compte-rendu forcé + jalon daté + porte 3.9). Vérifier qu'il fonctionne au premier `/deploy` réel. — fait quand : un `/deploy` exécute 0.4, affiche son compte-rendu et passe la porte 3.9 — réf : `.claude/commands/deploy.md` étapes 0 et 3.9, `.claude/revue_googledoc.md` étape 2
 - [P1] Retirer du dépôt le lien Google Drive du commentaire de livraison v5.58 et le stocker dans `.env` ; ne jamais versionner ce lien. — fait quand : le lien n’est plus suivi par Git et est lu depuis `.env` — réf : `COMMUNICATION/Marie/livraisons/v5.58.md`, `.env.example`, `.gitignore`
 - [P1] Définir puis appliquer le rangement des fichiers `commentaires_marie_vX.Y.docx` créés à la racine après publication Drive. — fait quand : aucun fichier de commentaire de livraison ne reste à la racine et son emplacement d’archive est documenté — réf : `commentaires_marie_v5.58.docx`, `.claude/commands/deploy.md`
@@ -42,7 +42,30 @@
 - [P3] `PlanningBoard.tsx` : le bouton « Reporter » (mode surcharge) est imbriqué dans le `<button>` de ligne — HTML invalide, avertissement jsdom au run des tests. Pré-existant, révélé par la Phase 2. Candidat à une phase de refacto entre deux phases fonctionnelles de la roadmap planning. — fait quand : le bouton « Reporter » n'est plus descendant du bouton de ligne — réf : `src/ui/screens/dashboard/PlanningBoard.tsx` (rendu d'une ligne), `roadmap_planning_accueil_2026-08-29.md`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-29 — Phases 1-2 roadmap planning accueil : #20 hauteur fixe, #18 case colorée)
+## Dernière session (2026-08-29 — attente de réponse de Marie pour la Phase 5)
+
+## Décisions prises
+- La Phase 5 reste non démarrée : les phases 3 et 4 sont toujours à réaliser et les deux choix produit de la Phase 5 attendent la réponse de Marie.
+- Le message destiné à Marie a été réécrit selon les règles du projet ; aucun envoi WhatsApp n'a été effectué.
+- Le contenu de `.claude/CLAUDE.md` a été copié dans `AGENTS.md`.
+
+## Livrables produits ou modifiés
+- `AGENTS.md` : contenu aligné sur `.claude/CLAUDE.md`.
+- `_contexte/signals.md`, `_contexte/contexte.md`, `roadmap_planning_accueil_2026-08-29.md`, `README.md`, `CHANGELOG.md` : attente de décision et clôture consignées.
+
+## Hypothèses validées / invalidées
+- VALIDE : le Google Doc « Modifications » a été exporté et ses demandes 18 à 22 correspondent au registre et à la roadmap.
+- EN ATTENTE : réponse de Marie sur la navigation de la vue semaine et la route de la Phase 5.
+
+## Prochaine étape exacte
+Attendre la réponse de Marie, puis reprendre la roadmap à la Phase 3. La Phase 5 reste bloquée jusqu'à ce que les deux choix soient tranchés.
+
+## Question bloquante pour la session suivante
+Navigation de la vue semaine : par semaine ou par jour ? Réutiliser `planning` ou créer `planning-week` ?
+
+---
+
+## Dernière session archivée (2026-08-29 — Phases 1-2 roadmap planning accueil : #20 hauteur fixe, #18 case colorée)
 
 ## Décisions prises
 - Phase 1 (#20) livrée : planning de l'accueil à hauteur fixe 325 px ; poignée, trait gris et logique drag/expand retirés de `E10Dashboard.tsx` ; prop `collapsed`, `COLLAPSED_ROW_LIMIT` et `effectiveDate` retirés de `PlanningBoard.tsx` ; seule la liste des tâches défile (mois + bandeau de jours fixes).

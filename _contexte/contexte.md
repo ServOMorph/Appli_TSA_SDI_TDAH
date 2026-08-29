@@ -14,7 +14,8 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 ## État actuel (réécrit intégralement à chaque /close)
 **v5.64 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié le 2026-08-29).
 Demandes 1-17 du Google Doc livrées (#7 écartée), retirées du Doc par Marie le 28/08. #3 (cadre Date/Heure) corrigée en v5.64, `en attente` de revalidation par Marie.
-**`roadmap_planning_accueil_2026-08-29.md` (demandes 18-22, toutes « Accueil / Planning ») : Phases 1 (#20, hauteur de planning fixe 325 px + retrait plier/déplier) et 2 (#18, case colorée pleine hauteur + sous-tâches) `[FAIT]`, non déployées.** Phase 3 (#19) `[EN COURS]`, Phases 4-5 `[TODO]`. 2 décisions produit #22 à obtenir de Marie avant la Phase 5.
+**`roadmap_planning_accueil_2026-08-29.md` (demandes 18-22) : Phases 1-2 `[FAIT]`, non déployées ; Phase 3 `[EN COURS]`, Phases 4-5 `[TODO]`.**
+La réponse de Marie est attendue pour trancher la navigation de la vue semaine et la route de la Phase 5 ; le message a été rédigé, sans envoi.
 Code applicatif modifié depuis v5.64 mais non déployé : `E10Dashboard.tsx`, `PlanningBoard.tsx` (+ tests, catalogue, `WHATS_NEW`). 624 tests, `tsc -b` et lint verts.
 
 ## Décisions structurantes (append only — 10 entrées max, archiver au-delà)

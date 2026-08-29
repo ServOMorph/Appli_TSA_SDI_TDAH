@@ -19,10 +19,58 @@
 - Détecter quand on polit la méta (analyser l'analyse, auditer l'audit) au lieu d'avancer : le signaler et recommander de passer à l'action.
 - Ne pas justifier son propre travail après l'avoir produit. Si une réponse est bonne, elle se défend seule.
 
+### Déclencheurs de vérification (mécaniques, sans jugement)
+Ces règles s'appliquent aussi aux remarques annexes et aux apartés, pas seulement au livrable demandé.
+- Nommer un fichier = l'avoir lu dans la session. Toute assertion sur le contenu d'un fichier cité par son nom exige une lecture effective dans le même tour.
+- Tout chiffre ou état issu de `signals.md`/`contexte.md` est daté, pas courant. Avant de l'énoncer au présent (un compte, une version, un statut), relire la source primaire.
+- Vocabulaire de vérification réservé : « vérifié », « confirmé », « contrôlé » sont interdits sans appel d'outil correspondant dans la session.
+- Par défaut, poser la question plutôt qu'affirmer une absence. Ne pas disposer d'une information n'autorise pas à énoncer l'absence du fait.
+
 ## Code
 - Pas d'emojis dans le code
 - Code fonctionnel uniquement
 - Pas de commentaires décoratifs
+
+## Modèles recommandés
+- `/start` : Haiku
+- `/close` : Sonnet
+- Plans, debug complexe : Opus
+- Phase de refacto ou migration structurelle : Opus
+
+## Roadmap
+
+### Quand créer une roadmap
+Pas à chaque session. Une roadmap se justifie quand :
+- la feature ou la modification comporte plusieurs phases distinctes
+- le travail va s'étaler sur plusieurs sessions
+- le risque de perdre le fil entre deux `/compact` est réel
+
+Si aucun de ces critères n'est rempli, le signaler avant de créer le fichier.
+
+### Format
+- Nommage : `roadmap_<sujet>.md`, dans le dossier de zone (racine du projet).
+- Une seule phase `[EN COURS]` à la fois, les autres `[TODO]` ou `[FAIT]`.
+- Chaque phase se termine par un checkpoint `/compact` (ne pas le supprimer, ne pas le modifier) :
+
+  **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+  Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+- Mise à jour des statuts : à la charge de `/close`, jamais en cours de session.
+
+### Contenu des phases
+- Chaque phase de développement inclut la création et l'exécution des tests pertinents
+  avant d'être marquée [FAIT] — pas une phase séparée, sauf si le volume de tests le justifie.
+- Insérer une phase de refacto dédiée entre deux phases fonctionnelles quand :
+  - la phase qui vient de se terminer a introduit de la dette technique visible (duplication,
+    contournement temporaire, structure bancale) qui compliquerait la phase suivante
+  - le refacto est trop large pour être absorbé silencieusement dans la phase suivante
+  Sinon, ne pas insérer de phase dédiée : signaler l'opportunité sans forcer une phase.
+- Quand une phase produit un comportement critique difficile à tester unitairement
+  (anonymisation, prompt système, pipeline), le gate peut être un benchmark reproductible
+  à N cas verrouillés plutôt que des tests unitaires classiques.
+
+## Tests manuels
+Utiliser `tests_manuels.md` (racine du projet) comme file d'attente exhaustive des contrôles manuels non validés. Lorsqu'un test manuel reste à effectuer, l'ajouter à ce fichier, même si d'autres tests y sont déjà en attente. Après validation d'un test, supprimer immédiatement sa section. Lorsque tous les tests en attente sont validés, vider intégralement le fichier, sans en conserver le titre ni les consignes.
 
 ## Contrôle du contexte
 
@@ -36,5 +84,92 @@ Lire `.claude/memory.md` en début de chaque session si le fichier existe. Ce fi
 
 Certains dossiers ou fichiers peuvent contenir des données sensibles (informations clients, données personnelles, fichiers financiers). Les lister ici pour interdire toute lecture ou écriture sans instruction explicite :
 
+D:\ServOMorph\Appli_TSA_SDI_TDAH\.env
+D:\ServOMorph\Appli_TSA_SDI_TDAH\donnees_marie\
+
+<!-- Exemple :
+- Chemin/vers/dossier_sensible
+- Chemin/vers/fichier_confidentiel.md
+-->
+
 ## Délégation Ollama
-Pour les tâches répétitives et templated (commits, posts, changelogs, données de test, digest de logs), déléguer à Ollama via `./scripts/ollama_call.sh` plutôt que de traiter en cloud. Ne jamais envoyer de données sensibles à un modèle cloud.
+Pour les tâches répétitives et templated (commits, posts, changelogs, données de test, digest de logs), déléguer à Ollama via `python scripts/ollama_call.py "<prompt>"` plutôt que de traiter en cloud. Ne jamais envoyer de données sensibles à un modèle cloud.
+
+## Spécificités projet
+
+Section réservée aux règles propres à ce projet, hors périmètre du kit. Cette section est préservée intégralement par `/update` (jamais écrasée ni fusionnée avec le contenu du kit). Convention : toute règle liée à une section précise du fichier doit la référencer explicitement par son titre (ex: "Section Roadmap : ..."), plutôt que compter sur la position physique de cette section (toujours en fin de fichier).
+
+### Bridge ROBERTO (assistant vocal téléphone, partagé)
+Le bridge assistant vocal est partagé et hébergé par le projet Roberto
+(`D:\ServOMorph\Roberto\com_telephone\`). Ce projet n'en contient qu'un raccordement léger :
+`ROBERTO/com_telephone/README.md` (détail) et la commande `/roberto` (`.claude/commands/roberto.md`)
+qui met la session en écoute du log TSA.
+
+- **Log surveillé** : `D:\ServOMorph\Roberto\com_telephone\voice-code-bridge\server\logs\messages_tsa.log`.
+  Le verrou du Monitor actif est `ROBERTO/com_telephone/_commands/monitor_tsa.lock` (se fier à ce
+  fichier, jamais à la mémoire de conversation).
+- **`POST /send` obligatoirement avec `"project": "tsa"`** (`http://127.0.0.1:5000/send`, loopback
+  uniquement). Une requête sans `project` valide est rejetée en HTTP 400.
+- Dès que le bridge est actif : toute question destinée à l'utilisateur (décision, choix,
+  validation) passe par `POST /send` (avec `options`/`recommended` si choix fermé), jamais par une
+  question bloquante terminal. Toute réponse à un message reçu via le log repart par `POST /send`,
+  même si elle est déjà écrite dans la conversation Claude Code (canaux étanches).
+- **Convention `!<commande>`** : un message téléphone commençant par `!` (ex. `!close`) est une
+  instruction directe — appliquer `.claude/commands/<commande>.md` de ce projet, reste du message =
+  arguments, actions git incluses sans confirmation terminal supplémentaire (l'envoi depuis le
+  téléphone vaut confirmation). Commande inconnue : le signaler par `POST /send` plutôt que deviner.
+- Prérequis : les 3 process partagés doivent tourner (démarrés côté Roberto via
+  `com_manager.py start`). Rien à lancer depuis ce projet.
+
+### Messages pour Marie : prêts à copier-coller, avec emojis
+Tout message rédigé à l'intention de Marie (pas seulement celui de `/deploy`) doit être livré prêt
+à copier-coller tel quel : un bloc unique, encadré par `💻🤖` — une occurrence au tout début, une à
+la toute fin — rien à retoucher avant l'envoi. Ne jamais demander à l'utilisateur d'ajouter les
+emojis ou de reformater lui-même.
+
+Le message pour Marie part dans son propre `POST /send`, isolé : ce `/send` ne contient QUE le bloc
+`💻🤖 … 💻🤖`, aucun texte avant ou après. Tout commentaire à l'utilisateur (ce qui a été fait,
+pourquoi, prochaine étape) part dans un `/send` distinct ou reste dans le terminal — jamais dans la
+même bulle que le message Marie, sinon il n'est plus copiable d'un bloc.
+
+Style attendu par Marie (préférence explicite du 28/08) : **hyper synthétique, aucune formule de
+politesse** — pas de salutation, pas de remerciement, pas de formule de clôture. Aller droit à
+l'information : ce qui est fait, ce qu'elle doit vérifier, une idée par phrase.
+
+**Gabarit du message de livraison** (préférence du 28/08) :
+
+```
+💻🤖
+
+Version <X.Y> en ligne.
+
+<N> tests à faire, correspondant aux modifications :
+• <n° de modification du Google Doc>
+• <n° …>
+
+<lien de l'appli sur sa propre ligne>
+
+💻🤖
+```
+
+`<N>` = nombre de parcours actuellement à faire dans l'écran « Tests à faire » (parcours non
+validés sur la version déployée). Les puces reprennent les numéros de modification du Google Doc
+`Modifications` couverts par ces parcours (champ `docRefs` de `src/domain/data/manualTestsCatalog.ts`,
+recoupé avec `_contexte/marie_modifications_suivi.md`). Un parcours sans numéro de modification
+(retour hors Doc) est listé par son titre. Le lien du commentaire Drive est ajouté sur sa propre
+ligne, introduit par « Détail des changements et questions : », uniquement s'il y a un commentaire
+utile pour cette livraison.
+
+### Tests à faire pour Marie : uniquement dans l'appli
+Tous les tests que Marie doit effectuer vivent dans le catalogue in-app
+(`src/domain/data/manualTestsCatalog.ts`, écran « Tests à faire »). Ne jamais lister de tests à
+refaire ailleurs :
+- `COMMUNICATION/Marie/a_transmettre.md` et les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md`
+  ne contiennent que des **commentaires de livraison** (ce qui change, décisions attendues, écarts
+  assumés) — aucune liste de tests, aucune étape de test.
+- Le message WhatsApp généré par `/deploy` renvoie vers l'écran « Tests à faire » de l'appli pour
+  les tests, sans les énumérer.
+Chaque comportement à valider par Marie doit donc être ajouté au catalogue in-app (Section « Tests
+manuels » : le catalogue, pas `tests_manuels.md`, qui reste réservé aux contrôles développeur).
+Cette règle prime sur toute étape de `/deploy`, `/close` ou `/analyser_googledoc` qui mentionnerait
+une rubrique « Tests à refaire » dans les documents de communication.

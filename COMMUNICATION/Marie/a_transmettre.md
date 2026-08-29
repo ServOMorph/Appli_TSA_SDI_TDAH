@@ -6,6 +6,4 @@ Ce fichier ne contient jamais de liste de tests : tous les tests que Marie doit 
 
 ## Changement livré
 
-Un point à vérifier est disponible dans l'écran « Tests à faire » : le cadre « Date » et « Heure de début » du formulaire de tâche. C'est le retour que tu avais signalé sur le débordement à droite. D'après le code, le cadre est déjà bien contraint dans l'écran ; on te demande de le confirmer sur ton téléphone.
-
-Tes deux derniers tests validés (« Suivre ses dépenses avec Comptes » et le point rouge sur « Tests à faire ») sont bien enregistrés et ne réapparaissent plus dans ta liste.
+Le cadre « Date » et le cadre « Heure de début » du formulaire de tâche ne débordent plus sur le bord droit de l'écran. C'est ton retour #3. Le parcours à revérifier est dans l'écran « Tests à faire ».

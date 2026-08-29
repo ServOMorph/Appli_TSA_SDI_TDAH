@@ -16,7 +16,9 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-La version **v5.63** est en production : elle ajoute un parcours de vérification du cadre « Date » et « Heure de début » du formulaire de tâche (retour #3 de Marie) et, côté outillage, un registre de suivi des demandes du Google Doc de Marie réconcilié par `/analyser_googledoc`, `/deploy` et `/traiter_export_marie`.
+La version **v5.64** est en production : elle corrige le débordement à droite des cadres « Date » et « Heure de début » du formulaire de tâche (retour #3 de Marie), en attente de revalidation par Marie.
+
+La version **v5.63** ajoute un registre de suivi des demandes du Google Doc de Marie réconcilié par `/analyser_googledoc`, `/deploy` et `/traiter_export_marie`, plus le champ `docRefs` du catalogue de tests.
 
 La version **v5.62** rallume le point rouge de l’icône « Tests à faire » dès qu’un test reste à valider (révision comprise), en suivant exactement la liste de l’écran « Tests à faire ».
 

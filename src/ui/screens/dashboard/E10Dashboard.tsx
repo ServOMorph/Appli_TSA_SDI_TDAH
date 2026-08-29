@@ -1,5 +1,5 @@
 import { useApp } from '@/app/AppContext'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
@@ -12,36 +12,7 @@ import { DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 import { hasPendingManualTests } from '@/domain/rules/manualTestRules'
 
-const handleStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 'var(--spacing-xs)',
-  width: '100%',
-  padding: '8px 0',
-  background: 'none',
-  border: 'none',
-  cursor: 'pointer',
-  color: 'var(--color-text-muted)',
-  fontSize: '0.8125rem',
-  fontFamily: 'var(--font-body)',
-}
-
-const handleBarStyle: React.CSSProperties = {
-  display: 'block',
-  width: '36px',
-  height: '4px',
-  borderRadius: '2px',
-  background: 'var(--color-border)',
-}
-
-const PLANNING_MIN_HEIGHT_PX = 190
-const PLANNING_MAX_HEIGHT_PX = 460
-const DRAG_MOVE_EPSILON_PX = 6
-
-function clampPlanningHeight(value: number): number {
-  return Math.min(PLANNING_MAX_HEIGHT_PX, Math.max(PLANNING_MIN_HEIGHT_PX, value))
-}
+export const PLANNING_HEIGHT_PX = 325
 
 const widgetBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -57,7 +28,6 @@ const widgetBtnStyle: React.CSSProperties = {
 
 export function E10Dashboard() {
   const {
-    route,
     todayEnergy,
     todayEnergyStatus,
     todayPlannedTasks,
@@ -71,15 +41,6 @@ export function E10Dashboard() {
     settings,
   } = useApp()
   const [showCreateTool, setShowCreateTool] = useState(false)
-
-  const expanded = route.name === 'planning'
-
-  const dragStartY = useRef<number | null>(null)
-  const dragTriggered = useRef(false)
-  const [dragDeltaY, setDragDeltaY] = useState<number | null>(null)
-
-  const baseHeight = expanded ? PLANNING_MAX_HEIGHT_PX : PLANNING_MIN_HEIGHT_PX
-  const planningHeight = dragDeltaY === null ? baseHeight : clampPlanningHeight(baseHeight + dragDeltaY)
 
   const rootFolders = folders
   const rootTools = tools.filter((t) => t.folder_id === null)
@@ -101,51 +62,6 @@ export function E10Dashboard() {
     selectList(listId)
     goTo('list-detail')
   }
-
-  function handleHandlePointerDown(event: React.PointerEvent) {
-    dragStartY.current = event.clientY
-    dragTriggered.current = false
-    setDragDeltaY(0)
-  }
-
-  function handleHandlePointerMove(event: React.PointerEvent) {
-    if (dragStartY.current === null) return
-    const delta = event.clientY - dragStartY.current
-    if (!dragTriggered.current && Math.abs(delta) > DRAG_MOVE_EPSILON_PX) dragTriggered.current = true
-    setDragDeltaY(delta)
-  }
-
-  function handleHandlePointerUp() {
-    if (dragTriggered.current && dragStartY.current !== null) {
-      const releasedHeight = clampPlanningHeight(baseHeight + (dragDeltaY ?? 0))
-      const shouldExpand = releasedHeight > (PLANNING_MIN_HEIGHT_PX + PLANNING_MAX_HEIGHT_PX) / 2
-      if (shouldExpand !== expanded) goTo(shouldExpand ? 'planning' : 'dashboard')
-    }
-    dragStartY.current = null
-    setDragDeltaY(null)
-  }
-
-  function handleHandleClick() {
-    if (dragTriggered.current) {
-      dragTriggered.current = false
-      return
-    }
-    goTo(expanded ? 'dashboard' : 'planning')
-  }
-
-  const handle = (
-    <button
-      onClick={handleHandleClick}
-      onPointerDown={handleHandlePointerDown}
-      onPointerMove={handleHandlePointerMove}
-      onPointerUp={handleHandlePointerUp}
-      aria-expanded={expanded}
-      aria-label={expanded ? 'Replier le planning' : 'Déplier le planning'}
-      style={{ ...handleStyle, touchAction: 'none' }}
-    >
-      <span aria-hidden style={handleBarStyle} />
-    </button>
-  )
 
   return (
     <AppShell overloadMode={overloadMode}>
@@ -182,21 +98,16 @@ export function E10Dashboard() {
         </Card>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        {expanded && handle}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: 0,
-            height: `${planningHeight}px`,
-            overflowY: dragDeltaY === null ? 'auto' : 'hidden',
-            transition: dragDeltaY === null ? 'height 0.2s ease' : 'none',
-          }}
-        >
-          <PlanningBoard collapsed={!expanded} />
-        </div>
-        {!expanded && handle}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+          height: `${PLANNING_HEIGHT_PX}px`,
+          overflow: 'hidden',
+        }}
+      >
+        <PlanningBoard />
       </div>
 
       {!overloadMode && (

@@ -16,10 +16,10 @@ function makeTaskV2(overrides: Partial<Task> = {}): Task {
 }
 
 function renderExpanded(ctx = makeAppContext()) {
-  return renderWithApp(<PlanningBoard collapsed={false} />, ctx)
+  return renderWithApp(<PlanningBoard />, ctx)
 }
 
-describe('PlanningBoard — déplié', () => {
+describe('PlanningBoard', () => {
   beforeEach(() => {
     vi.setSystemTime(new Date('2026-06-30T14:30:00'))
   })
@@ -255,30 +255,68 @@ describe('PlanningBoard — déplié', () => {
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     expect(await screen.findByText('Rien de planifié ce jour-là.')).toBeInTheDocument()
   })
-})
 
-describe('PlanningBoard — replié', () => {
-  beforeEach(() => {
-    vi.setSystemTime(new Date('2026-06-30T14:30:00'))
-  })
-
-  it('affiche le bandeau de dates comme en mode déplié', async () => {
-    renderWithApp(<PlanningBoard collapsed />, makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
-    await waitFor(() => expect(screen.queryByLabelText('2026-06-30')).not.toBeNull())
-  })
-
-  it('charge toujours le jour courant, quelle que soit la navigation précédente', async () => {
-    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
-    renderWithApp(<PlanningBoard collapsed />, makeAppContext({ getPlannedTasksForDate }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
-  })
-
-  it('limite le nombre de lignes affichées', async () => {
+  it('affiche toutes les tâches du jour et les rend défilables (#20)', async () => {
     const tasks = Array.from({ length: 6 }, (_, i) =>
       makeTaskV2({ id: `t${i}`, title: `Tâche ${i}`, scheduled_date: '2026-06-30', scheduled_start: `0${i}:00`, scheduled_end: `0${i}:30` }),
     )
-    renderWithApp(<PlanningBoard collapsed />, makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue(tasks) }))
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue(tasks) }))
     await waitFor(() => expect(screen.getByText('Tâche 0')).toBeInTheDocument())
-    expect(screen.queryByText('Tâche 5')).toBeNull()
+    expect(screen.getByText('Tâche 5')).toBeInTheDocument()
+
+    const list = screen.getByText('Tâche 0').closest('div[style*="overflow-y"]') as HTMLElement | null
+    expect(list?.style.overflowY).toBe('auto')
+  })
+
+  it('pose la teinte sur le conteneur de la ligne, à la hauteur imposée par la durée (#18)', async () => {
+    const task = makeTaskV2({
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+      duration_minutes: 60,
+      color: '#ff8800',
+    })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+
+    const tinted = title.closest('div[style*="background-color"]') as HTMLElement
+    const row = tinted.querySelector('button') as HTMLElement
+    expect(tinted.style.backgroundColor).toContain('#ff8800')
+    expect(row.style.minHeight).toBe('80px')
+    expect(row.style.backgroundColor).toBe('')
+  })
+
+  it('englobe les sous-étapes dépliées dans le même aplat coloré (#18)', async () => {
+    const parent = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    const child = baseTask({ id: 'c1', parent_id: 't1', title: 'Étape 1', status: 'inbox' })
+    renderExpanded(
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([parent]),
+        getSubTasks: vi.fn().mockResolvedValue([child]),
+      }),
+    )
+    await userEvent.click(await screen.findByLabelText('0 sur 1 sous-étapes, déplier'))
+
+    const step = await screen.findByText('Étape 1')
+    const tinted = screen.getByText('Médecin').closest('div[style*="background-color"]') as HTMLElement
+    expect(tinted.contains(step)).toBe(true)
+  })
+
+  it('garde le fond plein et le texte blanc barré sur une tâche terminée (#18)', async () => {
+    const task = makeTaskV2({
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+      status: 'completed',
+      color: '#ff8800',
+    })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+
+    const tinted = title.closest('div[style*="background-color"]') as HTMLElement
+    const row = tinted.querySelector('button') as HTMLElement
+    expect(tinted.style.backgroundColor).not.toContain('color-mix')
+    expect(row.style.color).toBe('rgb(255, 255, 255)')
+    expect(row.style.textDecoration).toBe('line-through')
   })
 })

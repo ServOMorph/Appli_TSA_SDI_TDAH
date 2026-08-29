@@ -45,17 +45,17 @@ describe('AppScreens — navigation persistante (N1)', () => {
   })
 
   it('rend le même écran fusionné sur dashboard et sur planning (E19, Q8)', () => {
-    const collapsed = renderWithApp(<AppScreens />, makeAppContext({ screen: 'dashboard' }))
+    const fromDashboard = renderWithApp(<AppScreens />, makeAppContext({ screen: 'dashboard' }))
     expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Déplier le planning' })).toBeDefined()
-    collapsed.unmount()
+    expect(screen.getByRole('region', { name: 'Planning du jour' })).toBeDefined()
+    fromDashboard.unmount()
 
     renderWithApp(
       <AppScreens />,
       makeAppContext({ screen: 'planning', route: { name: 'planning' } }),
     )
     expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Replier le planning' })).toBeDefined()
+    expect(screen.getByRole('region', { name: 'Planning du jour' })).toBeDefined()
   })
 
   it("le bouton \"+\" ouvre la création de tâche, la pile portant l'écran courant comme origine", async () => {

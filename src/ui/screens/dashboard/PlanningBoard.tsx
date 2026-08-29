@@ -9,7 +9,6 @@ import { DEFAULT_AMBIANCE_COLOR, plannedTaskTintStyle } from '@/ui/styles/ambian
 import { isCompleted } from '@/domain/rules/taskRules'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@/domain/rules/planningSlotRules'
 
-const COLLAPSED_ROW_LIMIT = 4
 const DATE_STRIP_RADIUS = 2
 const SWIPE_THRESHOLD_PX = 50
 
@@ -237,7 +236,16 @@ const subTaskListStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: '4px',
-  padding: '4px 0 4px 42px',
+  padding: '0 12px 10px 54px',
+}
+
+function rowContainerStyle(tint: React.CSSProperties): React.CSSProperties {
+  return {
+    backgroundColor: tint.backgroundColor,
+    borderRadius: 'var(--radius-md)',
+    overflow: 'hidden',
+    flexShrink: 0,
+  }
 }
 
 const subTaskRowStyle: React.CSSProperties = {
@@ -259,11 +267,7 @@ const emptyStateStyle: React.CSSProperties = {
   textAlign: 'center',
 }
 
-interface PlanningBoardProps {
-  collapsed: boolean
-}
-
-export function PlanningBoard({ collapsed }: PlanningBoardProps) {
+export function PlanningBoard() {
   const {
     getPlannedTasksForDate,
     getPlannedSubTasksForDate,
@@ -290,8 +294,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   const [subTasksByTask, setSubTasksByTask] = useState<Record<string, Task[]>>({})
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
-  const effectiveDate = collapsed ? todayStr() : displayDate
-  const displayDateRef = useRef(effectiveDate)
+  const displayDateRef = useRef(displayDate)
   const touchStartX = useRef<number | null>(null)
   const [dragOffset, setDragOffset] = useState(0)
   const [dragging, setDragging] = useState(false)
@@ -301,13 +304,13 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   )
 
   useEffect(() => {
-    displayDateRef.current = effectiveDate
-  }, [effectiveDate])
+    displayDateRef.current = displayDate
+  }, [displayDate])
 
   function updateDisplayDate(updater: string | ((d: string) => string)) {
     setDisplayDate((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater
-      if (!collapsed) replace({ name: 'planning', date: next })
+      replace({ name: 'planning', date: next })
       return next
     })
   }
@@ -333,7 +336,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
   useEffect(() => {
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectiveDate])
+  }, [displayDate])
 
   function toggleExpand(taskId: string) {
     setExpandedIds((prev) => {
@@ -393,12 +396,11 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
     jumpTo(addDays(displayDate, delta < 0 ? 1 : -1))
   }
 
-  const isToday = effectiveDate === todayStr()
-  let blocks: PlanBlock[] = sortBlocks([
+  const isToday = displayDate === todayStr()
+  const blocks: PlanBlock[] = sortBlocks([
     ...scheduledTasks.map((t): PlanBlock => ({ kind: 'task', item: t })),
     ...scheduledSubTasks.map((s): PlanBlock => ({ kind: 'subtask', item: s })),
   ])
-  if (collapsed) blocks = blocks.slice(0, COLLAPSED_ROW_LIMIT)
 
   const displayDateObj = new Date(displayDate + 'T12:00:00')
 
@@ -406,7 +408,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
     <>
     <section
       aria-label="Planning du jour"
-      style={{ display: 'flex', flexDirection: 'column', minHeight: 0, gap: 'var(--spacing-sm)' }}
+      style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, gap: 'var(--spacing-sm)' }}
     >
       <div style={monthBarStyle}>
         <button
@@ -456,7 +458,7 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
         })}
       </div>
 
-      <div style={collapsed ? undefined : { flex: 1, minHeight: 0, overflowY: 'auto' }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {blocks.length === 0 && <p style={emptyStateStyle}>Rien de planifié ce jour-là.</p>}
 
         {blocks.map((block) => {
@@ -466,57 +468,63 @@ export function PlanningBoard({ collapsed }: PlanningBoardProps) {
           const hasSubs = subs.length > 0
           const done = subs.filter(isCompleted).length
           const expanded = expandedIds.has(block.item.id)
+          const tint = rowTintStyle(block, ambianceColor)
 
           return (
-            <div key={`${block.kind}-${block.item.id}`}>
-              <button style={rowStyle(block.item.duration_minutes)} onClick={() => openDetail(block.item.id)}>
-                <div style={{ ...rowTintStyle(block, ambianceColor), display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flex: 1, borderRadius: 'var(--radius-md)', padding: '6px 8px' }}>
-                  <span style={timeLabelStyle}>{block.item.scheduled_start ?? 'Sans horaire'}</span>
-                  {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
-                  <span style={titleColStyle}>
-                    <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
-                    {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
+            <div key={`${block.kind}-${block.item.id}`} style={rowContainerStyle(tint)}>
+              <button
+                style={{
+                  ...rowStyle(block.item.duration_minutes),
+                  color: tint.color,
+                  textDecoration: tint.textDecoration,
+                }}
+                onClick={() => openDetail(block.item.id)}
+              >
+                <span style={timeLabelStyle}>{block.item.scheduled_start ?? 'Sans horaire'}</span>
+                {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
+                <span style={titleColStyle}>
+                  <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
+                  {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
+                </span>
+                {hasSubs && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${done} sur ${subs.length} sous-étapes, ${expanded ? 'replier' : 'déplier'}`}
+                    style={expandBtnStyle}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      toggleExpand(block.item.id)
+                    }}
+                  >
+                    {done}/{subs.length} {expanded ? '▾' : '▸'}
                   </span>
-                  {hasSubs && (
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`${done} sur ${subs.length} sous-étapes, ${expanded ? 'replier' : 'déplier'}`}
-                      style={expandBtnStyle}
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        toggleExpand(block.item.id)
-                      }}
-                    >
-                      {done}/{subs.length} {expanded ? '▾' : '▸'}
-                    </span>
-                  )}
-                  {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
-                  <input
-                    type="checkbox"
-                    checked={completed}
-                    onClick={(event) => event.stopPropagation()}
-                    onChange={() => handleComplete(block)}
-                    aria-label={`Terminer ${blockDisplayTitle(block)}`}
-                    style={taskCheckboxStyle}
-                  />
-                  {canPostpone && (
-                    <button
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        handleReport(block)
-                      }}
-                      aria-label={`Reporter ${blockDisplayTitle(block)}`}
-                      style={taskActionStyle}
-                    >
-                      Reporter
-                    </button>
-                  )}
-                </div>
+                )}
+                {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
+                <input
+                  type="checkbox"
+                  checked={completed}
+                  onClick={(event) => event.stopPropagation()}
+                  onChange={() => handleComplete(block)}
+                  aria-label={`Terminer ${blockDisplayTitle(block)}`}
+                  style={taskCheckboxStyle}
+                />
+                {canPostpone && (
+                  <button
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      handleReport(block)
+                    }}
+                    aria-label={`Reporter ${blockDisplayTitle(block)}`}
+                    style={taskActionStyle}
+                  >
+                    Reporter
+                  </button>
+                )}
               </button>
 
               {expanded && hasSubs && (
-                <div style={subTaskListStyle}>
+                <div style={{ ...subTaskListStyle, color: tint.color }}>
                   {subs.map((st) => (
                     <div key={st.id} style={subTaskRowStyle}>
                       <input

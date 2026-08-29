@@ -1,3 +1,11 @@
+## v5.67 — 2026-08-29
+
+### Modifié
+- Planning de l'accueil (roadmap `roadmap_planning_accueil_2026-08-29.md`, phases 1 et 2, non déployées) :
+  - Phase 1 (#20) : le planning garde une hauteur fixe de 325 px. La poignée, le trait gris et le geste pour plier ou déplier sont retirés ; seule la liste des tâches défile, le mois et le bandeau des jours restent fixes. La route `planning` est conservée (point d'entrée de la création de tâche et de la future vue semaine) mais ne pilote plus d'état déplié.
+  - Phase 2 (#18) : la couleur d'une tâche remplit désormais toute la hauteur de sa case (proportionnelle à la durée). Les sous-étapes dépliées sont intégrées au même aplat coloré. Le cas d'une tâche terminée (fond plein, texte blanc barré) est conservé.
+- Catalogue de tests : parcours `glisser-pour-ouvrir-le-planning` retiré (obsolète) ; parcours `planning-hauteur-fixe` (#20) et `case-de-tache-coloree-en-entier` (#18) ajoutés.
+
 ## v5.66 — 2026-08-29
 
 ### Ajouté

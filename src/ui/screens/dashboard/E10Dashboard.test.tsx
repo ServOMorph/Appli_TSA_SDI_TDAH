@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
-import { E10Dashboard } from './E10Dashboard'
+import { E10Dashboard, PLANNING_HEIGHT_PX } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
 import { makeTask as baseTask } from '@/test/factories'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
@@ -149,41 +149,37 @@ describe('E10Dashboard', () => {
       vi.useRealTimers()
     })
 
-    it('replié : affiche le bandeau de dates comme en mode déplié', async () => {
+    it('affiche le bandeau de dates du planning et la zone widgets', async () => {
       const ctx = makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) })
       renderWithApp(<E10Dashboard />, ctx)
       expect(await screen.findByRole('region', { name: 'Planning du jour' })).not.toBeNull()
-    })
-
-    it('replié : affiche la zone widgets', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByRole('region', { name: 'Outils' })).toBeDefined()
-    })
-
-    it('replié : la poignée déplie le planning (E18)', async () => {
-      const ctx = makeAppContext()
-      renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(await screen.findByRole('button', { name: 'Déplier le planning' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('planning')
-    })
-
-    it('déplié : affiche le bandeau de dates du planning et garde la zone widgets visible', async () => {
-      const ctx = makeAppContext({
-        route: { name: 'planning' },
-        screen: 'planning',
-        getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      expect(await screen.findByRole('region', { name: 'Planning du jour' })).toBeDefined()
       expect(screen.getByRole('region', { name: 'Outils' })).toBeDefined()
     })
 
-    it('déplié : la poignée replie vers l\'accueil (E18)', async () => {
-      const ctx = makeAppContext({ route: { name: 'planning' }, screen: 'planning' })
+    it('n’expose plus de poignée pour plier ou déplier le planning (#20)', async () => {
+      renderWithApp(<E10Dashboard />, makeAppContext())
+      await screen.findByRole('region', { name: 'Planning du jour' })
+      expect(screen.queryByRole('button', { name: 'Déplier le planning' })).toBeNull()
+      expect(screen.queryByRole('button', { name: 'Replier le planning' })).toBeNull()
+    })
+
+    it('donne au planning une hauteur fixe, quelle que soit la route (#20)', async () => {
+      for (const ctx of [makeAppContext(), makeAppContext({ route: { name: 'planning' }, screen: 'planning' })]) {
+        const { unmount } = renderWithApp(<E10Dashboard />, ctx)
+        const board = await screen.findByRole('region', { name: 'Planning du jour' })
+        const container = board.parentElement as HTMLElement
+        expect(container.style.height).toBe(`${PLANNING_HEIGHT_PX}px`)
+        unmount()
+      }
+    })
+
+    it('fait défiler la liste des tâches à l’intérieur du planning (#20)', async () => {
+      const ctx = makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) })
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(await screen.findByRole('button', { name: 'Replier le planning' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+      const board = await screen.findByRole('region', { name: 'Planning du jour' })
+      const list = screen.getByText('Rien de planifié ce jour-là.').parentElement as HTMLElement
+      expect(list.style.overflowY).toBe('auto')
+      expect((board.parentElement as HTMLElement).style.overflow).toBe('hidden')
     })
 
     it('affiche une tâche planifiée du jour dans son créneau', async () => {

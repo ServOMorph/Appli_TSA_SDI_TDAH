@@ -2,7 +2,7 @@
 
 ## Contexte chaud
 - **v5.64 déployée en prod le 2026-08-29** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : correctif du débordement à droite des cadres « Date » et « Heure de début » du formulaire de tâche (demande #3). Cause : le `<form>`, enfant flex sans `min-width: 0`, ne rétrécissait pas sous la largeur intrinsèque des sélecteurs natifs date/heure. Corrigé sur `E21CreateTaskV2.tsx` et `E24EditTask.tsx`, test de non-régression. Marie doit revalider le parcours `cadre-date-heure-dans-l-ecran`. 624 tests verts. Commentaires v5.62/v5.63/v5.64 publiés sur Drive (`COMMUNICATION/Marie/livraisons/`).
-- **Demandes 18-22 du Google Doc de Marie analysées le 2026-08-29** (`/analyser_googledoc`). Toutes « Accueil / Planning », aucune déjà livrée, toutes des évolutions de la vue planning : 18) fond des cases de tâches coloré pleine hauteur, sous-tâches dépliées incluses ; 19) fond de la case des jours pleinement coloré ; 20) retirer le plier/déplier + trait gris, hauteur fixe à 325 px ; 21) glissement des jours à l'intérieur de la case + grossissement au sélecteur ; 22) logo planning à gauche du mois ouvrant une vue semaine pleine page (cases en logos). Roadmap créée : `roadmap_planning_accueil_2026-08-29.md`, 5 phases (#20 socle → #18 → #19 → #21 → #22), Phase 1 à démarrer. 2 décisions produit bloquantes pour la Phase 5 (voir Questions ouvertes).
+- **`roadmap_planning_accueil_2026-08-29.md` (demandes 18-22, toutes « Accueil / Planning ») : Phases 1 et 2 livrées le 2026-08-29, non déployées.** Phase 1 (#20) : planning de l'accueil à hauteur fixe 325 px, poignée + trait gris + logique drag/expand retirés, prop `collapsed` de `PlanningBoard` supprimée ; décision 5 tranchée = route `planning` **conservée** (originScreen de la création de tâche, emplacement de la future vue semaine, ne pilote plus d'état déplié). Phase 2 (#18) : teinte de la case portée sur le conteneur de ligne (hauteur ∝ durée), sous-tâches dépliées dans le même aplat coloré, cas « terminé » conservé. 624 tests, `tsc -b` et lint verts. Phase 3 (#19) `[EN COURS]`, Phases 4 (#21) et 5 (#22) `[TODO]`. 2 décisions produit bloquantes pour la Phase 5 (voir Questions ouvertes). 2 parcours catalogue ajoutés (`planning-hauteur-fixe`, `case-de-tache-coloree-en-entier`), 2 entrées `WHATS_NEW`.
 - **Contournement de l'étape 0.4 de `/deploy` corrigé le 2026-08-29** : titre de l'étape 0 renommé (mentionne la revue du Doc), compte-rendu de la revue rendu obligatoire en 0.4, jalon daté `- Dernière exécution de la revue :` écrit dans l'en-tête de `_contexte/marie_modifications_suivi.md` à chaque passage de `.claude/revue_googledoc.md` (Doc changé ou non), porte bloquante mécanique 3.9 dans `/deploy` (`grep` du jalon, doit être la date du jour). Mécanisme non encore exercé en live.
 - **Suivi des demandes du Google Doc de Marie** : registre durable `_contexte/marie_modifications_suivi.md`, réconcilié par `/analyser_googledoc` (étape 6) et par la revue commune `.claude/revue_googledoc.md` câblée dans `/deploy` étape 0 et `/traiter_export_marie`. La revue compare la date de modif du Doc à « Dernière revue du Doc » du registre (2026-08-28). Demandes 1-17 : 16 livrées, #7 écartée, retirées du Doc par Marie le 28/08 (lignes conservées comme historique).
 - **Exports de Marie du 2026-08-28 traités** : `utiliser-comptes` rev 2 et `pastille-nouveaux-tests` validés ; `cadre-date-heure-dans-l-ecran` en échec (« ça dépasse toujours ») → corrigé en v5.64, à revalider.
@@ -25,7 +25,7 @@
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] **Livrer `roadmap_planning_accueil_2026-08-29.md`** (demandes 18-22, vue planning de l'accueil), phase par phase avec checkpoint `/compact`. — fait quand : les 5 phases `[FAIT]`, `/deploy` proposé — réf : `roadmap_planning_accueil_2026-08-29.md`, `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx`
+- [P1] **Poursuivre `roadmap_planning_accueil_2026-08-29.md`** : Phases 1-2 `[FAIT]`, Phase 3 (#19, fond du bandeau de dates pleinement coloré) `[EN COURS]`, Phases 4-5 `[TODO]`. Phase par phase avec checkpoint `/compact`. — fait quand : les 5 phases `[FAIT]`, `/deploy` proposé — réf : `roadmap_planning_accueil_2026-08-29.md`, `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx`
 - [P1] **Décisions produit à obtenir de Marie avant la Phase 5 (#22)** : (a) le glissement de la vue semaine défile d'une semaine ou d'un jour ? (b) la route `planning` (dépliage inline, vidée par la Phase 1) est-elle réaffectée à la vue semaine ou faut-il une route `planning-week` distincte ? — fait quand : les deux points tranchés (avec Marie ou en implémentation validée) — réf : `roadmap_planning_accueil_2026-08-29.md` § Décisions produit non tranchées (points 4 et 5)
 - [P2] `/deploy` étape 0.4 (revue du Doc) : mécanisme anti-contournement posé le 29/08 (compte-rendu forcé + jalon daté + porte 3.9). Vérifier qu'il fonctionne au premier `/deploy` réel. — fait quand : un `/deploy` exécute 0.4, affiche son compte-rendu et passe la porte 3.9 — réf : `.claude/commands/deploy.md` étapes 0 et 3.9, `.claude/revue_googledoc.md` étape 2
 - [P1] Retirer du dépôt le lien Google Drive du commentaire de livraison v5.58 et le stocker dans `.env` ; ne jamais versionner ce lien. — fait quand : le lien n’est plus suivi par Git et est lu depuis `.env` — réf : `COMMUNICATION/Marie/livraisons/v5.58.md`, `.env.example`, `.gitignore`
@@ -39,9 +39,40 @@
 - [P2] Décider si une catégorie de dépense peut changer de périodicité après sa création, compte tenu de l'impact sur l'historique. — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
 - [P3] `todayStr()` (`planningSlotRules.ts`) ignore `dev_fake_date` alors que `todayDate()` (`repositories.ts:29`) le respecte — en dev avec date simulée active, le planning peut afficher un jour différent de celui utilisé pour l'énergie. — fait quand : décision prise (harmoniser ou accepter, outil dev uniquement) — réf : `planningSlotRules.ts`, `repositories.ts:29`
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
+- [P3] `PlanningBoard.tsx` : le bouton « Reporter » (mode surcharge) est imbriqué dans le `<button>` de ligne — HTML invalide, avertissement jsdom au run des tests. Pré-existant, révélé par la Phase 2. Candidat à une phase de refacto entre deux phases fonctionnelles de la roadmap planning. — fait quand : le bouton « Reporter » n'est plus descendant du bouton de ligne — réf : `src/ui/screens/dashboard/PlanningBoard.tsx` (rendu d'une ligne), `roadmap_planning_accueil_2026-08-29.md`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-29 — analyse Google Doc 18-22, roadmap planning, anti-contournement étape 0.4 de /deploy)
+## Dernière session (2026-08-29 — Phases 1-2 roadmap planning accueil : #20 hauteur fixe, #18 case colorée)
+
+## Décisions prises
+- Phase 1 (#20) livrée : planning de l'accueil à hauteur fixe 325 px ; poignée, trait gris et logique drag/expand retirés de `E10Dashboard.tsx` ; prop `collapsed`, `COLLAPSED_ROW_LIMIT` et `effectiveDate` retirés de `PlanningBoard.tsx` ; seule la liste des tâches défile (mois + bandeau de jours fixes).
+- Décision 5 de la roadmap tranchée : la route `planning` est **conservée** — elle sert d'`originScreen` à la création de tâche (`E21CreateTaskV2.tsx`) et reste l'emplacement de la vue pleine page de la Phase 5 ; elle ne pilote plus d'état déplié. `navigation.ts`, `App.tsx`, `DevResetButton.tsx` inchangés.
+- Phase 2 (#18) livrée : le `<div>` teinté interne (hauteur du contenu) est supprimé ; la teinte passe sur le conteneur de ligne, le `<button>` porte `rowStyle(duration_minutes)` — la couleur remplit la hauteur ∝ durée (44-160 px). Sous-tâches dépliées intégrées dans le même aplat (héritent de `tint.color`). Liste des tâches passée en `flex column gap 6px`. Cas « terminé » (fond plein, texte blanc barré) conservé.
+
+## Livrables produits ou modifiés
+- `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`) : hauteur fixe, `PLANNING_HEIGHT_PX` exporté, retrait poignée/drag.
+- `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`) : `collapsed` supprimé, teinte sur conteneur de ligne (`rowContainerStyle`), sous-tâches dans l'aplat.
+- `src/App.test.tsx` : assertions poignée → région « Planning du jour ».
+- `src/domain/data/manualTestsCatalog.ts` : `glisser-pour-ouvrir-le-planning` retiré ; `planning-hauteur-fixe` (#20) et `case-de-tache-coloree-en-entier` (#18) ajoutés.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : 2 entrées `WHATS_NEW`.
+- `roadmap_planning_accueil_2026-08-29.md` : Phases 1 et 2 `[FAIT]`, Phase 3 `[EN COURS]`.
+- `COMMUNICATION/Marie/a_transmettre.md` : 2 commentaires de livraison ajoutés.
+
+## Hypothèses validées / invalidées
+- VALIDE : 624 tests (76 fichiers), `tsc -b` et lint verts après les 2 phases.
+- EN ATTENTE : rendu visuel des 325 px et contraste du texte des sous-étapes sur couleur saturée — validation Marie via les 2 parcours du catalogue.
+- EN ATTENTE : mécanisme anti-contournement étape 0.4 de `/deploy` (posé le 29/08), premier `/deploy` réel à confirmer.
+- EN ATTENTE : retour de Marie sur `cadre-date-heure-dans-l-ecran` (#3, v5.64).
+
+## Prochaine étape exacte
+Phase 3 de `roadmap_planning_accueil_2026-08-29.md` (#19) : donner au bandeau de dates (`dateStripStyle`) un fond plein d'un aplat de la couleur d'ambiance au lieu de la seule bordure (décisions 1 et 2), garder le jour affiché repérable. Terminer par le checkpoint `/compact`.
+
+## Question bloquante pour la session suivante
+Aucune pour les Phases 3-4. Les 2 décisions #22 restent à obtenir de Marie avant la Phase 5.
+
+---
+
+## Dernière session archivée (2026-08-29 — analyse Google Doc 18-22, roadmap planning, anti-contournement étape 0.4 de /deploy)
 
 ## Décisions prises
 - Demandes 18-22 du Google Doc de Marie (toutes « Accueil / Planning ») analysées via `/analyser_googledoc` contre le code réel (`PlanningBoard.tsx`, `E10Dashboard.tsx`, `ambiance.ts`, `planningSlotRules.ts`, `navigation.ts`) : aucune déjà livrée, toutes des évolutions de la vue planning. Preuves d'écart consignées dans le registre.

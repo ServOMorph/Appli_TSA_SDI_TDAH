@@ -68,66 +68,70 @@ Phases 2 et 3 sont indépendantes l'une de l'autre et de la 1 (mais la 1 simplif
 Phase 4 dépend de la 1 (plus de drag externe du bandeau) et de la 3 (style de la case des jours).
 Phase 5 dépend de la 1 (réaffectation de la route `planning`).
 
-## Phase 1 — #20 : hauteur fixe du planning, retrait du plier/déplier [EN COURS]
+## Phase 1 — #20 : hauteur fixe du planning, retrait du plier/déplier [FAIT]
 
-- [ ] Retirer la poignée (`handle`, `handleStyle`, `handleBarStyle`) et toute la logique de
+- [x] Retirer la poignée (`handle`, `handleStyle`, `handleBarStyle`) et toute la logique de
   drag/expansion dans `E10Dashboard.tsx` (`dragStartY`, `dragDeltaY`, `handleHandle*`,
   `clampPlanningHeight`, constantes `PLANNING_MIN/MAX_HEIGHT_PX`).
-- [ ] Fixer la hauteur du conteneur du planning à 325 px (moitié pile de 190 et 460).
-- [ ] Traiter la route `planning` : ne plus l'utiliser pour un état « déplié » du dashboard
-  (le dashboard n'a plus qu'un seul état). Décision 5 : conserver la route pour la Phase 5
-  ou la retirer temporairement — à acter au démarrage de la phase.
-- [ ] `PlanningBoard` : supprimer la prop `collapsed` et les branches qui en dépendent
-  (`COLLAPSED_ROW_LIMIT`, `effectiveDate`, bornes de liste), le planning affiche toujours le
-  jour sélectionné avec défilement interne de la liste sur 325 px.
-- [ ] Retirer / réécrire le parcours catalogue `glisser-pour-ouvrir-le-planning` (obsolète).
-- [ ] Fichiers pressentis : `src/ui/screens/dashboard/E10Dashboard.tsx`(`.test.tsx`),
-  `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`), `src/app/navigation.ts`,
-  `src/App.tsx`, `src/ui/components/DevResetButton.tsx`,
-  `src/domain/data/manualTestsCatalog.ts`.
-- [ ] Tests automatisés : le dashboard n'affiche plus de poignée ni de bouton
-  replier/déplier ; la hauteur du bloc planning est fixe ; la liste des tâches défile à
-  l'intérieur.
-- [ ] Test manuel Marie (catalogue in-app) : parcours « Planning à hauteur fixe » — vérifier
-  l'absence du trait gris et du bouton, et que la hauteur ne change plus.
-- [ ] Entrée `WHATS_NEW` en langage clair.
+- [x] Fixer la hauteur du conteneur du planning à 325 px (moitié pile de 190 et 460) —
+  `PLANNING_HEIGHT_PX` exporté par `E10Dashboard.tsx`.
+- [x] Route `planning` — décision 5 tranchée : **conservée**. Elle ne pilote plus d'état
+  « déplié » (le dashboard n'a plus qu'un seul état) mais sert d'`originScreen` à la création
+  de tâche (`E21CreateTaskV2.tsx`) et reste l'emplacement de la vue pleine page de la Phase 5.
+  `navigation.ts`, `App.tsx`, `DevResetButton.tsx` inchangés.
+- [x] `PlanningBoard` : prop `collapsed`, `COLLAPSED_ROW_LIMIT` et `effectiveDate` supprimés ;
+  le planning affiche toujours le jour sélectionné, seule la liste des tâches défile
+  (`flex: 1; min-height: 0; overflow-y: auto`), mois et bandeau de jours fixes.
+- [x] Parcours catalogue `glisser-pour-ouvrir-le-planning` retiré, remplacé par
+  `planning-hauteur-fixe` (`docRefs: [20]`).
+- [x] Fichiers touchés : `E10Dashboard.tsx`(`.test.tsx`), `PlanningBoard.tsx`(`.test.tsx`),
+  `App.test.tsx`, `manualTestsCatalog.ts`, `E01Welcome.tsx`.
+- [x] Tests automatisés : absence de poignée / bouton replier-déplier, hauteur fixe sur les
+  deux routes, défilement interne de la liste.
+- [x] Test manuel Marie : parcours « Planning à hauteur fixe ».
+- [x] Entrée `WHATS_NEW`.
 
 Critère de sortie : sur l'accueil, le planning occupe une hauteur constante (325 px), sans
 trait gris ni possibilité de le plier/déplier ; on fait défiler la liste des tâches à
-l'intérieur. Suite complète, `tsc -b` et lint verts.
+l'intérieur. Suite complète, `tsc -b` et lint verts. **Atteint** (621 tests à la clôture de
+la phase, `tsc -b` et lint verts). Non vérifié : rendu visuel des 325 px sur appareil réel.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 2 — #18 : fond de case coloré sur toute la hauteur, sous-tâches incluses [TODO]
+## Phase 2 — #18 : fond de case coloré sur toute la hauteur, sous-tâches incluses [FAIT]
 
-- [ ] Restructurer le rendu d'une ligne de planning (`PlanningBoard.tsx:470-536`) pour que le
-  fond teinté (`plannedTaskTintStyle` / `rowTintStyle`) couvre toute la hauteur de la case
-  (celle imposée par `rowStyle`, proportionnelle à la durée) et non plus seulement la hauteur
-  du contenu.
-- [ ] Faire entrer le bloc des sous-tâches dépliées (`subTaskListStyle`) **à l'intérieur** de
-  la zone teintée, avec la même couleur de fond, de sorte que case + sous-tâches forment un
-  seul aplat coloré continu.
-- [ ] Vérifier la lisibilité du texte des sous-tâches sur le fond teinté (contraste, barré des
-  sous-tâches terminées).
-- [ ] Conserver le cas « terminé » (fond plein `flashyBackground`, texte blanc, barré).
-- [ ] Fichiers pressentis : `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`),
-  éventuellement `src/ui/styles/ambiance.ts`, `src/domain/data/manualTestsCatalog.ts`.
-- [ ] Tests automatisés : le conteneur teinté d'une ligne englobe le bloc sous-tâches quand il
-  est déplié ; la teinte n'est plus sur un enfant à hauteur réduite.
-- [ ] Test manuel Marie (catalogue in-app) : parcours « Case de tâche colorée en entier » —
-  déplier une tâche à sous-tâches et vérifier que la couleur remplit toute la case, sous-tâches
-  comprises.
-- [ ] Entrée `WHATS_NEW`.
+- [x] Rendu d'une ligne restructuré : le `<div>` teinté interne (hauteur du contenu) est
+  supprimé ; la teinte passe sur le conteneur de la ligne (`rowContainerStyle`), le `<button>`
+  porte `rowStyle(duration_minutes)` — la couleur remplit donc toute la hauteur ∝ durée
+  (44-160 px).
+- [x] Le bloc des sous-tâches dépliées est passé **à l'intérieur** du conteneur teinté et hérite
+  de `tint.color` : case + sous-tâches forment un seul aplat continu. `subTaskListStyle`
+  re-padé (`0 12px 10px 54px`) pour aligner les sous-étapes et fermer l'aplat en bas.
+- [x] Lisibilité des sous-tâches : `pastelBackground` reste un mélange clair à 22 %, texte en
+  `--color-text` ; barré per-sous-étape conservé. Contraste raisonné, pas mesuré → test Marie.
+- [x] Cas « terminé » conservé : fond plein `flashyBackground`, `color` blanc et
+  `textDecoration: line-through` reportés sur le `<button>`.
+- [x] Liste des tâches passée en `flex column` avec `gap: 6px` (les aplats se touchaient
+  sinon, le padding du bouton ne les séparant plus).
+- [x] Fichiers touchés : `PlanningBoard.tsx`(`.test.tsx`), `manualTestsCatalog.ts`,
+  `E01Welcome.tsx`. `ambiance.ts` non modifié.
+- [x] Tests automatisés : teinte sur le conteneur avec `minHeight` 80 px sur le bouton pour
+  60 min et aucun fond sur le bouton ; sous-étapes dépliées contenues dans l'élément teinté ;
+  cas terminé (fond non-`color-mix`, texte blanc, barré).
+- [x] Test manuel Marie : parcours « Case de tâche colorée en entier » (`docRefs: [18]`).
+- [x] Entrée `WHATS_NEW`.
 
 Critère de sortie : chaque case de tâche du planning est colorée sur toute sa hauteur ; quand
 on déplie ses sous-tâches, elles sont dans le même bloc coloré. Suite complète, `tsc -b` et
-lint verts.
+lint verts. **Atteint** (624 tests, `tsc -b` et lint verts). Non vérifié : contraste réel du
+texte des sous-étapes sur couleur saturée. Dette pré-existante notée : bouton « Reporter »
+imbriqué dans le bouton de ligne (HTML invalide, avertissement jsdom), hors périmètre #18.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 3 — #19 : fond de la case des jours pleinement coloré [TODO]
+## Phase 3 — #19 : fond de la case des jours pleinement coloré [EN COURS]
 
 - [ ] Donner au conteneur du bandeau de dates (`dateStripStyle`) un fond plein d'un aplat de
   la couleur d'ambiance (au lieu de la seule bordure). Ajuster l'opacité/mélange pour garder

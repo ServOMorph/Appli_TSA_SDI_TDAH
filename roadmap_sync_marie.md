@@ -1,6 +1,6 @@
 # Roadmap — Synchronisation automatique des données de Marie
 
-Version créée 2026-08-15. Remplace le flux manuel export JSON -> envoi -> ingestion par une synchronisation automatique en arrière-plan. Branche : `sync-marie`.
+Version créée 2026-08-15. Remplace le flux manuel export JSON -> envoi -> ingestion par une synchronisation automatique en arrière-plan. Les travaux historiques sont sur `sync-marie` ; l'intégration et la suite de la roadmap se font sur `main`.
 
 Légende : `[ ]` non démarrée · `[~]` en cours · `[x]` terminée.
 Gate commun : tests créés et verts · test manuel de la phase · doc à jour · aucun écran ne perd son point d'entrée · critère de sortie.
@@ -12,6 +12,8 @@ Gate commun : tests créés et verts · test manuel de la phase · doc à jour �
 - Statut visible dans Paramètres : « vos données de test sont partagées avec le développeur » — pas de sync silencieuse invisible, en rupture assumée avec le flux d'export actuel où l'envoi était un geste explicite.
 - Sauvegarde régulière (fréquence à trancher Phase 2, proposition par défaut : au démarrage de l'app + au retour au premier plan, throttlé à au plus une fois par heure).
 - Ajout des nouveautés (`WHATS_NEW`) et du catalogue de tests manuels reste sur l'édition de fichiers actuelle — hors périmètre de cette roadmap.
+- Ne pas fusionner ni cherry-pick intégralement `sync-marie` : la branche a divergé et contient des travaux hors synchronisation. Reporter sélectivement le socle Supabase sur une branche d'intégration créée depuis `main`, puis fusionner cette branche dans `main` après validation.
+- Les variables `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` sont réservées au navigateur. `SUPABASE_SERVICE_ROLE_KEY` est réservée au script développeur et ne doit jamais être exposée dans le bundle ou les variables publiques Netlify.
 
 ## Prérequis externe [FAIT — 2026-08-15]
 
@@ -57,13 +59,27 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Bascule et retrait du flux manuel [EN COURS]
+## Phase 4 — Intégration et validation sur `main` [EN COURS]
 
-- [FAIT] Accès côté développeur pour lire les données remontées (script ou requête Supabase), en remplacement de l'ingestion des fichiers d'export (`scripts/ingest_manual_tests.py`, `_contexte/marie_tests_journal.json`). Livré : `scripts/read_device_snapshots.py`. Reste à exécuter `supabase/schema.sql` côté projet Supabase avant premier usage réel.
-- [FAIT] `main` intégré dans `sync-marie` le 2026-08-24 ; snapshot Supabase et export manuel alignés sur le schéma 3.5, incluant `budget_income_entries`.
-- Retrait des bannières urgentes demandant réimport/réexport (`E01Welcome.tsx`, `E121ManualTests.tsx`) une fois la sync confirmée fonctionnelle en conditions réelles avec Marie.
-- `.claude/commands/deploy.md` étape 0 (traitement des exports de Marie) à réviser ou retirer en conséquence.
-- Test manuel : sync réelle depuis l'appareil de Marie confirmée reçue côté Supabase.
+- Créer une branche d'intégration depuis `main` et y reporter sélectivement le socle Supabase de `sync-marie` : `src/data/sync/`, `src/app/AppContext.tsx`, `src/app/contexts/useSettingsState.ts`, `src/ui/components/SyncStatusCard.tsx`, `src/ui/screens/settings/E110Settings.tsx`, `supabase/schema.sql`, `scripts/read_device_snapshots.py` et la dépendance `@supabase/supabase-js`.
+- Revoir les modifications de `package.json` et `package-lock.json` dans le contexte de `main` ; ne pas reprendre mécaniquement les mises à jour non liées à Supabase.
+- Configurer et documenter les variables navigateur `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`, séparément de `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` utilisées uniquement par le script développeur.
+- Exécuter `supabase/schema.sql` dans le projet Supabase avant tout essai réel.
+- Vérifier les régressions de l'export manuel, puis exécuter `npm test` et `npm run build`.
+- Test manuel : depuis l'appareil de Marie, constater la synchronisation puis lire le snapshot reçu avec `scripts/read_device_snapshots.py`.
+- Fusionner la branche d'intégration dans `main` uniquement lorsque ces contrôles sont concluants.
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Phase 5 — Bascule et retrait du flux manuel [TODO]
+
+- Retirer les bannières urgentes demandant réimport/réexport (`E01Welcome.tsx`, `E121ManualTests.tsx`) après confirmation de la synchronisation réelle.
+- Réviser ou retirer l'étape 0 de `.claude/commands/deploy.md` relative au traitement des exports de Marie.
+- Conserver un chemin de lecture développeur des snapshots Supabase et documenter le remplacement effectif de l'ingestion manuelle.
+- Tests : absence de régression des écrans concernés ; parcours de synchronisation et de lecture du snapshot reproductible.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

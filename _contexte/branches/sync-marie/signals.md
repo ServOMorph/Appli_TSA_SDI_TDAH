@@ -2,31 +2,33 @@
 
 ## Contexte chaud
 - Périmètre exclusif : authentification sécurisée, Supabase et synchronisation. Aucun déploiement, test Marie, `CHANGELOG.md` ou `WHATS_NEW` sur cette branche.
-- `main` a 8 commits absents de `sync-marie` : planifier une intégration contrôlée avant toute fusion ou tout déploiement.
+- Les branches ont divergé : `main` a 50 commits absents de `sync-marie` et `sync-marie` en a 27 absents de `main`. L'intégration doit partir de `main`, par report sélectif du socle Supabase ; aucune fusion ou rebase automatique.
 - Le CLI Supabase `2.115.0` est disponible localement via `npx supabase`.
 
 ## Questions ouvertes
-- [P1] Activer le backend réel : exécuter `supabase/schema.sql`, renseigner `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` dans `.env`, puis vérifier la lecture par `scripts/read_device_snapshots.py`. — fait quand : le script renvoie une ligne de snapshot réelle — réf : `roadmap_sync_marie.md`, `supabase/schema.sql`, `scripts/read_device_snapshots.py`
+- [P1] Intégrer sélectivement le socle Supabase dans une branche créée depuis `main`, puis valider les tests et le build. — fait quand : la branche d'intégration contient uniquement le périmètre Phase 4 et `npm test` ainsi que `npm run build` réussissent — réf : `roadmap_sync_marie.md` Phase 4
+- [P1] Activer le backend réel : exécuter `supabase/schema.sql`, configurer les variables navigateur et serveur selon leur rôle, puis vérifier la lecture par `scripts/read_device_snapshots.py`. — fait quand : le script renvoie une ligne de snapshot réelle — réf : `roadmap_sync_marie.md` Phase 4, `supabase/schema.sql`, `scripts/read_device_snapshots.py`
 - [P1] Tester une synchronisation réelle depuis l'appareil de Marie et confirmer l'affichage de `SyncStatusCard`. — fait quand : `synced_at` récent pour l'appareil de Marie et statut visible côté application — réf : `roadmap_sync_marie.md` Phase 4, `src/ui/components/SyncStatusCard.tsx`
-- [P2] Confirmer si les variables Supabase publiques sont aussi configurées sur le site Netlify de test. — fait quand : configuration confirmée ou jugée non nécessaire — réf : `roadmap_sync_marie.md` Prérequis externe
 
-## Dernière session (2026-08-25 — préparation du CLI et corrections de dépendances)
+## Dernière session (2026-08-29 — stratégie d'intégration Supabase)
 
 ## Décisions prises
-- Le CLI Supabase est installé localement et s'utilise avec `npx supabase`.
-- Les correctifs de dépendances compatibles ont été appliqués ; la vulnérabilité faible restante d'esbuild ne doit pas être forcée hors de la compatibilité Vite.
+- La suite de la roadmap sera intégrée et terminée sur `main`, pas sur `sync-marie`.
+- Le socle Supabase sera reporté sélectivement depuis une branche d'intégration créée sur `main` ; aucun cherry-pick ou merge intégral de `sync-marie`.
+- Les clés Supabase navigateur et la clé serveur sont séparées explicitement dans la roadmap.
 
 ## Livrables produits ou modifiés
-- `package.json`, `package-lock.json` : CLI Supabase ajouté, Vite mis à jour en 8.2.2 et dépendances indirectes corrigées.
-- `_docs/manip branches.txt` : procédure novice ajoutée avant changement de branche.
+- `roadmap_sync_marie.md` : Phase 4 recentrée sur l'intégration et validation dans `main` ; Phase 5 ajoutée pour le retrait du flux manuel.
+- `_contexte/branches/sync-marie/` : état de divergence et actions ouvertes actualisés.
 
 ## Hypothèses validées / invalidées
-- VALIDE : le build de production réussit avec Vite 8.2.2.
-- EN ATTENTE : exécution du schéma, accès de lecture avec clé service et validation sur l'appareil de Marie.
+- VALIDE : le socle de synchronisation est identifiable et peut être reporté sans reprendre les travaux hors périmètre de `sync-marie`.
+- INVALIDE : poursuivre la roadmap directement sur `sync-marie` est sûr compte tenu de la divergence avec `main` -> pivot vers une branche d'intégration issue de `main`.
+- EN ATTENTE : intégration, exécution du schéma et validation réelle avec Marie.
 
 ## Prochaine étape exacte
-Exécuter `supabase/schema.sql` dans le projet Supabase, puis ajouter `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` à `.env`.
-Lancer ensuite `python scripts/read_device_snapshots.py` et effectuer une synchronisation réelle depuis l'appareil de Marie.
+Depuis `main`, créer une branche d'intégration et y reporter le périmètre défini en Phase 4.
+Configurer ensuite Supabase, lancer les tests et valider une synchronisation réelle avant fusion dans `main`.
 
 ## Question bloquante pour la session suivante
-Le schéma Supabase est-il exécuté et les deux variables serveur sont-elles configurées localement ?
+L'intégration sélective doit-elle être démarrée maintenant depuis `main` ?

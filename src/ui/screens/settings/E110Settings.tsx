@@ -1,5 +1,6 @@
 import { useApp } from '@/app/AppContext'
 import { Card } from '@/ui/components/Card'
+import { SyncStatusCard } from '@/ui/components/SyncStatusCard'
 import type { Screen } from '@/app/AppContext'
 
 const backBtnStyle: React.CSSProperties = {
@@ -83,6 +84,8 @@ export function E110Settings() {
           ))}
         </ul>
       </nav>
+
+      <SyncStatusCard />
 
     </main>
   )

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/repositories'
+import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { createList } from '@/domain/rules/listRules'
 import { createTool } from '@/domain/rules/toolRules'
 import type { Settings } from '@/domain/entities/settings'
@@ -92,67 +93,9 @@ export function useSettingsState() {
 
   async function exportData() {
     if (!currentUser) return
-    const [
-      user,
-      tasks,
-      taskRecurrences,
-      taskExceptions,
-      lists,
-      listItems,
-      listItemSubTasks,
-      listCategories,
-      folders,
-      tools,
-      energyEntries,
-      settingsData,
-      categories,
-      entries,
-      accounts,
-      deposits,
-      incomeEntries,
-      manualTestResults,
-    ] = await Promise.all([
-      userRepo.getFirst(),
-      db.tasks.toArray(),
-      db.taskRecurrences.toArray(),
-      db.taskExceptions.toArray(),
-      db.lists.toArray(),
-      db.listItems.toArray(),
-      db.listItemSubTasks.toArray(),
-      db.listCategories.toArray(),
-      db.folders.toArray(),
-      db.tools.toArray(),
-      db.energyEntries.toArray(),
-      settingsRepo.getByUserId(currentUser.id),
-      db.budgetCategories.toArray(),
-      db.budgetEntries.toArray(),
-      db.budgetAccounts.toArray(),
-      db.budgetDeposits.toArray(),
-      db.budgetIncomeEntries.toArray(),
-      db.manualTestResults.toArray(),
-    ])
-    const payload = {
-      export_date: new Date().toISOString(),
-      version: '3.5',
-      user,
-      tasks,
-      task_recurrences: taskRecurrences,
-      task_exceptions: taskExceptions,
-      lists,
-      list_items: listItems,
-      list_item_sub_tasks: listItemSubTasks,
-      list_categories: listCategories,
-      folders,
-      tools,
-      energy_entries: energyEntries,
-      settings: settingsData,
-      budget_categories: categories,
-      budget_entries: entries,
-      budget_accounts: accounts,
-      budget_deposits: deposits,
-      budget_income_entries: incomeEntries,
-      manual_test_results: manualTestResults,
-    }
+    const snapshot = await buildSnapshotPayload()
+    if (!snapshot) return
+    const payload = { export_date: new Date().toISOString(), ...snapshot }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

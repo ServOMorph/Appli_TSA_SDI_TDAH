@@ -77,6 +77,7 @@ function readBlob(blob: Blob): Promise<string> {
 
 afterEach(async () => {
   await db.manualTestResults.clear()
+  await db.budgetIncomeEntries.clear()
 })
 
 describe('useSettingsState — résultats des tests manuels', () => {
@@ -89,6 +90,7 @@ describe('useSettingsState — résultats des tests manuels', () => {
     render(<SettingsPanel />)
     await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
     await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    await db.budgetIncomeEntries.add({ id: 'income-1', amount: 1500, label: 'Salaire', date: '2026-08-24', created_at: '2026-08-24T09:00:00.000Z' })
     await act(async () => {
       await userEvent.click(screen.getByRole('button', { name: 'Exporter' }))
     })
@@ -97,6 +99,9 @@ describe('useSettingsState — résultats des tests manuels', () => {
     expect(payload.version).toBe('3.5')
     expect(payload.manual_test_results).toEqual([
       { id: 'exported-result', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T09:00:00.000Z' },
+    ])
+    expect(payload.budget_income_entries).toEqual([
+      { id: 'income-1', amount: 1500, label: 'Salaire', date: '2026-08-24', created_at: '2026-08-24T09:00:00.000Z' },
     ])
 
     await act(async () => {

@@ -1,6 +1,7 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-29)
 
 ## Contexte chaud
+- **Intégration Supabase préparée sur `integration/supabase-main`, non fusionnée ni déployée.** Le report sélectif comprend la synchronisation, son statut visible dans Paramètres, le schéma et le script de lecture ; 640 tests, build et lint sont verts. Les variables navigateur sont configurées localement ; `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` manquent pour exécuter le schéma et lire un snapshot réel.
 - **v5.64 déployée en prod le 2026-08-29** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) : correctif du débordement à droite des cadres « Date » et « Heure de début » du formulaire de tâche (demande #3). Cause : le `<form>`, enfant flex sans `min-width: 0`, ne rétrécissait pas sous la largeur intrinsèque des sélecteurs natifs date/heure. Corrigé sur `E21CreateTaskV2.tsx` et `E24EditTask.tsx`, test de non-régression. Marie doit revalider le parcours `cadre-date-heure-dans-l-ecran`. 624 tests verts. Commentaires v5.62/v5.63/v5.64 publiés sur Drive (`COMMUNICATION/Marie/livraisons/`).
 - **`roadmap_planning_accueil_2026-08-29.md` (demandes 18-22, toutes « Accueil / Planning ») : Phases 1 et 2 livrées le 2026-08-29, non déployées.** Phase 1 (#20) : planning de l'accueil à hauteur fixe 325 px, poignée + trait gris + logique drag/expand retirés, prop `collapsed` de `PlanningBoard` supprimée ; décision 5 tranchée = route `planning` **conservée** (originScreen de la création de tâche, emplacement de la future vue semaine, ne pilote plus d'état déplié). Phase 2 (#18) : teinte de la case portée sur le conteneur de ligne (hauteur ∝ durée), sous-tâches dépliées dans le même aplat coloré, cas « terminé » conservé. 624 tests, `tsc -b` et lint verts. Phase 3 (#19) `[EN COURS]`, Phases 4 (#21) et 5 (#22) `[TODO]`. 2 décisions produit bloquantes pour la Phase 5 (voir Questions ouvertes). 2 parcours catalogue ajoutés (`planning-hauteur-fixe`, `case-de-tache-coloree-en-entier`), 2 entrées `WHATS_NEW`.
 - **Contournement de l'étape 0.4 de `/deploy` corrigé le 2026-08-29** : titre de l'étape 0 renommé (mentionne la revue du Doc), compte-rendu de la revue rendu obligatoire en 0.4, jalon daté `- Dernière exécution de la revue :` écrit dans l'en-tête de `_contexte/marie_modifications_suivi.md` à chaque passage de `.claude/revue_googledoc.md` (Doc changé ou non), porte bloquante mécanique 3.9 dans `/deploy` (`grep` du jalon, doit être la date du jour). Mécanisme non encore exercé en live.
@@ -25,6 +26,7 @@
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
+- [P1] **Achever la validation réelle de la synchronisation Supabase** : exécuter le schéma, fournir les variables serveur au script de lecture, synchroniser depuis l'appareil de Marie, puis fusionner `integration/supabase-main` dans `main`. — fait quand : `scripts/read_device_snapshots.py` renvoie un snapshot récent et le statut est visible dans Paramètres — réf : `roadmap_sync_marie.md` Phase 4, `supabase/schema.sql`, `scripts/read_device_snapshots.py`
 - [P1] **Poursuivre `roadmap_planning_accueil_2026-08-29.md`** : Phases 1-2 `[FAIT]`, Phase 3 (#19, fond du bandeau de dates pleinement coloré) `[EN COURS]`, Phases 4-5 `[TODO]`. Phase par phase avec checkpoint `/compact`. — fait quand : les 5 phases `[FAIT]`, `/deploy` proposé — réf : `roadmap_planning_accueil_2026-08-29.md`, `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx`
 - [P1] **Réponse de Marie attendue avant la Phase 5 (#22)** : le message WhatsApp demandant (a) une navigation par semaine ou par jour et (b) la réutilisation de `planning` ou la création de `planning-week` a été préparé, sans envoi. — fait quand : Marie tranche les deux points — réf : `roadmap_planning_accueil_2026-08-29.md` § Décisions produit non tranchées (points 4 et 5)
 - [P2] `/deploy` étape 0.4 (revue du Doc) : mécanisme anti-contournement posé le 29/08 (compte-rendu forcé + jalon daté + porte 3.9). Vérifier qu'il fonctionne au premier `/deploy` réel. — fait quand : un `/deploy` exécute 0.4, affiche son compte-rendu et passe la porte 3.9 — réf : `.claude/commands/deploy.md` étapes 0 et 3.9, `.claude/revue_googledoc.md` étape 2
@@ -42,26 +44,25 @@
 - [P3] `PlanningBoard.tsx` : le bouton « Reporter » (mode surcharge) est imbriqué dans le `<button>` de ligne — HTML invalide, avertissement jsdom au run des tests. Pré-existant, révélé par la Phase 2. Candidat à une phase de refacto entre deux phases fonctionnelles de la roadmap planning. — fait quand : le bouton « Reporter » n'est plus descendant du bouton de ligne — réf : `src/ui/screens/dashboard/PlanningBoard.tsx` (rendu d'une ligne), `roadmap_planning_accueil_2026-08-29.md`
 - [P3] Veille (consigne permanente de l'utilisateur, 2026-08-17) : avertissement de build « chunk JS > 500 kB » (`vite build`) laissé tel quel pour l'instant (531 kB gzip 149 kB, `App.tsx` importe statiquement les ~25 écrans). Si le poids continue de grossir significativement, proposer le refacto (`React.lazy`/`Suspense` par écran) plutôt que de laisser filer silencieusement. — fait quand : avertissement de taille signalé de nouveau en augmentation notable lors d'un futur `/deploy` — réf : `vite.config.ts`, `src/App.tsx`
 
-## Dernière session (2026-08-29 — attente de réponse de Marie pour la Phase 5)
+## Dernière session (2026-08-30 — intégration Supabase préparée)
 
 ## Décisions prises
-- La Phase 5 reste non démarrée : les phases 3 et 4 sont toujours à réaliser et les deux choix produit de la Phase 5 attendent la réponse de Marie.
-- Le message destiné à Marie a été réécrit selon les règles du projet ; aucun envoi WhatsApp n'a été effectué.
-- Le contenu de `.claude/CLAUDE.md` a été copié dans `AGENTS.md`.
+- Le socle Supabase de `sync-marie` est reporté sélectivement sur `integration/supabase-main`, sans fusion ni cherry-pick global de la branche divergente.
+- La branche ne sera fusionnée dans `main` qu'après exécution du schéma et synchronisation réelle validée.
 
 ## Livrables produits ou modifiés
-- `AGENTS.md` : contenu aligné sur `.claude/CLAUDE.md`.
-- `_contexte/signals.md`, `_contexte/contexte.md`, `roadmap_planning_accueil_2026-08-29.md`, `README.md`, `CHANGELOG.md` : attente de décision et clôture consignées.
+- `src/data/sync/`, `SyncStatusCard`, `supabase/schema.sql`, `read_device_snapshots.py` : synchronisation et lecture de snapshot reportées.
+- `roadmap_sync_marie.md`, `.env.example` : intégration et séparation des variables documentées.
 
 ## Hypothèses validées / invalidées
-- VALIDE : le Google Doc « Modifications » a été exporté et ses demandes 18 à 22 correspondent au registre et à la roadmap.
-- EN ATTENTE : réponse de Marie sur la navigation de la vue semaine et la route de la Phase 5.
+- VALIDE : le socle se reporte sur `main` sans reprendre les changements produit de `sync-marie` ; 640 tests, build et lint sont verts.
+- EN ATTENTE : schéma Supabase, accès serveur et synchronisation réelle depuis l'appareil de Marie.
 
 ## Prochaine étape exacte
-Attendre la réponse de Marie, puis reprendre la roadmap à la Phase 3. La Phase 5 reste bloquée jusqu'à ce que les deux choix soient tranchés.
+Configurer `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY`, exécuter `supabase/schema.sql`, puis valider un snapshot réel avant la fusion dans `main`.
 
 ## Question bloquante pour la session suivante
-Navigation de la vue semaine : par semaine ou par jour ? Réutiliser `planning` ou créer `planning-week` ?
+Les accès serveur Supabase nécessaires au script de lecture sont-ils disponibles ?
 
 ---
 

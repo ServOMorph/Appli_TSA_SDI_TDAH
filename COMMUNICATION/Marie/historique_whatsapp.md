@@ -51,3 +51,25 @@ Si tu ne peux pas mettre toute la semaine dans l'écran : jour.
 _Suite :_ décision 4 de `roadmap_planning_accueil_2026-08-29.md` tranchée — navigation ±1 semaine,
 qui est déjà l'objectif de #22 (vue d'ensemble de la semaine, cases en logos). Repli sur jour
 par jour seulement si les 7 jours s'avèrent illisibles à l'implémentation (gate = test Marie).
+
+### 2026-08-31 — message de livraison v5.69 (à envoyer)
+
+**Dév ->**
+Version 5.69 en ligne.
+
+Tes données de test se sauvegardent maintenant toutes seules. Plus besoin d'exporter ni d'envoyer un fichier. Un message dans Paramètres le confirme.
+
+4 tests à faire dans l'écran « Tests à faire », correspondant aux modifications :
+- #3
+- #18
+- #20
+- sauvegarde automatique des données
+
+Pas encore fait : le fond coloré de la case des jours de la semaine (#19). À la prochaine mise à jour.
+
+https://appli-audhd.netlify.app/
+
+Détail des changements et questions : https://drive.google.com/open?id=1d3VWHYVZ6vSKoZjtFfkL-qz5iv3isakh
+
+_Suite :_ `/deploy` v5.69 (socle Supabase en prod + planning Phases 1-2). Commentaire figé dans
+`livraisons/v5.69.md`, publié sur Drive. En attente : retour de Marie + sa 1re synchronisation réelle.

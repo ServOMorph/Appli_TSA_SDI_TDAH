@@ -1,3 +1,11 @@
+## v5.71 — 2026-08-31
+
+### Modifié
+- Branches Git : tri des branches obsolètes (priorité P1). Sept branches locales supprimées (`integration/supabase-main`, fusionnée dans `main` en v5.69, et les instantanés de versions `v2` à `v5.1`) et six branches distantes supprimées sur GitHub (`v2` à `v5.1`). Restent `main` et `sync-marie`. `main` vérifié sain : build, lint et suite de tests verts, arbre de travail propre, synchronisé avec le distant.
+
+### Ajouté
+- `roadmap_bundle_2026-08-31.md` (créée, non lancée) : plan en cinq phases pour ramener le bundle JavaScript (766,88 ko, un seul chunk) sous le seuil d'alerte de Vite. Composition mesurée par attribution des octets via la sourcemap. Phase 1 (retrait de `@supabase/supabase-js` au profit d'appels `fetch` PostgREST natifs) : gain de 208 ko mesuré par build réel, flux de synchronisation des données de Marie inchangé. Relue par un agent puis corrigée (quatre défauts bloquants).
+
 ## v5.70 — 2026-08-31
 
 ### Modifié

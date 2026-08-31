@@ -160,6 +160,21 @@ recoupé avec `_contexte/marie_modifications_suivi.md`). Un parcours sans numér
 ligne, introduit par « Détail des changements et questions : », uniquement s'il y a un commentaire
 utile pour cette livraison.
 
+### Historique WhatsApp avec Marie : sauvegarde systématique et immédiate
+Tout message WhatsApp échangé avec Marie est consigné dans
+`COMMUNICATION/Marie/historique_whatsapp.md`, sans exception et sans attendre le `/close` :
+
+- **Message rédigé pour Marie** (livraison, question, relance — pas seulement ceux de `/deploy`) :
+  l'ajouter au fichier dans le même tour où il est rédigé, avant de le présenter à l'utilisateur.
+  Recopier le texte tel qu'envoyé, sans les emojis d'encadrement `💻🤖`.
+- **Message que l'utilisateur transmet** (sa réponse, un message de Marie qu'il colle) : l'ajouter
+  au fichier dans le tour où il est reçu.
+- Suivre la convention d'entrée en tête du fichier (`### AAAA-MM-JJ`, `**Dév ->**` / `**Marie ->**`,
+  `_Suite :_` pour la décision ou l'action qui en découle).
+- Committer cette mise à jour (ne pas la laisser en résidu non commité). Le fichier est une mémoire
+  durable, distincte de `a_transmettre.md` (commentaires de livraison en attente uniquement) et des
+  `livraisons/vX.Y.md` (historique figé des livraisons).
+
 ### Tests à faire pour Marie : uniquement dans l'appli
 Tous les tests que Marie doit effectuer vivent dans le catalogue in-app
 (`src/domain/data/manualTestsCatalog.ts`, écran « Tests à faire »). Ne jamais lister de tests à

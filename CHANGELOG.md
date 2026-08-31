@@ -1,3 +1,10 @@
+## v5.70 — 2026-08-31
+
+### Modifié
+- `CLAUDE.md` (§ Spécificités projet) et `AGENTS.md` : règle de sauvegarde systématique et immédiate de l'historique WhatsApp avec Marie. Tout message rédigé pour Marie ou transmis par l'utilisateur est consigné dans `COMMUNICATION/Marie/historique_whatsapp.md` (fichier créé cette session) et commité sans attendre le `/close`.
+- `COMMUNICATION/Marie/a_transmettre.md` purgé après la livraison v5.69 (contenu figé dans `livraisons/v5.69.md`).
+- `_contexte/signals.md` : priorités urgentes de la prochaine session inscrites en tête des questions ouvertes (tri des branches Git, vérification de `main`, puis réduction de la taille du bundle JS — 767 kB / gzip 208 kB depuis l'ajout de `@supabase/supabase-js`).
+
 ## v5.69 — 2026-08-31
 
 ### Ajouté

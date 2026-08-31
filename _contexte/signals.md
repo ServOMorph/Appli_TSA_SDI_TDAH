@@ -48,23 +48,26 @@
 
 ## Décisions prises
 - Le test perso de la sync (write mobile + read script, 2026-08-31) vaut validation du mécanisme ; la 1re sync réelle de Marie sur v5.69 sert de confirmation grandeur nature.
-- `integration/supabase-main` fusionnée dans `main` (fast-forward) et déployée en v5.69, rattrapant v5.65→v5.68 en prod.
+- `integration/supabase-main` fusionnée dans `main` (fast-forward) et **déployée en v5.69** (prod HTTP 200), rattrapant v5.65→v5.68 en prod.
 - Phase 5 planning : navigation par semaine si les 7 jours tiennent à l'écran, sinon par jour (Marie, décision 4) ; route `planning` réaffectée à la vue semaine, pas de route dédiée (dév, décision 5).
+- Règle durable posée par l'utilisateur : tout message WhatsApp avec Marie (rédigé ou transmis) est consigné immédiatement dans `COMMUNICATION/Marie/historique_whatsapp.md` et commité, sans attendre le `/close` (`CLAUDE.md` § Spécificités projet, propagé à `AGENTS.md`).
 
 ## Livrables produits ou modifiés
-- Fusion `integration/supabase-main` → `main`. `CHANGELOG.md` : entrée v5.69.
-- `src/domain/data/manualTestsCatalog.ts` : parcours `donnees-synchronisees-automatiquement`. `E01Welcome.tsx` : entrée `WHATS_NEW` sync auto.
-- `COMMUNICATION/Marie/historique_whatsapp.md` (créé), `a_transmettre.md` (sync auto + #19 à venir).
+- **v5.69 déployée** : `dist/v5.69`, `_contexte/dernier_deploiement.md`, `WHATS_NEW` vidé, `COMMUNICATION/Marie/livraisons/v5.69.md`, Drive `commentaires_marie_v5.69.docx`.
+- Fusion `integration/supabase-main` → `main`. `CHANGELOG.md` : entrées v5.69 puis v5.70.
+- `src/domain/data/manualTestsCatalog.ts` : parcours `donnees-synchronisees-automatiquement`. `E01Welcome.tsx` : `WHATS_NEW`.
+- `COMMUNICATION/Marie/historique_whatsapp.md` (créé, 3 entrées dont le message de livraison v5.69), `a_transmettre.md` (purgé après livraison).
 - `roadmap_planning_accueil_2026-08-29.md` (décisions 4-5), `roadmap_sync_marie.md` (Phase 4 → `[FAIT]`), `_contexte/marie_modifications_suivi.md` (jalon revue 2026-08-31).
+- `.claude/CLAUDE.md` + `AGENTS.md` : règle sauvegarde WhatsApp. `_contexte/signals.md` : priorités urgentes prochaine session.
 - `donnees_marie/export-audhd-2026-08-30-20h14.json` : export du 30/08 traité (0 nouveau test).
 
 ## Hypothèses validées / invalidées
-- VALIDE : sync Supabase fonctionnelle write + read, vérifiée en réel (snapshot `app_version` v5.68 + lecture script, 19 snapshots).
+- VALIDE : sync Supabase fonctionnelle write + read, vérifiée en réel (snapshot `app_version` v5.68 + lecture script, 19 snapshots) ; déploiement v5.69 HTTP 200.
 - VALIDE : merge du socle sur `main` sans conflit (fast-forward).
 - EN ATTENTE : 1re sync réelle de Marie sur v5.69 ; retour de Marie sur planning Phases 1-2 (#20, #18) et sur la carte de sync.
 
 ## Prochaine étape exacte
-Attendre l'export/retour de Marie sur v5.69. Puis, sync confirmée en prod, entamer `roadmap_sync_marie.md` Phase 5 (retrait des bannières de réimport, révision de `deploy.md` étape 0) et poursuivre `roadmap_planning_accueil` Phase 3 (#19).
+URGENT avant tout : trier les branches Git, vérifier `main` sain, puis traiter la taille du bundle (767 kB / gzip 208 kB depuis `@supabase/supabase-js`). Ensuite : attendre l'export/retour de Marie sur v5.69 ; sync confirmée, entamer `roadmap_sync_marie.md` Phase 5 et poursuivre `roadmap_planning_accueil` Phase 3 (#19).
 
 ## Question bloquante pour la session suivante
 Aucune.

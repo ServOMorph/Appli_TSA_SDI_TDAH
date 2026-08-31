@@ -186,6 +186,18 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'donnees-synchronisees-automatiquement',
+    title: 'Voir que les données se sauvegardent toutes seules',
+    category: 'Paramètres / Profil',
+    steps: [
+      'Ouvrez l’appli et utilisez-la normalement un instant : ajoutez une tâche ou une saisie d’énergie.',
+      'Depuis l’accueil, ouvrez « Paramètres ».',
+      'En bas de l’écran, vous devez voir un encadré « Vos données de test sont partagées avec le développeur ».',
+      'Juste en dessous, la ligne « Dernière synchronisation : ... » doit afficher une date et une heure récentes (ou « Synchronisation en attente » si c’est la toute première fois).',
+      'Fermez l’appli, rouvrez-la un peu plus tard puis retournez dans « Paramètres » : la date de dernière synchronisation doit avoir été mise à jour.',
+    ],
+  },
+  {
     id: 'montant-total-apres-migration-revenus',
     title: 'Vérifier le Montant total après la migration des revenus de Marie',
     category: 'Outils : Budget',

@@ -44,13 +44,18 @@ avant arbitrage sur les points marqués « bloquant ».
    (réglable dans Paramètres > Accessibilité). Confirmé par cohérence avec la demande #2.
 3. **#21 — intensité du grossissement** (non bloquant) : facteur d'échelle et courbe de
    l'effet à régler à l'œil pendant l'implémentation, gate = test manuel Marie.
-4. **#22 — granularité de navigation** (bloquant) : « mêmes modalités que l'accueil » —
-   le glissement fait défiler d'une semaine ou d'un jour ? Défaut envisagé : ±1 semaine.
-   À confirmer avec Marie avant la Phase 5.
-5. **#22 — devenir de la route `planning` actuelle** (bloquant) : après la Phase 1, la route
-   `planning` (dépliage inline) n'a plus de sens. La Phase 5 la réaffecte-t-elle à la vue
-   pleine page semaine, ou crée-t-on une route `planning-week` distincte ? À trancher au
-   démarrage de la Phase 5 (impacte `navigation.ts`, `App.tsx`, `DevResetButton.tsx`).
+4. **#22 — granularité de navigation** (TRANCHÉ 2026-08-31, Marie) : le glissement fait
+   défiler **d'une semaine** (±1 semaine), à condition que les 7 jours de la semaine tiennent
+   à l'écran — ce qui est l'objectif même de #22 (« vue d'ensemble de la semaine », cases en
+   logos). Réponse de Marie : « si tu peux mettre toute la semaine dans l'écran : semaine ;
+   si tu ne peux pas : jour ». Repli sur navigation jour par jour uniquement si l'affichage
+   des 7 jours s'avère illisible en implémentation ; gate = test manuel Marie.
+   Cf. `COMMUNICATION/Marie/historique_whatsapp.md`.
+5. **#22 — devenir de la route `planning` actuelle** (TRANCHÉ 2026-08-30, côté dév) : choix
+   d'implémentation interne, hors périmètre Marie. La route `planning` existante est
+   **réaffectée** à la vue pleine page semaine de la Phase 5 (cohérent avec la Phase 1 qui l'a
+   explicitement conservée comme emplacement de cette vue). Pas de route `planning-week`
+   distincte. Impacte `navigation.ts`, `App.tsx`, `DevResetButton.tsx` au moment de la Phase 5.
 6. **#22 — « cases en logos »** (non bloquant) : les cellules de tâche de la vue semaine
    n'affichent que l'icône de la tâche (pas de titre, pas d'horaire). Défaut retenu.
 

@@ -6,7 +6,7 @@ archivée après livraison).
 
 - Google Doc : `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
 - Dernière revue du Doc : 2026-08-28 (date de modification analysée : 2026-08-28 23:28)
-- Dernière exécution de la revue : 2026-08-29 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
+- Dernière exécution de la revue : 2026-08-31 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
 - Marie a retiré les demandes 1 à 17 (toutes traitées) et ajouté 18 à 22 (toutes « Accueil / Planning »). Analysées le 2026-08-29 via `/analyser_googledoc` -> `roadmap_planning_accueil_2026-08-29.md`.
 - Dernière mise à jour de ce registre : 2026-08-29 (analyse des demandes 18-22, roadmap créée)
 

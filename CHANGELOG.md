@@ -1,3 +1,13 @@
+## v5.69 — 2026-08-31
+
+### Ajouté
+- Synchronisation automatique des données de test (roadmap `roadmap_sync_marie.md`, Phases 1-4) : socle Supabase reporté de `sync-marie` puis fusionné dans `main`. Sérialisation des tables Dexie, envoi vers Supabase (région UE) via un secret d'appareil généré localement, au démarrage et au retour au premier plan, throttlé à au plus une fois par heure ; échec silencieux hors ligne. Statut visible dans Paramètres (`SyncStatusCard`) : « vos données de test sont partagées avec le développeur » avec date de dernière synchronisation. Lecture développeur via `scripts/read_device_snapshots.py` (clé `service_role`, jamais exposée au navigateur). Write et read vérifiés en réel depuis un appareil mobile.
+
+### Modifié
+- Suivi Phase 5 du planning : Marie a tranché la granularité de navigation de la vue semaine (par semaine si les 7 jours tiennent à l'écran, sinon par jour — décision 4). Le devenir de la route `planning` est tranché côté dév (réaffectée à la vue semaine, pas de route dédiée — décision 5). Historique WhatsApp consigné dans `COMMUNICATION/Marie/historique_whatsapp.md`.
+- Ce déploiement rattrape en production les versions v5.65 à v5.68 (suivi du Google Doc, création de `roadmap_planning_accueil_2026-08-29.md`, durcissement de la revue Doc dans `/deploy`, planning de l'accueil Phases 1-2 : hauteur fixe sans plier/déplier #20 et cases colorées sur toute la hauteur #18, `AGENTS.md`).
+- Catalogue de tests Marie : parcours `donnees-synchronisees-automatiquement` ajouté (vérifier la carte de synchronisation dans Paramètres). Entrée `WHATS_NEW` correspondante.
+
 ## v5.68 — 2026-08-29
 
 ### Modifié

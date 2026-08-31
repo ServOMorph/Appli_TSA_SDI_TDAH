@@ -1,5 +1,11 @@
 # Décisions archivées — Appli_TSA_SDI_TDAH
 
+## 2026-08-17 (suite 9, clôture roadmap_budget_v3, Phases 5-6) (archivé depuis contexte.md 2026-08-31, déploiement v5.69)
+- Phase 5 livrée — fiche détaillée par livret (`E77BudgetLivretDetail.tsx`) avec mouvements modifiables (`updateBudgetDeposit` ajouté), gestion des mouvements déplacée hors de `E74BudgetSettings.tsx` pour éviter deux formulaires incohérents (décision au-delà du libellé littéral de la roadmap). Phase 6 (nettoyage) : 5 fonctions mortes retirées de `budgetRules.ts`, aucun écran mort identifié, widget accueil « Comptes » confirmé non affecté, `WHATS_NEW` mis à jour. Roadmap intégralement `[FAIT]`. 571/571 tests unitaires, `tsc -b`/lint clean. Jamais testée par Marie — `/deploy` en cours.
+
+## 2026-08-17 (suite 10, déploiement v5.49) (archivé depuis contexte.md 2026-08-31, déploiement v5.69)
+- `/deploy` mené à terme après confirmation utilisateur — vérifications bloquantes toutes passées (571/571 tests, `tsc -b`/lint clean), build (avertissement chunk JS 542 kB, non bloquant, veille déjà actée), déploiement Netlify, HTTP 200 vérifié. Étape 0 (exports de Marie) traitée par l'utilisateur lui-même hors session, sur sa confirmation explicite. `WHATS_NEW` vidé et committé après déploiement.
+
 ## 2026-08-17 (suite 6, catégorisation du travail, regroupement du catalogue de tests) (archivé depuis contexte.md 2026-08-29, Phases 1-2 roadmap planning accueil)
 - Marie a demandé une ligne directrice (« je pars dans tous les sens ») — découpage du travail validé en 7 catégories (Accueil/Planning, Tâches, Outils : Budget, Outils : Listes, Outils : autres, Énergie, Paramètres/Profil), `COMMUNICATION/message_marie_categories_travail.md`. Appliqué immédiatement à l'écran « Tests à faire » (`manualTestsCatalog.ts` : champ `category` sur chaque test ; `E121ManualTests.tsx` : regroupement, catégories repliées par défaut et mises en évidence, pliage à 3 niveaux catégorie -> tests -> étapes). Export de Marie du 17/08 11h13 traité (étape 0 `/deploy`) : copié dans `donnees_marie/`, journal ré-ingéré, ni perte ni friction. 568/568 tests unitaires, `tsc -b`/lint clean.
 

@@ -59,15 +59,16 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Intégration et validation sur `main` [EN COURS]
+## Phase 4 — Intégration et validation sur `main` [FAIT]
 
 - [x] Branche `integration/supabase-main` créée depuis `main` et socle Supabase de `sync-marie` reporté sélectivement : `src/data/sync/`, `src/app/AppContext.tsx`, `src/app/contexts/useSettingsState.ts`, `src/ui/components/SyncStatusCard.tsx`, `src/ui/screens/settings/E110Settings.tsx`, `supabase/schema.sql`, `scripts/read_device_snapshots.py` et `@supabase/supabase-js`.
 - [x] `package.json` et `package-lock.json` revus dans le contexte de `main` : seule la dépendance Supabase a été ajoutée.
-- [~] Variables navigateur `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` configurées localement et documentées ; `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY`, réservées au script développeur, restent à fournir.
-- Exécuter `supabase/schema.sql` dans le projet Supabase avant tout essai réel.
+- [x] Variables navigateur `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` et variables script `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` configurées dans `.env` ; documentées dans `.env.example`.
+- [x] `supabase/schema.sql` exécuté dans le projet Supabase (session 2026-08-30).
 - [x] Régressions de l'export manuel vérifiées ; `npm test` (640 tests), `npm run build` et le lint réussissent.
-- Test manuel : depuis l'appareil de Marie, constater la synchronisation puis lire le snapshot reçu avec `scripts/read_device_snapshots.py`.
-- Fusionner la branche d'intégration dans `main` uniquement lorsque ces contrôles sont concluants.
+- [x] Synchronisation vérifiée en réel le 2026-08-31 : écriture depuis un appareil mobile (snapshot `app_version` v5.68) + lecture via `scripts/read_device_snapshots.py` (19 snapshots, le plus récent daté). Confirmation grandeur nature = 1re sync de Marie sur v5.69.
+- [x] `integration/supabase-main` fusionnée dans `main` (fast-forward) le 2026-08-31.
+- [x] `/deploy` v5.69 exécuté depuis `main` le 2026-08-31.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

@@ -73,3 +73,20 @@ Détail des changements et questions : https://drive.google.com/open?id=1d3VWHYV
 
 _Suite :_ `/deploy` v5.69 (socle Supabase en prod + planning Phases 1-2). Commentaire figé dans
 `livraisons/v5.69.md`, publié sur Drive. En attente : retour de Marie + sa 1re synchronisation réelle.
+
+### 2026-09-01 — relance tests v5.69 non validés (à envoyer)
+
+**Dév ->**
+Rien de neuf déployé, version 5.69 toujours en ligne.
+
+Les tests de la 5.69 ne sont pas encore validés de ton côté.
+
+Peux-tu passer les parcours de l'écran « Tests à faire » ?
+
+Signale-moi tout parcours bloquant ou pas clair.
+
+https://appli-audhd.netlify.app
+
+_Suite :_ vérification via les snapshots Supabase — appareil de Marie synchronisé sur v5.69
+(snapshot 2026-09-01 10:47 UTC), mais aucun nouveau `manual_test_results` depuis le 2026-08-31
+20:31. Les 4 parcours annoncés à la livraison v5.69 (#3, #18, #20, sauvegarde auto) restent à valider.

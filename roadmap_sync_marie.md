@@ -75,7 +75,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 5 — Bascule et retrait du flux manuel [TODO]
+## Phase 5 — Bascule et retrait du flux manuel [FAIT]
 
 Préalable levé le 2026-09-01 : 1re synchronisation réelle de Marie sur v5.69 confirmée par
 lecture Supabase (device `192f2411`, `synced_at` 2026-09-01 10:47 UTC, `app_version` v5.69).
@@ -87,6 +87,13 @@ lecture Supabase (device `192f2411`, `synced_at` 2026-09-01 10:47 UTC, `app_vers
   `donnees_marie/` (format identique aux exports historiques), branché en étape 4 de `/start`.
   Reste à documenter la bascule et le retrait de `/traiter_export_marie` du flux nominal.
 - Tests : absence de régression des écrans concernés ; parcours de synchronisation et de lecture du snapshot reproductible.
+
+### Bascule effectuée le 2026-09-01
+
+- Bannières urgentes de réimport/réexport : déjà retirées de `E01Welcome.tsx` et `E121ManualTests.tsx` lors de la session du 2026-08-16 (devenues obsolètes) ; aucune trace restante dans le code (grep `bannière`/`réimport`/`réexport` + lecture des deux fichiers).
+- `.claude/commands/deploy.md` étape 0 révisée : ne réclame plus les exports manuels de Marie. Elle rafraîchit le snapshot Supabase via `scripts/backup_marie_snapshot.py` (idempotent, déjà lancé en étape 4 de `/start`), analyse le dernier snapshot de `donnees_marie/` puis l'ingère via `scripts/ingest_manual_tests.py` (le payload du snapshot a le même format que les exports historiques). Étapes 0.4-0.6 (revue du Google Doc) inchangées ; les deux scripts Python ajoutés à `allowed-tools`.
+- Chemin de lecture développeur conservé : `scripts/read_device_snapshots.py` (lecture directe Supabase) et `scripts/backup_marie_snapshot.py` (archive datée). Ingestion manuelle remplacée par : sync auto -> `/start` archive -> `/deploy` étape 0 analyse.
+- `/traiter_export_marie` sorti du flux nominal : en-tête « Repli manuel » ajouté, n'est plus appelé par `/deploy`. Conservé pour ré-ingérer un ancien export ou un envoi manuel résiduel.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

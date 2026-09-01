@@ -6,4 +6,5 @@ Ce fichier ne contient jamais de liste de tests : tous les tests que Marie doit 
 
 ## Changement livré
 
-_(rien en attente — dernière livraison figée dans `livraisons/v5.69.md`)_
+Le point rouge de l'accueil et la liste « Tests à faire » s'éteignent maintenant dès que tu as passé un test, même si tu le marques « Non validé ». Ils se rallument seulement pour un nouveau test, ou pour un test corrigé à repasser.
+

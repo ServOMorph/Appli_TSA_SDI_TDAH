@@ -1,3 +1,11 @@
+## v5.74 — 2026-09-01
+
+### Modifié
+- Le point rouge « Tests à faire » de l'accueil et la liste de l'écran E121 suivent désormais « test passé » au lieu de « test validé » : tout résultat enregistré sur la révision courante d'un test (qu'il soit « Validé » ou « Non validé ») éteint le point rouge et retire le test de la liste ; une nouvelle révision du test l'y ramène. `isManualTestValidated` est renommé `isManualTestDone` (`src/domain/rules/manualTestRules.ts`), le statut ok/nok n'entre plus dans le calcul. Parcours de test `pastille-nouveaux-tests` porté en révision 2, entrée « Nouveautés » ajoutée. Répond au retour de Marie du 1er septembre 2026 (« je l'ai déjà fait hier » — parcours passés le 31 août en marquant « Non validé » ceux qui échouent). Non déployé : partira au prochain `/deploy` avec le travail bundle et les phases 1-2 du planning.
+- `roadmap_sync_marie.md` close : Phase 5 (bascule et retrait du flux manuel) livrée. `/deploy` étape 0 ne réclame plus les exports manuels de Marie — elle rafraîchit la sauvegarde locale du dernier snapshot Supabase (`scripts/backup_marie_snapshot.py`, idempotent, déjà lancée par `/start`), analyse ce snapshot puis l'ingère (`scripts/ingest_manual_tests.py`) ; la revue du Google Doc est inchangée. `/traiter_export_marie` est marqué « repli manuel — hors flux nominal » et n'est plus appelé par `/deploy`. Le chemin de lecture développeur des snapshots est conservé.
+- `.claude/CLAUDE.md` (§ Historique WhatsApp avec Marie) : la relecture de `COMMUNICATION/Marie/historique_whatsapp.md` sur disque est rendue obligatoire avant toute rédaction, synthèse ou raisonnement d'attribution de fil concernant Marie ; interdiction de reconstituer l'enchaînement des messages depuis le résumé de compaction ou la mémoire de session. Le `_Suite :_` d'un message entrant doit nommer explicitement le message auquel Marie répond, repéré dans le fichier.
+- `COMMUNICATION/Marie/historique_whatsapp.md` : échanges du 1er septembre consignés (retour de Marie sur le point rouge et réponse, « je l'ai déjà fait hier » et réponse). `COMMUNICATION/Marie/a_transmettre.md` : commentaire de livraison ajouté pour le nouveau comportement du point rouge.
+
 ## v5.73 — 2026-09-01
 
 ### Ajouté

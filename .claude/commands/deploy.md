@@ -2,26 +2,36 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_marie_snapshot.py:*), Bash(python scripts/ingest_manual_tests.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
 
 ## Procédure
 
-0. Traiter les exports de Marie et revoir le Google Doc avant toute chose.
-   1. Rappeler explicitement à l'utilisateur, avant de poursuivre, qu'il faut d'abord récupérer les
-      derniers exports de Marie disponibles. Ne pas continuer tant que confirmation n'est pas donnée
-      qu'ils sont fournis (fichiers reçus hors dépôt — jamais copiés automatiquement dans
-      `donnees_marie/` sans instruction explicite, donnée sensible listée dans `CLAUDE.md`).
-   2. Une fois les exports fournis, les analyser dans leur intégralité (toutes les tables du payload
-      JSON, pas seulement `manual_test_results`) :
+0. Traiter les données synchronisées de Marie et revoir le Google Doc avant toute chose.
+   Depuis la bascule du 2026-09-01 (`roadmap_sync_marie.md` Phase 5), les données de Marie
+   arrivent par synchronisation automatique (Supabase) : plus aucun export ni envoi manuel à
+   réclamer. `/start` archive déjà le dernier snapshot daté dans `donnees_marie/`
+   (`scripts/backup_marie_snapshot.py`). `/traiter_export_marie` ne subsiste que comme repli
+   manuel (voir son en-tête) et ne fait pas partie de ce flux.
+   1. Rafraîchir la sauvegarde locale du dernier snapshot Supabase de Marie (idempotent — ne
+      réécrit rien si `/start` l'a déjà produite cette session), en chargeant `.env` dans le seul
+      environnement de la commande :
+      ```
+      set -a; source .env; set +a; python scripts/backup_marie_snapshot.py
+      ```
+      Échec (hors ligne, Supabase indisponible) : le signaler en une ligne et poursuivre avec le
+      snapshot le plus récent déjà présent dans `donnees_marie/`. Ne jamais copier ni modifier un
+      fichier de `donnees_marie/` à la main (donnée sensible listée dans `CLAUDE.md`).
+   2. Analyser le dernier snapshot de `donnees_marie/` dans son intégralité (toutes les tables du
+      payload JSON, pas seulement `manual_test_results`) :
       - pertes ou incohérences de données par rapport au dernier état connu (journal
         `_contexte/marie_tests_journal.json` pour l'historique des tests, comparaison structurelle du
-        reste du payload avec l'export précédent analysé) ;
+        reste du payload avec le snapshot précédent analysé) ;
       - frictions signalées par Marie elle-même (commentaires des résultats `nok` dans
         `manual_test_results`).
-   3. Ingérer les résultats de tests via `python scripts/ingest_manual_tests.py <export>`
+   3. Ingérer les résultats de tests via `python scripts/ingest_manual_tests.py <dernier snapshot>`
       (dédoublonnage par `id`, jamais d'écrasement d'une entrée existante).
    4. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
       réconcilie `_contexte/marie_modifications_suivi.md` et pose le jalon daté « Dernière exécution
@@ -31,12 +41,12 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       affiché. Si elle rapporte que le Google Doc est plus récent que la dernière revue du registre :
       s'arrêter après la réconciliation et demander à l'utilisateur de lancer `/analyser_googledoc`
       avant de reprendre `/deploy`.
-   5. Si l'analyse (exports + revue du Doc) ne révèle ni perte, ni incohérence, ni friction
+   5. Si l'analyse (snapshot + revue du Doc) ne révèle ni perte, ni incohérence, ni friction
       bloquante, ni changement non revu du Google Doc : continuer normalement à l'étape 1.
    6. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
       les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
-      fichiers d'export bruts ou `donnees_marie/` pour « résoudre » un problème constaté — toute
-      correction porte sur le code ou le journal projet, jamais sur les données sources de Marie.
+      snapshots ou fichiers d'export de `donnees_marie/` pour « résoudre » un problème constaté —
+      toute correction porte sur le code ou le journal projet, jamais sur les données sources de Marie.
 
 1. Exécuter intégralement `/close` (sans argument — zone implicite : dossier courant) avant de
    poursuivre. Le code à déployer doit être clôturé et commité, pas laissé en session ouverte.

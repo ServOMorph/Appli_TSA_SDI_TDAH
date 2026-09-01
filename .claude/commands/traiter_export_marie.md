@@ -7,6 +7,10 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
 
 # /traiter_export_marie [chemin]
 
+> **Repli manuel — hors flux nominal.** Depuis la bascule du 2026-09-01 (`roadmap_sync_marie.md` Phase 5), les données de Marie arrivent par synchronisation
+> automatique (Supabase). `/start` archive le dernier snapshot daté dans `donnees_marie/` (`scripts/backup_marie_snapshot.py`) et `/deploy` étape 0 analyse ce snapshot. Cette
+> commande ne sert plus qu'aux cas résiduels : Marie transmet encore un export JSON manuel, ou il faut ré-ingérer un ancien export. Elle n'est plus appelée par `/deploy`.
+
 ## Procédure
 
 1. Localiser l'export.

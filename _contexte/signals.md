@@ -1,6 +1,8 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-01)
 
 ## Contexte chaud
+- **Comportement pastille « Tests à faire » modifié le 2026-09-01, non déployé** (commit `2d5c0b8`) : la pastille rouge de l'accueil et la liste E121 suivent « test passé » (tout résultat `ok`/`nok` sur la révision courante) au lieu de « test validé » ; `isManualTestValidated` -> `isManualTestDone`. Parcours `pastille-nouveaux-tests` en `revision: 2`, `WHATS_NEW` complété. 683/683 tests. Répond au retour de Marie du 2026-09-01 (« je l'ai déjà fait hier »). Partira au prochain `/deploy`.
+- **`roadmap_sync_marie.md` close le 2026-09-01** : Phase 5 (bascule et retrait du flux manuel) `[FAIT]`. `/deploy` étape 0 ne réclame plus d'export de Marie — elle rafraîchit (`scripts/backup_marie_snapshot.py`, idempotent) puis analyse le dernier snapshot Supabase de `donnees_marie/` (format = exports historiques) et l'ingère (`scripts/ingest_manual_tests.py`) ; étapes 0.4-0.6 (revue Google Doc) inchangées. `/traiter_export_marie` marqué « Repli manuel — hors flux nominal », plus appelé par `/deploy`. Chemin de lecture dév conservé. Roadmap à archiver au prochain `/deploy`.
 - **v5.69 déployée en prod le 2026-08-31** (`https://appli-audhd.netlify.app`) : socle Supabase de synchronisation fusionné dans `main` (fast-forward) et déployé. Rattrape v5.65→v5.68 en prod (prod était restée à v5.64). Sync auto des tables Dexie vers Supabase (région UE) via secret d'appareil `localStorage`, au démarrage + retour premier plan, throttle 1 h, échec silencieux hors ligne. Carte `SyncStatusCard` dans Paramètres (« Vos données de test sont partagées avec le développeur » + date). Lecture dév via `scripts/read_device_snapshots.py` (`SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` dans `.env`).
 - **1re sync réelle de Marie sur v5.69 confirmée le 2026-09-01** : device `192f2411-9e09-495c-97ec-6df563f01732` (seul snapshot à usage réel sur 48 : `app_version` v5.69, 45 tâches, 49 `manual_test_results`, énergie/budget quotidiens jusqu'au 2026-09-01, `synced_at` 2026-09-01 10:47 UTC). Identité formelle non prouvée (device_id anonyme par design, recoupement `donnees_marie/` non fait — dossier sensible) mais faisceau d'indices concluant. Question ouverte P1 satisfaite. Aucun nouveau `manual_test_results` depuis le 2026-08-31 20:31 → parcours v5.69 (#3, #18, #20, sauvegarde auto) toujours non validés par Marie.
 - **SAV locale du snapshot Supabase de Marie en place (2026-09-01)** : `scripts/backup_marie_snapshot.py` lit `device_snapshots`, sélectionne l'appareil au plus de `manual_test_results`, écrit le `payload` daté dans `donnees_marie/snapshot-supabase-<device>-<synced_at>.json` (format identique aux exports historiques, gitignoré), idempotent. Branché en **étape 4 de `/start`** (racine du projet, non bloquant). Comble l'absence d'historique côté Supabase — le schéma fait un `upsert` d'une ligne unique par `device_id` (`on conflict do update`), chaque sync écrase la précédente. 1re sauvegarde produite : `snapshot-supabase-192f2411-2026-09-01-1526h26.json`.
@@ -31,8 +33,7 @@
 
 ## Questions ouvertes
 - [P2] **Déployer le travail de `roadmap_bundle_2026-08-31.md`** (close le 2026-09-01, jamais mis en prod) : chunk d'entrée 242,21 kB, garde-fou `bundle:check` branché dans `/deploy`. Pas urgent en soi (aucune régression fonctionnelle, gain invisible pour Marie tant qu'il n'y a pas de nouveau déploiement), mais partira naturellement avec le prochain `/deploy`. — fait quand : `/deploy` exécuté avec succès, nouvelle version en prod incluant ce travail — réf : `roadmap_bundle_2026-08-31.md`, `_contexte/dernier_deploiement.md`
-- [P1] **Retour de Marie attendu sur la relance tests v5.69** (message consigné dans `historique_whatsapp.md`, 2026-09-01, pas encore envoyé/répondu) : les 4 parcours v5.69 (#3, #18, #20, sauvegarde auto) sont non validés depuis le 2026-08-31 20:31. — fait quand : Marie répond, ou un nouveau snapshot montre des `manual_test_results` datés d'après le 2026-08-31 sur ces parcours — réf : `COMMUNICATION/Marie/historique_whatsapp.md`, `scripts/backup_marie_snapshot.py`
-- [P1] **Entamer `roadmap_sync_marie.md` Phase 5 (bascule et retrait du flux manuel)** — débloquée : la 1re sync réelle de Marie est confirmée (2026-09-01). Retirer les bannières de réimport/réexport (`E01Welcome.tsx`, `E121ManualTests.tsx`), réviser l'étape 0 de `.claude/commands/deploy.md`, documenter le remplacement de l'ingestion manuelle. La brique d'archivage dév (`scripts/backup_marie_snapshot.py` branché dans `/start`) est déjà en place — le point « conserver un chemin de lecture dév + documenter » de la Phase 5 s'appuie dessus. — fait quand : les 4 points de la Phase 5 `[FAIT]` — réf : `roadmap_sync_marie.md` Phase 5, `scripts/backup_marie_snapshot.py`
+- [P1] **Revalidation des tests v5.69 par Marie après déploiement du correctif pastille** : Marie a répondu le 2026-09-01 (« je l'ai déjà fait hier ») — parcours passés le 2026-08-31 en marquant « Non validé » ceux qui échouent. Le grief (un parcours « non validé » reste compté « à valider ») est corrigé en commit `2d5c0b8` (`isManualTestDone`), non déployé. — fait quand : correctif déployé + snapshot postérieur montrant les parcours #3/#18/#20 sortis de la liste ou re-signalés — réf : `COMMUNICATION/Marie/historique_whatsapp.md`, `src/domain/rules/manualTestRules.ts`, `scripts/backup_marie_snapshot.py`
 - [P1] **Poursuivre `roadmap_planning_accueil_2026-08-29.md`** : Phases 1-2 déployées (v5.69), Phase 3 (#19, fond du bandeau de dates pleinement coloré) `[EN COURS]`, Phases 4-5 `[TODO]` (décisions Phase 5 tranchées). Phase par phase avec checkpoint `/compact`. — fait quand : les 5 phases `[FAIT]`, `/deploy` proposé — réf : `roadmap_planning_accueil_2026-08-29.md`, `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx`
 - [P1] Retirer du dépôt le lien Google Drive du commentaire de livraison v5.58 et le stocker dans `.env` ; ne jamais versionner ce lien. — fait quand : le lien n’est plus suivi par Git et est lu depuis `.env` — réf : `COMMUNICATION/Marie/livraisons/v5.58.md`, `.env.example`, `.gitignore`
 - [P1] Définir puis appliquer le rangement des fichiers `commentaires_marie_vX.Y.docx` créés à la racine après publication Drive. — fait quand : aucun fichier de commentaire de livraison ne reste à la racine et son emplacement d’archive est documenté — réf : `commentaires_marie_v5.58.docx`, `.claude/commands/deploy.md`
@@ -46,7 +47,33 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] `PlanningBoard.tsx` : le bouton « Reporter » (mode surcharge) est imbriqué dans le `<button>` de ligne — HTML invalide, avertissement jsdom au run des tests. Pré-existant, révélé par la Phase 2. Candidat à une phase de refacto entre deux phases fonctionnelles de la roadmap planning. — fait quand : le bouton « Reporter » n'est plus descendant du bouton de ligne — réf : `src/ui/screens/dashboard/PlanningBoard.tsx` (rendu d'une ligne), `roadmap_planning_accueil_2026-08-29.md`
 
-## Dernière session (2026-09-01 — confirmation sync Marie v5.69, SAV locale des snapshots Supabase, archivage roadmaps closes)
+## Dernière session (2026-09-01 — comportement pastille « test passé », bascule sync Marie Phase 5, correctif process WhatsApp)
+
+## Décisions prises
+- Pastille rouge accueil + liste « Tests à faire » : critère « test validé » -> « test passé » (tout résultat `ok`/`nok` sur la révision courante éteint ; révision incrémentée rallume). E121 suit le même critère que la pastille (un test `nok` en sort).
+- Bascule sync Marie (`roadmap_sync_marie.md` Phase 5, dernière phase, `[FAIT]`) : plus d'export manuel dans le flux nominal. `/deploy` étape 0 rafraîchit puis analyse le snapshot Supabase archivé par `/start` ; `/traiter_export_marie` = repli manuel hors flux.
+- Process WhatsApp : relecture obligatoire de `COMMUNICATION/Marie/historique_whatsapp.md` (disque) avant toute rédaction / synthèse / attribution de fil pour Marie.
+
+## Livrables produits ou modifiés
+- `manualTestRules.ts`, `E10Dashboard.tsx`, `E121ManualTests.tsx`, parcours `pastille-nouveaux-tests` rev 2, `WHATS_NEW` : commit `2d5c0b8`.
+- `.claude/commands/deploy.md`, `.claude/commands/traiter_export_marie.md`, `roadmap_sync_marie.md` (Phase 5 `[FAIT]` + § Bascule) : commités par ce `/close`.
+- `.claude/CLAUDE.md` : règle relecture WhatsApp (`db0144c`). `COMMUNICATION/Marie/historique_whatsapp.md` : 4 entrées (`f8aa044`, `feadc8b`, `670ce3c`, `c34551c`, `f709ed8`).
+- `COMMUNICATION/Marie/a_transmettre.md` : commentaire de livraison pastille ajouté.
+
+## Hypothèses validées / invalidées
+- VALIDE : 683/683 tests, `tsc -b`/lint verts après `2d5c0b8` (consigné dans `historique_whatsapp.md`).
+- INVALIDE : « je l'ai déjà fait hier » de Marie n'est pas un défaut de synchronisation — parcours passés le 2026-08-31 en « Non validé » ; c'est le grief pastille, corrigé et non déployé.
+- EN ATTENTE : revalidation formelle des parcours v5.69 (#3, #18, #20) après déploiement du correctif pastille.
+
+## Prochaine étape exacte
+`/deploy` (livre le correctif pastille + le travail bundle + planning Phases 1-2 déjà en attente), ou poursuivre `roadmap_planning_accueil_2026-08-29.md` Phase 3 (#19).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-09-01 — confirmation sync Marie v5.69, SAV locale des snapshots Supabase, archivage roadmaps closes)
 
 ## Décisions prises
 - SAV régulière des données de Marie : script tiré des snapshots Supabase, branché en **étape 4 de `/start`** (choix utilisateur : intégration `/start` plutôt que tâche planifiée Windows). Comble l'absence d'historique côté Supabase (schéma = `upsert` d'une ligne unique par `device_id`, chaque sync écrase la précédente).

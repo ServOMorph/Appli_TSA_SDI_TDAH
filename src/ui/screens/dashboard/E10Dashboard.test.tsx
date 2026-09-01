@@ -117,6 +117,21 @@ describe('E10Dashboard', () => {
       expect(screen.getByRole('button', { name: 'Tests à faire' })).toBeDefined()
     })
 
+    it('masque la pastille dès qu’un test a un résultat, même « Non validé »', async () => {
+      const ctx = makeAppContext({
+        manualTestResults: manualTestsCatalog.map((test) => ({
+          id: `result-${test.id}`,
+          test_id: test.id,
+          test_revision: test.revision,
+          status: 'nok' as const,
+          comment: 'Retour de test',
+          created_at: '2026-08-14T10:00:00.000Z',
+        })),
+      })
+      await renderDashboard(ctx)
+      expect(screen.queryByLabelText('Nouveaux tests disponibles')).toBeNull()
+    })
+
     it('affiche la pastille quand un test révisé n’a été validé que sur une ancienne révision', async () => {
       const revised = manualTestsCatalog.find((test) => test.revision !== undefined)!
       const ctx = makeAppContext({

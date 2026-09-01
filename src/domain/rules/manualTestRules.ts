@@ -13,14 +13,16 @@ export function latestManualTestResult(
     )
 }
 
-export function isManualTestValidated(
+// Un test est « fait » dès qu'un résultat (validé ou non) a été enregistré sur sa révision
+// courante. Le statut ok/nok n'entre pas en compte : marquer un test « Non validé » suffit à
+// le retirer de la liste et à éteindre la pastille. Une nouvelle révision du test (rectification)
+// le rend de nouveau « à faire ».
+export function isManualTestDone(
   test: ManualTest,
   result: ManualTestResult | undefined,
 ): boolean {
-  return (
-    result?.status === 'ok' &&
-    (test.revision === undefined || result.test_revision === test.revision)
-  )
+  if (!result) return false
+  return test.revision === undefined || result.test_revision === test.revision
 }
 
 export function pendingManualTests(
@@ -28,7 +30,7 @@ export function pendingManualTests(
   results: ManualTestResult[],
 ): ManualTest[] {
   return catalog.filter(
-    (test) => !isManualTestValidated(test, latestManualTestResult(results, test.id)),
+    (test) => !isManualTestDone(test, latestManualTestResult(results, test.id)),
   )
 }
 

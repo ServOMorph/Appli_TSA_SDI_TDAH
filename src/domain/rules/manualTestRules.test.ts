@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   hasPendingManualTests,
-  isManualTestValidated,
+  isManualTestDone,
   latestManualTestResult,
   pendingManualTests,
 } from '@/domain/rules/manualTestRules'
@@ -38,47 +38,45 @@ describe('latestManualTestResult', () => {
   })
 })
 
-describe('isManualTestValidated', () => {
+describe('isManualTestDone', () => {
   it('est faux sans résultat', () => {
-    expect(isManualTestValidated(test(), undefined)).toBe(false)
+    expect(isManualTestDone(test(), undefined)).toBe(false)
   })
 
-  it('est faux si le dernier résultat est un échec', () => {
-    expect(isManualTestValidated(test(), result({ status: 'nok' }))).toBe(false)
+  it('est vrai si un résultat existe, même un échec, quand le test n’a pas de révision', () => {
+    expect(isManualTestDone(test(), result({ status: 'nok' }))).toBe(true)
+    expect(isManualTestDone(test(), result({ status: 'ok' }))).toBe(true)
   })
 
-  it('est vrai si validé et le test n’a pas de révision', () => {
-    expect(isManualTestValidated(test(), result())).toBe(true)
+  it('est faux si le dernier résultat porte sur une révision antérieure', () => {
+    expect(isManualTestDone(test({ revision: 2 }), result({ test_revision: 1 }))).toBe(false)
   })
 
-  it('est faux si validé sur une révision antérieure', () => {
-    expect(isManualTestValidated(test({ revision: 2 }), result({ test_revision: 1 }))).toBe(false)
+  it('est faux si le résultat n’a pas de révision alors que le test en a une', () => {
+    expect(isManualTestDone(test({ revision: 2 }), result())).toBe(false)
   })
 
-  it('est faux si validé sans révision alors que le test en a une', () => {
-    expect(isManualTestValidated(test({ revision: 2 }), result())).toBe(false)
-  })
-
-  it('est vrai si validé sur la révision courante', () => {
-    expect(isManualTestValidated(test({ revision: 2 }), result({ test_revision: 2 }))).toBe(true)
+  it('est vrai si un résultat existe sur la révision courante, quel que soit son statut', () => {
+    expect(isManualTestDone(test({ revision: 2 }), result({ test_revision: 2 }))).toBe(true)
+    expect(isManualTestDone(test({ revision: 2 }), result({ test_revision: 2, status: 'nok' }))).toBe(true)
   })
 })
 
 describe('pendingManualTests / hasPendingManualTests', () => {
   const catalog = [test({ id: 'a' }), test({ id: 'b', revision: 2 })]
 
-  it('liste les tests non validés dans leur révision courante', () => {
+  it('liste les tests jamais faits sur leur révision courante', () => {
     const results = [
-      result({ id: 'ra', test_id: 'a' }),
+      result({ id: 'ra', test_id: 'a', status: 'nok' }),
       result({ id: 'rb', test_id: 'b', test_revision: 1 }),
     ]
     expect(pendingManualTests(catalog, results).map((t) => t.id)).toEqual(['b'])
     expect(hasPendingManualTests(catalog, results)).toBe(true)
   })
 
-  it('est vide quand tout est validé dans la révision courante', () => {
+  it('est vide quand chaque test a un résultat sur sa révision courante, échec compris', () => {
     const results = [
-      result({ id: 'ra', test_id: 'a' }),
+      result({ id: 'ra', test_id: 'a', status: 'nok' }),
       result({ id: 'rb', test_id: 'b', test_revision: 2 }),
     ]
     expect(pendingManualTests(catalog, results)).toEqual([])

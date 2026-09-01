@@ -253,12 +253,14 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'pastille-nouveaux-tests',
+    revision: 2,
     title: 'Pastille rouge quand il y a des tests à faire',
     category: 'Paramètres / Profil',
     steps: [
-      'Sur l’accueil, regardez l’icône en forme de coche en haut à droite : tant qu’il reste des tests non validés, un point rouge doit être affiché dessus.',
-      'Touchez cette icône, ouvrez un test et enregistrez-le comme « Validé ».',
-      'Recommencez jusqu’à ce que plus aucun test n’apparaisse dans « Tests à faire » : le point rouge sur l’icône de l’accueil doit alors disparaître.',
+      'Sur l’accueil, regardez l’icône en forme de coche en haut à droite : tant qu’au moins un test n’a jamais été passé, un point rouge doit être affiché dessus.',
+      'Touchez cette icône, ouvrez un test et enregistrez un résultat en choisissant « Non validé » : le test doit disparaître de la liste « Tests à faire ».',
+      'Passez ainsi tous les tests, certains en « Validé », d’autres en « Non validé » : quand la liste « Tests à faire » est vide, le point rouge de l’accueil doit disparaître, même s’il reste des tests que vous avez marqués « Non validé ».',
+      'Après une mise à jour qui corrige un test marqué « Non validé », ce test doit réapparaître dans « Tests à faire » et le point rouge doit se rallumer.',
     ],
   },
   {

@@ -39,15 +39,15 @@ describe('E121ManualTests', () => {
     expect(screen.getAllByText('Jamais testé')).toHaveLength(manualTestsCatalog.length)
   })
 
-  it('affiche le dernier résultat connu pour chaque test', () => {
+  it('affiche le dernier résultat connu pour un test encore à faire', () => {
     const ctx = makeAppContext({
       manualTestResults: [
-        { id: 'old', test_id: 'creer-une-liste', status: 'nok', comment: 'Ancien refus', created_at: '2026-08-14T09:00:00.000Z' },
-        { id: 'new', test_id: 'creer-une-liste', status: 'nok', comment: 'Toujours en échec', created_at: '2026-08-14T10:00:00.000Z' },
+        { id: 'old', test_id: 'menu-actions-tache-simplifie', test_revision: 1, status: 'nok', comment: 'Ancien refus', created_at: '2026-08-14T09:00:00.000Z' },
+        { id: 'new', test_id: 'menu-actions-tache-simplifie', test_revision: 1, status: 'nok', comment: 'Toujours en échec', created_at: '2026-08-14T10:00:00.000Z' },
       ],
     })
     renderWithApp(<E121ManualTests />, ctx)
-    expandCategory('Outils : Listes')
+    expandCategory('Tâches')
 
     expect(screen.getByText('Non validé')).toBeInTheDocument()
   })
@@ -69,6 +69,18 @@ describe('E121ManualTests', () => {
       manualTestResults: [
         { id: 'old', test_id: 'creer-une-liste', status: 'nok', comment: 'Ancien échec', created_at: '2026-08-14T09:00:00.000Z' },
         { id: 'new', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T10:00:00.000Z' },
+      ],
+    })
+    renderWithApp(<E121ManualTests />, ctx)
+    expandCategory('Outils : Listes')
+
+    expect(screen.queryByRole('button', { name: 'Ouvrir le test Créer une liste' })).not.toBeInTheDocument()
+  })
+
+  it('masque un test dont le dernier résultat est un échec sur la révision courante', () => {
+    const ctx = makeAppContext({
+      manualTestResults: [
+        { id: 'ko', test_id: 'creer-une-liste', status: 'nok', comment: 'Le bouton est absent.', created_at: '2026-08-14T10:00:00.000Z' },
       ],
     })
     renderWithApp(<E121ManualTests />, ctx)
@@ -142,14 +154,14 @@ describe('E121ManualTests', () => {
       <E121ManualTests />,
       makeAppContext({
         manualTestResults: [
-          { id: 'first', test_id: 'creer-une-liste', status: 'nok', comment: 'Le bouton est absent.', created_at: '2026-08-14T09:00:00.000Z' },
-          { id: 'second', test_id: 'creer-une-liste', status: 'nok', comment: 'Toujours en échec', created_at: '2026-08-14T10:00:00.000Z' },
+          { id: 'first', test_id: 'menu-actions-tache-simplifie', test_revision: 1, status: 'nok', comment: 'Le bouton est absent.', created_at: '2026-08-14T09:00:00.000Z' },
+          { id: 'second', test_id: 'menu-actions-tache-simplifie', test_revision: 1, status: 'nok', comment: 'Toujours en échec', created_at: '2026-08-14T10:00:00.000Z' },
         ],
       }),
     )
-    expandCategory('Outils : Listes')
+    expandCategory('Tâches')
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le test Créer une liste' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Ouvrir le test Menu d’actions simplifié sur la fiche d’une tâche' }))
     expect(screen.getByRole('heading', { name: 'Historique' })).toBeInTheDocument()
     expect(screen.getByText('Le bouton est absent.')).toBeInTheDocument()
     expect(within(screen.getByRole('region', { name: 'Historique du test' })).getAllByText('Non validé')).toHaveLength(2)

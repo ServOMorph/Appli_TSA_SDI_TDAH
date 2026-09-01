@@ -3,7 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { MANUAL_TEST_CATEGORIES, manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 import type { ManualTestResult, ManualTestStatus } from '@/domain/entities/manualTestResult'
 import type { ManualTest, ManualTestCategory } from '@/domain/data/manualTestsCatalog'
-import { isManualTestValidated, latestManualTestResult } from '@/domain/rules/manualTestRules'
+import { isManualTestDone, latestManualTestResult } from '@/domain/rules/manualTestRules'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { inputStyle, modalBox, modalOverlay } from '@/ui/styles/budget'
@@ -35,7 +35,7 @@ export function E121ManualTests() {
   )
 
   const visibleTests = useMemo(
-    () => manualTestsCatalog.filter((test) => !isManualTestValidated(test, latestByTest.get(test.id))),
+    () => manualTestsCatalog.filter((test) => !isManualTestDone(test, latestByTest.get(test.id))),
     [latestByTest],
   )
 

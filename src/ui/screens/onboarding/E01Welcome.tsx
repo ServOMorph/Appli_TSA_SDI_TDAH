@@ -3,7 +3,9 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = []
+const WHATS_NEW: string[] = [
+  'Le point rouge « Tests à faire » de l’accueil s’éteint dès que vous avez passé un test, que vous l’ayez marqué « Validé » ou « Non validé ». Il se rallume seulement pour un nouveau test ou pour un test corrigé, à repasser.',
+]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

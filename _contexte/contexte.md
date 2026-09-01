@@ -8,8 +8,10 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 - Stockage local : IndexedDB via Dexie.js (source de vérité V1)
 - Chiffrement local : retiré (2026-08-05) — jamais activable ni actif en production, code mort supprimé (`src/crypto/`)
 - Mobile futur : Capacitor (même codebase web)
-- Sync cloud : Supabase région UE — socle fusionné dans `main` et déployé en v5.69 ; sync auto des tables Dexie, échec silencieux hors ligne
+- Sync cloud : Supabase région UE — socle fusionné dans `main` et déployé en v5.69 ; sync auto des tables Dexie, échec silencieux hors ligne. Client `@supabase/supabase-js` retiré du navigateur (2026-09-01, `roadmap_bundle_2026-08-31.md` Phase 1) : transport `fetch` natif vers PostgREST (`src/data/sync/rpc.ts`), flux et sécurité inchangés, gain -208 kB. Auth/realtime/storage indisponibles côté app tant que le SDK n'est pas réintroduit (pas d'écran de connexion prévu).
 - Offline-first strict : fonctionne sans serveur ni compte en V1
+- Taille du bundle JS : plancher structurel `react-dom` + `dexie` ≈ 280 kB, incompressible sans changement de socle. Chunk d'entrée + chunk `AppContext.tsx` (`modulepreload`) verrouillés par `bundle.budget.json` (`scripts/check_bundle_budget.mjs`), contrôle bloquant intégré à `/deploy` (`roadmap_bundle_2026-08-31.md` Phase 4).
+- Règle durable : tout nouvel écran ajouté à `AppScreens` (`src/App.tsx`) est chargé en différé (`React.lazy`), jamais en import statique — sauf `E10Dashboard`, écran d'atterrissage de Marie.
 
 ## État actuel (réécrit intégralement à chaque /close)
 **v5.69 est en production** (`https://appli-audhd.netlify.app`, HTTP 200 le 2026-08-31) : socle Supabase de synchronisation en prod (sync auto + carte statut dans Paramètres), rattrapant v5.65→v5.68. Sync vérifiée write+read côté dév ; 1re sync réelle de Marie à confirmer.

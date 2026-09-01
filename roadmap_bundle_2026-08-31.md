@@ -619,7 +619,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Garde-fou permanent et documentation [TODO]
+## Phase 4 — Garde-fou permanent et documentation [FAIT]
 
 - Verrouiller `bundle.budget.json` sur la mesure finale plus 10 % de marge.
 - Intégrer le contrôle de budget à `.claude/commands/deploy.md`. **Trois contraintes vérifiées le
@@ -655,6 +655,57 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 **Critère de sortie** : une régression de taille de bundle est détectée automatiquement.
 
+### Résultats mesurés (2026-09-01)
+
+**Écart avec le plan.** Le point de transparence laissé ouvert en fin de Phase 2 (le chunk
+`AppContext.tsx`, chargé via `<link rel="modulepreload">`, échappait à la mesure de
+`check_bundle_budget.mjs`) a été traité par la première option proposée — **élargir la mesure**,
+plutôt que la documenter comme simple limite : le script lit désormais aussi les balises
+`modulepreload` de `index.html` et somme leurs octets à ceux du chunk d'entrée. Un garde-fou qui ne
+couvre pas 38 % du poids réel au démarrage (150.38 kB sur 392.59 kB) n'aurait pas rempli son rôle.
+
+**Livré**
+
+- `scripts/check_bundle_budget.mjs` : parse les `<link rel="modulepreload">` de `index.html` en plus
+  du `<script type="module">` d'entrée ; nouveaux contrôles `totalEntryBytes` / `totalGzipBytes`
+  (entrée + preload), rétrocompatibles (ignorés si absents de `bundle.budget.json`) ; sortie `--json`
+  enrichie (`preloadFiles`, `totalBytes`, `totalGzipBytes`).
+- `bundle.budget.json` : `limits` verrouillé sur la mesure finale + 10 % de marge de bruit de build
+  (`entryBytes` 266 428 o, `gzipBytes` 81 568 o, `totalEntryBytes` 431 790 o, `totalGzipBytes`
+  131 317 o) ; `cible` réécrite avec les chiffres finaux au lieu de l'estimation initiale à 450 kB.
+- `vite.config.ts` : `build.chunkSizeWarningLimit` abaissé à `260` (défaut Vite : 500) — la valeur
+  atteinte, avec une petite marge, plutôt qu'un plafond générique qui ne dirait plus rien.
+  `build.outDir` corrigé de `dist/v5.1` (build versionné réel, écrasé silencieusement à chaque
+  `npm run build`) vers `dist/dev`, dossier scratch déjà conventionnel dans ce dépôt et sans risque
+  d'écrasement.
+- `.claude/commands/deploy.md` : `Bash(node scripts/check_bundle_budget.mjs:*)` ajouté aux
+  `allowed-tools` ; étape 6 exécute désormais `node scripts/check_bundle_budget.mjs dist/<version>`
+  sur le build déjà produit à l'étape 5 (pas de rebuild, pas de dérive vers `dist/v5.1`), code 1
+  bloquant. L'ancien mécanisme non bloquant de l'étape 5 (« avertissement > 500 kB à noter pour le
+  rapport ») retiré — un seul mécanisme de contrôle de taille, celui-ci bloquant ; étapes 9 et 13
+  mises à jour en conséquence.
+- `_contexte/contexte.md` (section « Stack / contraintes techniques ») : consigné l'abandon de
+  `@supabase/supabase-js` côté navigateur, le plancher structurel `react-dom` + `dexie` ≈ 280 kB, et
+  la règle durable « tout nouvel écran de `AppScreens` est chargé en différé ».
+- `src/domain/data/manualTestsCatalog.ts` : parcours `navigation-entre-tous-les-ecrans` ajouté
+  (catégorie « Paramètres / Profil », hors Doc) — navigation entre écrans différés, aucun blocage sur
+  « Chargement... » attendu, avec parade (fermer/rouvrir l'appli) si le cas se présentait malgré tout.
+
+**Tests — après**
+
+| Contrôle | Résultat |
+|---|---|
+| `npm test` | **682/682 verts**, 84 fichiers (inchangé — nouvelle entrée de catalogue, pas un nouveau cas de test) |
+| `npm run lint` | vert |
+| `npx tsc -b` | vert |
+| `npm run build` (défaut, sans `--outDir`) | écrit dans `dist/dev` (plus `dist/v5.1`), aucun avertissement de taille de chunk (243.01 kB < 260 kB) |
+| `npm run bundle:check` | vert — chunk d'entrée 243.01 kB / seuil 266.43 kB ; total démarrage (+ preload) 393.34 kB / seuil 431.79 kB |
+| `npm run test:e2e` | **57/57 verts** (35.2 s) |
+
+**Critère de sortie atteint** : une régression du chunk d'entrée **et** du chunk `AppContext.tsx`
+préchargé est désormais détectée automatiquement, en local (`bundle:check`) comme dans `/deploy`
+(étape 6, bloquant).
+
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
@@ -666,6 +717,6 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - Preact ou remplacement de Dexie : changement de socle, disproportionné pour un objectif de taille.
 - `build.outDir: 'dist/v5.1'` codé en dur dans `vite.config.ts` alors que la version courante est
   v5.69 : sans effet sur la **taille** du bundle, donc hors périmètre de l'objectif.
-  **Mais cette anomalie casse le harnais de la Phase 0** (`npm run build` écrit dans `dist/v5.1`,
-  parmi 23 dossiers de build). Elle est donc traitée comme contrainte de conception du script
-  (Phase 0) et sa correction est proposée en Phase 4 — pas ignorée.
+  **Mais cette anomalie cassait le harnais de la Phase 0** (`npm run build` écrivait dans
+  `dist/v5.1`, parmi 23 dossiers de build). Traitée comme contrainte de conception du script
+  (Phase 0), puis **corrigée en Phase 4** : `outDir` pointe désormais vers `dist/dev`.

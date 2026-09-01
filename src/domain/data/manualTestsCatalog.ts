@@ -364,4 +364,15 @@ export const manualTestsCatalog: ManualTest[] = [
       'Pour terminer la tâche, cochez-la directement dans le planning.',
     ],
   },
+  {
+    id: 'navigation-entre-tous-les-ecrans',
+    title: 'Navigation fluide entre les écrans',
+    category: 'Paramètres / Profil',
+    steps: [
+      'Depuis l’accueil, touchez successivement chaque icône du menu du bas (Réception, Ajouter une tâche, Accueil, Paramètres) : chaque écran doit s’afficher normalement, sans rester bloqué sur « Chargement... ».',
+      'Dans la section « Outils », ouvrez successivement le Budget, une Liste existante et un dossier : chaque écran doit s’ouvrir normalement.',
+      'Ouvrez le détail d’une tâche existante, puis touchez « Décomposer » : les deux écrans doivent s’afficher sans blocage.',
+      'Si un écran reste bloqué sur « Chargement... » plus de quelques secondes, fermez complètement l’application puis rouvrez-la : l’écran doit alors s’afficher normalement.',
+    ],
+  },
 ]

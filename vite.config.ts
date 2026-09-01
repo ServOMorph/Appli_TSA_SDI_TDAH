@@ -49,6 +49,17 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist/v5.1',
+    // Dossier par defaut de npm run build / npm run test:e2e — jamais une reference de mesure.
+    // /deploy impose toujours --outDir dist/<version>, qui prime sur cette valeur. dist/dev est
+    // le dossier scratch deja utilise a cet effet (roadmap_bundle_2026-08-31.md, Phase 4) :
+    // avant ce correctif, la valeur codee en dur pointait vers dist/v5.1, un build versionne reel,
+    // silencieusement ecrase a chaque build local.
+    outDir: 'dist/dev',
+    // Alerte Vite abaissee a la valeur reellement atteinte (chunk d entree 242 kB, marge de
+    // bruit incluse) plutot que le defaut 500 kB : un depassement doit signaler une regression,
+    // pas rester silencieux jusqu au prochain seuil arbitraire. Le gate bloquant reste
+    // scripts/check_bundle_budget.mjs (bundle.budget.json), cette valeur n est qu un avertissement
+    // de build informatif.
+    chunkSizeWarningLimit: 260,
   },
 })

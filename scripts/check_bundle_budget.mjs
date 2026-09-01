@@ -49,12 +49,34 @@ if (!entrySrc) fail(`aucun script module d entree trouve dans ${indexPath}`)
 const entryPath = join(buildDir, entrySrc.replace(/^\//, ''))
 if (!existsSync(entryPath)) fail(`chunk d entree introuvable : ${entryPath}`)
 
+// Chunks precharges de force via <link rel="modulepreload"> : Vite les fait telecharger en
+// parallele du chunk d entree, pas a la demande (ex. AppContext.tsx, dependance statique
+// incontournable de tout ecran). Ignores jusqu ici (Phase 2 de roadmap_bundle_2026-08-31.md,
+// point de transparence) ; comptes desormais dans le total reellement charge au demarrage.
+const linkTags = [...html.matchAll(/<link\b[^>]*>/g)].map((match) => match[0])
+const preloadSrcs = linkTags
+  .filter((tag) => /rel\s*=\s*["']modulepreload["']/.test(tag))
+  .map((tag) => tag.match(/href\s*=\s*["']([^"']+)["']/)?.[1])
+  .filter((href) => href && href.includes('/assets/') && href.endsWith('.js'))
+
 if (!existsSync(BUDGET_FILE)) fail(`${BUDGET_FILE} introuvable a la racine du projet`)
 const budget = JSON.parse(readFileSync(BUDGET_FILE, 'utf-8'))
 
 const entryBuffer = readFileSync(entryPath)
 const entryBytes = entryBuffer.length
 const gzipBytes = gzipSync(entryBuffer).length
+
+const preloadFiles = preloadSrcs.map((src) => {
+  const path = join(buildDir, src.replace(/^\//, ''))
+  if (!existsSync(path)) fail(`chunk preload introuvable : ${path}`)
+  const buffer = readFileSync(path)
+  return { src, bytes: buffer.length, gzipBytes: gzipSync(buffer).length }
+})
+
+// Somme des gzip individuels : legere surestimation par rapport a un flux combine, mais c est
+// la meme approximation deja documentee en Phase 2 — suffisante pour un garde-fou de regression.
+const totalBytes = entryBytes + preloadFiles.reduce((sum, f) => sum + f.bytes, 0)
+const totalGzipBytes = gzipBytes + preloadFiles.reduce((sum, f) => sum + f.gzipBytes, 0)
 
 const kb = (bytes) => (bytes / 1000).toFixed(2)
 const delta = (actual, reference) => {
@@ -69,6 +91,23 @@ const checks = [
   { name: 'chunk d entree gzip', actual: gzipBytes, limit: budget.limits.gzipBytes, base: budget.baseline.gzipBytes },
 ]
 
+if (budget.limits.totalEntryBytes !== undefined) {
+  checks.push({
+    name: 'total demarrage (+ preload)',
+    actual: totalBytes,
+    limit: budget.limits.totalEntryBytes,
+    base: budget.baseline.entryBytes,
+  })
+}
+if (budget.limits.totalGzipBytes !== undefined) {
+  checks.push({
+    name: 'total demarrage gzip',
+    actual: totalGzipBytes,
+    limit: budget.limits.totalGzipBytes,
+    base: budget.baseline.gzipBytes,
+  })
+}
+
 const failures = checks.filter((check) => check.actual > check.limit)
 
 if (asJson) {
@@ -79,6 +118,9 @@ if (asJson) {
         entryFile: entrySrc,
         entryBytes,
         gzipBytes,
+        preloadFiles,
+        totalBytes,
+        totalGzipBytes,
         limits: budget.limits,
         baseline: budget.baseline,
         ok: failures.length === 0,
@@ -94,6 +136,9 @@ if (asJson) {
 console.log('')
 console.log(`Budget bundle — ${buildDir}`)
 console.log(`Chunk d entree : ${entrySrc}`)
+if (preloadFiles.length > 0) {
+  console.log(`Chunks precharges (modulepreload) : ${preloadFiles.map((f) => f.src).join(', ')}`)
+}
 console.log('')
 for (const check of checks) {
   const status = check.actual > check.limit ? 'DEPASSE' : 'ok'

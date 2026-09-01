@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -111,13 +111,18 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    ```
    `--outDir` prime sur `outDir` de `vite.config.ts` : chaque version obtient son propre dossier sous `dist/`,
    sans toucher `vite.config.ts`. `VITE_APP_VERSION` alimente le bouton « Entrer dans la <version> » de l'écran
-   d'accueil (`E01Welcome.tsx`) — absente en dev/tests, le bouton reste « Entrer ». Si le build signale un
-   avertissement de taille de chunk (> 500 kB), le noter pour le rapport final (étape 9) sans bloquer.
+   d'accueil (`E01Welcome.tsx`) — absente en dev/tests, le bouton reste « Entrer ». Le contrôle de
+   taille du bundle est fait à l'étape 6 (gate bloquant), pas ici.
 
-6. Vérifier que `dist/<version>` a été créé et n'est pas vide avant de déployer :
+6. Vérifier que `dist/<version>` a été créé et n'est pas vide avant de déployer, puis contrôler son
+   budget de taille (`bundle.budget.json`, seuils resserrés par `roadmap_bundle_2026-08-31.md`
+   Phase 4 — mesure sur le build déjà produit, sans rebuild) :
    ```
    test -d dist/<version> && test -n "$(ls -A dist/<version>)"
+   node scripts/check_bundle_budget.mjs dist/<version>
    ```
+   Un code de sortie 1 est bloquant : s'arrêter, rapporter le dépassement précis (chunk concerné,
+   écart au seuil) et attendre une instruction explicite avant de déployer.
 
 7. Déployer en prod sur Netlify, en chargeant `.env` dans l'environnement de la seule commande (jamais affiché,
    jamais passé en argument visible) :
@@ -139,8 +144,8 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    `dist/<version>` a déjà embarqué le contenu avant le vidage).
 
 9. Préparer les éléments du rapport final : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify,
-   résultat de la vérification de fumée et avertissement de taille de chunk éventuel. Le rapport est envoyé après
-   les étapes de communication ci-dessous.
+   résultat de la vérification de fumée et résultat du contrôle de budget bundle (étape 6). Le rapport est
+   envoyé après les étapes de communication ci-dessous.
 
 10. Constituer l'inventaire de communication de la livraison. Avant toute rédaction pour Marie, lire et croiser :
     - les changements de la version cible dans `CHANGELOG.md` et `WHATS_NEW` ;
@@ -184,6 +189,6 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     Encadrer systématiquement le message par `💻🤖` : une occurrence au début du message et une autre à la fin.
 
 13. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify, résultat de la
-    vérification de fumée, avertissement de taille de chunk éventuel, nom et lien du document Drive, inventaire
+    vérification de fumée, résultat du contrôle de budget bundle, nom et lien du document Drive, inventaire
     synthétique et message WhatsApp complet. Ne jamais relancer le déploiement automatiquement en cas d'échec —
     signaler l'erreur et attendre une confirmation explicite.

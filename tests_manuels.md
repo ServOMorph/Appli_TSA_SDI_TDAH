@@ -4,16 +4,19 @@ File d'attente des contrôles manuels non validés, réservés au développeur (
 détails d'implémentation, régressions de protocole). Après validation d'un test, supprimer
 immédiatement sa section. Quand la file est vide, vider intégralement ce fichier.
 
-## SAV Marie branchée dans /start (étape 4)
+## SAV Marie branchée dans /close (étape 2) — chemin « écriture réelle »
 
-Ajouté le 2026-09-01. `scripts/backup_marie_snapshot.py` a été exécuté à la main avec succès
-(sauvegarde `donnees_marie/snapshot-supabase-192f2411-2026-09-01-1526h26.json` produite), mais
-son déclenchement automatique via l'étape 4 de `.claude/commands/start.md` n'a pas encore été
-exercé en conditions réelles.
+Ajouté le 2026-09-01. L'étape 2 de `.claude/commands/close.md` lance désormais
+`scripts/backup_marie_snapshot.py` en fin de session, comme l'étape 4 de `/start` le fait en début.
+Elle a été exercée dès son ajout, mais seulement sur le chemin « Deja sauvegarde » : Marie n'avait
+pas resynchronisé entre le `/start` et le `/close` de cette session.
 
-À vérifier au prochain `/start` sur la racine du projet :
-- l'étape 4 lance bien la commande `( set -a; . ./.env; set +a; python scripts/backup_marie_snapshot.py )` ;
-- une nouvelle sauvegarde apparaît dans `donnees_marie/` si Marie a resynchronisé depuis la dernière,
-  sinon le script affiche « Deja sauvegarde » sans erreur ;
-- un échec (hors ligne, Supabase indisponible) est signalé en une ligne et ne bloque pas `/start` ;
-- le contenu de `.env` n'est jamais affiché.
+À vérifier au prochain `/close` suivant une resynchronisation de Marie :
+- une nouvelle sauvegarde est bien écrite dans `donnees_marie/` depuis `/close`, pas seulement
+  depuis `/start` ;
+- l'échec éventuel reste non bloquant : la clôture se poursuit et va jusqu'au commit ;
+- le contenu de `.env` et celui du snapshot ne sont jamais affichés.
+
+Note : le point « un échec est signalé en une ligne » ne fait plus partie de ce test — il est
+mesuré comme non tenu (traceback brut sur `URLError`) et traité par la Phase 1 de
+`roadmap_sav_snapshot_marie.md`.

@@ -1,3 +1,12 @@
+## v5.75 — 2026-09-01
+
+### Ajouté
+- `roadmap_sav_snapshot_marie.md` : roadmap de fiabilisation de la sauvegarde locale du snapshot de Marie, en trois phases (robustesse réseau et doublons ; lisibilité du nom de fichier et traçabilité de l'appareil retenu ; factorisation avec `read_device_snapshots.py` et rétention bornée de `donnees_marie/`). Elle part de dix défauts mesurés au test du script `scripts/backup_marie_snapshot.py`, pas d'une revue théorique. Deux sont sérieux : une erreur réseau remonte un traceback brut d'une vingtaine de lignes au lieu du message d'une ligne annoncé, et la déduplication porte sur l'heure de synchronisation — qui change à chaque relance de l'application par Marie — au lieu du contenu, si bien que deux fichiers du 1er septembre ont le même md5. Le harnais de test retenu est `unittest` de la bibliothèque standard, sans dépendance nouvelle. L'ajout d'un historique côté Supabase est explicitement hors périmètre.
+
+### Modifié
+- `.claude/commands/close.md` : la sauvegarde du snapshot Supabase de Marie est lancée en fin de session (étape 2, bloc Spécificités projet), symétriquement à l'étape 4 de `/start`. Elle réduit la fenêtre pendant laquelle une perte de données locale chez Marie, suivie d'une resynchronisation, écraserait le dernier bon snapshot — le schéma Supabase ne conserve qu'une ligne par appareil, écrasée à chaque envoi. Non bloquante en cas d'échec, sans effet sur le commit puisque `donnees_marie/` est ignoré par Git.
+- `tests_manuels.md` : le contrôle du branchement de la sauvegarde dans `/start` est clos — il a été exercé en conditions réelles cette session (sauvegarde écrite, idempotence à la relance, `.env` jamais affiché). Un nouveau contrôle le remplace : vérifier que `/close` écrit bien une sauvegarde quand Marie a resynchronisé entre l'ouverture et la clôture de la session.
+
 ## v5.74 — 2026-09-01
 
 ### Modifié

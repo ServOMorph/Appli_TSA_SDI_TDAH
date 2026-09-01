@@ -170,4 +170,16 @@ langage clair et sans jargon technique au tableau `WHATS_NEW` de
 `src/ui/screens/onboarding/E01Welcome.tsx`. Ajout uniquement, ne jamais réécrire ni supprimer les
 entrées existantes : le tableau accumule les changements depuis le dernier déploiement, la modale
 Nouveautés de l'écran d'accueil s'appuyant dessus pour la version publiée par `/deploy`.
+Étape 2, sur `main` uniquement et si la zone résolue est la racine du projet
+(`Appli_TSA_SDI_TDAH`) : lancer une sauvegarde du snapshot Supabase de Marie avant de produire la
+synthèse de l'étape 3 :
+`( set -a; . ./.env; set +a; python scripts/backup_marie_snapshot.py )`.
+Non bloquant — en cas d'échec (hors ligne, Supabase indisponible), le signaler en une ligne et
+poursuivre la clôture. Symétrique de l'étape 4 de `/start` : sauvegarder aussi en fin de session
+réduit la fenêtre pendant laquelle une perte de données locale chez Marie, suivie d'une
+resynchronisation, écraserait le dernier bon snapshot côté Supabase — le schéma fait un `upsert`
+d'une ligne unique par `device_id`, sans aucun historique. Le script est idempotent et écrit dans
+`donnees_marie/` (gitignoré : sans effet sur le commit de l'étape 10). Ne jamais afficher le
+contenu de `.env` ni celui d'un snapshot (données personnelles de Marie).
+
 <!-- SPECIFICITES PROJET : FIN -->

@@ -137,3 +137,19 @@ lui redemandait de passer les parcours « Tests à faire ». Elle signale les av
 reste compté « à valider » sur la v5.69 en ligne — pas un défaut de synchronisation, c'est le
 grief déjà corrigé en commit `2d5c0b8` (`isManualTestDone`), non déployé. Confirmer que ses
 résultats du 31 sont bien remontés = inspection du dernier snapshot Supabase (flux `/deploy` étape 0).
+
+### 2026-09-01 — réponse à « je l'ai déjà fait hier »
+
+**Dév ->**
+Pas besoin de refaire les tests maintenant.
+
+Sur la version en ligne, l'écran « Tests à faire » garde encore les parcours que tu as marqués « Non validé ». C'est ce comportement qu'on corrige.
+
+À la prochaine mise à jour, la liste se videra de ce que tu as déjà passé.
+
+Tu repasseras seulement les parcours qui ne marchaient pas, une fois corrigés.
+
+https://appli-audhd.netlify.app
+
+_Suite :_ aucune action de Marie attendue avant le prochain `/deploy` (correctif `2d5c0b8`,
+`isManualTestDone`). Message envoyé pour clore l'aller-retour sur la pastille rouge.

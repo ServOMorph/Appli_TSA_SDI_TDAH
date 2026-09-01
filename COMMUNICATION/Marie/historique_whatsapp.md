@@ -131,9 +131,9 @@ ignoré ; parcours `pastille-nouveaux-tests` en `revision: 2` ; `WHATS_NEW`). 68
 **Marie ->**
 mais je l'ai déjà fait hier
 
-_Suite :_ répond à la relance « tests v5.69 non validés ». Cohérent avec son retour sur la
-pastille rouge du même jour : elle a passé les parcours le 2026-08-31 en marquant « Non validé »
-ceux qui ne fonctionnent pas. Côté dév, un parcours « non validé » reste compté « à valider » sur
-la v5.69 en ligne — pas un défaut de synchronisation, mais le même grief que la pastille rouge,
-déjà corrigé en commit `2d5c0b8` (`isManualTestDone`) et non encore déployé. Confirmer que ses
+_Suite :_ répond au message « point rouge pris en compte » (2026-09-01), dont la dernière ligne
+lui redemandait de passer les parcours « Tests à faire ». Elle signale les avoir déjà passés le
+2026-08-31, en marquant « Non validé » ceux qui échouent. Côté dév, un parcours « non validé »
+reste compté « à valider » sur la v5.69 en ligne — pas un défaut de synchronisation, c'est le
+grief déjà corrigé en commit `2d5c0b8` (`isManualTestDone`), non déployé. Confirmer que ses
 résultats du 31 sont bien remontés = inspection du dernier snapshot Supabase (flux `/deploy` étape 0).

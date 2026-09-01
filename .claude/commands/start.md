@@ -81,4 +81,11 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 
 - Étape 4 : si la zone résolue est `roberto`, charger en plus, après les fichiers de la zone,
   `_contexte/signals.md` et `_contexte/contexte.md` de la racine du projet (lecture seule).
+- Étape 4 : si la zone résolue est la racine du projet (`Appli_TSA_SDI_TDAH`), lancer une
+  sauvegarde du snapshot Supabase de Marie avant d'afficher la synthèse :
+  `( set -a; . ./.env; set +a; python scripts/backup_marie_snapshot.py )`.
+  Non bloquant — en cas d'échec (hors ligne, Supabase indisponible), le signaler en une ligne
+  et poursuivre `/start`. Le script est idempotent (aucune réécriture si le snapshot courant est
+  déjà sauvegardé) et écrit dans `donnees_marie/` (gitignoré). Ne jamais afficher le contenu de
+  `.env`.
 <!-- SPECIFICITES PROJET : FIN -->

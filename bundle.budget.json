@@ -1,0 +1,23 @@
+{
+  "comment": [
+    "Seuils de taille du chunk JS d entree, verifies par scripts/check_bundle_budget.mjs.",
+    "Les octets gzip sont mesures avec zlib.gzipSync (niveau par defaut) : le chiffre",
+    "differe de 1 a 2 kB du rapport de build Vite, qui utilise ses propres reglages.",
+    "Seule la mesure de ce script fait foi ici, pour rester comparable dans le temps.",
+    "limits est initialise a la baseline + une marge de bruit de build ; il est resserre",
+    "a la fin de chaque phase de roadmap_bundle_2026-08-31.md."
+  ],
+  "baseline": {
+    "label": "2026-08-31 (main @ 1311805, avant Phase 1)",
+    "entryBytes": 766844,
+    "gzipBytes": 205686
+  },
+  "limits": {
+    "entryBytes": 570000,
+    "gzipBytes": 160000
+  },
+  "cible": {
+    "commentaire": "Objectif de fin de roadmap, a acter en Phase 2 (decision 2 de la roadmap).",
+    "entryBytes": 450000
+  }
+}

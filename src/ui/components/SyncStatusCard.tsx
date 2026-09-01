@@ -1,4 +1,4 @@
-import { isSyncEnabled } from '@/data/sync/supabaseClient'
+import { isSyncEnabled } from '@/data/sync/syncConfig'
 import { getLastSyncSuccessAt } from '@/data/sync/syncClient'
 import { Card } from '@/ui/components/Card'
 

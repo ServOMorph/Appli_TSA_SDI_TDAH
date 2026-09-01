@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const rpc = vi.fn()
-
-vi.mock('@/data/sync/supabaseClient', () => ({
-  getSupabaseClient: vi.fn(),
+vi.mock('@/data/sync/syncConfig', () => ({
+  isSyncEnabled: vi.fn(),
+}))
+vi.mock('@/data/sync/rpc', () => ({
+  callRpc: vi.fn(),
 }))
 vi.mock('@/data/sync/deviceIdentity', () => ({
   getDeviceIdentity: vi.fn(() => ({ deviceId: 'device-1', deviceSecret: 'secret-1' })),
@@ -13,37 +14,38 @@ vi.mock('@/data/sync/buildSnapshot', () => ({
   SNAPSHOT_SCHEMA_VERSION: '3.3',
 }))
 
-import { getSupabaseClient } from '@/data/sync/supabaseClient'
+import { isSyncEnabled } from '@/data/sync/syncConfig'
+import { callRpc } from '@/data/sync/rpc'
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { getLastSyncSuccessAt, syncNow } from './syncClient'
 
-const getSupabaseClientMock = vi.mocked(getSupabaseClient)
+const isSyncEnabledMock = vi.mocked(isSyncEnabled)
+const callRpcMock = vi.mocked(callRpc)
 const buildSnapshotPayloadMock = vi.mocked(buildSnapshotPayload)
 
 beforeEach(() => {
   localStorage.clear()
-  rpc.mockReset()
-  getSupabaseClientMock.mockReset()
+  callRpcMock.mockReset()
+  isSyncEnabledMock.mockReset()
   buildSnapshotPayloadMock.mockClear()
 })
 
 describe('syncNow', () => {
-  it("ne fait rien si aucun client Supabase n'est configuré", async () => {
-    getSupabaseClientMock.mockReturnValue(null)
+  it("ne fait rien si aucune synchronisation n'est configurée", async () => {
+    isSyncEnabledMock.mockReturnValue(false)
     const result = await syncNow()
     expect(result).toBe(false)
     expect(getLastSyncSuccessAt()).toBeNull()
   })
 
   it('envoie le snapshot via rpc et enregistre le succès', async () => {
-    rpc.mockResolvedValue({ data: true, error: null })
-    // @ts-expect-error client minimal pour le test
-    getSupabaseClientMock.mockReturnValue({ rpc })
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({ data: true, error: null })
 
     const result = await syncNow()
 
     expect(result).toBe(true)
-    expect(rpc).toHaveBeenCalledWith('sync_device_snapshot', {
+    expect(callRpcMock).toHaveBeenCalledWith('sync_device_snapshot', {
       p_device_id: 'device-1',
       p_device_secret: 'secret-1',
       p_payload: { version: '3.3', user: { id: 'user-1' } },
@@ -54,9 +56,8 @@ describe('syncNow', () => {
   })
 
   it('renvoie false sans lever si le secret est refusé (data: false)', async () => {
-    rpc.mockResolvedValue({ data: false, error: null })
-    // @ts-expect-error client minimal pour le test
-    getSupabaseClientMock.mockReturnValue({ rpc })
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({ data: false, error: null })
 
     const result = await syncNow()
 
@@ -65,9 +66,8 @@ describe('syncNow', () => {
   })
 
   it('renvoie false sans lever en cas d’erreur réseau', async () => {
-    rpc.mockResolvedValue({ data: null, error: new Error('offline') })
-    // @ts-expect-error client minimal pour le test
-    getSupabaseClientMock.mockReturnValue({ rpc })
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({ data: null, error: new Error('offline') })
 
     const result = await syncNow()
 
@@ -75,24 +75,22 @@ describe('syncNow', () => {
   })
 
   it('throttle : ne relance pas avant une heure sans force', async () => {
-    rpc.mockResolvedValue({ data: true, error: null })
-    // @ts-expect-error client minimal pour le test
-    getSupabaseClientMock.mockReturnValue({ rpc })
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({ data: true, error: null })
 
     await syncNow()
-    expect(rpc).toHaveBeenCalledTimes(1)
+    expect(callRpcMock).toHaveBeenCalledTimes(1)
 
     await syncNow()
-    expect(rpc).toHaveBeenCalledTimes(1)
+    expect(callRpcMock).toHaveBeenCalledTimes(1)
   })
 
   it('throttle : force ignore le délai', async () => {
-    rpc.mockResolvedValue({ data: true, error: null })
-    // @ts-expect-error client minimal pour le test
-    getSupabaseClientMock.mockReturnValue({ rpc })
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({ data: true, error: null })
 
     await syncNow()
     await syncNow({ force: true })
-    expect(rpc).toHaveBeenCalledTimes(2)
+    expect(callRpcMock).toHaveBeenCalledTimes(2)
   })
 })

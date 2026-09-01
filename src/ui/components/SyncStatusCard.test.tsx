@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-vi.mock('@/data/sync/supabaseClient', () => ({
+vi.mock('@/data/sync/syncConfig', () => ({
   isSyncEnabled: vi.fn(),
 }))
 vi.mock('@/data/sync/syncClient', () => ({
   getLastSyncSuccessAt: vi.fn(),
 }))
 
-import { isSyncEnabled } from '@/data/sync/supabaseClient'
+import { isSyncEnabled } from '@/data/sync/syncConfig'
 import { getLastSyncSuccessAt } from '@/data/sync/syncClient'
 import { SyncStatusCard } from './SyncStatusCard'
 

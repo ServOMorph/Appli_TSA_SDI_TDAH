@@ -1,4 +1,5 @@
-import { getSupabaseClient } from '@/data/sync/supabaseClient'
+import { isSyncEnabled } from '@/data/sync/syncConfig'
+import { callRpc } from '@/data/sync/rpc'
 import { getDeviceIdentity } from '@/data/sync/deviceIdentity'
 import { buildSnapshotPayload, SNAPSHOT_SCHEMA_VERSION } from '@/data/sync/buildSnapshot'
 
@@ -30,8 +31,7 @@ export function getLastSyncSuccessAt(): string | null {
 export async function syncNow(options: { force?: boolean } = {}): Promise<boolean> {
   if (!options.force && msSinceLastAttempt() < THROTTLE_MS) return false
 
-  const client = getSupabaseClient()
-  if (!client) return false
+  if (!isSyncEnabled()) return false
 
   localStorage.setItem(LAST_ATTEMPT_KEY, String(now()))
 
@@ -40,7 +40,7 @@ export async function syncNow(options: { force?: boolean } = {}): Promise<boolea
     if (!payload) return false
 
     const { deviceId, deviceSecret } = getDeviceIdentity()
-    const { data, error } = await client.rpc('sync_device_snapshot', {
+    const { data, error } = await callRpc<boolean>('sync_device_snapshot', {
       p_device_id: deviceId,
       p_device_secret: deviceSecret,
       p_payload: payload,

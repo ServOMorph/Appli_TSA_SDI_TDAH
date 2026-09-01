@@ -153,20 +153,18 @@ lancer la Phase 0, sinon collision garantie.
 
 ---
 
-## Décisions à trancher en ouverture de Phase 1
+## Décisions tranchées en ouverture de Phase 1 (2026-09-01)
 
-1. **Abandon de `@supabase/supabase-js` côté navigateur.** Conséquence assumée : perte du client
-   typé et des fonctionnalités Supabase « gratuites » (auth, realtime) côté app. Si une
-   authentification réelle est envisagée à moyen terme, ce retrait est à reconsidérer.
-   *Recommandation : retirer.* `roadmap_sync_marie.md` ne prévoit aucune auth (décision actée du
-   2026-08-15 : « pas d'écran de connexion »). Le script développeur
-   `scripts/read_device_snapshots.py` est en Python et n'est pas concerné. Détail complet de
-   l'impact sur les données de Marie : section « Ce que devient la synchronisation des données de
-   Marie » ci-dessus.
-2. **Seuil du garde-fou.** Proposition : 450 kB pour le chunk initial (marge de 50 kB sous le
+1. **Abandon de `@supabase/supabase-js` côté navigateur.** **Tranché : retiré.** Conséquence
+   assumée : perte du client typé et des fonctionnalités Supabase « gratuites » (auth, realtime)
+   côté app. `roadmap_sync_marie.md` ne prévoit aucune auth (décision actée du 2026-08-15 : « pas
+   d'écran de connexion »). Le script développeur `scripts/read_device_snapshots.py` est en Python
+   et n'est pas concerné. Détail complet de l'impact sur les données de Marie : section « Ce que
+   devient la synchronisation des données de Marie » ci-dessus.
+2. **Seuil du garde-fou.** **Tranché : 450 kB** pour le chunk initial (marge de 50 kB sous le
    seuil Vite), à ajuster après la Phase 2.
-3. **Écrans d'onboarding en chargement différé ou non.** Ils ne concernent qu'une première
-   ouverture. *Recommandation : différés* (3.4 kB, gain marginal mais cohérence du découpage).
+3. **Écrans d'onboarding en chargement différé ou non.** **Tranché : différés** (3.4 kB, gain
+   marginal mais cohérence du découpage). Ils ne concernent qu'une première ouverture.
 
 ---
 
@@ -305,7 +303,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 1 — Retrait de `@supabase/supabase-js` du navigateur [TODO]
+## Phase 1 — Retrait de `@supabase/supabase-js` du navigateur [FAIT]
 
 > Gain **mesuré** : −208.64 kB (−27.2 %). Meilleur rapport gain/risque de la roadmap.
 
@@ -364,6 +362,41 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 **Critère de sortie** : chunk initial ≤ 570 kB, synchronisation réelle vérifiée de bout en bout,
 `@supabase/supabase-js` absent de `package.json`.
+
+### Résultats mesurés (2026-09-01)
+
+**Livré**
+
+- `src/data/sync/syncConfig.ts` (ex-`supabaseClient.ts`) : `getSyncConfig()` / `isSyncEnabled()`,
+  sans dépendance externe.
+- `src/data/sync/rpc.ts` : `callRpc(name, params)` en `fetch` natif, reproduisant le contrat
+  PostgREST (méthode, URL, en-têtes `apikey`/`Authorization`/`Content-Type`, mapping des erreurs
+  HTTP et réseau vers `{ data, error }`).
+- `src/data/sync/syncClient.ts` adapté (`isSyncEnabled()` + `callRpc()`), signature et
+  comportement de `syncNow()` inchangés.
+- `@supabase/supabase-js` retiré de `package.json`, `package-lock.json` régénéré (16 paquets
+  supprimés).
+- `bundle.budget.json` : seuils resserrés à 570 000 o / 160 000 o gzip (décision 2 actée).
+
+**Tests — après**
+
+| Contrôle | Résultat |
+|---|---|
+| `rpc.contract.test.ts` (référence SDK capturée avant refacto, rejouée contre `callRpc`) | vert |
+| `syncConfig.test.ts` (4 cas cible + cache) | vert |
+| `rpc.test.ts` (200 / 4xx / 5xx / fetch rejeté) | vert |
+| `syncClient.test.ts` (6 cas comportementaux, inchangés) | vert |
+| `npm test` | **648/648 verts**, 82 fichiers |
+| `npm run lint` | vert |
+| `npm run test:coverage` | seuils 85 % respectés (`src/data/sync` : 98.81 % lignes / 88.37 % branches) |
+| `npm run bundle:check` (seuil 570 kB / 160 kB gzip) | **558.64 kB / 152.70 kB gzip — vert** (−208.20 kB soit −27.2 % vs baseline) |
+| Vérification réelle (`callRpc` en direct contre Supabase, snapshot de test lu via `read_device_snapshots.py`) | **confirmée** — ligne `device_id a2245b57…` retrouvée avec le marqueur émis |
+| `npm run test:e2e` | **57/57 verts** (14.2 s) — identique à la baseline Phase 0 |
+
+**Note.** La ligne de test écrite lors de la vérification réelle n'a pas pu être supprimée du
+backend (suppression bloquée par le mode auto, action destructrice sur Supabase). Elle est
+inoffensive — `device_id` de test sans lien avec un appareil de Marie — et peut être supprimée
+manuellement (`device_id: a2245b57-15f0-429d-8a6e-77f0b6769117`) si souhaité.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

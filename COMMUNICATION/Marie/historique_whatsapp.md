@@ -90,3 +90,20 @@ https://appli-audhd.netlify.app
 _Suite :_ vérification via les snapshots Supabase — appareil de Marie synchronisé sur v5.69
 (snapshot 2026-09-01 10:47 UTC), mais aucun nouveau `manual_test_results` depuis le 2026-08-31
 20:31. Les 4 parcours annoncés à la livraison v5.69 (#3, #18, #20, sauvegarde auto) restent à valider.
+
+### 2026-09-01 — retour de Marie sur la pastille rouge
+
+**Marie ->**
+Ce n'est pas valide parce que ça ne marche pas tous ce qui sont ok j'ai validé.
+Il faut que quand j'ai effectué le test, même si j'ai pas validé, la pastille rouge s'enlève et
+elle se remet quand il y'a de nouveau test, ou que ce qui n'ont pas été validé on était
+rectifié et donc le test est à refaire pour voir si les ça a été bien modifié.
+
+_Suite :_ demande de changement de comportement de la pastille rouge (accueil). Aujourd'hui
+pastille + liste « Tests à faire » partagent le même critère (`hasPendingManualTests` /
+`!isManualTestValidated` = dernier résultat `ok` sur la bonne révision). Marie veut découpler :
+la pastille doit s'éteindre dès qu'un résultat (ok OU nok) est enregistré sur la révision
+courante, et ne se rallumer que pour un test neuf ou un test dont la révision a été incrémentée
+(rectification -> à refaire). Modif à faire : `manualTestRules.ts`, `E10Dashboard.tsx`, parcours
+`pastille-nouveaux-tests`, `WHATS_NEW`. Décision produit ouverte : la liste E121 suit-elle
+aussi ce critère (un test `nok` en sort) ou reste-t-elle sur « non validé » ?

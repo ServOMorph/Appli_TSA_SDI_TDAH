@@ -77,9 +77,15 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ## Phase 5 — Bascule et retrait du flux manuel [TODO]
 
+Préalable levé le 2026-09-01 : 1re synchronisation réelle de Marie sur v5.69 confirmée par
+lecture Supabase (device `192f2411`, `synced_at` 2026-09-01 10:47 UTC, `app_version` v5.69).
+
 - Retirer les bannières urgentes demandant réimport/réexport (`E01Welcome.tsx`, `E121ManualTests.tsx`) après confirmation de la synchronisation réelle.
 - Réviser ou retirer l'étape 0 de `.claude/commands/deploy.md` relative au traitement des exports de Marie.
 - Conserver un chemin de lecture développeur des snapshots Supabase et documenter le remplacement effectif de l'ingestion manuelle.
+  Brique déjà livrée (2026-09-01) : `scripts/backup_marie_snapshot.py` archive le `payload` daté dans
+  `donnees_marie/` (format identique aux exports historiques), branché en étape 4 de `/start`.
+  Reste à documenter la bascule et le retrait de `/traiter_export_marie` du flux nominal.
 - Tests : absence de régression des écrans concernés ; parcours de synchronisation et de lecture du snapshot reproductible.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.

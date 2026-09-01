@@ -1,3 +1,15 @@
+## v5.73 — 2026-09-01
+
+### Ajouté
+- `scripts/backup_marie_snapshot.py` : sauvegarde locale du snapshot Supabase de Marie. Lit la table `device_snapshots`, sélectionne l'appareil au plus de résultats de tests manuels (heuristique qui isole l'usage réel de Marie des appareils de test), écrit le contenu daté dans `donnees_marie/` au format des exports historiques (gitignoré), idempotent. Comble l'absence d'historique côté Supabase : le schéma n'y conserve qu'une seule ligne par appareil, écrasée à chaque synchronisation.
+- `.claude/commands/start.md` : étape 4 — pour la racine du projet, `/start` lance cette sauvegarde (non bloquante, silencieuse en cas d'échec réseau).
+
+### Modifié
+- Première synchronisation réelle de Marie sur v5.69 confirmée par lecture des snapshots Supabase (appareil actif sur v5.69, 45 tâches, 49 résultats de tests, usage quotidien). La question de suivi correspondante est close.
+- `roadmap_sync_marie.md` : préalable de la Phase 5 (bascule et retrait du flux manuel) levé ; la brique d'archivage développeur qu'elle prévoit est en place.
+- `roadmap_bundle_2026-08-31.md` et `roadmap_e2e_2026-09-01.md`, toutes deux closes, déplacées dans `Archives/`.
+- `_contexte/` : décision structurante du 2026-08-19 (incident de branche) déplacée de `contexte.md` vers `archive_decisions.md`.
+
 ## v5.72 — 2026-09-01
 
 ### Modifié

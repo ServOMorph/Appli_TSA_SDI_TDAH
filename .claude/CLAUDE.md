@@ -164,13 +164,20 @@ utile pour cette livraison.
 Tout message WhatsApp échangé avec Marie est consigné dans
 `COMMUNICATION/Marie/historique_whatsapp.md`, sans exception et sans attendre le `/close` :
 
+- **Relire la fin du fichier (`sed -n` sur les dernières entrées) avant toute rédaction pour
+  Marie, toute synthèse d'un échange, ou tout raisonnement sur « à quel message Marie répond ».**
+  Le fichier fait seul foi pour le fil de conversation. Ne jamais reconstituer l'enchaînement des
+  bulles à partir du résumé de compaction ou de la mémoire de session — c'est la cause connue des
+  erreurs d'attribution.
 - **Message rédigé pour Marie** (livraison, question, relance — pas seulement ceux de `/deploy`) :
   l'ajouter au fichier dans le même tour où il est rédigé, avant de le présenter à l'utilisateur.
   Recopier le texte tel qu'envoyé, sans les emojis d'encadrement `💻🤖`.
 - **Message que l'utilisateur transmet** (sa réponse, un message de Marie qu'il colle) : l'ajouter
   au fichier dans le tour où il est reçu.
 - Suivre la convention d'entrée en tête du fichier (`### AAAA-MM-JJ`, `**Dév ->**` / `**Marie ->**`,
-  `_Suite :_` pour la décision ou l'action qui en découle).
+  `_Suite :_` pour la décision ou l'action qui en découle). Pour un message entrant de Marie, le
+  `_Suite :_` nomme explicitement le message auquel elle répond, repéré dans le fichier et non
+  supposé.
 - Committer cette mise à jour (ne pas la laisser en résidu non commité). Le fichier est une mémoire
   durable, distincte de `a_transmettre.md` (commentaires de livraison en attente uniquement) et des
   `livraisons/vX.Y.md` (historique figé des livraisons).

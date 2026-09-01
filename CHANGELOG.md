@@ -1,3 +1,8 @@
+## v5.72 — 2026-09-01
+
+### Modifié
+- `roadmap_bundle_2026-08-31.md` close : Phase 3 abandonnée (condition de lancement non remplie, décision explicite de l'utilisateur — gain résiduel de 14 ko jugé inférieur au coût de duplication de code), Phase 4 livrée. Le garde-fou de taille de bundle (`scripts/check_bundle_budget.mjs`) mesure désormais aussi les chunks `<link rel="modulepreload">`, jusqu'ici hors mesure ; ses seuils sont verrouillés sur la mesure finale (`bundle.budget.json`) et le contrôle est intégré, bloquant, à l'étape 6 de `/deploy`. `vite.config.ts` : dossier de build par défaut corrigé (`dist/v5.1` périmé → `dist/dev`), alerte de taille de chunk abaissée à la valeur atteinte (260 ko). Bilan du chantier : chunk d'entrée 766,88 → 242,21 ko (−68,4 %), total réellement chargé au démarrage 392,54 ko. Ce travail n'est pas encore déployé.
+
 ## v5.71 — 2026-08-31
 
 ### Modifié

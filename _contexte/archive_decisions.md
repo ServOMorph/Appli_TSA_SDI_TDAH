@@ -341,3 +341,6 @@
 
 ## 2026-08-17 (suite 5, archivé depuis contexte.md 2026-08-29)
 - déploiement v5.45 : export de Marie du 17/08 11h13 analysé avant déploiement (étape 0 `/deploy`) — ni perte, ni incohérence, ni friction, 0 nouveau résultat de test (12 déjà connus). v5.45 déployée en prod après confirmation utilisateur, cumulant refonte Budget + drag continu du planning + sélecteur mois/année + navigation planning + édition de tâche dédiée (aucun testé par Marie avant ce déploiement). HTTP 200 vérifié, `WHATS_NEW` vidé. `roadmap_budget_v2.md` (toutes phases FAIT) archivée vers `Archives/`.
+
+## 2026-08-29 (Phases 1-2 roadmap planning accueil, archivé depuis contexte.md 2026-09-01)
+- Phase 1 (#20) — planning de l'accueil figé à `PLANNING_HEIGHT_PX = 325`, poignée/trait gris/drag retirés ; route `planning` conservée (`originScreen` de `E21CreateTaskV2.tsx`, réservée à la Phase 5), ne pilote plus d'état déplié. Phase 2 (#18) — teinte déplacée sur le conteneur de ligne (`rowContainerStyle`, hauteur ∝ durée), sous-tâches dépliées dans le même aplat. `manualTestsCatalog.ts` : `glisser-pour-ouvrir-le-planning` retiré, `planning-hauteur-fixe` et `case-de-tache-coloree-en-entier` ajoutés. 624 tests, `tsc -b`/lint verts. Non déployé à l'époque. Dette révélée : bouton « Reporter » imbriqué dans le `<button>` de ligne (HTML invalide), candidat à une phase de refacto.

@@ -1,11 +1,11 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-08-31)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-01)
 
 ## Contexte chaud
 - **v5.69 déployée en prod le 2026-08-31** (`https://appli-audhd.netlify.app`) : socle Supabase de synchronisation fusionné dans `main` (fast-forward) et déployé. Rattrape v5.65→v5.68 en prod (prod était restée à v5.64). Sync auto des tables Dexie vers Supabase (région UE) via secret d'appareil `localStorage`, au démarrage + retour premier plan, throttle 1 h, échec silencieux hors ligne. Carte `SyncStatusCard` dans Paramètres (« Vos données de test sont partagées avec le développeur » + date). Lecture dév via `scripts/read_device_snapshots.py` (`SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` dans `.env`). Write+read vérifiés en réel le 2026-08-31 (snapshot `app_version` v5.68, 19 snapshots lus). Confirmation grandeur nature = 1re sync de Marie sur v5.69.
 - **`roadmap_planning_accueil_2026-08-29.md` (demandes 18-22) : Phases 1-2 déployées en v5.69.** Phase 1 (#20) : planning accueil hauteur fixe 325 px, poignée + trait gris + drag/expand retirés. Phase 2 (#18) : teinte sur le conteneur de ligne (hauteur ∝ durée), sous-tâches dans le même aplat. Phase 3 (#19) `[EN COURS]`, Phases 4 (#21) et 5 (#22) `[TODO]`. **Décisions Phase 5 tranchées le 2026-08-31** : navigation par semaine si les 7 jours tiennent à l'écran, sinon par jour (Marie, décision 4) ; route `planning` réaffectée à la vue semaine, pas de route dédiée (dév, décision 5). Parcours catalogue : `planning-hauteur-fixe`, `case-de-tache-coloree-en-entier`, `donnees-synchronisees-automatiquement`.
 - **Étape 0.4 de `/deploy` (revue du Doc obligatoire + jalon daté + porte 3.9) exercée pour la première fois en live le 2026-08-31** (déploiement v5.69) : jalon `Dernière exécution de la revue : 2026-08-31` posé, porte 3.9 franchie.
 - **Branches Git triées le 2026-08-31** (priorité P1) : 7 branches locales obsolètes supprimées (`integration/supabase-main` fusionnée FF dans `main` en v5.69 ; instantanés `v2`, `v3`, `v4`, `v4.1`, `v5.0`, `v5.1` — toutes ancêtres de `main`, `v2`/`v4`/`v4.1` en `-D` après vérif `merge-base --is-ancestor`), 6 distantes supprimées sur GitHub (`v2`→`v5.1`). Restent `main` et `sync-marie` (branche de recherche, 57 derrière / 28 devant `main` ; son objet Supabase est désormais dans `main`, à réévaluer après `roadmap_sync_marie` Phase 5). `main` vérifié sain : build, lint, tests verts, arbre propre (hors `commentaires_marie_v5.69.docx` non suivi), local == distant à `1311805`.
-- **`roadmap_bundle_2026-08-31.md` créée le 2026-08-31 (non lancée)** : 5 phases pour ramener le bundle (766,88 kB / gzip 207,47 kB, un seul chunk) sous 500 kB. Composition mesurée par attribution des octets via sourcemap (VLQ) : `@supabase/*` 202,8 kB (pour un unique appel `client.rpc('sync_device_snapshot')`), `react-dom`+`react` 185 kB et `dexie` 93 kB = plancher ~280 kB intouchable, 30 écrans 124 kB, `@dnd-kit` 42,7 kB (2 écrans). Phase 1 (retrait `@supabase/supabase-js` → `fetch` PostgREST natif) : gain -208 kB / -27 % mesuré par build réel avec stub ; flux de sync des données de Marie inchangé (SDK = transport HTTP seul, lecture dév déjà en `urllib` brut). Relue par un agent : 4 défauts bloquants corrigés (glob `dist/**` inutilisable avec 23 dossiers de build + `outDir` périmé `dist/v5.1` ; intégration `/deploy` à reprendre ; constat faux que 3 fichiers de test cassaient avec `React.lazy` — un seul monte `AppScreens` ; piste Phase 3 « sans catalogue » impossible). Séquencement à arbitrer : `roadmap_planning_accueil` Phase 5 modifie `src/App.tsx` (faire la Phase 2 bundle avant), `roadmap_sync_marie` Phase 5 modifie `deploy.md`.
+- **`roadmap_bundle_2026-08-31.md` close le 2026-09-01** : chunk d'entrée 766,88 → 242,21 kB (−68,4 %), total démarrage (+ `AppContext.tsx` préchargé) 392,54 kB. Phases 0-2 et 4 `[FAIT]`, Phase 3 `[ABANDONNÉE]` (condition de lancement non remplie — Phase 2 avait déjà mesuré 242,21 kB, sous la cible finale de 450 kB ; gain résiduel −14 kB jugé inférieur au coût de duplication d'`id`, décision explicite de l'utilisateur). Phase 1 : retrait `@supabase/supabase-js` → `fetch` PostgREST natif (gain -208 kB, flux de sync inchangé). Phase 2 : 29 écrans en `React.lazy`, error boundary + `vite:preloadError`. Phase 4 : `scripts/check_bundle_budget.mjs` élargi aux chunks `modulepreload` (couvrait mal `AppContext.tsx`), seuils verrouillés (`bundle.budget.json`), contrôle bloquant branché en étape 6 de `/deploy` ; `vite.config.ts` corrigé (`outDir` `dist/v5.1` → `dist/dev`, `chunkSizeWarningLimit` 260). Validé manuellement par l'utilisateur sur téléphone (`vite preview --host`, build de prod servi en LAN). **Pas encore déployé** : prod toujours en v5.69.
 - **Suivi des demandes du Google Doc de Marie** : registre durable `_contexte/marie_modifications_suivi.md`, réconcilié par `/analyser_googledoc` et la revue commune `.claude/revue_googledoc.md` (câblée dans `/deploy` étape 0 et `/traiter_export_marie`). « Dernière revue du Doc » = 2026-08-28 (Doc inchangé depuis). Demandes 1-17 : 16 livrées, #7 écartée, retirées du Doc (lignes conservées). 18-22 : en cours via la roadmap planning.
 - **Export de Marie du 2026-08-30 20:14 traité** (`export-audhd-2026-08-30-20h14.json`) : aucune perte, structure v3.5 inchangée, +1 tâche / +2 énergie / +2 budget (usage normal), **0 nouveau résultat de test** (identique à l'export du 28/08). `cadre-date-heure-dans-l-ecran` reste `nok` (« ça dépasse toujours ») = #3, corrigé en v5.64, à revalider par Marie.
 - **Historique WhatsApp avec Marie** : `COMMUNICATION/Marie/historique_whatsapp.md`, alimenté manuellement (l'utilisateur colle les messages). Mémoire durable des questions/réponses/décisions produit.
@@ -28,8 +28,7 @@
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
-- [P1] **Lancer `roadmap_bundle_2026-08-31.md`** (créée cette session, non lancée) : bundle 766,88 kB / gzip 207,47 kB en un seul chunk, cible < 500 kB. Arbitrer d'abord le séquencement avec `roadmap_planning_accueil` Phase 5 (touche `src/App.tsx` — faire la Phase 2 bundle avant) et `roadmap_sync_marie` Phase 5 (touche `deploy.md`). Trancher aussi la décision 1 de la Phase 1 (abandon définitif de `@supabase/supabase-js` côté navigateur). — fait quand : les 5 phases `[FAIT]`, chunk initial sous le seuil, garde-fou `bundle:check` câblé dans `/deploy` — réf : `roadmap_bundle_2026-08-31.md`, `src/App.tsx`, `src/data/sync/`, `vite.config.ts`
-  Tri des branches Git et vérification de `main` (points 1-2 de l'ancienne priorité urgente) : faits le 2026-08-31, cf. Contexte chaud.
+- [P2] **Déployer le travail de `roadmap_bundle_2026-08-31.md`** (close le 2026-09-01, jamais mis en prod) : chunk d'entrée 242,21 kB, garde-fou `bundle:check` branché dans `/deploy`. Pas urgent en soi (aucune régression fonctionnelle, gain invisible pour Marie tant qu'il n'y a pas de nouveau déploiement), mais partira naturellement avec le prochain `/deploy`. — fait quand : `/deploy` exécuté avec succès, nouvelle version en prod incluant ce travail — réf : `roadmap_bundle_2026-08-31.md`, `_contexte/dernier_deploiement.md`
 - [P1] **Confirmer la 1re synchronisation réelle de Marie sur v5.69** : le mécanisme est vérifié côté dév (write mobile + read script le 2026-08-31), mais Marie n'a pas encore synchronisé depuis la version déployée. — fait quand : `scripts/read_device_snapshots.py` renvoie un snapshot daté d'après le 2026-08-31 avec `app_version` v5.69 — réf : `roadmap_sync_marie.md` Phase 4, `scripts/read_device_snapshots.py`
 - [P1] **Entamer `roadmap_sync_marie.md` Phase 5 (bascule et retrait du flux manuel)** : retirer les bannières de réimport/réexport (`E01Welcome.tsx`, `E121ManualTests.tsx`), réviser l'étape 0 de `.claude/commands/deploy.md`, documenter le remplacement de l'ingestion manuelle. À faire une fois la sync de Marie confirmée en prod. — fait quand : les 4 points de la Phase 5 `[FAIT]` — réf : `roadmap_sync_marie.md` Phase 5
 - [P1] **Poursuivre `roadmap_planning_accueil_2026-08-29.md`** : Phases 1-2 déployées (v5.69), Phase 3 (#19, fond du bandeau de dates pleinement coloré) `[EN COURS]`, Phases 4-5 `[TODO]` (décisions Phase 5 tranchées). Phase par phase avec checkpoint `/compact`. — fait quand : les 5 phases `[FAIT]`, `/deploy` proposé — réf : `roadmap_planning_accueil_2026-08-29.md`, `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/ui/screens/dashboard/E10Dashboard.tsx`
@@ -45,7 +44,35 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] `PlanningBoard.tsx` : le bouton « Reporter » (mode surcharge) est imbriqué dans le `<button>` de ligne — HTML invalide, avertissement jsdom au run des tests. Pré-existant, révélé par la Phase 2. Candidat à une phase de refacto entre deux phases fonctionnelles de la roadmap planning. — fait quand : le bouton « Reporter » n'est plus descendant du bouton de ligne — réf : `src/ui/screens/dashboard/PlanningBoard.tsx` (rendu d'une ligne), `roadmap_planning_accueil_2026-08-29.md`
 
-## Dernière session (2026-08-31 — tri des branches Git + roadmap de réduction du bundle)
+## Dernière session (2026-09-01 — clôture roadmap_bundle_2026-08-31.md : Phase 3 abandonnée, Phase 4 garde-fou permanent)
+
+## Décisions prises
+- Phase 3 abandonnée sur décision explicite de l'utilisateur, après avoir signalé que sa condition de lancement n'était pas remplie (chunk déjà sous la cible finale après Phase 2) et que son gain résiduel (−14 kB) était inférieur au coût de duplication d'`id` entre deux modules.
+- Phase 4 : le point de transparence laissé ouvert en Phase 2 (chunk `AppContext.tsx` non mesuré) traité en élargissant la mesure du garde-fou, pas en la documentant comme simple limite.
+- `vite.config.ts` : `outDir` corrigé (`dist/v5.1` → `dist/dev`) et `chunkSizeWarningLimit` abaissé à 260 kB.
+- Le contrôle de budget devient un gate bloquant de `/deploy` (étape 6), remplaçant l'ancien avertissement non bloquant.
+
+## Livrables produits ou modifiés
+- `scripts/check_bundle_budget.mjs` : mesure aussi les chunks `<link rel="modulepreload">`.
+- `bundle.budget.json` : seuils verrouillés (entrée 266,43 kB / total 431,79 kB).
+- `vite.config.ts`, `.claude/commands/deploy.md`, `_contexte/contexte.md`, `src/domain/data/manualTestsCatalog.ts` (parcours `navigation-entre-tous-les-ecrans`).
+- `roadmap_bundle_2026-08-31.md` : Phase 3 `[ABANDONNÉE]`, Phase 4 `[FAIT]` — roadmap close.
+- Commits `882cc58` (abandon Phase 3) et `f91cd75` (Phase 4).
+
+## Hypothèses validées / invalidées
+- VALIDE : chargement différé + garde-fou fonctionnent en réel — testé sur téléphone via `vite preview --host` (build de prod servi en LAN).
+- VALIDE : 682/682 tests, lint/tsc/build/e2e (57/57) verts après la Phase 4.
+- INVALIDE : la condition de lancement de la Phase 3 (chunk au-dessus de la cible après Phase 2) — jamais remplie, phase abandonnée.
+
+## Prochaine étape exacte
+`roadmap_bundle_2026-08-31.md` close, rien à reprendre dessus. Reprendre `roadmap_planning_accueil_2026-08-29.md` Phase 3 (#19) ou lancer `/deploy` pour livrer le travail bundle (prod toujours en v5.69).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
+## Dernière session archivée (2026-08-31 — tri des branches Git + roadmap de réduction du bundle)
 
 ## Décisions prises
 - Le refacto du bundle passe par une roadmap dédiée en 5 phases (harnais de mesure, retrait de `@supabase/supabase-js`, `React.lazy` par écran, découplage catalogue tests, garde-fou) — créée, non lancée.

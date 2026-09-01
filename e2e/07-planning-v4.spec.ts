@@ -17,15 +17,15 @@ test('T46 — planifier une tâche à la création, puis modifier son horaire de
 
   await page.getByText('McDo').click()
   await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
-  await page.getByRole('button', { name: /^Horaire/ }).click()
-  await page.getByLabel("Modifier l'heure de début").fill('12:00')
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Modifier' }).click()
+  await page.getByLabel('Heure de début').fill('12:00')
+  await page.getByRole('button', { name: 'Enregistrer' }).click()
 
+  await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
   await expect(page.getByText('12:00')).toBeVisible()
 })
 
 test('T47 — le planning épuré ne propose plus de grille ni de glisser-déposer (Q10)', async ({ page }) => {
-  await page.getByRole('button', { name: 'Déplier le planning' }).click()
   await expect(page.getByRole('grid', { name: 'Planning de la journée' })).toHaveCount(0)
   await expect(page.getByRole('gridcell')).toHaveCount(0)
 })
@@ -39,9 +39,9 @@ test('T48 — cliquer une tâche planifiée ouvre sa fiche, renommer et supprime
   await page.getByText('RDV dentiste').click()
   await expect(page.getByRole('heading', { name: 'RDV dentiste' })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Titre' }).click()
-  await page.getByLabel('Modifier le titre').fill('RDV dentiste Dr Martin')
-  await page.getByLabel('Modifier le titre').blur()
+  await page.getByRole('button', { name: 'Modifier' }).click()
+  await page.getByLabel('Titre de la tâche').fill('RDV dentiste Dr Martin')
+  await page.getByRole('button', { name: 'Enregistrer' }).click()
   await expect(page.getByRole('heading', { name: 'RDV dentiste Dr Martin' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Supprimer', exact: true }).click()
@@ -59,11 +59,16 @@ test('T49 — Reporter une tâche en surcharge la bascule sur le lendemain (E8)'
   await page.getByRole('button', { name: 'Reporter Tâche lourde', exact: true }).click()
   await expect(page.getByText('Reporté')).toHaveCount(0)
 
-  await page.getByRole('button', { name: 'Jour suivant' }).click()
+  const toIso = (d: Date) => d.toISOString().slice(0, 10)
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(today.getDate() + 1)
+
+  await page.getByRole('button', { name: toIso(tomorrow) }).click()
   await expect(page.getByText('Tâche lourde')).toBeVisible()
   await expect(page.getByText('Reporté')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Jour précédent' }).click()
+  await page.getByRole('button', { name: toIso(today) }).click()
   await expect(page.getByText('Tâche lourde')).toHaveCount(0)
 })
 
@@ -82,6 +87,5 @@ test('T51 — planifier une sous-tâche depuis Décomposer, comptée sur la tâc
   await page.getByLabel('Heure de Ranger le bureau').fill('10:00')
 
   await page.getByRole('button', { name: 'Accueil' }).click()
-  await page.getByRole('button', { name: 'Déplier le planning' }).click()
   await expect(page.getByText('Grand ménage - Ranger le bureau')).toBeVisible()
 })

@@ -8,6 +8,12 @@ Légende : `[TODO]` · `[EN COURS]` · `[FAIT]`. Une seule phase `[EN COURS]` à
 Gate commun à chaque phase : tests avant écrits · refacto · tests après verts ·
 `npm test` + `npm run lint` + `npm run build` verts · mesure consignée dans cette roadmap.
 
+> **Suspension levée le 2026-09-01.** La Phase 0 avait révélé 26 tests e2e en échec, préexistants
+> et sans lien avec ce chantier. Corrigés en 3 phases via `roadmap_e2e_2026-09-01.md` (triage
+> intégral : spec obsolètes, un bug réel confirmé et corrigé sur validation utilisateur) — voir ce
+> fichier pour le détail. `npm run test:e2e` est de nouveau intégralement vert (57/57) : filet de
+> régression fiable restauré, Phase 1 peut s'ouvrir.
+
 ---
 
 ## Constat mesuré (2026-08-31, `main` @ 1311805)
@@ -164,7 +170,7 @@ lancer la Phase 0, sinon collision garantie.
 
 ---
 
-## Phase 0 — Harnais de mesure et baseline [TODO]
+## Phase 0 — Harnais de mesure et baseline [FAIT]
 
 Rien n'est refactoré dans cette phase. Elle produit les outils qui prouveront le refacto.
 
@@ -210,6 +216,89 @@ Rien n'est refactoré dans cette phase. Elle produit les outils qui prouveront l
 
 **Critère de sortie** : `npm run bundle:check` opérationnel, baseline chiffrée dans
 `bundle.budget.json`, résultat e2e consigné ici.
+
+### Résultats mesurés (2026-08-31)
+
+**Livré**
+
+- `scripts/analyse_bundle.mjs` — build isolé `dist/_bundle-analyse` (`--sourcemap --emptyOutDir`),
+  décodage VLQ, attribution par source puis par groupe, sortie tableau ou `--json`, mode
+  `--dir <d>` pour analyser un build existant portant ses `.map`.
+- `scripts/check_bundle_budget.mjs` — **dossier de build en argument obligatoire** (refus explicite
+  sans argument, code 1) ; chunk d'entrée identifié en lisant le `<script type="module">` pointant
+  vers `/assets/*.js` dans `<dossier>/index.html` (le `registerSW.js` du plugin PWA est donc
+  écarté) ; mesure brute + gzip, comparaison aux seuils, écart affiché vs baseline, code 1 si
+  dépassement.
+- `bundle.budget.json` à la racine.
+- Scripts npm : `bundle:build` (build isolé dans `dist/_bundle-check`), `bundle:check`
+  (`bundle:build` puis contrôle sur ce dossier), `bundle:analyse`. Aucun n'appelle `npm run build`.
+
+**Baseline mesurée** (`main` @ `1311805`, build isolé du 2026-08-31)
+
+| Mesure | Valeur | Source |
+|---|---:|---|
+| Chunk d'entrée, brut | **766 844 o — 766.84 kB** | `check_bundle_budget.mjs` |
+| Chunk d'entrée, gzip | **205 686 o — 205.69 kB** | `check_bundle_budget.mjs` (`zlib.gzipSync`) |
+| Chunk d'entrée, brut (rapport Vite) | 766.84 kB | `vite build` |
+| Chunk d'entrée, gzip (rapport Vite) | 207.42 kB | `vite build` |
+| Chunks JS | 1 | — |
+| Modules sources dans la sourcemap | 160 | `analyse_bundle.mjs` |
+
+> **Écart de gzip assumé.** `zlib.gzipSync` au niveau par défaut donne 205.69 kB là où Vite
+> rapporte 207.42 kB (−1.73 kB). Les deux chiffres sont justes, les réglages diffèrent. Le
+> garde-fou n'utilise que sa propre mesure, pour rester comparable dans le temps ; c'est celle-ci
+> qui est inscrite en baseline, pas le 207.47 kB estimé à la création de la roadmap.
+
+**Composition re-mesurée** (`npm run bundle:analyse`, 763.52 kB attribués sur 766.89, soit 99.6 %)
+
+| Groupe | kB | % | Roadmap (script jetable) |
+|---|---:|---:|---:|
+| `@supabase/*` + `iceberg-js` | 207.70 | 27.1 % | 208.0 |
+| `react` + `react-dom` + `scheduler` | 189.80 | 24.7 % | 185.4 |
+| `src/ui/screens/*` | 127.06 | 16.6 % | 124.1 |
+| `dexie` | 95.35 | 12.4 % | 93.1 |
+| `@dnd-kit/*` | 44.22 | 5.8 % | 42.7 |
+| `src/ui/components` | 28.41 | 3.7 % | 27.7 |
+| `src/app` | 23.52 | 3.1 % | — |
+| `src/domain/data/manualTestsCatalog.ts` | 18.82 | 2.5 % | 18.4 |
+| `src/data` | 17.54 | 2.3 % | — |
+| `src/domain/rules` | 6.67 | 0.9 % | — |
+| reste (`App.tsx`, styles, `tslib`, entités, `main.tsx`) | 4.42 | 0.6 % | — |
+
+Le constat initial est confirmé sur tous les postes. Les valeurs sont uniformément un peu
+supérieures parce que ce script attribue 99.6 % des octets contre 97.4 % au script jetable :
+le non-mappé tombe de 19.6 kB à 1.73 kB, et ces octets se répartissent sur les groupes.
+
+**Tests — après**
+
+| Contrôle | Résultat |
+|---|---|
+| `npm run bundle:check` sur build courant | vert, code 0 |
+| Seuil abaissé à 100 kB | échec attendu, code 1, 2 seuils signalés, message lisible ; seuils restaurés |
+| Choix de dossier — `dist/v5.69` | 767 380 o, chunk `index-DbRgLjnu.js` |
+| Choix de dossier — build frais | 766 844 o, chunk `index-_cz3v0AP.js` |
+| Choix de dossier — sans argument | refus explicite + rappel d'usage, code 1 |
+| `npm test` | **640 tests / 80 fichiers, verts** |
+| `npm run lint` | vert, code 0 |
+| Lint des `scripts/*.mjs` | aucun avertissement — `eslint.config.js` ne les sélectionne pas (`files: **/*.{ts,tsx}`) ; `ignores` **non modifié**, inutile |
+| Baseline e2e (`npm run test:e2e`) | **57 tests / 9 fichiers de specs — 57/57 verts** (chromium, 2026-09-01, après correction via `roadmap_e2e_2026-09-01.md`) |
+
+Le chiffre de 640 tests, jusqu'ici hérité de `roadmap_sync_marie.md`, est donc **confirmé par
+re-mesure** et non plus daté. La roadmap annonçait « 9 specs Playwright » : ce sont bien 9
+fichiers de specs, 57 tests.
+
+> **Historique.** La mesure initiale du 2026-08-31 avait révélé 26 échecs sur 57 tests, tous
+> préexistants et sans lien avec ce chantier (aucun fichier applicatif touché par la Phase 0).
+> Corrigés en 3 phases via `roadmap_e2e_2026-09-01.md` : désynchronisations spec/app confirmées
+> obsolètes par comparaison aux tests unitaires à jour, plus un bug réel identifié et corrigé sur
+> validation utilisateur explicite (`useTasksState.ts`, `moveTask`). Filet de régression désormais
+> intégralement fiable pour les Phases 1 à 3 ci-dessous.
+
+**Point relevé, hors périmètre de cette phase** : `build.outDir` de `vite.config.ts` vaut toujours
+`dist/v5.1`. Sans danger pour les déploiements — `/deploy` passe `--outDir dist/<version>`, qui
+prime — mais `npm run build` et `npm run test:e2e` écrasent silencieusement le build versionné
+`dist/v5.1`. À corriger dans une phase ultérieure ou hors roadmap ; les scripts `bundle:*`
+contournent le problème en imposant leur propre `--outDir`.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

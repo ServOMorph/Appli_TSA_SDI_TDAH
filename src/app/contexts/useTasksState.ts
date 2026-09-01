@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { listCategoryRepo, listItemRepo, newId, taskRepo } from '@/app/repositories'
+import { listCategoryRepo, listItemRepo, newId, taskRepo, todayDate } from '@/app/repositories'
 import {
   createTask as createTaskRule,
   scheduleTask as scheduleTaskRule,
@@ -79,7 +79,8 @@ export function useTasksState() {
   async function moveTask(id: string, status: TaskStatus) {
     const task = await taskRepo.getById(id)
     if (!task) return
-    await taskRepo.update({ ...task, status, updated_at: new Date().toISOString() })
+    const scheduled_date = status === 'today' ? todayDate() : task.scheduled_date
+    await taskRepo.update({ ...task, status, scheduled_date, updated_at: new Date().toISOString() })
     await load()
   }
 

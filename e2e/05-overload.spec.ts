@@ -9,15 +9,7 @@ test.beforeEach(async ({ page }) => {
 const OVERLOAD_ACTIVE = 'Mode surcharge actif, ouvrir le centre récupération'
 const OVERLOAD_IDLE = 'Détail du mode surcharge'
 
-async function expand(page: Page) {
-  await page.getByRole('button', { name: 'Déplier le planning' }).click()
-}
-
-async function collapse(page: Page) {
-  await page.getByRole('button', { name: 'Replier le planning' }).click()
-}
-
-/** La tâche est créée directement planifiée ; le planning est déplié à l'arrivée. */
+/** La tâche est créée directement planifiée ; le planning est toujours déplié (#20). */
 async function planOverloadingTask(page: Page, title: string) {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill(title)
@@ -28,20 +20,17 @@ async function planOverloadingTask(page: Page, title: string) {
 
 test('T40 — Planifier une tâche coûteuse en énergie → surcharge activée automatiquement', async ({ page }) => {
   await planOverloadingTask(page, 'Tâche lourde')
-  await collapse(page)
   await expect(page.getByRole('button', { name: OVERLOAD_ACTIVE })).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/40-overload-active.png' })
 })
 
 test('T41 — Surcharge active → bouton Centre récupération visible', async ({ page }) => {
   await planOverloadingTask(page, 'Tâche lourde')
-  await collapse(page)
   await expect(page.getByRole('button', { name: 'Centre récupération', exact: true })).toBeVisible()
 })
 
 test('T42 — Centre récupération → conseils affichés', async ({ page }) => {
   await planOverloadingTask(page, 'Tâche lourde')
-  await collapse(page)
   await page.getByRole('button', { name: 'Centre récupération', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Mode surcharge actif' })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Conseils de récupération' })).toBeVisible()
@@ -52,7 +41,6 @@ test('T43 — Terminer la tâche depuis le planning → surcharge désactivée, 
   await planOverloadingTask(page, 'Tâche lourde')
   await expect(page.getByRole('button', { name: OVERLOAD_ACTIVE })).toBeVisible()
   await page.getByRole('checkbox', { name: 'Terminer Tâche lourde' }).click()
-  await collapse(page)
   await expect(page.getByRole('button', { name: OVERLOAD_IDLE })).toHaveText('Mode surcharge')
   await expect(page.getByRole('button', { name: 'Centre récupération', exact: true })).not.toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/43-overload-deactivated.png' })
@@ -66,7 +54,6 @@ test('T44 — La pastille de surcharge ouvre directement le centre de récupéra
 
 test('T45 — Surcharge persistée après rechargement page', async ({ page }) => {
   await planOverloadingTask(page, 'Tâche lourde')
-  await collapse(page)
   await expect(page.getByRole('button', { name: OVERLOAD_ACTIVE })).toBeVisible()
   await page.waitForLoadState('networkidle')
   await page.reload()
@@ -81,12 +68,9 @@ test('T46 — Décocher une tâche planifiée réactive la surcharge', async ({ 
 
   await checkbox.click()
   await expect(checkbox).toBeChecked()
-  await collapse(page)
   await expect(page.getByRole('button', { name: OVERLOAD_IDLE })).toHaveText('Mode surcharge')
 
-  await expand(page)
   await checkbox.click()
   await expect(checkbox).not.toBeChecked()
-  await collapse(page)
   await expect(page.getByRole('button', { name: OVERLOAD_ACTIVE })).toHaveText('Mode surcharge actif')
 })

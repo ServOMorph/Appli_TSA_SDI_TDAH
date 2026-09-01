@@ -59,6 +59,6 @@ test('T07 — Dashboard vide après onboarding sans tâche', async ({ page }) =>
   await page.getByRole('button', { name: 'Adulte' }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
-  await expect(page.getByText('Rien à faire aujourd\'hui')).toBeVisible()
+  await expect(page.getByText('Rien de planifié ce jour-là.')).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/07-dashboard-empty.png' })
 })

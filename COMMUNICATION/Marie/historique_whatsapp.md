@@ -107,3 +107,21 @@ courante, et ne se rallumer que pour un test neuf ou un test dont la révision a
 (rectification -> à refaire). Modif à faire : `manualTestRules.ts`, `E10Dashboard.tsx`, parcours
 `pastille-nouveaux-tests`, `WHATS_NEW`. Décision produit ouverte : la liste E121 suit-elle
 aussi ce critère (un test `nok` en sort) ou reste-t-elle sur « non validé » ?
+
+**Dév ->**
+Ton retour sur le point rouge est pris en compte.
+
+Bientôt : le point rouge s'éteindra dès que tu as passé un test, même si tu le marques « Non validé ».
+
+Il se rallumera seulement pour un nouveau test, ou pour un test corrigé à repasser.
+
+Pas encore en ligne, ça arrive à la prochaine mise à jour.
+
+En attendant, tu peux passer les tests de l'écran « Tests à faire ». Marque « Non validé » ceux qui ne marchent pas, avec un mot sur le problème.
+
+https://appli-audhd.netlify.app
+
+_Suite :_ décision produit tranchée — liste E121 alignée sur la pastille (un test `nok` en sort
+aussi). Implémenté commit `2d5c0b8` (`isManualTestValidated` -> `isManualTestDone`, statut
+ignoré ; parcours `pastille-nouveaux-tests` en `revision: 2` ; `WHATS_NEW`). 683/683 tests,
+`tsc -b`/lint verts. Non déployé — partira au prochain `/deploy`.

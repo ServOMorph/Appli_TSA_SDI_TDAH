@@ -556,10 +556,21 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Découpler le catalogue de tests manuels du démarrage [TODO]
+## Phase 3 — Découpler le catalogue de tests manuels du démarrage [ABANDONNÉE]
 
 > Gain estimé : −13 à −15 kB. Phase optionnelle : à ne lancer que si la Phase 2 laisse le chunk
 > initial au-dessus de la cible, ou si le confort de maintenance le justifie.
+
+### Décision d'abandon (2026-09-01)
+
+Condition de lancement non remplie : la Phase 2 a mesuré **242.21 kB**, sous le seuil 430 kB et
+sous la cible finale de 450 kB (y compris le second chunk `AppContext.tsx`, total ~392.59 kB —
+voir le point de transparence en fin de Phase 2). Le gain résiduel de cette phase (−13 à −15 kB)
+a été jugé inférieur à son coût : la scission duplique l'`id` de chaque test entre
+`manualTestsIndex.ts` et `manualTestsSteps.ts`, ce qui va à l'encontre de la règle projet
+« ajout de test = édition simple, dans l'appli uniquement ». Décision utilisateur explicite,
+prise en ouverture de phase conformément à la consigne posée par la roadmap elle-même.
+Aucun fichier de cette phase n'a été créé ni modifié.
 
 `src/domain/data/manualTestsCatalog.ts` (18.4 kB, 367 lignes) est tiré dans le chunk initial par
 `E10Dashboard.tsx`, qui n'en a besoin que pour `hasPendingManualTests(manualTestsCatalog, results)`

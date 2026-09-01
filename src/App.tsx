@@ -1,37 +1,89 @@
+import { lazy, Suspense } from 'react'
 import { AppProvider, useApp } from '@/app/AppContext'
-import { E01Welcome } from '@/ui/screens/onboarding/E01Welcome'
-import { E02Profile } from '@/ui/screens/onboarding/E02Profile'
-import { E03Energy } from '@/ui/screens/onboarding/E03Energy'
 import { E10Dashboard } from '@/ui/screens/dashboard/E10Dashboard'
-import { E20Inbox } from '@/ui/screens/tasks/E20Inbox'
-import { E21CreateTaskV2 } from '@/ui/screens/tasks/E21CreateTaskV2'
-import { E22TaskDetail } from '@/ui/screens/tasks/E22TaskDetail'
-import { E23Decompose } from '@/ui/screens/tasks/E23Decompose'
-import { E24EditTask } from '@/ui/screens/tasks/E24EditTask'
-import { E30EnergyView } from '@/ui/screens/energy/E30EnergyView'
-import { E31EnergyCheckIn } from '@/ui/screens/energy/E31EnergyCheckIn'
-import { E90OverloadRecovery } from '@/ui/screens/overload/E90OverloadRecovery'
-import { E120Resources } from '@/ui/screens/resources/E120Resources'
-import { E121ManualTests } from '@/ui/screens/tests/E121ManualTests'
-import { E110Settings } from '@/ui/screens/settings/E110Settings'
-import { E111Profile } from '@/ui/screens/settings/E111Profile'
-import { E112Accessibility } from '@/ui/screens/settings/E112Accessibility'
-import { E116Privacy } from '@/ui/screens/settings/E116Privacy'
-import { E117Export } from '@/ui/screens/settings/E117Export'
-import { E61ListDetail } from '@/ui/screens/lists/E61ListDetail'
-import { E62ListItemDetail } from '@/ui/screens/lists/E62ListItemDetail'
-import { E70Tools } from '@/ui/screens/tools/E70Tools'
-import { E72FolderDetail } from '@/ui/screens/tools/E72FolderDetail'
-import { E71Budget } from '@/ui/screens/tools/E71Budget'
-import { E73CategoryDetail } from '@/ui/screens/tools/E73CategoryDetail'
-import { E74BudgetSettings } from '@/ui/screens/tools/E74BudgetSettings'
-import { E75BudgetAccount } from '@/ui/screens/tools/E75BudgetAccount'
-import { E76BudgetLivrets } from '@/ui/screens/tools/E76BudgetLivrets'
-import { E77BudgetLivretDetail } from '@/ui/screens/tools/E77BudgetLivretDetail'
-import { E78BudgetPrevisions } from '@/ui/screens/tools/E78BudgetPrevisions'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
+import { ScreenLoading } from '@/ui/components/ScreenLoading'
+import { LazyScreenBoundary } from '@/ui/components/LazyScreenBoundary'
 import type { Screen } from '@/app/AppContext'
+
+// `E10Dashboard` reste en import statique : c'est l'écran d'atterrissage de Marie. Tous les
+// autres sont chargés en différé (roadmap_bundle_2026-08-31.md, Phase 2) — un seul écran est
+// visible à la fois, mais les 29 restants pesaient plein pot dans le chunk initial. Les exports
+// nommés imposent l'interop `.then((m) => ({ default: m.X }))` : `React.lazy` exige un défaut.
+const E01Welcome = lazy(() => import('@/ui/screens/onboarding/E01Welcome').then((m) => ({ default: m.E01Welcome })))
+const E02Profile = lazy(() => import('@/ui/screens/onboarding/E02Profile').then((m) => ({ default: m.E02Profile })))
+const E03Energy = lazy(() => import('@/ui/screens/onboarding/E03Energy').then((m) => ({ default: m.E03Energy })))
+const E20Inbox = lazy(() => import('@/ui/screens/tasks/E20Inbox').then((m) => ({ default: m.E20Inbox })))
+const E21CreateTaskV2 = lazy(() =>
+  import('@/ui/screens/tasks/E21CreateTaskV2').then((m) => ({ default: m.E21CreateTaskV2 })),
+)
+const E22TaskDetail = lazy(() =>
+  import('@/ui/screens/tasks/E22TaskDetail').then((m) => ({ default: m.E22TaskDetail })),
+)
+const E23Decompose = lazy(() =>
+  import('@/ui/screens/tasks/E23Decompose').then((m) => ({ default: m.E23Decompose })),
+)
+const E24EditTask = lazy(() => import('@/ui/screens/tasks/E24EditTask').then((m) => ({ default: m.E24EditTask })))
+const E30EnergyView = lazy(() =>
+  import('@/ui/screens/energy/E30EnergyView').then((m) => ({ default: m.E30EnergyView })),
+)
+const E31EnergyCheckIn = lazy(() =>
+  import('@/ui/screens/energy/E31EnergyCheckIn').then((m) => ({ default: m.E31EnergyCheckIn })),
+)
+const E90OverloadRecovery = lazy(() =>
+  import('@/ui/screens/overload/E90OverloadRecovery').then((m) => ({ default: m.E90OverloadRecovery })),
+)
+const E120Resources = lazy(() =>
+  import('@/ui/screens/resources/E120Resources').then((m) => ({ default: m.E120Resources })),
+)
+const E121ManualTests = lazy(() =>
+  import('@/ui/screens/tests/E121ManualTests').then((m) => ({ default: m.E121ManualTests })),
+)
+const E110Settings = lazy(() =>
+  import('@/ui/screens/settings/E110Settings').then((m) => ({ default: m.E110Settings })),
+)
+const E111Profile = lazy(() =>
+  import('@/ui/screens/settings/E111Profile').then((m) => ({ default: m.E111Profile })),
+)
+const E112Accessibility = lazy(() =>
+  import('@/ui/screens/settings/E112Accessibility').then((m) => ({ default: m.E112Accessibility })),
+)
+const E116Privacy = lazy(() =>
+  import('@/ui/screens/settings/E116Privacy').then((m) => ({ default: m.E116Privacy })),
+)
+const E117Export = lazy(() =>
+  import('@/ui/screens/settings/E117Export').then((m) => ({ default: m.E117Export })),
+)
+const E61ListDetail = lazy(() =>
+  import('@/ui/screens/lists/E61ListDetail').then((m) => ({ default: m.E61ListDetail })),
+)
+const E62ListItemDetail = lazy(() =>
+  import('@/ui/screens/lists/E62ListItemDetail').then((m) => ({ default: m.E62ListItemDetail })),
+)
+const E70Tools = lazy(() => import('@/ui/screens/tools/E70Tools').then((m) => ({ default: m.E70Tools })))
+const E72FolderDetail = lazy(() =>
+  import('@/ui/screens/tools/E72FolderDetail').then((m) => ({ default: m.E72FolderDetail })),
+)
+const E71Budget = lazy(() => import('@/ui/screens/tools/E71Budget').then((m) => ({ default: m.E71Budget })))
+const E73CategoryDetail = lazy(() =>
+  import('@/ui/screens/tools/E73CategoryDetail').then((m) => ({ default: m.E73CategoryDetail })),
+)
+const E74BudgetSettings = lazy(() =>
+  import('@/ui/screens/tools/E74BudgetSettings').then((m) => ({ default: m.E74BudgetSettings })),
+)
+const E75BudgetAccount = lazy(() =>
+  import('@/ui/screens/tools/E75BudgetAccount').then((m) => ({ default: m.E75BudgetAccount })),
+)
+const E76BudgetLivrets = lazy(() =>
+  import('@/ui/screens/tools/E76BudgetLivrets').then((m) => ({ default: m.E76BudgetLivrets })),
+)
+const E77BudgetLivretDetail = lazy(() =>
+  import('@/ui/screens/tools/E77BudgetLivretDetail').then((m) => ({ default: m.E77BudgetLivretDetail })),
+)
+const E78BudgetPrevisions = lazy(() =>
+  import('@/ui/screens/tools/E78BudgetPrevisions').then((m) => ({ default: m.E78BudgetPrevisions })),
+)
 
 export const NO_NAV_SCREENS: Screen[] = ['welcome', 'profile', 'energy', 'energy-checkin']
 
@@ -53,21 +105,7 @@ export function AppScreens() {
   const { screen, loading, overloadMode, inboxTasks, goTo } = useApp()
 
   if (loading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100svh',
-          color: 'var(--color-text-muted)',
-        }}
-        role="status"
-        aria-live="polite"
-      >
-        Chargement...
-      </div>
-    )
+    return <ScreenLoading />
   }
 
   function renderScreen() {
@@ -141,7 +179,9 @@ export function AppScreens() {
   return (
     <>
       <DevResetButton />
-      {renderScreen()}
+      <LazyScreenBoundary>
+        <Suspense fallback={<ScreenLoading />}>{renderScreen()}</Suspense>
+      </LazyScreenBoundary>
       {showNav && (
         <BottomNav
           activeTab={activeTabFor(screen)}

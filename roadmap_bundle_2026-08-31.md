@@ -403,7 +403,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — Chargement différé des écrans [TODO]
+## Phase 2 — Chargement différé des écrans [FAIT]
 
 > Gain estimé : **−130 à −150 kB** sur le chunk initial. Arithmétique : 124.1 kB d'écrans
 > + 42.7 kB de `@dnd-kit` = 166.8 kB différables bruts, moins `E10Dashboard` + `PlanningBoard`
@@ -485,6 +485,71 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 **Critère de sortie** : chunk initial ≤ 430 kB, avertissement Vite « chunks larger than 500 kB »
 disparu du build, e2e verts dont le parcours hors-ligne, aucun test perdu.
+
+### Résultats mesurés (2026-09-01)
+
+**Écart avec le plan.** L'alternative « ajouter un `export default` aux 30 écrans » (évoquée en
+ouverture de phase) n'a pas été retenue : le wrapper `lazy(() => import(...).then((m) => ({
+default: m.X })))` isole l'interop dans `App.tsx` seul, sans toucher aux exports nommés utilisés
+par ailleurs (tests, autres imports). 29 déclarations, un seul fichier modifié.
+
+**Constat empirique qui simplifie le plan.** La partie annoncée comme le vrai coût de la phase —
+une fixture de contexte et de route par écran pour éviter un crash sur paramètre manquant — ne
+s'est pas matérialisée : les 30 écrans, montés avec `makeAppContext()` et une route minimale
+(uniquement le paramètre `id` pertinent quand il existe), se résolvent tous sans erreur. Le code
+des écrans gère déjà l'absence de sélection (recherches `.find()` retournant `undefined`,
+`route.name === '…' ? route.param : null`). `src/App.suspense.test.tsx` (31 cas : 30 écrans +
+`planning`) en est la preuve, pas une supposition.
+
+**Livré**
+
+- Tous les écrans sauf `E10Dashboard` convertis en `React.lazy`, wrappers d'interop dans `App.tsx`.
+- `src/ui/components/ScreenLoading.tsx` : fallback extrait, réutilisé par le `loading` applicatif
+  et par le `<Suspense>` (même `role="status"`, même `aria-live="polite"` — accessibilité inchangée).
+- `src/ui/components/LazyScreenBoundary.tsx` : error boundary autour du `<Suspense>`, double
+  déclencheur de rechargement (erreur de rendu attrapée **et** événement `vite:preloadError`).
+- `src/App.suspense.test.tsx` (31 cas) et `src/ui/components/LazyScreenBoundary.test.tsx` (3 cas,
+  dont le rejet simulé d'un chunk et la vérification de `location.reload()`).
+
+**Tests — après**
+
+| Contrôle | Résultat |
+|---|---|
+| `src/App.test.tsx` | vert **sans modification** — confirme que le périmètre du `<Suspense>` ne déborde pas sur `BottomNav` |
+| `src/App.suspense.test.tsx` (30 écrans + `planning`) | vert |
+| `src/ui/components/LazyScreenBoundary.test.tsx` (chunk périmé, `vite:preloadError`, cas nominal) | vert |
+| Accessibilité du fallback (`role="status"`, `aria-live="polite"`) | vert |
+| `npm test` | **682/682 verts**, 84 fichiers (+34 vs Phase 1) |
+| `npm run lint` | vert |
+| `npm run test:coverage` | seuils 85 % respectés (93.23 % lignes / 86.86 % branches global) |
+| `npm run build` (`tsc -b && vite build`) | vert |
+| `npm run test:e2e` | **57/57 verts** (34.4 s), dont `06-offline.spec.ts` (5 cas) |
+
+**Mesure du bundle** (`npm run bundle:check`, seuil resserré à **430 kB**)
+
+| Mesure | Valeur |
+|---|---:|
+| Chunk d'entrée (`index-*.js`), brut | **242.21 kB** — seuil 430 kB, marge 187.79 kB |
+| Chunk d'entrée, gzip | **74.15 kB** |
+| vs baseline (766.84 kB) | **−524.63 kB (−68.4 %)** |
+| vs Phase 1 (558.64 kB) | −316.43 kB (−56.6 %) |
+
+> **Point de transparence, au-delà de ce que mesure `bundle:check`.** `AppContext.tsx` (150.38 kB,
+> dépendance statique incontournable de `AppScreens` — l'état applicatif doit exister avant tout
+> écran) forme un second chunk que Vite fait précharger par le navigateur via
+> `<link rel="modulepreload">` dans `index.html`, donc téléchargé en parallèle de l'entrée, pas à
+> la demande. Le script de budget, dont la méthode (lire le `<script type="module">` de
+> `index.html`) date de la Phase 0 — un seul chunk à l'époque — ne mesure pas ce second fichier.
+> Total réellement chargé au démarrage : **242.21 + 150.38 = 392.59 kB** brut, **~120.5 kB** gzip
+> (somme des gzip individuels rapportés par Vite, légère surestimation par rapport à un flux
+> combiné). Ce total reste sous la cible finale de 450 kB — donc sans impact sur la suite de la
+> roadmap — mais le seuil `bundle.budget.json` ne le couvre pas : à traiter en Phase 4 (`garde-fou
+> permanent`), soit en élargissant la mesure aux chunks `modulepreload`, soit en documentant
+> explicitement la limite. `@dnd-kit` (44.35 kB), lui, est correctement différé et absent de tout
+> préchargement — confirmé par `bundle:analyse` et par l'absence d'un second `modulepreload` dans
+> `index.html`.
+
+L'avertissement Vite « chunks larger than 500 kB » a disparu du build (242 kB < 500 kB).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

@@ -1,10 +1,13 @@
-# Historique de conversation WhatsApp avec Marie
+# Historique de conversation avec Marie
 
-Journal des échanges WhatsApp entre le développeur et Marie. Alimenté manuellement :
-l'utilisateur colle ici les messages au fil de l'eau. Sert de mémoire durable des questions
-posées, des réponses reçues et des décisions produit qui en découlent, indépendamment des
-roadmaps (vues de travail éphémères) et de `a_transmettre.md` (commentaires de livraison en
-attente uniquement).
+Journal des échanges avec Marie. **Depuis le 2026-09-02, le canal est Discord** (via la gateway
+`DISCORD/discord_com/` ; le bridge ROBERTO reste un secours vocal). Nom de fichier conservé pour
+l'historique. Alimenté au fil de l'eau : messages composés pour Marie ajoutés dans le tour où ils
+sont rédigés, réponses de Marie ajoutées dans le tour où elles arrivent (l'utilisateur peut aussi
+en coller). Sert de mémoire durable des questions posées, des réponses reçues et des décisions
+produit qui en découlent, indépendamment des roadmaps (vues de travail éphémères) et de
+`a_transmettre.md` (commentaires de livraison en attente uniquement). Log brut Discord :
+`DISCORD/discord_com/logs/conversation.jsonl`.
 
 Convention d'entrée :
 
@@ -153,3 +156,43 @@ https://appli-audhd.netlify.app
 
 _Suite :_ aucune action de Marie attendue avant le prochain `/deploy` (correctif `2d5c0b8`,
 `isManualTestDone`). Message envoyé pour clore l'aller-retour sur la pastille rouge.
+
+### 2026-09-02 — 2 questions produit (demandes 23-33 du Google Doc) — envoyé sur Discord
+
+**Dév ->**
+Deux questions rapides pour la prochaine mise à jour.
+
+1) Quand tu crées une tâche, veux-tu être obligée d'indiquer une durée à chaque fois, ou seulement pour les tâches que tu mets dans le planning avec une heure ?
+Réponds « toujours » ou « seulement planning ».
+
+2) Bientôt, quand tu modifieras ton énergie, le bouton Retour te ramènera direct à l'accueil : l'écran « Mon énergie » (le petit résumé avec la batterie) ne s'affichera plus au passage. Veux-tu quand même pouvoir l'ouvrir de temps en temps, ou on peut le retirer complètement ?
+Réponds « garder » ou « retirer ».
+
+_Suite :_ premier message envoyé via Discord (`message_marie.py`, avant l'adoption de la gateway
+le même jour). Couvre les décisions produit 1 (#25, périmètre de la durée obligatoire) et 6 (#29,
+devenir de l'écran « Mon énergie ») de `roadmap_demandes_marie_2026-09-02.md`. Pending enregistré
+dans `DISCORD/discord_com/gateway/state.json` → la réponse de Marie sera routée vers
+`gateway/inbox/orchestrateur/` (lecture : `gateway.py poll --agent orchestrateur`).
+
+### 2026-09-02 17h16 — réponses aux 2 questions produit
+
+**Marie ->**
+1) seulement planning, 2)retirer
+
+_Suite :_ répond aux 2 questions produit du 2026-09-02 (envoyées via `message_marie.py`).
+Décision 1 (#25) : durée de tâche obligatoire **uniquement pour les tâches planifiées avec une
+heure**, pas à chaque création. Décision 6 (#29) : écran « Mon énergie » **retiré complètement**
+(plus d'accès, le bouton Retour de la modification d'énergie ramène direct à l'accueil). Réponse
+routée vers `gateway/inbox/orchestrateur/` (`20260902T173626_407513`), `pending_reply` purgé.
+À reporter dans `roadmap_demandes_marie_2026-09-02.md`.
+
+### 2026-09-02 17h17 — question sur le délai
+
+**Marie ->**
+dans combien de temps tu penses la nouvelles version ?
+
+_Suite :_ message perdu sur le moment par l'ancien comportement du bot (rejet « renvoie ce
+message » quand Claude occupé), récupéré depuis `logs/conversation.jsonl` après correction du bot
+(mise en file d'attente). Routé vers `gateway/inbox/orchestrateur/` (`20260902T173626_562363`).
+Réponse à formuler : prochain `/deploy` (correctif pastille + bundle + planning Phases 3-5 déjà
+prêts).

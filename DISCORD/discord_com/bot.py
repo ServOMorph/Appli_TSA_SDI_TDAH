@@ -177,33 +177,37 @@ async def on_message(message):
     if client.user not in message.mentions:
         return
 
-    # Mode commande Claude : si Claude attend, transmettre
+    # Mode commande Claude : préparation du contenu (retrait mention + préfixe novice)
+    contenu = message.content
+    for token in (f"<@{client.user.id}>", f"<@!{client.user.id}>"):
+        contenu = contenu.replace(token, "")
+    contenu = contenu.strip()
+    if contenu.startswith("? "):
+        sujet = contenu[2:].strip()
+        contenu = f"Explique à un novice complet, en termes simples et concrets (pas de jargon) : {sujet}"
+
+    entree = {
+        "command": contenu,
+        "author": str(message.author),
+        "author_display": message.author.display_name,
+        "author_id": message.author.id,
+        "timestamp": int(time.time()),
+    }
+
     cmd = lire(COMMANDS)
-    if cmd["status"] == "idle":
-        # Retrait de la mention du bot avant transmission
-        contenu = message.content
-        for token in (f"<@{client.user.id}>", f"<@!{client.user.id}>"):
-            contenu = contenu.replace(token, "")
-        contenu = contenu.strip()
-        # Préfixe novice si message commence par "? "
-        if contenu.strip().startswith("? "):
-            sujet = contenu.strip()[2:].strip()
-            contenu = f"Explique à un novice complet, en termes simples et concrets (pas de jargon) : {sujet}"
+    if cmd["status"] == "idle" and not cmd.get("queue"):
         await envoyer("Bien reçu")
-        ecrire(COMMANDS, {
-            "status": "pending",
-            "command": contenu,
-            "author": str(message.author),
-            "author_display": message.author.display_name,
-            "author_id": message.author.id,
-            "timestamp": int(time.time())
-        })
+        ecrire(COMMANDS, {"status": "pending", "queue": [], **entree})
     else:
-        await envoyer("⏳ Claude traite déjà une commande. Renvoie ce message quand il a répondu.")
+        file = cmd.get("queue", [])
+        file.append(entree)
+        cmd["queue"] = file
+        ecrire(COMMANDS, cmd)
+        await envoyer(f"📥 En file d'attente ({len(file)}). Traité dès que Claude se libère.")
 
 
 async def boucle_polling():
-    """Envoie les messages en attente dans queue.json vers Discord."""
+    """Envoie les messages en attente dans queue.json vers Discord et promeut la file commands.json."""
     _dernier_ts_envoye = 0
     while True:
         try:
@@ -215,6 +219,24 @@ async def boucle_polling():
                 q["response"] = ""
                 ecrire(QUEUE, q)
                 await envoyer(q["message"])
+
+            # Promotion de la file d'attente des commandes Claude
+            c = lire(COMMANDS)
+            if c.get("status") == "idle" and c.get("queue"):
+                suivante = c["queue"].pop(0)
+                c.update({
+                    "status": "pending",
+                    "command": suivante["command"],
+                    "author": suivante["author"],
+                    "author_display": suivante["author_display"],
+                    "author_id": suivante["author_id"],
+                    "timestamp": suivante["timestamp"],
+                })
+                ecrire(COMMANDS, c)
+                await envoyer(
+                    f"▶️ Reprise de la demande de {suivante['author_display']} "
+                    f"(file : {len(c['queue'])} restante(s))."
+                )
         except Exception as e:
             print(f"Erreur polling : {e}")
         await asyncio.sleep(POLL_INTERVAL)

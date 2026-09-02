@@ -53,15 +53,28 @@ const REPORTED_BADGE_STYLE: React.CSSProperties = {
   flexShrink: 0,
 }
 
-function dateStripStyle(ambianceColor: string): React.CSSProperties {
+function dateStripBoxStyle(ambianceColor: string): React.CSSProperties {
   return {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
     border: `2px solid ${ambianceColor}`,
     borderRadius: 'var(--radius-md)',
-    padding: '2px',
+    padding: '4px 2px',
+    backgroundColor: `color-mix(in srgb, ${ambianceColor} 14%, var(--color-surface))`,
+    overflow: 'hidden',
   }
+}
+
+const dateTrackStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '4px',
+}
+
+const DAY_CELL_MAX_SCALE = 1.18
+
+// Grossissement du jour au sélecteur central : max au centre, dégressif vers les bords.
+function dayCellScale(distanceFromCenter: number): number {
+  const t = Math.max(0, 1 - distanceFromCenter / 2)
+  return Math.round((1 + t * (DAY_CELL_MAX_SCALE - 1)) * 1000) / 1000
 }
 
 function dayCellStyle(isDisplayed: boolean): React.CSSProperties {
@@ -72,8 +85,8 @@ function dayCellStyle(isDisplayed: boolean): React.CSSProperties {
     alignItems: 'center',
     gap: '2px',
     padding: '6px 2px',
-    background: isDisplayed ? 'color-mix(in srgb, var(--color-primary) 12%, transparent)' : 'none',
-    border: 'none',
+    backgroundColor: isDisplayed ? 'var(--color-surface)' : 'transparent',
+    border: isDisplayed ? '1px solid var(--color-border)' : '1px solid transparent',
     borderRadius: 'var(--radius-sm)',
     cursor: 'pointer',
     color: 'var(--color-text)',
@@ -156,6 +169,19 @@ const monthBarStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 'var(--spacing-sm)',
+}
+
+const planningLogoBtnStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--color-text)',
+  padding: '10px 4px',
+  minHeight: '44px',
+  minWidth: '32px',
 }
 
 const todayBtnStyle: React.CSSProperties = {
@@ -287,7 +313,7 @@ export function PlanningBoard() {
   const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
 
   const [displayDate, setDisplayDate] = useState(() =>
-    route.name === 'planning' && route.date ? route.date : todayStr(),
+    route.name === 'dashboard' && route.date ? route.date : todayStr(),
   )
   const [scheduledTasks, setScheduledTasks] = useState<Task[]>([])
   const [scheduledSubTasks, setScheduledSubTasks] = useState<PlannedSubTask[]>([])
@@ -300,7 +326,7 @@ export function PlanningBoard() {
   const [dragging, setDragging] = useState(false)
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
   const [stripCenter, setStripCenter] = useState(() =>
-    route.name === 'planning' && route.date ? route.date : todayStr(),
+    route.name === 'dashboard' && route.date ? route.date : todayStr(),
   )
 
   useEffect(() => {
@@ -310,7 +336,7 @@ export function PlanningBoard() {
   function updateDisplayDate(updater: string | ((d: string) => string)) {
     setDisplayDate((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater
-      replace({ name: 'planning', date: next })
+      replace({ name: 'dashboard', date: next })
       return next
     })
   }
@@ -411,18 +437,31 @@ export function PlanningBoard() {
       style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, gap: 'var(--spacing-sm)' }}
     >
       <div style={monthBarStyle}>
-        <button
-          type="button"
-          style={monthButtonStyle}
-          aria-label={`${formatMonthYear(displayDate)}, choisir un mois`}
-          onClick={() => setMonthPickerOpen(true)}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <rect x="3" y="4" width="18" height="18" rx="2" />
-            <path d="M16 2v4M8 2v4M3 10h18" />
-          </svg>
-          {formatMonthYear(displayDate)}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', minWidth: 0 }}>
+          <button
+            type="button"
+            style={planningLogoBtnStyle}
+            aria-label="Ouvrir le planning de la semaine"
+            onClick={() => goTo({ name: 'planning', date: displayDate })}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 9h18M9 9v11M15 9v11" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            style={monthButtonStyle}
+            aria-label={`${formatMonthYear(displayDate)}, choisir un mois`}
+            onClick={() => setMonthPickerOpen(true)}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+            {formatMonthYear(displayDate)}
+          </button>
+        </div>
         {!isToday && (
           <button style={todayBtnStyle} onClick={() => jumpTo(todayStr())}>
             Aujourd'hui
@@ -430,32 +469,43 @@ export function PlanningBoard() {
         )}
       </div>
       <div
-        style={{
-          ...dateStripStyle(ambianceColor),
-          transform: `translateX(${dragOffset}px)`,
-          transition: dragging ? 'none' : 'transform 0.2s ease-out',
-        }}
+        aria-label="Bandeau des jours de la semaine"
+        style={dateStripBoxStyle(ambianceColor)}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {dateStrip(stripCenter, DATE_STRIP_RADIUS).map((d) => {
-          const badge = formatDayBadge(d)
-          const isDisplayed = d === displayDate
-          return (
-            <button
-              key={d}
-              style={dayCellStyle(isDisplayed)}
-              onClick={() => updateDisplayDate(d)}
-              aria-current={isDisplayed ? 'date' : undefined}
-              aria-label={d}
-            >
-              <span style={dayWeekdayStyle}>{badge.weekday}</span>
-              <span style={dayNumberStyle(d === todayStr())}>{badge.day}</span>
-              <span style={isDisplayed ? dayDotStyle : dayDotPlaceholderStyle} aria-hidden />
-            </button>
-          )
-        })}
+        <div
+          style={{
+            ...dateTrackStyle,
+            transform: `translateX(${dragOffset}px)`,
+            transition: dragging ? 'none' : 'transform 0.2s ease-out',
+          }}
+        >
+          {dateStrip(stripCenter, DATE_STRIP_RADIUS).map((d, i, arr) => {
+            const badge = formatDayBadge(d)
+            const isDisplayed = d === displayDate
+            const scale = dayCellScale(Math.abs(i - (arr.length - 1) / 2))
+            return (
+              <button
+                key={d}
+                style={{
+                  ...dayCellStyle(isDisplayed),
+                  transform: `scale(${scale})`,
+                  transition: dragging ? 'none' : 'transform 0.2s ease-out',
+                  ...(scale > 1 ? { position: 'relative', zIndex: 2 } : null),
+                }}
+                onClick={() => updateDisplayDate(d)}
+                aria-current={isDisplayed ? 'date' : undefined}
+                aria-label={d}
+              >
+                <span style={dayWeekdayStyle}>{badge.weekday}</span>
+                <span style={dayNumberStyle(d === todayStr())}>{badge.day}</span>
+                <span style={isDisplayed ? dayDotStyle : dayDotPlaceholderStyle} aria-hidden />
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>

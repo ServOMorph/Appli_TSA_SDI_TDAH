@@ -85,7 +85,7 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.createDetailedTask).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Tâche depuis planning', status: 'planned', startTime: '10:30' }),
     )
-    expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
   it('le formulaire et les champs Date/Heure gardent des contraintes de largeur (évite le débordement à droite)', async () => {
@@ -109,7 +109,7 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.createDetailedTask).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Tâche depuis accueil', status: 'planned', startTime: '08:00' }),
     )
-    expect(ctx.goTo).toHaveBeenCalledWith('planning')
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
   it('permet d\'ajouter et retirer des sous-tâches', async () => {

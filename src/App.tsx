@@ -12,6 +12,9 @@ import type { Screen } from '@/app/AppContext'
 // visible à la fois, mais les 29 restants pesaient plein pot dans le chunk initial. Les exports
 // nommés imposent l'interop `.then((m) => ({ default: m.X }))` : `React.lazy` exige un défaut.
 const E01Welcome = lazy(() => import('@/ui/screens/onboarding/E01Welcome').then((m) => ({ default: m.E01Welcome })))
+const E12WeekPlanning = lazy(() =>
+  import('@/ui/screens/dashboard/E12WeekPlanning').then((m) => ({ default: m.E12WeekPlanning })),
+)
 const E02Profile = lazy(() => import('@/ui/screens/onboarding/E02Profile').then((m) => ({ default: m.E02Profile })))
 const E03Energy = lazy(() => import('@/ui/screens/onboarding/E03Energy').then((m) => ({ default: m.E03Energy })))
 const E20Inbox = lazy(() => import('@/ui/screens/tasks/E20Inbox').then((m) => ({ default: m.E20Inbox })))
@@ -117,8 +120,9 @@ export function AppScreens() {
       case 'energy':
         return <E03Energy />
       case 'dashboard':
-      case 'planning':
         return <E10Dashboard />
+      case 'planning':
+        return <E12WeekPlanning />
       case 'inbox':
         return <E20Inbox />
       case 'task-create-v2':

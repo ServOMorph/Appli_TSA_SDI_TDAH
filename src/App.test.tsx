@@ -44,18 +44,19 @@ describe('AppScreens — navigation persistante (N1)', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
-  it('rend le même écran fusionné sur dashboard et sur planning (E19, Q8)', () => {
+  it('rend le dashboard sur la route dashboard et la vue semaine sur la route planning (#22)', async () => {
     const fromDashboard = renderWithApp(<AppScreens />, makeAppContext({ screen: 'dashboard' }))
     expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     expect(screen.getByRole('region', { name: 'Planning du jour' })).toBeDefined()
+    expect(screen.queryByRole('region', { name: 'Planning de la semaine' })).toBeNull()
     fromDashboard.unmount()
 
     renderWithApp(
       <AppScreens />,
       makeAppContext({ screen: 'planning', route: { name: 'planning' } }),
     )
-    expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
-    expect(screen.getByRole('region', { name: 'Planning du jour' })).toBeDefined()
+    expect(await screen.findByRole('region', { name: 'Planning de la semaine' })).toBeDefined()
+    expect(screen.queryByRole('heading', { name: 'AuDHD' })).toBeNull()
   })
 
   it("le bouton \"+\" ouvre la création de tâche, la pile portant l'écran courant comme origine", async () => {

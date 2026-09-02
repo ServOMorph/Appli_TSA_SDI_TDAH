@@ -136,85 +136,105 @@ imbriqué dans le bouton de ligne (HTML invalide, avertissement jsdom), hors pé
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 3 — #19 : fond de la case des jours pleinement coloré [EN COURS]
+## Phase 3 — #19 : fond de la case des jours pleinement coloré [FAIT]
 
-- [ ] Donner au conteneur du bandeau de dates (`dateStripStyle`) un fond plein d'un aplat de
-  la couleur d'ambiance (au lieu de la seule bordure). Ajuster l'opacité/mélange pour garder
-  la lisibilité des libellés de jours.
-- [ ] Revoir `dayCellStyle` : mise en évidence du jour affiché qui reste distincte sur ce
-  nouveau fond (contraste, pastille), sans réintroduire une couleur qui jure.
-- [ ] Aligner sur la décision 1 (fond du conteneur) et la décision 2 (couleur d'ambiance).
-- [ ] Fichiers pressentis : `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`),
-  `src/domain/data/manualTestsCatalog.ts`.
-- [ ] Tests automatisés : le bandeau de dates a un fond non transparent dérivé de la couleur
-  d'ambiance ; le jour affiché reste identifiable.
-- [ ] Test manuel Marie (catalogue in-app) : parcours « Bandeau des jours coloré » — changer
-  la couleur d'ambiance et vérifier que le fond du bandeau suit, pas seulement son contour.
-- [ ] Entrée `WHATS_NEW`.
+- [x] Conteneur du bandeau de dates renommé `dateStripStyle` → `dateStripBoxStyle` : garde la
+  bordure `2px solid` couleur d'ambiance et reçoit en plus un fond
+  `color-mix(in srgb, <ambiance> 14%, var(--color-surface))` + `overflow: hidden`.
+- [x] `dayCellStyle` revu : le jour affiché ressort par `backgroundColor: var(--color-surface)`
+  + `border: 1px solid var(--color-border)` (au lieu de `color-mix(--color-primary 12%)`),
+  les autres jours en fond `transparent` / bordure transparente ; le point sous le numéro
+  (`dayDotStyle`) est conservé.
+- [x] Aligné sur la décision 1 (fond du conteneur) et la décision 2 (couleur d'ambiance).
+- [x] Fichiers touchés : `PlanningBoard.tsx`(`.test.tsx`), `manualTestsCatalog.ts`,
+  `E01Welcome.tsx`.
+- [x] Tests automatisés : le bandeau (`aria-label="Bandeau des jours de la semaine"`) a un
+  `backgroundColor` contenant la couleur d'ambiance et `14%` ; le jour affiché a
+  `backgroundColor: var(--color-surface)`, les autres `transparent`.
+- [x] Test manuel Marie : parcours `bandeau-des-jours-colore` (`docRefs: [19]`).
+- [x] Entrée `WHATS_NEW`.
 
 Critère de sortie : le bandeau des jours de la semaine a un fond plein à la couleur choisie ;
-le jour affiché reste clairement repérable. Suite complète, `tsc -b` et lint verts.
+le jour affiché reste clairement repérable. Suite complète, `tsc -b` et lint verts. **Atteint**
+(698 tests, `tsc -b` et lint verts). Non vérifié : rendu réel du contraste des libellés sur le
+fond teinté selon la couleur d'ambiance choisie — validation Marie.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 4 — #21 : glissement interne des jours + grossissement au sélecteur [TODO]
+## Phase 4 — #21 : glissement interne des jours + grossissement au sélecteur [FAIT]
 
-- [ ] Séparer le bandeau en deux couches : une case fixe (fond + bordure, décision 1/3) et une
-  piste interne contenant les jours, seule cette piste recevant la translation au glissement
-  (`dragOffset`).
-- [ ] Adapter `handleTouch*` et `dragOffset` pour ne transformer que la piste interne, la case
-  restant immobile.
-- [ ] Ajouter un effet d'échelle progressif sur le jour qui passe sous le sélecteur central
-  (le plus proche du centre est le plus grossi), décision 3 pour l'intensité.
-- [ ] Vérifier le débordement (overflow) : les jours qui sortent de la case sont masqués
-  proprement.
-- [ ] Fichiers pressentis : `src/ui/screens/dashboard/PlanningBoard.tsx`(`.test.tsx`),
-  `src/domain/data/manualTestsCatalog.ts`.
-- [ ] Tests automatisés (portée limitée, animation testée à la main) : au glissement, la case
-  extérieure ne subit pas de `translateX` ; la piste interne oui. Le jour central porte un
-  style d'échelle > 1.
-- [ ] Test manuel Marie (catalogue in-app) : parcours « Défilement des jours dans la case » —
-  glisser les jours et vérifier que la case ne bouge pas, que seuls les jours défilent, et que
-  le jour au centre grossit.
-- [ ] Entrée `WHATS_NEW`.
+- [x] Bandeau séparé en deux couches : `dateStripBoxStyle` (case fixe, fond + bordure +
+  `overflow: hidden`, décisions 1/3) et `dateTrackStyle` (piste interne `flex` contenant les
+  boutons de jour). Seule la piste porte `transform: translateX(dragOffset)`.
+- [x] `handleTouchStart/Move/End` inchangés dans leur logique de seuil, mais `dragOffset`
+  n'est plus appliqué qu'à la piste interne ; la case extérieure reste immobile.
+- [x] Effet d'échelle progressif : `dayCellScale(distanceFromCenter)` — `scale` max
+  `DAY_CELL_MAX_SCALE = 1.18` au centre, dégressif linéaire vers les bords
+  (`t = max(0, 1 - distance / 2)`), le jour agrandi passe en `position: relative; z-index: 2`.
+- [x] Débordement : `overflow: hidden` sur `dateStripBoxStyle` masque proprement les jours
+  qui sortent de la case pendant le glissement.
+- [x] Fichiers touchés : `PlanningBoard.tsx`(`.test.tsx`), `manualTestsCatalog.ts`,
+  `E01Welcome.tsx`.
+- [x] Tests automatisés : au glissement, `box.style.transform` reste vide et
+  `track.style.transform` vaut `translateX(-30px)` ; le jour central porte `scale(1.18)`, un
+  jour de bord `scale(1)`.
+- [x] Test manuel Marie : parcours `defilement-des-jours-dans-la-case` (`docRefs: [21]`).
+- [x] Entrée `WHATS_NEW`.
 
 Critère de sortie : au glissement, la case des jours reste fixe et seuls les jours défilent à
 l'intérieur ; le jour au niveau du sélecteur est visiblement agrandi. Suite complète, `tsc -b`
-et lint verts.
+et lint verts. **Atteint** (698 tests, `tsc -b` et lint verts). Non vérifié : intensité réelle
+du grossissement et fluidité du glissement sur mobile (décision 3) — validation Marie.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 5 — #22 : écran planning pleine page, vue semaine [TODO]
+## Phase 5 — #22 : écran planning pleine page, vue semaine [FAIT]
 
-- [ ] Attendre la réponse de Marie sur les décisions 4 et 5 ; le message de demande a été rédigé le 2026-08-29, sans envoi.
-- [ ] Trancher les décisions 4 et 5 (granularité de navigation, route) avant de coder.
-- [ ] Ajouter un bouton « logo planning » à gauche du libellé du mois dans la barre du mois
-  (`PlanningBoard.tsx:411-429`), cliquable.
-- [ ] Créer l'écran pleine page « planning de la semaine » : bandeau des jours en haut
-  (comme l'accueil), et sous chaque jour son planning ; les cases de tâche n'affichent que
-  l'icône (décision 6).
-- [ ] Reprendre la même navigation que l'accueil (glissement, bouton « Aujourd'hui »,
-  sélecteur mois/année), selon décision 4.
-- [ ] Route + câblage : `src/app/navigation.ts`, `src/App.tsx`,
-  `src/ui/components/DevResetButton.tsx`.
-- [ ] Extraire si besoin la partie « bandeau des jours » réutilisée entre l'accueil et cette
-  vue plutôt que de la dupliquer (opportunité de refacto, à évaluer à ce moment-là).
-- [ ] Fichiers pressentis : nouvel écran `src/ui/screens/dashboard/EXXWeekPlanning.tsx`
-  (`.test.tsx`), `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/app/navigation.ts`,
-  `src/App.tsx`, `src/ui/components/DevResetButton.tsx`,
-  `src/domain/data/manualTestsCatalog.ts`.
-- [ ] Tests automatisés : le bouton logo ouvre l'écran semaine ; l'écran affiche 7 jours avec
-  leurs tâches en icônes ; la navigation change la semaine (ou le jour) affichée.
-- [ ] Test manuel Marie (catalogue in-app) : parcours « Vue planning de la semaine » — ouvrir
-  la vue semaine par le logo, parcourir la semaine, vérifier que chaque jour montre ses tâches
-  en logos.
-- [ ] Entrée `WHATS_NEW`.
+> Phases 3, 4 et 5 implémentées ensemble le 2026-09-02 (un seul cycle, checkpoint `/compact` à
+> la fin). **Non déployées** (prod toujours v5.69).
+
+- [x] Décisions 4 et 5 déjà tranchées (2026-08-30/31), pas d'attente Marie supplémentaire.
+- [x] Bouton « logo planning » (calendrier à colonnes) à gauche du libellé du mois dans la
+  barre du mois de `PlanningBoard.tsx`, `aria-label="Ouvrir le planning de la semaine"` →
+  `goTo({ name: 'planning', date: displayDate })`.
+- [x] Écran pleine page `E12WeekPlanning.tsx` : grille 7 colonnes lundi→dimanche
+  (`<section aria-label="Planning de la semaine">` avec bordure + aplat 14 % de la couleur
+  d'ambiance), chaque colonne = en-tête jour + ses tâches planifiées en **boutons icône seule**
+  (décision 6) ouvrant la fiche de la tâche.
+- [x] Navigation calquée sur l'accueil : glissement = ±1 semaine (décision 4, via
+  `weekStrip`/`shiftWeek` + `SWIPE_THRESHOLD_PX`), bouton « Aujourd'hui » (masqué si la
+  semaine du jour est affichée), sélecteur mois/année (`MonthYearPickerModal`) plaçant la vue
+  sur la 1ʳᵉ semaine du mois, bouton « ← Retour » (`back('dashboard')`).
+- [x] Route + câblage : `navigation.ts` (`date?` ajouté à la route `dashboard`), `App.tsx`
+  (route `planning` → `E12WeekPlanning` en `React.lazy`). **`DevResetButton.tsx` non touché** :
+  le nom d'écran `planning` est réutilisé, pas renommé, donc `SCREEN_CODES` (indexé par nom
+  d'écran) reste valide — écart assumé vs « fichiers pressentis ».
+- [x] Ancien double rôle de la route `planning` (mémoire du jour de l'accueil + atterrissage
+  après création de tâche) libéré : mémoire du jour repointée sur le nouveau champ optionnel
+  `dashboard.date` (`PlanningBoard.tsx`), `DESTINATION_SCREEN.planned` de `E21CreateTaskV2.tsx`
+  repointé de `planning` vers `dashboard`.
+- [x] Bandeau des jours partagé **non extrait** : `E12WeekPlanning` a sa propre grille,
+  réutilise seulement les helpers purs de `planningSlotRules`. La roadmap marquait
+  l'extraction optionnelle (« à évaluer »).
+- [x] Fichiers touchés : `E12WeekPlanning.tsx`(`.test.tsx`) créé, `planningSlotRules.ts`
+  (`.test.ts`) (`weekStrip` + 2 tests), `navigation.ts`, `App.tsx`, `App.test.tsx`,
+  `PlanningBoard.tsx`(`.test.tsx`), `E21CreateTaskV2.tsx`(`.test.tsx`),
+  `manualTestsCatalog.ts`, `E01Welcome.tsx`.
+- [x] Tests automatisés : le bouton logo ouvre l'écran semaine (+1 test `PlanningBoard`) ;
+  l'écran affiche 7 conteneurs de jour avec tâches en icônes ; le glissement change la semaine
+  chargée ; « Aujourd'hui » et le sélecteur de mois recentrent ; le clic sur une icône ouvre
+  la fiche ; Retour appelle `back('dashboard')` (8 tests `E12WeekPlanning`).
+- [x] Test manuel Marie (catalogue in-app) : parcours `vue-planning-de-la-semaine`
+  (`docRefs: [22]`).
+- [x] Entrée `WHATS_NEW`.
 
 Critère de sortie : un logo à gauche du mois ouvre une page pleine écran montrant la semaine
 entière, chaque jour avec son planning en cases-logos, navigable comme l'accueil. Suite
-complète, `tsc -b` et lint verts.
+complète, `tsc -b` et lint verts. **Atteint** (698 tests, `tsc -b` et lint verts). Non
+vérifié : rendu réel des 7 colonnes sur mobile (gate décision 4 — repli jour-par-jour si
+illisible), ressenti du glissement et des cellules-icônes (décision 6) — validation Marie.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

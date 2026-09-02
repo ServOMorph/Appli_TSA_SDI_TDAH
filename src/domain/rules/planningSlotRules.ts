@@ -45,3 +45,11 @@ export function dateStrip(center: string, radius: number): string[] {
   for (let i = -radius; i <= radius; i++) days.push(addDays(center, i))
   return days
 }
+
+/** Les 7 dates de la semaine (lundi → dimanche) contenant `date`. */
+export function weekStrip(date: string): string[] {
+  const d = new Date(date + 'T12:00:00')
+  const mondayOffset = (d.getDay() + 6) % 7
+  const monday = addDays(date, -mondayOffset)
+  return Array.from({ length: 7 }, (_, i) => addDays(monday, i))
+}

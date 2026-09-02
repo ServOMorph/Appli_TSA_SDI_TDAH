@@ -60,8 +60,29 @@ describe('PlanningBoard', () => {
     })
     renderExpanded(ctx)
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    const strip = screen.getByLabelText('Bandeau des jours de la semaine')
     expect(strip.style.border).toContain('rgb(255, 0, 170)')
+  })
+
+  it('remplit le fond du bandeau de dates avec la couleur d’ambiance (#19)', async () => {
+    const ctx = makeAppContext({
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#ff00aa' },
+    })
+    renderExpanded(ctx)
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    const strip = screen.getByLabelText('Bandeau des jours de la semaine')
+    expect(strip.style.backgroundColor).toContain('#ff00aa')
+    expect(strip.style.backgroundColor).toContain('14%')
+  })
+
+  it('garde le jour affiché identifiable sur le fond coloré du bandeau (#19)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    const displayed = screen.getByLabelText('2026-06-30')
+    const other = screen.getByLabelText('2026-06-28')
+    expect(displayed.style.backgroundColor).toBe('var(--color-surface)')
+    expect(other.style.backgroundColor).toBe('transparent')
   })
 
   it('suit le doigt pendant le glissement du bandeau (AP2)', async () => {
@@ -75,6 +96,42 @@ describe('PlanningBoard', () => {
 
     fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 170 }] })
     expect(strip.style.transform).toBe('translateX(0px)')
+  })
+
+  it('au glissement, seule la piste interne se translate, pas la case (#21)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+
+    const box = screen.getByLabelText('Bandeau des jours de la semaine')
+    const track = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    expect(track).not.toBe(box)
+    expect(box.contains(track)).toBe(true)
+
+    fireEvent.touchStart(box, { touches: [{ clientX: 200 }] })
+    fireEvent.touchMove(box, { touches: [{ clientX: 170 }] })
+    expect(track.style.transform).toBe('translateX(-30px)')
+    expect(box.style.transform).toBe('')
+
+    fireEvent.touchEnd(box, { changedTouches: [{ clientX: 170 }] })
+  })
+
+  it('grossit le jour au sélecteur central du bandeau (#21)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+
+    const center = screen.getByLabelText('2026-06-30')
+    const edge = screen.getByLabelText('2026-06-28')
+    expect(center.style.transform).toBe('scale(1.18)')
+    expect(edge.style.transform).toBe('scale(1)')
+  })
+
+  it('ouvre le planning de la semaine depuis le logo à gauche du mois (#22)', async () => {
+    const goTo = vi.fn()
+    renderExpanded(makeAppContext({ goTo, getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ouvrir le planning de la semaine' }))
+    expect(goTo).toHaveBeenCalledWith({ name: 'planning', date: '2026-06-30' })
   })
 
   it('ne propose plus de flèches de navigation par semaine', async () => {

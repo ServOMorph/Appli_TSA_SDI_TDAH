@@ -2,7 +2,7 @@ export type Route =
   | { name: 'welcome' }
   | { name: 'profile' }
   | { name: 'energy' }
-  | { name: 'dashboard' }
+  | { name: 'dashboard'; date?: string }
   | { name: 'inbox' }
   | { name: 'task-create-v2' }
   | { name: 'planning'; date?: string }

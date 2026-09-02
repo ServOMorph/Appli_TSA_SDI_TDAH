@@ -1,3 +1,16 @@
+## v5.77 — 2026-09-02
+
+### Ajouté
+- Nouvelle vue « Planning de la semaine » en pleine page (`roadmap_planning_accueil_2026-08-29.md` Phase 5, demande #22) : un logo à gauche du nom du mois, sur l'accueil, ouvre un écran montrant les sept jours de la semaine (lundi à dimanche) côte à côte, chacun avec ses tâches planifiées affichées en icône seule ; toucher une icône ouvre la fiche de la tâche. Navigation identique à l'accueil : glissement pour changer de semaine, bouton « Aujourd'hui », choix du mois et de l'année. Nouvel écran `src/ui/screens/dashboard/E12WeekPlanning.tsx` chargé en différé, helper `weekStrip` ajouté à `planningSlotRules.ts`.
+
+### Modifié
+- `roadmap_planning_accueil_2026-08-29.md` close : les cinq phases sont `[FAIT]`. Phases 1-2 déjà en production (v5.69) ; phases 3, 4 et 5 implémentées, pas encore déployées.
+- Bandeau des jours de la semaine sur l'accueil (Phase 3, demande #19) : le bandeau reçoit un fond plein dérivé de la couleur d'ambiance (`color-mix` à 14 %) en plus de son contour ; le jour affiché ressort désormais par un fond de surface bordé plutôt qu'une teinte primaire.
+- Glissement du bandeau des jours (Phase 4, demande #21) : le bandeau est scindé en une case fixe (fond + contour) et une piste interne ; seule la piste défile au glissement, la case ne bouge plus, et les jours qui sortent sont masqués proprement. Le jour au centre du sélecteur grossit progressivement (échelle jusqu'à 1,18), dégressif vers les bords.
+- Route `planning` réaffectée à la vue semaine pleine page (décision d'implémentation, sans route dédiée) : `src/App.tsx` la rend via `E12WeekPlanning`. La mémoire du jour affiché sur l'accueil passe sur un champ optionnel `date` de la route `dashboard` (`src/app/navigation.ts`) ; après planification d'une tâche, le retour se fait sur `dashboard`. `DevResetButton.tsx` inchangé (nom d'écran `planning` réutilisé).
+- Catalogue de tests manuels : parcours « Bandeau des jours coloré » (#19), « Défilement des jours dans la case » (#21) et « Vue planning de la semaine » (#22) ajoutés. Trois entrées « Nouveautés » correspondantes.
+- `_contexte/contexte.md`, `_contexte/archive_decisions.md` : décision du 2026-08-28 (déploiement v5.62, pastille alignée sur la liste, registre de suivi du Doc de Marie) archivée pour tenir la limite de dix entrées.
+
 ## v5.76 — 2026-09-02
 
 ### Modifié

@@ -29,7 +29,7 @@ const DESTINATION_STATUS: Record<Destination, TaskStatus> = {
 
 const DESTINATION_SCREEN: Record<Destination, Screen> = {
   todo: 'inbox',
-  planned: 'planning',
+  planned: 'dashboard',
 }
 
 const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)

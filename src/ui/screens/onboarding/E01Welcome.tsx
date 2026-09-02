@@ -5,6 +5,9 @@ import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
 const WHATS_NEW: string[] = [
   'Le point rouge « Tests à faire » de l’accueil s’éteint dès que vous avez passé un test, que vous l’ayez marqué « Validé » ou « Non validé ». Il se rallume seulement pour un nouveau test ou pour un test corrigé, à repasser.',
+  'Le bandeau des jours de la semaine, sur l’accueil, a maintenant un fond dans votre couleur d’ambiance, pas seulement un contour. Le jour affiché reste bien visible.',
+  'Quand vous faites glisser le bandeau des jours, seuls les jours défilent à l’intérieur : la case colorée, elle, ne bouge plus. Le jour au centre grossit légèrement pour mieux le repérer.',
+  'Nouvelle vue « Planning de la semaine » : touchez le logo à gauche du mois, sur l’accueil, pour voir les sept jours de la semaine côte à côte, chacun avec ses tâches en icônes. Glissez pour changer de semaine.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

@@ -1,0 +1,5 @@
+{
+  "enabled": false,
+  "channel_id": "Clic droit sur le salon Discord (mode développeur) → Copier l'ID",
+  "admins": ["ID Discord des utilisateurs admin (accès complet). Les autres = lecture seule. Voir ACCES.md"]
+}

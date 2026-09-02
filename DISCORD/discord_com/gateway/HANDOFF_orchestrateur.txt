@@ -1,0 +1,58 @@
+De : agent DISCORD
+Objet : gateway Discord complete (entree + sortie) — a toi d'adopter le protocole (Phase 3)
+
+ETAT
+La gateway est operationnelle des deux cotes :
+- SORTIE (Phase 1) : outbox/ + gateway.py enqueue/drain/curate.
+- ENTREE (Phase 2) : route_inbound() classe les messages Discord entrants et les depose dans
+  gateway/inbox/<agent>/ ; poll(agent) / ack(agent, id) pour les lire.
+Doc : DISCORD/discord_com/gateway/README.md.
+
+DECISIONS MORPHEUS (2026-09-02) — actees, integrees
+1. Canal Marie = Discord via la gateway. Le bridge ROBERTO (POST /send) devient secours/vocal,
+   plus le canal principal des messages produit a Marie.
+2. Identite « Rayonne Toi » (id 1368654289584656394) = bien Marie. La reponse en attente
+   (gateway/state.json -> pending_reply) est exploitable telle quelle.
+
+DEJA VERROUILLE COTE DISCORD (rien a faire pour toi)
+- message_marie.py : la CLI refuse tout envoi reel sans --force (reserve agent DISCORD) ;
+  --dry-run reste libre. La gateway importe le module et appelle _read_token/_read_channel_id/_send.
+- claude_bridge.py : deprecie. envoyer() et notifier() levent RuntimeError.
+
+CE QUE TU DOIS FAIRE (Phase 3, cote orchestrateur — hors de mon perimetre)
+1. N'utiliser QUE gateway.enqueue(...) pour tout envoi Discord (Marie, Morpheus, channel).
+2. Mettre a jour ton agent_role.md ET celui de design : interdiction d'ecrire sur Discord en
+   direct (message_marie.py, API REST, webhook, claude_bridge, queue.json/commands.json) ;
+   pointer vers DISCORD/discord_com/gateway/README.md.
+3. Retirer les appels directs (message_marie.py, claude_bridge) de tes commandes :
+   deploy.md, analyser_googledoc.md, et toute autre qui poste sur Discord.
+4. CLAUDE.md — sections « Messages pour Marie » et « Bridge ROBERTO » : elles imposent
+   aujourd'hui POST /send project:tsa pour Marie. Avec la decision 1, les aligner sur
+   « canal Marie = Discord via gateway ». Sans ca, l'instruction existante contredit la cible.
+5. Cablage /discord_loop : a l'etape 3b de .claude/commands/discord_loop.md (perimetre racine),
+   si le message recu n'est pas pour l'agent DISCORD, le passer a
+   gateway.route_inbound(author_id, author_name, content) puis reboucler sur wait sans send.
+   Detail : DISCORD/discord_com/gateway/LOOP.md section « 2 bis ».
+
+TA QUESTION EN COURS A MARIE
+Le pending est enregistre. Des que Marie repond sur Discord, l'agent DISCORD route sa reponse
+vers gateway/inbox/orchestrateur/ et purge le pending. Tu la lis avec :
+
+  python DISCORD/discord_com/gateway.py poll --agent orchestrateur
+  python DISCORD/discord_com/gateway.py ack  --agent orchestrateur --id <id>
+
+API RAPPEL
+
+  # envoyer
+  import sys; sys.path.insert(0, "DISCORD/discord_com")
+  import gateway
+  gateway.enqueue("orchestrateur", "marie", corps, kind="question", expect_reply=True)
+
+  # recevoir
+  for msg in gateway.poll("orchestrateur"):
+      traiter(msg)            # msg["content"], msg["from_discord"], msg["routing"]
+      gateway.ack("orchestrateur", msg["id"])
+
+Champs message inbox : id, from_discord{author_id,author_name}, content (corps sans le tag),
+raw_content, routing (tag|pending|heuristique|aucune), reply_to, received_at.
+Pour forcer le routage d'une reponse Discord vers toi : que l'expediteur prefixe « @orchestrateur: ».

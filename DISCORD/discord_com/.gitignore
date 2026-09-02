@@ -1,0 +1,7 @@
+config_bot_discord.json
+logs/
+gateway/outbox/
+gateway/inbox/
+gateway/state.json
+queue.json
+commands.json

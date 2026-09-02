@@ -1,3 +1,21 @@
+## v5.78 — 2026-09-02
+
+### Ajouté
+- `roadmap_demandes_marie_2026-09-02.md` (demandes 23 à 33 du Google Doc de Marie) : phases 1 à 9 `[FAIT]`, non déployées ; phase 10 (#3 + #32, débordements horizontaux) `[BLOQUÉ]` faute d'une capture récente de l'écran Paramètres de Marie (décision 7). Roadmap non archivée.
+- #28 : bloc « Solde du mois » en tête de l'écran « Mon compte » — somme prévue de toutes les sous-catégories (les « Semaine » comptent quatre fois, les « Mois » une fois), diminuée des dépenses du mois ; sur la page Budget, ce montant reste fixe. Nouvelle règle `getMonCompteSolde` dans `src/domain/rules/budgetRules.ts`.
+- #31 : la carte « Mon compte » apparaît dans « Couleur des outils » (Paramètres > Accessibilité), toujours présente même sans autre outil ; la couleur choisie teinte sa carte d'accueil. Champ `mon_compte_color` ajouté à `Settings` sans migration de schéma (câblage particulier, décision 5).
+
+### Modifié
+- #23 : dans `src/ui/styles/ambiance.ts`, une tâche du planning sans couleur choisie garde son texte en `var(--color-text)` barré une fois cochée, au lieu de passer en blanc.
+- #30 : `src/ui/screens/dashboard/E10Dashboard.tsx` applique `pastelBackground(tool.color)` au fond de chaque carte d'outil de l'accueil.
+- #24 / #25 : dans `src/ui/screens/dashboard/PlanningBoard.tsx`, le nom de la tâche et l'heure de début sont ancrés en haut de la case (`alignItems: flex-start`), l'heure de fin est poussée en bas d'une colonne pleine hauteur. La durée devient obligatoire pour créer ou modifier une tâche planifiée avec une heure de début (`E21CreateTaskV2.tsx`, `E24EditTask.tsx`, décision 1 de Marie : « seulement planning ») ; message d'aide sous le sélecteur de durée.
+- #27 : l'outil « Comptes » de l'accueil et son écran (`E75BudgetAccount`) sont renommés « Mon compte » ; l'écran de prévisions ouvert depuis la page Budget (`E78BudgetPrevisions`) et son lien d'accès sont renommés « Prévisions » (décision 4). Routes techniques inchangées.
+- #26 : sur la page Budget (`src/ui/screens/tools/E71Budget.tsx`), la carte « Prévisions » affiche son montant en positif et en vert, comme « Mes livrets ». La ligne de détail du Montant total reste en négatif (décision 3).
+- #29 : depuis l'écran d'énergie (`src/ui/screens/energy/E31EnergyCheckIn.tsx`), « Retour » et « Ignorer » ramènent directement à l'accueil. L'écran « Mon énergie » (`E30EnergyView`) et sa route `energy-view` sont supprimés (décision 6 de Marie : « retirer ») ; `App.tsx`, `navigation.ts`, `DevResetButton.tsx` et les tests end-to-end d'énergie sont nettoyés.
+- #33 : dans `src/ui/screens/lists/E61ListDetail.tsx`, chaque élément de liste ayant des sous-tâches affiche un compteur et un chevron pour les déplier et les cocher directement depuis la page de la catégorie.
+- Catalogue de tests manuels : `utiliser-le-budget` (révision 3), `utiliser-comptes` (révision 4), `couleur-de-fond-par-outil` (révision 3), `consulter-et-modifier-l-energie` (révision 2) mis à jour ; parcours « Nom de la tâche en haut de la case », « Heure de début en haut, heure de fin en bas », « Durée obligatoire pour une tâche planifiée » et « Sous-tâches d'un élément visibles dans la page de catégorie » ajoutés. Huit entrées « Nouveautés » correspondantes.
+- `_contexte/contexte.md`, `_contexte/archive_decisions.md` : décision du 2026-08-29 (analyse Google Doc 18-22 + anti-contournement étape 0.4 de `/deploy`) archivée pour tenir la limite de dix entrées.
+
 ## v5.77 — 2026-09-02
 
 ### Ajouté

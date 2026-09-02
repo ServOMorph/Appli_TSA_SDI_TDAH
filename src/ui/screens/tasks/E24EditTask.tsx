@@ -136,7 +136,8 @@ export function E24EditTask() {
     }
   }, [task, initialized])
 
-  const canSubmit = title.trim().length > 0
+  const hasDuration = durationMinutes != null && durationMinutes > 0
+  const canSubmit = title.trim().length > 0 && (!startTime || hasDuration)
 
   function returnToDetail() {
     back('task-detail')
@@ -274,6 +275,11 @@ export function E24EditTask() {
           <div>
             <span style={labelStyle}>Durée</span>
             <DurationRoller minutes={durationMinutes} onChange={setDurationMinutes} />
+            {startTime && !hasDuration && (
+              <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                La durée est obligatoire quand une heure de début est renseignée.
+              </p>
+            )}
           </div>
         </div>
 

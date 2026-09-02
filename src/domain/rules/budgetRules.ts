@@ -101,6 +101,25 @@ export function getMonComptePrevisions(categories: BudgetCategory[]): number {
   return categories.reduce((total, category) => total + category.amount * getMonCompteWeight(category.period), 0)
 }
 
+/**
+ * Solde affiché en tête de l'écran « Mon compte » (#28) : la prévision « Mon compte » du Budget
+ * (semaine ×4, mois ×1), diminuée de toutes les dépenses des sous-catégories du mois de
+ * `referenceDate`. Contrairement à la page Budget, où la valeur reste fixe, ce solde baisse à
+ * chaque dépense saisie et se « reconfigure » au changement de mois.
+ */
+export function getMonCompteSolde(
+  categories: BudgetCategory[],
+  entries: BudgetEntry[],
+  referenceDate: string,
+): number {
+  const monthBounds = getPeriodBounds('month', referenceDate)
+  const categoryIds = new Set(categories.map((category) => category.id))
+  const spent = entries
+    .filter((entry) => categoryIds.has(entry.category_id) && isDateInPeriod(entry.date, monthBounds))
+    .reduce((total, entry) => total + entry.amount, 0)
+  return getMonComptePrevisions(categories) - spent
+}
+
 /** Montant total après effet des livrets et des prévisions de « Mon compte » (revenus - livrets - prévisions). */
 export function getMontantTotal(
   incomeEntries: BudgetIncomeEntry[],

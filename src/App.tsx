@@ -28,9 +28,6 @@ const E23Decompose = lazy(() =>
   import('@/ui/screens/tasks/E23Decompose').then((m) => ({ default: m.E23Decompose })),
 )
 const E24EditTask = lazy(() => import('@/ui/screens/tasks/E24EditTask').then((m) => ({ default: m.E24EditTask })))
-const E30EnergyView = lazy(() =>
-  import('@/ui/screens/energy/E30EnergyView').then((m) => ({ default: m.E30EnergyView })),
-)
 const E31EnergyCheckIn = lazy(() =>
   import('@/ui/screens/energy/E31EnergyCheckIn').then((m) => ({ default: m.E31EnergyCheckIn })),
 )
@@ -133,8 +130,6 @@ export function AppScreens() {
         return <E24EditTask />
       case 'task-decompose':
         return <E23Decompose />
-      case 'energy-view':
-        return <E30EnergyView />
       case 'energy-checkin':
         return <E31EnergyCheckIn />
       case 'overload-recovery':

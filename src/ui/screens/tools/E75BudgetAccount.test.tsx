@@ -41,9 +41,9 @@ describe('E75BudgetAccount', () => {
     expect(ctx.back).toHaveBeenCalledWith('dashboard')
   })
 
-  it('affiche le titre « Comptes »', () => {
+  it('affiche le titre « Mon compte »', () => {
     renderWithApp(<E75BudgetAccount />, makeAppContext())
-    expect(screen.getByRole('heading', { name: 'Comptes' })).toBeDefined()
+    expect(screen.getByRole('heading', { name: 'Mon compte' })).toBeDefined()
   })
 
   it('ouvre les paramètres du budget', async () => {
@@ -51,6 +51,28 @@ describe('E75BudgetAccount', () => {
     renderWithApp(<E75BudgetAccount />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Paramètres du budget' }))
     expect(ctx.goTo).toHaveBeenCalledWith('budget-settings')
+  })
+
+  it('affiche en tête le solde du mois : prévision « Mon compte » diminuée des dépenses (#28)', () => {
+    const categories = [
+      makeCategory({ id: 'courses', period: 'week', amount: 60 }),
+      makeCategory({ id: 'loyer', name: 'Loyer', period: 'month', amount: 600 }),
+    ]
+    const withoutSpend = makeAppContext({ budgetCategories: categories, budgetEntries: [] })
+    const { unmount } = renderWithApp(<E75BudgetAccount />, withoutSpend)
+    const solde = screen.getByRole('region', { name: 'Solde de Mon compte' })
+    // 60 ×4 + 600 = 840
+    expect(within(solde).getByText('840,00 €')).toBeDefined()
+    expect(within(solde).getByText(/prévu 840,00/)).toBeDefined()
+    unmount()
+
+    const withSpend = makeAppContext({
+      budgetCategories: categories,
+      budgetEntries: [makeEntry({ category_id: 'courses', amount: 25, date: todayDate() })],
+    })
+    renderWithApp(<E75BudgetAccount />, withSpend)
+    const solde2 = screen.getByRole('region', { name: 'Solde de Mon compte' })
+    expect(within(solde2).getByText('815,00 €')).toBeDefined()
   })
 
   it('affiche Semaine et Mois côte à côte avec prévu/restant et jauge par sous-catégorie', () => {

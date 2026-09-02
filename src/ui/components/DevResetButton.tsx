@@ -12,7 +12,6 @@ const SCREEN_CODES: Record<Screen, string> = {
   'task-detail': 'E22',
   'task-edit': 'E24',
   'task-decompose': 'E23',
-  'energy-view': 'E30',
   'energy-checkin': 'E31',
   'overload-recovery': 'E90',
   resources: 'E120',

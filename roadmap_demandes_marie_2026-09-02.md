@@ -106,7 +106,7 @@ pour le reste.
 
 ---
 
-## Phase 1 — #23 : texte des tâches sans couleur lisible une fois cochées [TODO]
+## Phase 1 — #23 : texte des tâches sans couleur lisible une fois cochées [FAIT]
 
 **Objectif** : une tâche du planning sans couleur choisie, une fois cochée, garde son texte en
 `var(--color-text)` (noir en clair) barré — pas en blanc.
@@ -138,7 +138,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — #30 : couleur d'outil appliquée sur la carte d'accueil [TODO]
+## Phase 2 — #30 : couleur d'outil appliquée sur la carte d'accueil [FAIT]
 
 **Objectif** : quand une couleur d'outil est réglée dans Paramètres > Accessibilité, la carte
 de cet outil sur l'accueil prend cette couleur (aujourd'hui elle reste blanche).
@@ -165,7 +165,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — #24 + #25 : mise en page verticale de la case du planning + durée obligatoire [TODO]
+## Phase 3 — #24 + #25 : mise en page verticale de la case du planning + durée obligatoire [FAIT]
 
 **Décision produit 1 tranchée** (2026-09-02, Marie) : durée obligatoire **pour les tâches
 planifiées uniquement**.
@@ -214,7 +214,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — #27 : renommage « Comptes » → « Mon compte » [TODO]
+## Phase 4 — #27 : renommage « Comptes » → « Mon compte » [FAIT]
 
 **Décision 4 tranchée** : E75 → « Mon compte », E78 → « Prévisions ».
 
@@ -243,7 +243,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 5 — #28 : total en tête de « Mon compte », décrémenté par les dépenses [TODO]
+## Phase 5 — #28 : total en tête de « Mon compte », décrémenté par les dépenses [FAIT]
 
 **Dépend de la Phase 4.**
 
@@ -280,7 +280,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 6 — #26 : « Mon compte » en positif + vert dans la page Budget [TODO]
+## Phase 6 — #26 : « Mon compte » en positif + vert dans la page Budget [FAIT]
 
 **Décision 3 tranchée** : la ligne de détail du Montant total (`E71Budget.tsx:93`) reste en
 négatif ; seule la carte change.
@@ -309,7 +309,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 7 — #31 : « Comptes » dans les réglages de couleur des outils [TODO]
+## Phase 7 — #31 : « Comptes » dans les réglages de couleur des outils [FAIT]
 
 **Dépend des Phases 2 et 4. Décision 5 tranchée** : câblage particulier, pas de migration.
 
@@ -344,7 +344,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 8 — #29 : retour depuis la modification d'énergie → accueil + suppression de E30 [TODO]
+## Phase 8 — #29 : retour depuis la modification d'énergie → accueil + suppression de E30 [FAIT]
 
 **Décision produit 6 tranchée** (2026-09-02, Marie) : **suppression complète de E30
 « Mon énergie »**.
@@ -374,7 +374,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 9 — #33 : sous-tâches d'un élément de liste dans la page de catégorie [TODO]
+## Phase 9 — #33 : sous-tâches d'un élément de liste dans la page de catégorie [FAIT]
 
 **Objectif** : dans la page d'une catégorie de liste, chaque élément qui a des sous-tâches les
 affiche en dessous, pliables/dépliables et cochables, comme les sous-étapes d'une tâche du
@@ -404,7 +404,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 10 — #3 + #32 : reprise des débordements horizontaux [TODO]
+## Phase 10 — #3 + #32 : reprise des débordements horizontaux [BLOQUÉ — capture de l'écran Paramètres de Marie attendue (décision 7)]
 
 **Décision produit 7** : obtenir une capture récente de l'écran Paramètres de Marie avant de
 commencer. Sans repro fiable, ne pas coder à l'aveugle.

@@ -69,7 +69,7 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('inbox')
   })
 
-  it("depuis Planning (originScreen 'planning') : affiche date/heure/durée, l'heure de début est requise puis planifie directement la tâche", async () => {
+  it("depuis Planning (originScreen 'planning') : heure de début et durée requises puis planifie directement la tâche (#25)", async () => {
     const ctx = makeAppContext({ originScreen: 'planning' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis planning')
@@ -79,11 +79,16 @@ describe('E21CreateTaskV2', () => {
     expect(btn.disabled).toBe(true)
     expect(screen.getByText("L'heure de début est requise pour planifier la tâche.")).toBeDefined()
     await userEvent.type(screen.getByLabelText('Heure de début'), '10:30')
-    expect(btn.disabled).toBe(false)
     expect(screen.queryByText("L'heure de début est requise pour planifier la tâche.")).toBeNull()
+    // Durée encore vide : validation toujours bloquée (#25).
+    expect(btn.disabled).toBe(true)
+    expect(screen.getByText('La durée est obligatoire pour planifier la tâche.')).toBeDefined()
+    await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
+    expect(btn.disabled).toBe(false)
+    expect(screen.queryByText('La durée est obligatoire pour planifier la tâche.')).toBeNull()
     await userEvent.click(btn)
     expect(ctx.createDetailedTask).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Tâche depuis planning', status: 'planned', startTime: '10:30' }),
+      expect.objectContaining({ title: 'Tâche depuis planning', status: 'planned', startTime: '10:30', durationMinutes: 60 }),
     )
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
@@ -105,9 +110,10 @@ describe('E21CreateTaskV2', () => {
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis accueil')
     await userEvent.type(screen.getByLabelText('Heure de début'), '08:00')
+    await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     expect(ctx.createDetailedTask).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'Tâche depuis accueil', status: 'planned', startTime: '08:00' }),
+      expect.objectContaining({ title: 'Tâche depuis accueil', status: 'planned', startTime: '08:00', durationMinutes: 60 }),
     )
     expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })

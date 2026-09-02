@@ -8,4 +8,6 @@ export interface Settings {
   reduced_motion: boolean
   ambiance_color?: string
   energy_max?: number
+  /** Couleur de fond de la carte « Mon compte » de l'accueil (câblage particulier, #31 : ce n'est pas un `Tool`). */
+  mon_compte_color?: string
 }

@@ -147,7 +147,7 @@ function rowStyle(durationMinutes: number | null | undefined): React.CSSProperti
   )
   return {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 'var(--spacing-sm)',
     padding: '10px 12px',
     borderRadius: 'var(--radius-md)',
@@ -197,16 +197,24 @@ const todayBtnStyle: React.CSSProperties = {
 }
 
 function rowTintStyle(block: PlanBlock, ambianceColor: string): React.CSSProperties {
-  return plannedTaskTintStyle(blockCompleted(block), block.kind === 'task' ? (block.item.color ?? 'var(--color-surface)') : ambianceColor)
+  return plannedTaskTintStyle(blockCompleted(block), block.kind === 'task' ? block.item.color : ambianceColor)
 }
 
-const timeLabelStyle: React.CSSProperties = {
+const timeColStyle: React.CSSProperties = {
   fontSize: '0.75rem',
   color: 'inherit',
   opacity: 0.8,
   width: '42px',
   flexShrink: 0,
   fontVariantNumeric: 'tabular-nums',
+  alignSelf: 'stretch',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+}
+
+const endTimeStyle: React.CSSProperties = {
+  opacity: 0.7,
 }
 
 const titleColStyle: React.CSSProperties = {
@@ -530,7 +538,14 @@ export function PlanningBoard() {
                 }}
                 onClick={() => openDetail(block.item.id)}
               >
-                <span style={timeLabelStyle}>{block.item.scheduled_start ?? 'Sans horaire'}</span>
+                <span style={timeColStyle}>
+                  <span>{block.item.scheduled_start ?? 'Sans horaire'}</span>
+                  {block.item.scheduled_start &&
+                    block.item.scheduled_end &&
+                    block.item.scheduled_end !== block.item.scheduled_start && (
+                      <span style={endTimeStyle}>{block.item.scheduled_end}</span>
+                    )}
+                </span>
                 {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
                 <span style={titleColStyle}>
                   <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>

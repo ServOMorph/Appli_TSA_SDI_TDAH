@@ -6,6 +6,7 @@ import { groupListItemsByCategory } from '@/domain/rules/listItemSortRules'
 import { todayDate } from '@/app/repositories'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { ListCategory } from '@/domain/entities/listCategory'
+import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 import type { RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
 
 const fieldInputStyle: React.CSSProperties = {
@@ -46,6 +47,8 @@ export function E61ListDetail() {
     route,
     createDetailedTask,
     deleteTool,
+    getListItemSubTasks,
+    toggleListItemSubTask,
   } = useApp()
   const list = lists.find((l) => l.id === selectedListId) ?? null
   const tool = tools.find((t) => t.type === 'liste' && t.list_id === selectedListId) ?? null
@@ -68,6 +71,8 @@ export function E61ListDetail() {
   const [alarmRecurrence, setAlarmRecurrence] = useState<RecurrenceRuleInput>(defaultRecurrence)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deletingCategory, setDeletingCategory] = useState<ListCategory | null>(null)
+  const [subTasksByItem, setSubTasksByItem] = useState<Record<string, ListItemSubTask[]>>({})
+  const [expandedItemIds, setExpandedItemIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!selectedListId) return
@@ -168,6 +173,42 @@ export function E61ListDetail() {
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null
   const currentGroup = groups.find((g) => g.category.id === selectedCategoryId) ?? null
   const currentItems = currentGroup?.items ?? []
+
+  const currentItemIdsKey = currentItems.map((i) => i.id).join(',')
+  useEffect(() => {
+    let cancelled = false
+    const ids = currentItemIdsKey ? currentItemIdsKey.split(',') : []
+    if (ids.length === 0) {
+      setSubTasksByItem({})
+      return
+    }
+    Promise.all(ids.map((id) => getListItemSubTasks(id))).then((results) => {
+      if (cancelled) return
+      const map: Record<string, ListItemSubTask[]> = {}
+      ids.forEach((id, idx) => {
+        map[id] = results[idx]
+      })
+      setSubTasksByItem(map)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [currentItemIdsKey, getListItemSubTasks])
+
+  function toggleItemExpand(itemId: string) {
+    setExpandedItemIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(itemId)) next.delete(itemId)
+      else next.add(itemId)
+      return next
+    })
+  }
+
+  async function handleToggleItemSubTask(itemId: string, subTaskId: string) {
+    await toggleListItemSubTask(subTaskId)
+    const updated = await getListItemSubTasks(itemId)
+    setSubTasksByItem((prev) => ({ ...prev, [itemId]: updated }))
+  }
 
   return (
     <main
@@ -342,74 +383,138 @@ export function E61ListDetail() {
               gap: 'var(--spacing-xs)',
             }}
           >
-            {currentItems.map((item) => (
-              <li
-                key={item.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: 'var(--spacing-sm)',
-                  background: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: 'var(--spacing-xs)',
-                }}
-              >
-                <button
-                  aria-label={item.checked ? `Décocher ${item.title}` : `Cocher ${item.title}`}
-                  onClick={() => handleToggle(item.id)}
+            {currentItems.map((item) => {
+              const subs = subTasksByItem[item.id] ?? []
+              const hasSubs = subs.length > 0
+              const doneSubs = subs.filter((s) => s.checked).length
+              const expanded = expandedItemIds.has(item.id)
+              return (
+                <li
+                  key={item.id}
                   style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                    border: '2px solid var(--color-accent)',
-                    backgroundColor: item.checked ? 'var(--color-accent)' : 'transparent',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    padding: 0,
-                  }}
-                />
-                <button
-                  onClick={() => openItemDetail(item)}
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    textAlign: 'left',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                    font: 'inherit',
-                    textDecoration: item.checked ? 'line-through' : 'none',
-                    color: item.checked ? 'var(--color-text-muted)' : 'var(--color-text)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)',
                   }}
                 >
-                  {item.title}
-                </button>
-                <button
-                  aria-label={`Planifier ${item.title}`}
-                  onClick={() => openAlarm(item)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: 'var(--color-text-muted)', padding: '0 4px' }}
-                >
-                  ⏰
-                </button>
-                <button
-                  aria-label={`Supprimer ${item.title}`}
-                  onClick={() => handleDelete(item.id)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '1.1rem',
-                    color: 'var(--color-text-muted)',
-                    padding: '0 4px',
-                  }}
-                >
-                  ×
-                </button>
-              </li>
-            ))}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 'var(--spacing-sm)',
+                      padding: 'var(--spacing-xs)',
+                    }}
+                  >
+                    <button
+                      aria-label={item.checked ? `Décocher ${item.title}` : `Cocher ${item.title}`}
+                      onClick={() => handleToggle(item.id)}
+                      style={{
+                        width: '20px',
+                        height: '20px',
+                        borderRadius: '50%',
+                        border: '2px solid var(--color-accent)',
+                        backgroundColor: item.checked ? 'var(--color-accent)' : 'transparent',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        padding: 0,
+                      }}
+                    />
+                    <button
+                      onClick={() => openItemDetail(item)}
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        textAlign: 'left',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                        font: 'inherit',
+                        textDecoration: item.checked ? 'line-through' : 'none',
+                        color: item.checked ? 'var(--color-text-muted)' : 'var(--color-text)',
+                      }}
+                    >
+                      {item.title}
+                    </button>
+                    {hasSubs && (
+                      <button
+                        aria-label={`${doneSubs} sur ${subs.length} sous-tâches, ${expanded ? 'replier' : 'déplier'}`}
+                        onClick={() => toggleItemExpand(item.id)}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '0.8125rem',
+                          color: 'var(--color-text-muted)',
+                          padding: '0 4px',
+                          flexShrink: 0,
+                          fontVariantNumeric: 'tabular-nums',
+                        }}
+                      >
+                        {doneSubs}/{subs.length} {expanded ? '▾' : '▸'}
+                      </button>
+                    )}
+                    <button
+                      aria-label={`Planifier ${item.title}`}
+                      onClick={() => openAlarm(item)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: 'var(--color-text-muted)', padding: '0 4px' }}
+                    >
+                      ⏰
+                    </button>
+                    <button
+                      aria-label={`Supprimer ${item.title}`}
+                      onClick={() => handleDelete(item.id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '1.1rem',
+                        color: 'var(--color-text-muted)',
+                        padding: '0 4px',
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                  {hasSubs && expanded && (
+                    <ul
+                      style={{
+                        listStyle: 'none',
+                        margin: 0,
+                        padding: '0 var(--spacing-sm) var(--spacing-sm) 34px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                      }}
+                    >
+                      {subs.map((sub) => (
+                        <li key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                          <input
+                            type="checkbox"
+                            checked={sub.checked}
+                            aria-label={`${sub.checked ? 'Décocher' : 'Cocher'} ${sub.title}`}
+                            onChange={() => handleToggleItemSubTask(item.id, sub.id)}
+                            style={{ width: '16px', height: '16px', flexShrink: 0, cursor: 'pointer', accentColor: 'var(--color-accent)' }}
+                          />
+                          <span
+                            style={{
+                              fontSize: '0.875rem',
+                              textDecoration: sub.checked ? 'line-through' : 'none',
+                              color: sub.checked ? 'var(--color-text-muted)' : 'var(--color-text)',
+                            }}
+                          >
+                            {sub.title}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              )
+            })}
           </ul>
 
           <Button fullWidth onClick={() => setShowAddForm(true)}>

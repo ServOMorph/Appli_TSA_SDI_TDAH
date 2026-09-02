@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import type { BudgetCategory, BudgetPeriod } from '@/domain/entities/budgetCategory'
-import { getBudgetedAmount, getPeriodBounds, getSpentForCategory } from '@/domain/rules/budgetRules'
+import { getBudgetedAmount, getMonComptePrevisions, getMonCompteSolde, getPeriodBounds, getSpentForCategory } from '@/domain/rules/budgetRules'
 import { BudgetGauge } from '@/ui/components/BudgetGauge'
 import { formatEuro, pageStyle } from '@/ui/styles/budget'
 
@@ -87,6 +87,9 @@ export function E75BudgetAccount() {
   const weekCategories = budgetCategories.filter((category) => category.period === 'week')
   const monthCategories = budgetCategories.filter((category) => category.period === 'month')
 
+  const previsions = getMonComptePrevisions(budgetCategories)
+  const solde = getMonCompteSolde(budgetCategories, budgetEntries, todayDate())
+
   function openCategory(category: BudgetCategory, date: string) {
     goTo({ name: 'budget-category-detail', categoryId: category.id, date })
   }
@@ -97,11 +100,22 @@ export function E75BudgetAccount() {
         <button aria-label="Retour" onClick={() => back('dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ←
         </button>
-        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Comptes</h1>
+        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Mon compte</h1>
         <button aria-label="Paramètres du budget" onClick={() => goTo('budget-settings')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ⚙
         </button>
       </header>
+
+      <section
+        aria-label="Solde de Mon compte"
+        style={{ display: 'flex', flexDirection: 'column', gap: '2px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)' }}
+      >
+        <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>Solde du mois</span>
+        <strong style={{ fontSize: '1.5rem', color: amountTone(solde) }}>{formatEuro(solde)}</strong>
+        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+          prévu {formatEuro(previsions)} · chaque dépense saisie diminue ce solde
+        </span>
+      </section>
 
       <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
         <PeriodColumn

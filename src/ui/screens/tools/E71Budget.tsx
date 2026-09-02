@@ -100,12 +100,12 @@ export function E71Budget() {
       <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
         <button
           onClick={() => goTo('budget-previsions')}
-          aria-label="Ouvrir Mon compte"
+          aria-label="Ouvrir Prévisions"
           style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', appearance: 'none', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-md)', cursor: 'pointer', color: 'var(--color-text)', font: 'inherit', textAlign: 'left' }}
         >
-          <span>Mon compte</span>
-          <span style={{ fontWeight: 600, color: amountTone(-monComptePrevisions) }}>
-            {budgetCategories.length === 0 ? 'Non configuré' : formatEuro(-monComptePrevisions)}
+          <span>Prévisions</span>
+          <span style={{ fontWeight: 600, color: 'var(--color-success)' }}>
+            {budgetCategories.length === 0 ? 'Non configuré' : formatEuro(monComptePrevisions)}
           </span>
         </button>
         <button

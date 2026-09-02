@@ -9,7 +9,6 @@ export type Route =
   | { name: 'task-detail'; taskId?: string }
   | { name: 'task-edit' }
   | { name: 'task-decompose' }
-  | { name: 'energy-view' }
   | { name: 'energy-checkin' }
   | { name: 'overload-recovery' }
   | { name: 'resources' }

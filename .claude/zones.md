@@ -3,3 +3,5 @@
 | Alias | Dossier |
 |-------|---------|
 | Appli_TSA_SDI_TDAH | D:\ServOMorph\Appli_TSA_SDI_TDAH |
+| design | D:\ServOMorph\Appli_TSA_SDI_TDAH\DESIGN |
+| discord | D:\ServOMorph\Appli_TSA_SDI_TDAH\DISCORD |

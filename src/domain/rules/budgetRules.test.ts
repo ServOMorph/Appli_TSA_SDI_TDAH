@@ -8,6 +8,7 @@ import {
   getGaugeLevel,
   getGaugeRatio,
   getMonComptePrevisions,
+  getMonCompteSolde,
   getPeriodBounds,
   getBudgetedAmount,
   getSpentForCategory,
@@ -142,6 +143,31 @@ describe('budgetRules', () => {
       expect(getMontantTotal(entries, deposits, accountCategories)).toBe(
         2000 - 100 - (600 + 60 * 4),
       )
+    })
+
+    it('solde « Mon compte » (#28) : sans dépense, égale la prévision « Mon compte » du Budget', () => {
+      const accountCategories = [
+        category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+        category({ id: 'courses', period: 'week', amount: 60 }),
+      ]
+      expect(getMonCompteSolde(accountCategories, [], '2026-07-21')).toBe(600 + 60 * 4)
+    })
+
+    it('solde « Mon compte » (#28) : chaque dépense du mois le diminue, les dépenses d’un autre mois sont ignorées', () => {
+      const accountCategories = [
+        category({ id: 'rent', name: 'Loyer', period: 'month', amount: 600 }),
+        category({ id: 'courses', period: 'week', amount: 60 }),
+      ]
+      const entries = [
+        entry({ id: 'e1', category_id: 'courses', amount: 25, date: '2026-07-10' }),
+        entry({ id: 'e2', category_id: 'rent', amount: 600, date: '2026-07-01' }),
+        entry({ id: 'e3', category_id: 'courses', amount: 999, date: '2026-06-30' }),
+      ]
+      expect(getMonCompteSolde(accountCategories, entries, '2026-07-21')).toBe(600 + 60 * 4 - 25 - 600)
+    })
+
+    it('solde « Mon compte » (#28) : sans sous-catégorie, vaut 0', () => {
+      expect(getMonCompteSolde([], [], '2026-07-21')).toBe(0)
     })
 
     it('calculates cumulative account balances', () => {

@@ -28,10 +28,10 @@ test('T22 — Modifier énergie via check-in', async ({ page }) => {
   await page.screenshot({ path: 'e2e/screenshots/22-energy-modified.png' })
 })
 
-test('T23 — Skip énergie depuis E30 check-in', async ({ page }) => {
+test('T23 — Skip énergie depuis le check-in ramène à l’accueil (#29)', async ({ page }) => {
   await page.getByRole('button', { name: "0 énergie planifiée sur 5 disponible aujourd'hui" }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/23-energy-skipped-dashboard.png' })
 })
 
@@ -42,15 +42,13 @@ test('T24 — Badge énergie visible sur dashboard après check-in', async ({ pa
 test('T25 — Énergie ignorée → badge "Énergie ignorée" visible sur dashboard', async ({ page }) => {
   await page.getByRole('button', { name: "0 énergie planifiée sur 5 disponible aujourd'hui" }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
-  await page.getByRole('button', { name: 'Retour' }).click()
   await expect(page.getByText('Énergie ignorée')).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/25-energy-skipped-badge.png' })
 })
 
-test('T26 — Retour depuis E30 → dashboard', async ({ page }) => {
+test('T26 — Retour depuis le check-in ramène directement à l’accueil (#29)', async ({ page }) => {
   await page.getByRole('button', { name: "0 énergie planifiée sur 5 disponible aujourd'hui" }).click()
-  await page.getByRole('button', { name: 'Retour' }).click()
-  await expect(page.getByRole('heading', { name: 'Mon énergie', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Mon énergie maintenant' })).toBeVisible()
   await page.getByRole('button', { name: 'Retour' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 })

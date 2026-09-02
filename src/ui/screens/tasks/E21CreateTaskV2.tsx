@@ -145,7 +145,9 @@ export function E21CreateTaskV2() {
   const [recurrence, setRecurrence] = useState<RecurrenceRuleInput>(DEFAULT_RECURRENCE)
   const effectiveDestination = (originScreen ? FORCED_DESTINATION_BY_ORIGIN[originScreen] : undefined) ?? DEFAULT_DESTINATION
   const isPlanned = effectiveDestination === 'planned'
-  const canSubmit = title.trim().length > 0 && (!isPlanned || startTime.length > 0)
+  const hasDuration = durationMinutes != null && durationMinutes > 0
+  const canSubmit =
+    title.trim().length > 0 && (!isPlanned || (startTime.length > 0 && hasDuration))
 
   function returnToOrigin() {
     back('inbox')
@@ -322,6 +324,11 @@ export function E21CreateTaskV2() {
             <div>
               <span style={labelStyle}>Durée</span>
               <DurationRoller minutes={durationMinutes} onChange={setDurationMinutes} />
+              {!hasDuration && (
+                <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                  La durée est obligatoire pour planifier la tâche.
+                </p>
+              )}
             </div>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
               <input type="checkbox" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />

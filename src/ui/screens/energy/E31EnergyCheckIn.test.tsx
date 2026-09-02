@@ -48,18 +48,18 @@ describe('E31EnergyCheckIn', () => {
     expect(ctx.skipTodayEnergy).toHaveBeenCalled()
   })
 
-  it('Ignorer navigue vers energy-view', async () => {
+  it('Ignorer ramène à l’accueil sans passer par « Mon énergie » (#29)', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E31EnergyCheckIn />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Ignorer' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
-  it('Retour navigue vers energy-view', async () => {
+  it('Retour ramène à l’accueil sans passer par « Mon énergie » (#29)', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E31EnergyCheckIn />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('energy-view')
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
   })
 
   it('pré-sélectionne la valeur existante si todayEnergy renseigné', () => {

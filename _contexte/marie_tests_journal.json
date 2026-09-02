@@ -316,6 +316,34 @@
       "status": "nok",
       "comment": "Ça dépasse toujours",
       "created_at": "2026-08-28T20:33:39.742Z"
+    },
+    {
+      "id": "5ad9e4db-de8b-40a8-b8bf-09843e1f2eae",
+      "status": "ok",
+      "comment": null,
+      "test_id": "planning-hauteur-fixe",
+      "created_at": "2026-08-31T15:02:02.341Z"
+    },
+    {
+      "id": "09842272-15e5-4c56-9863-9ce26a0fb076",
+      "status": "ok",
+      "comment": null,
+      "test_id": "case-de-tache-coloree-en-entier",
+      "created_at": "2026-08-31T15:02:49.205Z"
+    },
+    {
+      "id": "5a1e3368-b008-4d51-aa03-68baa5798d3e",
+      "status": "nok",
+      "comment": "Les cadres « dates » et « heure » ne tiennent pas entièrement dans l’écran, il dépasse à droite encore",
+      "test_id": "cadre-date-heure-dans-l-ecran",
+      "created_at": "2026-08-31T15:03:53.737Z"
+    },
+    {
+      "id": "ee3f2e75-a1db-4474-a65c-07d67b28be72",
+      "status": "ok",
+      "comment": null,
+      "test_id": "donnees-synchronisees-automatiquement",
+      "created_at": "2026-08-31T20:31:27.027Z"
     }
   ]
 }

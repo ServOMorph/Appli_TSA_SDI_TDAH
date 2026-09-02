@@ -73,7 +73,7 @@ describe('E71Budget', () => {
     expect(screen.getByRole('heading', { name: 'Budget' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Configurer le budget' })).toBeDefined()
     expect(screen.queryByText('Montant total')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Ouvrir Mon compte' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Ouvrir Prévisions' })).toBeNull()
   })
 
   it('le retour utilise back("dashboard") pour respecter l\'origine réelle de navigation, y compris non configuré', async () => {
@@ -136,7 +136,18 @@ describe('E71Budget', () => {
     expect(screen.getByText(/-240,00.*mon compte/)).toBeDefined()
   })
 
-  it('navigue vers Mon compte et Mes livrets avec leurs totaux respectifs', async () => {
+  it('affiche la carte « Prévisions » en positif et en vert, comme « Mes livrets » (#26)', () => {
+    renderWithApp(<E71Budget />, makeAppContext({
+      budgetIncomeEntries: [makeIncomeEntry({ amount: 2000 })],
+      budgetCategories: [makeCategory({ id: 'courses', name: 'Courses', period: 'week', amount: 60 })],
+    }))
+    const card = screen.getByRole('button', { name: 'Ouvrir Prévisions' })
+    const value = within(card).getByText('240,00 €')
+    expect(value.textContent).not.toContain('-')
+    expect(value.style.color).toBe('var(--color-success)')
+  })
+
+  it('navigue vers Prévisions et Mes livrets avec leurs totaux respectifs', async () => {
     const ctx = makeAppContext({
       budgetIncomeEntries: [makeIncomeEntry()],
       budgetCategories: [makeCategory()],
@@ -145,7 +156,7 @@ describe('E71Budget', () => {
     })
     renderWithApp(<E71Budget />, ctx)
     expect(within(screen.getByRole('button', { name: 'Ouvrir Mes livrets' })).getByText(/50,00/)).toBeDefined()
-    await userEvent.click(screen.getByRole('button', { name: 'Ouvrir Mon compte' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ouvrir Prévisions' }))
     expect(ctx.goTo).toHaveBeenCalledWith('budget-previsions')
     await userEvent.click(screen.getByRole('button', { name: 'Ouvrir Mes livrets' }))
     expect(ctx.goTo).toHaveBeenCalledWith('budget-livrets')

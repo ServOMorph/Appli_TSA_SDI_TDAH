@@ -14,10 +14,14 @@ export function flashyBackground(color: string): string {
   return color
 }
 
-export function plannedTaskTintStyle(completed: boolean, color: string): CSSProperties {
+export function plannedTaskTintStyle(completed: boolean, color: string | null): CSSProperties {
+  // Une tâche sans couleur choisie garde son texte lisible (`--color-text`) même cochée : le texte
+  // blanc barré sur fond clair serait invisible (retour Marie #23).
+  const hasColor = !!color && color !== 'var(--color-surface)'
+  const effective = color ?? 'var(--color-surface)'
   return {
-    backgroundColor: completed ? flashyBackground(color) : pastelBackground(color),
-    color: completed ? '#fff' : 'var(--color-text)',
+    backgroundColor: completed ? flashyBackground(effective) : pastelBackground(effective),
+    color: completed && hasColor ? '#fff' : 'var(--color-text)',
     textDecoration: completed ? 'line-through' : 'none',
   }
 }

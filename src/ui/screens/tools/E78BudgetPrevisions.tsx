@@ -46,7 +46,7 @@ export function E78BudgetPrevisions() {
         <button aria-label="Retour" onClick={() => back('budget')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ←
         </button>
-        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Mon compte</h1>
+        <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Prévisions</h1>
         <button aria-label="Paramètres du budget" onClick={() => goTo('budget-settings')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem', color: 'var(--color-text)', padding: 0 }}>
           ⚙
         </button>

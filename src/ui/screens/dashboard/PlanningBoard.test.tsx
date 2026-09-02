@@ -159,6 +159,33 @@ describe('PlanningBoard', () => {
     expect(screen.getByLabelText('7 énergie')).toBeInTheDocument()
   })
 
+  it('affiche l’heure de début en haut et l’heure de fin en bas de la case (#25)', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:30', duration_minutes: 90 })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    const start = screen.getByText('09:00')
+    const end = screen.getByText('10:30')
+    const timeCol = start.parentElement as HTMLElement
+    expect(timeCol.contains(end)).toBe(true)
+    expect(timeCol.style.justifyContent).toBe('space-between')
+    expect(timeCol.style.flexDirection).toBe('column')
+  })
+
+  it('n’affiche pas d’heure de fin quand elle est absente ou égale au début (#25)', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: null })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+    expect(screen.getAllByText('09:00')).toHaveLength(1)
+  })
+
+  it('ancre le contenu de la case en haut, y compris pour les grandes cases (#24)', async () => {
+    const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '12:00', duration_minutes: 180 })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+    const row = title.closest('button') as HTMLElement
+    expect(row.style.alignItems).toBe('flex-start')
+  })
+
   it('utilise un fond neutre quand une tâche n’a pas de couleur', async () => {
     const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', color: null })
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
@@ -374,6 +401,23 @@ describe('PlanningBoard', () => {
     const row = tinted.querySelector('button') as HTMLElement
     expect(tinted.style.backgroundColor).not.toContain('color-mix')
     expect(row.style.color).toBe('rgb(255, 255, 255)')
+    expect(row.style.textDecoration).toBe('line-through')
+  })
+
+  it('tâche sans couleur terminée : texte lisible (pas blanc) et barré (#23)', async () => {
+    const task = makeTaskV2({
+      scheduled_date: '2026-06-30',
+      scheduled_start: '09:00',
+      scheduled_end: '10:00',
+      status: 'completed',
+      color: null,
+    })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    const title = await screen.findByText('Médecin')
+
+    const tinted = title.closest('div[style*="background-color"]') as HTMLElement
+    const row = tinted.querySelector('button') as HTMLElement
+    expect(row.style.color).not.toBe('rgb(255, 255, 255)')
     expect(row.style.textDecoration).toBe('line-through')
   })
 })

@@ -15,7 +15,6 @@ const CASES: { screen: Screen; route?: Route }[] = [
   { screen: 'task-detail', route: { name: 'task-detail', taskId: 'task-1' } },
   { screen: 'task-edit' },
   { screen: 'task-decompose' },
-  { screen: 'energy-view' },
   { screen: 'energy-checkin' },
   { screen: 'overload-recovery' },
   { screen: 'resources' },

@@ -30,7 +30,7 @@ export function E31EnergyCheckIn() {
 
   async function skip() {
     await skipTodayEnergy()
-    goTo('energy-view')
+    goTo('dashboard')
   }
 
   return (
@@ -46,7 +46,7 @@ export function E31EnergyCheckIn() {
         justifyContent: 'center',
       }}
     >
-      <button style={backBtnStyle} onClick={() => goTo('energy-view')} aria-label="Retour">
+      <button style={backBtnStyle} onClick={() => goTo('dashboard')} aria-label="Retour">
         ← Retour
       </button>
 

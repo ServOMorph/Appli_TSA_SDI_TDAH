@@ -30,6 +30,7 @@ export function E112Accessibility() {
   const reducedMotion = settings?.reduced_motion ?? false
   const darkMode = settings?.dark_mode ?? false
   const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
+  const monCompteColor = settings?.mon_compte_color ?? null
 
   return (
     <main
@@ -117,11 +118,33 @@ export function E112Accessibility() {
         <p style={{ margin: '0 0 var(--spacing-sm)', fontWeight: 600, color: 'var(--color-text)' }}>
           Couleur des outils
         </p>
-        {tools.length === 0 ? (
-          <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Aucun outil à personnaliser.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            {tools.map((tool) => {
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--spacing-sm)' }}>
+            <span style={{ color: 'var(--color-text)' }}>Mon compte</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="color"
+                aria-label="Couleur de fond pour Mon compte"
+                value={monCompteColor ?? DEFAULT_TOOL_COLOR}
+                onChange={(e) => updateSettings({ mon_compte_color: e.target.value })}
+                style={{ width: '40px', height: '32px', cursor: 'pointer', border: 'none', padding: 0 }}
+              />
+              {monCompteColor && (
+                <button
+                  type="button"
+                  aria-label="Retirer la couleur de Mon compte"
+                  onClick={() => updateSettings({ mon_compte_color: undefined })}
+                  style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', cursor: 'pointer', fontSize: '1.125rem', lineHeight: 1, padding: 0 }}
+                >
+                  &times;
+                </button>
+              )}
+            </div>
+          </div>
+          {tools.length === 0 ? (
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Aucun autre outil à personnaliser.</p>
+          ) : (
+            tools.map((tool) => {
               const list = tool.list_id ? lists.find((item) => item.id === tool.list_id) : undefined
               const label = toolLabel(tool, list?.name)
               return (
@@ -148,9 +171,9 @@ export function E112Accessibility() {
                   </div>
                 </div>
               )
-            })}
-          </div>
-        )}
+            })
+          )}
+        </div>
       </Card>
 
     </main>

@@ -20,3 +20,31 @@ Quand tu fais glisser le bandeau des jours, seuls les jours défilent à l'inté
 
 Nouvelle vue « Planning de la semaine » : touche le logo à gauche du mois, sur l'accueil, pour voir les sept jours de la semaine côte à côte, chacun avec ses tâches en icônes. Glisse pour changer de semaine ; « Aujourd'hui » et le choix du mois marchent comme sur l'accueil.
 
+## Changement livré
+
+Une tâche du planning sans couleur choisie reste lisible une fois cochée : son texte se barre en noir, plus en blanc.
+
+## Changement livré
+
+Quand tu donnes une couleur à un outil dans les Paramètres, sa carte sur l'accueil prend aussitôt cette couleur. La carte « Mon compte » a maintenant, elle aussi, son réglage de couleur dans « Couleur des outils ».
+
+## Changement livré
+
+Sur le planning, le nom de la tâche reste toujours en haut de la case, même pour une grande case. L'heure de début s'affiche en haut, l'heure de fin en bas. Pour planifier une tâche à une heure précise, il faut maintenant lui donner une durée (une tâche de la liste à faire n'a rien de nouveau à remplir).
+
+## Changement livré
+
+L'outil « Comptes » de l'accueil s'appelle maintenant « Mon compte ». Depuis la page Budget, l'écran équivalent s'appelle « Prévisions », pour ne plus confondre les deux. En haut de « Mon compte », un « Solde du mois » montre la somme prévue de toutes les sous-catégories et baisse à chaque dépense ; sur la page Budget, ce montant reste fixe.
+
+## Changement livré
+
+Sur la page Budget, la carte « Prévisions » s'affiche maintenant en positif et en vert, comme « Mes livrets ».
+
+## Changement livré
+
+Sur l'écran d'énergie, « Retour » et « Ignorer » ramènent directement à l'accueil. L'ancien écran « Mon énergie » séparé a été retiré.
+
+## Changement livré
+
+Dans une liste, un élément qui a des sous-tâches les montre directement sous lui : tu peux les plier, les déplier et les cocher sans ouvrir l'élément.
+

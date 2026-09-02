@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_marie_snapshot.py:*), Bash(python scripts/ingest_manual_tests.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_marie_snapshot.py:*), Bash(python scripts/ingest_manual_tests.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -188,7 +188,8 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - Si la publication ou l'obtention du lien échoue, ne pas prétendre que Marie peut consulter le document ;
       signaler précisément l'échec et attendre une instruction.
 
-12. Rédiger un message WhatsApp prêt à envoyer à Marie à partir de l'inventaire. Il doit toujours contenir :
+12. Composer le message de livraison pour Marie à partir de l'inventaire et le **déposer dans la gateway Discord**
+    (cf. `CLAUDE.md` § Messages pour Marie). Il doit toujours contenir :
     - une annonce brève de la version disponible ;
     - les changements effectivement livrés ;
     - un renvoi vers l'écran « Tests à faire » de l'appli pour les tests à rejouer — sans les énumérer ;
@@ -196,9 +197,14 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - le lien de production, sur sa propre ligne : `https://appli-audhd.netlify.app/` ;
     - le lien partageable du commentaire Drive, sur sa propre ligne, introduit par « Détail des changements et questions : ».
 
-    Encadrer systématiquement le message par `💻🤖` : une occurrence au début du message et une autre à la fin.
+    Écrire le corps au fond définitif, **sans** l'encadrement `💻🤖` ni le tag (l'agent DISCORD les pose), puis :
+    ```
+    python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie --kind delivery --file <corps.txt>
+    ```
+    Ne jamais appeler `DISCORD/discord_com/message_marie.py`, l'API Discord ou `claude_bridge` en direct.
+    L'agent DISCORD ajuste ton, format et moment d'envoi sans changer le fond ; relever l'id de demande renvoyé.
 
 13. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify, résultat de la
     vérification de fumée, résultat du contrôle de budget bundle, nom et lien du document Drive, inventaire
-    synthétique et message WhatsApp complet. Ne jamais relancer le déploiement automatiquement en cas d'échec —
-    signaler l'erreur et attendre une confirmation explicite.
+    synthétique et corps du message de livraison déposé dans la gateway (avec son id de demande). Ne jamais
+    relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et attendre une confirmation explicite.

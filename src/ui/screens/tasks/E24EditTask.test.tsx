@@ -12,6 +12,8 @@ function makeTask(overrides: Partial<Task> = {}): Task {
     status: 'planned',
     scheduled_date: '2026-08-14',
     scheduled_start: '09:00',
+    scheduled_end: '10:00',
+    duration_minutes: 60,
     ...overrides,
   })
 }
@@ -42,6 +44,28 @@ describe('E24EditTask', () => {
       ),
     )
     expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
+  })
+
+  it('durée obligatoire quand une heure de début est renseignée (#25)', async () => {
+    const task = makeTask({ scheduled_start: '09:00', scheduled_end: null, duration_minutes: null })
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+    renderWithApp(<E24EditTask />, ctx)
+    await screen.findByDisplayValue('Appeler le médecin')
+    const btn = screen.getByRole('button', { name: 'Enregistrer' }) as HTMLButtonElement
+    expect(btn.disabled).toBe(true)
+    expect(screen.getByText('La durée est obligatoire quand une heure de début est renseignée.')).toBeDefined()
+    await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
+    expect(btn.disabled).toBe(false)
+    expect(screen.queryByText('La durée est obligatoire quand une heure de début est renseignée.')).toBeNull()
+  })
+
+  it('sans heure de début, la durée reste facultative (#25)', async () => {
+    const task = makeTask({ status: 'inbox', scheduled_date: null, scheduled_start: null, scheduled_end: null, duration_minutes: null })
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+    renderWithApp(<E24EditTask />, ctx)
+    await screen.findByDisplayValue('Appeler le médecin')
+    expect((screen.getByRole('button', { name: 'Enregistrer' }) as HTMLButtonElement).disabled).toBe(false)
+    expect(screen.queryByText('La durée est obligatoire quand une heure de début est renseignée.')).toBeNull()
   })
 
   it('tâche récurrente : propose le choix occurrence/série avant d\'enregistrer', async () => {

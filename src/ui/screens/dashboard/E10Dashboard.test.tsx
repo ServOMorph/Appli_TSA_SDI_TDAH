@@ -237,11 +237,53 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
     })
 
-    it('le widget Comptes navigue vers l’écran Comptes', async () => {
+    it('le widget « Mon compte » navigue vers l’écran budget-account', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Comptes' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Mon compte' }))
       expect(ctx.goTo).toHaveBeenCalledWith('budget-account')
+    })
+
+    it('applique la couleur de l’outil au fond de sa carte sur l’accueil (#30)', async () => {
+      const ctx = makeAppContext({
+        lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
+        tools: [
+          { id: 't1', type: 'liste', folder_id: null, list_id: 'l1', position: 0, color: '#ff8800', created_at: '', updated_at: '' },
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const card = (await screen.findByRole('button', { name: 'Courses' })).closest('div') as HTMLElement
+      expect(card.style.backgroundColor).toContain('#ff8800')
+      expect(card.style.backgroundColor).toContain('color-mix')
+    })
+
+    it('ne pose aucun fond personnalisé sur une carte d’outil sans couleur (#30)', async () => {
+      const ctx = makeAppContext({
+        lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
+        tools: [
+          { id: 't1', type: 'liste', folder_id: null, list_id: 'l1', position: 0, created_at: '', updated_at: '' },
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const card = (await screen.findByRole('button', { name: 'Courses' })).closest('div') as HTMLElement
+      expect(card.style.backgroundColor).not.toContain('color-mix')
+    })
+
+    it('applique la couleur configurée au fond de la carte « Mon compte » (#31)', async () => {
+      const ctx = makeAppContext({
+        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, mon_compte_color: '#22aa55' },
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      const card = (await screen.findByRole('button', { name: 'Mon compte' })).closest('div') as HTMLElement
+      expect(card.style.backgroundColor).toContain('#22aa55')
+      expect(card.style.backgroundColor).toContain('color-mix')
+    })
+
+    it('ne pose aucun fond sur la carte « Mon compte » sans couleur configurée (#31)', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      const card = (await screen.findByRole('button', { name: 'Mon compte' })).closest('div') as HTMLElement
+      expect(card.style.backgroundColor).not.toContain('color-mix')
     })
   })
 

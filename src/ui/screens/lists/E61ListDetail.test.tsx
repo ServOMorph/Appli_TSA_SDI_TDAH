@@ -6,6 +6,7 @@ import { E61ListDetail } from './E61ListDetail'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { ListCategory } from '@/domain/entities/listCategory'
+import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 import type { Tool } from '@/domain/entities/tool'
 
 function makeTool(overrides: Partial<Tool> = {}): Tool {
@@ -219,6 +220,54 @@ describe('E61ListDetail', () => {
       await waitFor(() => screen.getByRole('button', { name: 'Supprimer Hotel California' }))
       await userEvent.click(screen.getByRole('button', { name: 'Supprimer Hotel California' }))
       expect(ctx.deleteListItem).toHaveBeenCalledWith('i1')
+    })
+  })
+
+  describe('sous-tâches d’un élément dans la page de catégorie (#33)', () => {
+    const sub = (o: Partial<ListItemSubTask> = {}): ListItemSubTask => ({
+      id: 'sub-1',
+      list_item_id: 'i1',
+      title: 'Étape 1',
+      position: 0,
+      checked: false,
+      created_at: '2026-06-30T10:00:00.000Z',
+      ...o,
+    })
+
+    function ctxWithSubs(subsByItem: Record<string, ListItemSubTask[]>) {
+      return makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue([makeListItem({ id: 'i1', title: 'Hotel California' })]),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory()]),
+        getListItemSubTasks: vi.fn(async (itemId: string): Promise<ListItemSubTask[]> => subsByItem[itemId] ?? []),
+      })
+    }
+
+    it('n’affiche pas de contrôle plier/déplier pour un élément sans sous-tâche', async () => {
+      renderWithApp(<E61ListDetail />, ctxWithSubs({}))
+      await goToCategory('Général')
+      await waitFor(() => screen.getByText('Hotel California'))
+      expect(screen.queryByRole('button', { name: /sous-tâches/ })).toBeNull()
+    })
+
+    it('affiche le compteur et déplie la liste des sous-tâches au clic', async () => {
+      renderWithApp(<E61ListDetail />, ctxWithSubs({ i1: [sub({ id: 's1', title: 'Étape 1' }), sub({ id: 's2', title: 'Étape 2', checked: true })] }))
+      await goToCategory('Général')
+      const toggle = await screen.findByRole('button', { name: '1 sur 2 sous-tâches, déplier' })
+      expect(screen.queryByText('Étape 1')).toBeNull()
+      await userEvent.click(toggle)
+      expect(await screen.findByText('Étape 1')).toBeInTheDocument()
+      expect(screen.getByText('Étape 2')).toBeInTheDocument()
+    })
+
+    it('cocher une sous-tâche dépliée appelle toggleListItemSubTask', async () => {
+      const ctx = ctxWithSubs({ i1: [sub({ id: 's1', title: 'Étape 1' })] })
+      renderWithApp(<E61ListDetail />, ctx)
+      await goToCategory('Général')
+      await userEvent.click(await screen.findByRole('button', { name: '0 sur 1 sous-tâches, déplier' }))
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Cocher Étape 1' }))
+      expect(ctx.toggleListItemSubTask).toHaveBeenCalledWith('s1')
     })
   })
 

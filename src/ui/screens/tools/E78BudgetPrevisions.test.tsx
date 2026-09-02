@@ -33,6 +33,11 @@ describe('E78BudgetPrevisions', () => {
     expect(ctx.goTo).toHaveBeenCalledWith('budget-settings')
   })
 
+  it('affiche le titre « Prévisions » (décision 4, #27)', () => {
+    renderWithApp(<E78BudgetPrevisions />, makeAppContext())
+    expect(screen.getByRole('heading', { name: 'Prévisions' })).toBeDefined()
+  })
+
   it('affiche Semaine et Mois côte à côte avec le montant prévu par sous-catégorie, sans dépense ni jauge', () => {
     renderWithApp(<E78BudgetPrevisions />, makeAppContext({
       budgetCategories: [

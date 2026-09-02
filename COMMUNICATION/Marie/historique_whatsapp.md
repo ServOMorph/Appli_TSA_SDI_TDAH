@@ -196,3 +196,14 @@ message » quand Claude occupé), récupéré depuis `logs/conversation.jsonl` a
 (mise en file d'attente). Routé vers `gateway/inbox/orchestrateur/` (`20260902T173626_562363`).
 Réponse à formuler : prochain `/deploy` (correctif pastille + bundle + planning Phases 3-5 déjà
 prêts).
+
+### 2026-09-02 20h01 — réponse sur le délai
+
+**Dév ->**
+Prochaine version bientôt : elle corrige surtout des choses déjà signalées (pastille des tests, affichage du planning). Tes 11 nouvelles demandes du document arrivent après, livrées par petits lots.
+
+_Suite :_ répond à la question de Marie du 2026-09-02 17h17 (« dans combien de temps la nouvelle
+version ? »). Envoyé via la gateway (`enqueue` orchestrateur → `drain`, Discord message id
+`1544799987622215714`), `kind=info`, sans `--expect-reply`. Aucune date ferme donnée (engagement
+calendaire non pris). Le prochain `/deploy` livrera le correctif pastille + le travail bundle +
+`roadmap_planning_accueil` Phases 3-5.

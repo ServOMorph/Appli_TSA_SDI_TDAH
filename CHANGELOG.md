@@ -1,3 +1,12 @@
+## v5.76 — 2026-09-02
+
+### Modifié
+- `roadmap_sav_snapshot_marie.md` exécutée : ses trois phases sont `[FAIT]`. `scripts/backup_marie_snapshot.py` gère les coupures réseau (`URLError`/`TimeoutError`, délai d'attente de 15 s) par un message d'une ligne et une sortie en erreur, sans traceback ; la déduplication porte désormais sur le contenu du snapshot et non sur l'heure de synchronisation ; le nom de fichier est horodaté en temps universel via `datetime.fromisoformat` (`%Y%m%d-%H%Mz`, minutes non dupliquées) ; le script refuse un snapshot absent ou vide ; la requête est ordonnée par date de synchronisation décroissante et n'extrait plus `created_at` ; la ligne de sortie nomme l'appareil retenu, sa date de synchronisation et le nombre de résultats de tests ayant motivé la sélection. Les fichiers déjà écrits ne sont pas renommés.
+- `scripts/_supabase.py` : nouveau module partageant la garde d'environnement et la requête HTTP vers Supabase, consommé par `scripts/backup_marie_snapshot.py` et `scripts/read_device_snapshots.py` (ce dernier référençait `urllib.error` sans l'importer — corrigé par la factorisation).
+- `donnees_marie/` : rétention disponible à la demande (`--prune`, `--dry-run`, `--keep-last`, défaut 30 snapshots récents par appareil plus le premier de chaque mois) ; les exports historiques `export-audhd-*.json` ne sont jamais touchés. La purge n'est jamais automatique — ni `/start` ni `/close` ne l'exécutent.
+- `scripts/test_backup_marie_snapshot.py` : nouveau, 31 tests `unittest` de la bibliothèque standard couvrant la sélection de l'appareil, la déduplication par contenu, le refus d'un snapshot vide, le format du nom de fichier et le plan de rétention.
+- `_contexte/contexte.md`, `_contexte/archive_decisions.md` : décision du 2026-08-24/25 (nettoyage documentaire) archivée pour tenir la limite de dix entrées.
+
 ## v5.75 — 2026-09-01
 
 ### Ajouté

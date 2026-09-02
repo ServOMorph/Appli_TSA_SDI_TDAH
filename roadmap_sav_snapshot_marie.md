@@ -43,22 +43,22 @@ que deux exécutions sans synchronisation intercalée.
   n'a ni `pytest`, ni `requirements.txt`, ni aucun test Python à ce jour). Les fonctions pures sont
   testées ; le chemin réseau reste vérifié à la main.
 
-## Phase 1 — Robustesse : réseau et doublons [TODO]
+## Phase 1 — Robustesse : réseau et doublons [FAIT]
 
 Traite les constats 1, 2, 6, 9 — les seuls qui peuvent faire perdre une sauvegarde ou en écrire une
 fausse.
 
-- [ ] Attraper `urllib.error.URLError` et `TimeoutError` en plus de `HTTPError` : message d'une
+- [x] Attraper `urllib.error.URLError` et `TimeoutError` en plus de `HTTPError` : message d'une
   ligne sur `stderr`, `return 1`. Plus aucun traceback sur le chemin hors-ligne.
-- [ ] Ajouter `timeout=15` à `urlopen` (un `/start` ne doit jamais pendre sur Supabase).
-- [ ] Dédupliquer par **contenu** et non par `synced_at` : avant écriture, comparer le `payload`
+- [x] Ajouter `timeout=15` à `urlopen` (un `/start` ne doit jamais pendre sur Supabase).
+- [x] Dédupliquer par **contenu** et non par `synced_at` : avant écriture, comparer le `payload`
   sérialisé à la sauvegarde la plus récente du même appareil (`snapshot-supabase-<device>-*.json`,
   tri décroissant). Identique → ne rien écrire, afficher `inchangé depuis <nom>`.
-- [ ] Refuser d'écrire un `payload` absent, `None`, ou dépourvu à la fois de `tasks` et de
+- [x] Refuser d'écrire un `payload` absent, `None`, ou dépourvu à la fois de `tasks` et de
   `manual_test_results` : message explicite, `return 1`.
-- [ ] Créer `scripts/test_backup_marie_snapshot.py` (`unittest`) couvrant : sélection de cible,
+- [x] Créer `scripts/test_backup_marie_snapshot.py` (`unittest`) couvrant : sélection de cible,
   détection de doublon par contenu, refus d'un payload vide, génération du nom de fichier.
-- [ ] Vérification manuelle : relancer avec `SUPABASE_URL` invalide (message d'une ligne attendu),
+- [x] Vérification manuelle : relancer avec `SUPABASE_URL` invalide (message d'une ligne attendu),
   puis relancer normalement deux fois de suite (aucun fichier neuf attendu).
 
 Critère de sortie : hors-ligne, le script affiche une ligne et sort en 1 ; deux exécutions
@@ -67,20 +67,20 @@ successives sans changement réel des données de Marie ne produisent qu'un seul
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 2 — Lisibilité et traçabilité [TODO]
+## Phase 2 — Lisibilité et traçabilité [FAIT]
 
 Traite les constats 3, 4, 5, 7.
 
-- [ ] Générer le stamp via `datetime.fromisoformat(synced_at)` plutôt que par index de chaîne :
+- [x] Générer le stamp via `datetime.fromisoformat(synced_at)` plutôt que par index de chaîne :
   format `%Y%m%d-%H%Mz` (UTC explicite, minutes non dupliquées, robuste à un changement de format
   côté Supabase). Ne pas renommer les fichiers déjà écrits.
-- [ ] Chemin nominal : afficher le `device_id` complet, le `synced_at` retenu et le nombre de
+- [x] Chemin nominal : afficher le `device_id` complet, le `synced_at` retenu et le nombre de
   `manual_test_results` ayant motivé la sélection.
-- [ ] Requête PostgREST : ajouter `&order=synced_at.desc` (ordre déterministe, tie-break implicite
+- [x] Requête PostgREST : ajouter `&order=synced_at.desc` (ordre déterministe, tie-break implicite
   de `max()`), retirer `created_at` du `select`.
-- [ ] Tests : format du nom de fichier sur plusieurs formes de `synced_at` (avec/sans microsecondes,
+- [x] Tests : format du nom de fichier sur plusieurs formes de `synced_at` (avec/sans microsecondes,
   `Z` vs `+00:00`) ; départage de deux appareils à égalité de `manual_test_results`.
-- [ ] Vérification manuelle : une exécution réelle, contrôler que la ligne affichée nomme bien
+- [x] Vérification manuelle : une exécution réelle, contrôler que la ligne affichée nomme bien
   l'appareil `192f2411` et son horodatage UTC.
 
 Critère de sortie : le nom de fichier est sans ambiguïté et marqué UTC ; la sortie permet de voir
@@ -89,23 +89,23 @@ quel appareil a été retenu et pourquoi, sans relire le code.
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 3 — Dette et rétention [TODO]
+## Phase 3 — Dette et rétention [FAIT]
 
 Traite les constats 8 et 10. Phase de nettoyage : à faire seulement après que les Phases 1-2 ont
 stabilisé le comportement, pour ne pas refactoriser une cible mouvante.
 
-- [ ] Extraire dans `scripts/_supabase.py` la garde d'environnement et la requête HTTP partagées ;
+- [x] Extraire dans `scripts/_supabase.py` la garde d'environnement et la requête HTTP partagées ;
   `backup_marie_snapshot.py` et `read_device_snapshots.py` la consomment.
-- [ ] Corriger `read_device_snapshots.py` : `import urllib.error` manquant (fonctionne aujourd'hui
+- [x] Corriger `read_device_snapshots.py` : `import urllib.error` manquant (fonctionne aujourd'hui
   par import transitif de `urllib.request`, non garanti par la spécification).
-- [ ] Rétention dans `donnees_marie/` : conserver les N derniers snapshots par appareil (défaut
+- [x] Rétention dans `donnees_marie/` : conserver les N derniers snapshots par appareil (défaut
   proposé : 30) plus le premier de chaque mois, purger le reste. Les exports historiques
   `export-audhd-*.json` ne sont jamais touchés.
-- [ ] Purge sous `--prune` explicite, jamais automatique : une suppression de données de Marie ne
+- [x] Purge sous `--prune` explicite, jamais automatique : une suppression de données de Marie ne
   doit pas être un effet de bord silencieux de `/start` ou `/close`.
-- [ ] Tests : sélection des fichiers à conserver sur un jeu de noms synthétiques (aucun accès au
+- [x] Tests : sélection des fichiers à conserver sur un jeu de noms synthétiques (aucun accès au
   contenu réel).
-- [ ] Vérification manuelle : `--prune` à blanc (`--dry-run`) sur le dossier réel, contrôler la
+- [x] Vérification manuelle : `--prune` à blanc (`--dry-run`) sur le dossier réel, contrôler la
   liste avant toute suppression effective.
 
 Critère de sortie : une seule implémentation de l'accès Supabase ; `donnees_marie/` ne croît plus

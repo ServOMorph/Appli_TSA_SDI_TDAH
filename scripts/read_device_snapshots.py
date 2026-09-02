@@ -7,16 +7,16 @@ contourne). Ces valeurs ne sont jamais affichees ni journalisees par ce script.
 """
 
 import json
-import os
 import sys
-import urllib.request
+
+from _supabase import SupabaseError, fetch_snapshots, read_credentials
 
 
 def main() -> int:
-    url = os.environ.get("SUPABASE_URL")
-    service_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-    if not url or not service_key:
-        print("ERREUR: SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent etre definies dans l'environnement.", file=sys.stderr)
+    try:
+        url, service_key = read_credentials()
+    except SupabaseError as e:
+        print(f"ERREUR: {e}.", file=sys.stderr)
         return 1
 
     device_id = sys.argv[1] if len(sys.argv) > 1 else None
@@ -25,19 +25,10 @@ def main() -> int:
     if device_id:
         query += f"&device_id=eq.{device_id}"
 
-    request = urllib.request.Request(
-        f"{url.rstrip('/')}/rest/v1/device_snapshots?{query}",
-        headers={
-            "apikey": service_key,
-            "Authorization": f"Bearer {service_key}",
-        },
-    )
-
     try:
-        with urllib.request.urlopen(request) as response:
-            rows = json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        print(f"ERREUR: requete Supabase echouee ({e.code}) : {e.read().decode('utf-8')}", file=sys.stderr)
+        rows = fetch_snapshots(url, service_key, query)
+    except SupabaseError as e:
+        print(f"ERREUR: {e}.", file=sys.stderr)
         return 1
 
     if not rows:

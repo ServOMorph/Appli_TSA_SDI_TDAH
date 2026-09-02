@@ -20,3 +20,19 @@ pas resynchronisé entre le `/start` et le `/close` de cette session.
 Note : le point « un échec est signalé en une ligne » ne fait plus partie de ce test — il est
 mesuré comme non tenu (traceback brut sur `URLError`) et traité par la Phase 1 de
 `roadmap_sav_snapshot_marie.md`.
+
+## Bot Discord — file d'attente des commandes en conditions réelles
+
+Ajouté le 2026-09-02 (commit `2b75711`). `bot.py` empile désormais dans `commands.json` → `queue[]`
+tout message reçu pendant que Claude traite déjà une commande, et `boucle_polling` promeut la file
+en FIFO dès le retour à `idle`. Testé seulement en isolation (script hors ligne), pas encore avec
+le vrai bot et Discord.
+
+À vérifier lors d'une session `/discord_loop` active :
+- envoyer 2-3 messages au bot pendant qu'il traite une commande longue → chacun reçoit
+  « 📥 En file d'attente (N) », aucun n'est rejeté ;
+- à la fin du traitement, les messages sont repris un par un, dans l'ordre d'arrivée, avec le bon
+  auteur affiché (`[RESTREINT Rayonne Toi]` / `[ADMIN …]`) ;
+- `!ping` / `!help` répondent toujours immédiatement même file non vide ;
+- cas dégradé : tuer la session pendant un traitement → `commands.json` reste en `processing`,
+  la file se remplit sans être promue (angle mort connu, cf. question ouverte P3 de `signals.md`).

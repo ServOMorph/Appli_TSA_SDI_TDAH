@@ -1,3 +1,12 @@
+## v5.79 — 2026-09-02
+
+### Ajouté
+- Bot Discord (`DISCORD/discord_com/bot.py`) : file d'attente des commandes. Un message reçu pendant que Claude traite déjà une commande est empilé dans `commands.json` → `queue[]` puis promu en FIFO dès le retour à `idle`, au lieu d'être rejeté par « Renvoie ce message quand il a répondu » (commit `2b75711`).
+
+### Modifié
+- Modèle de message pour Marie (`.claude/CLAUDE.md`, `AGENTS.md`) : la règle du tag systématique `<@…>` est rendue explicite dans le gabarit et la consigne (« tague Marie dans chaque message, sans exception »). Le code (`gateway.curate()`, `to=marie`) le posait déjà sans condition (commit `1670bca`).
+- Décisions produit 1 (#25, durée obligatoire → « seulement planning ») et 6 (#29, écran « Mon énergie » → « retirer ») de `roadmap_demandes_marie_2026-09-02.md` tranchées sur les réponses Discord de Marie (commit `d1db72e`).
+
 ## v5.78 — 2026-09-02
 
 ### Ajouté

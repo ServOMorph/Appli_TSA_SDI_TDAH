@@ -105,6 +105,11 @@ Le bridge assistant vocal est partagé et hébergé par le projet Roberto
 `ROBERTO/com_telephone/README.md` (détail) et la commande `/roberto` (`.claude/commands/roberto.md`)
 qui met la session en écoute du log TSA.
 
+**Périmètre depuis le 2026-09-02** : le canal des **messages produit à Marie** est Discord via la
+gateway (voir § Messages pour Marie). Le bridge ROBERTO reste le canal **vocal / de secours** avec
+l'utilisateur (Morphéus) — questions/validations quand le bridge est actif, convention `!<commande>` —
+et n'est plus le vecteur des messages à Marie.
+
 - **Log surveillé** : `D:\ServOMorph\Roberto\com_telephone\voice-code-bridge\server\logs\messages_tsa.log`.
   Le verrou du Monitor actif est `ROBERTO/com_telephone/_commands/monitor_tsa.lock` (se fier à ce
   fichier, jamais à la mémoire de conversation).
@@ -121,25 +126,54 @@ qui met la session en écoute du log TSA.
 - Prérequis : les 3 process partagés doivent tourner (démarrés côté Roberto via
   `com_manager.py start`). Rien à lancer depuis ce projet.
 
-### Messages pour Marie : prêts à copier-coller, avec emojis
-Tout message rédigé à l'intention de Marie (pas seulement celui de `/deploy`) doit être livré prêt
-à copier-coller tel quel : un bloc unique, encadré par `💻🤖` — une occurrence au tout début, une à
-la toute fin — rien à retoucher avant l'envoi. Ne jamais demander à l'utilisateur d'ajouter les
-emojis ou de reformater lui-même.
+### Communication Discord : par la gateway uniquement
+Depuis le 2026-09-02, **tout envoi Discord** (Marie, Morphéus, canal) — quel que soit l'agent
+(orchestrateur, design, commandes) — passe par la gateway : dépôt via
+`python DISCORD/discord_com/gateway.py enqueue …` ou `gateway.enqueue(...)`. **Jamais en direct** :
+`DISCORD/discord_com/message_marie.py`, l'API / webhook Discord, `claude_bridge.py` (déprécié —
+lève `RuntimeError`), l'écriture dans `queue.json` / `commands.json`. Seul l'agent DISCORD envoie
+réellement et adapte ton / format / moment / regroupement **sans changer le fond**. Réception :
+`gateway.poll("<agent>")` puis `gateway.ack("<agent>", id)`. Doc : `DISCORD/discord_com/gateway/README.md`.
 
-Le message pour Marie part dans son propre `POST /send`, isolé : ce `/send` ne contient QUE le bloc
-`💻🤖 … 💻🤖`, aucun texte avant ou après. Tout commentaire à l'utilisateur (ce qui a été fait,
-pourquoi, prochaine étape) part dans un `/send` distinct ou reste dans le terminal — jamais dans la
-même bulle que le message Marie, sinon il n'est plus copiable d'un bloc.
+### Messages pour Marie : via la gateway Discord, encadrés 💻🤖
+Depuis le 2026-09-02, le canal de Marie est **Discord** et **toute communication Discord passe par
+la gateway** (`DISCORD/discord_com/gateway/README.md`). Tout message à l'intention de Marie (pas
+seulement celui de `/deploy`) est **déposé dans la gateway**, jamais envoyé en direct :
+
+```
+python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie \
+  --kind <info|question|delivery> [--expect-reply] --file <corps.txt>
+```
+
+ou `gateway.enqueue("orchestrateur", "marie", corps, kind=..., expect_reply=...)` en Python
+(`sys.path.insert(0, "DISCORD/discord_com")`). **Interdits** : appeler
+`DISCORD/discord_com/message_marie.py` en direct, l'API / webhook Discord, `claude_bridge.py`,
+écrire dans `queue.json` / `commands.json`.
+
+L'agent DISCORD relit chaque demande, ajuste **ton, format, longueur, moment d'envoi et
+regroupement**, pose l'encadrement `💻🤖` et **tague Marie (`<@1368654289584656394>`) dans
+chaque message qui lui est adressé, sans exception** (livraison, question, info, relance) —
+**sans changer le fond**. Le tag n'est jamais retiré ni omis ; la gateway (`curate()`,
+`to=marie`) l'insère de toute façon après le premier `💻🤖`. Le corps déposé doit
+donc être au fond définitif : question et options de réponse figées. Il ne contient QUE le message
+Marie — aucun commentaire à l'utilisateur (ce qui a été fait, pourquoi, prochaine étape), qui reste
+dans le terminal. Ne jamais demander à l'utilisateur d'envoyer ou de reformater lui-même.
+
+**Réponses de Marie** : avec `--expect-reply`, sa prochaine réponse Discord est routée vers
+`gateway/inbox/orchestrateur/`. La lire avec
+`python DISCORD/discord_com/gateway.py poll --agent orchestrateur`, puis
+`... ack --agent orchestrateur --id <id>` une fois traitée.
 
 Style attendu par Marie (préférence explicite du 28/08) : **hyper synthétique, aucune formule de
 politesse** — pas de salutation, pas de remerciement, pas de formule de clôture. Aller droit à
 l'information : ce qui est fait, ce qu'elle doit vérifier, une idée par phrase.
 
-**Gabarit du message de livraison** (préférence du 28/08) :
+**Gabarit du message de livraison** (préférence du 28/08 ; rendu final — le corps déposé dans la
+gateway n'inclut ni les `💻🤖` ni le tag, la gateway / l'agent DISCORD les ajoutent) :
 
 ```
 💻🤖
+<@1368654289584656394>
 
 Version <X.Y> en ligne.
 
@@ -160,9 +194,12 @@ recoupé avec `_contexte/marie_modifications_suivi.md`). Un parcours sans numér
 ligne, introduit par « Détail des changements et questions : », uniquement s'il y a un commentaire
 utile pour cette livraison.
 
-### Historique WhatsApp avec Marie : sauvegarde systématique et immédiate
-Tout message WhatsApp échangé avec Marie est consigné dans
-`COMMUNICATION/Marie/historique_whatsapp.md`, sans exception et sans attendre le `/close` :
+### Historique de conversation avec Marie : sauvegarde systématique et immédiate
+Tout message échangé avec Marie — canal Discord via la gateway, bridge ROBERTO en secours — est
+consigné dans `COMMUNICATION/Marie/historique_whatsapp.md` (nom de fichier historique), sans
+exception et sans attendre le `/close`. La gateway journalise aussi dans
+`DISCORD/discord_com/logs/conversation.jsonl` (brut) ; `historique_whatsapp.md` reste la mémoire
+curatée des questions / réponses / décisions produit :
 
 - **Relire la fin du fichier (`sed -n` sur les dernières entrées) avant toute rédaction pour
   Marie, toute synthèse d'un échange, ou tout raisonnement sur « à quel message Marie répond ».**
@@ -189,8 +226,8 @@ refaire ailleurs :
 - `COMMUNICATION/Marie/a_transmettre.md` et les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md`
   ne contiennent que des **commentaires de livraison** (ce qui change, décisions attendues, écarts
   assumés) — aucune liste de tests, aucune étape de test.
-- Le message WhatsApp généré par `/deploy` renvoie vers l'écran « Tests à faire » de l'appli pour
-  les tests, sans les énumérer.
+- Le message de livraison déposé par `/deploy` dans la gateway Discord renvoie vers l'écran
+  « Tests à faire » de l'appli pour les tests, sans les énumérer.
 Chaque comportement à valider par Marie doit donc être ajouté au catalogue in-app (Section « Tests
 manuels » : le catalogue, pas `tests_manuels.md`, qui reste réservé aux contrôles développeur).
 Cette règle prime sur toute étape de `/deploy`, `/close` ou `/analyser_googledoc` qui mentionnerait

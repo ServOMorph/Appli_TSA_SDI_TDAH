@@ -1,3 +1,10 @@
+## v5.82 — 2026-09-03
+
+### Modifié
+- Veille `/discord_loop` rendue économe en tokens : `DISCORD/discord_com/discord_loop.py` — `wait` accepte un timeout optionnel en argument (`wait [secondes]`, défaut 110 inchangé). `.claude/commands/discord_loop.md` étape 3a et format de démarrage réécrits pour appeler `wait 3600` en `run_in_background` — un réveil de modèle par message Discord reçu plus un de sécurité par heure, au lieu d'un cycle toutes les ~110 s. Note ajoutée : pas de notification Discord lors d'un `/close`.
+- `DISCORD/roadmap_gateway_discord_2026-09-02.md` : Phase 3 — `CLAUDE.md` marqué aligné et câblage `discord_loop.md` étape 3b constaté présent (vérifié 2026-09-03) ; reliquat hors zone réduit à la MAJ des `agent_role.md` orchestrateur+design et au retrait des appels directs dans `deploy.md`/`analyser_googledoc.md`.
+- `DISCORD/_contexte/signals.md`, `DISCORD/_contexte/contexte.md` : bot Discord constaté configuré (`enabled: true`, `channel_id`) et actif (PID 79532) ; actions « configurer le bot » et « copier /discord_loop à la racine » closes ; `bot.pid` non gitignoré signalé.
+
 ## v5.81 — 2026-09-03
 
 ### Modifié

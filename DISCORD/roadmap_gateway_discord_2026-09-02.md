@@ -97,7 +97,9 @@ Attendre sa réponse écrite.
 - Phase 1 : [FAIT] (2026-09-02)
 - Phase 2 : [FAIT] (2026-09-02) — 19 tests unittest verts
 - Phase 3 : [FAIT côté discord] (2026-09-02) — garde `message_marie.py`, dépréciation `claude_bridge.py`,
-  message final orchestrateur livré. Reste hors zone (suivi dans `_contexte/signals.md`) :
+  message final orchestrateur livré. `CLAUDE.md` aligné (sections « Communication Discord »
+  et « Messages pour Marie ») et câblage `discord_loop.md` étape 3b présent (bloc « Aiguillage
+  préalable », vérifié 2026-09-03). Reste hors zone (suivi dans `_contexte/signals.md`) :
   MAJ `agent_role.md` orchestrateur+design, retrait des appels directs dans `deploy.md`/
-  `analyser_googledoc.md`, alignement `CLAUDE.md`, câblage `discord_loop.md` étape 3b.
+  `analyser_googledoc.md`.
 - Décisions Morphéus 2026-09-02 : canal Marie = Discord via gateway ; « Rayonne Toi » = Marie.

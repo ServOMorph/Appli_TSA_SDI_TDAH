@@ -2,7 +2,9 @@
 Helper Discord ↔ Claude Code natif.
 
 Usage CLI :
-  python discord_loop.py wait           → bloque jusqu'à commande, affiche sur stdout
+  python discord_loop.py wait [timeout] → bloque jusqu'à commande, affiche sur stdout
+                                          (timeout en secondes, defaut 110 ; valeur haute
+                                          + run_in_background = veille sans cout token)
   python discord_loop.py send "msg"     → envoie message Discord et attend envoi
   python discord_loop.py done           → marque commande comme traitée (idle)
   python discord_loop.py notify "msg"   → notifie Discord sans attendre (fire & forget)
@@ -41,10 +43,10 @@ def _role(d: dict) -> str:
     return "ADMIN" if d.get("author_id") in admins else "RESTREINT"
 
 
-def wait_for_command() -> str | None:
+def wait_for_command(timeout: float = WAIT_TIMEOUT) -> str | None:
     """Bloque jusqu'à commande pending. Retourne la commande ou None si timeout."""
     debut = time.time()
-    while time.time() - debut < WAIT_TIMEOUT:
+    while time.time() - debut < timeout:
         d = _lire(COMMANDS)
         if d["status"] == "pending":
             d["status"] = "processing"
@@ -88,7 +90,11 @@ if __name__ == "__main__":
     action = sys.argv[1] if len(sys.argv) > 1 else "wait"
 
     if action == "wait":
-        cmd = wait_for_command()
+        try:
+            timeout = float(sys.argv[2]) if len(sys.argv) > 2 else WAIT_TIMEOUT
+        except ValueError:
+            timeout = WAIT_TIMEOUT
+        cmd = wait_for_command(timeout)
         if cmd:
             print(cmd)
         else:

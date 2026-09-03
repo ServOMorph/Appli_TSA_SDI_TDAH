@@ -36,3 +36,17 @@ le vrai bot et Discord.
 - `!ping` / `!help` répondent toujours immédiatement même file non vide ;
 - cas dégradé : tuer la session pendant un traitement → `commands.json` reste en `processing`,
   la file se remplit sans être promue (angle mort connu, cf. question ouverte P3 de `signals.md`).
+
+## Veille /discord_loop en tâche de fond — `wait` à timeout paramétrable
+
+Ajouté le 2026-09-03. `discord_loop.py wait` accepte un timeout optionnel en argument
+(`wait [secondes]`, défaut 110). `.claude/commands/discord_loop.md` étape 3a demande désormais
+`wait 3600` lancé en `run_in_background`.
+
+À vérifier lors d'une session `/discord_loop` active :
+- `wait 3600` en tâche de fond ne rend pas la main tant qu'aucun message n'arrive, et sort
+  sous ~1 s à la réception d'un message Discord (commande affichée, `commands.json` →
+  `processing`) ;
+- au bout d'une heure sans message : sortie `TIMEOUT`, code 1, la boucle relance proprement ;
+- `wait` sans argument garde le comportement d'origine (cycle ~110 s) ;
+- un `/close` ne déclenche aucune notification Discord.

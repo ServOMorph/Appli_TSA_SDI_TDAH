@@ -43,14 +43,20 @@ Répéter indéfiniment jusqu'à "stop" :
 #### 3a. Attendre une commande Discord
 
 ```bash
-python DISCORD/discord_com/discord_loop.py wait
+python DISCORD/discord_com/discord_loop.py wait 3600
 ```
 
-Ce script bloque jusqu'à 10 secondes par cycle. Quand un message Discord arrive :
+Lancer cet appel en tâche de fond (`run_in_background`). Le script bloque côté Python
+(`sleep`, aucun coût token) jusqu'à 3600 s. Quand un message Discord arrive, il sort sous
+0,3 s :
 - Affiche la commande sur stdout
 - Marque `commands.json` → `"processing"`
 
-Si la sortie est `TIMEOUT` → relancer `wait` immédiatement. Ce cycle peut se répéter indéfiniment (heures, jours). L'attente n'a pas de limite — juste des cycles de 10 secondes.
+La fin de la tâche de fond réveille la session : traiter le message (3b→3d) puis relancer un
+`wait 3600` en tâche de fond. Si la sortie est `TIMEOUT` (aucun message en 1 h) → relancer
+immédiatement. Ce cycle se répète indéfiniment (heures, jours) au rythme d'un réveil par
+message reçu, plus un réveil de sécurité par heure — et non un tour de modèle toutes les
+quelques secondes.
 
 #### 3b. Router ou traiter
 
@@ -126,7 +132,7 @@ stop                              → Arrête la boucle proprement
 
 Bot     : ✅ actif
 Mode    : Claude natif (pas de sous-processus)
-Timeout : cycles de 10s (reboucle automatiquement)
+Veille  : wait 3600 en tâche de fond (réveil par message, sécurité horaire)
 
 Envoie "stop" sur Discord pour arrêter.
 ```
@@ -138,3 +144,4 @@ Envoie "stop" sur Discord pour arrêter.
 - Les réponses >1900 caractères sont envoyées en plusieurs messages
 - Si le bot Discord s'arrête : relancer `python DISCORD/discord_com/bot.py`
 - `discord_loop.py` gère uniquement queue/commands — Claude gère l'exécution
+- Ne pas notifier Discord lors d'un `/close` : seule la commande `stop` explicite (3e) envoie un message de fin.

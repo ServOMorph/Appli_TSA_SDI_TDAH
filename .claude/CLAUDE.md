@@ -131,9 +131,16 @@ Depuis le 2026-09-02, **tout envoi Discord** (Marie, Morphéus, canal) — quel 
 (orchestrateur, design, commandes) — passe par la gateway : dépôt via
 `python DISCORD/discord_com/gateway.py enqueue …` ou `gateway.enqueue(...)`. **Jamais en direct** :
 `DISCORD/discord_com/message_marie.py`, l'API / webhook Discord, `claude_bridge.py` (déprécié —
-lève `RuntimeError`), l'écriture dans `queue.json` / `commands.json`. Seul l'agent DISCORD envoie
-réellement et adapte ton / format / moment / regroupement **sans changer le fond**. Réception :
-`gateway.poll("<agent>")` puis `gateway.ack("<agent>", id)`. Doc : `DISCORD/discord_com/gateway/README.md`.
+lève `RuntimeError`), l'écriture dans `queue.json` / `commands.json`.
+
+**`gateway.py drain` (envoi réel de l'outbox) est réservé à l'agent DISCORD — jamais lancé par
+l'orchestrateur ni une commande.** Tout autre agent s'arrête à `enqueue` : le message reste dans
+l'outbox jusqu'à ce que l'agent DISCORD le relise, l'adapte (ton / format / longueur / moment /
+regroupement, **sans changer le fond**) et le `drain`. Ne pas `drain` soi-même même si l'outbox
+semble bloquée : le signaler à l'utilisateur.
+
+Réception : `gateway.poll("<agent>")` puis `gateway.ack("<agent>", id)`.
+Doc : `DISCORD/discord_com/gateway/README.md`.
 
 ### Messages pour Marie : via la gateway Discord, encadrés 💻🤖
 Depuis le 2026-09-02, le canal de Marie est **Discord** et **toute communication Discord passe par

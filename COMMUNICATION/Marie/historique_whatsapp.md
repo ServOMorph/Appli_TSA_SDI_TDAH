@@ -238,3 +238,25 @@ Heure du formulaire de tâche, #3) reste sans réponse et sans capture. Premier 
 automatiquement par `bot.py` sans session agent DISCORD (`routing: "pending"`,
 `gateway/inbox/orchestrateur/20260903T171703_391686`, `pending_replies` purgé) — validation
 en réel de la Phase 1 de `roadmap_gateway_discord_service.md`.
+
+### 2026-09-03 19h16 — les 2 captures (transmises par l'utilisateur)
+
+**Marie ->**
+(2 captures d'écran, jointes à son message Discord du 19h16 qui @-mentionnait le bot)
+
+_Suite :_ Marie avait bien joint les 2 images à son message ; `bot.py` les a perdues — la branche
+@-mention de `on_message` (`bot.py:214+`) ne lit pas `message.attachments`, seul le trafic de
+canal hors @-mention passe par `route_inbound` (`bot.py:202-212`) qui les transporte. Les URLs
+Discord ne sont pas journalisées → non récupérables côté serveur. L'utilisateur a récupéré les
+fichiers depuis son téléphone et les a transmis. Archivés :
+`COMMUNICATION/Marie/captures/2026-09-03/parametres-accessibilite_deborde.png` (point 1) et
+`.../formulaire-tache_date-heure-deborde.png` (point 2, #3). Ce qu'elles montrent :
+- **Point 1** — Paramètres > Accessibilité : les cartes de réglage (« Réduire les animations »,
+  « Mode sombre », « Couleur d'ambiance », bloc « Couleur des outils ») sont coupées au bord droit,
+  marge droite absente alors que la marge gauche est nette ; pastilles de couleur et « × » poussés
+  hors champ. Débordement horizontal de la page.
+- **Point 2 (#3)** — formulaire de tâche : champs « Date » et « Heure de début » coupés au bord
+  droit, colonnes 6 et 12 de la grille « Coût en énergie » tronquées ; « Durée », « Tâche
+  récurrente » et « Valider » restent dans le cadre. Le correctif v5.64 (`min-width: 0` sur
+  `<form>`) n'a pas suffi.
+`roadmap_demandes_marie_2026-09-02.md` Phase 10 (#3 + #32) débloquée (décision 7 satisfaite).

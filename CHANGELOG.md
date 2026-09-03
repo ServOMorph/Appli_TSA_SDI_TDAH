@@ -1,3 +1,14 @@
+## v5.80 — 2026-09-03
+
+### Ajouté
+- `roadmap_gateway_discord_service.md` : roadmap en 3 phases (non démarrée) pour faire de l'agent DISCORD un service quasi-permanent — gardien de sortie qui juge la pertinence des messages `enqueue` vers Marie et les renvoie à l'agent auteur (`bounce`) sinon les envoie ; collecteur/répartiteur de tous les messages du canal (plus seulement les @-mentions du bot) vers l'`inbox` du bon agent ; livraison inter-agents en direct par hooks `SessionStart`/`Stop`. Décisions de cadrage figées : routage mécanique dans `bot.py`, agent = zone (`orchestrateur` = zone principale), 6 critères de rejet du gardien. Analyse préalable : 9 failles mesurées dans le système gateway actuel (`bot.py` ne transmet que les @-mentions, `state.pending_reply` à créneau unique, aucun verrou d'écriture).
+
+### Modifié
+- `.claude/CLAUDE.md` § Communication Discord : `gateway.py drain` (envoi réel de l'outbox) est réservé à l'agent DISCORD. Les autres agents s'arrêtent à `enqueue` et signalent un outbox bloqué à l'utilisateur plutôt que de le drainer eux-mêmes.
+
+### Corrigé
+- Message à Marie du 2026-09-03 (demande de 2 captures d'écran pour débloquer la phase 10 de `roadmap_demandes_marie_2026-09-02.md`) : déposé par `enqueue` puis, après constat qu'il n'était pas parti, envoyé par `gateway.py drain` (Discord id `1545092577982808154`). Consigné dans `COMMUNICATION/Marie/historique_whatsapp.md`.
+
 ## v5.79 — 2026-09-02
 
 ### Ajouté

@@ -68,6 +68,24 @@ describe('E24EditTask', () => {
     expect(screen.queryByText('La durée est obligatoire quand une heure de début est renseignée.')).toBeNull()
   })
 
+  it('le <main>, le formulaire et les champs Date/Heure gardent des contraintes de largeur (évite le débordement à droite) (#3)', async () => {
+    const task = makeTask()
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+    renderWithApp(<E24EditTask />, ctx)
+    await screen.findByDisplayValue('Appeler le médecin')
+    const main = document.querySelector('main') as HTMLElement
+    expect(main.style.width).toBe('100%')
+    expect(main.style.maxWidth).toBe('480px')
+    const form = screen.getByLabelText('Date').closest('form') as HTMLFormElement
+    expect(form.style.width).toBe('100%')
+    expect(form.style.minWidth).toBe('0')
+    for (const label of ['Date', 'Heure de début']) {
+      const input = screen.getByLabelText(label) as HTMLInputElement
+      expect(input.style.maxWidth).toBe('100%')
+      expect(input.style.minWidth).toBe('0')
+    }
+  })
+
   it('tâche récurrente : propose le choix occurrence/série avant d\'enregistrer', async () => {
     const task = makeTask({ recurrence_id: 'rec-1' })
     const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })

@@ -345,13 +345,28 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'cadre-date-heure-dans-l-ecran',
+    revision: 1,
     title: 'Cadre Date et Heure bien dans l’écran',
     category: 'Tâches',
     docRefs: [3],
     steps: [
       'Sur téléphone, commencez la création d’une tâche et activez sa planification pour faire apparaître les champs « Date » et « Heure de début ».',
       'Vérifiez que les cadres « Date » et « Heure de début » tiennent entièrement dans l’écran, sans dépasser sur le bord droit, avec la même marge à gauche et à droite.',
-      'Ouvrez ensuite une tâche déjà planifiée, touchez « Modifier » : faites la même vérification sur les cadres « Date » et « Heure de début » de l’écran de modification.',
+      'Vérifiez aussi la grille « Coût en énergie » (chiffres 1 à 12) : la 6e et la 12e case doivent être entières, pas coupées au bord droit.',
+      'Faites défiler tout le formulaire de haut en bas : aucun élément ne doit dépasser à droite et la page ne doit pas pouvoir glisser horizontalement.',
+      'Ouvrez ensuite une tâche déjà planifiée, touchez « Modifier » : refaites les mêmes vérifications sur l’écran de modification.',
+    ],
+  },
+  {
+    id: 'cadres-parametres-tiennent-dans-l-ecran',
+    title: 'Les cadres des Paramètres tiennent dans l’écran',
+    category: 'Paramètres / Profil',
+    docRefs: [32],
+    steps: [
+      'Sur téléphone, ouvrez « Paramètres » : vérifiez que chaque cadre de la liste tient entièrement dans l’écran, avec la même marge à gauche et à droite, sans être coupé au bord droit.',
+      'Ouvrez « Accessibilité » : vérifiez la rangée « Petite / Normale / Grande », les cadres « Réduire les animations », « Mode sombre », « Couleur d’ambiance » et le bloc « Couleur des outils » (pastilles et croix « × » comprises) : rien ne doit être coupé à droite.',
+      'Ouvrez tour à tour « Profil », « Confidentialité », « Export et import » : même vérification sur chaque écran.',
+      'Sur chaque écran, essayez de faire glisser la page vers la gauche : elle ne doit pas bouger horizontalement.',
     ],
   },
   {

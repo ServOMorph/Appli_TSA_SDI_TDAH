@@ -18,6 +18,7 @@ const WHATS_NEW: string[] = [
   'Sur l’écran d’énergie, « Retour » et « Ignorer » ramènent directement à l’accueil. L’ancien écran « Mon énergie » séparé a été retiré.',
   'Dans Paramètres > Accessibilité, « Couleur des outils » propose maintenant aussi la carte « Mon compte » : la couleur choisie s’applique à sa carte sur l’accueil.',
   'Dans une liste, un élément qui a des sous-tâches les montre directement sous lui : on peut les plier, les déplier et les cocher sans ouvrir l’élément.',
+  'Les écrans « Paramètres » (et ses sous-écrans) ainsi que le formulaire de tâche ne débordent plus à droite sur téléphone : tous les cadres tiennent dans la largeur de l’écran, avec la même marge de chaque côté.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

@@ -41,6 +41,13 @@ describe('E110Settings', () => {
     expect(goTo).toHaveBeenCalledWith('settings-accessibility')
   })
 
+  it('le <main> tient dans la fenêtre : width 100% borné à 480px (#32)', () => {
+    renderE110()
+    const main = document.querySelector('main') as HTMLElement
+    expect(main.style.width).toBe('100%')
+    expect(main.style.maxWidth).toBe('480px')
+  })
+
   it('navigue vers dashboard via Retour', () => {
     const goTo = vi.fn()
     renderE110({ goTo })

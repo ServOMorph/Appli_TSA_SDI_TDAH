@@ -51,6 +51,7 @@ export function E116Privacy() {
         flexDirection: 'column',
         padding: 'var(--spacing-xl)',
         gap: 'var(--spacing-lg)',
+        width: '100%',
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',

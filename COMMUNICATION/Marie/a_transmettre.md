@@ -48,3 +48,7 @@ Sur l'écran d'énergie, « Retour » et « Ignorer » ramènent directement à 
 
 Dans une liste, un élément qui a des sous-tâches les montre directement sous lui : tu peux les plier, les déplier et les cocher sans ouvrir l'élément.
 
+## Changement livré
+
+Les écrans « Paramètres » (et « Accessibilité », « Profil », « Confidentialité », « Export et import ») ainsi que le formulaire de création et de modification d'une tâche ne débordent plus à droite sur le téléphone : tous les cadres tiennent dans la largeur de l'écran, avec la même marge des deux côtés.
+

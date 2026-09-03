@@ -2,9 +2,22 @@
 
 - Source : Google Doc « Modifications » de Marie
   `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
-- Date de modification du Doc analysée : 2026-08-31 17:28
-- Date d'analyse : 2026-09-02 (`/analyser_googledoc`, depuis `/deploy` étape 0.4)
+- Date de modification du Doc analysée : 2026-08-31 17:28 ; re-analyse 2026-09-03 17:20 UTC
+- Date d'analyse : 2026-09-02 (`/analyser_googledoc`, depuis `/deploy` étape 0.4) ;
+  re-analyse 2026-09-03 (`/analyser_googledoc`, depuis `/deploy` étape 0.4)
 - Registre de suivi : `_contexte/marie_modifications_suivi.md` (lignes 23-33)
+
+### Re-analyse du 2026-09-03
+
+Doc modifié le 2026-09-03 17:20 UTC. L'export texte liste les **mêmes 14 demandes** (19, 21,
+22, 23 à 33), formulation inchangée, pied « Dernières modifications : 32 » — aucune demande
+nouvelle, retirée ni reformulée. Seul changement matériel : arrivée des **captures #3 et #32**
+(transmission manuelle, `COMMUNICATION/Marie/captures/2026-09-03/`, commit 9f03d5d), qui
+tranchent la décision produit 7 et débloquent la Phase 10. Traçabilité : #3 (registre ligne
+19, ex-`en attente`) et #32 → `en cours` Phase 10 débloquée ; toutes les autres demandes
+inchangées (23-31, 33 en Phases 1-9 `[FAIT]` ; 19/21/22 hors périmètre,
+`roadmap_planning_accueil_2026-08-29.md`). Snapshot Supabase du 2026-09-03 18:44 : aucune
+perte, aucune variation structurelle, `manual_test_results` = 49 (dernier 2026-08-31).
 
 ## Périmètre
 
@@ -29,7 +42,7 @@ Catégories touchées : Accueil/Planning (23-25), Outils : Budget (26), Outils :
 | 29 | Énergie | Depuis la page de modification de l'énergie, « Retour » revient à l'accueil sans afficher « Mon énergie » | Le badge énergie va déjà droit au check-in (`E10Dashboard.tsx:72` → `energy-checkin`). Mais dans `E31EnergyCheckIn`, « ← Retour » (`:49`) et « ignorer » (`:33`) renvoient vers `energy-view` (E30 « Mon énergie »). | Bug / évolution | 8 |
 | 30 | Paramètres / Profil | Modifier la couleur d'un outil met aussi à jour la couleur de sa carte sur l'accueil | `updateToolColor` enregistre bien la couleur ; le composant `ToolCard` l'applique (`ToolWidgetCard.tsx:38`, `pastelBackground`). Mais l'accueil rend un `<Card>` nu sans style de couleur (`E10Dashboard.tsx:148`). | Bug confirmé | 2 |
 | 31 | Paramètres / Profil | L'outil « Compte » manque dans les réglages de couleur ; tous les outils, même futurs, doivent y apparaître | « Couleur des outils » (`E112Accessibility.tsx:124`) itère `tools` (entités `Tool`). La carte « Comptes » est codée en dur, pas un `Tool` → absente. | Évolution + décision archi | 7 |
-| 32 | Paramètres / Profil | Tous les cadres de l'écran « Paramètres » débordent à droite ; ils doivent tenir dans l'écran | `E110Settings` : `<main>` `maxWidth: 480` + `Card` (`box-sizing: border-box` global). Cause du débordement non identifiée à la lecture — même famille que #3 (conteneur flex non rétrécissable, ex. `input type="color"` en `justify-content: space-between`). | Bug à reproduire (capture Marie) | 10 |
+| 32 | Paramètres / Profil | Tous les cadres de l'écran « Paramètres » débordent à droite ; ils doivent tenir dans l'écran | `<main>` sans `width` explicite (enfant flex de `#root`), `maxWidth: 480` + `margin: 0 auto` ; rangée « Taille du texte » non `flex-wrap`. Captures Marie du 2026-09-03 : débordement dans Paramètres > Accessibilité, cartes coupées à droite. | Bug confirmé (captures 2026-09-03) | 10 |
 | 33 | Outils : Listes | Les sous-tâches d'un élément de liste apparaissent dans la page de la catégorie, pliables/dépliables/cochables (comme au planning) | `E62ListItemDetail` gère les sous-tâches (`getListItemSubTasks`, `toggleListItemSubTask`, `addListItemSubTask`, `deleteListItemSubTask`). `E61ListDetail` (page de catégorie) liste les éléments sans jamais charger leurs sous-tâches. | Évolution | 9 |
 
 ### Écarts avec des décisions / livraisons antérieures
@@ -80,9 +93,11 @@ avant arbitrage sur les points marqués « bloquant ».
    **suppression complète de E30**. Marie a répondu « retirer » à la question du 2026-09-02.
    Retirer l'écran `E30EnergyView`, sa route `energy-view` (`navigation.ts`, `App.tsx`,
    `DevResetButton.tsx`) et tous les accès entrants (`rg -n "energy-view" src` avant de coder).
-7. **#32 — reproduction** (bloquant Phase 10) : une capture récente de l'écran Paramètres de
-   Marie sur son appareil est nécessaire pour localiser le cadre fautif. À demander avant la
-   phase.
+7. **#32 — reproduction** (TRANCHÉ 2026-09-03) : captures reçues de Marie (transmission
+   manuelle, archivées sous `COMMUNICATION/Marie/captures/2026-09-03/`, commit 9f03d5d).
+   `parametres-accessibilite_deborde.png` : le débordement est dans **Paramètres >
+   Accessibilité uniquement** (précision Discord de Marie du 2026-09-03 17h17). Phase 10
+   débloquée.
 
 ## Ordre et dépendances
 
@@ -404,42 +419,57 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 10 — #3 + #32 : reprise des débordements horizontaux [BLOQUÉ — capture de l'écran Paramètres de Marie attendue (décision 7)]
+## Phase 10 — #3 + #32 : reprise des débordements horizontaux [FAIT — non déployée, gate restant = validation sur l'appareil de Marie]
 
-**Décision produit 7** : obtenir une capture récente de l'écran Paramètres de Marie avant de
-commencer. Sans repro fiable, ne pas coder à l'aveugle.
+**Décision produit 7** : TRANCHÉE le 2026-09-03 — captures reçues de Marie (voir « Décisions
+produit non tranchées » ci-dessus).
 
-**Contexte** : #3 (cadre Date/Heure du formulaire de tâche) est `en attente` depuis le
-correctif v5.64 (`min-width: 0` sur le `<form>`), jugé insuffisant par Marie le 2026-08-31
-(« il dépasse à droite encore »). #32 signale le même symptôme sur l'écran « Paramètres ».
-Hypothèse commune : un conteneur flex intermédiaire (ligne portant deux `<input>` natifs, ou
-`label` + `input type="color"` en `justify-content: space-between`) sans `min-width: 0`, qui ne
-peut pas rétrécir sous la largeur intrinsèque de ses enfants et déborde `<main>` malgré
-`overflow-x: clip` sur `body` (qui masque sans corriger).
+### Analyse des captures (2026-09-03)
 
-**Fichiers pressentis**
-- `src/ui/screens/tasks/E21CreateTaskV2.tsx` et `src/ui/screens/tasks/E24EditTask.tsx` :
-  la ligne Date + Heure (`:291-321` / `:250-271` selon versions) — ajouter `min-width: 0` /
-  `flex-wrap` / largeurs explicites sur les `<input type="date">` / `type="time">`.
-- `src/ui/screens/settings/E110Settings.tsx`, `E112Accessibility.tsx`, `E111Profile.tsx`,
-  `E116Privacy.tsx`, `E117Export.tsx` : passer en revue les lignes en
-  `justify-content: space-between` avec un `input type="color"` / `type="checkbox"` ; le
-  composant `Card` (`padding: var(--spacing-lg)`) combiné à `<main padding: var(--spacing-xl)>`
-  sur un écran étroit.
-- `src/index.css` : envisager `overflow-x: clip` → diagnostic temporaire en `visible` pour
-  voir le débordement réel pendant le dev (à ne pas committer).
+Captures : `COMMUNICATION/Marie/captures/2026-09-03/parametres-accessibilite_deborde.png` et
+`.../formulaire-tache_date-heure-deborde.png`.
 
-**Tests automatisés**
-- Tests de contrainte de largeur (jsdom limité pour le layout réel) : au minimum vérifier la
-  présence de `min-width: 0` / `flex-wrap` sur les conteneurs corrigés (assertions de style),
-  comme le test de non-régression posé en v5.64.
+- **#32 — Paramètres > Accessibilité** : toutes les cartes (« Réduire les animations »,
+  « Mode sombre », « Couleur d'ambiance », bloc « Couleur des outils ») sont coupées au bord
+  droit, marge droite nulle alors que la marge gauche est nette ; pastilles de couleur et « × »
+  poussées hors champ ; bouton « Grande » de la rangée « Taille du texte » également tronqué.
+  Le contenu est plus large que la fenêtre ; `body { overflow-x: clip }` masque le scroll
+  horizontal sans corriger. Débordement limité à la rubrique Accessibilité (précision de Marie).
+- **#3 — formulaire de tâche** : grille « Coût en énergie » — 6e et 12e case coupées ; champs
+  natifs « Date » et « Heure de début » coupés au bord droit. La rangée « Durée »
+  (Jours/Heures/Minutes), « Obligatoire », « Tâche récurrente » et « Valider » tiennent dans le
+  cadre. Le `min-width: 0` sur `<form>` (v5.64) n'a pas suffi : la grille 6 colonnes
+  (`repeat(6, 1fr)`, `1fr` = `minmax(auto, 1fr)`) et les `<input>` natifs ne rétrécissent pas
+  sous leur largeur intrinsèque et débordent `<main>` (lui-même sans `width` explicite comme
+  enfant flex de `#root`).
 
-**Test manuel Marie** : parcours `cadre-date-heure-dans-l-ecran` (rev suivante) + nouveau
-`cadres-parametres-tiennent-dans-l-ecran`. Gate = validation sur l'appareil de Marie.
+### Correctif appliqué (arbre de travail, non commité au 2026-09-03)
 
-**Critère de sortie** : `tsc -b` + lint + suite verts ; parcours à jour ; `WHATS_NEW` (#3, #32) ;
-registre `_contexte/marie_modifications_suivi.md` : #3 et #32 repassées à `livrée vX.Y` une fois
-Marie ok (au `/close` / `/deploy`, pas en session).
+- `src/ui/screens/settings/E110Settings.tsx`, `E111Profile.tsx`, `E112Accessibility.tsx`,
+  `E116Privacy.tsx`, `E117Export.tsx` : `width: '100%'` sur le conteneur `<main>` (déjà
+  `maxWidth: 480` + `margin: 0 auto`).
+- `src/ui/screens/settings/E112Accessibility.tsx` : `flexWrap: 'wrap'` sur la rangée
+  « Petite / Normale / Grande ».
+- `src/ui/screens/tasks/E21CreateTaskV2.tsx`, `E24EditTask.tsx` : `width: '100%'` sur `pageStyle`
+  et sur le `<form>` (`minWidth: 0` conservé) ;
+  `gridTemplateColumns: 'repeat(6, minmax(0, 1fr))'` sur `energyGridStyle`. Les `<input>`
+  Date/Heure ont déjà `maxWidth: 100%` + `minWidth: 0` (v5.64).
+
+### Tests automatisés (faits)
+
+`E110Settings.test.tsx`, `E112Accessibility.test.tsx`, `E21CreateTaskV2.test.tsx`,
+`E24EditTask.test.tsx` : assertions de style (`width: 100%` sur `<main>` / `<form>`,
+`maxWidth: 480px`, `flexWrap: wrap` sur la rangée de taille de texte, `maxWidth`/`minWidth` sur
+les inputs Date/Heure). `tsc -b`, lint et la suite (719 tests) verts au 2026-09-03.
+
+**Test manuel Marie** : `cadre-date-heure-dans-l-ecran` (révision 1, étapes élargies) +
+nouveau `cadres-parametres-tiennent-dans-l-ecran` (`docRefs: [32]`) — ajoutés au catalogue.
+Gate = validation sur l'appareil de Marie (jsdom ne mesure pas le layout réel).
+
+**Critère de sortie** : `tsc -b` + lint + suite verts (fait) ; parcours à jour (fait) ;
+`WHATS_NEW` (#3, #32) (fait) ; commit du correctif ; registre
+`_contexte/marie_modifications_suivi.md` : #3 et #32 repassées à `livrée vX.Y` une fois Marie
+ok (au `/close` / `/deploy`, pas en session).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite.
@@ -455,4 +485,6 @@ tranchées), ou « Écart assumé ». Aucune liste de tests (catalogue in-app un
 
 ## Après la dernière phase
 
-Une fois les 10 phases `[FAIT]`, proposer `/deploy` (ne pas le lancer automatiquement).
+Les 10 phases `[FAIT]` au 2026-09-03 (non déployées). Roadmap à archiver dans `Archives/` au
+prochain `/deploy` réussi. Reconciliation registre : #23-#31, #33 → `livrée vX.Y` au déploiement ;
+#3 et #32 → `livrée vX.Y` seulement après validation de Marie sur son appareil.

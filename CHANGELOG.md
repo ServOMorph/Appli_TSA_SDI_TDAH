@@ -1,3 +1,14 @@
+## v5.84 — 2026-09-03
+
+### Corrigé
+- `roadmap_demandes_marie_2026-09-02.md` Phase 10 (#3 + #32) `[FAIT]` — les 10 phases de la roadmap sont désormais faites (non déployées). Captures reçues de Marie (transmission manuelle, `COMMUNICATION/Marie/captures/2026-09-03/`) : sur le formulaire de tâche, la grille « Coût en énergie » (6e et 12e case) et les champs natifs « Date » / « Heure de début » étaient coupés au bord droit ; sur Paramètres > Accessibilité, toutes les cartes étaient coupées à droite (pastilles de couleur et « × » hors champ), débordement limité à cette rubrique. Correctif : `width: '100%'` sur le conteneur `<main>` de `E110Settings`, `E111Profile`, `E112Accessibility`, `E116Privacy`, `E117Export` et sur `pageStyle` + le `<form>` (`minWidth: 0` conservé) de `E21CreateTaskV2`, `E24EditTask` ; `gridTemplateColumns: 'repeat(6, minmax(0, 1fr))'` sur `energyGridStyle` des deux écrans de tâche (blocage `minmax(auto, 1fr)`) ; `flexWrap: 'wrap'` sur la rangée « Petite / Normale / Grande » de `E112Accessibility`. Cause résiduelle du correctif v5.64 (`min-width: 0` sur `<form>`) : le `<main>` n'avait pas de `width` explicite comme enfant flex de `#root` et les grilles ne rétrécissaient pas sous leur largeur intrinsèque. `tsc -b` + lint + 719 tests (85 fichiers) verts.
+
+### Modifié
+- `src/domain/data/manualTestsCatalog.ts` : parcours `cadre-date-heure-dans-l-ecran` passé en `revision: 1` (étapes élargies à la grille « Coût en énergie » et au glissement horizontal de la page) ; nouveau parcours `cadres-parametres-tiennent-dans-l-ecran` (`docRefs: [32]`, écrans Paramètres, Accessibilité, Profil, Confidentialité, Export et import).
+- `src/ui/screens/onboarding/E01Welcome.tsx` : entrée `WHATS_NEW` sur les débordements Paramètres + formulaire de tâche.
+- `_contexte/marie_modifications_suivi.md` : revue du Google Doc du 2026-09-03 17:20 UTC (via `/analyser_googledoc` depuis `/deploy` étape 0.4) — aucune demande numérotée nouvelle, retirée ni reformulée dans l'export texte (14 demandes 19, 21 à 33) ; #3 et #32 passées de `en attente` / `[BLOQUÉ]` à `en cours` puis Phase 10 `[FAIT]` sur les captures ; en-tête, précision #3 et « Historique des revues » à jour.
+- `.gitignore` : `commentaires_marie_*.docx` (artefacts de `/deploy` étape 11 ; l'historique figé vit dans `COMMUNICATION/Marie/livraisons/vX.Y.md`). `DESIGN/` : zone-agent ajoutée au suivi Git.
+
 ## v5.83 — 2026-09-03
 
 ### Ajouté

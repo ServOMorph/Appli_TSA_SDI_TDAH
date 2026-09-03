@@ -48,6 +48,7 @@ const pageStyle: React.CSSProperties = {
   flexDirection: 'column',
   padding: 'var(--spacing-xl)',
   gap: 'var(--spacing-lg)',
+  width: '100%',
   maxWidth: '480px',
   margin: '0 auto',
   minHeight: '100svh',
@@ -86,7 +87,7 @@ const fieldGroupStyle: React.CSSProperties = { display: 'flex', flexDirection: '
 
 const energyGridStyle: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(6, 1fr)',
+  gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
   gap: 'var(--spacing-xs)',
 }
 
@@ -200,7 +201,7 @@ export function E21CreateTaskV2() {
 
       <h1 style={{ margin: 0 }}>Nouvelle tâche</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', minWidth: 0 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', width: '100%', minWidth: 0 }}>
         <div style={fieldGroupStyle}>
           <span style={labelStyle}>Icône</span>
           <IconPicker value={icon} onChange={setIcon} />

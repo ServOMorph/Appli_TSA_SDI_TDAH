@@ -39,6 +39,7 @@ export function E112Accessibility() {
         flexDirection: 'column',
         padding: 'var(--spacing-xl)',
         gap: 'var(--spacing-lg)',
+        width: '100%',
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',
@@ -55,7 +56,7 @@ export function E112Accessibility() {
         <p style={{ margin: '0 0 var(--spacing-sm)', fontWeight: 600, color: 'var(--color-text)' }}>
           Taille du texte
         </p>
-        <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)' }}>
           {(['small', 'medium', 'large'] as FontSize[]).map((size) => (
             <Button
               key={size}

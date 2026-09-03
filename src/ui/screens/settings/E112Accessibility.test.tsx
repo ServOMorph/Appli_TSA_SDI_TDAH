@@ -62,6 +62,15 @@ describe('E112Accessibility', () => {
     expect(updateSettings).toHaveBeenCalledWith({ dark_mode: true })
   })
 
+  it('le <main> tient dans la fenêtre et la rangée de taille de texte peut passer à la ligne (#32)', () => {
+    renderE112()
+    const main = document.querySelector('main') as HTMLElement
+    expect(main.style.width).toBe('100%')
+    expect(main.style.maxWidth).toBe('480px')
+    const row = screen.getByText('Petite').closest('div') as HTMLElement
+    expect(row.style.flexWrap).toBe('wrap')
+  })
+
   it('navigue vers settings via Retour', () => {
     const goTo = vi.fn()
     renderE112({ goTo })

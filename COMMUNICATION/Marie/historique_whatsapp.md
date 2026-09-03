@@ -221,5 +221,6 @@ Envoie les images ici.
 
 _Suite :_ débloque `roadmap_demandes_marie_2026-09-02.md` Phase 10 (décision 7 : pas de code à
 l'aveugle sur #32, capture récente de l'écran Paramètres requise ; #3 traité en même temps).
-Déposé dans la gateway (`enqueue` orchestrateur → outbox `20260903T042325_687674`), `kind=question`,
-`--expect-reply` → réponse routée vers `gateway/inbox/orchestrateur/`.
+Déposé dans la gateway (`enqueue` orchestrateur → `drain`, Discord message id
+`1545092577982808154`), `kind=question`, `--expect-reply` → réponse routée vers
+`gateway/inbox/orchestrateur/`.

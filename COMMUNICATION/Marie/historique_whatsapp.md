@@ -260,3 +260,46 @@ fichiers depuis son téléphone et les a transmis. Archivés :
   récurrente » et « Valider » restent dans le cadre. Le correctif v5.64 (`min-width: 0` sur
   `<form>`) n'a pas suffi.
 `roadmap_demandes_marie_2026-09-02.md` Phase 10 (#3 + #32) débloquée (décision 7 satisfaite).
+
+### 2026-09-03 — message de livraison v5.84 (déposé dans la gateway)
+
+**Dév ->**
+Version 5.84 en ligne.
+
+Ce qui change :
+- Le point rouge « Tests à faire » s'éteint dès qu'un test est passé, même marqué « Non validé ». Il se rallume pour un nouveau test ou un test corrigé.
+- Planning : bandeau des jours au fond coloré ; quand tu glisses, seuls les jours défilent et celui du centre grossit ; nouvelle vue « Planning de la semaine » via le logo à gauche du mois.
+- Planning : le nom de la tâche reste en haut de la case, l'heure de début en haut, l'heure de fin en bas. Une tâche planifiée à une heure doit maintenant avoir une durée.
+- Une tâche sans couleur reste lisible cochée : le texte se barre en noir.
+- Couleur d'un outil dans les Paramètres : la carte de l'accueil prend la couleur. La carte « Mon compte » a maintenant son réglage de couleur.
+- L'outil « Comptes » s'appelle « Mon compte ». L'écran équivalent du Budget s'appelle « Prévisions ». « Solde du mois » en tête de « Mon compte », qui baisse à chaque dépense.
+- Page Budget : carte « Prévisions » en positif et vert. La ligne de détail du Montant total reste en négatif, c'est une soustraction.
+- Énergie : « Retour » et « Ignorer » ramènent direct à l'accueil. L'écran « Mon énergie » a été retiré.
+- Listes : les sous-tâches d'un élément apparaissent sous lui dans la page de la catégorie, pliables et cochables.
+- Les cadres des Paramètres et du formulaire de tâche ne débordent plus à droite sur téléphone.
+
+À vérifier sur ton téléphone : que plus aucun cadre ne dépasse à droite dans Paramètres et dans le formulaire de tâche. Dis-moi si tu en vois encore un.
+
+16 tests à faire dans l'écran « Tests à faire », correspondant aux modifications :
+- #3
+- #19
+- #21
+- #22
+- #23
+- #24
+- #25
+- #26
+- #27
+- #28
+- #29
+- #30
+- #31
+- #32
+- #33
+(plus le point rouge des tests et la navigation entre les écrans)
+
+https://appli-audhd.netlify.app/
+
+Détail des changements et questions : https://drive.google.com/open?id=1AUtsYJ3O4H6PXE7vZ2p9381a-Q-ud8nF
+
+_Suite :_ `/deploy` v5.84 — livre le cumul depuis v5.69 : correctif pastille (`2d5c0b8`), travail bundle, `roadmap_planning_accueil_2026-08-29.md` Phases 3-5, `roadmap_demandes_marie_2026-09-02.md` 10 phases (demandes 23-33). Commentaire figé dans `livraisons/v5.84.md`, publié sur Drive. Déposé dans la gateway (`enqueue --source orchestrateur --to marie --kind delivery`), en attente du gardien (agent DISCORD). #3 et #32 passeront à `livrée v5.84` dans `marie_modifications_suivi.md` seulement après validation de Marie sur son appareil.

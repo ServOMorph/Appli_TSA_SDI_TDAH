@@ -9,6 +9,9 @@
 - `_contexte/marie_modifications_suivi.md` : revue du Google Doc du 2026-09-03 17:20 UTC (via `/analyser_googledoc` depuis `/deploy` étape 0.4) — aucune demande numérotée nouvelle, retirée ni reformulée dans l'export texte (14 demandes 19, 21 à 33) ; #3 et #32 passées de `en attente` / `[BLOQUÉ]` à `en cours` puis Phase 10 `[FAIT]` sur les captures ; en-tête, précision #3 et « Historique des revues » à jour.
 - `.gitignore` : `commentaires_marie_*.docx` (artefacts de `/deploy` étape 11 ; l'historique figé vit dans `COMMUNICATION/Marie/livraisons/vX.Y.md`). `DESIGN/` : zone-agent ajoutée au suivi Git.
 
+### Déployé
+- **v5.84 mise en production le 2026-09-03** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) — premier déploiement depuis v5.69 (31 août). Livre le cumul : correctif pastille « Tests à faire » (`2d5c0b8`), réduction du bundle (`Archives/roadmap_bundle_2026-08-31.md` — chunk d'entrée mesuré 253,8 kB, budget `bundle.budget.json` respecté), `Archives/roadmap_planning_accueil_2026-08-29.md` Phases 3-5 (bandeau des jours coloré, défilement interne des jours, vue « Planning de la semaine »), `Archives/roadmap_demandes_marie_2026-09-02.md` 10 phases (demandes 23-33). `WHATS_NEW` vidé après publication. Message de livraison déposé dans la gateway Discord (`20260903T193444_749089`). Commentaire figé : `COMMUNICATION/Marie/livraisons/v5.84.md`. Roadmaps `roadmap_demandes_marie_2026-09-02.md`, `roadmap_planning_accueil_2026-08-29.md`, `roadmap_sync_marie.md`, `roadmap_sav_snapshot_marie.md` déplacées dans `Archives/`.
+
 ## v5.83 — 2026-09-03
 
 ### Ajouté

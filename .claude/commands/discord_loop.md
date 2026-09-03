@@ -40,6 +40,44 @@ python DISCORD/discord_com/discord_loop.py notify "🤖 Claude Code connecté. E
 
 Répéter indéfiniment jusqu'à "stop" :
 
+#### 3a-bis. Gardien de sortie : juger l'outbox (à chaque cycle, avant le `wait`)
+
+C'est le rôle principal de cette session. Détail complet :
+`DISCORD/discord_com/gateway/LOOP.md` § 1.
+
+```bash
+python DISCORD/discord_com/gateway.py list
+python DISCORD/discord_com/gateway.py drain --dry-run
+```
+
+Chaque demande en `pending` (ou `held` repris) est jugée, sans jamais réécrire son fond :
+
+| test | verdict |
+|------|---------|
+| Même fond déjà envoyé récemment, rien de neuf | `bounce` « doublon » |
+| Question déjà répondue, ou info déjà envoyée | `bounce` « réponse déjà connue » |
+| `<placeholder>`, choix non tranché, options manquantes, TODO | `bounce` « fond non figé » |
+| Message pour Marie truffé de mécanique interne (hash, chemins, jargon) | `bounce` « hors périmètre canal » |
+| Version / URL incohérente avec `_contexte/dernier_deploiement.md` | `bounce` « incohérence de version » |
+| Fond bon, mais une question est déjà en attente de Marie et celle-ci n'y est pas liée | `hold` |
+| Plusieurs `info` courtes vers le même destinataire, fusionnables | `merge` |
+| tout le reste | `approve` |
+
+```bash
+python DISCORD/discord_com/gateway.py approve --id <id>
+python DISCORD/discord_com/gateway.py hold    --id <id> --reason "<motif>"
+python DISCORD/discord_com/gateway.py bounce  --id <id> --reason "<motif>"
+python DISCORD/discord_com/gateway.py merge   --ids <id>,<id>
+```
+
+Ajuster ton / format / longueur en éditant le champ `body` du fichier
+`gateway/outbox/<id>.json` est permis ; changer la question ou les options ne l'est pas —
+dans ce cas, `bounce`.
+
+**Ne jamais lancer `drain`** : `bot.py` envoie les `approved` tout seul toutes les 5 s.
+Vérifier aussi `poll --agent discord` : un `kind: "dead-letter"` = envoi échoué (demande en
+`failed`), à diagnostiquer puis `approve` pour retenter.
+
 #### 3a. Attendre une commande Discord
 
 ```bash
@@ -58,23 +96,20 @@ immédiatement. Ce cycle se répète indéfiniment (heures, jours) au rythme d'u
 message reçu, plus un réveil de sécurité par heure — et non un tour de modèle toutes les
 quelques secondes.
 
-#### 3b. Router ou traiter
+#### 3b. Traiter la commande
 
-**Aiguillage préalable (gateway DISCORD).** La ligne reçue est préfixée `[ROLE Pseudo]`. Décider
-si elle s'adresse à cette session : commande projet, question, `/slash`, ordre de l'admin. Sinon
-— réponse de Marie à une question en attente, message tagué `@design:` / destiné à un autre agent
-— **ne pas la traiter** : la passer à la gateway, puis reboucler sur `wait` **sans `send`** :
+Seuls les messages qui @-mentionnent le bot arrivent ici : ce sont des commandes pour cette
+session. Tout le reste du trafic du canal (réponse de Marie, message tagué `@design:`) est
+routé mécaniquement par `bot.py` vers `gateway/inbox/<agent>/` — rien à faire.
+
+Reste à ma charge, après le `wait` : vider `inbox/unrouted/` (relire, re-router en préfixant
+le bon `@agent:`, ou répondre soi-même).
 
 ```bash
-python DISCORD/discord_com/gateway.py route --author-id <id> --text "<contenu sans le préfixe [ROLE Pseudo]>"
+python DISCORD/discord_com/gateway.py poll --agent unrouted
 ```
 
-(ou `gateway.route_inbound(author_id, author_name, content)` en Python après
-`sys.path.insert(0, "DISCORD/discord_com")`). La gateway route vers `inbox/<agent>/` selon :
-tag explicite `@agent:`, réponse attendue (`state.json` → `pending_reply`), heuristique, sinon
-`inbox/unrouted/`. Détail : `DISCORD/discord_com/gateway/LOOP.md` § « 2 bis ».
-
-Sinon, lire la commande et l'**exécuter directement** avec les outils natifs Claude :
+Lire la commande et l'**exécuter directement** avec les outils natifs Claude :
 - Questions sur le projet → lire fichiers, analyser, répondre
 - Commandes bash → utiliser l'outil Bash
 - Création/modification fichiers → utiliser Write/Edit
@@ -109,8 +144,12 @@ python DISCORD/discord_com/discord_loop.py done
 ### Flux résumé
 
 ```
-wait → commande reçue → exécuter directement → send réponse → done → wait → ...
+juger l'outbox (approve/hold/bounce/merge) → wait → commande reçue → exécuter directement
+→ send réponse → done → vider inbox/unrouted → wait → ...
 ```
+
+L'envoi Discord des demandes `approved` et le routage des entrants sont faits par `bot.py`,
+en continu, indépendamment de cette session.
 
 ## Commandes Discord disponibles
 
@@ -133,6 +172,7 @@ stop                              → Arrête la boucle proprement
 Bot     : ✅ actif
 Mode    : Claude natif (pas de sous-processus)
 Veille  : wait 3600 en tâche de fond (réveil par message, sécurité horaire)
+Gardien : outbox <N> pending / <N> held — jugée à chaque cycle
 
 Envoie "stop" sur Discord pour arrêter.
 ```
@@ -145,3 +185,5 @@ Envoie "stop" sur Discord pour arrêter.
 - Si le bot Discord s'arrête : relancer `python DISCORD/discord_com/bot.py`
 - `discord_loop.py` gère uniquement queue/commands — Claude gère l'exécution
 - Ne pas notifier Discord lors d'un `/close` : seule la commande `stop` explicite (3e) envoie un message de fin.
+- Le `drain` de la gateway n'est plus manuel : `bot.py` s'en charge. Une demande bloquée en
+  `pending` attend un jugement de cette session, pas un `drain`.

@@ -224,3 +224,17 @@ l'aveugle sur #32, capture récente de l'écran Paramètres requise ; #3 traité
 Déposé dans la gateway (`enqueue` orchestrateur → `drain`, Discord message id
 `1545092577982808154`), `kind=question`, `--expect-reply` → réponse routée vers
 `gateway/inbox/orchestrateur/`.
+
+### 2026-09-03 17h17 — réponse partielle sur les captures
+
+**Marie ->**
+1) c'est dans la rubrique accessibilité des paramètres uniquement
+
+_Suite :_ répond au message « demande de captures pour la Phase 10 (débordements #3 + #32) » du
+2026-09-03 (`request_id` `20260903T042325_687674`), point 1 seulement. Précision de localisation,
+**sans capture jointe** (`attachments` vide) : le cadre qui déborde dans « Paramètres » est dans
+la rubrique **Accessibilité** uniquement, pas ailleurs dans l'écran. Le point 2 (cadre Date /
+Heure du formulaire de tâche, #3) reste sans réponse et sans capture. Premier message routé
+automatiquement par `bot.py` sans session agent DISCORD (`routing: "pending"`,
+`gateway/inbox/orchestrateur/20260903T171703_391686`, `pending_replies` purgé) — validation
+en réel de la Phase 1 de `roadmap_gateway_discord_service.md`.

@@ -1,0 +1,23 @@
+{
+  "Appli_TSA_SDI_TDAH": {
+    "alias": "orchestrateur",
+    "path": ".",
+    "keywords": [
+      "deploy", "deploie", "déploie", "version", "roadmap", "release",
+      "commit", "changelog", "netlify", "bundle", "livraison"
+    ]
+  },
+  "design": {
+    "path": "DESIGN",
+    "keywords": [
+      "design", "maquette", "ui", "interface", "couleur", "ecran", "écran",
+      "bouton", "visuel", "typo", "police", "layout"
+    ]
+  },
+  "discord": {
+    "path": "DISCORD",
+    "keywords": [
+      "discord", "gateway", "bot", "outbox", "inbox"
+    ]
+  }
+}

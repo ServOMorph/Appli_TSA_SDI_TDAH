@@ -3,5 +3,8 @@ logs/
 gateway/outbox/
 gateway/inbox/
 gateway/state.json
+gateway/*.lock
+gateway/*.tmp
 queue.json
 commands.json
+bot.pid

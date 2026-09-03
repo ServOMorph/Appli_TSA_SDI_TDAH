@@ -92,76 +92,83 @@ l'`inbox` de l'orchestrateur est un bon cas de livraison en direct).
 
 ---
 
-## Phase 1 — Fondations : `bot.py` transmet tout, registre d'agents, `pending_replies[]`, verrous [TODO]
+## Phase 1 — Fondations : `bot.py` transmet tout, registre d'agents, `pending_replies[]`, verrous [FAIT]
 
-Traite les constats 1, 2, 6, 7, 8.
+Traite les constats 1, 2, 6, 7, 8. Réalisée le 2026-09-03 (agent DISCORD arrêté). 58 auto-tests
+verts. Phase 1 éprouvée en réel : réponse de Marie du 2026-09-03 17h17 routée seule par `bot.py`
+(`routing:"pending"`, `inbox/orchestrateur/20260903T171703_391686`), sans session agent DISCORD.
 
-- [ ] **`gateway/agents.json`** (neuf) : registre `{ "<zone>": { "path": "...", "keywords": [...] } }`
-  pour `Appli_TSA_SDI_TDAH` (alias interne `orchestrateur`), `design`, `discord`. Un champ
-  `alias` optionnel porte `orchestrateur` pour la zone principale (compat des chemins `inbox/`
-  existants `inbox/orchestrateur/`, `inbox/design/`).
-- [ ] **`gateway.py`** : charger le registre au lieu du tuple `AGENTS` en dur ; `_HEURISTIQUE`
-  construit depuis les `keywords` du registre. `route_inbound` accepte un nom d'agent = nom de zone
-  ou alias.
-- [ ] **`gateway.py`** : `state.json` — `pending_reply` (objet) → `pending_replies` (liste),
-  chaque entrée `{ request_id, source, to, since }`. `enqueue --expect-reply` ajoute ; une réponse
-  entrante s'apparie à l'entrée **la plus récente pour le même `to`** et la retire (les autres
-  restent). Migration : lire un ancien `pending_reply` objet et le convertir en liste à 1 élément.
-- [ ] **`gateway.py`** : écritures atomiques (`tmp` + `os.replace`) pour `state.json` et tout fichier
-  de spool ; verrou fichier (`msvcrt.locking` sur Windows, ou un `.lock` par `os.O_CREAT|O_EXCL`
-  avec retry court) autour de chaque read-modify-write de `state.json`.
-- [ ] **`bot.py`** : dans `on_message`, après journalisation et après les commandes autonomes,
-  **tout message du canal qui n'est pas une commande @bot** → `gateway.route_inbound(author_id,
-  author_name, content)`. Conserver le chemin `commands.json` **uniquement** pour les messages qui
-  @-mentionnent le bot (canal de contrôle `/discord_loop`). Retirer le `return` sec de `bot.py:177`
-  pour la branche transmission.
-- [ ] **`bot.py`** : au démarrage, si `commands.json.status == "processing"` depuis plus de N
-  minutes (session `/discord_loop` tombée), le loguer et repasser `idle` (récupération orphelin).
-- [ ] **`test_gateway.py`** : registre chargé depuis `agents.json` ; `pending_replies[]` (ajout,
-  appariement au plus récent par `to`, entrées multiples) ; routage mécanique d'un message sans
-  @bot ; deux writers concurrents sur `state.json` ne corrompent pas le fichier.
+- [x] **`gateway/agents.json`** (neuf) : registre `{ "<zone>": { alias?, "path", "keywords" } }`
+  pour `Appli_TSA_SDI_TDAH` (`alias: "orchestrateur"`), `design`, `discord`.
+- [x] **`gateway.py`** : `load_registry()` / `resolve_agent()` / `_heuristique_registre()`
+  remplacent le tuple `AGENTS` en dur ; `poll`/`ack`/tags acceptent nom de zone ou alias.
+  Heuristique en frontières de mot `\b`, départage au nombre de mots-clés distincts (écart : `re.search`
+  et non sous-chaîne — `bot` matchait `bouton`).
+- [x] **`gateway.py`** : `pending_reply` (objet) → `pending_replies` (liste `{ request_id, source,
+  to, since }`), migration paresseuse non destructive (`_migrer_state`). Appariement d'une réponse
+  entrante à l'entrée la plus récente pour la cible de son **auteur Discord** (`_target_from_author`
+  via `MARIE_USER_ID`/`MORPHEUS_USER_ID`) ; retire cette seule entrée. Écart : le pending est posé
+  au `drain` (pas à `enqueue --expect-reply`) — évite un pending fantôme pour un message tenu par le
+  gardien en Phase 2.
+- [x] **`gateway.py`** : `_atomic_write` (`tmp` + `os.replace`) pour `state.json` et tout spool ;
+  `_state_lock()` (fichier `state.lock`, `os.O_CREAT|O_EXCL`, retry 10 ms, récup périmé > 30 s,
+  deadline 5 s) autour de chaque read-modify-write via `update_state(fn)`.
+- [x] **`bot.py`** : `on_message` route vers `gateway.route_inbound(author_id, author_name,
+  content, attachments)` tout message du canal hors @-mention (`return` sec retiré) ; `commands.json`
+  réservé aux commandes @bot. Écart : `attachments` transportés (réponse de Marie faite de captures).
+- [x] **`bot.py`** : `recuperer_processing_orphelin()` (appelé dans `on_ready`) — `commands.json`
+  en `processing` depuis plus de `ORPHAN_PROCESSING_MINUTES = 15` → repassé `idle`.
+- [x] **`test_gateway.py`** : registre, `pending_replies[]` (ajout, appariement au plus récent,
+  entrées multiples, migration), routage mécanique, concurrence 12 threads, `attachments`,
+  heuristique `\b`.
 
-**Critère de sortie** : `test_gateway.py` vert ; test manuel dev = un message Discord **sans**
-@-mention du bot, tagué `@design:`, atterrit dans `gateway/inbox/design/` ; une 2ᵉ question
-`--expect-reply` n'écrase pas la 1ʳᵉ ; `bot.py` redémarré via `bot_manager.py restart`.
+**Critère de sortie** : `test_gateway.py` vert (58) ; `bot.py` redémarré via `bot_manager.py
+restart` (PID 82188). Test manuel dev de bout en bout (`@design:` sans @bot → `inbox/design/`)
+tracé dans `tests_manuels.md` — le chemin `on_message` → gateway est par ailleurs éprouvé en réel
+par la réponse de Marie du 17h17.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
 ---
 
-## Phase 2 — Gardien de sortie : approbation, `bounce`, drain automatique par `bot.py` [TODO]
+## Phase 2 — Gardien de sortie : approbation, `bounce`, drain automatique par `bot.py` [FAIT]
 
-Traite les constats 4 et 9.
+Traite les constats 4 et 9. Réalisée le 2026-09-03. 58 auto-tests verts. `bot.py` redémarré
+(PID 82188).
 
-- [ ] **`gateway.py`** : statut sur chaque fichier outbox — `pending` (défaut) → `approved` |
-  `held` | `bounced` | `failed`. Verbes CLI + fonctions :
-  - `approve --id <id>` : `pending`/`held` → `approved`.
-  - `hold --id <id> [--reason]` : → `held` (repris au cycle suivant).
-  - `bounce --id <id> --reason "<motif>"` : déplace le fichier vers `inbox/<source>/` en
-    `{ kind: "bounce", reason, original_body, original_id }` ; retiré de l'outbox.
-  - `merge --ids <id,id,...>` : fusionne les `body` dans le plus ancien, supprime les autres.
-- [ ] **`gateway.py`** : `drain` ne traite plus que les items `approved` ; sur échec d'envoi
-  (`send_fn` lève), attraper → statut `failed` + dépôt `inbox/discord/` (dead-letter visible) +
-  continuer la boucle au lieu de l'interrompre.
-- [ ] **`bot.py`** : sa `boucle_polling` appelle `gateway.drain()` (items `approved` uniquement) à
-  chaque tour. Plus aucun `drain` manuel nulle part.
-- [ ] **`discord_loop.md`** (réécrit, périmètre racine — modif orchestrateur) : par cycle, avant le
-  `wait`, revoir chaque `outbox/*.json` en `pending` selon la **liste de critères de rejet** ci-dessus
-  → `approve` / `hold` / `bounce` / `merge`. Puis vider `inbox/unrouted/` (re-router ou répondre).
-  Le routage mécanique et le `drain` ne sont plus de son ressort (faits par `bot.py`).
-- [ ] **`CLAUDE.md`** § Communication Discord : contrat du gardien + liste des critères ;
-  préciser que `bot.py` draine les `approved` et que `gateway.py drain` en direct reste interdit
-  aux autres agents (règle déjà posée le 2026-09-03).
-- [ ] **`gateway/README.md`** + **`gateway/LOOP.md`** : mise à jour (statuts outbox, `bounce`,
-  drain automatique).
-- [ ] **`test_gateway.py`** : `bounce` écrit bien dans `inbox/<source>/` avec motif ; un `pending`
-  non `approved` n'est jamais envoyé par `drain` ; échec d'envoi simulé → `failed` + dead-letter,
-  la boucle continue.
+- [x] **`gateway.py`** : `status` sur chaque fichier outbox — `pending` (défaut) → `approved` |
+  `held` | `bounced` | `failed` (`_statut()` gère la compat de l'ancien booléen `hold`). Verbes :
+  - `approve --id <id>` : `pending`/`held`/`failed` → `approved` (`failed` inclus — écart, permet
+    de retenter un envoi échoué).
+  - `hold --id <id> [--reason]` : → `held` (ignoré par `drain` jusqu'à un `approve`).
+  - `bounce --id <id> --reason "<motif>"` : déplace vers `inbox/<source>/` en `{ kind:"bounce",
+    reason, original_body, original_id, original_to, original_kind }` ; retiré de l'outbox.
+  - `merge --ids <id,id,...>` : concatène les `body` dans le plus ancien (ordre chronologique),
+    `expect_reply = any`, supprime les autres ; refuse des destinataires différents.
+- [x] **`gateway.py`** : `drain` n'envoie que les `approved` (les autres → `ignoré`) ; `send_fn`
+  qui lève → `_marquer(..., "failed")` + dead-letter `{ kind:"dead-letter" }` dans `inbox/discord/`
+  + la boucle continue. Verrou `drain.lock` (le `drain` devient périodique).
+- [x] **`bot.py`** : `boucle_polling` appelle `gateway.drain()` via `asyncio.to_thread` toutes les
+  `GATEWAY_DRAIN_INTERVAL = 5.0` s (écart : throttle, pas « à chaque tour » de la boucle 0,5 s).
+  Plus aucun `drain` manuel nulle part.
+- [x] **`discord_loop.md`** : étape 3a-bis « gardien de sortie » ajoutée (table de décision
+  `approve`/`hold`/`bounce`/`merge`), étape 3b simplifiée (routage mécanique par `bot.py`),
+  flux résumé et format de démarrage mis à jour, note « ne jamais lancer `drain` ».
+- [x] **`CLAUDE.md`** § Communication Discord : contrat du gardien + 5 critères de rejet ; `bot.py`
+  draine les `approved` toutes les 5 s, `gateway.py drain` en direct interdit à **tous** (y compris
+  l'agent DISCORD).
+- [x] **`gateway/README.md`** + **`gateway/LOOP.md`** : statuts outbox, verbes du gardien,
+  `bounce`/`dead-letter`, drain automatique, « ne pas lancer `drain` ».
+- [x] **`test_gateway.py`** : `drain` n'envoie que les `approved` ; `bounce` → `inbox/<source>/`
+  avec motif, hors outbox, rien envoyé ; `merge` ; échec d'envoi simulé → `failed` + dead-letter,
+  la boucle continue ; `failed` ré-`approve` reparti ; verrous libérés.
 
-**Critère de sortie** : tests verts ; test manuel dev = un `enqueue` avec `<placeholder>` dans le
-corps est `bounce` vers `inbox/orchestrateur/` avec motif « fond non figé » ; un `enqueue` propre
-est `approve` puis envoyé par `bot.py` sans intervention.
+**Critère de sortie** : tests verts (58) ; test manuel dev vérifié sur la gateway réelle sans
+trafic Discord — `enqueue` d'un corps `<X.Y>` reste `pending`, `bounce --reason "fond non figé"` →
+`kind:"bounce"` dans `inbox/orchestrateur/`, aucun résidu. **Non encore vérifié** : le `drain`
+automatique de `bot.py` n'a pas encore envoyé de vrai message Discord (tracé dans
+`tests_manuels.md` § Gateway Discord Phase 2).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

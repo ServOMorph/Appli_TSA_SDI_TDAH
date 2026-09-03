@@ -133,11 +133,29 @@ Depuis le 2026-09-02, **tout envoi Discord** (Marie, Morphéus, canal) — quel 
 `DISCORD/discord_com/message_marie.py`, l'API / webhook Discord, `claude_bridge.py` (déprécié —
 lève `RuntimeError`), l'écriture dans `queue.json` / `commands.json`.
 
-**`gateway.py drain` (envoi réel de l'outbox) est réservé à l'agent DISCORD — jamais lancé par
-l'orchestrateur ni une commande.** Tout autre agent s'arrête à `enqueue` : le message reste dans
-l'outbox jusqu'à ce que l'agent DISCORD le relise, l'adapte (ton / format / longueur / moment /
-regroupement, **sans changer le fond**) et le `drain`. Ne pas `drain` soi-même même si l'outbox
-semble bloquée : le signaler à l'utilisateur.
+**`gateway.py drain` (envoi réel de l'outbox) n'est lancé par personne : depuis le 2026-09-03,
+`bot.py` draine automatiquement toutes les 5 s, et uniquement les demandes `approved`.** Ni
+l'orchestrateur, ni une commande, ni l'agent DISCORD ne l'appellent à la main. Si une demande
+`approved` ne part pas, c'est que `bot.py` est arrêté : le signaler à l'utilisateur, ne pas
+contourner.
+
+**Gardien de sortie.** Tout autre agent s'arrête à `enqueue` : la demande naît en `pending` et
+ne sort pas tant que l'agent DISCORD ne l'a pas jugée. Il ajuste ton / format / longueur /
+moment / regroupement **sans jamais changer le fond**, puis tranche :
+- `approve --id` : autorise la sortie (seul statut envoyé) ;
+- `hold --id [--reason]` : fond bon, moment inopportun (question déjà en attente de Marie) ;
+- `bounce --id --reason` : renvoie le message dans `inbox/<source>/`, **jamais sur Discord**.
+  Motifs arrêtés : doublon · réponse déjà connue · fond non figé (`<placeholder>`, choix non
+  tranché, options manquantes, TODO) · hors périmètre canal (jargon, hash, chemins de fichiers)
+  · incohérence de version (`_contexte/dernier_deploiement.md`) ;
+- `merge --ids` : fusionne plusieurs `info` courtes vers le même destinataire.
+
+Le gardien ne reformule pas le fond à la place de l'auteur : il `bounce` avec le motif, et
+l'agent auteur corrige puis re-`enqueue`. Un agent qui reçoit un `bounce` (`kind: "bounce"`
+dans son `inbox`) doit corriger le fond, pas re-déposer à l'identique.
+
+Un échec d'envoi Discord passe la demande en `failed` et dépose une `dead-letter` dans
+`inbox/discord/` ; un `approve` la remet en file.
 
 Réception : `gateway.poll("<agent>")` puis `gateway.ack("<agent>", id)`.
 Doc : `DISCORD/discord_com/gateway/README.md`.

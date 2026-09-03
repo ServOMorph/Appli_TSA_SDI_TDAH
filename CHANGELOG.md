@@ -1,3 +1,16 @@
+## v5.83 — 2026-09-03
+
+### Ajouté
+- `DISCORD/discord_com/gateway/agents.json` : registre « un agent = une zone » (`Appli_TSA_SDI_TDAH` avec alias `orchestrateur`, `design`, `discord`) — chemins, mots-clés d'heuristique et cibles de tag ; remplace le tuple `AGENTS` codé en dur dans `gateway.py`.
+- `roadmap_gateway_discord_service.md` Phase 1 `[FAIT]` : `bot.py` route vers `gateway.route_inbound` **tout** message du canal qui n'@-mentionne pas le bot, sans attendre une session agent DISCORD (le trafic Discord n'@-mentionnant pas le bot n'était jusqu'ici que journalisé puis perdu). `state.json` : `pending_reply` (créneau unique) → `pending_replies` (liste) — plusieurs questions peuvent attendre une réponse en même temps, l'appariement se fait sur l'auteur Discord et la demande la plus récente pour lui. Écritures atomiques + verrou fichier sur `state.json`. Pièces jointes Discord transportées jusqu'à l'`inbox`. `bot.py` : au démarrage, `commands.json` bloqué en `processing` depuis plus de 15 min (session `/discord_loop` tombée) est remis à `idle`.
+- `roadmap_gateway_discord_service.md` Phase 2 `[FAIT]` : gardien de sortie. Chaque demande `enqueue` naît en `pending` et ne part sur Discord qu'après `approve` de l'agent DISCORD ; verbes `hold`, `bounce --reason` (renvoi dans `inbox/<source>/`, jamais sur Discord), `merge`. `bot.py` envoie les demandes `approved` automatiquement toutes les 5 s — plus aucun `gateway.py drain` manuel nulle part. Un échec d'envoi Discord passe la demande en `failed` et dépose une alerte dans `inbox/discord/` au lieu d'interrompre la file.
+
+### Modifié
+- `.claude/CLAUDE.md` § Communication Discord, `DISCORD/discord_com/gateway/README.md`, `gateway/LOOP.md`, `.claude/commands/discord_loop.md` : contrat du gardien de sortie, statuts d'une demande outbox (`pending`/`approved`/`held`/`bounced`/`failed`), 5 critères de rejet, drain automatique par `bot.py`, `gateway.py drain` en direct interdit à tous les agents.
+- `DISCORD/discord_com/.gitignore` : `gateway/state.lock` → `gateway/*.lock` (couvre le verrou de drain).
+- `DISCORD/discord_com/test_gateway.py` : 17 → 58 tests (registre, `pending_replies`, concurrence, pièces jointes, heuristique en frontières de mot, statuts outbox, `bounce`, `merge`, échec d'envoi).
+- `COMMUNICATION/Marie/historique_whatsapp.md` : réponse partielle de Marie du 2026-09-03 17h17 à la demande de captures — le cadre qui déborde dans « Paramètres » est dans la rubrique Accessibilité, sans capture jointe ; le cadre Date/Heure du formulaire de tâche (#3) reste sans réponse. Première réponse de Marie routée automatiquement par `bot.py` (validation en réel de la Phase 1).
+
 ## v5.82 — 2026-09-03
 
 ### Modifié

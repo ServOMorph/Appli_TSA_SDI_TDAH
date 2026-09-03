@@ -37,6 +37,59 @@ le vrai bot et Discord.
 - cas dégradé : tuer la session pendant un traitement → `commands.json` reste en `processing`,
   la file se remplit sans être promue (angle mort connu, cf. question ouverte P3 de `signals.md`).
 
+## Gateway Discord Phase 1 — routage mécanique de tout le canal par `bot.py`
+
+Ajouté le 2026-09-03 (`roadmap_gateway_discord_service.md` Phase 1). `bot.py` route désormais vers
+`gateway.route_inbound` **tout** message du canal qui n'@-mentionne pas le bot, sans attendre une
+session agent DISCORD. 38 auto-tests verts, mais le chemin réel `on_message` → gateway n'a jamais
+vu de message Discord : le bot a été redémarré (PID 51768) après un `import gateway` réussi, rien
+de plus. Les `print` du bot partent dans `DEVNULL` (`bot_manager.cmd_start`) : la seule preuve
+observable est le fichier déposé dans `inbox/`.
+
+À vérifier en postant dans le canal Discord, **sans taguer le bot** :
+- `@design: test phase 1` → un JSON apparaît dans `gateway/inbox/design/`, `routing: "tag"`,
+  `content` sans le tag, `raw_content` complet
+  (`python DISCORD/discord_com/gateway.py poll --agent design`) ;
+- un message quelconque sans tag ni mot-clé → `inbox/unrouted/`, `routing: "aucune"` ;
+- un message avec une image jointe → le champ `attachments` porte `filename` / `url` /
+  `content_type` (chemin critique : la réponse attendue de Marie est faite de 2 captures) ;
+- un message @-mentionnant le bot → comportement inchangé (`commands.json`, « Bien reçu » /
+  « 📥 En file d'attente »), rien dans `inbox/` ;
+- ~~la réponse de Marie à la demande de captures atterrit dans `inbox/orchestrateur/` avec
+  `routing: "pending"` et retire la seule entrée `20260903T042325_687674` de
+  `state.pending_replies`.~~ **Confirmé en réel le 2026-09-03 17h17** : réponse de Marie
+  (« 1) c'est dans la rubrique accessibilité… ») routée par `bot.py` sans session agent
+  DISCORD, `gateway/inbox/orchestrateur/20260903T171703_391686`, `pending_replies` vidé.
+
+À vérifier aussi (item 6 de la phase, corrige l'angle mort P3) : laisser `commands.json` en
+`processing` avec un `timestamp` de plus de 15 min, puis `python bot_manager.py restart` →
+le statut repasse `idle` et la file est promue.
+
+## Gateway Discord Phase 2 — gardien de sortie + drain automatique par `bot.py`
+
+Ajouté le 2026-09-03 (`roadmap_gateway_discord_service.md` Phase 2). Chaque demande outbox
+porte un `status` (`pending` → `approved` | `held` | `bounced` | `failed`) ; `drain` n'envoie
+que les `approved` ; `bot.py` appelle `gateway.drain()` toutes les 5 s (plus aucun `drain`
+manuel). 58 auto-tests verts. `approve` / `hold` / `bounce` / `merge` et le refus d'envoi d'un
+`pending` ont été exercés sur la gateway réelle sans trafic Discord ; le `drain` automatique
+par le bot (PID 82188 après restart) n'a pas encore envoyé de vrai message.
+
+À vérifier lors d'une session `/discord_loop` active, bot tournant :
+- `enqueue` d'une demande propre (`--to channel`, corps figé) → elle reste en `pending`,
+  `bot.py` ne l'envoie pas ; après `gateway.py approve --id <id>`, elle part sur Discord dans
+  les ~5 s **sans autre intervention**, archivée dans `outbox/sent/`, tracée dans
+  `logs/conversation.jsonl` (`role: GATEWAY`) ;
+- `enqueue` avec un `<placeholder>` dans le corps → `gateway.py bounce --id <id> --reason
+  "fond non figé"` : le fichier quitte l'outbox, rien ne part sur Discord, un JSON
+  `kind: "bounce"` apparaît dans `inbox/orchestrateur/` avec `reason` et `original_body` ;
+- `hold --id <id>` → la demande est ignorée par les `drain` suivants jusqu'à `approve` ;
+- `merge --ids a,b` (deux `info` vers le même `--to`) → corps concaténés dans la plus
+  ancienne, la seconde supprimée, `merged_from` renseigné ;
+- échec d'envoi réel (couper le réseau ou un token invalide le temps d'un `drain`) → la
+  demande passe `failed`, un `kind: "dead-letter"` atterrit dans `inbox/discord/`, les
+  demandes suivantes de la même passe partent quand même ; `approve` sur la `failed` la
+  renvoie en file.
+
 ## Veille /discord_loop en tâche de fond — `wait` à timeout paramétrable
 
 Ajouté le 2026-09-03. `discord_loop.py wait` accepte un timeout optionnel en argument

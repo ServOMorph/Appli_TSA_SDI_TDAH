@@ -9,6 +9,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+import gateway
+
 DIR = Path(__file__).parent
 load_dotenv(DIR / ".env")
 CONFIG = json.loads((DIR / "config_bot_discord.json").read_text(encoding="utf-8"))
@@ -27,6 +29,8 @@ CONV_LOG = LOGS_DIR / "conversation.jsonl"
 BACKFILL_LOG = LOGS_DIR / "backfill.jsonl"
 BACKFILL_MARKER = LOGS_DIR / ".backfill_done"
 POLL_INTERVAL = 0.5
+ORPHAN_PROCESSING_MINUTES = 15
+GATEWAY_DRAIN_INTERVAL = 5.0
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -139,11 +143,32 @@ async def traiter_autonome(message_content: str) -> str | None:
 # Events Discord
 # ------------------------------------------------------------------
 
+def recuperer_processing_orphelin():
+    """Une session /discord_loop tombée laisse commands.json en `processing` : la file ne
+    serait plus jamais promue. Au démarrage du bot, on remet `idle` au-delà du délai."""
+    try:
+        cmd = lire(COMMANDS)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"Erreur lecture commands.json : {e}")
+        return
+    if cmd.get("status") != "processing":
+        return
+    age = time.time() - cmd.get("timestamp", 0)
+    if age < ORPHAN_PROCESSING_MINUTES * 60:
+        print(f"commands.json en processing depuis {int(age)}s — session probablement active.")
+        return
+    cmd["status"] = "idle"
+    ecrire(COMMANDS, cmd)
+    print(f"commands.json bloque en processing depuis {int(age / 60)} min -> remis a idle "
+          f"(file : {len(cmd.get('queue') or [])} en attente).")
+
+
 @client.event
 async def on_ready():
     global _channel
     _channel = await client.fetch_channel(CHANNEL_ID)
     print(f"Bot pret -> #{_channel.name}")
+    recuperer_processing_orphelin()
     await backfill_historique()
     asyncio.ensure_future(boucle_polling())
 
@@ -172,9 +197,18 @@ async def on_message(message):
         ecrire(QUEUE, q)
         return
 
-    # Filtre mention : le bot ne traite que les messages où il est explicitement tagué.
-    # Message taguant d'autres membres (ou personne) -> journalisé seulement, pas transmis à Claude.
+    # Sans @-mention du bot : ce n'est pas une commande /discord_loop, c'est du trafic de canal.
+    # Il part vers la gateway, qui le route dans l'inbox de l'agent concerné.
     if client.user not in message.mentions:
+        try:
+            pieces = [{"filename": a.filename, "url": a.url, "content_type": a.content_type}
+                      for a in message.attachments]
+            res = gateway.route_inbound(message.author.id, str(message.author),
+                                        message.content, pieces)
+            print(f"Route vers inbox/{res['routed_to']} ({res['routing']}) : {res['id']} "
+                  f"— {len(pieces)} piece(s) jointe(s)")
+        except Exception as e:  # le routage ne doit jamais tuer le bot
+            print(f"Erreur route_inbound : {e}")
         return
 
     # Mode commande Claude : préparation du contenu (retrait mention + préfixe novice)
@@ -206,9 +240,23 @@ async def on_message(message):
         await envoyer(f"📥 En file d'attente ({len(file)}). Traité dès que Claude se libère.")
 
 
+async def drainer_gateway():
+    """Envoie les demandes gateway approuvées par le gardien. Hors event loop (POST bloquant)."""
+    try:
+        resultats = await asyncio.to_thread(gateway.drain)
+    except Exception as e:
+        print(f"Erreur drain gateway : {e}")
+        return
+    for r in resultats:
+        if r.get("status") in ("sent", "failed", "erreur"):
+            print(f"Gateway {r.get('id')} : {r['status']} "
+                  f"{r.get('discord_message_id') or r.get('detail') or ''}")
+
+
 async def boucle_polling():
     """Envoie les messages en attente dans queue.json vers Discord et promeut la file commands.json."""
     _dernier_ts_envoye = 0
+    _dernier_drain = 0.0
     while True:
         try:
             q = lire(QUEUE)
@@ -237,6 +285,11 @@ async def boucle_polling():
                     f"▶️ Reprise de la demande de {suivante['author_display']} "
                     f"(file : {len(c['queue'])} restante(s))."
                 )
+
+            # Gardien de sortie : seules les demandes `approved` partent, et seulement d'ici.
+            if time.monotonic() - _dernier_drain >= GATEWAY_DRAIN_INTERVAL:
+                _dernier_drain = time.monotonic()
+                await drainer_gateway()
         except Exception as e:
             print(f"Erreur polling : {e}")
         await asyncio.sleep(POLL_INTERVAL)

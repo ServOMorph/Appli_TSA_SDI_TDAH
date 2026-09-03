@@ -303,3 +303,14 @@ https://appli-audhd.netlify.app/
 Détail des changements et questions : https://drive.google.com/open?id=1AUtsYJ3O4H6PXE7vZ2p9381a-Q-ud8nF
 
 _Suite :_ `/deploy` v5.84 — livre le cumul depuis v5.69 : correctif pastille (`2d5c0b8`), travail bundle, `roadmap_planning_accueil_2026-08-29.md` Phases 3-5, `roadmap_demandes_marie_2026-09-02.md` 10 phases (demandes 23-33). Commentaire figé dans `livraisons/v5.84.md`, publié sur Drive. Déposé dans la gateway (`enqueue --source orchestrateur --to marie --kind delivery`), en attente du gardien (agent DISCORD). #3 et #32 passeront à `livrée v5.84` dans `marie_modifications_suivi.md` seulement après validation de Marie sur son appareil.
+
+### 2026-09-03 19h44 — précision de Marie sur le débordement Paramètres (#32)
+
+**Marie ->**
+1) c'est dans la rubrique « accessibilité » des paramètres uniquement, pas dans tous les paramètres
+
+_Suite :_ re-précise le point 1 de la demande de captures Phase 10 (#32), déjà abordé au 17h17 —
+le débordement horizontal ne concerne que la rubrique **Accessibilité** de l'écran Paramètres, pas
+l'ensemble de l'écran. Message @-mentionnant le bot, donc capté par la session `/discord_loop` au
+lieu du routage automatique ; re-routé manuellement vers `gateway/inbox/orchestrateur/`
+(`20260903T194455_255655`). Aucun `pending_reply` actif (purgé au 17h17). Sans capture jointe.

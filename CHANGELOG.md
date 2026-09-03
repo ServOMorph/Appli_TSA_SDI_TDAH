@@ -1,3 +1,10 @@
+## v5.81 — 2026-09-03
+
+### Modifié
+- `/deploy` lancé pour livrer le backlog (v5.80 : `roadmap_demandes_marie_2026-09-02.md` Phases 1-9, `roadmap_planning_accueil` Phases 3-5, correctif pastille `2d5c0b8`, travail bundle) : étape 0 exécutée sans anomalie (snapshot Supabase `20260903-1513z` sans perte ni friction nouvelle, `manual_test_results` toujours à 49, Google Doc « Modifications » inchangé depuis le 2026-08-31, ingestion journal 0 ajout), puis **déploiement suspendu sur décision de l'utilisateur** : attendre les 2 captures de Marie (écran Paramètres + cadre Date/Heure du formulaire de tâche) qui débloquent la Phase 10 (#3 + #32) avant de mettre v5.80 en production.
+- `_contexte/marie_modifications_suivi.md` : jalon « Dernière exécution de la revue » porté au 2026-09-03 (revue du Google Doc via `.claude/revue_googledoc.md`, Doc inchangé).
+- `_contexte/signals.md` : deux roadmaps Discord explicitement distinguées (`DISCORD/roadmap_gateway_discord_2026-09-02.md` close avec un reliquat d'adoption orchestrateur ; `roadmap_gateway_discord_service.md` non démarrée) ; ajout d'une action ouverte pour nettoyer l'arbre de travail (`DESIGN/` non suivi, `bot.pid`, `commentaires_marie_v5.69.docx`) avant le prochain `/deploy`.
+
 ## v5.80 — 2026-09-03
 
 ### Ajouté

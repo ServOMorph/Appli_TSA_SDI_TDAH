@@ -6,7 +6,7 @@ archivée après livraison).
 
 - Google Doc : `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
 - Dernière revue du Doc : 2026-08-31 (date de modification analysée : 2026-08-31 17:28)
-- Dernière exécution de la revue : 2026-09-02 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
+- Dernière exécution de la revue : 2026-09-03 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
 - Marie a retiré les demandes 1 à 17 (toutes traitées) puis, le 2026-08-31, retiré 18 et 20 (livrées, Phases 1-2 de `roadmap_planning_accueil_2026-08-29.md`) et ajouté 23 à 33. Le Doc porte à présent 19, 21, 22 (en cours) et 23 à 33 (nouvelles, à analyser via `/analyser_googledoc`).
 - Dernière mise à jour de ce registre : 2026-09-02 (réconciliation depuis `/deploy` étape 0.4 : Doc modifié le 2026-08-31, demandes 23-33 ajoutées à l'état `en attente`)
 

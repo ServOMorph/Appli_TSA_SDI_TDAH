@@ -55,8 +55,32 @@
 - [P3] `index.html:7` : `<title>tsa-scaffold</title>`, résidu de scaffold toujours visible dans l'onglet du navigateur. — fait quand : titre corrigé — réf : `index.html`
 - [P3] Durcir `/discord_loop` : auto-rattrapage au démarrage si `commands.json` est bloqué en `processing` (session précédente tombée en plein traitement) — le loguer puis le repasser `idle` ou le retraiter ; ajouter un `stop` qui notifie Discord « Claude hors ligne ». — fait quand : le skill gère le cas `processing` orphelin au lancement — réf : `.claude/commands/discord_loop.md`, `DISCORD/discord_com/bot.py` (`boucle_polling`), `DISCORD/discord_com/discord_loop.py` (`wait_for_command`)
 - [P3] `PlanningBoard.tsx` : le bouton « Reporter » (mode surcharge) est imbriqué dans le `<button>` de ligne — HTML invalide, avertissement jsdom au run des tests. Pré-existant, révélé par la Phase 2. Candidat à une phase de refacto entre deux phases fonctionnelles de la roadmap planning. — fait quand : le bouton « Reporter » n'est plus descendant du bouton de ligne — réf : `src/ui/screens/dashboard/PlanningBoard.tsx` (rendu d'une ligne), `roadmap_planning_accueil_2026-08-29.md`
+- [P2] Nettoyer l'arbre de travail avant le prochain `/deploy` (gate 3.1 : `git status --short` doit être vide). `DESIGN/` : nouvelle zone-agent non suivie (`agent_role.md` + `_contexte/`) → `git add`. `DISCORD/discord_com/bot.pid` : fichier runtime du bot → `.gitignore`. `commentaires_marie_v5.69.docx` : reliquat du déploiement v5.69 → traiter avec la question P1 « ranger les `commentaires_marie_*.docx` » (gitignore + suppression, ou archivage documenté). — fait quand : `git status --short` vide (hors modifications de session légitimes) et le prochain `/deploy` passe la porte 3.1 — réf : `.claude/commands/deploy.md` étape 3.1, `.gitignore`, question P1 « ranger les fichiers `commentaires_marie_vX.Y.docx` »
+- [P3] Reliquat d'adoption de la gateway Discord v1 (`DISCORD/roadmap_gateway_discord_2026-09-02.md` Phase 3, « hors zone discord ») : MAJ `agent_role.md` orchestrateur + `design`, retrait des appels directs (`message_marie.py`, `claude_bridge`) dans `.claude/commands/deploy.md` et `analyser_googledoc.md`, alignement `.claude/CLAUDE.md`, câblage `discord_loop.md` étape 3b. En partie recouvert par `roadmap_gateway_discord_service.md` — à trancher : traiter isolément ou laisser la roadmap service l'absorber. — fait quand : plus aucun appel direct à `message_marie.py`/`claude_bridge` dans les commandes de l'orchestrateur, ou décision explicite de le porter dans `roadmap_gateway_discord_service.md` — réf : `DISCORD/roadmap_gateway_discord_2026-09-02.md` (§ Statuts, Phase 3), `roadmap_gateway_discord_service.md`
 
-## Dernière session (2026-09-03 — analyse système gateway Discord + roadmap service permanent ; message capture Phase 10 envoyé à Marie)
+## Dernière session (2026-09-03 — /deploy tenté puis suspendu : attendre le retour de Marie avant v5.80 ; deux roadmaps Discord distinguées)
+
+## Décisions prises
+- **Déploiement de v5.80 suspendu** : attendre les 2 captures de Marie (écran Paramètres + cadre Date/Heure du formulaire de tâche) qui débloquent `roadmap_demandes_marie_2026-09-02.md` Phase 10 (#3 + #32), avant de livrer. Tout le backlog (Phases 1-9, planning 3-5, pastille `2d5c0b8`, bundle) partira avec ce même `/deploy`, une fois la Phase 10 traitée ou une décision de coder à l'aveugle prise avec l'utilisateur.
+
+## Livrables produits ou modifiés
+- `_contexte/marie_modifications_suivi.md` : jalon « Dernière exécution de la revue » → 2026-09-03 (revue Google Doc, `/deploy` étape 0.4 ; Doc inchangé depuis 2026-08-31 17:28).
+- `_contexte/signals.md`, `_contexte/contexte.md`, `README.md`, `CHANGELOG.md` (v5.81) : ce `/close`.
+
+## Hypothèses validées / invalidées
+- VALIDE : `/deploy` étape 0 exécutée — snapshot `20260903-1513z` sans perte (usage normal : `list_items` +1, `energy_entries` +1, `budget_categories` +1), `manual_test_results` toujours à 49 (aucun test rejoué par Marie depuis le 2026-08-31 20:31), 17 `nok` tous anciens (≤ 2026-08-31) et déjà tracés ; ingestion journal 0 ajout ; Google Doc inchangé.
+- CONSTAT : deux roadmaps Discord distinctes — `DISCORD/roadmap_gateway_discord_2026-09-02.md` (Phases 1-2-3 `[FAIT]` 2026-09-02 ; reliquat d'adoption côté orchestrateur : MAJ `agent_role.md` orchestrateur+design, retrait des appels directs `message_marie.py`/`claude_bridge` dans `deploy.md`/`analyser_googledoc.md`, alignement `.claude/CLAUDE.md`, câblage `discord_loop.md` étape 3b) ET `roadmap_gateway_discord_service.md` (racine, 3 phases `[TODO]`, non démarrée, la prolonge).
+- BLOCAGE À LEVER AVANT `/deploy` : arbre non propre (gate 3.1) — `DESIGN/` (nouvelle zone-agent non suivie : `agent_role.md` + `_contexte/`), `DISCORD/discord_com/bot.pid` (runtime, à gitignorer), `commentaires_marie_v5.69.docx` (reliquat v5.69, question P1 ouverte).
+
+## Prochaine étape exacte
+Attendre la réponse de Marie : `python DISCORD/discord_com/gateway.py poll --agent orchestrateur`. À réception : traiter `roadmap_demandes_marie_2026-09-02.md` Phase 10 (#3 + #32), régler les 3 fichiers non suivis, puis `/deploy` v5.80 (backlog complet + archivage `roadmap_planning_accueil`, `roadmap_sync_marie`, `roadmap_sav_snapshot_marie`).
+
+## Question bloquante pour la session suivante
+Aucune — attente d'une donnée externe (les captures de Marie).
+
+---
+
+## Dernière session archivée (2026-09-03 — analyse système gateway Discord + roadmap service permanent ; message capture Phase 10 envoyé à Marie)
 
 ## Décisions prises
 - `gateway.py drain` (envoi réel de l'outbox) réservé à l'agent DISCORD : règle ajoutée à `.claude/CLAUDE.md` § Communication Discord. Les autres agents s'arrêtent à `enqueue`, un outbox bloqué se signale à l'utilisateur. Suite à un `drain` lancé à tort par l'orchestrateur en début de session.

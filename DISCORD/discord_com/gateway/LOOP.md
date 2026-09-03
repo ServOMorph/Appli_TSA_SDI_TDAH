@@ -11,8 +11,10 @@ python DISCORD/discord_com/gateway.py drain --dry-run     # rendu final, tous st
 
 Pour chaque demande en `pending` (ou `held` repris) :
 - Lire `body`. Vérifier qu'elle est lisible pour son destinataire (`to`).
-- Si le ton / le format / la longueur doivent être ajustés : éditer le champ `body` du
-  fichier `gateway/outbox/<id>.json` **sans changer le fond** (question, options).
+- **Relire `gateway/STYLE.md`, section du destinataire (`to`).** Ajuster le champ `body` du
+  fichier `gateway/outbox/<id>.json` à ce style (ton, formulations, longueur, ponctuation,
+  emojis, structure) **sans changer le fond** (question, options, faits, chiffres, liens).
+  Si la forme ne peut pas être corrigée sans toucher au fond : `bounce`.
 - Puis trancher, par ordre de test :
 
 | test | verdict |

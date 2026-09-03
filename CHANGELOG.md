@@ -1,3 +1,12 @@
+## v5.85 — 2026-09-03
+
+### Ajouté
+- `DISCORD/discord_com/gateway/STYLE.md` : guide de forme des messages Discord sortants, un bloc par destinataire (`marie`, `morpheus`, `channel`), relu par la session `/discord_loop` avant chaque `approve` du gardien de sortie. Régit ton, formulations, longueur, ponctuation, emojis, structure — jamais le fond (question, options, faits, chiffres, liens) ; si la forme ne peut être corrigée sans toucher au fond : `bounce`. Contraintes communes à tous les destinataires : identité sortante « El Patrone » (jamais « Claude » / « Claude Code »), pas de mention d'un modèle de langage ni d'Anthropic, aucune mécanique de protocole dans un message, pas d'excuse, un sujet par message, aucun emoji dans le corps (l'encadrement `💻🤖` et le tag Marie exceptés, posés par `curate()`). Ouvertures imposées : Marie → « Salut Poulette ! », Morphéus → « Salut ma poule ! ». Section `marie` complète (reprend la préférence CLAUDE.md : hyper synthétique, sans politesse au-delà de l'ouverture, vocabulaire non technique, gabarit de livraison) ; `morpheus` et `channel` en valeurs par défaut, à compléter. STYLE.md prime sur `.claude/CLAUDE.md` § « Messages pour Marie » pour la forme uniquement (divergence assumée sur la salutation) ; CLAUDE.md reste la référence du fond.
+
+### Modifié
+- `DISCORD/discord_com/gateway/LOOP.md` § 1 : relecture de `STYLE.md` (section du destinataire) rendue obligatoire avant chaque `approve`.
+- `README.md`, `DISCORD/_contexte/contexte.md` : mention du guide de forme.
+
 ## v5.84 — 2026-09-03
 
 ### Corrigé

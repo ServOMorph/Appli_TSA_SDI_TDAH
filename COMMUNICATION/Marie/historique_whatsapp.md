@@ -207,3 +207,19 @@ version ? »). Envoyé via la gateway (`enqueue` orchestrateur → `drain`, Disc
 `1544799987622215714`), `kind=info`, sans `--expect-reply`. Aucune date ferme donnée (engagement
 calendaire non pris). Le prochain `/deploy` livrera le correctif pastille + le travail bundle +
 `roadmap_planning_accueil` Phases 3-5.
+
+### 2026-09-03 — demande de captures pour la Phase 10 (débordements #3 + #32)
+
+**Dév ->**
+J'ai besoin de deux captures d'écran pour corriger des affichages qui débordent à droite.
+
+1) Écran « Paramètres » : ouvre-le et prends une capture qui montre le cadre qui dépasse à droite.
+
+2) Écran de création d'une tâche : le cadre Date / Heure dépasse encore à droite. Une capture aussi si tu peux.
+
+Envoie les images ici.
+
+_Suite :_ débloque `roadmap_demandes_marie_2026-09-02.md` Phase 10 (décision 7 : pas de code à
+l'aveugle sur #32, capture récente de l'écran Paramètres requise ; #3 traité en même temps).
+Déposé dans la gateway (`enqueue` orchestrateur → outbox `20260903T042325_687674`), `kind=question`,
+`--expect-reply` → réponse routée vers `gateway/inbox/orchestrateur/`.

@@ -351,3 +351,19 @@ toujours `nok` — 3e échec (v5.45 réévaluation, v5.64 `min-width:0` sur `<fo
 rouvert, #3 repassé `en attente`. Correctifs à l'aveugle répétés sans appareil de test : piste
 jamais essayée = `appearance: none` sur les `<input type="date">` / `<input type="time">` (largeur
 intrinsèque native, non rétrécissable sur iOS Safari malgré `width:100%`).
+
+### 2026-09-04 — demande de capture pour #3 (débordement Date/Heure) — déposé dans la gateway
+
+**Dév ->**
+Le débordement des cadres « Date » et « Heure » dans la planification d'une tâche n'est toujours pas réglé.
+
+Pour le corriger sans tâtonner, il me faut trois choses :
+• une photo ou une courte vidéo de l'écran de création de tâche planifiée, cadres « Date » et « Heure » visibles avec le débordement à droite
+• le modèle de ton téléphone
+• le navigateur utilisé (Safari, Chrome, autre)
+
+_Suite :_ #3 `nok` pour la 3e fois (retour v5.84 du 2026-09-04). Correctifs à l'aveugle épuisés
+(v5.45, v5.64 `min-width:0`, v5.84 `width:100%` + grille énergie) ; #32 validé au même moment écarte
+la cause flex commune. Message déposé dans la gateway (`enqueue --source orchestrateur --to marie
+--kind question --expect-reply`, id `20260904T045637_240031`), en attente du gardien (agent DISCORD).
+Réponse attendue routée vers `gateway/inbox/orchestrateur/`.

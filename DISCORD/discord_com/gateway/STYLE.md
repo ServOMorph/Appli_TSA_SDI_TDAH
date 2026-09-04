@@ -136,6 +136,13 @@ Destinataire : le canal Discord, message public (pas d'interlocuteur unique).
 - Neutre, informatif, phrases complètes.
 - Pas de tutoiement nominatif, pas de tag `@`.
 
+**Exception (décision Morphéus 2026-09-04)** : les deux `notify` fixes de `/discord_loop`
+(connexion étape 2, arrêt sur `stop` étape 3e) dérogent à ce ton — formulations figées et
+familières, humour assumé (« Allez ça y'est je me remets au taf » / « Allez, les jeunes, bonne
+nuit, je va me coucher », « va » inclus, volontaire). Ne pas les aligner sur ce ton neutre.
+Chaînes en dur dans `.claude/commands/discord_loop.md`, hors du jugement de l'agent DISCORD
+(pas de demande outbox pour ces deux messages).
+
 ### Format
 
 - Autonome : compréhensible sans le fil de conversation.

@@ -1,3 +1,9 @@
+## v5.90 — 2026-09-04
+
+### Modifié
+- `DISCORD/discord_com/gateway/STYLE.md` § channel : exception de ton consignée pour les deux `notify` fixes de `/discord_loop` (connexion, arrêt) — humour assumé, décision Morphéus (« Allez ça y'est je me remets au taf » / « Allez, les jeunes, bonne nuit, je va me coucher »), dérogent volontairement au ton neutre du canal.
+- `DISCORD/_contexte/contexte.md` : décision structurante consignant durablement la convention `[discord-auto]` / étape 3d-bis livrée par l'orchestrateur (commit `32f3f2d`), pour que la session `discord` l'applique à chaque cycle concerné et pas seulement une fois.
+
 ## v5.89 — 2026-09-04
 
 ### Ajouté

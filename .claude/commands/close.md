@@ -194,10 +194,12 @@ d'une ligne unique par `device_id`, sans aucun historique. Le script est idempot
 contenu de `.env` ni celui d'un snapshot (données personnelles de Marie).
 
 Étape 12, sur `main` uniquement et si la zone résolue est la racine du projet : mettre à jour le
-manifeste des fichiers Git non commités, sans lancer de copie vers Drive :
-`python claude-vibecoding-kit/backup_project.py . --refresh-list`.
-Afficher son contenu dans le bilan. La copie ne peut être lancée qu'après validation explicite de
-cette liste par l'utilisateur, avec `python claude-vibecoding-kit/backup_project.py . --upload`.
-Le script utilise `rclone copy` et ne supprime aucun fichier distant.
+manifeste des fichiers absents de la branche GitHub suivie puis les copier vers Drive :
+`git fetch --quiet` puis `python claude-vibecoding-kit/backup_project.py . --refresh-list --upload`.
+Afficher le nombre de fichiers et le résultat de la copie dans le bilan. La liste comprend les
+fichiers privés/ignorés et les différences avec la branche publique, y compris les commits locaux
+non publiés. Cette sauvegarde est automatique ; une erreur rclone est non bloquante mais doit être
+signalée. Le script utilise `rclone copy` et ne supprime aucun fichier distant. Les dépendances et
+artefacts régénérables restent exclus.
 
 <!-- SPECIFICITES PROJET : FIN -->

@@ -1974,3 +1974,10 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 - Distinction notification push / suggestion in-app établie dans Design System et User Flows
 - Règle de skip du check-in énergie (statut `skipped`) dans Modèle de données
 - Sync cloud définie comme post-MVP (Supabase région UE)
+## v5.88 — 2026-09-04
+
+### Ajouté
+- Sauvegarde Drive automatique à `/close` des fichiers absents du dépôt GitHub suivi, incluant les données privées nécessaires à une réinstallation.
+
+### Modifié
+- `.claude/commands/close.md` : actualisation de la référence GitHub avant la sauvegarde ; échec Drive non bloquant signalé au bilan.

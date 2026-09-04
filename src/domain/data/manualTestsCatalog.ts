@@ -345,13 +345,14 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'cadre-date-heure-dans-l-ecran',
-    revision: 1,
+    revision: 2,
     title: 'Cadre Date et Heure bien dans l’écran',
     category: 'Tâches',
     docRefs: [3],
     steps: [
       'Sur téléphone, commencez la création d’une tâche et activez sa planification pour faire apparaître les champs « Date » et « Heure de début ».',
       'Vérifiez que les cadres « Date » et « Heure de début » tiennent entièrement dans l’écran, sans dépasser sur le bord droit, avec la même marge à gauche et à droite.',
+      'Touchez le champ « Heure de début » et choisissez une heure : vérifiez qu’elle s’affiche entièrement dans le cadre (rien de coupé ni d’invisible).',
       'Vérifiez aussi la grille « Coût en énergie » (chiffres 1 à 12) : la 6e et la 12e case doivent être entières, pas coupées au bord droit.',
       'Faites défiler tout le formulaire de haut en bas : aucun élément ne doit dépasser à droite et la page ne doit pas pouvoir glisser horizontalement.',
       'Ouvrez ensuite une tâche déjà planifiée, touchez « Modifier » : refaites les mêmes vérifications sur l’écran de modification.',

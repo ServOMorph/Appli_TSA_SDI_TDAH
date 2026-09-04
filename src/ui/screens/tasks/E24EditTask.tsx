@@ -258,7 +258,7 @@ export function E24EditTask() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              style={{ ...inputStyle, minWidth: 0, maxWidth: '100%' }}
+              style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
             />
           </div>
           <div style={{ minWidth: 0 }}>
@@ -270,7 +270,7 @@ export function E24EditTask() {
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              style={{ ...inputStyle, minWidth: 0, maxWidth: '100%' }}
+              style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
             />
           </div>
           <div>

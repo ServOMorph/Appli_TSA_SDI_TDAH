@@ -4,6 +4,15 @@
 - `DISCORD/discord_com/gateway/STYLE.md` § channel : exception de ton consignée pour les deux `notify` fixes de `/discord_loop` (connexion, arrêt) — humour assumé, décision Morphéus (« Allez ça y'est je me remets au taf » / « Allez, les jeunes, bonne nuit, je va me coucher »), dérogent volontairement au ton neutre du canal.
 - `DISCORD/_contexte/contexte.md` : décision structurante consignant durablement la convention `[discord-auto]` / étape 3d-bis livrée par l'orchestrateur (commit `32f3f2d`), pour que la session `discord` l'applique à chaque cycle concerné et pas seulement une fois.
 
+## v5.90 — 2026-09-04
+
+### Ajouté
+- `.claude/commands/start.md` (zone racine, étape 4-5) : relit `tests_manuels.md` à chaque `/start` s'il existe et n'est pas vide, l'inclut dans la synthèse — pour voir ce qui a été validé passivement par la session `discord` (`[discord-auto]`) entre deux sessions.
+- `.claude/commands/close.md` (zone racine, étape 6) : interdiction explicite de recréer ou modifier une section `[discord-auto]` déjà supprimée par la session `discord` — seule la session `discord` la valide ; nouvelle section acceptée uniquement si un test délégable est décidé en session.
+
+### Modifié
+- Message expliquant la convention `[discord-auto]` (livrée en v5.89) composé et copié dans le presse-papier, à transmettre manuellement à la session `discord` pour qu'elle la note durablement.
+
 ## v5.89 — 2026-09-04
 
 ### Ajouté

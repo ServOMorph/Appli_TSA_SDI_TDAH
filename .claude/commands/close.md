@@ -193,6 +193,14 @@ d'une ligne unique par `device_id`, sans aucun historique. Le script est idempot
 `donnees_marie/` (gitignoré : sans effet sur le commit de l'étape 10). Ne jamais afficher le
 contenu de `.env` ni celui d'un snapshot (données personnelles de Marie).
 
+Étape 6, sur `main` uniquement et si la zone résolue est la racine du projet : vérifier que
+`tests_manuels.md` est cohérent avant de le committer à l'étape 10 — en particulier, ne jamais
+recréer ni modifier une section `[discord-auto]` que la session `discord` a supprimée pendant la
+session (elle signale un test délégué validé, cf. `.claude/commands/discord_loop.md` § 3d-bis) ;
+ajouter de nouvelles sections `[discord-auto]` uniquement si un nouveau test délégable a été
+décidé en session. Si une section `[discord-auto]` reste présente sans avoir été observée,
+la laisser telle quelle — elle attend un cycle `/discord_loop` pertinent, pas une action ici.
+
 Étape 12, sur `main` uniquement et si la zone résolue est la racine du projet : mettre à jour le
 manifeste des fichiers absents de la branche GitHub suivie puis les copier vers Drive :
 `git fetch --quiet` puis `python claude-vibecoding-kit/backup_project.py . --refresh-list --upload`.

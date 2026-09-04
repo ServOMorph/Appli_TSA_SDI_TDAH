@@ -106,4 +106,11 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
   et poursuivre `/start`. Le script est idempotent (aucune réécriture si le snapshot courant est
   déjà sauvegardé) et écrit dans `donnees_marie/` (gitignoré). Ne jamais afficher le contenu de
   `.env`.
+- Étape 4-5, zone racine uniquement : si `tests_manuels.md` existe et n'est pas vide, le lire et
+  l'inclure dans la synthèse de l'étape 5 (contrôles dev en attente). Objectif : ne jamais perdre
+  de vue ce qui a été validé passivement par la session `discord` entre deux `/start` — une
+  section `[discord-auto]` qui a disparu depuis la dernière session signale un test délégué
+  validé (cf. `.claude/commands/discord_loop.md` § 3d-bis). Ne pas recréer une section déjà
+  supprimée par `discord` : lire l'état actuel du fichier comme source de vérité, jamais la
+  mémoire de session.
 <!-- SPECIFICITES PROJET : FIN -->

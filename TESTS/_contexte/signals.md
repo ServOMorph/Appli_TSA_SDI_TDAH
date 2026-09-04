@@ -1,4 +1,4 @@
-# Signals — EVOLUTIONS_TESTS
+# Signals — TESTS
 
 ## Actions ouvertes
 

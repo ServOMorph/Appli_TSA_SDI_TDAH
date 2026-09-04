@@ -1,17 +1,17 @@
-# Équipe parallèle — EVOLUTIONS_TESTS
+# Équipe parallèle — TESTS
 
 ## Coordinateur
 
-- Alias : EVOLUTIONS_TESTS
+- Alias : TESTS
 - Branche d'intégration : `main`
-- Dossier : `EVOLUTIONS_TESTS/`
+- Dossier : `TESTS/`
 
 ## Membres
 
 | Alias | Mode | Worktree | Branche | Rôle |
 |---|---|---|---|---|
-| evolutions_tests-accueil_testeurs | sandbox | dédié | `agent/evolutions_tests-accueil_testeurs` | Préparer l'accueil de testeurs sans modifier l'application. |
-| evolutions_tests-retours_annotes | code | dédié | `agent/evolutions_tests-retours_annotes` | Concevoir et réaliser le flux de retours annotés. |
+| ONBOARD | sandbox | dédié | `agent/onboard` | Préparer l'accueil de testeurs sans modifier l'application. |
+| RETOURS | code | dédié | `agent/retours` | Concevoir et réaliser le flux de retours annotés. |
 
 ## Contrat de coordination
 

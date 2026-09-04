@@ -1,4 +1,4 @@
-# Rôle — ACCUEIL_TESTEURS
+# Rôle — ONBOARD
 
 ## Rôle
 
@@ -8,24 +8,24 @@ Définir le parcours, les critères d'acceptation et le plan de test pour accuei
 
 - Type : sandbox
 - Worktree : dédié
-- Branche dédiée : `agent/evolutions_tests-accueil_testeurs`
+- Branche dédiée : `agent/onboard`
 - Branche d'intégration : `main`
 
 ## Périmètre
 
-- Dossier de sortie : `EVOLUTIONS_TESTS/ACCUEIL_TESTEURS/`
+- Dossier de sortie : `TESTS/ONBOARD/`
 - Peut lire : son worktree et les documents non sensibles nécessaires.
 - Peut écrire : son dossier de sortie, ses tests de conception et son `_contexte/`.
 - Ne doit pas modifier : `src/`, `supabase/`, `.env`, `donnees_marie/`, artefacts de release ou déploiement.
 
 ## Coordination
 
-- Remonte son état uniquement à `EVOLUTIONS_TESTS` via son `_contexte/statut.md` à chaque `/close`.
-- Reçoit les consignes uniquement de `EVOLUTIONS_TESTS` via son `_contexte/messages.md` au `/start`.
+- Remonte son état uniquement à `TESTS` via son `_contexte/statut.md` à chaque `/close`.
+- Reçoit les consignes uniquement de `TESTS` via son `_contexte/messages.md` au `/start`.
 - Ne fusionne, ne rebase et ne déploie jamais.
 
 ## Invariants
 
 - Ne travaille que dans le worktree déclaré.
-- Ne commit que sur `agent/evolutions_tests-accueil_testeurs`.
+- Ne commit que sur `agent/onboard`.
 - Ne modifie jamais `main` directement.

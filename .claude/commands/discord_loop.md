@@ -49,7 +49,7 @@ Si erreur → demander à l'utilisateur de lancer `python DISCORD/discord_com/bo
 ### Étape 2 : Notifier Discord
 
 ```bash
-python DISCORD/discord_com/discord_loop.py notify "El Patrone est connecté et en écoute des commandes sur ce canal."
+python DISCORD/discord_com/discord_loop.py notify "Allez ça y'est je me remets au taf"
 ```
 
 ### Étape 3 : Boucle native Claude
@@ -107,11 +107,11 @@ Lancer cet appel en tâche de fond (`run_in_background`). Le script bloque côt�
 - Affiche la commande sur stdout
 - Marque `commands.json` → `"processing"`
 
-La fin de la tâche de fond réveille la session : traiter le message (3b→3d) puis relancer un
-`wait 3600` en tâche de fond. Si la sortie est `TIMEOUT` (aucun message en 1 h) → relancer
-immédiatement. Ce cycle se répète indéfiniment (heures, jours) au rythme d'un réveil par
-message reçu, plus un réveil de sécurité par heure — et non un tour de modèle toutes les
-quelques secondes.
+La fin de la tâche de fond réveille la session : traiter le message (3b→3d→3d-bis) puis relancer
+un `wait 3600` en tâche de fond. Si la sortie est `TIMEOUT` (aucun message en 1 h) → passer par
+3d-bis (un `TIMEOUT` est justement l'un des événements qu'elle guette) puis relancer immédiatement.
+Ce cycle se répète indéfiniment (heures, jours) au rythme d'un réveil par message reçu, plus un
+réveil de sécurité par heure — et non un tour de modèle toutes les quelques secondes.
 
 #### 3b. Traiter la commande
 
@@ -149,11 +149,29 @@ Pour les réponses longues, envoyer par morceaux (appeler `send` plusieurs fois)
 python DISCORD/discord_com/discord_loop.py done
 ```
 
+#### 3d-bis. Tests manuels délégués `[discord-auto]`
+
+`tests_manuels.md` (racine) peut contenir des sections taguées `[discord-auto]` : leur condition
+se vérifie d'elle-même au fil de l'usage normal de cette boucle, sans qu'il faille la provoquer.
+Cette étape est **générique** — elle ne nomme aucun test précis, pour ne jamais avoir besoin
+d'être retouchée quand `tests_manuels.md` grossit ou change.
+
+Ne relire `tests_manuels.md` que si ce cycle vient de produire l'un de ces événements (pas à
+chaque cycle sans raison) :
+- une file de commandes (`queue[]`) vient d'être traitée en rafale ;
+- le `wait` précédent est sorti en `TIMEOUT` ;
+- un `stop` explicite ou un `/close` viennent d'avoir lieu.
+
+Si c'est le cas : lire les sections `[discord-auto]`, comparer ce qui vient d'être observé à leur
+description. Une condition remplie → supprimer immédiatement sa section (test validé), sans
+signal supplémentaire. Un sous-point annoté « (hors délégation, à provoquer manuellement) » à
+l'intérieur d'une section `[discord-auto]` n'est jamais validé par cette étape.
+
 #### 3e. Commande "stop"
 
 Si la commande reçue est exactement `stop` :
 ```bash
-python DISCORD/discord_com/discord_loop.py notify "El Patrone se met en pause. Plus d'ecoute des commandes sur ce canal."
+python DISCORD/discord_com/discord_loop.py notify "Allez, les jeunes, bonne nuit, je va me coucher"
 python DISCORD/discord_com/discord_loop.py done
 ```
 → Arrêter la boucle.
@@ -162,7 +180,7 @@ python DISCORD/discord_com/discord_loop.py done
 
 ```
 juger l'outbox (approve/hold/bounce/merge) → wait → commande reçue → exécuter directement
-→ send réponse → done → vider inbox/unrouted → wait → ...
+→ send réponse → done → tests [discord-auto] si pertinent → vider inbox/unrouted → wait → ...
 ```
 
 L'envoi Discord des demandes `approved` et le routage des entrants sont faits par `bot.py`,

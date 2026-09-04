@@ -4,6 +4,14 @@ File d'attente des contrôles manuels non validés, réservés au développeur (
 détails d'implémentation, régressions de protocole). Après validation d'un test, supprimer
 immédiatement sa section. Quand la file est vide, vider intégralement ce fichier.
 
+Un titre de section marqué `[discord-auto]` désigne un test dont la condition se vérifie
+d'elle-même au fil de l'usage normal de `/discord_loop`, sans que quiconque ait besoin de la
+provoquer — la session `discord` le valide et supprime la section dès qu'elle observe la
+condition décrite (`.claude/commands/discord_loop.md` § Tests manuels délégués). Un sous-point
+annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'une section `[discord-auto]`
+reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
+demande d'éditer que ce fichier — jamais `discord_loop.md`.
+
 ## SAV Marie branchée dans /close (étape 2) — chemin « écriture réelle »
 
 Ajouté le 2026-09-01. L'étape 2 de `.claude/commands/close.md` lance désormais
@@ -21,102 +29,35 @@ Note : le point « un échec est signalé en une ligne » ne fait plus partie de
 mesuré comme non tenu (traceback brut sur `URLError`) et traité par la Phase 1 de
 `roadmap_sav_snapshot_marie.md`.
 
-## Bot Discord — file d'attente des commandes en conditions réelles
+## Bot Discord — file d'attente des commandes en conditions réelles [discord-auto]
 
 Ajouté le 2026-09-02 (commit `2b75711`). `bot.py` empile désormais dans `commands.json` → `queue[]`
 tout message reçu pendant que Claude traite déjà une commande, et `boucle_polling` promeut la file
 en FIFO dès le retour à `idle`. Testé seulement en isolation (script hors ligne), pas encore avec
 le vrai bot et Discord.
 
-À vérifier lors d'une session `/discord_loop` active :
-- envoyer 2-3 messages au bot pendant qu'il traite une commande longue → chacun reçoit
-  « 📥 En file d'attente (N) », aucun n'est rejeté ;
-- à la fin du traitement, les messages sont repris un par un, dans l'ordre d'arrivée, avec le bon
+À observer au fil de l'usage de `/discord_loop` :
+- 2-3 messages reçus pendant un traitement en cours → chacun reçoit « 📥 En file d'attente (N) »,
+  aucun n'est rejeté ; à la fin du traitement, repris un par un dans l'ordre d'arrivée, avec le bon
   auteur affiché (`[RESTREINT Rayonne Toi]` / `[ADMIN …]`) ;
 - `!ping` / `!help` répondent toujours immédiatement même file non vide ;
-- cas dégradé : tuer la session pendant un traitement → `commands.json` reste en `processing`,
-  la file se remplit sans être promue (angle mort connu, cf. question ouverte P3 de `signals.md`).
+- cas dégradé (hors délégation, à provoquer manuellement) : tuer la session pendant un traitement
+  → `commands.json` reste en `processing`, la file se remplit sans être promue (angle mort connu,
+  cf. question ouverte P3 de `signals.md`).
 
-## Gateway Discord Phase 1 — routage mécanique de tout le canal par `bot.py`
-
-Ajouté le 2026-09-03 (`roadmap_gateway_discord_service.md` Phase 1). `bot.py` route désormais vers
-`gateway.route_inbound` **tout** message du canal qui n'@-mentionne pas le bot, sans attendre une
-session agent DISCORD. 38 auto-tests verts, mais le chemin réel `on_message` → gateway n'a jamais
-vu de message Discord : le bot a été redémarré (PID 51768) après un `import gateway` réussi, rien
-de plus. Les `print` du bot partent dans `DEVNULL` (`bot_manager.cmd_start`) : la seule preuve
-observable est le fichier déposé dans `inbox/`.
-
-À vérifier en postant dans le canal Discord, **sans taguer le bot** :
-- `@design: test phase 1` → un JSON apparaît dans `gateway/inbox/design/`, `routing: "tag"`,
-  `content` sans le tag, `raw_content` complet
-  (`python DISCORD/discord_com/gateway.py poll --agent design`) ;
-- un message quelconque sans tag ni mot-clé → `inbox/unrouted/`, `routing: "aucune"` ;
-- un message avec une image jointe → le champ `attachments` porte `filename` / `url` /
-  `content_type` (chemin critique : la réponse attendue de Marie est faite de 2 captures) ;
-- un message @-mentionnant le bot → comportement inchangé (`commands.json`, « Bien reçu » /
-  « 📥 En file d'attente »), rien dans `inbox/` ;
-- ~~la réponse de Marie à la demande de captures atterrit dans `inbox/orchestrateur/` avec
-  `routing: "pending"` et retire la seule entrée `20260903T042325_687674` de
-  `state.pending_replies`.~~ **Confirmé en réel le 2026-09-03 17h17** : réponse de Marie
-  (« 1) c'est dans la rubrique accessibilité… ») routée par `bot.py` sans session agent
-  DISCORD, `gateway/inbox/orchestrateur/20260903T171703_391686`, `pending_replies` vidé.
-
-À vérifier aussi (item 6 de la phase, corrige l'angle mort P3) : laisser `commands.json` en
-`processing` avec un `timestamp` de plus de 15 min, puis `python bot_manager.py restart` →
-le statut repasse `idle` et la file est promue.
-
-## Gateway Discord Phase 2 — gardien de sortie + drain automatique par `bot.py`
-
-Ajouté le 2026-09-03 (`roadmap_gateway_discord_service.md` Phase 2). Chaque demande outbox
-porte un `status` (`pending` → `approved` | `held` | `bounced` | `failed`) ; `drain` n'envoie
-que les `approved` ; `bot.py` appelle `gateway.drain()` toutes les 5 s (plus aucun `drain`
-manuel). 58 auto-tests verts. `approve` / `hold` / `bounce` / `merge` et le refus d'envoi d'un
-`pending` ont été exercés sur la gateway réelle sans trafic Discord ; le `drain` automatique
-par le bot (PID 82188 après restart) n'a pas encore envoyé de vrai message.
-
-À vérifier lors d'une session `/discord_loop` active, bot tournant :
-- `enqueue` d'une demande propre (`--to channel`, corps figé) → elle reste en `pending`,
-  `bot.py` ne l'envoie pas ; après `gateway.py approve --id <id>`, elle part sur Discord dans
-  les ~5 s **sans autre intervention**, archivée dans `outbox/sent/`, tracée dans
-  `logs/conversation.jsonl` (`role: GATEWAY`) ;
-- `enqueue` avec un `<placeholder>` dans le corps → `gateway.py bounce --id <id> --reason
-  "fond non figé"` : le fichier quitte l'outbox, rien ne part sur Discord, un JSON
-  `kind: "bounce"` apparaît dans `inbox/orchestrateur/` avec `reason` et `original_body` ;
-- `hold --id <id>` → la demande est ignorée par les `drain` suivants jusqu'à `approve` ;
-- `merge --ids a,b` (deux `info` vers le même `--to`) → corps concaténés dans la plus
-  ancienne, la seconde supprimée, `merged_from` renseigné ;
-- échec d'envoi réel (couper le réseau ou un token invalide le temps d'un `drain`) → la
-  demande passe `failed`, un `kind: "dead-letter"` atterrit dans `inbox/discord/`, les
-  demandes suivantes de la même passe partent quand même ; `approve` sur la `failed` la
-  renvoie en file.
-
-## Gateway Discord Phase 3 — `poll --zone` / `--format hook` + relevé zones design/discord
-
-Ajouté le 2026-09-03 (`roadmap_gateway_discord_service.md` Phase 3). `gateway.py poll` accepte
-`--zone` (synonyme de `--agent`) et `--format hook` (`id — auteur — 1re ligne`, `RIEN` si
-vide, `exit 0` toujours). Pas de hooks Claude Code : la com Discord se gère dans la session
-`discord` / `/discord_loop` ; l'orchestrateur ne touche `inbox/orchestrateur/` que sur demande.
-66 auto-tests verts (`rendu_hook`, `poll --zone`, CLI, zone hors registre).
-
-À vérifier :
-- `/start discord` enchaîne `/discord_loop` sans confirmation (étape 6 de `start.md`) ;
-- `/start design` fait un `poll --zone design --format hook` et affiche l'`inbox/design/`
-  accumulé s'il y en a (étape 4-bis) ; `/close design` signale un message non acquitté
-  (étape 2-bis) ;
-- `/start` sur la zone racine ne relève **rien** de la gateway ;
-- `python DISCORD/discord_com/gateway.py poll --zone Appli_TSA_SDI_TDAH --format hook` sur
-  inbox vide → `RIEN`, `exit 0` ; zone inconnue → `RIEN`, `exit 0`.
-
-## Veille /discord_loop en tâche de fond — `wait` à timeout paramétrable
+## Veille /discord_loop en tâche de fond — `wait` à timeout paramétrable [discord-auto]
 
 Ajouté le 2026-09-03. `discord_loop.py wait` accepte un timeout optionnel en argument
 (`wait [secondes]`, défaut 110). `.claude/commands/discord_loop.md` étape 3a demande désormais
 `wait 3600` lancé en `run_in_background`.
 
-À vérifier lors d'une session `/discord_loop` active :
+À observer au fil de l'usage de `/discord_loop` :
 - `wait 3600` en tâche de fond ne rend pas la main tant qu'aucun message n'arrive, et sort
   sous ~1 s à la réception d'un message Discord (commande affichée, `commands.json` →
   `processing`) ;
 - au bout d'une heure sans message : sortie `TIMEOUT`, code 1, la boucle relance proprement ;
-- `wait` sans argument garde le comportement d'origine (cycle ~110 s) ;
 - un `/close` ne déclenche aucune notification Discord.
+
+`wait` sans argument garde le comportement d'origine (cycle ~110 s) — jamais appelé ainsi par
+`discord_loop.md` en usage normal (toujours `wait 3600`), donc non observable passivement
+(hors délégation, à provoquer manuellement).

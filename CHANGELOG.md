@@ -1,3 +1,12 @@
+## v5.89 — 2026-09-04
+
+### Ajouté
+- Convention `[discord-auto]` dans `tests_manuels.md` : un titre de section ainsi tagué se valide par observation passive au fil de l'usage normal de `/discord_loop`, sans qu'il faille provoquer la condition. Étape générique 3d-bis ajoutée à `.claude/commands/discord_loop.md` (relit `tests_manuels.md` seulement après une file de commandes traitée en rafale, un `TIMEOUT`, ou un `stop`/`close`) — conçue pour rester scalable : ajouter un futur test délégable ne demande d'éditer que `tests_manuels.md`, jamais le protocole. Sections taguées : « Bot Discord — file d'attente des commandes », « Veille /discord_loop — wait timeout » (leurs sous-points de provocation manuelle restent explicitement hors délégation).
+
+### Modifié
+- `roadmap_gateway_discord_service.md` : test manuel dev de bout en bout validé par l'utilisateur → roadmap close et archivée dans `Archives/`.
+- `_contexte/signals.md` corrigé — 4 entrées indiquaient à tort le retour de Marie sur v5.84 comme « à dépouiller », alors que `_contexte/marie_modifications_suivi.md` était déjà à jour avant cette session (commit `95e813e`).
+
 ## v5.88 — 2026-09-04
 
 ### Ajouté

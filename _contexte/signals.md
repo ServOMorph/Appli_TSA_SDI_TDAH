@@ -1,6 +1,7 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-04)
 
 ## Contexte chaud
+- **`roadmap_supprimer_tache_du_jour.md` : Phases 1 et 2 `[FAIT]` le 2026-09-04 (retrait de la catégorie « Tâche du jour »), non déployées.** Phase 3 `[TODO — BLOQUÉ]` : attend D2 (point d'entrée « accueil » retenu pour l'ajout planifié d'office), à regrouper avec le retour de Marie sur v5.84 plutôt que de lui poser isolément — décision utilisateur du 2026-09-04. `tsc -b` + lint + 717 tests verts.
 - **Marie a synchronisé sur v5.84** (snapshot `20260903-2342z` sauvegardé au `/close` du 2026-09-04) : `manual_test_results` 49 → **57** (+8), `app_version` v5.69 → v5.84, tâches 45 → 119. **Retour de Marie sur le lot v5.84 à dépouiller** (non fait ce `/close` — hors périmètre). Réconcilier `_contexte/marie_modifications_suivi.md` : #3/#32 → `livrée v5.84` si parcours `ok`, rouverts si `nok` ; idem les autres parcours du lot.
 - **v5.84 déployée en prod le 2026-09-03** (`https://appli-audhd.netlify.app`, HTTP 200 vérifié) — premier déploiement depuis v5.69 (31 août). Livre le cumul : correctif pastille (`2d5c0b8`), travail bundle (chunk d'entrée 253,8 kB, `node scripts/check_bundle_budget.mjs` vert), `roadmap_planning_accueil_2026-08-29.md` Phases 3-5, `roadmap_demandes_marie_2026-09-02.md` 10 phases (demandes 23-33). `dist/v5.84`, `WHATS_NEW` vidé (commit `0a77a12`), `_contexte/dernier_deploiement.md` → v5.84, `COMMUNICATION/Marie/livraisons/v5.84.md`, Drive `commentaires_marie_v5.84.docx` (`https://drive.google.com/open?id=1AUtsYJ3O4H6PXE7vZ2p9381a-Q-ud8nF`). Message de livraison déposé dans la gateway (`enqueue --to marie --kind delivery`, id `20260903T193444_749089`, **en attente d'`approve` du gardien / agent DISCORD** — `bot.py` PID 82188 draine les `approved` toutes les 5 s). `roadmap_demandes_marie_2026-09-02.md`, `roadmap_planning_accueil_2026-08-29.md`, `roadmap_sync_marie.md`, `roadmap_sav_snapshot_marie.md` archivées dans `Archives/`. Seule roadmap active : `roadmap_gateway_discord_service.md`.
 - **#3 + #32 (débordements horizontaux) : correctif déployé en v5.84, en attente de validation Marie sur son appareil.** Dans `_contexte/marie_modifications_suivi.md` ils restent `en cours` jusqu'à ce que Marie confirme `cadre-date-heure-dans-l-ecran` (rev 1) et `cadres-parametres-tiennent-dans-l-ecran` en `ok` → alors `livrée v5.84`. 16 parcours à faire dans l'écran « Tests à faire » sur v5.84.
@@ -40,6 +41,7 @@
 - `/deploy` et `/deploy_dev` vérifient la fraîcheur de `manualTestsCatalog.ts` avant le déploiement.
 
 ## Questions ouvertes
+- [P2] **D2 — quel point d'entrée « accueil » pour l'ajout de tâche planifiée d'office (Phase 3 de `roadmap_supprimer_tache_du_jour.md`) ?** Interprétation dev = bouton « + » du menu du bas (`BottomNav`, `App.tsx:189`). Ne pas poser isolément à Marie — regrouper avec sa réponse aux autres questions en attente (#3, re-tests v5.84). — fait quand : Marie confirme (ou corrige) le point d'entrée → Phase 3 débloquée — réf : `roadmap_supprimer_tache_du_jour.md` § Décisions produit (D2), § Phase 3
 - [P1] **#3 + #32 : correctif déployé en v5.84, Marie a testé (snapshot `20260903-2342z`, 57 résultats) — à dépouiller.** Dans `_contexte/marie_modifications_suivi.md` ils restent `en cours` (roadmap archivée). — fait quand : résultats `cadre-date-heure-dans-l-ecran` (rev 1) et `cadres-parametres-tiennent-dans-l-ecran` lus dans le snapshot → `ok` : registre `livrée v5.84` ; `nok` : rouvrir avec capture — réf : `donnees_marie/snapshot-supabase-192f2411-20260903-2342z.json`, `_contexte/marie_modifications_suivi.md`, `COMMUNICATION/Marie/captures/2026-09-03/`
 - [P2] **`roadmap_gateway_discord_service.md` : test manuel dev de bout en bout à exécuter puis archiver la roadmap.** Les 3 phases `[FAIT]`. — fait quand : `tests_manuels.md` § Gateway Discord Phase 3 validé (`/start discord` enchaîne `/discord_loop` ; `/start design` relève `inbox/design/` ; `/start` racine ne relève rien ; `poll --zone … --format hook` inbox vide / zone inconnue → `RIEN` exit 0) → déplacer `roadmap_gateway_discord_service.md` dans `Archives/` — réf : `roadmap_gateway_discord_service.md` Phase 3, `tests_manuels.md`, `.claude/commands/start.md` (étapes 4-bis, 6), `.claude/commands/close.md` (étape 2-bis)
 - [OK] **Phases 1-2 : les 6 écarts à la lettre de la roadmap validés tels quels le 2026-09-04** (aucune correction) : (1) `pending` posé au `drain` et non à `enqueue --expect-reply` ; (2) appariement des réponses par auteur Discord ; (3) `attachments` transportés par `route_inbound` ; (4) heuristique en frontières `\b` ; (5) `drain` throttlé 5 s ; (6) `failed` reste dans l'outbox, ré-`approve` pour retenter. Documentés comme définitifs dans `contexte.md`.
@@ -62,7 +64,41 @@
 - [P3] Nettoyage arbre de travail pré-`/deploy` (gate 3.1) — **traité le 2026-09-03** : `DESIGN/` ajouté au suivi Git (commit de close), `commentaires_marie_*.docx` gitignorés (`.gitignore`), `bot.pid` déjà gitignoré, `gateway/agents.json` commité. Reste à surveiller : que le prochain `/deploy` passe bien la porte 3.1. — fait quand : `/deploy` franchit la porte 3.1 sans résidu — réf : `.claude/commands/deploy.md` étape 3.1, `.gitignore`
 - [P3] Reliquat d'adoption de la gateway Discord v1 (`DISCORD/roadmap_gateway_discord_2026-09-02.md` Phase 3, « hors zone discord ») : MAJ `agent_role.md` orchestrateur + `design`, retrait des appels directs (`message_marie.py`, `claude_bridge`) dans `.claude/commands/deploy.md` et `analyser_googledoc.md`, alignement `.claude/CLAUDE.md`. `discord_loop.md` étape 3b : **réécrit le 2026-09-03** (Phase 2 de la roadmap service — `bot.py` route mécaniquement, plus de `route_inbound` manuel ; étape 3a-bis « gardien de sortie » ajoutée). En partie recouvert par `roadmap_gateway_discord_service.md` — à trancher : traiter isolément ou laisser la roadmap service l'absorber (Phase 3 touche `CLAUDE.md`). — fait quand : plus aucun appel direct à `message_marie.py`/`claude_bridge` dans les commandes de l'orchestrateur, ou décision explicite de le porter dans `roadmap_gateway_discord_service.md` — réf : `DISCORD/roadmap_gateway_discord_2026-09-02.md` (§ Statuts, Phase 3), `roadmap_gateway_discord_service.md`
 
-## Dernière session (2026-09-04 — roadmap_gateway_discord_service.md Phase 3 : poll --zone / --format hook, sans hooks)
+## Dernière session (2026-09-04 — roadmap_supprimer_tache_du_jour.md Phases 1-2 : retrait de « Tâche du jour »)
+
+## Décisions prises
+- Demande de Marie du 2026-09-04, hors Google Doc (commentaire sur `heures-debut-fin-sur-la-case`) : retirer complètement la catégorie « Tâche du jour ». D1 tranchée en amont par l'utilisateur : migration `today → inbox` (pas de perte pour les tâches déjà en `today` sur l'appareil de Marie).
+- Phase 1 exécutée : `TaskStatus` perd `'today'`, migration Dexie v18 dédiée, bouton « Tâche du jour » et toute la plomberie associée retirés.
+- Phase 2 exécutée : « Ajouter une tâche » de la Réception devient un champ inline titre seul (`createTaskInbox`), sans passer par le formulaire complet `task-create-v2`.
+- Checkpoint `/compact` respecté entre les deux phases (confirmation écrite de l'utilisateur à chaque fois).
+
+## Livrables produits ou modifiés
+- `src/domain/entities/task.ts` : `TaskStatus` = `'inbox' | 'planned' | 'completed'`.
+- `src/data/db.ts` : migration `version(18)` — tâches `status: 'today'` → `inbox`, dates de planification nettoyées. Test dédié dans `db.test.ts`.
+- `src/data/repositories/taskRepository.ts` : `getTodayTasks()` supprimé.
+- `src/app/contexts/useTasksState.ts` : `todayTasks`/`todaySubTasksMap`/`addTask`/`moveTask`/`reorderTodayTasks` retirés (zéro appelant restant).
+- `src/ui/screens/tasks/E20Inbox.tsx` : bouton « Tâche du jour » retiré ; « Ajouter une tâche » ouvre un champ inline titre seul (`createTaskInbox`, Valider/Annuler, Entrée/Échap).
+- `src/ui/screens/tasks/E22TaskDetail.tsx`, `E23Decompose.tsx`, `E24EditTask.tsx` : recherche d'objet tâche basculée sur `inboxTasks` + repli `getTaskById` (plus de `todayTasks`).
+- `src/ui/screens/resources/E120Resources.tsx` : textes d'aide reformulés.
+- `src/domain/data/manualTestsCatalog.ts` : parcours `plus-de-categorie-tache-du-jour` et `ajouter-une-tache-depuis-la-reception` ajoutés (hors Doc, catégorie Tâches).
+- Tests : `taskRepository.test.ts`, `taskRules.test.ts`, `AppContext.test.tsx`, `testUtils.tsx`, `E20Inbox.test.tsx`, `E22TaskDetail.test.tsx`, `db.test.ts`, e2e `02-tasks.spec.ts` (T14 retiré, T11 ajustée).
+- `roadmap_supprimer_tache_du_jour.md` : Phases 1 et 2 → `[FAIT]`.
+- `README.md`, `CHANGELOG.md` (v5.88), `_contexte/signals.md`, `_contexte/contexte.md` : ce `/close`.
+
+## Hypothèses validées / invalidées
+- VALIDE : `tsc -b` + lint (`--max-warnings 0`) + **717 tests** (85 fichiers) verts après les deux phases.
+- EN ATTENTE : Phase 3 (ajout planifié d'office depuis l'accueil) bloquée sur D2 — la question à Marie n'a volontairement pas été posée isolément, à regrouper avec sa réponse sur le retour v5.84.
+- EN ATTENTE : les deux phases livrées ne sont pas déployées ; `COMMUNICATION/Marie/a_transmettre.md` et `WHATS_NEW` volontairement non alimentés (roadmap : commentaire de livraison groupé « Après la dernière phase »).
+
+## Prochaine étape exacte
+Regrouper D2 (point d'entrée accueil de la Phase 3) avec les autres questions en attente pour Marie (#3, re-tests v5.84), puis reprendre `roadmap_supprimer_tache_du_jour.md` Phase 3 une fois sa réponse reçue. En parallèle : dépouiller le retour de Marie sur v5.84 (toujours en attente, voir Contexte chaud).
+
+## Question bloquante pour la session suivante
+Aucune — Phase 3 attend une décision produit (D2) à regrouper avec Marie, pas une action immédiate.
+
+---
+
+## Dernière session archivée (2026-09-04 — roadmap_gateway_discord_service.md Phase 3 : poll --zone / --format hook, sans hooks)
 
 ## Décisions prises
 - **Phase 3 redéfinie sans hooks.** Le design initial (livraison en direct dans *toutes* les sessions via `SessionStart`/`Stop`) est abandonné : l'utilisateur gère toute la com Discord dans la session `discord` / `/discord_loop` et ne veut pas que l'orchestrateur soit interrompu. Modèle retenu : la session `discord` est le point de contact unique ; l'orchestrateur ne consulte `inbox/orchestrateur/` que sur demande explicite.

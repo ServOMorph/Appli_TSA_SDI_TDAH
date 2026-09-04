@@ -60,15 +60,15 @@ const foundations = [
 const guide = [
   {
     title: 'Commencer par “Que faire maintenant ?”',
-    text: 'Le dashboard sert de point de départ. Quand une tâche du jour existe, l’application affiche l’action à faire maintenant pour éviter de devoir choisir seul.',
+    text: 'Le dashboard sert de point de départ. Quand une tâche est planifiée pour aujourd’hui, l’application affiche l’action à faire maintenant pour éviter de devoir choisir seul.',
   },
   {
     title: 'Capturer sans organiser tout de suite',
-    text: `Le bouton “Ajouter une tâche” permet de noter rapidement une idée. Une tâche peut ensuite rester dans le Todo, être mise à Aujourd’hui ou être reportée à faire plus tard.`,
+    text: `Le bouton “Ajouter une tâche” permet de noter rapidement une idée. Une tâche peut ensuite rester en réception, être planifiée ou être ajoutée à une liste.`,
   },
   {
     title: 'Limiter la journée',
-    text: 'La vue Aujourd’hui garde peu de tâches visibles. Si la limite est atteinte, l’application demande quoi remplacer au lieu d’empiler davantage.',
+    text: 'Le planning de l’accueil garde peu de tâches visibles à la fois. Mieux vaut planifier peu de tâches par jour plutôt que d’en empiler davantage.',
   },
   {
     title: 'Découper quand une tâche bloque',

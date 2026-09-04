@@ -45,16 +45,6 @@ function EnergyButton() {
   )
 }
 
-function TaskButton() {
-  const { addTask, todayTasks } = useApp()
-  return (
-    <>
-      <button onClick={() => addTask('Ma tâche')}>ajouter tâche</button>
-      <div data-testid="task-count">{todayTasks.length}</div>
-    </>
-  )
-}
-
 function addOneDay(date: string): string {
   const d = new Date(date + 'T12:00:00')
   d.setDate(d.getDate() + 1)
@@ -170,21 +160,6 @@ describe('AppProvider', () => {
     })
   })
 
-  it('addTask ajoute une tâche à la liste', async () => {
-    render(
-      <AppProvider>
-        <ScreenIndicator />
-        <TaskButton />
-      </AppProvider>,
-    )
-    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
-    expect(screen.getByTestId('task-count').textContent).toBe('0')
-    await userEvent.click(screen.getByRole('button', { name: 'ajouter tâche' }))
-    await waitFor(() => {
-      expect(screen.getByTestId('task-count').textContent).toBe('1')
-    })
-  })
-
   it('la surcharge se dérive automatiquement de l\'énergie vs coût planifié (E5)', async () => {
     render(
       <AppProvider>
@@ -255,7 +230,7 @@ describe('AppProvider', () => {
 
 describe('AppProvider — opérations tâches inbox', () => {
   function InboxPanel() {
-    const { createTaskInbox, inboxTasks, moveTask, completeTask, deleteTask, updateTaskTitle, loading } = useApp()
+    const { createTaskInbox, inboxTasks, completeTask, deleteTask, updateTaskTitle, loading } = useApp()
     const first = inboxTasks[0]
     if (loading) return <div data-testid="loading">chargement</div>
     return (
@@ -265,7 +240,6 @@ describe('AppProvider — opérations tâches inbox', () => {
         {first && (
           <>
             <div data-testid="task-title">{first.title}</div>
-            <button onClick={() => moveTask(first.id, 'today')}>déplacer</button>
             <button onClick={() => completeTask(first.id)}>compléter</button>
             <button onClick={() => deleteTask(first.id)}>supprimer</button>
             <button onClick={() => updateTaskTitle(first.id, 'Renommé')}>renommer</button>
@@ -291,16 +265,6 @@ describe('AppProvider — opérations tâches inbox', () => {
     await waitFor(() => expect(getCount()).toBe(before + 1))
   })
 
-
-  it('moveTask déplace une tâche inbox vers today', async () => {
-    render(<AppProvider><InboxPanel /></AppProvider>)
-    await waitReady()
-    const before = getCount()
-    await userEvent.click(screen.getByRole('button', { name: 'créer inbox' }))
-    await waitFor(() => expect(getCount()).toBe(before + 1))
-    await userEvent.click(screen.getByRole('button', { name: 'déplacer' }))
-    await waitFor(() => expect(getCount()).toBe(before))
-  })
 
   it('completeTask retire la tâche de la liste', async () => {
     render(<AppProvider><InboxPanel /></AppProvider>)
@@ -614,7 +578,7 @@ describe('AppProvider — outils et dossiers (V5-3)', () => {
 
 describe('AppProvider — createDetailedTask (E21)', () => {
   function DetailedTaskPanel() {
-    const { createUser, completeOnboarding, createDetailedTask, inboxTasks, todayTasks, loading } = useApp()
+    const { createUser, completeOnboarding, createDetailedTask, inboxTasks, loading } = useApp()
     if (loading) return <div data-testid="loading">chargement</div>
     return (
       <>
@@ -638,32 +602,12 @@ describe('AppProvider — createDetailedTask (E21)', () => {
         >
           créer inbox détaillée
         </button>
-        <button
-          onClick={() =>
-            createDetailedTask({
-              title: 'Tâche détaillée today',
-              description: '',
-              icon: null,
-              color: null,
-              energyCost: null,
-              essential: false,
-              durationMinutes: null,
-              date: null,
-              startTime: null,
-              status: 'today',
-              recurrence: null,
-            })
-          }
-        >
-          créer today détaillée
-        </button>
         <div data-testid="inbox-count">{inboxTasks.length}</div>
-        <div data-testid="today-count">{todayTasks.length}</div>
       </>
     )
   }
 
-  it('une tâche créée via createDetailedTask apparaît immédiatement dans inboxTasks / todayTasks', async () => {
+  it('une tâche créée via createDetailedTask apparaît immédiatement dans inboxTasks', async () => {
     render(<AppProvider><DetailedTaskPanel /></AppProvider>)
     await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
     await userEvent.click(screen.getByRole('button', { name: 'init' }))
@@ -672,10 +616,6 @@ describe('AppProvider — createDetailedTask (E21)', () => {
     const inboxBefore = parseInt(screen.getByTestId('inbox-count').textContent ?? '0')
     await userEvent.click(screen.getByRole('button', { name: 'créer inbox détaillée' }))
     await waitFor(() => expect(parseInt(screen.getByTestId('inbox-count').textContent ?? '0')).toBe(inboxBefore + 1))
-
-    const todayBefore = parseInt(screen.getByTestId('today-count').textContent ?? '0')
-    await userEvent.click(screen.getByRole('button', { name: 'créer today détaillée' }))
-    await waitFor(() => expect(parseInt(screen.getByTestId('today-count').textContent ?? '0')).toBe(todayBefore + 1))
   })
 })
 

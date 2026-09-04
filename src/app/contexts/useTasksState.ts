@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { listCategoryRepo, listItemRepo, newId, taskRepo, todayDate } from '@/app/repositories'
+import { listCategoryRepo, listItemRepo, newId, taskRepo } from '@/app/repositories'
 import {
   createTask as createTaskRule,
   scheduleTask as scheduleTaskRule,
@@ -9,13 +9,11 @@ import {
   completeTask as completeTaskRule,
 } from '@/domain/rules/taskRules'
 import { createListItem as createListItemRule, createListCategory as createListCategoryRule } from '@/domain/rules/listRules'
-import type { Task, TaskStatus } from '@/domain/entities/task'
+import type { Task } from '@/domain/entities/task'
 import type { PlannedSubTask } from '@/app/contexts/usePlanningState'
 
-/** Tâches de la réception et de la journée, et leurs sous-étapes. */
+/** Tâches de la réception et leurs sous-étapes. */
 export function useTasksState() {
-  const [todayTasks, setTodayTasks] = useState<Task[]>([])
-  const [todaySubTasksMap, setTodaySubTasksMap] = useState<Record<string, Task[]>>({})
   const [inboxTasks, setInboxTasks] = useState<Task[]>([])
   const [inboxSubTasksMap, setInboxSubTasksMap] = useState<Record<string, Task[]>>({})
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
@@ -30,25 +28,15 @@ export function useTasksState() {
   }
 
   async function load() {
-    const [inbox, today] = await Promise.all([taskRepo.getByStatus('inbox'), taskRepo.getTodayTasks()])
-    const [inboxMap, todayMap] = await Promise.all([loadSubTasksMap(inbox), loadSubTasksMap(today)])
+    const inbox = await taskRepo.getByStatus('inbox')
+    const inboxMap = await loadSubTasksMap(inbox)
     setInboxTasks(inbox)
     setInboxSubTasksMap(inboxMap)
-    setTodayTasks(today)
-    setTodaySubTasksMap(todayMap)
   }
 
   function reset() {
-    setTodayTasks([])
     setInboxTasks([])
     setSelectedTaskId(null)
-  }
-
-  async function addTask(title: string) {
-    const now = new Date().toISOString()
-    const task = createTaskRule(newId(), title, 'today', false, now, null, todayTasks.length)
-    await taskRepo.create(task)
-    setTodayTasks((prev) => [...prev, task])
   }
 
   async function createTaskInbox(title: string) {
@@ -76,14 +64,6 @@ export function useTasksState() {
     await load()
   }
 
-  async function moveTask(id: string, status: TaskStatus) {
-    const task = await taskRepo.getById(id)
-    if (!task) return
-    const scheduled_date = status === 'today' ? todayDate() : task.scheduled_date
-    await taskRepo.update({ ...task, status, scheduled_date, updated_at: new Date().toISOString() })
-    await load()
-  }
-
   async function completeTask(id: string) {
     const task = await taskRepo.getById(id)
     if (!task) return
@@ -100,11 +80,6 @@ export function useTasksState() {
     const task = await taskRepo.getById(id)
     if (!task) return
     await taskRepo.update(renameTaskRule(task, title, new Date().toISOString()))
-    await load()
-  }
-
-  async function reorderTodayTasks(ids: string[]) {
-    await taskRepo.reorder(ids)
     await load()
   }
 
@@ -161,20 +136,15 @@ export function useTasksState() {
   }
 
   return {
-    todayTasks,
-    todaySubTasksMap,
     inboxTasks,
     inboxSubTasksMap,
     selectedTaskId,
     selectTask: setSelectedTaskId,
-    addTask,
     createTaskInbox,
     moveTodoTaskToList,
-    moveTask,
     completeTask,
     deleteTask,
     updateTaskTitle,
-    reorderTodayTasks,
     addSubTask,
     deleteSubTask,
     toggleSubTask,

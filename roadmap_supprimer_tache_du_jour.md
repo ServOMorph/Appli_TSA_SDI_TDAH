@@ -53,7 +53,7 @@ plomberie accueil / dépôt.
 
 ---
 
-## Phase 1 — Retrait du statut `today` et du bouton « Tâche du jour » [EN COURS]
+## Phase 1 — Retrait du statut `today` et du bouton « Tâche du jour » [FAIT]
 
 Cœur de la demande : « que cette catégorie n'existe nulle part ».
 
@@ -91,7 +91,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — Ajout depuis la Réception : titre seul [TODO]
+## Phase 2 — Ajout depuis la Réception : titre seul [FAIT]
 
 - `src/ui/screens/tasks/E20Inbox.tsx` : « Ajouter une tâche » n'ouvre plus `task-create-v2`.
   À la place, saisie du **titre seul** (champ inline sous la liste, ou petite modale), validation

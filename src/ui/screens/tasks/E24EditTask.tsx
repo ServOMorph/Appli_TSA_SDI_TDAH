@@ -97,9 +97,9 @@ const modalBox: React.CSSProperties = {
 }
 
 export function E24EditTask() {
-  const { selectedTaskId, inboxTasks, todayTasks, getTaskById, updateTaskFields, goTo, back } = useApp()
+  const { selectedTaskId, inboxTasks, getTaskById, updateTaskFields, goTo, back } = useApp()
 
-  const taskFromLists = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
+  const taskFromLists = inboxTasks.find((t) => t.id === selectedTaskId)
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
   const task = taskFromLists ?? fetchedTask ?? undefined
 

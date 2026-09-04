@@ -37,21 +37,6 @@ export class TaskRepository {
     return tasks.filter(isRoot)
   }
 
-  async getTodayTasks(): Promise<Task[]> {
-    const today = new Date().toISOString().slice(0, 10)
-    const [activeTasks, completedTasks] = await Promise.all([
-      this.db.tasks.where('status').equals('today').toArray(),
-      this.db.tasks.where('status').equals('completed').toArray(),
-    ])
-    return [
-      ...activeTasks.filter(isRoot),
-      ...completedTasks.filter((task) => isRoot(task) && task.completed_at?.slice(0, 10) === today),
-    ].sort((a, b) => {
-      if (a.status !== b.status) return a.status === 'completed' ? 1 : -1
-      return a.position - b.position
-    })
-  }
-
   /** Sous-étapes d'une tâche, triées par position. */
   async getChildren(parentId: string): Promise<Task[]> {
     return this.db.tasks.where('parent_id').equals(parentId).sortBy('position')

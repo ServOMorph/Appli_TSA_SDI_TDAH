@@ -218,8 +218,8 @@ export function E23Decompose() {
   const {
     selectedTaskId,
     inboxTasks,
-    todayTasks,
     getSubTasks,
+    getTaskById,
     addSubTask,
     deleteSubTask,
     toggleSubTask,
@@ -231,14 +231,25 @@ export function E23Decompose() {
 
   const [subTasks, setSubTasks] = useState<Task[]>([])
   const [newTitle, setNewTitle] = useState('')
+  const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
 
-  const task = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
+  const taskFromLists = inboxTasks.find((t) => t.id === selectedTaskId)
+  const task = taskFromLists ?? fetchedTask ?? undefined
 
   useEffect(() => {
     if (selectedTaskId) {
       getSubTasks(selectedTaskId).then(setSubTasks)
     }
   }, [getSubTasks, selectedTaskId])
+
+  useEffect(() => {
+    if (selectedTaskId && !taskFromLists) {
+      getTaskById(selectedTaskId).then((t) => setFetchedTask(t ?? null))
+    } else {
+      setFetchedTask((prev) => (prev === null ? prev : null))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTaskId, taskFromLists])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),

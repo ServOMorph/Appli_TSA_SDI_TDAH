@@ -247,7 +247,7 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onSchedule, onRename
 }
 
 function backScreenForTask(task: Task): Screen {
-  if (task.status === 'today' || task.status === 'planned') return 'dashboard'
+  if (task.status === 'planned') return 'dashboard'
   return 'inbox'
 }
 
@@ -269,7 +269,6 @@ export function E22TaskDetail() {
   const {
     selectedTaskId,
     inboxTasks,
-    todayTasks,
     getSubTasks,
     deleteSubTask,
     toggleSubTask,
@@ -294,7 +293,7 @@ export function E22TaskDetail() {
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
   const [pendingDelete, setPendingDelete] = useState(false)
 
-  const taskFromLists = [...inboxTasks, ...todayTasks].find((t) => t.id === selectedTaskId)
+  const taskFromLists = inboxTasks.find((t) => t.id === selectedTaskId)
   const task = taskFromLists ?? fetchedTask ?? undefined
 
   useEffect(() => {

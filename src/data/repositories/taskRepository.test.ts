@@ -27,11 +27,11 @@ describe('TaskRepository', () => {
     it('updates task', async () => {
       const task = mockTask()
       await repo.create(task)
-      const updated = mockTask({ title: 'Updated', status: 'today' })
+      const updated = mockTask({ title: 'Updated', status: 'planned' })
       await repo.update(updated)
       const retrieved = await repo.getById(task.id)
       expect(retrieved?.title).toBe('Updated')
-      expect(retrieved?.status).toBe('today')
+      expect(retrieved?.status).toBe('planned')
     })
 
     it('deletes task', async () => {
@@ -43,23 +43,12 @@ describe('TaskRepository', () => {
     })
 
     it('gets tasks by status', async () => {
-      await repo.create(mockTask({ id: 't1', status: 'today' }))
-      await repo.create(mockTask({ id: 't2', status: 'today' }))
+      await repo.create(mockTask({ id: 't1', status: 'planned' }))
+      await repo.create(mockTask({ id: 't2', status: 'planned' }))
       await repo.create(mockTask({ id: 't3', status: 'inbox' }))
 
-      const todayTasks = await repo.getByStatus('today')
-      expect(todayTasks).toHaveLength(2)
-    })
-
-    it('gets active and completed tasks for today', async () => {
-      const today = new Date().toISOString()
-      await repo.create(mockTask({ id: 't1', status: 'today' }))
-      await repo.create(mockTask({ id: 't2', status: 'inbox' }))
-      await repo.create(mockTask({ id: 't3', status: 'completed', completed_at: today }))
-      await repo.create(mockTask({ id: 't4', status: 'completed', completed_at: '2020-01-01T12:00:00.000Z' }))
-
-      const todayTasks = await repo.getTodayTasks()
-      expect(todayTasks.map((task) => task.id)).toEqual(['t1', 't3'])
+      const plannedTasks = await repo.getByStatus('planned')
+      expect(plannedTasks).toHaveLength(2)
     })
 
     it('reorders tasks', async () => {
@@ -84,14 +73,6 @@ describe('TaskRepository', () => {
 
       const roots = await repo.getByStatus('inbox')
       expect(roots.map((t) => t.id)).toEqual(['root'])
-    })
-
-    it('exclut les sous-étapes de getTodayTasks', async () => {
-      await repo.create(mockTask({ id: 'root', status: 'today' }))
-      await repo.create(mockTask({ id: 'child', status: 'today', parent_id: 'root' }))
-
-      const tasks = await repo.getTodayTasks()
-      expect(tasks.map((t) => t.id)).toEqual(['root'])
     })
 
     it('retourne les sous-étapes triées par position', async () => {

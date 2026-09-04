@@ -30,7 +30,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(17)
+    expect(db.verno).toBe(18)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -210,13 +210,13 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(17)
+    expect(upgraded.verno).toBe(18)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche V1',
-      status: 'today',
+      status: 'inbox',
       parent_id: null,
       essential: false,
       energy_cost: null,
@@ -294,7 +294,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(17)
+    expect(upgraded.verno).toBe(18)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -333,7 +333,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(17)
+    expect(upgraded.verno).toBe(18)
 
     const migratedItem = await upgraded.listItems.get('existing-item')
     expect(migratedItem).toMatchObject({ checked: false })
@@ -386,7 +386,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(17)
+    expect(upgraded.verno).toBe(18)
     const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
     expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
 
@@ -432,7 +432,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(17)
+    expect(upgraded.verno).toBe(18)
     expect(await upgraded.budgetCategories.get('income-1')).toBeUndefined()
     expect(await upgraded.budgetCategories.get('expense-1')).toBeDefined()
 
@@ -481,7 +481,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(17)
+    expect(upgraded.verno).toBe(18)
     expect(await upgraded.listItems.get('item-1')).toMatchObject({ description: '' })
     expect(upgraded.listItemSubTasks).toBeDefined()
 
@@ -526,8 +526,83 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(17)
+    expect(upgraded.verno).toBe(18)
     expect(await upgraded.tools.get('tool-1')).toMatchObject({ color: null })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 17 database by migrating tasks with status "today" to "inbox"', async () => {
+    const name = `migration-v18-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(17).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+      lists: 'id',
+      listItems: 'id, list_id, position, checked, category_id',
+      listItemSubTasks: 'id, list_item_id, position',
+      listCategories: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
+      budgetIncomeEntries: 'id, date',
+      taskRecurrences: 'id',
+      taskExceptions: 'id, recurrence_id',
+      folders: 'id, position',
+      tools: 'id, type, folder_id, position',
+      manualTestResults: 'id, test_id',
+    })
+    await legacy.open()
+    await legacy.table('tasks').bulkAdd([
+      {
+        id: 'task-today',
+        parent_id: null,
+        title: 'Tâche du jour',
+        status: 'today',
+        essential: false,
+        energy_cost: null,
+        postponed: false,
+        position: 0,
+        scheduled_date: '2026-09-03',
+        scheduled_start: '09:00',
+        scheduled_end: '09:30',
+        created_at: '2026-09-03T00:00:00Z',
+        updated_at: '2026-09-03T00:00:00Z',
+        completed_at: null,
+      },
+      {
+        id: 'task-inbox',
+        parent_id: null,
+        title: 'Tâche réception',
+        status: 'inbox',
+        essential: false,
+        energy_cost: null,
+        postponed: false,
+        position: 1,
+        scheduled_date: null,
+        scheduled_start: null,
+        scheduled_end: null,
+        created_at: '2026-09-03T00:00:00Z',
+        updated_at: '2026-09-03T00:00:00Z',
+        completed_at: null,
+      },
+    ])
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(18)
+    expect(await upgraded.tasks.get('task-today')).toMatchObject({
+      status: 'inbox',
+      scheduled_date: null,
+      scheduled_start: null,
+      scheduled_end: null,
+    })
+    expect(await upgraded.tasks.get('task-inbox')).toMatchObject({ status: 'inbox', position: 1 })
 
     await upgraded.delete()
   })

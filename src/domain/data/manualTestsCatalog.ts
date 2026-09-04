@@ -486,6 +486,28 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'plus-de-categorie-tache-du-jour',
+    title: 'La catégorie « Tâche du jour » a disparu',
+    category: 'Tâches',
+    steps: [
+      'Ouvrez « Réception » : sur chaque tâche de la liste, seuls les boutons « Planifier » et « Liste » doivent être proposés. Le bouton « Tâche du jour » ne doit plus exister.',
+      'Ouvrez la fiche d’une tâche, puis « Décomposer » et « Modifier » : nulle part il ne doit être question de « Tâche du jour » ni d’une catégorie « Aujourd’hui » distincte du planning.',
+      'Si vous aviez déjà des tâches rangées dans « Tâche du jour » avant la mise à jour, vérifiez qu’elles sont maintenant dans « Réception », sans date, prêtes à être re-triées.',
+    ],
+  },
+  {
+    id: 'ajouter-une-tache-depuis-la-reception',
+    title: 'Ajouter une tâche depuis la Réception',
+    category: 'Tâches',
+    steps: [
+      'Ouvrez « Réception » et touchez « Ajouter une tâche ».',
+      'Un champ « Titre de la tâche » doit apparaître à la place du bouton, sans changement d’écran et sans aucun autre champ (pas d’heure, pas de durée, pas de destination).',
+      'Saisissez un titre puis touchez « Valider » : le champ se referme et la tâche apparaît dans la liste de Réception.',
+      'Sur cette nouvelle tâche, seuls les boutons « Planifier » et « Liste » doivent être proposés.',
+      'Touchez de nouveau « Ajouter une tâche » puis « Annuler » : le champ se referme sans rien créer.',
+    ],
+  },
+  {
     id: 'navigation-entre-tous-les-ecrans',
     title: 'Navigation fluide entre les écrans',
     category: 'Paramètres / Profil',

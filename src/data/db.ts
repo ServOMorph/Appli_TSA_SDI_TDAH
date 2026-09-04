@@ -375,6 +375,21 @@ export class AppDatabase extends Dexie {
             tool.color = null
           })
       })
+    this.version(18)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table('tasks')
+          .toCollection()
+          .modify((task) => {
+            if (task.status === 'today') {
+              task.status = 'inbox'
+              task.scheduled_date = null
+              task.scheduled_start = null
+              task.scheduled_end = null
+            }
+          })
+      })
   }
 }
 

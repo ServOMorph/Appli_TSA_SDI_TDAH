@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await completeFastOnboarding(page)
 })
 
-test('T10 — Ajouter une tâche depuis dashboard → apparaît dans tâches du jour', async ({ page }) => {
+test('T10 — Ajouter une tâche depuis le dashboard ouvre l\'écran de création', async ({ page }) => {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await expect(page.getByRole('heading', { name: 'Votre première tâche' }).or(page.getByRole('heading', { name: 'Nouvelle tâche' }))).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/10-create-task-screen.png' })
@@ -15,7 +15,6 @@ test('T10 — Ajouter une tâche depuis dashboard → apparaît dans tâches du 
 test('T11 — Créer tâche dans inbox → visible dans inbox', async ({ page }) => {
   await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
-  await expect(page.getByRole('heading', { name: 'Nouvelle tâche' })).toBeVisible()
   await page.getByLabel('Titre de la tâche').fill('Tâche inbox Playwright')
   await page.getByRole('button', { name: 'Valider' }).click()
   await expect(page.getByRole('heading', { name: 'Réception' })).toBeVisible()
@@ -46,18 +45,6 @@ test('T13 — Décomposer tâche → ajouter sous-tâche → affichée dans dét
   await page.getByRole('button', { name: 'Décomposer', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Décomposer' }).or(page.getByRole('heading', { level: 1 }))).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/13-decompose-screen.png' })
-})
-
-test('T14 — Déplacer tâche inbox → Aujourd\'hui', async ({ page }) => {
-  await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
-  await page.getByRole('main').getByRole('button', { name: 'Ajouter une tâche' }).click()
-  await page.getByLabel('Titre de la tâche').fill('Tâche vers aujourd\'hui')
-  await page.getByRole('button', { name: 'Valider' }).click()
-  await page.getByRole('button', { name: /Déplacer Tâche vers aujourd'hui vers Tâche du jour/ }).click()
-  await page.getByRole('button', { name: 'Retour' }).click()
-  await page.getByRole('button', { name: 'Accueil' }).click()
-  await expect(page.getByText("Tâche vers aujourd'hui")).toBeVisible()
-  await page.screenshot({ path: 'e2e/screenshots/14-task-today.png' })
 })
 
 test('T16 — Terminer tâche → retour dashboard', async ({ page }) => {

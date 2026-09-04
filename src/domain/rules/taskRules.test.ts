@@ -24,7 +24,7 @@ import type { Task } from '@/domain/entities/task'
 const now = '2026-06-29T10:00:00Z'
 
 const mockTask = (overrides?: Partial<Task>): Task => ({
-  ...createTask('task-1', 'Test task', 'today', false, now),
+  ...createTask('task-1', 'Test task', 'inbox', false, now),
   ...overrides,
 })
 

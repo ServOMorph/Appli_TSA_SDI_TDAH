@@ -57,18 +57,29 @@ export function E20Inbox() {
     selectTask,
     selectList,
     goTo,
-    moveTask,
     planTaskToday,
     moveTodoTaskToList,
     createToolList,
+    createTaskInbox,
     goToPath,
   } = useApp()
   const [listPickerTask, setListPickerTask] = useState<Task | null>(null)
   const [newListName, setNewListName] = useState('')
   const [subtaskWarning, setSubtaskWarning] = useState<{ task: Task; action: 'list' } | null>(null)
+  const [adding, setAdding] = useState(false)
+  const [newTaskTitle, setNewTaskTitle] = useState('')
 
-  async function handleMoveToToday(taskId: string) {
-    await moveTask(taskId, 'today')
+  async function handleAddTask() {
+    const title = newTaskTitle.trim()
+    if (!title) return
+    await createTaskInbox(title)
+    setNewTaskTitle('')
+    setAdding(false)
+  }
+
+  function cancelAddTask() {
+    setNewTaskTitle('')
+    setAdding(false)
   }
 
   async function handlePlan(task: Task) {
@@ -151,13 +162,6 @@ export function E20Inbox() {
                 )}
                 <div style={{ display: 'flex', gap: 'var(--spacing-xs)', flexWrap: 'wrap' }}>
                   <button
-                    aria-label={`Déplacer ${task.title} vers Tâche du jour`}
-                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
-                    onClick={() => handleMoveToToday(task.id)}
-                  >
-                    Tâche du jour
-                  </button>
-                  <button
                     aria-label={`Planifier ${task.title}`}
                     style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '4px 8px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}
                     onClick={() => handlePlan(task)}
@@ -179,12 +183,35 @@ export function E20Inbox() {
         </div>
       )}
 
-      <Button
-        fullWidth
-        onClick={() => goTo('task-create-v2')}
-      >
-        Ajouter une tâche
-      </Button>
+      {adding ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+          <input
+            type="text"
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleAddTask()
+              if (e.key === 'Escape') cancelAddTask()
+            }}
+            placeholder="Titre de la tâche"
+            aria-label="Titre de la tâche"
+            autoFocus
+            style={{ padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
+          />
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+            <Button onClick={handleAddTask} disabled={!newTaskTitle.trim()}>
+              Valider
+            </Button>
+            <Button variant="secondary" onClick={cancelAddTask}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Button fullWidth onClick={() => setAdding(true)}>
+          Ajouter une tâche
+        </Button>
+      )}
 
       {listPickerTask && (
         <div role="dialog" aria-modal="true" aria-label="Choisir une liste" style={modalOverlay}>

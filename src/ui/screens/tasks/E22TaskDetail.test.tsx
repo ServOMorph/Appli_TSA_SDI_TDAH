@@ -220,11 +220,14 @@ describe('E22TaskDetail', () => {
       expect(ctx.back).toHaveBeenCalledWith('inbox')
     })
 
-    it('retour vers dashboard pour tâche today', async () => {
-      const task = makeTask({ status: 'today' })
-      const ctx = makeAppContext({ selectedTaskId: 'task-1', todayTasks: [task] })
+    it('retour vers dashboard pour tâche planifiée', async () => {
+      const task = makeTask({ id: 'task-1', status: 'planned' })
+      const ctx = makeAppContext({
+        selectedTaskId: 'task-1',
+        getTaskById: vi.fn().mockResolvedValue(task),
+      })
       renderWithApp(<E22TaskDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
+      await userEvent.click(await screen.findByRole('button', { name: 'Retour' }))
       expect(ctx.back).toHaveBeenCalledWith('dashboard')
     })
 

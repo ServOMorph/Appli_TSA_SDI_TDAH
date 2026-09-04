@@ -1,3 +1,11 @@
+## v5.88 — 2026-09-04
+
+### Ajouté
+- `roadmap_supprimer_tache_du_jour.md` Phases 1 et 2 `[FAIT]` — non déployées. Demande de Marie du 2026-09-04, hors Google Doc : retrait complet de la catégorie « Tâche du jour ». Phase 1 : `TaskStatus` perd `'today'` ; migration Dexie v18 (`today` → `inbox`, dates de planification nettoyées) ; bouton « Tâche du jour » et plomberie associée (`getTodayTasks`, `addTask`, `moveTask`, `reorderTodayTasks`) retirés. Phase 2 : le bouton « Ajouter une tâche » de la Réception (`E20Inbox`) n'ouvre plus le formulaire complet — il révèle un champ inline titre seul, validé par `createTaskInbox`. Catalogue : parcours « Plus de catégorie Tâche du jour » et « Ajouter une tâche depuis la Réception ». `tsc -b` + lint + **717 tests** verts.
+
+### Modifié
+- `src/ui/screens/resources/E120Resources.tsx` : textes d'aide reformulés (retrait des mentions « tâche du jour » / vue « Aujourd'hui »).
+
 ## v5.87 — 2026-09-04
 
 ### Modifié

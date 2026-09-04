@@ -57,17 +57,12 @@ describe('E20Inbox', () => {
       expect(screen.queryByLabelText(/sur .* étapes/)).toBeNull()
     })
 
-    it("déplace vers Tâche du jour sans limite de nombre", async () => {
+    it("n'affiche plus le bouton Tâche du jour", () => {
       const task = makeTask({ id: 'abc', title: 'Lire livre' })
-      const todayTasks = [
-        makeTask({ id: 't1', title: 'T1', status: 'today' }),
-        makeTask({ id: 't2', title: 'T2', status: 'today' }),
-        makeTask({ id: 't3', title: 'T3', status: 'today' }),
-      ]
-      const ctx = makeAppContext({ inboxTasks: [task], todayTasks })
+      const ctx = makeAppContext({ inboxTasks: [task] })
       renderWithApp(<E20Inbox />, ctx)
-      await userEvent.click(screen.getByLabelText('Déplacer Lire livre vers Tâche du jour'))
-      expect(ctx.moveTask).toHaveBeenCalledWith('abc', 'today')
+      expect(screen.queryByLabelText(/vers Tâche du jour/)).toBeNull()
+      expect(screen.queryByRole('button', { name: 'Tâche du jour' })).toBeNull()
     })
   })
 
@@ -79,11 +74,23 @@ describe('E20Inbox', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('tools')
     })
 
-    it('Ajouter une tâche navigue vers task-create-v2', async () => {
+    it('Ajouter une tâche ouvre un champ titre seul, sans navigation', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E20Inbox />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('task-create-v2')
+      expect(ctx.goTo).not.toHaveBeenCalled()
+      expect(screen.getByLabelText('Titre de la tâche')).toBeDefined()
+    })
+
+    it('valider le champ titre appelle createTaskInbox et referme le champ', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
+      await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Acheter du pain')
+      await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
+      expect(ctx.createTaskInbox).toHaveBeenCalledWith('Acheter du pain')
+      expect(ctx.goTo).not.toHaveBeenCalledWith('task-create-v2')
+      expect(screen.queryByLabelText('Titre de la tâche')).toBeNull()
     })
   })
 

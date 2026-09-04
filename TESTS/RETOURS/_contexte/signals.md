@@ -1,4 +1,4 @@
-# Signals — RETOURS_ANNOTES
+# Signals — RETOURS
 
 ## Actions ouvertes
 

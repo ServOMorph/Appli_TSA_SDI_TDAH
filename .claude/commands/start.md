@@ -52,6 +52,19 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    > `contexte.md` peut être chargé à la demande plutôt que systématiquement.
    > En cas de doute : le charger.
 
+4-bis. **Relevé de l'`inbox` gateway — zones `design` et `discord` uniquement.** Le nom de zone
+   résolu est le nom d'agent de la gateway Discord (registre
+   `DISCORD/discord_com/gateway/agents.json`). Si la zone résolue est `design` ou `discord` :
+   ```bash
+   python DISCORD/discord_com/gateway.py poll --zone <zone résolue> --format hook
+   ```
+   Si la sortie vaut autre chose que `RIEN` : afficher les messages en attente et les traiter
+   dans la session (puis `ack --agent <zone> --id <id>` chacun). Étape non bloquante : gateway
+   absente ou zone hors registre → sortie vide, poursuivre.
+   **Zone racine (`Appli_TSA_SDI_TDAH`) : ne rien relever.** L'orchestrateur ne consulte
+   `inbox/orchestrateur/` que sur demande explicite de l'utilisateur (`gateway.py poll --agent
+   orchestrateur`). Toute la com Discord se gère dans la session `discord` / `/discord_loop`.
+
 5. Afficher le contenu intégral de `signals.md` (sans résumé ni reformulation).
 
 5b. Pour chaque action listée dans `signals.md` qui contient un champ `réf:`, lire les fichiers
@@ -81,6 +94,11 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 
 - Étape 4 : si la zone résolue est `roberto`, charger en plus, après les fichiers de la zone,
   `_contexte/signals.md` et `_contexte/contexte.md` de la racine du projet (lecture seule).
+- Étape 6 : si la zone résolue est `discord`, enchaîner automatiquement `/discord_loop` juste
+  après l'affichage de la synthèse (`🎉🎉🎉`), sans demander de confirmation. Cette zone n'existe
+  que pour faire tourner la boucle Discord en service quasi-permanent (gardien de sortie de
+  l'outbox + vidage de `inbox/unrouted/` et `inbox/discord/`) — cf.
+  `.claude/commands/discord_loop.md` § Service quasi-permanent.
 - Étape 4 : si la zone résolue est la racine du projet (`Appli_TSA_SDI_TDAH`), lancer une
   sauvegarde du snapshot Supabase de Marie avant d'afficher la synthèse :
   `( set -a; . ./.env; set +a; python scripts/backup_marie_snapshot.py )`.

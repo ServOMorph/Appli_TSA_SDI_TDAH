@@ -27,6 +27,7 @@ CLI :
   python gateway.py merge   --ids <id,id,...>
   python gateway.py drain [--dry-run]
   python gateway.py poll --agent orchestrateur
+  python gateway.py poll --zone design --format hook   # relevé compact (RIEN si vide, exit 0)
   python gateway.py ack --agent orchestrateur --id <id>
   python gateway.py route --author-id <id> --text "..."
   python gateway.py agents
@@ -624,6 +625,30 @@ def poll(agent: str) -> list[dict]:
     return out
 
 
+def rendu_hook(items: list[dict]) -> str:
+    """
+    Rendu compact d'une liste de messages inbox (`poll --format hook`), pour un relevé
+    rapide par `/start` / `/close`. `RIEN` si la liste est vide. Sinon une ligne par message :
+    `id — auteur — 1re ligne`, puis le décompte des pièces jointes s'il y en a.
+    """
+    if not items:
+        return "RIEN"
+    lignes = []
+    for it in items:
+        auteur = it.get("from_discord", {}).get("author_name") or "?"
+        premiere = ""
+        contenu = (it.get("content") or "").strip()
+        if contenu:
+            premiere = contenu.splitlines()[0][:200]
+        pieces = it.get("attachments") or []
+        if pieces and not premiere:
+            premiere = f"[{len(pieces)} pièce(s) jointe(s)] {pieces[0].get('filename') or '?'}"
+        elif pieces:
+            premiere = f"{premiere}  [+{len(pieces)} pièce(s) jointe(s)]"
+        lignes.append(f"{it.get('id')} — {auteur} — {premiere}".rstrip(" —"))
+    return "\n".join(lignes)
+
+
 def ack(agent: str, msg_id: str) -> bool:
     """Supprime un message inbox traité. Retourne False si le fichier n'existe pas."""
     path = INBOX / (resolve_agent(agent) or agent) / f"{msg_id}.json"
@@ -672,7 +697,11 @@ def _main() -> None:
     p_drn.add_argument("--dry-run", action="store_true")
 
     p_poll = sub.add_parser("poll", help="lire l'inbox d'un agent")
-    p_poll.add_argument("--agent", required=True)
+    g_poll = p_poll.add_mutually_exclusive_group(required=True)
+    g_poll.add_argument("--agent", help="nom d'agent ou de zone")
+    g_poll.add_argument("--zone", help="nom de zone (synonyme de --agent, lisible en hook)")
+    p_poll.add_argument("--format", choices=("texte", "hook"), default="texte",
+                        help="hook : sortie compacte, 'RIEN' si vide, toujours exit 0")
 
     p_ack = sub.add_parser("ack", help="marquer un message inbox comme traité")
     p_ack.add_argument("--agent", required=True)
@@ -755,9 +784,16 @@ def _main() -> None:
                       f"{r.get('discord_message_id') or r.get('detail') or ''}")
 
     elif args.cmd == "poll":
-        items = poll(args.agent)
+        cible = args.agent or args.zone
+        try:
+            items = poll(cible)
+        except Exception:  # un hook ne doit jamais échouer sur la gateway
+            items = []
+        if args.format == "hook":
+            print(rendu_hook(items))
+            return
         if not items:
-            print(f"inbox/{args.agent} vide.")
+            print(f"inbox/{cible} vide.")
             return
         for it in items:
             auteur = it.get("from_discord", {}).get("author_name", "?")

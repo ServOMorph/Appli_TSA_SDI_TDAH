@@ -534,6 +534,63 @@ class GatewayTest(unittest.TestCase):
     def test_ack_introuvable(self):
         self.assertFalse(gateway.ack("design", "inexistant"))
 
+    # -- poll --zone / --format hook (livraison en direct, Phase 3) -----
+
+    def test_rendu_hook_inbox_vide_donne_RIEN(self):
+        self.assertEqual(gateway.rendu_hook([]), "RIEN")
+
+    def test_rendu_hook_liste_compacte(self):
+        gateway.route_inbound(7, "Morpheus", "@design: revoir le bouton\nligne 2 ignorée")
+        rendu = gateway.rendu_hook(gateway.poll("design"))
+        lignes = rendu.splitlines()
+        self.assertEqual(len(lignes), 1)
+        self.assertIn(" — Morpheus — revoir le bouton", lignes[0])
+        self.assertNotIn("ligne 2", rendu)
+
+    def test_rendu_hook_piece_jointe_sans_texte(self):
+        pieces = [{"filename": "capture.png", "url": "https://cdn/c.png",
+                   "content_type": "image/png"}]
+        gateway.route_inbound(7, "X", "@design:", pieces)
+        rendu = gateway.rendu_hook(gateway.poll("design"))
+        self.assertIn("[1 pièce(s) jointe(s)] capture.png", rendu)
+
+    def test_poll_resout_le_nom_de_zone(self):
+        gateway.route_inbound(7, "X", "@Appli_TSA_SDI_TDAH: relance")
+        self.assertEqual(len(gateway.poll("Appli_TSA_SDI_TDAH")), 1)
+        self.assertEqual(len(gateway.poll("orchestrateur")), 1)
+
+    def test_poll_zone_hors_registre_donne_liste_vide(self):
+        self.assertEqual(gateway.poll("zone_inexistante"), [])
+        self.assertEqual(gateway.rendu_hook(gateway.poll("zone_inexistante")), "RIEN")
+
+    def _run_cli(self, *argv):
+        import contextlib
+        import io
+        buf = io.StringIO()
+        code = 0
+        with mock.patch.object(gateway.sys, "argv", ["gateway.py", *argv]):
+            with contextlib.redirect_stdout(buf):
+                try:
+                    gateway._main()
+                except SystemExit as e:
+                    code = e.code or 0
+        return code, buf.getvalue()
+
+    def test_cli_poll_zone_format_hook_inbox_vide(self):
+        code, out = self._run_cli("poll", "--zone", "Appli_TSA_SDI_TDAH", "--format", "hook")
+        self.assertEqual(code, 0)
+        self.assertEqual(out.strip(), "RIEN")
+
+    def test_cli_poll_zone_format_hook_avec_messages(self):
+        gateway.route_inbound(7, "Morpheus", "@design: un point à revoir")
+        code, out = self._run_cli("poll", "--zone", "design", "--format", "hook")
+        self.assertEqual(code, 0)
+        self.assertIn(" — Morpheus — un point à revoir", out)
+
+    def test_cli_poll_exige_agent_ou_zone(self):
+        code, _ = self._run_cli("poll", "--format", "hook")
+        self.assertNotEqual(code, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

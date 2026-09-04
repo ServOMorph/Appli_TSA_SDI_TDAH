@@ -80,6 +80,21 @@ Ne jamais écrire dans le dossier `memory/` ni dans aucun système de mémoire p
 ### Mémoire projet
 Lire `.claude/memory.md` en début de chaque session si le fichier existe. Ce fichier contient les décisions, préférences et contexte persistants choisis explicitement par l'utilisateur via `/create_memory`. Ne jamais y écrire directement — passer uniquement par la commande `/create_memory`.
 
+### Inbox gateway : la com Discord se gère dans la session `discord`
+Chaque session est un agent gateway dont le nom est sa zone (`Appli_TSA_SDI_TDAH` → alias
+`orchestrateur`, `design`, `discord` ; registre `DISCORD/discord_com/gateway/agents.json`).
+`bot.py` route les messages Discord entrants vers `DISCORD/discord_com/gateway/inbox/<zone>/`.
+
+- **Session `discord` + `/discord_loop`** : point de contact unique. Lancée par
+  `/start discord` (qui enchaîne `/discord_loop`), elle juge l'outbox (gardien de sortie) et
+  vide `inbox/unrouted/` + `inbox/discord/` à chaque cycle. Toute la com Discord passe par là.
+- **Zone `design`** : `/start` (étape 4-bis) et `/close` (étape 2-bis) font un relevé de
+  `inbox/design/` avec `poll --zone design --format hook`.
+- **Orchestrateur (zone racine)** : ne se soucie pas de Discord. Il ne consulte
+  `inbox/orchestrateur/` (réponses de Marie routées par `--expect-reply`) que **sur demande
+  explicite de l'utilisateur** — `python DISCORD/discord_com/gateway.py poll --agent
+  orchestrateur`, traiter, puis `ack`. Aucun hook, aucun relevé automatique.
+
 ## Données sensibles
 
 Certains dossiers ou fichiers peuvent contenir des données sensibles (informations clients, données personnelles, fichiers financiers). Les lister ici pour interdire toute lecture ou écriture sans instruction explicite :
@@ -221,9 +236,9 @@ utile pour cette livraison.
 
 ### Historique de conversation avec Marie : sauvegarde systématique et immédiate
 Tout message échangé avec Marie — canal Discord via la gateway, bridge ROBERTO en secours — est
-consigné dans `COMMUNICATION/Marie/historique_whatsapp.md` (nom de fichier historique), sans
+consigné dans `COMMUNICATION/Marie/historique_conversation_marie.md`, sans
 exception et sans attendre le `/close`. La gateway journalise aussi dans
-`DISCORD/discord_com/logs/conversation.jsonl` (brut) ; `historique_whatsapp.md` reste la mémoire
+`DISCORD/discord_com/logs/conversation.jsonl` (brut) ; `historique_conversation_marie.md` reste la mémoire
 curatée des questions / réponses / décisions produit :
 
 - **Relire la fin du fichier (`sed -n` sur les dernières entrées) avant toute rédaction pour

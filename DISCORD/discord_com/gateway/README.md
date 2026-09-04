@@ -111,6 +111,11 @@ python DISCORD/discord_com/gateway.py poll --agent orchestrateur
 python DISCORD/discord_com/gateway.py ack  --agent orchestrateur --id <id>
 ```
 
+`poll` accepte `--zone <nom>` comme synonyme de `--agent` (les deux résolvent zone ou alias) et
+`--format hook` : sortie compacte `id — auteur — 1re ligne`, `RIEN` si l'`inbox` est vide,
+`exit 0` en toute circonstance (gateway absente ou zone inconnue → `RIEN`). Utilisé par
+`/start` / `/close` (zones `design`, `discord`) pour un relevé rapide de l'`inbox`.
+
 ou en Python :
 
 ```python

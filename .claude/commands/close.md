@@ -35,6 +35,17 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    a avancé, signaler l'intégration à planifier ; ne jamais lancer un merge ou un rebase
    automatiquement.
 
+2-bis. **Relevé final de l'`inbox` gateway — zones `design` et `discord` uniquement** (symétrique
+   de l'étape 4-bis de `/start`). Si la zone résolue est `design` ou `discord` :
+   ```bash
+   python DISCORD/discord_com/gateway.py poll --zone <zone résolue> --format hook
+   ```
+   `ack --agent <zone> --id <id>` chaque message effectivement traité pendant la session ;
+   ajouter à la synthèse (étape 3) une ligne pour tout message restant non acquitté. Étape non
+   bloquante : gateway absente ou zone hors registre → sortie vide, poursuivre.
+   **Zone racine : ne rien relever** — l'orchestrateur ne touche `inbox/orchestrateur/` que sur
+   demande explicite de l'utilisateur.
+
 3. Produire une synthèse de session (< 25 lignes) au format suivant :
 
 ```
@@ -181,5 +192,12 @@ resynchronisation, écraserait le dernier bon snapshot côté Supabase — le sc
 d'une ligne unique par `device_id`, sans aucun historique. Le script est idempotent et écrit dans
 `donnees_marie/` (gitignoré : sans effet sur le commit de l'étape 10). Ne jamais afficher le
 contenu de `.env` ni celui d'un snapshot (données personnelles de Marie).
+
+Étape 12, sur `main` uniquement et si la zone résolue est la racine du projet : mettre à jour le
+manifeste des fichiers Git non commités, sans lancer de copie vers Drive :
+`python claude-vibecoding-kit/backup_project.py . --refresh-list`.
+Afficher son contenu dans le bilan. La copie ne peut être lancée qu'après validation explicite de
+cette liste par l'utilisateur, avec `python claude-vibecoding-kit/backup_project.py . --upload`.
+Le script utilise `rclone copy` et ne supprime aucun fichier distant.
 
 <!-- SPECIFICITES PROJET : FIN -->

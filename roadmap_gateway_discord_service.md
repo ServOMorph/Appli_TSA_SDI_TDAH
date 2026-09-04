@@ -86,9 +86,10 @@ Tout le reste → **`approve`**.
 
 ## Ordre et dépendances
 
-Phase 1 (fondations) est prérequise pour 2 et 3. Phase 2 (gardien) et Phase 3 (hooks) sont
-indépendantes entre elles mais Phase 3 se teste mieux après Phase 2 (un `bounce` visible dans
-l'`inbox` de l'orchestrateur est un bon cas de livraison en direct).
+Phase 1 (fondations) est prérequise pour 2 et 3. Phase 2 (gardien) et Phase 3 (`poll --zone` +
+relevé zones design/discord) sont indépendantes entre elles. Note : le volet « livraison en
+direct par hooks » de la Phase 3 a été abandonné (cf. Phase 3) — l'orchestrateur ne reçoit rien
+de Discord automatiquement.
 
 ---
 
@@ -175,41 +176,44 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Livraison en direct : hooks, `start.md`, `close.md`, docs [TODO]
+## Phase 3 — `poll --zone` / `--format hook` + relevé zones design/discord [FAIT]
 
-Traite le constat 5.
+Traite le constat 5. Réalisée le 2026-09-04. **Pas de hooks** : le design initial (livraison en
+direct dans *toutes* les sessions via `SessionStart`/`Stop`) a été abandonné en cours de session,
+tranché avec l'utilisateur. Modèle réel retenu : la com Discord se gère entièrement dans la
+session `discord` / `/discord_loop` ; l'orchestrateur ne consulte `inbox/orchestrateur/` que sur
+demande explicite de l'utilisateur. 66 auto-tests verts.
 
-- [ ] **`gateway.py`** : `poll` accepte `--zone <alias>` (résout le nom d'agent via `agents.json`) ;
-  sortie compacte exploitable telle quelle dans un hook (liste `id — auteur — 1ʳᵉ ligne`, ou
-  `RIEN`). Nouveau `poll --format hook` si besoin d'un rendu dédié.
-- [ ] **`.claude/settings.json`** (via skill `update-config`) : 
-  - hook `SessionStart` → `python DISCORD/discord_com/gateway.py poll --zone <zone courante>` ;
-    sa sortie entre dans le contexte de démarrage (rattrapage de ce qui s'est accumulé hors-ligne).
-  - hook `Stop` → même `poll` ; si l'`inbox` n'est pas vide, réinjecter les messages pour que la
-    session les traite (+ `ack`) avant de se mettre au repos.
-  - Les deux hooks ne bloquent jamais sur erreur (gateway absente, zone hors registre → sortie
-    vide, exit 0).
-- [ ] **`start.md`** : nouvelle étape (après résolution de zone) — « identité d'agent » : le nom de
-  zone résolu **est** le nom d'agent gateway (`Appli_TSA_SDI_TDAH` → alias `orchestrateur`). Faire
-  un `poll --zone` initial, afficher les messages en attente, rappeler que le hook `Stop` prend le
-  relais en cours de session. Ne rien lancer en tâche de fond (les hooks suffisent).
-- [ ] **`close.md`** : étape symétrique — `poll --zone` final, `ack` de ce qui est traité,
-  signalement en une ligne de ce qui reste non traité dans l'`inbox`.
-- [ ] **`discord_loop.md`** : documenter le fonctionnement en service quasi-permanent de la session
-  agent DISCORD (session dédiée, cadence de revue de l'outbox, auto-récupération de l'orphelin
-  `processing` déjà ajoutée en Phase 1).
-- [ ] **`CLAUDE.md`** § Mémoire projet / Contrôle du contexte : documenter que les sessions
-  d'agent reçoivent leur `inbox` par hook, et le rôle de `start.md` / `close.md`.
-- [ ] **`test_gateway.py`** : `poll --zone` résout correctement ; `poll` sur inbox vide → `RIEN`
-  exit 0 ; sur inbox non vide → liste attendue.
+- [x] **`gateway.py`** : `poll` accepte `--zone` (synonyme de `--agent`, tous deux résolvent zone
+  ou alias via `agents.json`) et `--format hook` — sortie compacte `id — auteur — 1ʳᵉ ligne`
+  (`+N pièce(s) jointe(s)` le cas échéant), `RIEN` si l'`inbox` est vide, `exit 0` en toute
+  circonstance (gateway absente / zone inconnue → `RIEN`). Fonction pure `rendu_hook(items)`.
+- [x] **`.claude/settings.json`** : ~~hooks `SessionStart` / `Stop`~~ **abandonné** — l'utilisateur
+  ne veut pas que l'orchestrateur soit interrompu par la com Discord. `settings.json` et le
+  wrapper `hook_gateway_poll.py` ont été créés puis supprimés, jamais commités.
+- [x] **`start.md`** : étape 4-bis — relevé de l'`inbox` (`poll --zone <zone> --format hook`)
+  **zones `design` et `discord` uniquement** ; zone racine → ne rien relever. Étape 6 :
+  `/start discord` enchaîne automatiquement `/discord_loop` (sans confirmation).
+- [x] **`close.md`** : étape 2-bis symétrique — relevé final + `ack` du traité, zones
+  `design`/`discord` uniquement ; zone racine → rien.
+- [x] **`discord_loop.md`** : section « Service quasi-permanent » (session dédiée, cadence de revue
+  de l'outbox, seule session à vider les `inbox` en continu, orphelin `processing` traité en
+  Phase 1).
+- [x] **`CLAUDE.md`** § « Inbox gateway : la com Discord se gère dans la session `discord` » —
+  remplace la version « livraison par hooks » ; orchestrateur sur demande explicite seulement.
+- [x] **`gateway/README.md`** : `poll --zone` / `--format hook` documentés.
+- [x] **`test_gateway.py`** : `rendu_hook` (vide → `RIEN`, liste compacte, pièce jointe seule) ;
+  `poll` résout le nom de zone ; zone hors registre → liste vide ; CLI `poll --zone --format hook`
+  (inbox vide → `RIEN` exit 0 ; avec messages → liste ; sans `--agent`/`--zone` → exit ≠ 0).
+  58 → **66 auto-tests** verts.
 
-**Critère de sortie** : tests verts ; test manuel dev = pendant une session orchestrateur active,
-un message routé vers `inbox/orchestrateur/` est vu au tour suivant (hook `Stop`) sans boucle de
-polling ; un `/start` sur la zone `design` affiche l'`inbox/design/` accumulé ; `/close` signale
-un message non acquitté.
+**Critère de sortie** : tests verts (66). Test manuel dev (`tests_manuels.md` § Gateway Discord
+Phase 3) : `/start discord` enchaîne `/discord_loop` ; `/start design` relève `inbox/design/` ;
+`/start` racine ne relève rien ; `poll --zone … --format hook` sur inbox vide / zone inconnue →
+`RIEN` exit 0. **Non encore exécuté en session réelle.**
 
-**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact`. Roadmap close une fois les 3
-phases `[FAIT]` et le test manuel de bout en bout validé.
+**⏸ Checkpoint** — Les 3 phases sont `[FAIT]`. Roadmap à archiver dans `Archives/` une fois le
+test manuel dev de bout en bout (`tests_manuels.md` § Gateway Discord Phase 3) validé.
 
 ---
 

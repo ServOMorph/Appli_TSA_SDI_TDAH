@@ -90,6 +90,23 @@ par le bot (PID 82188 après restart) n'a pas encore envoyé de vrai message.
   demandes suivantes de la même passe partent quand même ; `approve` sur la `failed` la
   renvoie en file.
 
+## Gateway Discord Phase 3 — `poll --zone` / `--format hook` + relevé zones design/discord
+
+Ajouté le 2026-09-03 (`roadmap_gateway_discord_service.md` Phase 3). `gateway.py poll` accepte
+`--zone` (synonyme de `--agent`) et `--format hook` (`id — auteur — 1re ligne`, `RIEN` si
+vide, `exit 0` toujours). Pas de hooks Claude Code : la com Discord se gère dans la session
+`discord` / `/discord_loop` ; l'orchestrateur ne touche `inbox/orchestrateur/` que sur demande.
+66 auto-tests verts (`rendu_hook`, `poll --zone`, CLI, zone hors registre).
+
+À vérifier :
+- `/start discord` enchaîne `/discord_loop` sans confirmation (étape 6 de `start.md`) ;
+- `/start design` fait un `poll --zone design --format hook` et affiche l'`inbox/design/`
+  accumulé s'il y en a (étape 4-bis) ; `/close design` signale un message non acquitté
+  (étape 2-bis) ;
+- `/start` sur la zone racine ne relève **rien** de la gateway ;
+- `python DISCORD/discord_com/gateway.py poll --zone Appli_TSA_SDI_TDAH --format hook` sur
+  inbox vide → `RIEN`, `exit 0` ; zone inconnue → `RIEN`, `exit 0`.
+
 ## Veille /discord_loop en tâche de fond — `wait` à timeout paramétrable
 
 Ajouté le 2026-09-03. `discord_loop.py wait` accepte un timeout optionnel en argument

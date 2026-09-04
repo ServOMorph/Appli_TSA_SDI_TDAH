@@ -10,6 +10,22 @@ Active la boucle de contrôle Discord native : Claude (cette session) attend les
 /discord_loop
 ```
 
+## Service quasi-permanent
+
+Cette session est le **seul point de contact Discord** du projet et a vocation à tourner en
+continu (heures, jours) : une session dédiée, distincte des sessions de travail `/start`. Son
+rôle central est le **jugement de l'outbox** (gardien de sortie, étape 3a-bis) — les autres
+agents s'arrêtent à `enqueue`, rien ne part sur Discord sans un `approve` d'ici.
+
+- Cadence : une revue de l'outbox à chaque cycle, avant le `wait` (réveil par message +
+  sécurité horaire). Pas de tour de modèle en rafale.
+- Routage entrant et envoi des `approved` : `bot.py`, en continu, hors de cette session.
+- Orphelin `commands.json` bloqué en `processing` > 15 min : repassé `idle` par
+  `bot.py` (`recuperer_processing_orphelin()` au démarrage), aucune action manuelle.
+- Cette session est la seule à vider les `inbox` en continu (`poll --agent unrouted`,
+  `poll --agent discord`, à chaque cycle). L'orchestrateur ne consulte `inbox/orchestrateur/`
+  que sur demande explicite de l'utilisateur ; la zone `design` le fait à `/start` et `/close`.
+
 ## Prérequis
 
 - `DISCORD/discord_com/config_bot_discord.json` → `"enabled": true` + token (`.env`) + channel_id configurés
@@ -70,9 +86,10 @@ python DISCORD/discord_com/gateway.py bounce  --id <id> --reason "<motif>"
 python DISCORD/discord_com/gateway.py merge   --ids <id>,<id>
 ```
 
-Ajuster ton / format / longueur en éditant le champ `body` du fichier
-`gateway/outbox/<id>.json` est permis ; changer la question ou les options ne l'est pas —
-dans ce cas, `bounce`.
+Avant chaque `approve` : relire `DISCORD/discord_com/gateway/STYLE.md`, section du
+destinataire (`to`), et ajuster le champ `body` du fichier `gateway/outbox/<id>.json` à ce
+style (ton, formulations, longueur, ponctuation, emojis, structure). Changer la question, les
+options, les faits, les chiffres ou les liens n'est pas permis — dans ce cas, `bounce`.
 
 **Ne jamais lancer `drain`** : `bot.py` envoie les `approved` tout seul toutes les 5 s.
 Vérifier aussi `poll --agent discord` : un `kind: "dead-letter"` = envoi échoué (demande en

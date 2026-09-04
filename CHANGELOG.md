@@ -1,3 +1,18 @@
+## v5.86 — 2026-09-04
+
+### Ajouté
+- `roadmap_gateway_discord_service.md` Phase 3 `[FAIT]` — **sans hooks**. Le design initial (livraison en direct de l'`inbox` dans toutes les sessions via hooks `SessionStart`/`Stop`, réinjection `decision:block`) est abandonné : l'utilisateur gère toute la communication Discord dans la session `discord` / `/discord_loop` et l'orchestrateur ne doit pas être interrompu. Livré : `gateway.py poll` accepte `--zone` (synonyme de `--agent`, résout zone ou alias) et `--format hook` (sortie compacte `id — auteur — 1ʳᵉ ligne`, `RIEN` si l'`inbox` est vide, `exit 0` en toute circonstance) + fonction pure `rendu_hook(items)`. `test_gateway.py` : 58 → 66 auto-tests verts.
+- `.claude/commands/start.md` étape 6 : `/start discord` enchaîne automatiquement `/discord_loop` (sans confirmation). Étape 4-bis : relevé de l'`inbox` gateway (`poll --zone … --format hook`) aux zones `design` et `discord` uniquement ; zone racine → aucun relevé. `.claude/commands/close.md` étape 2-bis : relevé final symétrique.
+
+### Modifié
+- `.claude/CLAUDE.md` § « Contrôle du contexte » : nouvelle sous-section « Inbox gateway : la com Discord se gère dans la session `discord` » (remplace la version « livraison par hooks ») — la session `discord` / `/discord_loop` est le point de contact unique, l'orchestrateur ne consulte `inbox/orchestrateur/` que sur demande explicite de l'utilisateur.
+- `.claude/commands/discord_loop.md` : section « Service quasi-permanent » (session dédiée, cadence de revue de l'outbox, seule session à vider les `inbox` en continu). `DISCORD/discord_com/gateway/README.md` : `poll --zone` / `--format hook` documentés.
+- `_contexte/archive_decisions.md` : les deux entrées `contexte.md` du 2026-09-01 (test de la SAV Marie ; confirmation sync Marie + SAV locale) archivées.
+- `COMMUNICATION/Marie/historique_whatsapp.md` renommé `historique_conversation_marie.md` (travail de la session `design`, intégré à ce commit) ; chemin mis à jour dans `.claude/CLAUDE.md` et `AGENTS.md` § « Historique de conversation avec Marie ».
+
+### Abandonné
+- `.claude/settings.json` et `DISCORD/discord_com/hook_gateway_poll.py` : créés puis supprimés en cours de session (changement de design de la Phase 3), jamais commités.
+
 ## v5.85 — 2026-09-03
 
 ### Ajouté

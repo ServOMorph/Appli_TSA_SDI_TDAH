@@ -344,6 +344,64 @@
       "comment": null,
       "test_id": "donnees-synchronisees-automatiquement",
       "created_at": "2026-08-31T20:31:27.027Z"
+    },
+    {
+      "id": "38657b40-f5b9-449f-b234-c5ed11e9b3e1",
+      "status": "ok",
+      "comment": null,
+      "test_id": "bandeau-des-jours-colore",
+      "created_at": "2026-09-03T20:10:54.393Z"
+    },
+    {
+      "id": "36caa9b6-5d1b-4b51-97ba-83032e5b1569",
+      "status": "ok",
+      "comment": null,
+      "test_id": "defilement-des-jours-dans-la-case",
+      "created_at": "2026-09-03T20:11:35.719Z"
+    },
+    {
+      "id": "1cb2cf4a-d7a9-4d15-a1f4-920f083910d0",
+      "status": "ok",
+      "comment": null,
+      "test_id": "vue-planning-de-la-semaine",
+      "created_at": "2026-09-03T20:13:30.111Z"
+    },
+    {
+      "id": "f8eb80bb-5448-455b-870b-350ccc097c2a",
+      "status": "ok",
+      "comment": null,
+      "test_id": "nom-de-tache-en-haut-de-case",
+      "created_at": "2026-09-03T20:15:06.936Z"
+    },
+    {
+      "id": "0a4bd344-fbf3-4f78-9b6b-b86a43221838",
+      "status": "nok",
+      "comment": "1. Ok, 2.Ok, 3.oui ça marche mais je veux que tu enlève «tache du jour », quand on ajoute une tache via l’écran d’accueil, elle se planifie automatiquement et on doit compléter tous les champs notamment l’heure et la durée, mais quand on ajoute une tache à partir de réception, on doit uniquement devoir rentrer le champ « titre de la tache », et ensuite dans réception elle s’afficher avec les case « planifier » ou « liste » mais enlève «tache du jour ». Je veux que tu supprime complètement « tache du jour » je ne veux plus que cette catégorie existe nulle part",
+      "test_id": "heures-debut-fin-sur-la-case",
+      "created_at": "2026-09-03T20:20:29.089Z"
+    },
+    {
+      "id": "ddeed2da-2011-46e3-9635-c9b3234e40c6",
+      "status": "nok",
+      "comment": "2.non, le cadre des champs « date » et « heure » sortent toujours de l’écran à droite.",
+      "test_id": "cadre-date-heure-dans-l-ecran",
+      "created_at": "2026-09-03T20:23:19.949Z",
+      "test_revision": 1
+    },
+    {
+      "id": "25b0c951-efd9-4d90-8d02-7e7d42cb470b",
+      "status": "ok",
+      "comment": null,
+      "test_id": "couleur-tache-sans-couleur-choisie",
+      "created_at": "2026-09-03T20:25:11.645Z",
+      "test_revision": 2
+    },
+    {
+      "id": "7befeed9-6e17-4c8b-ae62-2adbcadd83d3",
+      "status": "ok",
+      "comment": null,
+      "test_id": "duree-obligatoire-tache-planifiee",
+      "created_at": "2026-09-03T20:25:42.727Z"
     }
   ]
 }

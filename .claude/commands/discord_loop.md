@@ -49,7 +49,7 @@ Si erreur → demander à l'utilisateur de lancer `python DISCORD/discord_com/bo
 ### Étape 2 : Notifier Discord
 
 ```bash
-python DISCORD/discord_com/discord_loop.py notify "🤖 Claude Code connecté. Envoie ta commande."
+python DISCORD/discord_com/discord_loop.py notify "El Patrone est connecté et en écoute des commandes sur ce canal."
 ```
 
 ### Étape 3 : Boucle native Claude
@@ -153,7 +153,7 @@ python DISCORD/discord_com/discord_loop.py done
 
 Si la commande reçue est exactement `stop` :
 ```bash
-python DISCORD/discord_com/discord_loop.py notify "👋 Session Claude arrêtée."
+python DISCORD/discord_com/discord_loop.py notify "El Patrone se met en pause. Plus d'ecoute des commandes sur ce canal."
 python DISCORD/discord_com/discord_loop.py done
 ```
 → Arrêter la boucle.

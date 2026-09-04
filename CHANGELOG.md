@@ -1,3 +1,11 @@
+## v5.87 — 2026-09-04
+
+### Modifié
+- `.claude/commands/discord_loop.md` : les deux chaînes `notify` émises directement par la boucle (message de connexion à l'étape 2, message d'arrêt à l'étape 3e) alignées sur `DISCORD/discord_com/gateway/STYLE.md` § channel — identité « El Patrone » au lieu de « Claude Code » / « Session Claude », suppression des emojis 🤖 / 👋.
+
+### Activité `/discord_loop` (session discord 2026-09-04)
+- Gardien de sortie : `bounce` de la demande design→marie « image d'accueil ChatGPT » (3461 caractères > limite Discord 2000, prompt à copier indivisible — à redéposer en message court + pièce jointe .txt) ; `approve` de la question orchestrateur→marie sur le débordement des cadres « Date » et « Heure » du formulaire de tâche (#3), après mise en forme STYLE.md § marie.
+
 ## v5.86 — 2026-09-04
 
 ### Ajouté

@@ -38,22 +38,18 @@ plomberie accueil / dépôt.
 - « Planifier » depuis la Réception : `planTaskToday` (`usePlanningState.ts:100`) pose
   `status: 'planned'`, `scheduled_date = todayDate()`, sans horaire, puis ouvre `task-detail`.
 
-## Décisions produit à trancher (ne pas coder avant arbitrage)
+## Décisions produit
 
-- **D1 — sort des tâches `status: 'today'` déjà présentes sur l'appareil de Marie** (119 tâches
-  au total, part en `today` inconnue). Options : (a) migrer `today → inbox` (retour en Réception
-  pour re-tri — aucune perte, cohérent avec « la Réception ne demande que le titre ») ;
-  (b) migrer `today → planned` à la date du jour sans horaire (l'utilisateur affine via la fiche).
-  Recommandation dev : (a).
-- **D2 — « ajouter via l'écran d'accueil »** : interprétation dev = le bouton « Ajouter une
-  tâche » du menu du bas (`BottomNav`, global, `App.tsx:189`), utilisé notamment depuis l'accueil.
-  À confirmer par Marie : est-ce bien ce bouton ? Confirme-t-elle date + heure + durée
-  obligatoires dans ce cas (déjà le comportement de `E21CreateTaskV2` en mode planifié depuis
-  #25) ? **Question à poser à Marie — bloque la Phase 3.**
-- **D3 — mode « création non planifiée » de `E21CreateTaskV2`** : après la Phase 2, le formulaire
-  complet n'est plus atteint qu'en mode planifié d'office (Phase 3). Le mode `isPlanned = false`
-  devient sans point d'entrée. Options : le retirer en Phase 3, ou le laisser en jachère.
-  Recommandation dev : le retirer (moins de chemins morts).
+- **D1 — TRANCHÉE (2026-09-04, utilisateur)** : migrer `today → inbox`. Les tâches
+  `status: 'today'` déjà sur l'appareil de Marie repartent en Réception pour re-tri. Aucune
+  perte, cohérent avec « la Réception ne demande que le titre ». Débloque la Phase 1.
+- **D2 — EN ATTENTE** : « ajouter via l'écran d'accueil » = quel point d'entrée ? Interprétation
+  dev = le bouton « Ajouter une tâche » du menu du bas (`BottomNav`, global, `App.tsx:189`).
+  Décision utilisateur du 2026-09-04 : **ne pas poser la question à Marie maintenant**, la
+  regrouper avec sa réponse aux autres questions en attente (#3, re-tests v5.84). **Bloque la
+  Phase 3.**
+- **D3 — TRANCHÉE (2026-09-04, utilisateur)** : retirer le mode « création non planifiée » de
+  `E21CreateTaskV2` en Phase 3 (moins de chemins morts).
 
 ---
 
@@ -61,7 +57,7 @@ plomberie accueil / dépôt.
 
 Cœur de la demande : « que cette catégorie n'existe nulle part ».
 
-Pré-requis : **D1 tranchée**.
+Pré-requis : D1 tranchée (migration `today → inbox`).
 
 - `src/domain/entities/task.ts` : `TaskStatus` → `'inbox' | 'planned' | 'completed'`.
 - `src/domain/rules/taskRules.ts` : vérifier qu'aucune transition ne produit `'today'` ; retirer

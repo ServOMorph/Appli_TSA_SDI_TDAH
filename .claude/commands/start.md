@@ -32,7 +32,8 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
      de divergence. Si le premier compteur (commits de `main` absents de `sync-marie`) est non
      nul, signaler explicitement qu'une intégration contrôlée de `main` est requise avant tout
      travail susceptible d'être fusionné ou déployé ; ne jamais la lancer automatiquement.
-   - Sur une branche `agent/<alias>` déclarée dans `.claude/zones.md` : définir `<contexte>` comme
+   - Sur une branche `agent/<alias>` correspondant à un alias déclaré dans `.claude/zones.md`
+     (sans tenir compte de la casse) : définir `<contexte>` comme
      `<dossier>/_contexte`, afficher l'écart avec `main` et appliquer le rôle de l'agent. Cette
      branche est isolée : ne pas fusionner, rebaser, déployer ni modifier `main`.
    - Sur toute autre branche : afficher la branche et son écart avec `main`, puis demander la
@@ -102,7 +103,7 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 
 - `main` est la seule branche autorisée pour les évolutions produit générales, les retours et
   tests de Marie, `CHANGELOG.md`, `WHATS_NEW`, `manualTestsCatalog.ts` et tout déploiement.
-- Une branche `agent/<alias>` déclarée dans `.claude/zones.md` peut contenir un travail isolé
+- Une branche `agent/<alias>` correspondant à une zone déclarée dans `.claude/zones.md` peut contenir un travail isolé
   strictement limité à son `agent_role.md`. Elle ne modifie jamais directement `main`, ne
   déclenche aucun déploiement et n'est intégrée qu'après validation explicite de l'utilisateur.
 - `sync-marie` est réservée à l'authentification sécurisée, Supabase et la synchronisation. Elle

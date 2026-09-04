@@ -10,9 +10,9 @@
 - [P1|ouvert] Réponse Marie attendue pour #3 (débordement cadres Date/Heure du formulaire de tâche) : capture + modèle téléphone + navigateur. Question approuvée et partie via bot.py le 2026-09-04.
   fait quand: réponse Marie présente dans gateway/inbox/orchestrateur/, ack après traitement
   réf: gateway/outbox/20260904T045637_240031.json, historique_conversation_marie.md (2026-09-04), _contexte/marie_modifications_suivi.md (#3)
-- [P2|ouvert] Re-soumission attendue de la zone design : message « image d'accueil ChatGPT » bouncé (trop long). Doit revenir en message court + bloc PROMPT en pièce jointe .txt.
+- [P2|ouvert] Re-soumission attendue de la zone design : message « image d'accueil ChatGPT » bouncé (trop long). Doit revenir en message court + bloc PROMPT en pièce jointe .txt. À `hold` (pas `approve`) tant que #3 est dans `pending_replies` — sujet non lié.
   fait quand: nouvelle demande design->marie dans l'outbox, jugée au prochain /discord_loop
-  réf: gateway/inbox/design/20260904T033440_749547 (bounce), scratchpad/msg_marie_image_accueil.txt
+  réf: gateway/inbox/design/20260904T033440_749547 (bounce), scratchpad/msg_marie_image_accueil.txt, gateway/state.json
 - [P2|ouvert] Compléter STYLE.md sections `morpheus` et `channel` avec les préférences de Morphéus (ton, niveau de détail ; audience du canal). Emojis déjà tranché : aucun dans le corps.
   fait quand: les deux sections n'ont plus la mention "à compléter / valider par Morphéus"
   réf: DISCORD/discord_com/gateway/STYLE.md
@@ -24,6 +24,7 @@
 - STYLE.md (`DISCORD/discord_com/gateway/STYLE.md`) : forme des messages sortants par destinataire, relu avant chaque `approve`. Câblé dans `gateway/LOOP.md` § 1 et `.claude/commands/discord_loop.md` étape 3a-bis (les deux commités).
 - Les messages système émis directement par `/discord_loop` (notify de connexion, notify d'arrêt sur `stop`) passent par STYLE.md § channel : identité « El Patrone », aucun emoji. Chaînes corrigées en dur dans `.claude/commands/discord_loop.md` étapes 2 et 3e (session 2026-09-04).
 - `gateway/state.json` : `pending_replies` — une réponse Marie attendue pour #3 depuis le 2026-09-04 (routage vers inbox/orchestrateur/).
+- RÈGLE (rappel Morphéus 2026-09-04) : avant tout `approve` d'une demande `to=marie`, lire `pending_replies` dans `gateway/state.json`. S'il est non vide et que la demande n'est pas liée à la question en attente → `hold`, jamais `approve`. Le contrôle mécanique de `state.json` fait foi, pas l'historique de conversation. Verdict codifié dans `gateway/LOOP.md`.
 - Bot Discord : `queue.json` lu `idle` en début de session 2026-09-04 ; non revérifié en fin de session. Veille `wait 3600` en tâche de fond arrêtée au `/close`.
 - Décision Morphéus 2026-09-02 : canal Marie = Discord via gateway (ROBERTO = secours/vocal) ; identité « Rayonne Toi » (id 1368654289584656394) = Marie.
 - Presse-papier inaccessible depuis les sessions Claude Code de ce poste : livrer les messages via fichier.

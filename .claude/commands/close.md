@@ -29,7 +29,8 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
      `<dossier>/_contexte/branches/sync-marie`. Cette branche est limitée à l'authentification,
      Supabase et la synchronisation : ne pas modifier `CHANGELOG.md`, `README.md`, `WHATS_NEW`,
      `manualTestsCatalog.ts`, `tests_manuels.md` et ne jamais lancer `/deploy`.
-   - Sur une branche `agent/<alias>` déclarée dans `.claude/zones.md`, définir `<contexte>` comme
+   - Sur une branche `agent/<alias>` correspondant à un alias déclaré dans `.claude/zones.md`
+     (sans tenir compte de la casse), définir `<contexte>` comme
      `<dossier>/_contexte`. Écrire et committer seulement les livrables autorisés par
      `agent_role.md`, sur cette branche. Ne jamais fusionner, rebaser, déployer ni modifier `main`.
    - Sur toute autre branche, s'arrêter et demander le périmètre avant d'écrire ou de committer.

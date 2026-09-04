@@ -115,9 +115,14 @@ réveil de sécurité par heure — et non un tour de modèle toutes les quelque
 
 #### 3b. Traiter la commande
 
-Seuls les messages qui @-mentionnent le bot arrivent ici : ce sont des commandes pour cette
-session. Tout le reste du trafic du canal (réponse de Marie, message tagué `@design:`) est
-routé mécaniquement par `bot.py` vers `gateway/inbox/<agent>/` — rien à faire.
+Arrivent ici les messages qui @-mentionnent le bot, **sauf** une réponse à une question en
+attente (`state.pending_replies`) : même @-mentionné par réflexe, `bot.py` la route
+mécaniquement vers `gateway/inbox/<agent>/` (pièces jointes incluses) au lieu de la mettre en
+commande — `gateway.has_pending_reply(author_id)`, vérifié avant la branche commande. Plus
+d'archéologie manuelle à faire ici pour ce cas (jusqu'au 2026-09-04, une réponse @-mentionnant
+le bot atterrissait en commande, sans ses pièces jointes, et devait être re-routée à la main).
+Tout le reste du trafic du canal (réponse hors pending, message tagué `@design:`) est aussi
+routé mécaniquement par `bot.py` — rien à faire.
 
 Reste à ma charge, après le `wait` : vider `inbox/unrouted/` (relire, re-router en préfixant
 le bon `@agent:`, ou répondre soi-même).

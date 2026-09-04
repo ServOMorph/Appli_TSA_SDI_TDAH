@@ -175,6 +175,17 @@ Un échec d'envoi Discord passe la demande en `failed` et dépose une `dead-lett
 Réception : `gateway.poll("<agent>")` puis `gateway.ack("<agent>", id)`.
 Doc : `DISCORD/discord_com/gateway/README.md`.
 
+**Correctif du 2026-09-04 (trou de protocole)** : `bot.py` route désormais tout message d'un
+auteur ayant une réponse attendue (`gateway.has_pending_reply(author_id)`) vers `route_inbound`
+— pièces jointes incluses — même s'il @-mentionne le bot par réflexe en répondant ; avant, ce
+cas tombait en commande `/discord_loop`, perdait ses pièces jointes et exigeait une
+re-transcription manuelle. `/start` (étape 4-bis) fait aussi désormais, pour la **zone racine**,
+un `poll --agent orchestrateur --format hook` **visibility-only** (affiché dans la synthèse,
+jamais traité ni `ack` automatiquement) — corrige § « Inbox gateway : la com Discord se gère
+dans la session `discord` » ci-dessus, dont l'affirmation « Aucun hook, aucun relevé automatique »
+pour la zone racine ne tient plus depuis cette date. Traiter une réponse `--expect-reply` de
+Marie reste une décision explicite de l'utilisateur.
+
 ### Messages pour Marie : via la gateway Discord, encadrés 💻🤖
 Depuis le 2026-09-02, le canal de Marie est **Discord** et **toute communication Discord passe par
 la gateway** (`DISCORD/discord_com/gateway/README.md`). Tout message à l'intention de Marie (pas

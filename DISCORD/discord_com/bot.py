@@ -197,9 +197,11 @@ async def on_message(message):
         ecrire(QUEUE, q)
         return
 
-    # Sans @-mention du bot : ce n'est pas une commande /discord_loop, c'est du trafic de canal.
-    # Il part vers la gateway, qui le route dans l'inbox de l'agent concerné.
-    if client.user not in message.mentions:
+    # Sans @-mention du bot, ou réponse attendue de cet auteur (même en @-mentionnant le bot
+    # par réflexe en répondant) : ce n'est pas une commande /discord_loop, c'est du trafic de
+    # canal. Il part vers la gateway, qui le route dans l'inbox de l'agent concerné, pièces
+    # jointes incluses.
+    if client.user not in message.mentions or gateway.has_pending_reply(message.author.id):
         try:
             pieces = [{"filename": a.filename, "url": a.url, "content_type": a.content_type}
                       for a in message.attachments]
@@ -237,7 +239,7 @@ async def on_message(message):
         file.append(entree)
         cmd["queue"] = file
         ecrire(COMMANDS, cmd)
-        await envoyer(f"📥 En file d'attente ({len(file)}). Traité dès que Claude se libère.")
+        await envoyer(f"📥 En file d'attente ({len(file)}). j'envoie la sauce dès que j'ai fini mon café")
 
 
 async def drainer_gateway():

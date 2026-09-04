@@ -438,6 +438,24 @@ class GatewayTest(unittest.TestCase):
         gateway.add_pending_reply("orchestrateur", "marie", "req")
         self.assertFalse(gateway.LOCK.exists())
 
+    # -- has_pending_reply --------------------------------------------
+
+    def test_has_pending_reply_vrai_apres_envoi_question(self):
+        self._envoyer_question()
+        self.assertTrue(gateway.has_pending_reply(gateway.MARIE_USER_ID))
+
+    def test_has_pending_reply_faux_sans_question_en_attente(self):
+        self.assertFalse(gateway.has_pending_reply(gateway.MARIE_USER_ID))
+
+    def test_has_pending_reply_faux_pour_auteur_inconnu(self):
+        self._envoyer_question()
+        self.assertFalse(gateway.has_pending_reply(999999))
+
+    def test_has_pending_reply_faux_apres_purge(self):
+        self._envoyer_question()
+        gateway.route_inbound(gateway.MARIE_USER_ID, "Marie", "toujours")
+        self.assertFalse(gateway.has_pending_reply(gateway.MARIE_USER_ID))
+
     # -- route_inbound ----------------------------------------------
 
     def test_route_inbound_vers_source_en_attente_et_purge(self):

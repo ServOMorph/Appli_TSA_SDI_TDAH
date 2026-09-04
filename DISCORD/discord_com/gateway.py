@@ -239,6 +239,17 @@ def _match_pending(state: dict, to: str | None) -> dict | None:
     return max(candidats, key=lambda p: p.get("since") or "")
 
 
+def has_pending_reply(author_id) -> bool:
+    """True si cet auteur a une réponse attendue en cours (`state.pending_replies`).
+
+    Sert à `bot.py` : un message qui @-mentionne le bot par réflexe en répondant à une
+    question de la gateway doit quand même être routé vers `route_inbound` (avec pièces
+    jointes), pas traité comme une commande `/discord_loop`.
+    """
+    to = _target_from_author(author_id)
+    return _match_pending(load_state(), to) is not None
+
+
 # ------------------------------------------------------------------
 # Sortie
 # ------------------------------------------------------------------

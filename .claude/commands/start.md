@@ -65,18 +65,24 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    > `contexte.md` peut être chargé à la demande plutôt que systématiquement.
    > En cas de doute : le charger.
 
-4-bis. **Relevé de l'`inbox` gateway — zones `design` et `discord` uniquement.** Le nom de zone
-   résolu est le nom d'agent de la gateway Discord (registre
-   `DISCORD/discord_com/gateway/agents.json`). Si la zone résolue est `design` ou `discord` :
-   ```bash
-   python DISCORD/discord_com/gateway.py poll --zone <zone résolue> --format hook
-   ```
-   Si la sortie vaut autre chose que `RIEN` : afficher les messages en attente et les traiter
-   dans la session (puis `ack --agent <zone> --id <id>` chacun). Étape non bloquante : gateway
-   absente ou zone hors registre → sortie vide, poursuivre.
-   **Zone racine (`Appli_TSA_SDI_TDAH`) : ne rien relever.** L'orchestrateur ne consulte
-   `inbox/orchestrateur/` que sur demande explicite de l'utilisateur (`gateway.py poll --agent
-   orchestrateur`). Toute la com Discord se gère dans la session `discord` / `/discord_loop`.
+4-bis. **Relevé de l'`inbox` gateway.** Le nom de zone résolu est le nom d'agent de la gateway
+   Discord (registre `DISCORD/discord_com/gateway/agents.json`).
+   - Zones `design` et `discord` :
+     ```bash
+     python DISCORD/discord_com/gateway.py poll --zone <zone résolue> --format hook
+     ```
+     Si la sortie vaut autre chose que `RIEN` : afficher les messages en attente et les traiter
+     dans la session (puis `ack --agent <zone> --id <id>` chacun).
+   - **Zone racine (`Appli_TSA_SDI_TDAH`, depuis le 2026-09-04)** : même commande
+     (`poll --agent orchestrateur --format hook`), mais en **visibility-only** — afficher le
+     résultat dans la synthèse de l'étape 5, sans jamais le traiter ni l'`ack` automatiquement
+     dans la session. Traiter une réponse à une question `--expect-reply` reste une décision
+     explicite de l'utilisateur (`gateway.py poll --agent orchestrateur` puis `ack`). Corrige le
+     trou de protocole constaté le 2026-09-04 : deux réponses de Marie étaient restées
+     invisibles plusieurs heures, l'orchestrateur ne consultant auparavant cet inbox que sur
+     demande explicite, sans aucun relevé même informatif.
+   Étape non bloquante dans les deux cas : gateway absente ou zone hors registre → sortie vide,
+   poursuivre.
 
 5. Afficher le contenu intégral de `signals.md` (sans résumé ni reformulation).
 

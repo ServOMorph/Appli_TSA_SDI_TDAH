@@ -1,8 +1,9 @@
 # Historique de conversation avec Marie
 
 Journal des échanges avec Marie. **Depuis le 2026-09-02, le canal est Discord** (via la gateway
-`DISCORD/discord_com/` ; le bridge ROBERTO reste un secours vocal). Nom de fichier conservé pour
-l'historique. Alimenté au fil de l'eau : messages composés pour Marie ajoutés dans le tour où ils
+`DISCORD/discord_com/` ; le bridge ROBERTO reste un secours vocal). Fichier renommé de
+`historique_whatsapp.md` en `historique_conversation_marie.md` le 2026-09-03. Alimenté au fil de
+l'eau : messages composés pour Marie ajoutés dans le tour où ils
 sont rédigés, réponses de Marie ajoutées dans le tour où elles arrivent (l'utilisateur peut aussi
 en coller). Sert de mémoire durable des questions posées, des réponses reçues et des décisions
 produit qui en découlent, indépendamment des roadmaps (vues de travail éphémères) et de
@@ -314,3 +315,23 @@ le débordement horizontal ne concerne que la rubrique **Accessibilité** de l'�
 l'ensemble de l'écran. Message @-mentionnant le bot, donc capté par la session `/discord_loop` au
 lieu du routage automatique ; re-routé manuellement vers `gateway/inbox/orchestrateur/`
 (`20260903T194455_255655`). Aucun `pending_reply` actif (purgé au 17h17). Sans capture jointe.
+
+### 2026-09-03 — lancement du design : image d'accueil via ChatGPT (déposé dans la gateway)
+
+**Dév ->**
+On démarre le travail sur le design de l'appli. Premier sujet : l'image d'accueil, celle qui s'affiche à l'ouverture. On va la remplacer.
+
+Tu vas la créer avec ChatGPT (version gratuite). Je te guide.
+
+Étapes :
+1. Ouvre ChatGPT, nouvelle conversation.
+2. Copie le prompt ci-dessous en entier, colle-le, envoie.
+3. Fais ce que ChatGPT te demande : il va d'abord te décrire 10 idées d'images à l'écrit, puis te demander laquelle tu préfères, puis te poser des questions une par une pour l'affiner.
+4. Quand la description te convient, écris-lui « c'est bon » : il génère l'image.
+5. Renvoie-moi l'image obtenue et la description finale.
+
+Si ChatGPT dit que tu as atteint une limite d'images, attends quelques heures et redemande la génération.
+
+Prompt fourni (résumé) : rôle directrice artistique ; présentation de l'appli (Assistant AuDHD, adultes autistes/TDAH, allègement de la charge mentale, téléphone, sans compte ni cloud, ambiance calme et épurée) ; image = écran de bienvenue, format vertical, sujet centré, aucun texte dans l'image, éviter pièce de puzzle / cerveau / ampoule / visuel enfantin / couleurs criardes ; consigne en 3 temps : 10 concepts décrits à l'écrit, puis choix + questions une par une pour affiner la description, puis génération de l'image seulement après « c'est bon ». Texte intégral : `scratchpad/msg_marie_image_accueil.txt`.
+
+_Suite :_ première session de la zone `design`. Message déposé dans la gateway (`enqueue --source design --to marie --kind info`, id `20260903T195903_088417`), en attente du gardien (agent DISCORD). L'image actuelle (`public/images/welcome-hero.png`) contient le texte « Bienvenue / Appli TSA SDI TDAH » ; le nouveau brief demande une image sans texte, ce qui impliquera de rendre visible le titre côté appli (`E01Welcome.tsx`, `h1` actuellement `sr-only`).

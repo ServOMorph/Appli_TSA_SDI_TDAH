@@ -196,9 +196,9 @@ utile pour cette livraison.
 
 ### Historique de conversation avec Marie : sauvegarde systématique et immédiate
 Tout message échangé avec Marie — canal Discord via la gateway, bridge ROBERTO en secours — est
-consigné dans `COMMUNICATION/Marie/historique_whatsapp.md` (nom de fichier historique), sans
+consigné dans `COMMUNICATION/Marie/historique_conversation_marie.md`, sans
 exception et sans attendre le `/close`. La gateway journalise aussi dans
-`DISCORD/discord_com/logs/conversation.jsonl` (brut) ; `historique_whatsapp.md` reste la mémoire
+`DISCORD/discord_com/logs/conversation.jsonl` (brut) ; `historique_conversation_marie.md` reste la mémoire
 curatée des questions / réponses / décisions produit :
 
 - **Message rédigé pour Marie** (livraison, question, relance — pas seulement ceux de `/deploy`) :

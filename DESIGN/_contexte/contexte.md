@@ -12,7 +12,16 @@ S'occuper du design de l'application : direction visuelle, maquettes, chartes gr
 - Dossiers cibles : `DESIGN/` (specs, maquettes, chartes), `src/ui/`, `src/app/`.
 
 ## État actuel (réécrit intégralement à chaque /close)
-Projet initialisé. Aucun livrable produit.
+Premier chantier ouvert : remplacer l'image d'accueil (`public/images/welcome-hero.png`). Marie
+la conçoit avec ChatGPT gratuit à partir d'un prompt fourni (10 concepts écrits, affinage, puis
+génération). Message + prompt prêts (`scratchpad/msg_marie_image_accueil.txt`) mais la demande
+gateway a été *bounced* (trop longue pour Discord) : canal de livraison du prompt à trancher.
 
 ## Décisions structurantes (append only — 10 entrées max, 5 lignes max/entrée, archiver au-delà)
 - 2026-09-02 : Initialisation du protocole vibecoding.
+- 2026-09-04 : Chantier « image d'accueil » — pilotée par Marie via ChatGPT (version gratuite),
+  workflow en 3 temps (10 concepts écrits, affinage guidé, génération). Texte conservé dans
+  l'image (« Bienvenue » + « Appli TSA SDI TDAH »). Éviter pièce de puzzle / cerveau / ampoule /
+  engrenage / visuel enfantin.
+- 2026-09-04 : `COMMUNICATION/Marie/historique_whatsapp.md` renommé `historique_conversation_marie.md`
+  (dépendances : `.claude/CLAUDE.md`, `AGENTS.md` § Historique).

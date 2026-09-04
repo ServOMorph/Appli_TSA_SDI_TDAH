@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { AppProvider, useApp } from '@/app/AppContext'
 import { E10Dashboard } from '@/ui/screens/dashboard/E10Dashboard'
 import { DevResetButton } from '@/ui/components/DevResetButton'
@@ -17,10 +17,11 @@ const E12WeekPlanning = lazy(() =>
 )
 const E02Profile = lazy(() => import('@/ui/screens/onboarding/E02Profile').then((m) => ({ default: m.E02Profile })))
 const E03Energy = lazy(() => import('@/ui/screens/onboarding/E03Energy').then((m) => ({ default: m.E03Energy })))
-const E20Inbox = lazy(() => import('@/ui/screens/tasks/E20Inbox').then((m) => ({ default: m.E20Inbox })))
-const E21CreateTaskV2 = lazy(() =>
-  import('@/ui/screens/tasks/E21CreateTaskV2').then((m) => ({ default: m.E21CreateTaskV2 })),
-)
+const importE20Inbox = () => import('@/ui/screens/tasks/E20Inbox').then((m) => ({ default: m.E20Inbox }))
+const E20Inbox = lazy(importE20Inbox)
+const importE21CreateTaskV2 = () =>
+  import('@/ui/screens/tasks/E21CreateTaskV2').then((m) => ({ default: m.E21CreateTaskV2 }))
+const E21CreateTaskV2 = lazy(importE21CreateTaskV2)
 const E22TaskDetail = lazy(() =>
   import('@/ui/screens/tasks/E22TaskDetail').then((m) => ({ default: m.E22TaskDetail })),
 )
@@ -40,9 +41,9 @@ const E120Resources = lazy(() =>
 const E121ManualTests = lazy(() =>
   import('@/ui/screens/tests/E121ManualTests').then((m) => ({ default: m.E121ManualTests })),
 )
-const E110Settings = lazy(() =>
-  import('@/ui/screens/settings/E110Settings').then((m) => ({ default: m.E110Settings })),
-)
+const importE110Settings = () =>
+  import('@/ui/screens/settings/E110Settings').then((m) => ({ default: m.E110Settings }))
+const E110Settings = lazy(importE110Settings)
 const E111Profile = lazy(() =>
   import('@/ui/screens/settings/E111Profile').then((m) => ({ default: m.E111Profile })),
 )
@@ -101,8 +102,26 @@ export function activeTabFor(screen: Screen): BottomNavTab | null {
   }
 }
 
+// Préchargement des 3 écrans du menu du bas (Réception, Ajouter une tâche, Paramètres — Accueil
+// est déjà en import statique) : lancé une fois, en tâche d'arrière-plan, après le premier
+// affichage. Corrige la latence « Chargement... » signalée par Marie (2026-09-04) sur le
+// parcours de navigation entre écrans, sans revenir sur le lazy-loading des écrans rares
+// (roadmap_bundle_2026-08-31.md Phase 2).
+function preloadNavScreens() {
+  importE20Inbox()
+  importE21CreateTaskV2()
+  importE110Settings()
+}
+
 export function AppScreens() {
   const { screen, loading, overloadMode, inboxTasks, goTo } = useApp()
+
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(cb, 1))
+    const cancelIdle = window.cancelIdleCallback ?? window.clearTimeout
+    const id = idle(preloadNavScreens)
+    return () => cancelIdle(id)
+  }, [])
 
   if (loading) {
     return <ScreenLoading />

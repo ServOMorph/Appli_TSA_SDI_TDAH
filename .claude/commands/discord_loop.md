@@ -23,8 +23,10 @@ agents s'arrêtent à `enqueue`, rien ne part sur Discord sans un `approve` d'ic
 - Orphelin `commands.json` bloqué en `processing` > 15 min : repassé `idle` par
   `bot.py` (`recuperer_processing_orphelin()` au démarrage), aucune action manuelle.
 - Cette session est la seule à vider les `inbox` en continu (`poll --agent unrouted`,
-  `poll --agent discord`, à chaque cycle). L'orchestrateur ne consulte `inbox/orchestrateur/`
-  que sur demande explicite de l'utilisateur ; la zone `design` le fait à `/start` et `/close`.
+  `poll --agent discord`, à chaque cycle). L'orchestrateur reçoit un relevé visibility-only de
+  `inbox/orchestrateur/` à chaque `/start` (étape 4-bis, depuis le 2026-09-04) mais ne le traite
+  ni ne l'`ack` que sur demande explicite de l'utilisateur ; la zone `design` le fait à `/start`
+  et `/close`.
 
 ## Prérequis
 
@@ -176,7 +178,7 @@ l'intérieur d'une section `[discord-auto]` n'est jamais validé par cette étap
 
 Si la commande reçue est exactement `stop` :
 ```bash
-python DISCORD/discord_com/discord_loop.py notify "Allez, les jeunes, bonne nuit, je va me coucher"
+python DISCORD/discord_com/discord_loop.py notify "J'en ai plein le c... je vais me faire un café et je reviens"
 python DISCORD/discord_com/discord_loop.py done
 ```
 → Arrêter la boucle.

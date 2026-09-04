@@ -32,6 +32,9 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
      de divergence. Si le premier compteur (commits de `main` absents de `sync-marie`) est non
      nul, signaler explicitement qu'une intégration contrôlée de `main` est requise avant tout
      travail susceptible d'être fusionné ou déployé ; ne jamais la lancer automatiquement.
+   - Sur une branche `agent/<alias>` déclarée dans `.claude/zones.md` : définir `<contexte>` comme
+     `<dossier>/_contexte`, afficher l'écart avec `main` et appliquer le rôle de l'agent. Cette
+     branche est isolée : ne pas fusionner, rebaser, déployer ni modifier `main`.
    - Sur toute autre branche : afficher la branche et son écart avec `main`, puis demander la
      règle de périmètre applicable avant de charger un contexte.
 
@@ -42,6 +45,15 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 3b. Si `<dossier>/agent_role.md` existe : le charger et l'afficher intégralement,
     avant `signals.md`. Ce fichier n'existe que pour les zones-agents ; une zone
     racine classique n'en a pas.
+
+3c. Si `<dossier>/_contexte/messages.processing.md` existe, l'afficher : c'est un message déjà
+    pris en charge qui ne doit pas être perdu.
+
+3d. Si `<dossier>/_contexte/messages.md` existe, le renommer atomiquement en
+    `messages.processing.md`, afficher son contenu, puis supprimer le fichier de traitement
+    seulement après traitement effectif. Le parent écrit les nouveaux messages dans un fichier
+    temporaire du même dossier avant renommage en `messages.md` ; lui seul écrit directement ce
+    fichier.
 
 4. Charger dans l'ordre :
    1. `<contexte>/signals.md` — actions ouvertes, blocages, dernière session (priorité absolue)
@@ -74,6 +86,11 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
     Ajouter ensuite, à partir des autres fichiers chargés : la phase en cours si roadmap active,
     et le point d'attention immédiat.
 
+5c. Pour une zone racine ou coordinatrice, agréger les `_contexte/statut.md` des agents dont
+    `agent_role.md` déclare cette zone comme parent, ainsi que les équipes dont `team.md` déclare
+    cette zone comme coordinateur. Les remonter séparément : aucune consigne ne contourne le
+    coordinateur.
+
 6. Afficher en fin de réponse : 🎉🎉🎉
 
 <!-- SPECIFICITES PROJET : DEBUT (préservé par /update, ne pas toucher hors de ce bloc) -->
@@ -85,6 +102,9 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 
 - `main` est la seule branche autorisée pour les évolutions produit générales, les retours et
   tests de Marie, `CHANGELOG.md`, `WHATS_NEW`, `manualTestsCatalog.ts` et tout déploiement.
+- Une branche `agent/<alias>` déclarée dans `.claude/zones.md` peut contenir un travail isolé
+  strictement limité à son `agent_role.md`. Elle ne modifie jamais directement `main`, ne
+  déclenche aucun déploiement et n'est intégrée qu'après validation explicite de l'utilisateur.
 - `sync-marie` est réservée à l'authentification sécurisée, Supabase et la synchronisation. Elle
   ne doit pas déclencher `/deploy` ni modifier les artefacts de release ou de tests de Marie.
 - Une intégration de `main` dans `sync-marie` est une opération explicite, jamais implicite dans

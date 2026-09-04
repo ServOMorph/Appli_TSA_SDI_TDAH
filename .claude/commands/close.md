@@ -29,6 +29,9 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
      `<dossier>/_contexte/branches/sync-marie`. Cette branche est limitée à l'authentification,
      Supabase et la synchronisation : ne pas modifier `CHANGELOG.md`, `README.md`, `WHATS_NEW`,
      `manualTestsCatalog.ts`, `tests_manuels.md` et ne jamais lancer `/deploy`.
+   - Sur une branche `agent/<alias>` déclarée dans `.claude/zones.md`, définir `<contexte>` comme
+     `<dossier>/_contexte`. Écrire et committer seulement les livrables autorisés par
+     `agent_role.md`, sur cette branche. Ne jamais fusionner, rebaser, déployer ni modifier `main`.
    - Sur toute autre branche, s'arrêter et demander le périmètre avant d'écrire ou de committer.
 
    Sur `sync-marie`, afficher aussi `git rev-list --left-right --count main...HEAD`. Si `main`
@@ -112,6 +115,10 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    catalogue in-app (cf. `CLAUDE.md` § Spécificités projet). Ne pas déplacer les documents de
    `COMMUNICATION/Marie/livraisons/`, qui sont l'historique figé des messages déjà publiés.
 
+6-bis. Pour une zone-agent, écrire ou mettre à jour `<contexte>/statut.md` avec : objectif,
+avancement, blocages, prochain pas, commit proposé, fichiers modifiés, tests et migrations. Le
+statut remonte uniquement au parent déclaré dans `agent_role.md`.
+
 7. Sur `main` uniquement, mettre à jour `README.md` à la racine du projet :
    - Refléter l'état actuel du projet (section "État actuel" de `contexte.md`).
    - Ne pas modifier les sections stables (objectif, stack, structure) sauf changement explicite.
@@ -152,11 +159,16 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
       survenir avec l'étape 9, mais à vérifier via `git status` après coup) : les inclure dans
       ce même commit, jamais dans un commit séparé.
 
+    Sur une branche `agent/<alias>`, ne pousser que si cette branche dispose déjà d'un suivi
+    distant et si le parent l'a explicitement demandé ; sinon conserver le commit local et le
+    signaler dans `statut.md`.
+
 11. Exécuter `git push` :
     ```bash
     git push
     ```
-    Si le projet n'a pas de remote configuré, ignorer cette étape silencieusement. Si le push
+    Si le projet n'a pas de remote configuré, ignorer cette étape silencieusement. Une branche
+    `agent/<alias>` sans demande explicite de son parent ne lance pas cette étape. Si le push
     échoue (pas de remote tracking, conflit, réseau, etc.) : afficher l'erreur telle quelle dans
     le bilan de l'étape 12, ne pas tenter de résolution automatique (pas de force push, pas de
     pull/rebase automatique).

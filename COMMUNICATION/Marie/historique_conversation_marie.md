@@ -335,3 +335,19 @@ Si ChatGPT dit que tu as atteint une limite d'images, attends quelques heures et
 Prompt fourni (résumé) : rôle directrice artistique ; présentation de l'appli (Assistant AuDHD, adultes autistes/TDAH, allègement de la charge mentale, téléphone, sans compte ni cloud, ambiance calme et épurée) ; image = écran de bienvenue, format vertical, sujet centré, aucun texte dans l'image, éviter pièce de puzzle / cerveau / ampoule / visuel enfantin / couleurs criardes ; consigne en 3 temps : 10 concepts décrits à l'écrit, puis choix + questions une par une pour affiner la description, puis génération de l'image seulement après « c'est bon ». Texte intégral : `scratchpad/msg_marie_image_accueil.txt`.
 
 _Suite :_ première session de la zone `design`. Message déposé dans la gateway (`enqueue --source design --to marie --kind info`, id `20260903T195903_088417`), en attente du gardien (agent DISCORD). L'image actuelle (`public/images/welcome-hero.png`) contient le texte « Bienvenue / Appli TSA SDI TDAH » ; le nouveau brief demande une image sans texte, ce qui impliquera de rendre visible le titre côté appli (`E01Welcome.tsx`, `h1` actuellement `sr-only`).
+
+### 2026-09-04 — retour de Marie sur v5.84 (débordements #3 + #32)
+
+**Marie ->**
+Dans paramètres le problème de débordement d'écran est réglé. Par contre dans la planification
+d'une tâche, les cadres des champs « date » et « heure » débordent toujours sur la droite. Je l'ai
+mentionné dans le test que j'ai mis « non validé ».
+
+_Suite :_ répond au message de livraison v5.84 du 2026-09-03. **#32** (débordement écran
+Paramètres) validé : parcours `cadres-parametres-tiennent-dans-l-ecran` → `ok`, registre
+`marie_modifications_suivi.md` → `livrée v5.84`. **#3** (cadres Date/Heure du formulaire de tâche)
+toujours `nok` — 3e échec (v5.45 réévaluation, v5.64 `min-width:0` sur `<form>`, v5.84
+`width:100%` + grille énergie `minmax(0,1fr)`). Parcours `cadre-date-heure-dans-l-ecran` rev 1
+rouvert, #3 repassé `en attente`. Correctifs à l'aveugle répétés sans appareil de test : piste
+jamais essayée = `appearance: none` sur les `<input type="date">` / `<input type="time">` (largeur
+intrinsèque native, non rétrécissable sur iOS Safari malgré `width:100%`).

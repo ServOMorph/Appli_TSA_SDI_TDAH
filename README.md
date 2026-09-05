@@ -52,6 +52,8 @@ Le déploiement public est disponible sur [appli-audhd.netlify.app](https://appl
 
 Les éléments à transmettre à Marie sont centralisés dans [COMMUNICATION/Marie/a_transmettre.md](COMMUNICATION/Marie/a_transmettre.md) ; chaque déploiement en conserve une copie versionnée et la publie sur Drive.
 
+Le flux de retours annotés (capture d'écran, annotation au crayon, code d'écran visible, commentaire), conçu dans la branche isolée `agent/retours`, a été relu et fusionné dans `main` le 5 septembre 2026 après rejeu de la suite de tests. Il n'est pas encore déployé en production : `supabase/feedback.sql` reste à appliquer dans un environnement contrôlé avant que la synchronisation serveur ne soit activée. En parallèle, la zone `ONBOARD` a produit le cadrage complet de l'accueil de nouveaux testeurs (parcours, critères d'acceptation, plan de test, demandes d'évolution D1-D6), bloqué sur une répétition à blanc avec un testeur pilote réel.
+
 ## Prérequis
 
 - Node.js et npm.

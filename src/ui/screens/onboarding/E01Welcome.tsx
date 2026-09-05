@@ -5,6 +5,7 @@ import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
 const WHATS_NEW: string[] = [
   'Nouvel essai pour corriger l’affichage du champ « Heure de début » sur le formulaire de tâche.',
+  'Nouveau flux de retours annotés : capture d’écran, annotation au crayon et commentaire directement dans l’appli.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

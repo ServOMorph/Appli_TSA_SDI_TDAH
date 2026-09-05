@@ -1,3 +1,8 @@
+## v5.91 — 2026-09-05
+
+### Ajouté
+- Flux de retours annotés (`agent/retours`, commit `bdff457`) fusionné dans `main` : capture d'écran, annotation au crayon, code d'écran visible, commentaire, persistance Dexie v19, synchronisation opportuniste, lecture développeur. Conflits résolus avec le travail en cours sur `main` : `src/App.tsx` (imports lazy combinés), `src/data/db.ts` (version Dexie 19 combinant `taskCategories` et `feedbackReports`). `tsc -b`, lint et Vitest (773 tests) verts après fusion. `supabase/feedback.sql` non appliqué : flux testé en dev sans synchro serveur.
+
 ## v5.90 — 2026-09-04
 
 ### Modifié

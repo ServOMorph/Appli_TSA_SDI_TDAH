@@ -1,3 +1,11 @@
+## v5.94 — 2026-09-06
+
+### Corrigé
+- Catalogue de tests manuels : trou de test pour #37 (refonte de la fiche de tâche) comblé — `modifier-une-tache-planifiee` réécrit (édition par case), nouveau parcours `creer-une-tache-bandeau-colore`, `menu-actions-tache-simplifie` et `duree-obligatoire-tache-planifiee` corrigés (référençaient un bouton « Modifier » supprimé par #37), `cadre-date-heure-dans-l-ecran` retiré (#3 abandonnée par Marie au profit de #37). Message de livraison v5.92 à Marie corrigé et envoyé, après 4 bounces du gardien.
+
+### Modifié
+- `_contexte/signals.md`/`contexte.md` : rotation des sessions et décisions historiques appliquée pour la première fois — `_contexte/archive_sessions.md` créé (42 sessions déplacées), `_contexte/archive_decisions.md` complété (11 décisions archivées).
+
 ## v5.93 — 2026-09-05
 
 ### Ajouté

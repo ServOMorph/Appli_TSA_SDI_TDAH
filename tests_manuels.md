@@ -59,7 +59,9 @@ création.
 - `/close discord` arrête `bot.py` (`bot_manager.py stop`) ;
 - un échec de l'un ou l'autre reste non bloquant (message affiché, session poursuit).
 
-Racine : déjà exercé partiellement à ce `/close` (snapshot Supabase + backup Drive via les hooks) —
-reste à vérifier côté `/start` racine (le hook `_contexte/on_start.md` n'a pas encore été chargé par
-un `/start` réel, seulement écrit).
+Racine : hook `on_start.md` (Pré-synthèse, snapshot Supabase) et hook `on_close.md` (Pré-synthèse
++ Fin, snapshot + backup Drive) désormais exercés par un `/start` puis un `/close` réels de la
+zone racine (session du 2026-09-06) — les deux échecs possibles restent non bloquants comme prévu.
+Reste à vérifier côté `discord` : `/start discord` (relance `bot_manager.py restart` + enchaînement
+`/discord_loop`) et `/close discord` (`bot_manager.py stop`), jamais exercés.
 

@@ -1,12 +1,13 @@
-# Signals — design   (MAJ 2026-09-04)
+# Signals — design   (MAJ 2026-09-05)
 
 ## Actions ouvertes
-- [P1|ouvert] Livrer le prompt « image d'accueil » à Marie. La demande gateway `design -> marie`
-  a été *bounced* (3461 car. > limite Discord 2000 ; `gateway.py enqueue` n'a pas d'option pièce
-  jointe). Trancher le canal : message court gateway + prompt transmis autrement (utilisateur /
-  Drive), ou ajouter le support pièce jointe à la gateway. Puis re-déposer.
-  fait quand: Marie a reçu le message d'accompagnement ET le bloc prompt complet, copiable en un seul bloc.
-  réf: `scratchpad/msg_marie_image_accueil.txt` (message + prompt), `inbox/design/20260904T033440_749547.json` (bounce, non acké), `DISCORD/discord_com/gateway/README.md`
+- [P1|en attente d'approbation discord] Livrer le prompt « image d'accueil » à Marie. Support
+  pièce jointe ajouté à `gateway.py enqueue`/`bot.py` par l'orchestrateur (77 tests verts, non
+  committé côté DISCORD) ; `bot.py` redémarré. Demande redéposée avec `--attachment` :
+  `20260905T213244_730443` (message court + pièce jointe `prompt_image_accueil.txt`). Ancien
+  bounce acquitté.
+  fait quand: Marie a reçu le message d'accompagnement ET le fichier prompt complet en pièce jointe.
+  réf: `DISCORD/discord_com/gateway/outbox/20260905T213244_730443.json`, `DISCORD/discord_com/gateway/README.md`
 - [P2|ouvert] Après retour de Marie (image + description finale retenues) : intégrer la nouvelle
   image d'accueil. Remplacer `public/images/welcome-hero.png` ; `E01Welcome.tsx` référence déjà
   `/images/welcome-hero.png` — aucun code à changer si le nom de fichier est conservé.
@@ -28,31 +29,38 @@
   ampoule, engrenage, visuel enfantin, couleurs criardes.
 - Envoi Discord : `gateway.enqueue("design", "marie", ...)` uniquement ; le gardien (session
   `discord`) approuve. `bot.py` draine les `approved` toutes les 5 s.
+- `scratchpad/` à la racine : zone de dépôt transitoire hors dépôt git (`msg_marie_image_accueil.txt`,
+  `prompt_image_accueil.txt` recréés le 2026-09-05, l'original du 2026-09-04 avait disparu — contenu
+  récupéré depuis le bounce `original_body`). Ne jamais committer ce dossier.
+- Répertoire de travail partagé avec la session orchestrateur (même dépôt, pas de worktree) :
+  `signals.md` de design a été réécrasé une fois pendant la session du 2026-09-05 par une action
+  externe non identifiée. Rester vigilant en cas de perte de mise à jour similaire.
+- `COMMUNICATION/Marie/historique_conversation_marie.md` a été mis à jour ce 2026-09-05 (message
+  envoyé à Marie) mais **non committé par design** (hors périmètre d'écriture/commit de
+  `agent_role.md`) : à committer par l'orchestrateur avec le reste de ses changements DISCORD/.
 
-## Dernière session (2026-09-04)
-<!-- Écrasé intégralement par /close. Synthèse < 25 lignes. -->
+## Dernière session (2026-09-05)
 
 ## Décisions prises
-- Premier chantier design : remplacer l'image d'accueil, conçue par Marie via ChatGPT (version
-  gratuite) — 10 concepts écrits, affinage guidé, génération finale.
-- Le texte reste dans l'image (« Bienvenue » + « Appli TSA SDI TDAH »).
-- `COMMUNICATION/Marie/historique_whatsapp.md` renommé `historique_conversation_marie.md`.
+- Canal retenu pour le prompt trop long : ajout du support pièce jointe à la gateway (demandé à
+  l'orchestrateur), plutôt qu'un Artifact ou un relais par l'utilisateur.
 
 ## Livrables produits ou modifiés
-- `scratchpad/msg_marie_image_accueil.txt` : message d'accompagnement + prompt ChatGPT (hors dépôt).
-- gateway outbox : demande `design -> marie` `20260903T200827_188290` -> *bounced* `20260904T033440_749547`.
-- `COMMUNICATION/Marie/historique_conversation_marie.md` : renommé (git mv), entrée 2026-09-03 ajoutée, note de renommage en tête.
-- `.claude/CLAUDE.md`, `AGENTS.md` : chemin mis à jour au § Historique.
-- Message à l'orchestrateur (renommage à committer, résidus `_contexte/`).
+- `scratchpad/msg_marie_image_accueil.txt`, `scratchpad/prompt_image_accueil.txt` : recréés (hors dépôt).
+- gateway outbox : demande `design -> marie` `20260905T213244_730443` avec `--attachment`, `pending`.
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : entrée 2026-09-05 ajoutée (non committée).
+- `DESIGN/_contexte/signals.md`, `DESIGN/_contexte/contexte.md` : mis à jour.
+- Ancien bounce `20260904T033440_749547` : acquitté.
+- Demande transmise à l'orchestrateur (support pièce jointe gateway) : traitée pendant la session.
 
 ## Hypothèses validées / invalidées
-- INVALIDE : un seul message Discord ne peut pas porter message + prompt complet (3461 > 2000 car.).
-- EN ATTENTE : canal de livraison du prompt à Marie (gateway sans pièce jointe).
+- VALIDE : le bounce `original_body` conserve le contenu intégral, aucune perte malgré la
+  disparition du fichier scratchpad d'origine.
+- EN ATTENTE : approbation de la demande `20260905T213244_730443` par le gardien (session discord).
 
 ## Prochaine étape exacte
-Trancher le canal de livraison du prompt à Marie, re-déposer une demande gateway courte, faire
-approuver par la session `discord`. Puis attendre le retour de Marie (image + description).
+Attendre l'approbation/envoi de la demande `20260905T213244_730443`, puis le retour de Marie
+(image + description finale) pour lancer le P2 (intégration de l'image).
 
 ## Question bloquante pour la session suivante
-Comment acheminer le bloc prompt (~2600 car., à copier en un bloc) à Marie, la gateway Discord ne
-gérant pas les pièces jointes et Discord coupant à 2000 caractères ?
+Aucune.

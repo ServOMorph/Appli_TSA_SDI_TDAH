@@ -12,10 +12,12 @@ S'occuper du design de l'application : direction visuelle, maquettes, chartes gr
 - Dossiers cibles : `DESIGN/` (specs, maquettes, chartes), `src/ui/`, `src/app/`.
 
 ## État actuel (réécrit intégralement à chaque /close)
-Premier chantier ouvert : remplacer l'image d'accueil (`public/images/welcome-hero.png`). Marie
-la conçoit avec ChatGPT gratuit à partir d'un prompt fourni (10 concepts écrits, affinage, puis
-génération). Message + prompt prêts (`scratchpad/msg_marie_image_accueil.txt`) mais la demande
-gateway a été *bounced* (trop longue pour Discord) : canal de livraison du prompt à trancher.
+Premier chantier ouvert : remplacer l'image d'accueil (`public/images/welcome-hero.png`). Blocage
+du 2026-09-04 (prompt 3461 car. > limite Discord, pièce jointe absente de la gateway) levé le
+2026-09-05 : support pièce jointe ajouté à `gateway.py`/`bot.py` par l'orchestrateur (non
+committé côté DISCORD). Demande redéposée avec `--attachment` (`20260905T213244_730443`),
+en attente d'approbation par la session `discord`. Prochaine étape : retour de Marie (image +
+description finale).
 
 ## Décisions structurantes (append only — 10 entrées max, 5 lignes max/entrée, archiver au-delà)
 - 2026-09-02 : Initialisation du protocole vibecoding.
@@ -25,3 +27,6 @@ gateway a été *bounced* (trop longue pour Discord) : canal de livraison du pro
   engrenage / visuel enfantin.
 - 2026-09-04 : `COMMUNICATION/Marie/historique_whatsapp.md` renommé `historique_conversation_marie.md`
   (dépendances : `.claude/CLAUDE.md`, `AGENTS.md` § Historique).
+- 2026-09-05 : blocage de livraison du prompt résolu via ajout du support pièce jointe à la
+  gateway (demandé à l'orchestrateur, hors périmètre d'écriture design) plutôt qu'un Artifact ou
+  un relais par l'utilisateur.

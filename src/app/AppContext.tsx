@@ -22,6 +22,7 @@ import { useManualTestsState } from '@/app/contexts/useManualTestsState'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { syncNow } from '@/data/sync/syncClient'
+import { startFeedbackSync } from '@/data/sync/feedbackClient'
 
 export type { Screen, Route } from '@/app/navigation'
 export type { PlannedSubTask } from '@/app/contexts/usePlanningState'
@@ -143,6 +144,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     init()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => startFeedbackSync(), [])
 
   useEffect(() => {
     function onVisibilityChange() {

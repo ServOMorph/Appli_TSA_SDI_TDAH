@@ -102,7 +102,7 @@ Application :
 
 ---
 
-## Phase 1 — Socle domaine et persistance locale [TODO]
+## Phase 1 — Socle domaine et persistance locale [FAIT]
 
 - `src/domain/entities/feedbackReport.ts` : entité `FeedbackReport` (`id`, `screen_code`,
   `comment`, `image_path`, `image_bytes`, `strokes` (D4), `app_version`, `created_at`,
@@ -122,7 +122,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — Numéro d'écran visible [TODO]
+## Phase 2 — Numéro d'écran visible [FAIT]
 
 Placée avant l'UI de retour : le code d'écran est une donnée d'entrée du formulaire.
 
@@ -141,7 +141,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Capture, annotation au crayon, commentaire [TODO]
+## Phase 3 — Capture, annotation au crayon, commentaire [FAIT]
 
 - `src/domain/rules/annotationStrokes.ts` : **module pur** — points, traits, `undo`, `clear`,
   simplification. jsdom n'a pas de contexte 2D : toute la logique testable doit être hors canvas.
@@ -167,7 +167,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Backend Supabase : bucket privé et métadonnées [TODO]
+## Phase 4 — Backend Supabase : bucket privé et métadonnées [FAIT]
 
 - `supabase/feedback.sql` (fichier séparé, `supabase/schema.sql` non réécrit) :
   - table `feedback_reports` (`id uuid pk`, `device_id`, `screen_code`, `comment`,
@@ -192,7 +192,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 5 — Envoi de bout en bout et file d'attente [TODO]
+## Phase 5 — Envoi de bout en bout et file d'attente [FAIT]
 
 - `src/data/sync/feedbackClient.ts` : orchestration `upload image → RPC métadonnées → markSent`,
   reprise des `pending` / `failed`, throttle des tentatives, échec silencieux si
@@ -208,7 +208,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 6 — Lecture côté dev et remise au coordinateur [TODO]
+## Phase 6 — Lecture côté dev et remise au coordinateur [FAIT]
 
 - `scripts/read_feedback_reports.py` : liste les retours et télécharge les images depuis le
   bucket privé en `SUPABASE_SERVICE_ROLE_KEY`. Nécessite de généraliser `fetch_snapshots()` de

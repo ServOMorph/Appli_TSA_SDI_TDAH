@@ -16,15 +16,17 @@ describe('activeTabFor', () => {
 
 describe('AppScreens — navigation persistante (N1)', () => {
   it('affiche la nav sur le dashboard avec l\'onglet Accueil actif', () => {
-    const ctx = makeAppContext({ screen: 'dashboard' })
+    const ctx = makeAppContext({ screen: 'dashboard', route: { name: 'dashboard' } })
     renderWithApp(<AppScreens />, ctx)
     expect(screen.getByRole('button', { name: 'Accueil' }).getAttribute('aria-current')).toBe('page')
+    expect(screen.getByLabelText('Écran E10 : Accueil')).toBeDefined()
   })
 
   it('affiche la nav sur un écran secondaire (settings) sans point d\'entrée perdu', () => {
-    const ctx = makeAppContext({ screen: 'settings' })
+    const ctx = makeAppContext({ screen: 'settings', route: { name: 'settings' } })
     renderWithApp(<AppScreens />, ctx)
     expect(screen.getByRole('button', { name: 'Accueil' })).toBeDefined()
+    expect(screen.getByLabelText('Écran E110 : Paramètres')).toBeDefined()
   })
 
   it('masque la nav pendant l\'onboarding', () => {

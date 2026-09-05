@@ -13,6 +13,8 @@ export type Route =
   | { name: 'overload-recovery' }
   | { name: 'resources' }
   | { name: 'manual-tests' }
+  | { name: 'feedback'; sourceScreen?: Screen }
+  | { name: 'feedback-list' }
   | { name: 'settings' }
   | { name: 'settings-profile' }
   | { name: 'settings-accessibility' }

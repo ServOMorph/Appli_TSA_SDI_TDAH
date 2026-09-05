@@ -5,6 +5,8 @@ import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
 import { ScreenLoading } from '@/ui/components/ScreenLoading'
 import { LazyScreenBoundary } from '@/ui/components/LazyScreenBoundary'
+import { ScreenCodeBadge } from '@/ui/components/ScreenCodeBadge'
+import { FeedbackFab } from '@/ui/components/FeedbackFab'
 import type { Screen } from '@/app/AppContext'
 
 // `E10Dashboard` reste en import statique : c'est l'écran d'atterrissage de Marie. Tous les
@@ -39,6 +41,12 @@ const E120Resources = lazy(() =>
 )
 const E121ManualTests = lazy(() =>
   import('@/ui/screens/tests/E121ManualTests').then((m) => ({ default: m.E121ManualTests })),
+)
+const E122FeedbackCapture = lazy(() =>
+  import('@/ui/screens/feedback/E122FeedbackCapture').then((m) => ({ default: m.E122FeedbackCapture })),
+)
+const E123FeedbackList = lazy(() =>
+  import('@/ui/screens/feedback/E123FeedbackList').then((m) => ({ default: m.E123FeedbackList })),
 )
 const E110Settings = lazy(() =>
   import('@/ui/screens/settings/E110Settings').then((m) => ({ default: m.E110Settings })),
@@ -85,7 +93,7 @@ const E78BudgetPrevisions = lazy(() =>
   import('@/ui/screens/tools/E78BudgetPrevisions').then((m) => ({ default: m.E78BudgetPrevisions })),
 )
 
-export const NO_NAV_SCREENS: Screen[] = ['welcome', 'profile', 'energy', 'energy-checkin']
+export const NO_NAV_SCREENS: Screen[] = ['welcome', 'profile', 'energy', 'energy-checkin', 'feedback', 'feedback-list']
 
 export function activeTabFor(screen: Screen): BottomNavTab | null {
   switch (screen) {
@@ -105,7 +113,12 @@ export function AppScreens() {
   const { screen, loading, overloadMode, inboxTasks, goTo } = useApp()
 
   if (loading) {
-    return <ScreenLoading />
+    return (
+      <>
+        <ScreenCodeBadge />
+        <ScreenLoading />
+      </>
+    )
   }
 
   function renderScreen() {
@@ -138,6 +151,10 @@ export function AppScreens() {
         return <E120Resources />
       case 'manual-tests':
         return <E121ManualTests />
+      case 'feedback':
+        return <E122FeedbackCapture />
+      case 'feedback-list':
+        return <E123FeedbackList />
       case 'settings':
         return <E110Settings />
       case 'settings-profile':
@@ -178,6 +195,8 @@ export function AppScreens() {
   return (
     <>
       <DevResetButton />
+      <ScreenCodeBadge />
+      <FeedbackFab />
       <LazyScreenBoundary>
         <Suspense fallback={<ScreenLoading />}>{renderScreen()}</Suspense>
       </LazyScreenBoundary>

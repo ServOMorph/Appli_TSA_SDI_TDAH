@@ -2,8 +2,8 @@ import type { Page } from '@playwright/test'
 
 const DB_NAME = 'appli-tsa-sdi-tdah'
 
-export async function resetApp(page: Page) {
-  await page.goto('/')
+export async function resetApp(page: Page, url = '/') {
+  await page.goto(url)
   await page.evaluate(async (dbName) => {
     await new Promise<void>((resolve) => {
       const req = indexedDB.deleteDatabase(dbName)

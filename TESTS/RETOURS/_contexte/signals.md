@@ -2,27 +2,32 @@
 
 ## Actions ouvertes
 
-- [P1] Réaliser le flux de retours annotés dans une branche isolée.
-  - fait quand: le parcours, le stockage Supabase, les tests et la demande d'intégration sont remis au coordinateur.
-  - réf: ../agent_role.md, ../roadmap_retours_annotes.md
+- [P1] Intégrer la branche RETOURS et appliquer la migration Supabase dans un environnement contrôlé.
+  - fait quand: la branche est relue puis intégrée par TESTS, et `supabase/feedback.sql` est appliqué hors production avant mise à disposition.
+  - réf: statut.md, ../roadmap_retours_annotes.md, ../../../../supabase/feedback.sql
 
-## Dernière session (2026-09-04 — cadrage : roadmap et décisions produit D1-D3)
+## Dernière session (2026-09-05 — finalisation du commit de clôture)
 
 ## Décisions prises
-- D1 : entrée de capture = `<input type="file">` + collage presse-papier, pattern repris du bridge ROBERTO (UI seulement, aucune dépendance au projet Roberto).
-- D2 : badge de code d'écran (E##) permanent sur chaque écran, pas de réglage « mode retour » à activer.
-- D2bis : point d'entrée du flux = bouton flottant global, pas une entrée dans les Paramètres.
-- D3 : risque accepté sur la policy `insert` Storage ouverte à `anon` (dépôt parasite possible, pas de fuite de données) ; alternative Edge Function + URL signée écartée (hors périmètre de l'agent).
+- Aucune nouvelle décision produit. Le commit de clôture annoncé le 2026-09-04
+  (« flux de retours annotés prêt à intégrer ») n'avait en réalité jamais été fait : seul un
+  commit de roadmap/décisions (`2240123`) existait, tout le code des Phases 1-6 restait en
+  working tree non commité.
 
 ## Livrables produits ou modifiés
-- `roadmap_retours_annotes.md` : créé — 6 phases `[TODO]` avec checkpoints `/compact`.
-- `_contexte/messages.md` : consigne absorbée (contenu déjà dans `signals.md`/`agent_role.md`), supprimé après prise en charge.
+- Aucun nouveau développement. Commit du travail déjà réalisé le 2026-09-04 : entité, Dexie v19,
+  codes E##, capture, annotation, file d'envoi, écran de liste, `supabase/feedback.sql`, script
+  de lecture développeur, tests Vitest/Playwright et documentation de remise.
 
 ## Hypothèses validées / invalidées
-- EN ATTENTE : aucune phase de code démarrée cette session — cadrage et décisions produit uniquement.
+- EN ATTENTE : les résultats de tests (tsc, lint, bundle:check, Vitest, Playwright) rapportés
+  dans `statut.md` datent du 2026-09-04 et n'ont pas été re-vérifiés dans cette session de
+  clôture — à revérifier par TESTS avant intégration.
 
 ## Prochaine étape exacte
-Démarrer la Phase 1 (entité `FeedbackReport`, Dexie `version(19)`, repository, règles, tests) sur confirmation de l'utilisateur.
+TESTS relit et intègre `agent/retours` sur une branche de test (pas `main` directement),
+relance la suite complète et `bundle:check`, applique `supabase/feedback.sql` dans un
+environnement contrôlé, puis valide le parcours sur téléphone réel.
 
 ## Question bloquante pour la session suivante
 Aucune.

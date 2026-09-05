@@ -18,6 +18,7 @@ import type { TaskException } from '@/domain/entities/taskException'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
 import type { ManualTestResult } from '@/domain/entities/manualTestResult'
+import type { FeedbackReport } from '@/domain/entities/feedbackReport'
 
 function migrationId(): string {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
@@ -48,6 +49,7 @@ export class AppDatabase extends Dexie {
   folders!: Table<Folder>
   tools!: Table<Tool>
   manualTestResults!: Table<ManualTestResult>
+  feedbackReports!: Table<FeedbackReport>
 
   constructor(name = 'appli-tsa-sdi-tdah') {
     super(name)
@@ -390,6 +392,9 @@ export class AppDatabase extends Dexie {
             }
           })
       })
+    this.version(19).stores({
+      feedbackReports: 'id, created_at, sync_status',
+    })
   }
 }
 

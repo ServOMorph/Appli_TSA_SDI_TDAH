@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, it, expect } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E21CreateTaskV2 } from './E21CreateTaskV2'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 
 describe('E21CreateTaskV2', () => {
   it('affiche le champ titre', () => {
@@ -47,6 +48,13 @@ describe('E21CreateTaskV2', () => {
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
     expect(ctx.back).toHaveBeenCalledWith('inbox')
+  })
+
+  it('propose les catégories de tâche configurées à la place du sélecteur natif (#35)', () => {
+    const category: TaskCategory = { id: 'cat-1', name: 'Voyage', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    renderWithApp(<E21CreateTaskV2 />, makeAppContext({ taskCategories: [category] }))
+    expect(screen.queryByLabelText('Choisir une couleur')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Voyage' })).toBeDefined()
   })
 
   it("depuis Todo (originScreen 'inbox') : Valider crée directement une tâche todo", async () => {

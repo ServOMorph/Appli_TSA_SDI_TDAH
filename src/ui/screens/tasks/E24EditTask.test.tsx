@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E24EditTask } from './E24EditTask'
 import type { Task } from '@/domain/entities/task'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 import { makeTask as baseTask } from '@/test/factories'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
@@ -44,6 +45,16 @@ describe('E24EditTask', () => {
       ),
     )
     expect(ctx.goTo).toHaveBeenCalledWith('task-detail')
+  })
+
+  it('propose les catégories de tâche configurées à la place du sélecteur natif (#35)', async () => {
+    const task = makeTask()
+    const category: TaskCategory = { id: 'cat-1', name: 'Voyage', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task], taskCategories: [category] })
+    renderWithApp(<E24EditTask />, ctx)
+    await screen.findByDisplayValue('Appeler le médecin')
+    expect(screen.queryByLabelText('Choisir une couleur')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Voyage' })).toBeDefined()
   })
 
   it('durée obligatoire quand une heure de début est renseignée (#25)', async () => {

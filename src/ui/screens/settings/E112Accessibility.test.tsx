@@ -5,6 +5,7 @@ import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
 import type { Settings } from '@/domain/entities/settings'
 import type { Tool } from '@/domain/entities/tool'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 
 const defaultSettings: Settings = {
   id: 's1',
@@ -123,5 +124,54 @@ describe('E112Accessibility', () => {
     renderE112({ settings: { ...defaultSettings, mon_compte_color: '#22aa55' }, updateSettings })
     fireEvent.click(screen.getByRole('button', { name: 'Retirer la couleur de Mon compte' }))
     expect(updateSettings).toHaveBeenCalledWith({ mon_compte_color: undefined })
+  })
+
+  it('sans catégorie configurée, affiche un message vide (#35)', () => {
+    renderE112()
+    expect(screen.getByText('Aucune catégorie configurée.')).toBeInTheDocument()
+  })
+
+  it('crée une catégorie via le formulaire d’ajout (#35)', () => {
+    const createTaskCategory = vi.fn().mockResolvedValue('cat-1')
+    renderE112({ createTaskCategory })
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter une catégorie' }))
+    fireEvent.change(screen.getByLabelText('Nom de la nouvelle catégorie'), { target: { value: 'Travail' } })
+    fireEvent.change(screen.getByLabelText('Couleur de la nouvelle catégorie'), { target: { value: '#ff8800' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+    expect(createTaskCategory).toHaveBeenCalledWith('Travail', '#ff8800')
+  })
+
+  it('affiche les catégories existantes avec leur couleur', () => {
+    const category: TaskCategory = { id: 'cat-1', name: 'Travail', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    renderE112({ taskCategories: [category] })
+    expect(screen.getByText('Travail')).toBeInTheDocument()
+    expect(screen.getByLabelText('Couleur de la catégorie Travail')).toHaveValue('#4a7c99')
+  })
+
+  it('change la couleur d’une catégorie existante', () => {
+    const category: TaskCategory = { id: 'cat-1', name: 'Travail', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    const updateTaskCategoryColor = vi.fn().mockResolvedValue(undefined)
+    renderE112({ taskCategories: [category], updateTaskCategoryColor })
+    fireEvent.change(screen.getByLabelText('Couleur de la catégorie Travail'), { target: { value: '#ff8800' } })
+    expect(updateTaskCategoryColor).toHaveBeenCalledWith('cat-1', '#ff8800')
+  })
+
+  it('supprime une catégorie existante', () => {
+    const category: TaskCategory = { id: 'cat-1', name: 'Travail', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    const deleteTaskCategory = vi.fn().mockResolvedValue(undefined)
+    renderE112({ taskCategories: [category], deleteTaskCategory })
+    fireEvent.click(screen.getByRole('button', { name: 'Supprimer la catégorie Travail' }))
+    expect(deleteTaskCategory).toHaveBeenCalledWith('cat-1')
+  })
+
+  it('renomme une catégorie via la modale', () => {
+    const category: TaskCategory = { id: 'cat-1', name: 'Travail', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    const renameTaskCategory = vi.fn().mockResolvedValue(undefined)
+    renderE112({ taskCategories: [category], renameTaskCategory })
+    fireEvent.click(screen.getByRole('button', { name: 'Travail' }))
+    const input = screen.getByLabelText('Nouveau nom de la catégorie')
+    fireEvent.change(input, { target: { value: 'Boulot' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    expect(renameTaskCategory).toHaveBeenCalledWith('cat-1', 'Boulot')
   })
 })

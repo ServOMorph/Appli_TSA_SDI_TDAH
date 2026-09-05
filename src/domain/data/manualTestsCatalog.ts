@@ -522,4 +522,29 @@ export const manualTestsCatalog: ManualTest[] = [
       'Si un écran reste bloqué sur « Chargement... » plus de quelques secondes, fermez complètement l’application puis rouvrez-la : l’écran doit alors s’afficher normalement.',
     ],
   },
+  {
+    id: 'configurer-un-code-couleur',
+    title: 'Configurer un code couleur de tâche',
+    category: 'Paramètres / Profil',
+    docRefs: [35],
+    steps: [
+      'Allez dans Paramètres > Accessibilité, repérez la section « Code couleur des tâches » : tant qu’aucune catégorie n’est créée, elle affiche « Aucune catégorie configurée. ».',
+      'Touchez « Ajouter une catégorie », saisissez un nom, choisissez une couleur, puis touchez « Ajouter » : la catégorie doit apparaître dans la liste avec son nom et sa couleur.',
+      'Touchez le nom de la catégorie : une fenêtre « Renommer la catégorie » s’ouvre ; changez le nom, touchez « Enregistrer » : le nouveau nom doit s’afficher immédiatement.',
+      'Touchez la pastille de couleur de la catégorie et choisissez une autre couleur : elle doit se mettre à jour aussitôt.',
+      'Touchez le bouton « × » à côté de la catégorie : elle doit disparaître de la liste.',
+    ],
+  },
+  {
+    id: 'choisir-une-couleur-de-tache-par-categorie',
+    title: 'Choisir une couleur de tâche par catégorie',
+    category: 'Tâches',
+    docRefs: [35],
+    steps: [
+      'Sans catégorie configurée (voir « Configurer un code couleur de tâche »), commencez la création d’une tâche : le champ « Couleur » doit proposer le sélecteur habituel (une pastille de couleur à toucher).',
+      'Configurez au moins une catégorie dans Paramètres > Accessibilité, puis revenez créer ou modifier une tâche : le champ « Couleur » doit maintenant proposer les catégories par leur nom et leur pastille, à la place du sélecteur habituel.',
+      'Touchez une catégorie : elle doit apparaître sélectionnée, et la tâche enregistrée doit prendre la couleur de cette catégorie.',
+      'Touchez « Retirer » : aucune catégorie ne doit plus être sélectionnée et la tâche enregistrée n’a alors aucune couleur.',
+    ],
+  },
 ]

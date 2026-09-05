@@ -130,6 +130,7 @@ export function E21CreateTaskV2() {
     createDetailedTask,
     back,
     originScreen,
+    taskCategories,
   } = useApp()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -267,7 +268,7 @@ export function E21CreateTaskV2() {
 
         <div style={fieldGroupStyle}>
           <span style={labelStyle}>Couleur</span>
-          <ColorPicker value={color} onChange={setColor} />
+          <ColorPicker value={color} onChange={setColor} categories={taskCategories} />
         </div>
 
         <div style={fieldGroupStyle}>

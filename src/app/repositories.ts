@@ -7,6 +7,7 @@ import { ListRepository } from '@/data/repositories/listRepository'
 import { ListItemRepository } from '@/data/repositories/listItemRepository'
 import { ListItemSubTaskRepository } from '@/data/repositories/listItemSubTaskRepository'
 import { ListCategoryRepository } from '@/data/repositories/listCategoryRepository'
+import { TaskCategoryRepository } from '@/data/repositories/taskCategoryRepository'
 import { BudgetCategoryRepository } from '@/data/repositories/budgetCategoryRepository'
 import { BudgetEntryRepository } from '@/data/repositories/budgetEntryRepository'
 import { BudgetAccountRepository } from '@/data/repositories/budgetAccountRepository'
@@ -29,6 +30,7 @@ export const listRepo = new ListRepository(db)
 export const listItemRepo = new ListItemRepository(db)
 export const listItemSubTaskRepo = new ListItemSubTaskRepository(db)
 export const listCategoryRepo = new ListCategoryRepository(db)
+export const taskCategoryRepo = new TaskCategoryRepository(db)
 export const budgetCategoryRepo = new BudgetCategoryRepository(db)
 export const budgetEntryRepo = new BudgetEntryRepository(db)
 export const budgetAccountRepo = new BudgetAccountRepository(db)

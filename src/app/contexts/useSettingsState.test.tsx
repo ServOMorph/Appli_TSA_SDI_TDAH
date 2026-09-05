@@ -96,7 +96,7 @@ describe('useSettingsState — résultats des tests manuels', () => {
     })
 
     const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
-    expect(payload.version).toBe('3.5')
+    expect(payload.version).toBe('3.6')
     expect(payload.manual_test_results).toEqual([
       { id: 'exported-result', test_id: 'creer-une-liste', status: 'ok', comment: null, created_at: '2026-08-14T09:00:00.000Z' },
     ])

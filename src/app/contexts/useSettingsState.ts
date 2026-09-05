@@ -8,6 +8,7 @@ import type { User, ProfileType } from '@/domain/entities/user'
 import type { Task } from '@/domain/entities/task'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
@@ -124,6 +125,7 @@ export function useSettingsState() {
       db.tools.clear(),
       db.taskRecurrences.clear(),
       db.taskExceptions.clear(),
+      db.taskCategories.clear(),
       db.manualTestResults.clear(),
     ])
   }
@@ -158,6 +160,7 @@ export function useSettingsState() {
     const tasks = Array.isArray(data.tasks) ? (data.tasks as Task[]) : []
     const taskRecurrences = Array.isArray(data.task_recurrences) ? (data.task_recurrences as TaskRecurrence[]) : []
     const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
+    const taskCategories = Array.isArray(data.task_categories) ? (data.task_categories as TaskCategory[]) : []
     const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
     const rawListItems = Array.isArray(data.list_items) ? (data.list_items as (ListItem & { section?: string | null })[]) : []
     const listItemSubTasks = Array.isArray(data.list_item_sub_tasks)
@@ -242,6 +245,7 @@ export function useSettingsState() {
         tasks.length ? db.tasks.bulkAdd(tasks) : Promise.resolve(),
         taskRecurrences.length ? db.taskRecurrences.bulkAdd(taskRecurrences) : Promise.resolve(),
         taskExceptions.length ? db.taskExceptions.bulkAdd(taskExceptions) : Promise.resolve(),
+        taskCategories.length ? db.taskCategories.bulkAdd(taskCategories) : Promise.resolve(),
         lists.length ? db.lists.bulkAdd(lists) : Promise.resolve(),
         repairedListItems.length ? db.listItems.bulkAdd(repairedListItems) : Promise.resolve(),
         listItemSubTasks.length ? db.listItemSubTasks.bulkAdd(listItemSubTasks) : Promise.resolve(),

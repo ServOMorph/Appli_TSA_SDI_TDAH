@@ -97,7 +97,7 @@ const modalBox: React.CSSProperties = {
 }
 
 export function E24EditTask() {
-  const { selectedTaskId, inboxTasks, getTaskById, updateTaskFields, goTo, back } = useApp()
+  const { selectedTaskId, inboxTasks, getTaskById, updateTaskFields, goTo, back, taskCategories } = useApp()
 
   const taskFromLists = inboxTasks.find((t) => t.id === selectedTaskId)
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
@@ -224,7 +224,7 @@ export function E24EditTask() {
 
         <div style={fieldGroupStyle}>
           <span style={labelStyle}>Couleur</span>
-          <ColorPicker value={color} onChange={setColor} />
+          <ColorPicker value={color} onChange={setColor} categories={taskCategories} />
         </div>
 
         <div style={fieldGroupStyle}>

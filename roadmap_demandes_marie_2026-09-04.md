@@ -126,27 +126,44 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — Code couleur par catégorie de tâche (#35) [TODO]
+## Phase 2 — Code couleur par catégorie de tâche (#35) [FAIT]
 
 Nouvelle fonctionnalité : catégories de tâche nommées et colorées, gérées depuis Paramètres >
 Accessibilité, utilisées comme raccourci de couleur à la création/modification d'une tâche.
 
-- Nouvelle entité domaine, ex. `src/domain/entities/taskCategory.ts` (`id`, `name`, `color`,
-  `position`), sur le modèle de `listCategory.ts` / `budgetCategory.ts`.
-- Repository + persistance Dexie (`src/data/repositories/`, `src/data/db.ts` — nouvelle table,
-  migration de schéma).
-- `src/ui/screens/settings/E112Accessibility.tsx` : nouvelle section « Code couleur » (créer,
-  renommer, supprimer une catégorie ; lui attribuer une couleur — réutiliser `ColorPicker.tsx`).
-- `src/ui/components/ColorPicker.tsx` ou un nouveau composant dédié : si des catégories existent,
-  proposer les catégories (nom + pastille couleur) en remplacement du sélecteur natif (cf. D2/D3) ;
-  sinon comportement inchangé.
-- `E21CreateTaskV2.tsx` (`:270`) et `E24EditTask.tsx` : brancher le nouveau sélecteur.
-- Tests : entité + repository, `E112Accessibility.test.tsx` (nouvelle section), sélecteur de
-  couleur (avec/sans catégorie configurée), `E21CreateTaskV2.test.tsx` / `E24EditTask.test.tsx`.
-  Tests de migration Dexie. `tsc -b` + lint + suite complète verts.
-- Catalogue in-app : parcours « Configurer un code couleur » (créer une catégorie, lui donner une
-  couleur) et « Choisir une couleur de tâche par catégorie » (le sélecteur ne propose plus que les
-  catégories une fois configurées).
+- `src/domain/entities/taskCategory.ts` (`id`, `name`, `color`, `position`, `created_at`) +
+  `src/domain/rules/taskCategoryRules.ts` (`createTaskCategory`), sur le modèle de `listCategory.ts`.
+- `src/data/repositories/taskCategoryRepository.ts` (CRUD + `getAll` trié par position) ;
+  `src/data/db.ts` version 19 (`taskCategories: 'id, position'`) ; `src/app/repositories.ts`
+  (`taskCategoryRepo`) ; nouveau hook `src/app/contexts/useTaskCategoriesState.ts`, câblé dans
+  `AppContext.tsx`.
+- **Écart constaté en cours d'implémentation, non prévu par l'analyse initiale** : la table Dexie
+  ajoutée devait aussi être versée dans le payload de sauvegarde/synchronisation partagé
+  (`buildSnapshot.ts`, export manuel ET sync Supabase — `task_categories`, schéma bumpé 3.5 → 3.6)
+  ainsi que dans `clearDatabase()`/`importData()` (`useSettingsState.ts`), sous peine de perte
+  silencieuse des catégories à l'export/import et de résidus après suppression du compte. Corrigé
+  par cohérence avec le motif documenté dans `buildSnapshot.ts` (« une seule source pour les tables
+  Dexie... évite qu'une table ajoutée soit oubliée »).
+- `src/ui/screens/settings/E112Accessibility.tsx` : nouvelle section « Code couleur des tâches »
+  (créer via un formulaire nom + `<input type="color">`, renommer via une modale, changer la
+  couleur, supprimer). `ColorPicker.tsx` n'est pas réutilisé ici : la couleur y est obligatoire
+  (jamais retirable), ce qui ne correspond pas au contrat nullable du composant ; l'écran suit donc
+  la convention locale déjà en place (couleur d'outil, `<input type="color">` brut) pour rester
+  cohérent avec le reste de la section.
+- `src/ui/components/ColorPicker.tsx` : nouvelle prop optionnelle `categories?: TaskCategory[]` —
+  si non vide, remplace le sélecteur natif par les catégories (nom + pastille) en boutons
+  sélectionnables (D2) ; `value`/`onChange` inchangés (D3 : la tâche garde `task.color`). Sans
+  catégorie (prop omise ou vide), comportement strictement inchangé.
+- `E21CreateTaskV2.tsx` et `E24EditTask.tsx` : passent `categories={taskCategories}` au
+  `ColorPicker` existant.
+- Tests : `taskCategoryRepository.test.ts`, `db.test.ts` (version 19 + table), `ambiance`/pattern
+  suivi pour `ColorPicker.test.tsx` (catégories présentes/absentes), `E112Accessibility.test.tsx`
+  (créer/renommer/changer couleur/supprimer), `E21CreateTaskV2.test.tsx` / `E24EditTask.test.tsx`
+  (sélecteur remplacé), `AppContext.test.tsx` (CRUD catégories bout en bout sur la vraie base
+  Dexie). `tsc -b` + lint + suite complète (742 tests) verts.
+- Catalogue in-app (`manualTestsCatalog.ts`, docRefs `[35]`) : parcours « Configurer un code couleur
+  de tâche » (créer/renommer/recolorer/supprimer une catégorie) et « Choisir une couleur de tâche
+  par catégorie » (le sélecteur ne propose plus que les catégories une fois configurées).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

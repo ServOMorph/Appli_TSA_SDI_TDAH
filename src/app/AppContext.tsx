@@ -14,6 +14,7 @@ import { energyRepo, settingsRepo, todayDate, userRepo } from '@/app/repositorie
 import { useBudgetState } from '@/app/contexts/useBudgetState'
 import { useEnergyState } from '@/app/contexts/useEnergyState'
 import { useListsState } from '@/app/contexts/useListsState'
+import { useTaskCategoriesState } from '@/app/contexts/useTaskCategoriesState'
 import { useToolsState } from '@/app/contexts/useToolsState'
 import { useSettingsState, type ImportResult } from '@/app/contexts/useSettingsState'
 import { useTasksState } from '@/app/contexts/useTasksState'
@@ -52,6 +53,7 @@ type AppContextValue = NavigationValue &
   Omit<ReturnType<typeof usePlanningState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useEnergyState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useListsState>, 'load' | 'reset'> &
+  Omit<ReturnType<typeof useTaskCategoriesState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useToolsState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useBudgetState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useManualTestsState>, 'load' | 'reset'> &
@@ -83,6 +85,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const planning = usePlanningState(tasks.load)
   const energy = useEnergyState()
   const lists = useListsState()
+  const taskCategories = useTaskCategoriesState()
   const tools = useToolsState(lists.load)
   const budget = useBudgetState()
   const manualTests = useManualTestsState()
@@ -92,6 +95,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { load: loadPlanning, reset: resetPlanning, ...planningValue } = planning
   const { load: loadEnergy, reset: resetEnergy, ...energyValue } = energy
   const { load: loadLists, reset: resetLists, ...listsValue } = lists
+  const { load: loadTaskCategories, reset: resetTaskCategories, ...taskCategoriesValue } = taskCategories
   const { load: loadTools, reset: resetTools, ...toolsValue } = tools
   const { load: loadBudget, reset: resetBudget, ...budgetValue } = budget
   const { load: loadManualTests, reset: resetManualTests, ...manualTestsValue } = manualTests
@@ -114,7 +118,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const overloadMode = isOverloaded(energy.todayEnergy, getRemainingPlannedCost(planning.todayPlannedTasks))
 
   async function loadAll() {
-    await Promise.all([loadTasks(), loadPlanning(), loadEnergy(), loadLists(), loadTools(), loadBudget(), loadManualTests()])
+    await Promise.all([
+      loadTasks(),
+      loadPlanning(),
+      loadEnergy(),
+      loadLists(),
+      loadTaskCategories(),
+      loadTools(),
+      loadBudget(),
+      loadManualTests(),
+    ])
   }
 
   useEffect(() => {
@@ -158,6 +171,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     resetPlanning()
     resetEnergy()
     resetLists()
+    resetTaskCategories()
     resetTools()
     resetBudget()
     resetManualTests()
@@ -200,6 +214,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...planningValue,
         ...energyValue,
         ...listsValue,
+        ...taskCategoriesValue,
         ...toolsValue,
         ...budgetValue,
         ...manualTestsValue,

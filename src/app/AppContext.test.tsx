@@ -576,6 +576,71 @@ describe('AppProvider — outils et dossiers (V5-3)', () => {
   })
 })
 
+describe('AppProvider — catégories de tâche (#35)', () => {
+  function TaskCategoriesPanel() {
+    const { createUser, goTo, screen: s, taskCategories, createTaskCategory, renameTaskCategory, updateTaskCategoryColor, deleteTaskCategory } = useApp()
+    const first = taskCategories[0]
+    return (
+      <>
+        <div data-testid="screen">{s}</div>
+        <div data-testid="category-count">{taskCategories.length}</div>
+        {first && <div data-testid="category-name">{first.name}</div>}
+        {first && <div data-testid="category-color">{first.color}</div>}
+        <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
+        <button onClick={() => createTaskCategory('Travail', '#4a7c99')}>créer catégorie</button>
+        <button onClick={() => first && renameTaskCategory(first.id, 'Boulot')}>renommer catégorie</button>
+        <button onClick={() => first && updateTaskCategoryColor(first.id, '#ff8800')}>changer couleur</button>
+        <button onClick={() => first && deleteTaskCategory(first.id)}>supprimer catégorie</button>
+      </>
+    )
+  }
+
+  it('createTaskCategory ajoute une catégorie', async () => {
+    render(<AppProvider><TaskCategoriesPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    const before = Number(screen.getByTestId('category-count').textContent)
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer catégorie' })) })
+    await waitFor(() => expect(Number(screen.getByTestId('category-count').textContent)).toBe(before + 1))
+    expect(screen.getByTestId('category-name').textContent).toBe('Travail')
+  })
+
+  it('renameTaskCategory renomme la catégorie', async () => {
+    render(<AppProvider><TaskCategoriesPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer catégorie' })) })
+    await waitFor(() => expect(screen.getByTestId('category-name')).toBeInTheDocument())
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'renommer catégorie' })) })
+    await waitFor(() => expect(screen.getByTestId('category-name').textContent).toBe('Boulot'))
+  })
+
+  it('updateTaskCategoryColor change la couleur', async () => {
+    render(<AppProvider><TaskCategoriesPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer catégorie' })) })
+    await waitFor(() => expect(screen.getByTestId('category-color')).toBeInTheDocument())
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'changer couleur' })) })
+    await waitFor(() => expect(screen.getByTestId('category-color').textContent).toBe('#ff8800'))
+  })
+
+  it('deleteTaskCategory retire la catégorie', async () => {
+    render(<AppProvider><TaskCategoriesPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer catégorie' })) })
+    await waitFor(() => expect(screen.getByTestId('category-count')).toBeInTheDocument())
+    const before = Number(screen.getByTestId('category-count').textContent)
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'supprimer catégorie' })) })
+    await waitFor(() => expect(Number(screen.getByTestId('category-count').textContent)).toBe(before - 1))
+  })
+})
+
 describe('AppProvider — createDetailedTask (E21)', () => {
   function DetailedTaskPanel() {
     const { createUser, completeOnboarding, createDetailedTask, inboxTasks, loading } = useApp()

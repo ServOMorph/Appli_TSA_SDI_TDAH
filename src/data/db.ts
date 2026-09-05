@@ -6,6 +6,7 @@ import type { List } from '@/domain/entities/list'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { ListItemSubTask } from '@/domain/entities/listItemSubTask'
 import type { ListCategory } from '@/domain/entities/listCategory'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 import type { EnergyEntry } from '@/domain/entities/energyEntry'
 import type { Settings } from '@/domain/entities/settings'
 import type { BudgetCategory } from '@/domain/entities/budgetCategory'
@@ -36,6 +37,7 @@ export class AppDatabase extends Dexie {
   listItems!: Table<ListItem>
   listItemSubTasks!: Table<ListItemSubTask>
   listCategories!: Table<ListCategory>
+  taskCategories!: Table<TaskCategory>
   energyEntries!: Table<EnergyEntry>
   settings!: Table<Settings>
   budgetCategories!: Table<BudgetCategory>
@@ -390,6 +392,9 @@ export class AppDatabase extends Dexie {
             }
           })
       })
+    this.version(19).stores({
+      taskCategories: 'id, position',
+    })
   }
 }
 

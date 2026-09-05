@@ -27,10 +27,11 @@ describe('AppDatabase', () => {
     expect(db.taskExceptions).toBeDefined()
     expect(db.folders).toBeDefined()
     expect(db.tools).toBeDefined()
+    expect(db.taskCategories).toBeDefined()
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(18)
+    expect(db.verno).toBe(19)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -210,7 +211,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -294,7 +295,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -333,7 +334,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
 
     const migratedItem = await upgraded.listItems.get('existing-item')
     expect(migratedItem).toMatchObject({ checked: false })
@@ -386,7 +387,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
     const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
     expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
 
@@ -432,7 +433,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
     expect(await upgraded.budgetCategories.get('income-1')).toBeUndefined()
     expect(await upgraded.budgetCategories.get('expense-1')).toBeDefined()
 
@@ -481,7 +482,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
     expect(await upgraded.listItems.get('item-1')).toMatchObject({ description: '' })
     expect(upgraded.listItemSubTasks).toBeDefined()
 
@@ -526,7 +527,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
     expect(await upgraded.tools.get('tool-1')).toMatchObject({ color: null })
 
     await upgraded.delete()
@@ -595,7 +596,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(18)
+    expect(upgraded.verno).toBe(19)
     expect(await upgraded.tasks.get('task-today')).toMatchObject({
       status: 'inbox',
       scheduled_date: null,

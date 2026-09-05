@@ -104,7 +104,7 @@ describe('E121ManualTests', () => {
   it('masque un test révisé après sa validation dans la révision courante', () => {
     const ctx = makeAppContext({
       manualTestResults: [
-        { id: 'current', test_id: 'menu-actions-tache-simplifie', test_revision: 2, status: 'ok', comment: null, created_at: '2026-08-25T18:00:00.000Z' },
+        { id: 'current', test_id: 'menu-actions-tache-simplifie', test_revision: 3, status: 'ok', comment: null, created_at: '2026-08-25T18:00:00.000Z' },
       ],
     })
     renderWithApp(<E121ManualTests />, ctx)

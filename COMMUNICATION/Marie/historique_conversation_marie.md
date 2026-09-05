@@ -525,6 +525,81 @@ Si ChatGPT dit que tu as atteint une limite d'images, attends quelques heures et
 _Suite :_ premier dépôt (`20260903T200827_188290`) bouncé par le gardien le 2026-09-04 (message +
 prompt = 3461 car. > limite Discord 2000, découpage en plusieurs messages écarté). Support pièce
 jointe ajouté à `gateway.py`/`bot.py` le 2026-09-05 (orchestrateur, non committé) ; `bot.py`
-redémarré. Redéposé avec `--attachment` (id `20260905T213244_730443`), **statut au moment de la
-rédaction : `pending`, en attente du gardien (session discord)** — à recontrôler avant d'affirmer
-un envoi.
+redémarré. Redéposé avec `--attachment` (id `20260905T213244_730443`), approuvé et envoyé par le
+gardien (session discord) le 2026-09-05 21h32.
+
+### 2026-09-05 21h32 — livraison v5.92, 3e bounce
+
+Le message de livraison v5.92 redéposé (id `20260905T203231_812342`, cf. entrée précédente) a été
+rejugé par le gardien (session discord) : bouncé une 3e fois (id retour `20260905T213045_252452`),
+motif inchangé — « 9 tests à faire » annoncé mais 8 puces listées. Toujours pas envoyé à Marie.
+
+### 2026-09-05 22h16 — livraison v5.92, 4e bounce
+
+Nouvelle tentative (id `20260905T221607_821502`) : nombre annoncé passé à « 12 tests à faire »,
+puces changées (33, 34, 35, 36, 37, 38, Retrait de « Tâche du jour », Ajout de tâche depuis
+Réception — le « 3 » disparu, « 37 » apparu) mais toujours 8 puces au total, toujours en désaccord
+avec le nombre annoncé. Bouncé (id retour `20260905T221635_196130`), motif détaillant les 4
+occurrences. Toujours pas envoyée à Marie.
+
+### 2026-09-05 22h06 — message correctif (erreur de jugement du gardien)
+
+**Dév ->**
+Le message d'avant, sur l'image d'accueil, c'est un sujet à part : le design de l'appli. Le
+message sur la version 5.92 arrive séparément.
+
+_Suite :_ le message design ci-dessus est parti alors que Morphéus avait annoncé en direct à
+Marie (20h02 UTC, hors gateway, cf. entrée v5.92 ci-dessus) qu'un message allait suivre — la
+livraison v5.92, restée bloquée en bounce. Le gardien (session discord) aurait dû `hold` le
+message design tant que ce sujet actif n'était pas réglé (règle `LOOP.md` : sujet en attente non
+lié → `hold`) ; erreur de jugement, pas un bug de code. Message correctif déposé et approuvé pour
+clarifier la confusion, sans donner de date pour la livraison (encore en correction côté
+orchestrateur).
+
+### 2026-09-05 22h16 — livraison v5.92, corps corrigé sur le fond (pas seulement le chiffre)
+
+**Dév ->**
+Version 5.92 en ligne.
+
+Ce qui change :
+- Bandeau des jours de l'accueil, logo énergie et cartes des outils : plus de fond coloré, juste un contour de couleur.
+- Nouveau réglage dans Paramètres > Accessibilité : créer des catégories de couleur pour tes tâches (sport, plaisir, travail...), reprises ensuite comme raccourci de couleur pour une tâche.
+- Fiche de tâche refaite : titre dans un bandeau coloré en haut, informations en cases sur deux colonnes modifiables directement au clic. Même présentation pour la création d'une tâche.
+- Le glissement du bandeau des jours est plus fluide, sans saut à la fin du geste.
+- La catégorie « Tâche du jour » est retirée : ajouter une tâche depuis la Boîte de réception ne demande plus que le titre.
+
+Question : pour l'ajout d'une tâche planifiée d'office depuis l'écran d'accueil (dernière étape du retrait de « Tâche du jour »), quel bouton doit ouvrir cet ajout ?
+
+Un bug technique de notre côté a empêché ce message de partir hier soir au moment du déploiement. Si tu as utilisé l'appli entre-temps, elle était déjà en version 5.92 sans que tu sois prévenue. C'est corrigé.
+
+12 tests à faire dans l'écran « Tests à faire », correspondant aux modifications :
+• 33
+• 34
+• 35
+• 36
+• 37
+• 38
+• Retrait de « Tâche du jour »
+• Ajout de tâche depuis la Réception
+
+https://appli-audhd.netlify.app/
+
+Détail des changements et questions : https://drive.google.com/open?id=1MAG1JiLDbP13tmNQL5O9g6GyeEmFBGIC
+
+_Suite :_ le 3e bounce (motif inchangé « 9 tests / 8 puces ») a mené à un diagnostic plus profond
+que le comptage : le catalogue in-app (`manualTestsCatalog.ts`) n'avait **aucun test doté de
+`docRefs: [37]`** (refonte de la fiche de tâche, la modification la plus visible de cette
+livraison) — perdu dans l'incident de stash relaté par `Archives/roadmap_demandes_marie_2026-09-04.md`
+Phase 3, malgré la roadmap marquée `[FAIT]`. Catalogue corrigé : `modifier-une-tache-planifiee`
+réécrit (édition par case, `docRefs: [37]`, `revision: 1`) ; nouveau parcours
+`creer-une-tache-bandeau-colore` (`docRefs: [37]`) ; `menu-actions-tache-simplifie` (`revision`
+2→3) et `duree-obligatoire-tache-planifiee` (`revision: 1`) corrigés (mentionnaient encore un
+bouton « Modifier » disparu) ; `cadre-date-heure-dans-l-ecran` **retiré du catalogue** (portait sur
+#3, abandonnée par Marie au profit de #37 — le garder aurait redemandé un test sur un comportement
+qu'elle a explicitement demandé d'abandonner). `tsc -b` + lint + 783 tests verts. Recalcul
+programmatique (`isManualTestDone`) : **12 tests réellement en attente**, tous rattachés à cette
+livraison, numéros neufs inchangés (33, 34, 35, 36, 37, 38 + 2 hors Doc). Message re-déposé
+(`enqueue --source orchestrateur --to marie --kind delivery --expect-reply`, id
+`20260905T221607_821502`), bounce précédent acquitté (`ack --agent orchestrateur --id
+20260905T213045_252452`). Statut non re-vérifié après ce dépôt — à recontrôler avant d'affirmer
+l'envoi effectif.

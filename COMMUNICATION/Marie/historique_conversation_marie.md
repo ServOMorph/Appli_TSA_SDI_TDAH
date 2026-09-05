@@ -366,4 +366,44 @@ _Suite :_ #3 `nok` pour la 3e fois (retour v5.84 du 2026-09-04). Correctifs à l
 (v5.45, v5.64 `min-width:0`, v5.84 `width:100%` + grille énergie) ; #32 validé au même moment écarte
 la cause flex commune. Message déposé dans la gateway (`enqueue --source orchestrateur --to marie
 --kind question --expect-reply`, id `20260904T045637_240031`), en attente du gardien (agent DISCORD).
+
+### 2026-09-05 — message de livraison v5.92 (déposé dans la gateway)
+
+**Dév ->**
+Version 5.92 en ligne.
+
+Ce qui change :
+- Bandeau des jours de l'accueil, logo énergie et cartes des outils : plus de fond coloré, juste un contour de couleur.
+- Nouveau réglage dans Paramètres > Accessibilité : créer des catégories de couleur pour tes tâches (sport, plaisir, travail...), reprises ensuite comme raccourci de couleur pour une tâche.
+- Fiche de tâche refaite : titre dans un bandeau coloré en haut, informations en cases sur deux colonnes modifiables directement au clic. Même présentation pour la création d'une tâche.
+- Le glissement du bandeau des jours est plus fluide, sans saut à la fin du geste.
+- La catégorie « Tâche du jour » est retirée : ajouter une tâche depuis la Boîte de réception ne demande plus que le titre.
+
+Question : pour l'ajout d'une tâche planifiée d'office depuis l'écran d'accueil (dernière étape du retrait de « Tâche du jour »), quel bouton doit ouvrir cet ajout ?
+
+9 tests à faire dans l'écran « Tests à faire », correspondant aux modifications :
+- 2
+- 3
+- 17
+- 19
+- 21
+- 29
+- 30
+- 31
+- 33
+- 34
+- 35
+- 36
+- 38
+(plus la disparition de « Tâche du jour » et l'ajout de tâche depuis la Réception)
+
+https://appli-audhd.netlify.app/
+
+Détail des changements et questions : https://drive.google.com/open?id=1MAG1JiLDbP13tmNQL5O9g6GyeEmFBGIC
+
+_Suite :_ répond à `roadmap_demandes_marie_2026-09-04.md` (33 reprise Doc, #34-38) et
+`roadmap_supprimer_tache_du_jour.md` Phases 1-2, toutes livrées en v5.92. Message déposé dans la
+gateway (`enqueue --source orchestrateur --to marie --kind delivery --expect-reply`, id
+`20260905T123341_083860`), en attente du gardien (agent DISCORD). Réponse attendue (D2 : point
+d'entrée accueil pour l'ajout de tâche planifiée d'office) routée vers `gateway/inbox/orchestrateur/`.
 Réponse attendue routée vers `gateway/inbox/orchestrateur/`.

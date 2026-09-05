@@ -19,6 +19,8 @@ const CASES: { screen: Screen; route?: Route }[] = [
   { screen: 'overload-recovery' },
   { screen: 'resources' },
   { screen: 'manual-tests' },
+  { screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } },
+  { screen: 'feedback-list' },
   { screen: 'settings' },
   { screen: 'settings-profile' },
   { screen: 'settings-accessibility' },

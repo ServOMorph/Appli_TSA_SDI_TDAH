@@ -10,6 +10,7 @@ import json
 import urllib.error
 import urllib.request
 import os
+from urllib.parse import quote
 
 HTTP_TIMEOUT_SECONDS = 15
 
@@ -28,9 +29,9 @@ def read_credentials() -> tuple[str, str]:
     return url, service_key
 
 
-def fetch_snapshots(url: str, service_key: str, query: str) -> list[dict]:
+def fetch_rows(url: str, service_key: str, table: str, query: str) -> list[dict]:
     request = urllib.request.Request(
-        f"{url.rstrip('/')}/rest/v1/device_snapshots?{query}",
+        f"{url.rstrip('/')}/rest/v1/{quote(table, safe='_')}?{query}",
         headers={
             "apikey": service_key,
             "Authorization": f"Bearer {service_key}",
@@ -42,6 +43,31 @@ def fetch_snapshots(url: str, service_key: str, query: str) -> list[dict]:
     except urllib.error.HTTPError as e:
         raise SupabaseError(
             f"requete Supabase echouee ({e.code}) : {e.read().decode('utf-8')}"
+        ) from e
+    except urllib.error.URLError as e:
+        raise SupabaseError(f"Supabase injoignable ({e.reason})") from e
+    except TimeoutError as e:
+        raise SupabaseError(f"Supabase n'a pas repondu en {HTTP_TIMEOUT_SECONDS} s") from e
+
+
+def fetch_snapshots(url: str, service_key: str, query: str) -> list[dict]:
+    return fetch_rows(url, service_key, "device_snapshots", query)
+
+
+def download_storage_object(url: str, service_key: str, bucket: str, path: str) -> bytes:
+    request = urllib.request.Request(
+        f"{url.rstrip('/')}/storage/v1/object/{quote(bucket, safe='')}/{quote(path, safe='/')}",
+        headers={
+            "apikey": service_key,
+            "Authorization": f"Bearer {service_key}",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
+            return response.read()
+    except urllib.error.HTTPError as e:
+        raise SupabaseError(
+            f"telechargement Storage echoue ({e.code}) : {e.read().decode('utf-8', errors='replace')}"
         ) from e
     except urllib.error.URLError as e:
         raise SupabaseError(f"Supabase injoignable ({e.reason})") from e

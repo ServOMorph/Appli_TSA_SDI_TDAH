@@ -1,38 +1,5 @@
 import { useApp } from '@/app/AppContext'
-import type { Screen } from '@/app/AppContext'
-
-const SCREEN_CODES: Record<Screen, string> = {
-  welcome: 'E01',
-  profile: 'E02',
-  energy: 'E03',
-  dashboard: 'E10',
-  inbox: 'E20',
-  'task-create-v2': 'E21v2',
-  planning: 'E40',
-  'task-detail': 'E22',
-  'task-edit': 'E24',
-  'task-decompose': 'E23',
-  'energy-checkin': 'E31',
-  'overload-recovery': 'E90',
-  resources: 'E120',
-  'manual-tests': 'E121',
-  settings: 'E110',
-  'settings-profile': 'E111',
-  'settings-accessibility': 'E112',
-  'settings-privacy': 'E116',
-  'settings-export': 'E117',
-  'list-detail': 'E61',
-  'list-item-detail': 'E62',
-  tools: 'E70',
-  'folder-detail': 'E72',
-  budget: 'E71',
-  'budget-category-detail': 'E73',
-  'budget-settings': 'E74',
-  'budget-account': 'E75',
-  'budget-previsions': 'E78',
-  'budget-livrets': 'E76',
-  'budget-livret-detail': 'E77',
-}
+import { SCREEN_CODES } from '@/domain/data/screenCodes'
 
 export function DevResetButton() {
   const { screen } = useApp()
@@ -93,7 +60,7 @@ export function DevResetButton() {
           fontFamily: 'monospace',
         }}
       >
-        {SCREEN_CODES[screen]}
+        {SCREEN_CODES[screen].code}
       </span>
       <input
         type="date"

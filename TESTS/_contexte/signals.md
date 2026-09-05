@@ -15,8 +15,17 @@
   - fait quand: le flux est validé avec synchro serveur (dépend de l'action SQL ci-dessus).
   - réf: TESTS/RETOURS/_contexte/statut.md § Points à valider
 
-## Dernière session (2026-09-05)
+## Dernière session (2026-09-05, suite)
 
-- Flux de retours annotés (`agent/retours`, commit `bdff457`) relu, tests rejoués (tsc -b, lint, Vitest 773/773 OK) et fusionné dans `main` (commit `f6f5e78`), après validation explicite de l'utilisateur. Conflits résolus : `src/App.tsx` (imports lazy combinés), `src/data/db.ts` (version Dexie 19 combinant `taskCategories` et `feedbackReports`).
-- `supabase/feedback.sql` non appliqué : le flux reste local (sans synchro serveur) pour ce test dev.
-- Une autre session travaille en parallèle sur `main` (refactor `E24EditTask` → `E21CreateTaskV2`/`E22TaskDetail`, `DevResetButton.tsx`) : son travail est stashé (`stash@{0}` sur le poste de dev), non touché par cette session.
+- Session précédente (fusion `agent/retours`, déploiement dev) close et poussée (`739aab3`). Ce
+  tour : message envoyé (presse-papier) à l'orchestrateur résumant la fusion et signalant le
+  stash laissé de côté — aucun changement de code dans ce tour.
+- Depuis, l'orchestrateur a committé et déployé en prod (v5.92) plusieurs évolutions (refonte
+  fiche de tâche #37, défilement bandeau #38) : le flux retours annotés (`E122FeedbackCapture`,
+  `E123FeedbackList`, `feedbackReports`) reste intact et présent dans `src/App.tsx` / `src/data/db.ts`
+  après ces commits — vérifié.
+- `stash@{0}` ("wip avant fusion agent/retours (TESTS)") est **toujours présent**, non récupéré :
+  soit l'orchestrateur n'a pas vu le message, soit le refactor `E24EditTask` a été refait
+  autrement (commit `40d1474`) et ce stash est obsolète — à trancher par l'orchestrateur, pas par
+  cette session.
+- `supabase/feedback.sql` toujours non appliqué : le flux reste local (sans synchro serveur).

@@ -404,6 +404,52 @@ Détail des changements et questions : https://drive.google.com/open?id=1MAG1JiL
 _Suite :_ répond à `roadmap_demandes_marie_2026-09-04.md` (33 reprise Doc, #34-38) et
 `roadmap_supprimer_tache_du_jour.md` Phases 1-2, toutes livrées en v5.92. Message déposé dans la
 gateway (`enqueue --source orchestrateur --to marie --kind delivery --expect-reply`, id
-`20260905T123341_083860`), en attente du gardien (agent DISCORD). Réponse attendue (D2 : point
-d'entrée accueil pour l'ajout de tâche planifiée d'office) routée vers `gateway/inbox/orchestrateur/`.
-Réponse attendue routée vers `gateway/inbox/orchestrateur/`.
+`20260905T123341_083860`). **Rejeté par le gardien** (bounce reçu le 2026-09-05 12h39 UTC, id
+`20260905T123914_786940`) : fond non figé — « 9 tests à faire » annoncé mais 13 puces de
+modification listées (doublons de numéros déjà livrés et validés il y a plusieurs semaines,
+étrangers à cette version). N'est donc **jamais parti sur Discord** ; Marie n'a pas été prévenue de
+la v5.92 par ce canal. Corrigé et redéposé ci-dessous.
+
+### 2026-09-05 — message de livraison v5.92 corrigé, redéposé dans la gateway
+
+**Dév ->**
+Version 5.92 en ligne.
+
+Ce qui change :
+- Bandeau des jours de l'accueil, logo énergie et cartes des outils : plus de fond coloré, juste un contour de couleur.
+- Nouveau réglage dans Paramètres > Accessibilité : créer des catégories de couleur pour tes tâches (sport, plaisir, travail...), reprises ensuite comme raccourci de couleur pour une tâche.
+- Fiche de tâche refaite : titre dans un bandeau coloré en haut, informations en cases sur deux colonnes modifiables directement au clic. Même présentation pour la création d'une tâche.
+- Le glissement du bandeau des jours est plus fluide, sans saut à la fin du geste.
+- La catégorie « Tâche du jour » est retirée : ajouter une tâche depuis la Boîte de réception ne demande plus que le titre.
+
+Question : pour l'ajout d'une tâche planifiée d'office depuis l'écran d'accueil (dernière étape du retrait de « Tâche du jour »), quel bouton doit ouvrir cet ajout ?
+
+9 tests à faire dans l'écran « Tests à faire », touchant les modifications 3, 33, 34, 35, 36, 38 (plus le retrait de « Tâche du jour » et l'ajout de tâche depuis la Réception, hors numérotation du Doc).
+
+https://appli-audhd.netlify.app/
+
+Détail des changements et questions : https://drive.google.com/open?id=1MAG1JiLDbP13tmNQL5O9g6GyeEmFBGIC
+
+_Suite :_ bullets réduits aux numéros réellement neufs dans cette version (le bounce précédent
+mélangeait des numéros déjà livrés et validés il y a plusieurs semaines avec les 6 nouveaux). Message
+déposé dans la gateway (`enqueue --source orchestrateur --to marie --kind delivery --expect-reply`,
+id `20260905T195125_508415`), bounce précédent acquitté (`ack --agent orchestrateur --id
+20260905T123914_786940`). **Statut non re-vérifié après ce redépôt** — à recontrôler
+(`gateway.py list` / `poll --agent orchestrateur`) avant d'affirmer que le message est bien parti.
+
+### 2026-09-05 17h51 — retour de Marie sur le test « ajouter une tâche depuis la Réception »
+
+**Marie ->**
+Je me suis trompé dans la réponse d'un test, j'ai validé alors que non. C'est celui où tu me
+demandes d'ajouter une tâche depuis « réception ». Je voulais te dire que ça marchait nickel sauf
+que quand je clique sur « ajouter » depuis « réception », il y'a un gros zoom sur la page, or je
+veux pas que ça bouge, il ne doit plus y avoir ce zoom.
+
+_Suite :_ message reçu dans `inbox/orchestrateur/` (id `20260905T175116_269860`), sans lien direct
+avec un `--expect-reply` en cours (routing `manuel`) — Marie répond spontanément sur le test
+`ajouter-une-tache-depuis-la-reception` (`roadmap_supprimer_tache_du_jour.md` Phase 2, pas encore
+officiellement annoncée puisque le message de livraison a été rejeté par le gardien, cf. ci-dessus ;
+elle y a vraisemblablement eu accès via le déploiement dev `appli-audhd-dev.netlify.app`, cf.
+message de la session TESTS du 2026-09-05). Signale un effet de zoom indésirable au clic sur
+« Ajouter » depuis Réception, non identifié ni corrigé à ce stade — décision de traitement laissée à
+l'utilisateur (nouvelle demande hors Google Doc, pas encore de roadmap ni de correctif).

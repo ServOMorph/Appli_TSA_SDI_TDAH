@@ -1,16 +1,16 @@
-.claude/commands/close.md
 .claude/rclone.conf
+.claude/scheduled_tasks.lock
 .env
 .netlify/netlify.toml
 .pytest_cache/.gitignore
 .pytest_cache/CACHEDIR.TAG
 .pytest_cache/README.md
 .pytest_cache/v/cache/nodeids
-CHANGELOG.md
 DISCORD/discord_com/.env
 DISCORD/discord_com/bot.pid
 DISCORD/discord_com/commands.json
 DISCORD/discord_com/config_bot_discord.json
+DISCORD/discord_com/gateway/STYLE.md
 DISCORD/discord_com/gateway/inbox/design/20260904T033440_749547.json
 DISCORD/discord_com/gateway/outbox/sent/20260902T200148_532025.json
 DISCORD/discord_com/gateway/outbox/sent/20260903T042325_687674.json
@@ -92,7 +92,6 @@ ROBERTO/_orchestrateur_ia/chatgpt/calibration/2026-08-18_1640830.png
 ROBERTO/_orchestrateur_ia/chatgpt/calibration/2026-08-18_1640943.png
 ROBERTO/_orchestrateur_ia/chatgpt/calibration/2026-08-18_1641304.png
 ROBERTO/com_telephone/_commands/monitor_tsa.lock
-_contexte/contexte.md
 _docs/captures/2026-08-27T21-37-33-538Z.png
 _docs/captures/2026-08-27T22-00-33-357Z.png
 _docs/captures/2026-08-28T19-25-26-045Z.png
@@ -263,6 +262,9 @@ donnees_marie/snapshot-supabase-192f2411-20260903-1714z.json
 donnees_marie/snapshot-supabase-192f2411-20260903-1844z.json
 donnees_marie/snapshot-supabase-192f2411-20260903-1947z.json
 donnees_marie/snapshot-supabase-192f2411-20260903-2342z.json
+donnees_marie/snapshot-supabase-192f2411-20260904-1355z.json
+donnees_marie/snapshot-supabase-192f2411-20260904-1911z.json
+donnees_marie/snapshot-supabase-192f2411-20260904-2110z.json
 e2e/playwright-report/index.html
 e2e/screenshots/01-welcome.png
 e2e/screenshots/02-profile.png
@@ -311,7 +313,6 @@ e2e/screenshots/v2-1-s4.png
 e2e/screenshots/v2-1-s5-dashboard.png
 e2e/screenshots/v2-1-todo.png
 e2e/test-results/.last-run.json
-roadmap_supprimer_tache_du_jour.md
 tmp/pdfs/modifications_marie/page-1.png
 tmp/pdfs/modifications_marie/page-2.png
 tmp/pdfs/modifications_marie/page-3.png

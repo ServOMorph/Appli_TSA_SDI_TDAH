@@ -233,18 +233,50 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Animation du bandeau des jours (#38) [TODO]
+## Phase 4 — Animation du bandeau des jours (#38) [FAIT]
 
-- `src/ui/screens/dashboard/PlanningBoard.tsx` : réécrire le mécanisme de glissement du bandeau
-  (`handleTouchStart/Move/End`, `dateStrip`, `dragOffset`) pour un défilement continu qui suit le
-  doigt sans à-coup, où la case restée au centre au relâchement y demeure (pas de recalcul discret
-  de `stripCenter` qui provoque un saut) — probablement via un rendu de jours supplémentaires
-  au-delà du rayon visible + une transition d'établissement calée sur la distance réellement
-  parcourue plutôt qu'un `jumpTo` binaire.
-- Tests : `PlanningBoard.test.tsx` (comportement de glissement, absence de saut, jour centré
-  conservé). `tsc -b` + lint + suite complète verts.
-- Catalogue in-app : révision du parcours `defilement-des-jours-dans-la-case` (déjà existant pour
-  #21, à mettre à jour plutôt qu'à dupliquer).
+Cause du saut identifiée en Phase 4 (cf. état constaté) : `handleTouchEnd` remettait `dragOffset`
+à `0` **au même instant** où `jumpTo` recentrait `stripCenter` sur le nouveau jour — deux
+changements visuellement décorrélés (l'un correspond à une distance de glissement arbitraire,
+l'autre à un recentrage discret d'exactement un jour), d'où le saut.
+
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : réécriture du mécanisme, sans mesure de layout
+  côté JS (incompatible avec jsdom en test, et inutile) :
+  - **Jours tampons** : rendu de `DATE_STRIP_RADIUS + 1` (au lieu de `DATE_STRIP_RADIUS`) de part
+    et d'autre du centre — 2 jours supplémentaires masqués par le `overflow: hidden` du bandeau,
+    pour qu'un glissement révèle du contenu réel plutôt qu'un vide. Marqués `aria-hidden` +
+    `tabIndex={-1}` (non atteignables au clavier/lecteur d'écran tant qu'ils restent hors-champ).
+  - **Position exprimée en fraction de piste, pas en pixels mesurés** : la piste (7 cases) a une
+    largeur de `140%` de la case visible (5/7), positionnée par `translateX(calc(-100% * n / 7 +
+    dragPx))` — `n` est le nombre de « crans » de piste consommés (1 au repos, pour masquer le
+    tampon de gauche), `dragPx` le décalage brut du doigt pendant le glissement actif. Le
+    navigateur résout `calc()`/`%` en pixels réels au moment du rendu ; aucune mesure `clientWidth`
+    n'est nécessaire côté JS.
+  - **Machine à 3 états** (`phase`: `idle` / `dragging` / `settling`) au lieu d'un simple booléen
+    `dragging` : au relâchement (`handleTouchEnd`), la piste ne saute plus à `0` — elle passe en
+    `settling` et continue son mouvement (via la transition CSS déjà en place, 0.2s ease-out)
+    jusqu'au cran plein le plus proche dans la direction du glissement (`n=2` pour avancer d'un
+    jour, `n=0` pour reculer, `n=1` — le repos — si le seuil de 50px n'est pas atteint). Le jour
+    affiché ne change qu'une fois cette transition terminée (`onTransitionEnd` sur la piste,
+    filtré par `event.target === event.currentTarget` pour ignorer les transitions de mise à
+    l'échelle qui remontent depuis les cases-jour enfants) : à cet instant, la fenêtre de jours est
+    recentrée et le décalage réinitialisé au même rendu — les deux états étant visuellement
+    identiques (glisser la fenêtre d'un jour ou glisser le pixel d'une case équivalent), le
+    remplacement est invisible.
+- Tests : `PlanningBoard.test.tsx` — glissement sous le seuil (retour au repos sans changer de
+  jour), glissement au-dessus du seuil (jour chargé seulement après la fin de la transition, jamais
+  avant), continuité du mouvement au relâchement (la piste poursuit vers le cran plein plutôt que
+  de sauter à zéro), présence des jours tampons masqués (`aria-hidden`). `tsc -b` + lint + suite
+  complète (783 tests) verts.
+- **Écart non traité, signalé sans action** : `src/ui/screens/dashboard/E12WeekPlanning.tsx`
+  (écran « Planning de la semaine ») reproduit le même mécanisme de glissement avec le même défaut
+  (`dragOffset` remis à 0 en même temps que le changement de semaine). #38 et son analyse ne
+  visaient explicitement que le bandeau des jours de `PlanningBoard.tsx` ; ce second écran n'a pas
+  été touché pour ne pas étendre le périmètre de la phase sans demande explicite — à traiter dans
+  une phase dédiée si Marie confirme le même problème sur cet écran.
+- Catalogue in-app : `defilement-des-jours-dans-la-case` révisé (révision 2, docRefs `[21, 38]`) —
+  étapes ajoutées pour distinguer relâchement sous le seuil (retour en douceur, pas de changement
+  de jour) et au-dessus (fin de course en douceur jusqu'au jour suivant/précédent, sans saut).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

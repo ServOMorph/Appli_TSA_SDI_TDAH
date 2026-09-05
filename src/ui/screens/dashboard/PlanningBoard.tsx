@@ -12,6 +12,23 @@ import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@
 const DATE_STRIP_RADIUS = 2
 const SWIPE_THRESHOLD_PX = 50
 
+// Jours supplémentaires rendus (masqués par le overflow:hidden du bandeau) de part et d'autre
+// des jours visibles, pour que le glissement révèle du contenu réel au lieu d'un vide (#38).
+const STRIP_BUFFER_DAYS = 1
+const STRIP_RENDER_RADIUS = DATE_STRIP_RADIUS + STRIP_BUFFER_DAYS
+const STRIP_VISIBLE_COUNT = DATE_STRIP_RADIUS * 2 + 1
+const STRIP_RENDER_COUNT = STRIP_RENDER_RADIUS * 2 + 1
+const STRIP_TRACK_WIDTH_PERCENT = (STRIP_RENDER_COUNT / STRIP_VISIBLE_COUNT) * 100
+
+// Position de la piste, en fonction du "cran" (jours déjà avalés par le glissement en cours,
+// -1/0/1) et du décalage brut du doigt en px. Exprimée en % (calc), la cible d'un cran est
+// résolue par le navigateur en pixels réels au moment du calcul — ce qui permet à la transition
+// CSS d'interpoler correctement entre un état suivi au pixel près (glissement) et un état exprimé
+// en fraction de la piste (cran final), sans mesure de layout côté JS.
+function stripShiftTransform(shiftNumerator: number, dragPx: number): string {
+  return `translateX(calc(-100% * ${shiftNumerator} / ${STRIP_RENDER_COUNT} + ${dragPx}px))`
+}
+
 type PlanBlock =
   | { kind: 'task'; item: Task }
   | { kind: 'subtask'; item: PlannedSubTask }
@@ -66,6 +83,7 @@ const dateTrackStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   gap: '4px',
+  width: `${STRIP_TRACK_WIDTH_PERCENT}%`,
 }
 
 const DAY_CELL_MAX_SCALE = 1.18
@@ -329,8 +347,9 @@ export function PlanningBoard() {
 
   const displayDateRef = useRef(displayDate)
   const touchStartX = useRef<number | null>(null)
-  const [dragOffset, setDragOffset] = useState(0)
-  const [dragging, setDragging] = useState(false)
+  const [phase, setPhase] = useState<'idle' | 'dragging' | 'settling'>('idle')
+  const [dragOffsetPx, setDragOffsetPx] = useState(0)
+  const [pendingShift, setPendingShift] = useState(0)
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
   const [stripCenter, setStripCenter] = useState(() =>
     route.name === 'dashboard' && route.date ? route.date : todayStr(),
@@ -409,24 +428,41 @@ export function PlanningBoard() {
 
   function handleTouchStart(event: React.TouchEvent) {
     touchStartX.current = event.touches[0]?.clientX ?? null
-    setDragging(true)
+    setPhase('dragging')
+    setDragOffsetPx(0)
+    setPendingShift(0)
   }
 
   function handleTouchMove(event: React.TouchEvent) {
     if (touchStartX.current === null) return
     const currentX = event.touches[0]?.clientX ?? touchStartX.current
-    setDragOffset(currentX - touchStartX.current)
+    setDragOffsetPx(currentX - touchStartX.current)
   }
 
+  // Au relâchement, la piste continue de glisser (transition CSS) jusqu'au cran plein le plus
+  // proche — jamais un saut brut à 0 — et ce n'est qu'une fois cette animation terminée
+  // (handleTrackTransitionEnd) que le jour affiché change réellement. Sans ce découplage, changer
+  // le jour en même temps que réinitialiser le décalage produit le saut visuel signalé (#38).
   function handleTouchEnd(event: React.TouchEvent) {
-    setDragging(false)
-    setDragOffset(0)
-    if (touchStartX.current === null) return
+    if (touchStartX.current === null) {
+      setPhase('idle')
+      return
+    }
     const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
     const delta = endX - touchStartX.current
     touchStartX.current = null
-    if (Math.abs(delta) < SWIPE_THRESHOLD_PX) return
-    jumpTo(addDays(displayDate, delta < 0 ? 1 : -1))
+    const shift = Math.abs(delta) < SWIPE_THRESHOLD_PX ? 0 : delta < 0 ? 1 : -1
+    setPendingShift(shift)
+    setDragOffsetPx(0)
+    setPhase('settling')
+  }
+
+  function handleTrackTransitionEnd(event: React.TransitionEvent) {
+    if (event.target !== event.currentTarget) return
+    if (phase !== 'settling') return
+    setPhase('idle')
+    setPendingShift(0)
+    if (pendingShift !== 0) jumpTo(addDays(displayDate, pendingShift))
   }
 
   const isToday = displayDate === todayStr()
@@ -485,26 +521,34 @@ export function PlanningBoard() {
         <div
           style={{
             ...dateTrackStyle,
-            transform: `translateX(${dragOffset}px)`,
-            transition: dragging ? 'none' : 'transform 0.2s ease-out',
+            transform: stripShiftTransform(
+              STRIP_BUFFER_DAYS + (phase === 'settling' ? pendingShift : 0),
+              phase === 'dragging' ? dragOffsetPx : 0,
+            ),
+            transition: phase === 'dragging' ? 'none' : 'transform 0.2s ease-out',
           }}
+          onTransitionEnd={handleTrackTransitionEnd}
         >
-          {dateStrip(stripCenter, DATE_STRIP_RADIUS).map((d, i, arr) => {
+          {dateStrip(stripCenter, STRIP_RENDER_RADIUS).map((d, i) => {
+            const offset = i - STRIP_RENDER_RADIUS
+            const isBuffer = Math.abs(offset) > DATE_STRIP_RADIUS
             const badge = formatDayBadge(d)
             const isDisplayed = d === displayDate
-            const scale = dayCellScale(Math.abs(i - (arr.length - 1) / 2))
+            const scale = dayCellScale(Math.abs(offset))
             return (
               <button
                 key={d}
                 style={{
                   ...dayCellStyle(isDisplayed),
                   transform: `scale(${scale})`,
-                  transition: dragging ? 'none' : 'transform 0.2s ease-out',
+                  transition: phase === 'dragging' ? 'none' : 'transform 0.2s ease-out',
                   ...(scale > 1 ? { position: 'relative', zIndex: 2 } : null),
                 }}
                 onClick={() => updateDisplayDate(d)}
                 aria-current={isDisplayed ? 'date' : undefined}
                 aria-label={d}
+                aria-hidden={isBuffer || undefined}
+                tabIndex={isBuffer ? -1 : undefined}
               >
                 <span style={dayWeekdayStyle}>{badge.weekday}</span>
                 <span style={dayNumberStyle(d === todayStr())}>{badge.day}</span>

@@ -31,7 +31,7 @@ describe('PlanningBoard', () => {
     expect(screen.getByLabelText('2026-07-02')).toBeInTheDocument()
   })
 
-  it('glisser vers la gauche charge le jour suivant', async () => {
+  it('glisser vers la gauche charge le jour suivant, une fois la piste posée (#38)', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
@@ -39,10 +39,12 @@ describe('PlanningBoard', () => {
     const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
     fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
     fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 100 }] })
+    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-01')
+    fireEvent.transitionEnd(strip)
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
   })
 
-  it('glisser vers la droite charge le jour précédent', async () => {
+  it('glisser vers la droite charge le jour précédent, une fois la piste posée (#38)', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
@@ -50,7 +52,43 @@ describe('PlanningBoard', () => {
     const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
     fireEvent.touchStart(strip, { touches: [{ clientX: 100 }] })
     fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 200 }] })
+    fireEvent.transitionEnd(strip)
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
+  })
+
+  it('un glissement sous le seuil revient à sa position sans changer de jour (#38)', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
+
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
+    fireEvent.touchMove(strip, { touches: [{ clientX: 180 }] })
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 180 }] })
+    fireEvent.transitionEnd(strip)
+    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-01')
+    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-06-29')
+  })
+
+  it('le relâchement poursuit le glissement jusqu’au cran plein, sans saut brut à zéro (#38)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+
+    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
+    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
+    fireEvent.touchMove(strip, { touches: [{ clientX: 100 }] })
+    expect(strip.style.transform).toBe(`translateX(calc(-100% * 1 / ${7} + -100px))`)
+
+    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 100 }] })
+    expect(strip.style.transform).toBe(`translateX(calc(-100% * 2 / ${7} + 0px))`)
+  })
+
+  it('rend un jour tampon masqué de chaque côté pour un glissement sans vide (#38)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    expect(screen.getByLabelText('2026-06-27')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByLabelText('2026-07-03')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByLabelText('2026-06-28')).not.toHaveAttribute('aria-hidden')
   })
 
   it('encadre le bandeau de dates avec la couleur d’ambiance (AP2)', async () => {
@@ -84,17 +122,18 @@ describe('PlanningBoard', () => {
     expect(other.style.backgroundColor).toBe('transparent')
   })
 
-  it('suit le doigt pendant le glissement du bandeau (AP2)', async () => {
+  it('suit le doigt au pixel près pendant le glissement du bandeau (AP2, #38)', async () => {
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
 
     const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
     fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
     fireEvent.touchMove(strip, { touches: [{ clientX: 170 }] })
-    expect(strip.style.transform).toBe('translateX(-30px)')
+    expect(strip.style.transform).toBe('translateX(calc(-100% * 1 / 7 + -30px))')
 
     fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 170 }] })
-    expect(strip.style.transform).toBe('translateX(0px)')
+    fireEvent.transitionEnd(strip)
+    expect(strip.style.transform).toBe('translateX(calc(-100% * 1 / 7 + 0px))')
   })
 
   it('au glissement, seule la piste interne se translate, pas la case (#21)', async () => {
@@ -108,7 +147,7 @@ describe('PlanningBoard', () => {
 
     fireEvent.touchStart(box, { touches: [{ clientX: 200 }] })
     fireEvent.touchMove(box, { touches: [{ clientX: 170 }] })
-    expect(track.style.transform).toBe('translateX(-30px)')
+    expect(track.style.transform).toBe('translateX(calc(-100% * 1 / 7 + -30px))')
     expect(box.style.transform).toBe('')
 
     fireEvent.touchEnd(box, { changedTouches: [{ clientX: 170 }] })

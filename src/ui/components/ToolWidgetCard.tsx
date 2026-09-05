@@ -1,6 +1,6 @@
 import { useApp } from '@/app/AppContext'
 import { Card } from '@/ui/components/Card'
-import { pastelBackground } from '@/ui/styles/ambiance'
+import { outlineOnlyStyle } from '@/ui/styles/ambiance'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
 
@@ -35,7 +35,7 @@ export function ToolCard({ tool, onOpen }: { tool: Tool; onOpen: () => void }) {
   const { lists } = useApp()
   const list = tool.list_id ? lists.find((l) => l.id === tool.list_id) : undefined
   return (
-    <Card style={tool.color ? { backgroundColor: pastelBackground(tool.color) } : undefined}>
+    <Card style={tool.color ? outlineOnlyStyle(tool.color) : undefined}>
       <button style={entryBtnStyle} onClick={onOpen}>
         {toolLabel(tool, list?.name)}
       </button>

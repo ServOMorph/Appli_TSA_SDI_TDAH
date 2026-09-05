@@ -1,7 +1,7 @@
 import { getEnergyPairLabel } from '@/domain/rules/energyRules'
 import type { EnergyStatus } from '@/domain/entities/energyEntry'
 import { BatteryIcon } from '@/ui/components/BatteryIcon'
-import { pastelBackground } from '@/ui/styles/ambiance'
+import { outlineOnlyStyle } from '@/ui/styles/ambiance'
 
 interface EnergyDisplayProps {
   status: EnergyStatus | null
@@ -15,7 +15,6 @@ const chipStyle: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   gap: 'var(--spacing-xs)',
-  border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-md)',
   padding: '6px 12px',
   fontSize: '0.875rem',
@@ -30,7 +29,7 @@ export function EnergyDisplay({ status, value, plannedCost, onClick, ambianceCol
     <button
       onClick={onClick}
       aria-label={ariaLabel}
-      style={{ ...chipStyle, backgroundColor: pastelBackground(ambianceColor) }}
+      style={{ ...chipStyle, ...outlineOnlyStyle(ambianceColor) }}
     >
       {filled && <BatteryIcon size={16} />}
       {label}

@@ -90,29 +90,36 @@ préalable.
 
 ---
 
-## Phase 1 — Style « contour coloré, sans fond » (33 reprise Doc, #34, #36) [EN COURS]
+## Phase 1 — Style « contour coloré, sans fond » (33 reprise Doc, #34, #36) [FAIT]
 
 Revient sur #19 (bandeau des jours) et applique le même motif à trois autres endroits déjà
 identifiés dans le code.
 
-- `src/ui/styles/ambiance.ts` : ajouter un helper (ex. `outlineOnlyStyle(color)`) retournant
-  `{ border: '2px solid <color>', backgroundColor: 'var(--color-surface)' }`, à côté de
+- `src/ui/styles/ambiance.ts` : nouveau helper `outlineOnlyStyle(color)` — `{ border: '2px solid
+  <color>', backgroundColor: 'var(--color-surface)' }`, à côté de
   `pastelBackground`/`mutedBackground`/`flashyBackground`.
-- `src/ui/screens/dashboard/PlanningBoard.tsx` : `dateStripBoxStyle` (`:56-64`) — retirer
-  `backgroundColor: color-mix(...)`, garder le `border` 2px coloré via le nouveau helper.
-- `src/ui/components/EnergyDisplay.tsx` : remplacer `backgroundColor: pastelBackground(...)` par le
-  contour coloré sur `chipStyle` (actuellement bordure grise générique).
+- `src/ui/screens/dashboard/PlanningBoard.tsx` : `dateStripBoxStyle` (`:56-64`) — fond retiré,
+  contour 2px via le nouveau helper.
+- `src/ui/components/EnergyDisplay.tsx` : `chipStyle` — fond teinté remplacé par le contour coloré
+  (bordure grise générique retirée).
 - `src/ui/components/ToolWidgetCard.tsx` (`ToolCard`) et `src/ui/screens/dashboard/E10Dashboard.tsx`
-  (carte « Mon compte » `:133` + grille Outils `:148-151`) : même remplacement (cf. D1 pour « Mon
-  compte »).
-- Vérifier `src/ui/screens/tools/E70Tools.tsx` (rend `ToolCard`/`FolderCard`, aucun changement
-  direct attendu si le helper est appliqué dans `ToolWidgetCard.tsx`).
-- Tests : `PlanningBoard.test.tsx`, `EnergyDisplay.test.tsx` (créer si absent), `ToolWidgetCard`/
-  `E10Dashboard.test.tsx`, `ambiance.test.ts` (nouveau helper). `tsc -b` + lint + suite complète
-  verts.
-- Catalogue in-app (`manualTestsCatalog.ts`) : nouveau parcours (ou révision d'un parcours
-  existant) couvrant le bandeau des jours, le logo énergie et les cartes d'outils (accueil +
-  écran Outils) sans fond coloré, contour seul.
+  (carte « Mon compte » + grille Outils) : même remplacement (D1 appliquée : « Mon compte » traitée
+  comme une carte d'outil).
+- **Écart constaté en cours d'implémentation, non prévu par l'analyse initiale** :
+  `src/ui/screens/dashboard/E12WeekPlanning.tsx` (`weekBoxStyle`, écran « Planning de la semaine »
+  livré en Phase 5 de `roadmap_planning_accueil_2026-08-29.md`) reproduisait exactement le même
+  motif fond+contour que `PlanningBoard.tsx`. Corrigé par cohérence avec la même demande (« la case
+  des jours de la semaine sur le planning ») plutôt que de laisser un des deux écrans du planning
+  incohérent avec l'autre — décision non bloquante, à valider par Marie comme le reste de la phase.
+- `src/ui/screens/tools/E70Tools.tsx` : aucun changement direct nécessaire (rend `ToolCard`/
+  `FolderCard`, hérite du helper via `ToolWidgetCard.tsx`).
+- Tests : `PlanningBoard.test.tsx`, `E12WeekPlanning.test.tsx`, `EnergyDisplay.test.tsx` (créé),
+  `ToolWidgetCard.test.tsx`, `E10Dashboard.test.tsx`, `ambiance.test.ts` (nouveau helper). `tsc -b` +
+  lint + suite complète (722 tests) verts.
+- Catalogue in-app (`manualTestsCatalog.ts`) : `bandeau-des-jours-colore` (révision 2, docRefs
+  `[19, 33]`, mentionne aussi le planning de la semaine), `couleur-de-fond-par-outil` renommé
+  « Couleur de contour par outil » (révision 4, docRef 36 ajouté), `consulter-et-modifier-l-energie`
+  (révision 3, docRef 34 ajouté).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

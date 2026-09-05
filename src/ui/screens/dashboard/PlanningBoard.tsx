@@ -5,7 +5,7 @@ import type { PlannedSubTask } from '@/app/AppContext'
 import { BatteryCost } from '@/ui/components/BatteryCost'
 import { TaskIcon } from '@/ui/components/TaskIcon'
 import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
-import { DEFAULT_AMBIANCE_COLOR, plannedTaskTintStyle } from '@/ui/styles/ambiance'
+import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import { isCompleted } from '@/domain/rules/taskRules'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@/domain/rules/planningSlotRules'
 
@@ -55,10 +55,9 @@ const REPORTED_BADGE_STYLE: React.CSSProperties = {
 
 function dateStripBoxStyle(ambianceColor: string): React.CSSProperties {
   return {
-    border: `2px solid ${ambianceColor}`,
+    ...outlineOnlyStyle(ambianceColor),
     borderRadius: 'var(--radius-md)',
     padding: '4px 2px',
-    backgroundColor: `color-mix(in srgb, ${ambianceColor} 14%, var(--color-surface))`,
     overflow: 'hidden',
   }
 }

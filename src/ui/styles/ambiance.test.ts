@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { plannedTaskTintStyle } from '@/ui/styles/ambiance'
+import { outlineOnlyStyle, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 
 describe('plannedTaskTintStyle', () => {
   it('tâche avec couleur, non terminée : aplat pastel, texte normal', () => {
@@ -33,5 +33,13 @@ describe('plannedTaskTintStyle', () => {
     const style = plannedTaskTintStyle(false, null)
     expect(style.color).toBe('var(--color-text)')
     expect(style.textDecoration).toBe('none')
+  })
+})
+
+describe('outlineOnlyStyle', () => {
+  it('contour coloré, fond neutre (demandes Marie #19/33/34/36)', () => {
+    const style = outlineOnlyStyle('#ff8800')
+    expect(style.border).toBe('2px solid #ff8800')
+    expect(style.backgroundColor).toBe('var(--color-surface)')
   })
 })

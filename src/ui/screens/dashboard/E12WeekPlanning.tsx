@@ -3,7 +3,7 @@ import { useApp } from '@/app/AppContext'
 import type { Task } from '@/domain/entities/task'
 import { TaskIcon } from '@/ui/components/TaskIcon'
 import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
-import { DEFAULT_AMBIANCE_COLOR } from '@/ui/styles/ambiance'
+import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, weekStrip } from '@/domain/rules/planningSlotRules'
 
 const SWIPE_THRESHOLD_PX = 50
@@ -65,9 +65,8 @@ const todayBtnStyle: React.CSSProperties = {
 
 function weekBoxStyle(ambianceColor: string): React.CSSProperties {
   return {
-    border: `2px solid ${ambianceColor}`,
+    ...outlineOnlyStyle(ambianceColor),
     borderRadius: 'var(--radius-md)',
-    backgroundColor: `color-mix(in srgb, ${ambianceColor} 14%, var(--color-surface))`,
     overflow: 'hidden',
     flex: 1,
     minHeight: 0,

@@ -14,6 +14,15 @@ export function flashyBackground(color: string): string {
   return color
 }
 
+// Contour coloré, sans fond (demandes Marie #19/33/34/36, roadmap_demandes_marie_2026-09-04.md
+// Phase 1) : remplace le fond teinté (`pastelBackground`) par un simple contour, fond neutre.
+export function outlineOnlyStyle(color: string): CSSProperties {
+  return {
+    border: `2px solid ${color}`,
+    backgroundColor: 'var(--color-surface)',
+  }
+}
+
 export function plannedTaskTintStyle(completed: boolean, color: string | null): CSSProperties {
   // Une tâche sans couleur choisie garde son texte lisible (`--color-text`) même cochée : le texte
   // blanc barré sur fond clair serait invisible (retour Marie #23).

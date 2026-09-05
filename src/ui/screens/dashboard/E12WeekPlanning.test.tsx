@@ -42,6 +42,18 @@ describe('E12WeekPlanning', () => {
     expect(await screen.findByRole('button', { name: 'Médecin' })).toBeInTheDocument()
   })
 
+  it('encadre la grille de la semaine en contour coloré, sans fond (33 reprise Doc)', async () => {
+    const ctx = makeAppContext({
+      route: WEEK_ROUTE,
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#ff00aa' },
+    })
+    renderWeek(ctx)
+    const grid = await screen.findByLabelText('Planning de la semaine')
+    expect(grid.style.border).toContain('rgb(255, 0, 170)')
+    expect(grid.style.backgroundColor).toBe('var(--color-surface)')
+  })
+
   it('glisser vers la gauche affiche la semaine suivante (#22)', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderWeek(makeAppContext({ route: WEEK_ROUTE, getPlannedTasksForDate }))

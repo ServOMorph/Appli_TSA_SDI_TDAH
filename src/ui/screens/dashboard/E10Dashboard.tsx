@@ -8,7 +8,7 @@ import { AppShell } from '@/ui/components/AppShell'
 import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
-import { DEFAULT_AMBIANCE_COLOR, pastelBackground } from '@/ui/styles/ambiance'
+import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 import { hasPendingManualTests } from '@/domain/rules/manualTestRules'
 
@@ -130,7 +130,7 @@ export function E10Dashboard() {
               marginTop: 'var(--spacing-md)',
             }}
           >
-            <Card style={settings?.mon_compte_color ? { backgroundColor: pastelBackground(settings.mon_compte_color) } : undefined}>
+            <Card style={settings?.mon_compte_color ? outlineOnlyStyle(settings.mon_compte_color) : undefined}>
               <button style={widgetBtnStyle} onClick={() => goTo('budget-account')}>
                 Mon compte
               </button>
@@ -147,7 +147,7 @@ export function E10Dashboard() {
               return (
                 <Card
                   key={tool.id}
-                  style={tool.color ? { backgroundColor: pastelBackground(tool.color) } : undefined}
+                  style={tool.color ? outlineOnlyStyle(tool.color) : undefined}
                 >
                   <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
                     {toolLabel(tool, list?.name)}

@@ -64,7 +64,7 @@ describe('PlanningBoard', () => {
     expect(strip.style.border).toContain('rgb(255, 0, 170)')
   })
 
-  it('remplit le fond du bandeau de dates avec la couleur d’ambiance (#19)', async () => {
+  it('ne remplit plus le fond du bandeau de dates, contour seul (33 reprise Doc, revient sur #19)', async () => {
     const ctx = makeAppContext({
       getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
       settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, ambiance_color: '#ff00aa' },
@@ -72,8 +72,7 @@ describe('PlanningBoard', () => {
     renderExpanded(ctx)
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
     const strip = screen.getByLabelText('Bandeau des jours de la semaine')
-    expect(strip.style.backgroundColor).toContain('#ff00aa')
-    expect(strip.style.backgroundColor).toContain('14%')
+    expect(strip.style.backgroundColor).toBe('var(--color-surface)')
   })
 
   it('garde le jour affiché identifiable sur le fond coloré du bandeau (#19)', async () => {

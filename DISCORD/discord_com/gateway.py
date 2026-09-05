@@ -10,6 +10,12 @@ Seules les demandes `approved` sortent ; `bot.py` les draine automatiquement.
 cf. `discord_loop.md` 3b) si elle dort dans un `wait`, au lieu d'attendre le prochain message
 Discord ou le timeout de sécurité (jusqu'à 1h).
 
+`enqueue(..., attachment_path=...)` joint un fichier local au message (copié sous
+`gateway/outbox/attachments/`, limite `MAX_ATTACHMENT_BYTES`) — utile pour un contenu qui doit
+rester copiable en un seul bloc au-delà des 2000 caractères Discord. Le corps (`body`/`--text`)
+reste le message Discord normal ; le fichier part en pièce jointe distincte, envoyée par `drain`
+via `message_marie._send(..., attachment_path=...)`.
+
 ENTRÉE : `route_inbound(...)` classe les messages Discord entrants et les dépose dans
 `gateway/inbox/<agent>/`. Priorité : tag explicite `@agent:` en tête, sinon réponse
 attendue de cet auteur (`state.pending_replies`), sinon heuristique par mots-clés,
@@ -23,6 +29,8 @@ l'heuristique et les cibles de tag viennent de ce fichier.
 CLI :
   python gateway.py enqueue --source orchestrateur --to marie --kind question \
                             --expect-reply --file corps.txt
+  python gateway.py enqueue --source design --to marie --kind delivery \
+                            --file corps.txt --attachment prompt.txt
   python gateway.py list
   python gateway.py approve --id <id>
   python gateway.py hold    --id <id> [--reason "..."]
@@ -42,6 +50,7 @@ Statuts outbox    : pending | approved | held | bounced | failed
 import argparse
 import json
 import os
+import random
 import re
 import sys
 import time
@@ -55,12 +64,14 @@ DIR = Path(__file__).parent
 GATEWAY = DIR / "gateway"
 OUTBOX = GATEWAY / "outbox"
 SENT = OUTBOX / "sent"
+ATTACHMENTS = OUTBOX / "attachments"
 INBOX = GATEWAY / "inbox"
 STATE = GATEWAY / "state.json"
 AGENTS_FILE = GATEWAY / "agents.json"
 LOCK = GATEWAY / "state.lock"
 DRAIN_LOCK = GATEWAY / "drain.lock"
 CONV_LOG = DIR / "logs" / "conversation.jsonl"
+SALUTATIONS_MARIE = GATEWAY / "salutations_marie.json"
 COMMANDS = DIR / "commands.json"
 COMMANDS_LOCK = GATEWAY / "commands.lock"
 GARDIEN_WAKE_COMMAND = "__gateway_wake__"
@@ -72,6 +83,7 @@ APPROUVABLES = ("pending", "held", "failed")
 
 LOCK_TIMEOUT_S = 5.0
 LOCK_STALE_S = 30.0
+MAX_ATTACHMENT_BYTES = 8 * 1024 * 1024  # marge sous la limite Discord (25 Mo hors boost serveur)
 
 _TAG_RE = re.compile(r"^\s*@(?P<agent>[\w-]+)\s*:\s*(?P<reste>.*)$", re.DOTALL)
 
@@ -91,7 +103,7 @@ def _now() -> str:
 
 
 def _ensure_dirs() -> None:
-    for d in (OUTBOX, SENT, INBOX):
+    for d in (OUTBOX, SENT, ATTACHMENTS, INBOX):
         d.mkdir(parents=True, exist_ok=True)
 
 
@@ -287,10 +299,13 @@ def has_pending_reply(author_id) -> bool:
 # ------------------------------------------------------------------
 
 def enqueue(source: str, to: str, body: str, *, kind: str = "info",
-            expect_reply: bool = False, meta: dict | None = None) -> str:
+            expect_reply: bool = False, meta: dict | None = None,
+            attachment_path: str | None = None) -> str:
     """
     Dépose une demande d'envoi dans l'outbox, en `pending`. Retourne l'id de la demande.
     Rien ne part sur Discord tant que le gardien (agent DISCORD) ne l'a pas `approve`.
+    `attachment_path` : fichier local joint au message (copié sous
+    `gateway/outbox/attachments/`, limite `MAX_ATTACHMENT_BYTES`).
     """
     source = (source or "").strip()
     if not source:
@@ -304,6 +319,20 @@ def enqueue(source: str, to: str, body: str, *, kind: str = "info",
 
     _ensure_dirs()
     req_id = _new_id()
+
+    attachment = None
+    if attachment_path:
+        src = Path(attachment_path)
+        if not src.is_file():
+            raise GatewayError(f"pièce jointe introuvable : {attachment_path}")
+        taille = src.stat().st_size
+        if taille > MAX_ATTACHMENT_BYTES:
+            raise GatewayError(
+                f"pièce jointe de {taille} octets > limite {MAX_ATTACHMENT_BYTES} octets")
+        dest = ATTACHMENTS / f"{req_id}_{src.name}"
+        dest.write_bytes(src.read_bytes())
+        attachment = {"filename": src.name, "path": str(dest)}
+
     _atomic_write(OUTBOX / f"{req_id}.json", json.dumps({
         "id": req_id,
         "source": source,
@@ -313,6 +342,7 @@ def enqueue(source: str, to: str, body: str, *, kind: str = "info",
         "expect_reply": bool(expect_reply),
         "status": "pending",
         "meta": meta or {},
+        "attachment": attachment,
         "created_at": _now(),
     }, ensure_ascii=False, indent=2))
     _wake_gardien()
@@ -393,6 +423,7 @@ def bounce(req_id: str, reason: str) -> dict:
     dest = INBOX / (resolve_agent(source) or source)
     dest.mkdir(parents=True, exist_ok=True)
     corps = (req.get("body") or "").strip()
+    attachment = req.get("attachment")
     msg_id = _new_id()
     _atomic_write(dest / f"{msg_id}.json", json.dumps({
         "id": msg_id,
@@ -405,7 +436,7 @@ def bounce(req_id: str, reason: str) -> dict:
         "original_body": corps,
         "original_to": req.get("to"),
         "original_kind": req.get("kind"),
-        "attachments": [],
+        "attachments": [attachment] if attachment else [],
         "routing": "bounce",
         "reply_to": None,
         "received_at": _now(),
@@ -437,13 +468,19 @@ def merge(req_ids: list[str]) -> dict:
     return {"id": base["id"], "to": base["to"], "merged": ids[1:]}
 
 
+def _salutation_marie() -> str:
+    salutations = json.loads(SALUTATIONS_MARIE.read_text(encoding="utf-8"))
+    return random.choice(salutations)
+
+
 def curate(to: str, kind: str, body: str) -> str:
     """Formatage mécanique par destinataire. Ne modifie pas le fond du message."""
     body = (body or "").strip()
     if not body:
         raise GatewayError("corps vide")
     if to == "marie":
-        text = f"{FRAME}\n<@{MARIE_USER_ID}>\n{body}\n{FRAME}"
+        salutation = _salutation_marie()
+        text = f"{FRAME}\n<@{MARIE_USER_ID}>\n{salutation}\n\n{body}\n{FRAME}"
     else:
         text = body
     if len(text) > 2000:
@@ -459,10 +496,12 @@ def _mention_ids(to: str) -> list[int]:
     return []
 
 
-def _discord_post(content: str, mention_user_ids: list[int]) -> str:
+def _discord_post(content: str, mention_user_ids: list[int],
+                   attachment_path: str | None = None) -> str:
     token = message_marie._read_token()
     channel_id = message_marie._read_channel_id()
-    return message_marie._send(token, channel_id, content, allowed_user_ids=mention_user_ids)
+    return message_marie._send(token, channel_id, content, allowed_user_ids=mention_user_ids,
+                                attachment_path=attachment_path)
 
 
 def _log(source: str, to: str, content: str) -> None:
@@ -513,6 +552,9 @@ def drain(send_fn=None, *, dry_run: bool = False) -> list[dict]:
     coupe pas la boucle : la demande passe en `failed` et une alerte est déposée dans
     `inbox/discord/`. En `--dry-run`, tous les statuts sont rendus, rien n'est envoyé.
     `send_fn(content, mention_user_ids) -> message_id`. Par défaut : POST Discord réel.
+    Si la demande porte une pièce jointe (`attachment.path`), `send_fn` est appelé avec
+    `attachment_path=...` en plus — un `send_fn` de test à 2 arguments reste compatible tant
+    qu'il n'y a pas de pièce jointe.
     """
     if send_fn is None:
         send_fn = _discord_post
@@ -539,13 +581,21 @@ def drain(send_fn=None, *, dry_run: bool = False) -> list[dict]:
                 results.append({"id": req["id"], "status": "erreur", "detail": str(e)})
                 continue
 
+            attachment = req.get("attachment")
+            attachment_path = attachment.get("path") if attachment else None
+
             if dry_run:
                 results.append({"id": req["id"], "status": "dry-run", "to": req["to"],
-                                "outbox_status": statut, "content": content})
+                                "outbox_status": statut, "content": content,
+                                "attachment": attachment})
                 continue
 
             try:
-                msg_id = send_fn(content, _mention_ids(req["to"]))
+                if attachment_path:
+                    msg_id = send_fn(content, _mention_ids(req["to"]),
+                                      attachment_path=attachment_path)
+                else:
+                    msg_id = send_fn(content, _mention_ids(req["to"]))
             except Exception as e:  # un envoi raté ne doit pas bloquer les suivants
                 _marquer(path, req, "failed", str(e))
                 results.append({"id": req["id"], "status": "failed", "detail": str(e),
@@ -716,6 +766,8 @@ def _main() -> None:
     p_enq.add_argument("--to", required=True, choices=TARGETS)
     p_enq.add_argument("--kind", default="info", choices=KINDS)
     p_enq.add_argument("--expect-reply", action="store_true")
+    p_enq.add_argument("--attachment", default=None,
+                       help="fichier local joint au message (copié dans l'outbox)")
     g = p_enq.add_mutually_exclusive_group(required=True)
     g.add_argument("--text", help="corps du message")
     g.add_argument("--file", help="corps depuis un fichier UTF-8")
@@ -771,7 +823,8 @@ def _main() -> None:
             body = args.text
         try:
             req_id = enqueue(args.source, args.to, body, kind=args.kind,
-                             expect_reply=args.expect_reply)
+                             expect_reply=args.expect_reply,
+                             attachment_path=args.attachment)
         except GatewayError as e:
             raise SystemExit(f"Erreur : {e}")
         print(f"Demande déposée : {req_id} (outbox/{req_id}.json)")
@@ -784,8 +837,9 @@ def _main() -> None:
         for it in items:
             reply = " [réponse attendue]" if it.get("expect_reply") else ""
             motif = f" — {it['status_reason']}" if it.get("status_reason") else ""
+            piece = f" [pièce jointe : {it['attachment']['filename']}]" if it.get("attachment") else ""
             print(f"- {it.get('id')} [{it.get('status')}] {it.get('source')} -> "
-                  f"{it.get('to')} ({it.get('kind')}){reply}{motif}")
+                  f"{it.get('to')} ({it.get('kind')}){reply}{motif}{piece}")
             print(f"    {(it.get('body') or '')[:120].splitlines()[0] if it.get('body') else ''}")
 
     elif args.cmd == "approve":

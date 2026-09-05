@@ -1,3 +1,10 @@
+## v5.93 — 2026-09-05
+
+### Ajouté
+- Mécanisme générique de hooks de zone pour `/start`/`/close` (`<dossier>/_contexte/on_start.md`/`on_close.md`, sections Pré-synthèse/Post-synthèse/Fin) : migration des blocs conditionnels racine (snapshot Supabase, backup Drive) et `discord` (`bot_manager.py restart`/`stop`, enchaînement `/discord_loop`) hors des commandes génériques. `discord_loop.md` mis à jour (`bot_manager.py status`/`start` au lieu d'un lancement manuel).
+- `DISCORD/discord_com/gateway.py`/`message_marie.py` : support d'une pièce jointe (`attachment_path`, multipart Discord, 8 Mo max), demandé par la zone `design` pour un message trop long pour un texte simple. 77 tests verts.
+- `.claude/commands/deploy.md` : étape 0.5 (vérifier les échanges Discord liés aux modifications de la version avant déploiement) et étape 12bis (vérifier que le message de livraison est bien sorti de l'outbox, déboguer si la cause est un bug de code identifiable, sinon demander à l'utilisateur).
+
 ## v5.92 — 2026-09-05
 
 ### Ajouté

@@ -34,6 +34,7 @@ class GatewayTest(unittest.TestCase):
             mock.patch.object(gateway, "GATEWAY", gw),
             mock.patch.object(gateway, "OUTBOX", gw / "outbox"),
             mock.patch.object(gateway, "SENT", gw / "outbox" / "sent"),
+            mock.patch.object(gateway, "ATTACHMENTS", gw / "outbox" / "attachments"),
             mock.patch.object(gateway, "INBOX", gw / "inbox"),
             mock.patch.object(gateway, "STATE", gw / "state.json"),
             mock.patch.object(gateway, "AGENTS_FILE", gw / "agents.json"),
@@ -117,6 +118,66 @@ class GatewayTest(unittest.TestCase):
     def test_enqueue_ne_laisse_pas_de_fichier_temporaire(self):
         gateway.enqueue("orchestrateur", "channel", "x")
         self.assertEqual(list(gateway.OUTBOX.glob("*.tmp")), [])
+
+    # -- pièce jointe -----------------------------------------------------
+
+    def test_enqueue_avec_piece_jointe_la_copie_dans_l_outbox(self):
+        src = Path(self._tmp.name) / "prompt.txt"
+        src.write_text("contenu du prompt" * 10, encoding="utf-8")
+        rid = gateway.enqueue("design", "marie", "Voir la pièce jointe.",
+                              attachment_path=str(src))
+        data = self._demande(rid)
+        self.assertEqual(data["attachment"]["filename"], "prompt.txt")
+        copie = Path(data["attachment"]["path"])
+        self.assertTrue(copie.is_file())
+        self.assertEqual(copie.read_text(encoding="utf-8"), src.read_text(encoding="utf-8"))
+        # la source d'origine n'est pas déplacée
+        self.assertTrue(src.is_file())
+
+    def test_enqueue_sans_piece_jointe_donne_attachment_none(self):
+        rid = gateway.enqueue("orchestrateur", "channel", "x")
+        self.assertIsNone(self._demande(rid)["attachment"])
+
+    def test_enqueue_refuse_piece_jointe_introuvable(self):
+        with self.assertRaises(gateway.GatewayError):
+            gateway.enqueue("design", "marie", "x",
+                            attachment_path=str(Path(self._tmp.name) / "absent.txt"))
+
+    def test_enqueue_refuse_piece_jointe_trop_grosse(self):
+        src = Path(self._tmp.name) / "gros.bin"
+        src.write_bytes(b"x" * (gateway.MAX_ATTACHMENT_BYTES + 1))
+        with self.assertRaises(gateway.GatewayError):
+            gateway.enqueue("design", "marie", "x", attachment_path=str(src))
+
+    def test_drain_transmet_l_attachment_path_au_send_fn(self):
+        src = Path(self._tmp.name) / "prompt.txt"
+        src.write_text("contenu", encoding="utf-8")
+        rid = gateway.enqueue("design", "marie", "Voir pièce jointe.", attachment_path=str(src))
+        gateway.approve(rid)
+        recus = {}
+
+        def _send_fn(content, ids, attachment_path=None):
+            recus["attachment_path"] = attachment_path
+            return "mid"
+
+        gateway.drain(send_fn=_send_fn)
+        self.assertTrue(recus["attachment_path"].endswith("prompt.txt"))
+
+    def test_drain_sans_piece_jointe_n_ajoute_pas_le_kwarg(self):
+        rid = gateway.enqueue("orchestrateur", "channel", "x")
+        gateway.approve(rid)
+        # send_fn à 2 arguments seulement : ne doit pas lever malgré l'ajout du support pièce jointe
+        res = gateway.drain(send_fn=lambda c, i: "mid")
+        self.assertEqual(res[0]["status"], "sent")
+
+    def test_bounce_transmet_la_piece_jointe_a_l_auteur(self):
+        src = Path(self._tmp.name) / "prompt.txt"
+        src.write_text("contenu", encoding="utf-8")
+        rid = gateway.enqueue("design", "marie", "x", attachment_path=str(src))
+        res = gateway.bounce(rid, "motif de test")
+        inbox_path = gateway.INBOX / res["routed_to"] / f"{res['inbox_id']}.json"
+        msg = json.loads(inbox_path.read_text(encoding="utf-8"))
+        self.assertEqual(msg["attachments"][0]["filename"], "prompt.txt")
 
     # -- curate --------------------------------------------------------
 

@@ -41,9 +41,18 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       affiché. Si elle rapporte que le Google Doc est plus récent que la dernière revue du registre :
       s'arrêter après la réconciliation et demander à l'utilisateur de lancer `/analyser_googledoc`
       avant de reprendre `/deploy`.
-   5. Si l'analyse (snapshot + revue du Doc) ne révèle ni perte, ni incohérence, ni friction
-      bloquante, ni changement non revu du Google Doc : continuer normalement à l'étape 1.
-   6. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
+   5. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
+      relire les dernières entrées de `COMMUNICATION/Marie/historique_conversation_marie.md` et
+      les messages non traités de `gateway/inbox/orchestrateur/`
+      (`python DISCORD/discord_com/gateway.py poll --agent orchestrateur`, sans `ack` — relevé de
+      lecture seule, cf. CLAUDE.md § Inbox gateway). Confronter au contenu de `CHANGELOG.md` pour
+      la version cible : signaler toute demande, remarque ou confirmation de Marie touchant ces
+      changements qui ne serait couverte ni par le code livré, ni par l'inventaire de communication
+      à venir (étape 10).
+   6. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
+      incohérence, ni friction bloquante, ni changement non revu du Google Doc, ni sujet Discord
+      oublié : continuer normalement à l'étape 1.
+   7. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
       les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
       snapshots ou fichiers d'export de `donnees_marie/` pour « résoudre » un problème constaté —
       toute correction porte sur le code ou le journal projet, jamais sur les données sources de Marie.
@@ -204,7 +213,31 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     Ne jamais appeler `DISCORD/discord_com/message_marie.py`, l'API Discord ou `claude_bridge` en direct.
     L'agent DISCORD ajuste ton, format et moment d'envoi sans changer le fond ; relever l'id de demande renvoyé.
 
+12bis. Vérifier que le message est effectivement sorti de l'outbox. Le dépôt en gateway (étape 12) ne
+    garantit pas l'envoi : le gardien Discord peut `bounce`, ou `bot.py` peut échouer à drainer. Depuis le
+    réveil synthétique de la gateway (`_wake_gardien`), la demande est en général jugée en quelques secondes
+    à quelques minutes plutôt que d'attendre jusqu'à 1h — recontrôler à ce rythme, sans `sleep` bloquant.
+    - `python DISCORD/discord_com/gateway.py list` : si l'id n'apparaît plus, vérifier sa présence dans
+      `DISCORD/discord_com/gateway/outbox/sent/<id>.json` (champ `sent_at` renseigné) → envoi confirmé,
+      consigner l'id dans le rapport final (étape 13).
+    - Si un fichier `kind: "bounce"` référant cet id apparaît dans `gateway/inbox/orchestrateur/`
+      (`gateway.py poll --agent orchestrateur`) : lire le motif, corriger le corps du message en conséquence
+      (gabarit CLAUDE.md), re-`enqueue`, `ack` le bounce, consigner la correction dans
+      `COMMUNICATION/Marie/historique_conversation_marie.md`, puis reprendre cette vérification sur le
+      nouvel id.
+    - Si la demande reste `pending` au-delà d'un délai raisonnable, ou passe `failed` (dead-letter dans
+      `inbox/discord/`) : diagnostiquer avant de conclure quoi que ce soit (process `bot.py` actif ? session
+      `discord` en veille ? erreur lisible dans la dead-letter ?). Corriger seul uniquement si la cause est
+      un bug de code identifiable et non ambigu — **jamais** modifier `gateway.py`, `bot.py` ou
+      `discord_loop.md` sans confirmation explicite de l'utilisateur (code partagé, session live). Si la
+      cause n'est pas clairement un bug de code (gardien apparemment arrêté, panne Discord, ambiguïté sur le
+      fond du message) : s'arrêter et demander à l'utilisateur de vérifier lui-même plutôt que de deviner.
+    - Ne jamais appeler `drain` manuellement (cf. CLAUDE.md § Communication Discord) : seul `bot.py` draine
+      les demandes `approved`.
+
 13. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify, résultat de la
     vérification de fumée, résultat du contrôle de budget bundle, nom et lien du document Drive, inventaire
-    synthétique et corps du message de livraison déposé dans la gateway (avec son id de demande). Ne jamais
-    relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et attendre une confirmation explicite.
+    synthétique, corps du message de livraison déposé dans la gateway (avec son id de demande) et résultat de sa
+    vérification d'envoi (étape 12bis) — confirmé sorti, corrigé après bounce, ou en attente signalée à
+    l'utilisateur. Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et
+    attendre une confirmation explicite.

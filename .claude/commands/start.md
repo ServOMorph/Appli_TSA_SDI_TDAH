@@ -84,6 +84,10 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    Étape non bloquante dans les deux cas : gateway absente ou zone hors registre → sortie vide,
    poursuivre.
 
+4-ter. **Hook de zone — Pré-synthèse.** Si `<dossier>/_contexte/on_start.md` existe : le charger et
+   exécuter les instructions de sa section « Pré-synthèse » (si cette section est présente). Rien
+   à faire si le fichier est absent, ou si cette section n'y figure pas.
+
 5. Afficher le contenu intégral de `signals.md` (sans résumé ni reformulation).
 
 5b. Pour chaque action listée dans `signals.md` qui contient un champ `réf:`, lire les fichiers
@@ -99,6 +103,10 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
     coordinateur.
 
 6. Afficher en fin de réponse : 🎉🎉🎉
+
+6-bis. **Hook de zone — Post-synthèse.** Si `<dossier>/_contexte/on_start.md` existe et contient
+    une section « Post-synthèse » : l'exécuter maintenant, juste après l'affichage ci-dessus. Rien
+    à faire sinon.
 
 <!-- SPECIFICITES PROJET : DEBUT (préservé par /update, ne pas toucher hors de ce bloc) -->
 <!-- Convention : toute règle liée à une étape précise de la Procédure ci-dessus doit la
@@ -121,18 +129,9 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 
 - Étape 4 : si la zone résolue est `roberto`, charger en plus, après les fichiers de la zone,
   `_contexte/signals.md` et `_contexte/contexte.md` de la racine du projet (lecture seule).
-- Étape 6 : si la zone résolue est `discord`, enchaîner automatiquement `/discord_loop` juste
-  après l'affichage de la synthèse (`🎉🎉🎉`), sans demander de confirmation. Cette zone n'existe
-  que pour faire tourner la boucle Discord en service quasi-permanent (gardien de sortie de
-  l'outbox + vidage de `inbox/unrouted/` et `inbox/discord/`) — cf.
-  `.claude/commands/discord_loop.md` § Service quasi-permanent.
-- Étape 4 : si la zone résolue est la racine du projet (`Appli_TSA_SDI_TDAH`), lancer une
-  sauvegarde du snapshot Supabase de Marie avant d'afficher la synthèse :
-  `( set -a; . ./.env; set +a; python scripts/backup_marie_snapshot.py )`.
-  Non bloquant — en cas d'échec (hors ligne, Supabase indisponible), le signaler en une ligne
-  et poursuivre `/start`. Le script est idempotent (aucune réécriture si le snapshot courant est
-  déjà sauvegardé) et écrit dans `donnees_marie/` (gitignoré). Ne jamais afficher le contenu de
-  `.env`.
+- Étapes 4-ter/6-bis : le contenu des hooks de zone `discord` et racine (relance/arrêt de `bot.py`,
+  enchaînement `/discord_loop`, snapshot Supabase) vit dans `DISCORD/_contexte/on_start.md` et
+  `_contexte/on_start.md` de la racine, pas ici.
 - Étape 4-5, zone racine uniquement : si `tests_manuels.md` existe et n'est pas vide, le lire et
   l'inclure dans la synthèse de l'étape 5 (contrôles dev en attente). Objectif : ne jamais perdre
   de vue ce qui a été validé passivement par la session `discord` entre deux `/start` — une

@@ -20,11 +20,12 @@ Usage :
   python DISCORD/discord_com/message_marie.py --file msg.txt --dry-run   # n'envoie rien
 
 Options :
-  --file PATH   lit le corps du message depuis un fichier UTF-8 (recommandé pour le multi-ligne)
-  --stdin       lit le corps du message sur l'entrée standard
-  --no-frame    n'ajoute pas l'encadrement 💻🤖
-  --no-tag      n'ajoute pas le tag de Marie en tête
-  --dry-run     affiche le contenu final et sort sans rien envoyer
+  --file PATH       lit le corps du message depuis un fichier UTF-8 (recommandé pour le multi-ligne)
+  --stdin           lit le corps du message sur l'entrée standard
+  --no-frame        n'ajoute pas l'encadrement 💻🤖
+  --no-tag          n'ajoute pas le tag de Marie en tête
+  --attachment PATH joint un fichier local au message (multipart Discord)
+  --dry-run         affiche le contenu final et sort sans rien envoyer
   --force       autorise un envoi réel via la CLI (agent DISCORD / débogage uniquement ;
                 le chemin normal est gateway.py)
 
@@ -32,6 +33,8 @@ Sortie : identifiant du message posté, ou une ligne d'erreur explicite + code 1
 """
 import argparse
 import json
+import mimetypes
+import secrets
 import sys
 import urllib.error
 import urllib.request
@@ -121,19 +124,46 @@ def _log(content: str) -> None:
         print(f"(log conversation ignoré : {e})", file=sys.stderr)
 
 
-def _send(token: str, channel_id: int, content: str, allowed_user_ids=None) -> str:
+def _build_multipart(payload: dict, attachment_path: str) -> tuple[bytes, str]:
+    """Corps multipart/form-data (`payload_json` + `files[0]`) pour joindre un fichier local."""
+    file_path = Path(attachment_path)
+    filename = file_path.name
+    filedata = file_path.read_bytes()
+    content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+    boundary = f"gateway-{secrets.token_hex(16)}"
+
+    parts = []
+    parts.append(f"--{boundary}\r\n"
+                 f'Content-Disposition: form-data; name="payload_json"\r\n'
+                 f"Content-Type: application/json\r\n\r\n"
+                 f"{json.dumps(payload)}\r\n".encode("utf-8"))
+    parts.append(f"--{boundary}\r\n"
+                 f'Content-Disposition: form-data; name="files[0]"; filename="{filename}"\r\n'
+                 f"Content-Type: {content_type}\r\n\r\n".encode("utf-8"))
+    parts.append(filedata)
+    parts.append(f"\r\n--{boundary}--\r\n".encode("utf-8"))
+    return b"".join(parts), f"multipart/form-data; boundary={boundary}"
+
+
+def _send(token: str, channel_id: int, content: str, allowed_user_ids=None,
+          attachment_path: str | None = None) -> str:
     if allowed_user_ids is None:
         allowed_user_ids = [str(MARIE_USER_ID)]
-    payload = json.dumps(
-        {"content": content, "allowed_mentions": {"users": [str(u) for u in allowed_user_ids]}}
-    ).encode("utf-8")
+    payload = {"content": content, "allowed_mentions": {"users": [str(u) for u in allowed_user_ids]}}
+
+    if attachment_path:
+        body, content_type = _build_multipart(payload, attachment_path)
+    else:
+        body = json.dumps(payload).encode("utf-8")
+        content_type = "application/json"
+
     req = urllib.request.Request(
         f"{API}/channels/{channel_id}/messages",
-        data=payload,
+        data=body,
         method="POST",
         headers={
             "Authorization": f"Bot {token}",
-            "Content-Type": "application/json",
+            "Content-Type": content_type,
             "User-Agent": "appli-tsa-message-marie/1.0",
         },
     )
@@ -155,6 +185,7 @@ def main() -> None:
     parser.add_argument("--stdin", action="store_true", help="lire le corps sur stdin")
     parser.add_argument("--no-frame", action="store_true", help="sans encadrement 💻🤖")
     parser.add_argument("--no-tag", action="store_true", help="sans tag de Marie")
+    parser.add_argument("--attachment", default=None, help="fichier local à joindre au message")
     parser.add_argument("--dry-run", action="store_true", help="afficher sans envoyer")
     parser.add_argument("--force", action="store_true",
                         help="autoriser un envoi réel via la CLI (agent DISCORD uniquement)")
@@ -183,12 +214,14 @@ def main() -> None:
     if args.dry_run:
         print("--- message (dry-run, non envoyé) ---")
         print(content)
+        if args.attachment:
+            print(f"--- pièce jointe (non envoyée) : {args.attachment} ---")
         print("-------------------------------------")
         return
 
     token = _read_token()
     channel_id = _read_channel_id()
-    message_id = _send(token, channel_id, content)
+    message_id = _send(token, channel_id, content, attachment_path=args.attachment)
     _log(content)
     print(f"Message envoyé à Marie (id {message_id}).")
 

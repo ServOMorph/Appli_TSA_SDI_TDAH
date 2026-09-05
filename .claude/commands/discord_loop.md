@@ -34,22 +34,22 @@ agents s'arrêtent à `enqueue`, rien ne part sur Discord sans un `approve` d'ic
 ## Prérequis
 
 - `DISCORD/discord_com/config_bot_discord.json` → `"enabled": true` + token (`.env`) + channel_id configurés
-- Bot Discord en cours d'exécution : `python DISCORD/discord_com/bot.py` (terminal séparé)
+- Bot Discord lancé automatiquement par `/start discord` (hook `DISCORD/_contexte/on_start.md`,
+  section Pré-synthèse, via `bot_manager.py restart`) — rien à lancer manuellement.
 
 ## Processus
 
 ### Étape 1 : Vérifier que le bot tourne
 
 ```bash
-python -c "
-import json
-from pathlib import Path
-q = json.loads(Path('DISCORD/discord_com/queue.json').read_text(encoding='utf-8'))
-print('Queue OK :', q['status'])
-"
+python DISCORD/discord_com/bot_manager.py status
 ```
 
-Si erreur → demander à l'utilisateur de lancer `python DISCORD/discord_com/bot.py` dans un terminal séparé.
+Si `[KO] bot.py inactif` → auto-réparation :
+```bash
+python DISCORD/discord_com/bot_manager.py start
+```
+puis revérifier `status`. Ne demander à l'utilisateur que si ce second `start` échoue à son tour.
 
 ### Étape 2 : Notifier Discord
 
@@ -238,7 +238,7 @@ Envoie "stop" sur Discord pour arrêter.
 - Claude reste en boucle active dans cette session — ne pas quitter
 - Chaque commande Discord est exécutée avec le contexte complet du projet
 - Les réponses >1900 caractères sont envoyées en plusieurs messages
-- Si le bot Discord s'arrête : relancer `python DISCORD/discord_com/bot.py`
+- Si le bot Discord s'arrête : relancer `python DISCORD/discord_com/bot_manager.py start`
 - `discord_loop.py` gère uniquement queue/commands — Claude gère l'exécution
 - Ne pas notifier Discord lors d'un `/close` : seule la commande `stop` explicite (3e) envoie un message de fin.
 - Le `drain` de la gateway n'est plus manuel : `bot.py` s'en charge. Une demande bloquée en

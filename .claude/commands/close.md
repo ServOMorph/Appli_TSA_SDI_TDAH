@@ -50,6 +50,9 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
    **Zone racine : ne rien relever** — l'orchestrateur ne touche `inbox/orchestrateur/` que sur
    demande explicite de l'utilisateur.
 
+2-ter. **Hook de zone — Pré-synthèse.** Si `<dossier>/_contexte/on_close.md` existe : le charger et
+   exécuter les instructions de sa section « Pré-synthèse » (si présente). Rien à faire sinon.
+
 3. Produire une synthèse de session (< 25 lignes) au format suivant :
 
 ```
@@ -174,6 +177,9 @@ statut remonte uniquement au parent déclaré dans `agent_role.md`.
     le bilan de l'étape 12, ne pas tenter de résolution automatique (pas de force push, pas de
     pull/rebase automatique).
 
+11bis. **Hook de zone — Fin.** Si `<dossier>/_contexte/on_close.md` existe et contient une section
+    « Fin » : l'exécuter maintenant. Rien à faire sinon.
+
 12. Afficher un bilan des résidus non commités :
     ```bash
     git status --short
@@ -194,17 +200,8 @@ langage clair et sans jargon technique au tableau `WHATS_NEW` de
 `src/ui/screens/onboarding/E01Welcome.tsx`. Ajout uniquement, ne jamais réécrire ni supprimer les
 entrées existantes : le tableau accumule les changements depuis le dernier déploiement, la modale
 Nouveautés de l'écran d'accueil s'appuyant dessus pour la version publiée par `/deploy`.
-Étape 2, sur `main` uniquement et si la zone résolue est la racine du projet
-(`Appli_TSA_SDI_TDAH`) : lancer une sauvegarde du snapshot Supabase de Marie avant de produire la
-synthèse de l'étape 3 :
-`( set -a; . ./.env; set +a; python scripts/backup_marie_snapshot.py )`.
-Non bloquant — en cas d'échec (hors ligne, Supabase indisponible), le signaler en une ligne et
-poursuivre la clôture. Symétrique de l'étape 4 de `/start` : sauvegarder aussi en fin de session
-réduit la fenêtre pendant laquelle une perte de données locale chez Marie, suivie d'une
-resynchronisation, écraserait le dernier bon snapshot côté Supabase — le schéma fait un `upsert`
-d'une ligne unique par `device_id`, sans aucun historique. Le script est idempotent et écrit dans
-`donnees_marie/` (gitignoré : sans effet sur le commit de l'étape 10). Ne jamais afficher le
-contenu de `.env` ni celui d'un snapshot (données personnelles de Marie).
+Étapes 2-ter/11bis : le contenu des hooks de zone racine (snapshot Supabase, backup Drive) vit dans
+`_contexte/on_close.md` de la racine, pas ici.
 
 Étape 6, sur `main` uniquement et si la zone résolue est la racine du projet : vérifier que
 `tests_manuels.md` est cohérent avant de le committer à l'étape 10 — en particulier, ne jamais
@@ -213,14 +210,5 @@ session (elle signale un test délégué validé, cf. `.claude/commands/discord_
 ajouter de nouvelles sections `[discord-auto]` uniquement si un nouveau test délégable a été
 décidé en session. Si une section `[discord-auto]` reste présente sans avoir été observée,
 la laisser telle quelle — elle attend un cycle `/discord_loop` pertinent, pas une action ici.
-
-Étape 12, sur `main` uniquement et si la zone résolue est la racine du projet : mettre à jour le
-manifeste des fichiers absents de la branche GitHub suivie puis les copier vers Drive :
-`git fetch --quiet` puis `python claude-vibecoding-kit/backup_project.py . --refresh-list --upload`.
-Afficher le nombre de fichiers et le résultat de la copie dans le bilan. La liste comprend les
-fichiers privés/ignorés et les différences avec la branche publique, y compris les commits locaux
-non publiés. Cette sauvegarde est automatique ; une erreur rclone est non bloquante mais doit être
-signalée. Le script utilise `rclone copy` et ne supprime aucun fichier distant. Les dépendances et
-artefacts régénérables restent exclus.
 
 <!-- SPECIFICITES PROJET : FIN -->

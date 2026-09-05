@@ -503,3 +503,28 @@ Par ailleurs, Morphéus a lui-même prévenu Marie en direct sur Discord (20h02 
 parti, désolé. Actuellement tu es sur la nouvelle version. Je fais partir le message de l'IA en
 suivant. » (reçu dans `inbox/orchestrateur/`, id `20260905T200233_062837`, non acquitté — laissé
 à l'utilisateur).
+
+### 2026-09-05 (session design)
+
+**Dév ->**
+On démarre le travail sur le design de l'appli. Premier sujet : l'image d'accueil, celle qui s'affiche à l'ouverture. On va la remplacer.
+
+Tu vas la créer avec ChatGPT (version gratuite). Je te guide.
+
+Étapes :
+1. Ouvre ChatGPT, nouvelle conversation.
+2. Ouvre le fichier joint (prompt_image_accueil.txt), copie tout son contenu, colle-le dans ChatGPT, envoie.
+3. Fais ce que ChatGPT te demande : il va d'abord te décrire 10 idées d'images à l'écrit, puis te demander laquelle tu préfères, puis te poser des questions une par une pour l'affiner.
+4. Quand la description te convient, écris-lui « c'est bon » : il génère l'image.
+5. Renvoie-moi l'image obtenue et la description finale.
+
+Si ChatGPT dit que tu as atteint une limite d'images, attends quelques heures et redemande la génération.
+
+[+ pièce jointe `prompt_image_accueil.txt`, prompt complet pour ChatGPT]
+
+_Suite :_ premier dépôt (`20260903T200827_188290`) bouncé par le gardien le 2026-09-04 (message +
+prompt = 3461 car. > limite Discord 2000, découpage en plusieurs messages écarté). Support pièce
+jointe ajouté à `gateway.py`/`bot.py` le 2026-09-05 (orchestrateur, non committé) ; `bot.py`
+redémarré. Redéposé avec `--attachment` (id `20260905T213244_730443`), **statut au moment de la
+rédaction : `pending`, en attente du gardien (session discord)** — à recontrôler avant d'affirmer
+un envoi.

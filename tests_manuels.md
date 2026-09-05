@@ -45,19 +45,21 @@ le vrai bot et Discord.
   → `commands.json` reste en `processing`, la file se remplit sans être promue (angle mort connu,
   cf. question ouverte P3 de `signals.md`).
 
-## Veille /discord_loop en tâche de fond — `wait` à timeout paramétrable [discord-auto]
+## Hooks de zone `on_start.md`/`on_close.md` — jamais exercés en réel
 
-Ajouté le 2026-09-03. `discord_loop.py wait` accepte un timeout optionnel en argument
-(`wait [secondes]`, défaut 110). `.claude/commands/discord_loop.md` étape 3a demande désormais
-`wait 3600` lancé en `run_in_background`.
+Ajouté le 2026-09-05. `start.md`/`close.md` chargent désormais `<dossier>/_contexte/on_start.md`
+et `on_close.md` s'ils existent (étapes 4-ter/6-bis et 2-ter/11bis). Fichiers créés pour `discord`
+(relance/arrêt de `bot.py` via `bot_manager.py`, enchaînement `/discord_loop`) et pour la racine
+(snapshot Supabase, backup Drive) — jamais exercés par un `/start`/`/close` réel depuis leur
+création.
 
-À observer au fil de l'usage de `/discord_loop` :
-- `wait 3600` en tâche de fond ne rend pas la main tant qu'aucun message n'arrive, et sort
-  sous ~1 s à la réception d'un message Discord (commande affichée, `commands.json` →
-  `processing`) ;
-- au bout d'une heure sans message : sortie `TIMEOUT`, code 1, la boucle relance proprement ;
-- un `/close` ne déclenche aucune notification Discord.
+À vérifier au prochain `/start discord` puis `/close discord` :
+- `/start discord` relance `bot.py` proprement (`bot_manager.py restart`, ancien PID tué) puis
+  enchaîne `/discord_loop` automatiquement ;
+- `/close discord` arrête `bot.py` (`bot_manager.py stop`) ;
+- un échec de l'un ou l'autre reste non bloquant (message affiché, session poursuit).
 
-`wait` sans argument garde le comportement d'origine (cycle ~110 s) — jamais appelé ainsi par
-`discord_loop.md` en usage normal (toujours `wait 3600`), donc non observable passivement
-(hors délégation, à provoquer manuellement).
+Racine : déjà exercé partiellement à ce `/close` (snapshot Supabase + backup Drive via les hooks) —
+reste à vérifier côté `/start` racine (le hook `_contexte/on_start.md` n'a pas encore été chargé par
+un `/start` réel, seulement écrit).
+

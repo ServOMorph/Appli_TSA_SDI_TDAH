@@ -15,7 +15,6 @@ export const SCREEN_CODES: Record<Route['name'], ScreenCode> = {
   'task-create-v2': { code: 'E21', label: 'Créer une tâche' },
   'task-detail': { code: 'E22', label: 'Détail de tâche' },
   'task-decompose': { code: 'E23', label: 'Découper une tâche' },
-  'task-edit': { code: 'E24', label: 'Modifier une tâche' },
   'energy-checkin': { code: 'E31', label: 'État d’énergie' },
   'overload-recovery': { code: 'E90', label: 'Récupération après surcharge' },
   resources: { code: 'E120', label: 'Ressources' },

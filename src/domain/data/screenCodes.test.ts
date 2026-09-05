@@ -11,7 +11,6 @@ const ROUTES: Route[] = [
   { name: 'inbox' },
   { name: 'task-create-v2' },
   { name: 'task-detail' },
-  { name: 'task-edit' },
   { name: 'task-decompose' },
   { name: 'energy-checkin' },
   { name: 'overload-recovery' },

@@ -5,8 +5,10 @@ import { IconPicker } from '@/ui/components/IconPicker'
 import { ColorPicker } from '@/ui/components/ColorPicker'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
+import { TaskCardLayout } from '@/ui/components/TaskCardLayout'
 import { todayDate } from '@/app/repositories'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
+import { pastelBackground } from '@/ui/styles/ambiance'
 import type { Screen } from '@/app/AppContext'
 import type { RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
 import type { TaskStatus } from '@/domain/entities/task'
@@ -105,6 +107,18 @@ function energyGridButtonStyle(selected: boolean): React.CSSProperties {
   }
 }
 
+function fieldCellStyle(color: string | null): React.CSSProperties {
+  return {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--spacing-xs)',
+    padding: 'var(--spacing-md)',
+    borderRadius: 'var(--radius-md)',
+    border: '1px solid var(--color-border)',
+    backgroundColor: color ? pastelBackground(color) : 'var(--color-surface)',
+  }
+}
+
 const subTaskRowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -200,27 +214,94 @@ export function E21CreateTaskV2() {
         &larr; Retour
       </button>
 
-      <h1 style={{ margin: 0 }}>Nouvelle tâche</h1>
-
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', width: '100%', minWidth: 0 }}>
-        <div style={fieldGroupStyle}>
-          <span style={labelStyle}>Icône</span>
-          <IconPicker value={icon} onChange={setIcon} />
-        </div>
+        <TaskCardLayout
+          icon={icon}
+          color={color}
+          titleSlot={
+            <div>
+              <label htmlFor="task-title" style={{ ...labelStyle, color: color ? 'inherit' : 'var(--color-text-muted)' }}>
+                Titre de la tâche
+              </label>
+              <input
+                id="task-title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Que faut-il faire ?"
+                style={inputStyle}
+              />
+            </div>
+          }
+        >
+          <div style={fieldCellStyle(color)}>
+            <span style={labelStyle}>Icône</span>
+            <IconPicker value={icon} onChange={setIcon} />
+          </div>
 
-        <div>
-          <label htmlFor="task-title" style={labelStyle}>
-            Titre de la tâche
-          </label>
-          <input
-            id="task-title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Que faut-il faire ?"
-            style={inputStyle}
-          />
-        </div>
+          <div style={fieldCellStyle(color)}>
+            <span style={labelStyle}>Couleur</span>
+            <ColorPicker value={color} onChange={setColor} categories={taskCategories} />
+          </div>
+
+          {isPlanned && (
+            <div style={fieldCellStyle(color)}>
+              <label htmlFor="task-date" style={labelStyle}>
+                Date
+              </label>
+              <input
+                id="task-date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
+              />
+            </div>
+          )}
+
+          {isPlanned && (
+            <div style={fieldCellStyle(color)}>
+              <label htmlFor="task-start-time" style={labelStyle}>
+                Heure de début
+              </label>
+              <input
+                id="task-start-time"
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
+              />
+              {!startTime && (
+                <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                  L'heure de début est requise pour planifier la tâche.
+                </p>
+              )}
+              <span style={labelStyle}>Durée</span>
+              <DurationRoller minutes={durationMinutes} onChange={setDurationMinutes} />
+              {!hasDuration && (
+                <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                  La durée est obligatoire pour planifier la tâche.
+                </p>
+              )}
+            </div>
+          )}
+
+          <div style={fieldCellStyle(color)}>
+            <span style={labelStyle}>Coût en énergie</span>
+            <div style={energyGridStyle} role="group" aria-label="Coût en énergie">
+              {ENERGY_OPTIONS.map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  style={energyGridButtonStyle(energyCost === v)}
+                  onClick={() => setEnergyCost((current) => (current === v ? null : v))}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+        </TaskCardLayout>
 
         <div style={fieldGroupStyle}>
           <span style={labelStyle}>Sous-tâches</span>
@@ -266,27 +347,6 @@ export function E21CreateTaskV2() {
           />
         </div>
 
-        <div style={fieldGroupStyle}>
-          <span style={labelStyle}>Couleur</span>
-          <ColorPicker value={color} onChange={setColor} categories={taskCategories} />
-        </div>
-
-        <div style={fieldGroupStyle}>
-          <span style={labelStyle}>Coût en énergie</span>
-          <div style={energyGridStyle} role="group" aria-label="Coût en énergie">
-            {ENERGY_OPTIONS.map((v) => (
-              <button
-                key={v}
-                type="button"
-                style={energyGridButtonStyle(energyCost === v)}
-                onClick={() => setEnergyCost((current) => (current === v ? null : v))}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
           <input type="checkbox" checked={essential} onChange={(e) => setEssential(e.target.checked)} />
           Obligatoire
@@ -294,44 +354,6 @@ export function E21CreateTaskV2() {
 
         {isPlanned && (
           <div style={fieldGroupStyle}>
-            <div style={{ minWidth: 0 }}>
-              <label htmlFor="task-date" style={labelStyle}>
-                Date
-              </label>
-              <input
-                id="task-date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
-              />
-            </div>
-            <div style={{ minWidth: 0 }}>
-              <label htmlFor="task-start-time" style={labelStyle}>
-                Heure de début
-              </label>
-              <input
-                id="task-start-time"
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
-              />
-              {!startTime && (
-                <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                  L'heure de début est requise pour planifier la tâche.
-                </p>
-              )}
-            </div>
-            <div>
-              <span style={labelStyle}>Durée</span>
-              <DurationRoller minutes={durationMinutes} onChange={setDurationMinutes} />
-              {!hasDuration && (
-                <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                  La durée est obligatoire pour planifier la tâche.
-                </p>
-              )}
-            </div>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
               <input type="checkbox" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />
               Tâche récurrente

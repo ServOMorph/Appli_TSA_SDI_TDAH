@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 
 test('T10 — Ajouter une tâche depuis le dashboard ouvre l\'écran de création', async ({ page }) => {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
-  await expect(page.getByRole('heading', { name: 'Votre première tâche' }).or(page.getByRole('heading', { name: 'Nouvelle tâche' }))).toBeVisible()
+  await expect(page.getByLabel('Titre de la tâche')).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/10-create-task-screen.png' })
 })
 
@@ -29,7 +29,6 @@ test('T12 — Ouvrir détail tâche depuis inbox', async ({ page }) => {
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.getByText('Tâche détail test').click()
   await expect(page.getByRole('heading', { name: 'Tâche détail test' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Modifier' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Décomposer' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Dupliquer' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Supprimer' })).toBeVisible()
@@ -80,7 +79,7 @@ test('T19 — Depuis Paramètres, "+" crée directement une tâche en réception
   await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
   await expect(page.getByRole('heading', { name: 'Paramètres' })).toBeVisible()
   await page.getByRole('navigation').getByRole('button', { name: 'Ajouter une tâche' }).click()
-  await expect(page.getByRole('heading', { name: 'Nouvelle tâche' })).toBeVisible()
+  await expect(page.getByLabel('Titre de la tâche')).toBeVisible()
   await expect(page.getByText('Que faire de cette tâche ?')).toHaveCount(0)
   await page.getByLabel('Titre de la tâche').fill('Tâche depuis paramètres')
   await page.getByRole('button', { name: 'Valider' }).click()

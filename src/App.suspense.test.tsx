@@ -13,7 +13,6 @@ const CASES: { screen: Screen; route?: Route }[] = [
   { screen: 'inbox' },
   { screen: 'task-create-v2' },
   { screen: 'task-detail', route: { name: 'task-detail', taskId: 'task-1' } },
-  { screen: 'task-edit' },
   { screen: 'task-decompose' },
   { screen: 'energy-checkin' },
   { screen: 'overload-recovery' },

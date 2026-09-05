@@ -17,8 +17,8 @@ test('T46 — planifier une tâche à la création, puis modifier son horaire de
 
   await page.getByText('McDo').click()
   await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
-  await page.getByRole('button', { name: 'Modifier' }).click()
-  await page.getByLabel('Heure de début').fill('12:00')
+  await page.getByRole('button', { name: 'Modifier Horaire' }).click()
+  await page.getByLabel('Heure').fill('12:00')
   await page.getByRole('button', { name: 'Enregistrer' }).click()
 
   await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
@@ -39,9 +39,9 @@ test('T48 — cliquer une tâche planifiée ouvre sa fiche, renommer et supprime
   await page.getByText('RDV dentiste').click()
   await expect(page.getByRole('heading', { name: 'RDV dentiste' })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Modifier' }).click()
+  await page.getByRole('button', { name: 'Modifier le titre' }).click()
   await page.getByLabel('Titre de la tâche').fill('RDV dentiste Dr Martin')
-  await page.getByRole('button', { name: 'Enregistrer' }).click()
+  await page.getByLabel('Titre de la tâche').press('Enter')
   await expect(page.getByRole('heading', { name: 'RDV dentiste Dr Martin' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Supprimer', exact: true }).click()

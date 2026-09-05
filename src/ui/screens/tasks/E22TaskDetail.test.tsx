@@ -1,9 +1,10 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E22TaskDetail } from './E22TaskDetail'
 import type { Task } from '@/domain/entities/task'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 import { makeTask as baseTask, makeSubTask as baseSubTask } from '@/test/factories'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
@@ -81,10 +82,11 @@ describe('E22TaskDetail', () => {
     expect(screen.queryByRole('dialog', { name: 'Renommer la sous-étape' })).toBeNull()
   })
 
-  it('affiche uniquement le menu simplifié (Modifier/Décomposer/Dupliquer/Supprimer)', async () => {
+  it('affiche uniquement le menu simplifié (Décomposer/Dupliquer/Supprimer)', async () => {
     const task = makeTask()
     const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
     renderWithApp(<E22TaskDetail />, ctx)
+    expect(screen.queryByRole('button', { name: 'Modifier' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Tâche du jour' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Planifier' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Liste' })).toBeNull()
@@ -167,26 +169,118 @@ describe('E22TaskDetail', () => {
     })
   })
 
-  describe('champs en lecture seule (M4)', () => {
-    it('affiche les champs sans les rendre éditables au clic', async () => {
-      const task = makeTask({ icon: 'sport', energy_cost: 5 })
+  describe('édition en ligne des champs (#37)', () => {
+    it('bandeau : la couleur de la tâche teinte le fond, pas la couleur d’ambiance', async () => {
+      const task = makeTask({ color: '#22aa55', scheduled_date: '2026-09-05' })
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
-      expect(screen.getByText('sport')).toBeDefined()
-      expect(screen.getByText('5')).toBeDefined()
-      expect(screen.queryByRole('button', { name: /Icône/i })).toBeNull()
-      expect(screen.queryByRole('button', { name: /Coût en énergie/i })).toBeNull()
+      const heading = screen.getByRole('heading', { name: 'Appeler le médecin' })
+      const banner = heading.closest('button')?.parentElement?.parentElement as HTMLElement
+      expect(banner.style.backgroundColor).toBe('rgb(34, 170, 85)')
     })
 
-    it('le bouton Modifier navigue vers l\'écran d\'édition', async () => {
+    it('clic sur le titre : édition inline, Entrée enregistre', async () => {
       const task = makeTask()
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
-      await userEvent.click(screen.getByRole('button', { name: 'Modifier' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('task-edit')
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier le titre' }))
+      const input = screen.getByLabelText('Titre de la tâche')
+      await userEvent.clear(input)
+      await userEvent.type(input, 'Appeler le dentiste{Enter}')
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { title: 'Appeler le dentiste' }, 'occurrence')
     })
 
-    it('une tâche récurrente ouvre le choix occurrence/série avant la suppression', async () => {
+    it('clic sur Icône : affiche IconPicker, sélectionner enregistre et replie', async () => {
+      const task = makeTask({ icon: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Icône' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Sport' }))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { icon: 'sport' }, 'occurrence')
+      expect(screen.queryByRole('group', { name: 'Choisir une icône' })).toBeNull()
+    })
+
+    it('clic sur Couleur : affiche le sélecteur natif, changer enregistre', async () => {
+      const task = makeTask({ color: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
+      fireEvent.change(screen.getByLabelText('Choisir une couleur'), { target: { value: '#ff8800' } })
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { color: '#ff8800' }, 'occurrence')
+    })
+
+    it('clic sur Couleur : propose les catégories configurées', async () => {
+      const task = makeTask({ color: null })
+      const category: TaskCategory = { id: 'cat-1', name: 'Voyage', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task], taskCategories: [category] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Voyage' }))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { color: '#4a7c99' }, 'occurrence')
+    })
+
+    it('clic sur Date : changer la date enregistre', async () => {
+      const task = makeTask({ scheduled_date: '2026-09-05' })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Date' }))
+      fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2026-09-10' } })
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { date: '2026-09-10' }, 'occurrence')
+    })
+
+    it('clic sur Horaire : heure + durée, Enregistrer envoie les deux', async () => {
+      const task = makeTask({ scheduled_start: null, duration_minutes: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Horaire' }))
+      fireEvent.change(screen.getByLabelText('Heure'), { target: { value: '09:00' } })
+      await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
+      await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { startTime: '09:00', durationMinutes: 60 }, 'occurrence')
+    })
+
+    it('clic sur Coût en énergie : sélectionner une valeur enregistre et replie', async () => {
+      const task = makeTask({ energy_cost: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Coût en énergie' }))
+      await userEvent.click(screen.getByRole('button', { name: '5' }))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { energyCost: 5 }, 'occurrence')
+      expect(screen.queryByRole('group', { name: 'Coût en énergie' })).toBeNull()
+    })
+
+    it('coche Obligatoire : enregistre immédiatement sans dépliage', async () => {
+      const task = makeTask({ essential: false })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByLabelText('Obligatoire'))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { essential: true }, 'occurrence')
+    })
+
+    it('clic sur Description : la modification est enregistrée au blur', async () => {
+      const task = makeTask({ description: '' })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Description' }))
+      const textarea = screen.getByLabelText('Description')
+      await userEvent.type(textarea, 'Apporter le carnet de santé')
+      fireEvent.blur(textarea)
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { description: 'Apporter le carnet de santé' }, 'occurrence')
+    })
+
+    it('tâche récurrente : propose occurrence/série avant d’enregistrer un champ modifié', async () => {
+      const task = makeTask({ recurrence_id: 'rec-1', energy_cost: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Coût en énergie' }))
+      await userEvent.click(screen.getByRole('button', { name: '5' }))
+      expect(ctx.updateTaskFields).not.toHaveBeenCalled()
+      expect(screen.getByRole('dialog', { name: 'Modifier la série récurrente' })).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Toutes les occurrences' }))
+      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { energyCost: 5 }, 'series')
+    })
+
+    it('une tâche récurrente ouvre aussi le choix occurrence/série avant la suppression', async () => {
       const task = makeTask({ recurrence_id: 'rec-1' })
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)

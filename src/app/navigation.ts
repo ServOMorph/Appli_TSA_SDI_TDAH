@@ -7,7 +7,6 @@ export type Route =
   | { name: 'task-create-v2' }
   | { name: 'planning'; date?: string }
   | { name: 'task-detail'; taskId?: string }
-  | { name: 'task-edit' }
   | { name: 'task-decompose' }
   | { name: 'energy-checkin' }
   | { name: 'overload-recovery' }

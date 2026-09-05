@@ -3,12 +3,16 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { DurationRoller } from '@/ui/components/DurationRoller'
+import { IconPicker } from '@/ui/components/IconPicker'
+import { ColorPicker } from '@/ui/components/ColorPicker'
+import { TaskCardLayout, TaskFieldCard } from '@/ui/components/TaskCardLayout'
 import type { Task } from '@/domain/entities/task'
 import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
 import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
-import { DEFAULT_AMBIANCE_COLOR, pastelBackground } from '@/ui/styles/ambiance'
+import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
+import { pastelBackground } from '@/ui/styles/ambiance'
 import type { Screen } from '@/app/AppContext'
-import type { TaskEditScope } from '@/app/contexts/usePlanningState'
+import type { TaskEditScope, TaskFieldEdit } from '@/app/contexts/usePlanningState'
 import {
   DndContext,
   PointerSensor,
@@ -27,6 +31,8 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+
+const ENERGY_OPTIONS = Array.from({ length: ENERGY_MAX - ENERGY_MIN + 1 }, (_, i) => ENERGY_MIN + i)
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -70,6 +76,68 @@ const modalBox: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 'var(--spacing-md)',
+}
+
+const titleButtonStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  padding: 0,
+  textAlign: 'left',
+  cursor: 'pointer',
+  color: 'inherit',
+  width: '100%',
+}
+
+const titleInputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px 12px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text)',
+  fontFamily: 'var(--font-body)',
+  fontSize: '1.25rem',
+  boxSizing: 'border-box',
+}
+
+const inputStyle: React.CSSProperties = {
+  padding: '10px 12px',
+  borderRadius: 'var(--radius-sm)',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text)',
+  fontFamily: 'var(--font-body)',
+}
+
+const energyGridStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
+  gap: 'var(--spacing-xs)',
+}
+
+function energyGridButtonStyle(selected: boolean): React.CSSProperties {
+  return {
+    padding: '10px 0',
+    borderRadius: 'var(--radius-sm)',
+    border: 'none',
+    backgroundColor: selected ? 'var(--color-accent)' : 'var(--color-surface)',
+    color: selected ? '#fff' : 'var(--color-text)',
+    fontSize: '0.9375rem',
+    fontWeight: 600,
+    fontFamily: 'var(--font-body)',
+    cursor: 'pointer',
+  }
+}
+
+function essentialCardStyle(color: string | null): React.CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    padding: 'var(--spacing-md)',
+    borderRadius: 'var(--radius-md)',
+    border: '1px solid var(--color-border)',
+    backgroundColor: color ? pastelBackground(color) : 'var(--color-surface)',
+  }
 }
 
 interface SortableSubTaskItemProps {
@@ -251,19 +319,7 @@ function backScreenForTask(task: Task): Screen {
   return 'inbox'
 }
 
-const fieldRowStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 'var(--spacing-sm)',
-  padding: 'var(--spacing-md)',
-  borderRadius: 'var(--radius-md)',
-  border: '1px solid var(--color-border)',
-  width: '100%',
-  color: 'var(--color-text)',
-  fontFamily: 'var(--font-body)',
-}
-
-const fieldLabelStyle: React.CSSProperties = { color: 'var(--color-text-muted)', fontSize: '0.875rem' }
+type FieldKey = 'icon' | 'color' | 'date' | 'time' | 'energy' | 'description'
 
 export function E22TaskDetail() {
   const {
@@ -283,7 +339,8 @@ export function E22TaskDetail() {
     getTaskById,
     duplicateTaskById,
     deleteTaskScoped,
-    settings,
+    updateTaskFields,
+    taskCategories,
   } = useApp()
 
   const [subTasks, setSubTasks] = useState<Task[]>([])
@@ -292,6 +349,12 @@ export function E22TaskDetail() {
   const [renameSubTaskTitle, setRenameSubTaskTitle] = useState('')
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
   const [pendingDelete, setPendingDelete] = useState(false)
+  const [pendingFieldEdit, setPendingFieldEdit] = useState<TaskFieldEdit | null>(null)
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [draftTitle, setDraftTitle] = useState('')
+  const [expandedField, setExpandedField] = useState<FieldKey | null>(null)
+  const [draftStart, setDraftStart] = useState('')
+  const [draftDuration, setDraftDuration] = useState<number | null>(null)
 
   const taskFromLists = inboxTasks.find((t) => t.id === selectedTaskId)
   const task = taskFromLists ?? fetchedTask ?? undefined
@@ -325,6 +388,52 @@ export function E22TaskDetail() {
 
   function cancelScope() {
     setPendingDelete(false)
+  }
+
+  async function saveField(patch: TaskFieldEdit) {
+    if (!selectedTaskId || !task) return
+    setExpandedField(null)
+    if (task.recurrence_id) {
+      setPendingFieldEdit(patch)
+    } else {
+      await updateTaskFields(selectedTaskId, patch, 'occurrence')
+    }
+  }
+
+  async function confirmFieldEditScope(scope: TaskEditScope) {
+    if (!selectedTaskId || !pendingFieldEdit) return
+    const patch = pendingFieldEdit
+    setPendingFieldEdit(null)
+    await updateTaskFields(selectedTaskId, patch, scope)
+  }
+
+  function toggleField(field: FieldKey) {
+    if (!task) return
+    setExpandedField((current) => {
+      if (current === field) return null
+      if (field === 'time') {
+        setDraftStart(task.scheduled_start ?? '')
+        setDraftDuration(task.duration_minutes)
+      }
+      return field
+    })
+  }
+
+  function startEditTitle() {
+    if (!task) return
+    setDraftTitle(task.title)
+    setEditingTitle(true)
+  }
+
+  async function saveTitle() {
+    const trimmed = draftTitle.trim()
+    setEditingTitle(false)
+    if (!task || !trimmed || trimmed === task.title) return
+    await saveField({ title: trimmed })
+  }
+
+  async function saveTime() {
+    await saveField({ startTime: draftStart || null, durationMinutes: draftDuration })
   }
 
   async function handleDuplicate() {
@@ -423,51 +532,143 @@ export function E22TaskDetail() {
     )
   }
 
-
-  const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
-  const detailPageStyle: React.CSSProperties = task.scheduled_date
-    ? { ...pageStyle, backgroundColor: pastelBackground(ambianceColor) }
-    : pageStyle
-
   return (
-    <main style={detailPageStyle}>
+    <main style={pageStyle}>
       <button style={backBtnStyle} onClick={() => back(backScreenForTask(task))} aria-label="Retour">
         ← Retour
       </button>
 
-      <h1 style={{ margin: 0 }}>{task.title}</h1>
+      <TaskCardLayout
+        icon={task.icon}
+        color={task.color}
+        titleSlot={
+          editingTitle ? (
+            <input
+              aria-label="Titre de la tâche"
+              value={draftTitle}
+              autoFocus
+              onChange={(e) => setDraftTitle(e.target.value)}
+              onBlur={saveTitle}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  saveTitle()
+                }
+              }}
+              style={titleInputStyle}
+            />
+          ) : (
+            <button type="button" onClick={startEditTitle} aria-label="Modifier le titre" style={titleButtonStyle}>
+              <h1 style={{ margin: 0, fontSize: '1.25rem' }}>{task.title}</h1>
+            </button>
+          )
+        }
+      >
+        <TaskFieldCard
+          label="Icône"
+          value={task.icon ?? 'Aucune'}
+          color={task.color}
+          expanded={expandedField === 'icon'}
+          onToggle={() => toggleField('icon')}
+        >
+          <IconPicker value={task.icon} onChange={(v) => saveField({ icon: v })} />
+        </TaskFieldCard>
 
-      <section aria-label="Détails" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-        <div style={fieldRowStyle}>
-          <span style={fieldLabelStyle}>Titre</span>
-          <span>{task.title}</span>
+        <TaskFieldCard
+          label="Couleur"
+          value={task.color ?? 'Aucune couleur'}
+          color={task.color}
+          expanded={expandedField === 'color'}
+          onToggle={() => toggleField('color')}
+        >
+          <ColorPicker value={task.color} onChange={(v) => saveField({ color: v })} categories={taskCategories} />
+        </TaskFieldCard>
+
+        <TaskFieldCard
+          label="Date"
+          value={task.scheduled_date ? formatFrenchDate(task.scheduled_date) : 'Non planifiée'}
+          color={task.color}
+          expanded={expandedField === 'date'}
+          onToggle={() => toggleField('date')}
+        >
+          <input
+            type="date"
+            aria-label="Date"
+            defaultValue={task.scheduled_date ?? todayStr()}
+            onChange={(e) => saveField({ date: e.target.value })}
+            style={inputStyle}
+          />
+        </TaskFieldCard>
+
+        <TaskFieldCard
+          label="Horaire"
+          value={task.scheduled_start ? `${task.scheduled_start} (${task.duration_minutes ?? 0} min)` : 'Non planifié'}
+          color={task.color}
+          expanded={expandedField === 'time'}
+          onToggle={() => toggleField('time')}
+        >
+          <input
+            type="time"
+            aria-label="Heure"
+            value={draftStart}
+            onChange={(e) => setDraftStart(e.target.value)}
+            style={inputStyle}
+          />
+          <DurationRoller minutes={draftDuration} onChange={setDraftDuration} />
+          <Button fullWidth onClick={saveTime}>
+            Enregistrer
+          </Button>
+        </TaskFieldCard>
+
+        <TaskFieldCard
+          label="Coût en énergie"
+          value={task.energy_cost ?? 'Non défini'}
+          color={task.color}
+          expanded={expandedField === 'energy'}
+          onToggle={() => toggleField('energy')}
+        >
+          <div style={energyGridStyle} role="group" aria-label="Coût en énergie">
+            {ENERGY_OPTIONS.map((v) => (
+              <button
+                key={v}
+                type="button"
+                style={energyGridButtonStyle(task.energy_cost === v)}
+                onClick={() => saveField({ energyCost: task.energy_cost === v ? null : v })}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        </TaskFieldCard>
+
+        <div style={essentialCardStyle(task.color)}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={task.essential}
+              onChange={(e) => saveField({ essential: e.target.checked })}
+            />
+            Obligatoire
+          </label>
         </div>
 
-        <div style={fieldRowStyle}>
-          <span style={fieldLabelStyle}>Icône</span>
-          <span>{task.icon ?? 'Aucune'}</span>
-        </div>
-
-        <div style={fieldRowStyle}>
-          <span style={fieldLabelStyle}>Couleur</span>
-          <span>{task.color ?? 'Aucune couleur'}</span>
-        </div>
-
-        <div style={fieldRowStyle}>
-          <span style={fieldLabelStyle}>Date</span>
-          <span>{task.scheduled_date ? formatFrenchDate(task.scheduled_date) : 'Non planifiée'}</span>
-        </div>
-
-        <div style={fieldRowStyle}>
-          <span style={fieldLabelStyle}>Horaire</span>
-          <span>{task.scheduled_start ? `${task.scheduled_start} (${task.duration_minutes ?? 0} min)` : 'Non planifié'}</span>
-        </div>
-
-        <div style={fieldRowStyle}>
-          <span style={fieldLabelStyle}>Coût en énergie</span>
-          <span>{task.energy_cost ?? 'Non défini'}</span>
-        </div>
-      </section>
+        <TaskFieldCard
+          label="Description"
+          value={task.description || 'Aucune description'}
+          color={task.color}
+          expanded={expandedField === 'description'}
+          onToggle={() => toggleField('description')}
+          span
+        >
+          <textarea
+            aria-label="Description"
+            defaultValue={task.description}
+            rows={3}
+            onBlur={(e) => saveField({ description: e.target.value })}
+            style={{ ...inputStyle, width: '100%', resize: 'vertical', boxSizing: 'border-box' }}
+          />
+        </TaskFieldCard>
+      </TaskCardLayout>
 
       {subTasks.length > 0 && (
         <section aria-label="Sous-étapes">
@@ -499,9 +700,6 @@ export function E22TaskDetail() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-        <Button fullWidth onClick={() => goTo('task-edit')}>
-          Modifier
-        </Button>
         <Button fullWidth onClick={() => goTo('task-decompose')}>
           Décomposer
         </Button>
@@ -528,6 +726,27 @@ export function E22TaskDetail() {
               Toutes les occurrences
             </Button>
             <Button variant="secondary" fullWidth onClick={cancelScope}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {pendingFieldEdit && (
+        <div role="dialog" aria-modal="true" aria-label="Modifier la série récurrente" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Tâche récurrente</h2>
+            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+              Appliquer la modification à cette occurrence seulement, ou à toutes les occurrences
+              futures de la série ?
+            </p>
+            <Button fullWidth onClick={() => confirmFieldEditScope('occurrence')}>
+              Cette occurrence
+            </Button>
+            <Button fullWidth onClick={() => confirmFieldEditScope('series')}>
+              Toutes les occurrences
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setPendingFieldEdit(null)}>
               Annuler
             </Button>
           </div>

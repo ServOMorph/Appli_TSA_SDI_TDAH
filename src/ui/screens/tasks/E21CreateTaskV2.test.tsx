@@ -57,6 +57,16 @@ describe('E21CreateTaskV2', () => {
     expect(screen.getByRole('button', { name: 'Voyage' })).toBeDefined()
   })
 
+  it('réutilise le bandeau titre coloré partagé avec la fiche de tâche (#37)', async () => {
+    const category: TaskCategory = { id: 'cat-1', name: 'Voyage', color: '#22aa55', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    renderWithApp(<E21CreateTaskV2 />, makeAppContext({ taskCategories: [category] }))
+    expect(screen.getByRole('group', { name: 'Champs de la tâche' })).toBeDefined()
+    await userEvent.click(screen.getByRole('button', { name: 'Voyage' }))
+    const label = screen.getByLabelText('Titre de la tâche')
+    const banner = label.closest('div')?.parentElement?.parentElement as HTMLElement
+    expect(banner.style.backgroundColor).toBe('rgb(34, 170, 85)')
+  })
+
   it("depuis Todo (originScreen 'inbox') : Valider crée directement une tâche todo", async () => {
     const ctx = makeAppContext({ originScreen: 'inbox' })
     renderWithApp(<E21CreateTaskV2 />, ctx)

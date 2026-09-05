@@ -170,31 +170,63 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Refonte de la fiche de tâche, réutilisée pour la création (#37, remplace #3) [TODO]
+## Phase 3 — Refonte de la fiche de tâche, réutilisée pour la création (#37, remplace #3) [FAIT]
 
 Remplace le correctif du cadre Date/Heure (#3, abandonné par Marie) par une refonte complète de
 l'écran.
 
-- Composant de mise en page partagé (cf. D4) : bandeau titre pleine largeur en haut, fond de la
-  couleur de la tâche, logo (`TaskIcon`) devant le titre dans la même case ; en dessous, grille
-  2 colonnes de champs (Icône, Couleur, Date, Horaire, Coût en énergie…) chacun dans une case
-  teintée de la couleur de la tâche, cliquable pour modifier son contenu directement (pas de bouton
-  « Modifier » global).
-- `src/ui/screens/tasks/E22TaskDetail.tsx` : adopter ce composant ; fond de page = couleur de la
-  tâche (`task.color`), pas la couleur d'ambiance (corrige l'écart constaté) ; retirer le bouton
-  « Modifier » (`:502-504`) ; câbler l'édition inline par case.
-- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : réutiliser le même composant de mise en page pour la
-  création (« je veux que tu utilises ce même écran d'affichage pour la création »).
-- `src/ui/screens/tasks/E24EditTask.tsx` : à réduire ou retirer selon ce que l'édition inline rend
-  effectivement obsolète (cf. D4) — décision de conception, pas de suppression aveugle en début de
-  phase.
-- Retirer le correctif résiduel non déployé de #3 (`appearance: none` / `WebkitAppearance: none`,
-  commit `bcbb932`) s'il devient sans objet dans la nouvelle mise en page.
-- Tests : `E22TaskDetail.test.tsx`, `E21CreateTaskV2.test.tsx`, tests du composant de mise en page
-  partagé, e2e `02-tasks.spec.ts` (parcours détail + création). `tsc -b` + lint + suite complète
-  verts.
+- `src/ui/components/TaskCardLayout.tsx` (nouveau, D4) : composant de mise en page partagé —
+  bandeau pleine largeur (`TaskIcon` + titre) teinté de `task.color` (neutre si aucune couleur),
+  suivi d'une grille 2 colonnes (`role="group"`) ; `TaskFieldCard` associé (libellé + valeur,
+  repliable, teinté par la couleur de la tâche) porte l'interaction « cliquable pour modifier ».
+- `src/ui/screens/tasks/E22TaskDetail.tsx` : adopte `TaskCardLayout`/`TaskFieldCard`. Fond du
+  bandeau = `task.color` (corrige l'écart constaté : ce n'est plus la couleur d'ambiance). Bouton
+  « Modifier » retiré ; édition inline par case pour Icône, Couleur, Date, Horaire, Coût en
+  énergie — Icône/Couleur/Énergie enregistrent au clic (repli immédiat), Horaire par un bouton
+  Enregistrer dédié (heure + durée), Date au changement. Titre cliquable dans le bandeau (saisie +
+  Entrée/blur). Recurrence : les édits sur tâche récurrente proposent occurrence/série via la même
+  modale que la suppression.
+  **Écart constaté en cours d'implémentation, non prévu par l'analyse initiale** : la demande ne
+  couvrait explicitement que 5 champs (Icône, Couleur, Date, Horaire, Énergie) ; Description et
+  Obligatoire n'avaient plus aucun point d'accès une fois le bouton « Modifier » retiré (leur seul
+  autre point d'entrée, `E24EditTask.tsx`, disparaît — voir plus bas). Ajoutés comme case
+  supplémentaire (Description, repliable) et case simple (Obligatoire, case à cocher) pour ne rien
+  régresser.
+- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : réutilise `TaskCardLayout` pour le bandeau (icône +
+  titre en direct) et la grille (Icône, Couleur, Date/Horaire si planifiée, Énergie), sans repli —
+  contrairement à la fiche de détail, un formulaire de création n'a pas de valeur à résumer avant
+  saisie ; ce sont donc des cases statiques (toujours ouvertes), pas des `TaskFieldCard`
+  repliables. Sous-tâches, Description, Obligatoire et Récurrence restent hors grille, inchangés.
+- `src/ui/screens/tasks/E24EditTask.tsx` : retiré (route `task-edit`, code écran `E24` compris)
+  après vérification que l'édition inline de la fiche couvre tous ses champs (titre, description,
+  icône, couleur, énergie, essentiel, date, horaire) — plus aucun point d'entrée ne menait à cet
+  écran une fois « Modifier » supprimé.
+- Le correctif résiduel de #3 (`appearance: none` / `WebkitAppearance: none`, commit `bcbb932`)
+  disparaît avec les champs qu'il ciblait sur `E24EditTask.tsx` ; conservé tel quel sur
+  `E21CreateTaskV2.tsx` où ces champs existent encore.
+- Tests : `TaskCardLayout.test.tsx` (nouveau), `E22TaskDetail.test.tsx` (édition inline par champ,
+  recurrence, bandeau teinté), `E21CreateTaskV2.test.tsx` (bandeau partagé), suppression de
+  `E24EditTask.test.tsx` ; `App.suspense.test.tsx`, `screenCodes.test.ts`, `navigation.ts` mis à
+  jour (route retirée) ; e2e `02-tasks.spec.ts` (bouton Modifier retiré du parcours détail, écran de
+  création vérifié par son champ Titre plutôt qu'un titre de page) et `07-planning-v4.spec.ts`
+  (édition via les nouvelles cases). `tsc -b` + lint + suite complète (780 tests) verts.
 - Catalogue in-app : révision du parcours existant sur la fiche de tâche + nouveau parcours sur la
   création (nouvel écran, édition par case).
+- **Incident, sans rapport avec le contenu de cette phase** : en cours d'implémentation, un `git
+  merge` non déclenché par cette session (fusion d'`agent/retours`, fonctionnalité de retours
+  annotés, par la session `TESTS`) s'est retrouvé en conflit sur `src/App.tsx` et `src/data/db.ts`
+  pendant que ces mêmes fichiers étaient en cours d'édition ici. Travail mis en pause sur confirmation
+  utilisateur ; la session `TESTS` a stashé le travail non commité trouvé sur `main` (dont celui de
+  cette phase) pour fusionner proprement, puis n'a pas pu restaurer le stash sans conflit et l'a
+  laissé intact (`stash@{0}`). Récupération faite ici par fichier ciblé (`git checkout stash@{0} --
+  <fichier>` pour les fichiers propres à cette phase, réédition manuelle de `App.tsx`/
+  `navigation.ts`/`screenCodes.ts`/`App.suspense.test.tsx` pour ne pas écraser les ajouts de la
+  fonctionnalité fusionnée) plutôt qu'un `git stash pop` global : le stash contient aussi des
+  modifications non commitées d'autres sessions concurrentes (`AGENTS.md`,
+  `DESIGN/_contexte/signals.md`, `DISCORD/discord_com/gateway/STYLE.md`,
+  `claude-vibecoding-kit/rclone_backup_files.txt`) qui n'ont pas été touchées et restent uniquement
+  dans `stash@{0}` — **à récupérer par leurs sessions respectives avant toute suppression de ce
+  stash**.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

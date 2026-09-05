@@ -6,7 +6,7 @@ archivée après livraison).
 
 - Google Doc : `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
 - Dernière revue du Doc : 2026-09-04 (date de modification analysée : 2026-09-04 19:48 UTC)
-- Dernière exécution de la revue : 2026-09-04 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
+- Dernière exécution de la revue : 2026-09-05 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
 - Marie a retiré du Doc #3, #19, #21, #22 et #23 à #33 (comportement livré v5.84 conservé pour toutes sauf #3, explicitement abandonnée au profit de #37) et ajouté 34 à 38. Le Doc réutilise le n°33 pour une demande distincte (revient sur #19 : contour seul, plus de fond coloré) — collision de numérotation avec l'ancien #33 (sous-tâches de liste, déjà `livrée v5.84`), non résolue ici, cf. Précisions. Le Doc porte à présent : nouveau 33 (collision), 34 à 38 (à analyser via `/analyser_googledoc`).
 - Dernière mise à jour de ce registre : 2026-09-04 (4e passage) — `/analyser_googledoc` : les 6
   demandes actives (33 reprise Doc, 34 à 38) analysées contre le code réel et passées à `en cours
@@ -78,6 +78,12 @@ archivée après livraison).
 
 ## Historique des revues
 
+- 2026-09-05 : revue depuis `/deploy` étape 0.4 (`.claude/revue_googledoc.md`). Google Doc inchangé
+  depuis la dernière revue (modification 2026-09-04 19:48 UTC, identique). Aucune réconciliation
+  nécessaire. Snapshot Supabase `20260904-2110z` analysé au passage : aucune perte, cardinalités
+  stables vs `20260904-1911z` (247 `tasks` inchangés, `manual_test_results` inchangé à 65 —
+  journal déjà à jour, 0 test à ingérer). Aucune friction nouvelle hors celles déjà consignées
+  ci-dessous.
 - 2026-09-04 : `/analyser_googledoc` sur les 6 demandes actives issues de la revue précédente (33
   reprise Doc, 34 à 38). Code réel consulté (`PlanningBoard.tsx`, `EnergyDisplay.tsx`,
   `ToolWidgetCard.tsx`, `E10Dashboard.tsx`, `ColorPicker.tsx`, `E22TaskDetail.tsx`,

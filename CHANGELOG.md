@@ -1,3 +1,11 @@
+## v5.92 — 2026-09-05
+
+### Ajouté
+- `roadmap_demandes_marie_2026-09-04.md` intégralement livrée (4 phases, demandes 33 reprise Doc, #34 à #38) : contour coloré sans fond sur le bandeau des jours, l'énergie et les cartes d'outils ; code couleur par catégorie de tâche (Paramètres > Accessibilité) ; refonte de la fiche de tâche réutilisée pour la création (remplace le correctif abandonné du cadre Date/Heure, #3) ; défilement continu du bandeau des jours sans saut au relâchement.
+
+### Modifié
+- `_contexte/marie_modifications_suivi.md` : revue du Google Doc (`/deploy` étape 0.4) — inchangé depuis le 2026-09-04 19:48 UTC, jalon de revue mis à jour.
+
 ## v5.91 — 2026-09-05
 
 ### Ajouté

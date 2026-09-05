@@ -6,6 +6,11 @@ import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 const WHATS_NEW: string[] = [
   'Nouvel essai pour corriger l’affichage du champ « Heure de début » sur le formulaire de tâche.',
   'Nouveau flux de retours annotés : capture d’écran, annotation au crayon et commentaire directement dans l’appli.',
+  'Le bandeau des jours de l’accueil, le logo énergie et les cartes des outils : plus de fond coloré, juste un contour de couleur.',
+  'Nouveau réglage dans Paramètres > Accessibilité : créer des catégories de couleur pour les tâches (sport, plaisir, travail…), reprises ensuite comme raccourci de couleur.',
+  'Fiche de tâche refaite : titre dans un bandeau coloré en haut, informations en cases sur deux colonnes modifiables directement au clic. Même présentation pour la création d’une tâche.',
+  'Le glissement du bandeau des jours de l’accueil est plus fluide, sans saut à la fin du geste.',
+  'La catégorie « Tâche du jour » est retirée : ajouter une tâche depuis la Boîte de réception ne demande plus que son titre.',
 ]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

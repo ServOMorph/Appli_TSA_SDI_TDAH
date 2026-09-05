@@ -482,5 +482,24 @@ confirme d'ailleurs qu'elle a découvert la v5.92 par le déploiement dev, pas p
 Bouncé par l'auteur (orchestrateur, pas le gardien — demande jamais jugée, corrigée à l'initiative
 du développeur) avec le motif « ajout d'une explication à Marie sur le bug de livraison »
 (id retour `20260905T201405_361096`, acquitté), puis redéposé avec la phrase expliquant le bug de
-livraison en plus (id `20260905T201428_210121`, `--expect-reply`). **Statut au moment de la
-rédaction : `pending`, en attente de jugement du gardien** — à recontrôler avant d'affirmer un envoi.
+livraison en plus (id `20260905T201428_210121`, `--expect-reply`).
+
+Cause racine identifiée : le gardien (agent DISCORD) ne juge l'outbox qu'en début de cycle
+(réveil par message Discord ou sécurité horaire à 1h) — un `enqueue` pendant que la session dort
+n'était jamais vu avant la prochaine heure. Correctif appliqué (`gateway.py` `_wake_gardien()` +
+`discord_loop.md` 3b, commit à suivre) : `enqueue` dépose désormais une commande synthétique
+`__gateway_wake__` dans `commands.json`, qui réveille la session en <1s au lieu d'attendre le
+cycle suivant.
+
+Le correctif a immédiatement révélé un second problème de fond sur le message
+`20260905T201428_210121` : gardien **bouncé** (id retour `20260905T203101_434291`, acquitté) —
+« 9 tests à faire » annoncé mais les modifications listées en une phrase au lieu du gabarit à
+puces (une par ligne) exigé par `CLAUDE.md`. Corrigé (format à puces) et redéposé
+(id `20260905T203231_812342`, `--expect-reply`). **Statut au moment de la rédaction : `pending`**
+— à recontrôler avant d'affirmer un envoi.
+
+Par ailleurs, Morphéus a lui-même prévenu Marie en direct sur Discord (20h02 UTC, hors gateway) :
+« J'ai fait une petite boulette aujourd'hui j'ai modifié l'appli et le message discord n'est pas
+parti, désolé. Actuellement tu es sur la nouvelle version. Je fais partir le message de l'IA en
+suivant. » (reçu dans `inbox/orchestrateur/`, id `20260905T200233_062837`, non acquitté — laissé
+à l'utilisateur).

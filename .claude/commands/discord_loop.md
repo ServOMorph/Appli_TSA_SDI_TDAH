@@ -17,8 +17,11 @@ continu (heures, jours) : une session dédiée, distincte des sessions de travai
 rôle central est le **jugement de l'outbox** (gardien de sortie, étape 3a-bis) — les autres
 agents s'arrêtent à `enqueue`, rien ne part sur Discord sans un `approve` d'ici.
 
-- Cadence : une revue de l'outbox à chaque cycle, avant le `wait` (réveil par message +
-  sécurité horaire). Pas de tour de modèle en rafale.
+- Cadence : une revue de l'outbox à chaque cycle, avant le `wait` (réveil par message, réveil
+  synthétique `__gateway_wake__` dès qu'un `enqueue` dépose une demande pendant que cette session
+  dort, ou sécurité horaire à défaut). Chaque `enqueue` provoque donc un tour de jugement quasi
+  immédiat (<1s) plutôt qu'une attente jusqu'à l'heure suivante — plus de tours de modèle sur
+  cette session si la gateway est sollicitée souvent, en échange de la réactivité.
 - Routage entrant et envoi des `approved` : `bot.py`, en continu, hors de cette session.
 - Orphelin `commands.json` bloqué en `processing` > 15 min : repassé `idle` par
   `bot.py` (`recuperer_processing_orphelin()` au démarrage), aucune action manuelle.
@@ -104,18 +107,28 @@ python DISCORD/discord_com/discord_loop.py wait 3600
 ```
 
 Lancer cet appel en tâche de fond (`run_in_background`). Le script bloque côté Python
-(`sleep`, aucun coût token) jusqu'à 3600 s. Quand un message Discord arrive, il sort sous
-0,3 s :
+(`sleep`, aucun coût token) jusqu'à 3600 s. Il sort sous 0,3 s dès que `commands.json` repasse
+`pending` — un message Discord réel, ou la commande synthétique `__gateway_wake__` qu'un
+`enqueue` de la gateway y dépose :
 - Affiche la commande sur stdout
 - Marque `commands.json` → `"processing"`
 
 La fin de la tâche de fond réveille la session : traiter le message (3b→3d→3d-bis) puis relancer
 un `wait 3600` en tâche de fond. Si la sortie est `TIMEOUT` (aucun message en 1 h) → passer par
 3d-bis (un `TIMEOUT` est justement l'un des événements qu'elle guette) puis relancer immédiatement.
-Ce cycle se répète indéfiniment (heures, jours) au rythme d'un réveil par message reçu, plus un
-réveil de sécurité par heure — et non un tour de modèle toutes les quelques secondes.
+Ce cycle se répète indéfiniment (heures, jours) au rythme d'un réveil par message reçu ou par
+demande déposée dans la gateway, plus une sécurité horaire à défaut — et non un tour de modèle
+toutes les quelques secondes.
 
 #### 3b. Traiter la commande
+
+**Réveil synthétique de la gateway** (`command == "__gateway_wake__"`, `author == "gateway"`) :
+`gateway.py enqueue` dépose ce signal pour sortir immédiatement du `wait` dès qu'une nouvelle
+demande arrive en pending, au lieu d'attendre le prochain message Discord ou le timeout d'1h.
+Ce n'est pas une commande d'utilisateur : ne pas répondre sur Discord (pas de 3c), passer
+directement par `done` (3d) puis reboucler en 3a-bis (le jugement de l'outbox qui suit va
+justement traiter la demande qui a causé ce réveil) avant de relancer `wait 3600`. Ignorer aussi
+3d-bis pour ce seul événement (pas un `TIMEOUT`, pas une rafale de `queue[]`).
 
 Arrivent ici les messages qui @-mentionnent le bot, **sauf** une réponse à une question en
 attente (`state.pending_replies`) : même @-mentionné par réflexe, `bot.py` la route
@@ -188,6 +201,7 @@ python DISCORD/discord_com/discord_loop.py done
 ```
 juger l'outbox (approve/hold/bounce/merge) → wait → commande reçue → exécuter directement
 → send réponse → done → tests [discord-auto] si pertinent → vider inbox/unrouted → wait → ...
+                       ↳ réveil "__gateway_wake__" → done (sans send) → reboucler sur juger l'outbox
 ```
 
 L'envoi Discord des demandes `approved` et le routage des entrants sont faits par `bot.py`,
@@ -213,7 +227,7 @@ stop                              → Arrête la boucle proprement
 
 Bot     : ✅ actif
 Mode    : Claude natif (pas de sous-processus)
-Veille  : wait 3600 en tâche de fond (réveil par message, sécurité horaire)
+Veille  : wait 3600 en tâche de fond (réveil par message, réveil gateway, sécurité horaire)
 Gardien : outbox <N> pending / <N> held — jugée à chaque cycle
 
 Envoie "stop" sur Discord pour arrêter.

@@ -6,6 +6,9 @@ SORTIE : les autres agents (orchestrateur, design) appellent `enqueue(...)` ou l
 Chaque demande naît en `pending`. L'agent DISCORD est le gardien de sortie : il ajuste
 ton/format/timing SANS toucher au fond, puis `approve` / `hold` / `bounce` / `merge`.
 Seules les demandes `approved` sortent ; `bot.py` les draine automatiquement.
+`enqueue` réveille aussi immédiatement la session DISCORD (`commands.json` -> `__gateway_wake__`,
+cf. `discord_loop.md` 3b) si elle dort dans un `wait`, au lieu d'attendre le prochain message
+Discord ou le timeout de sécurité (jusqu'à 1h).
 
 ENTRÉE : `route_inbound(...)` classe les messages Discord entrants et les dépose dans
 `gateway/inbox/<agent>/`. Priorité : tag explicite `@agent:` en tête, sinon réponse
@@ -58,6 +61,9 @@ AGENTS_FILE = GATEWAY / "agents.json"
 LOCK = GATEWAY / "state.lock"
 DRAIN_LOCK = GATEWAY / "drain.lock"
 CONV_LOG = DIR / "logs" / "conversation.jsonl"
+COMMANDS = DIR / "commands.json"
+COMMANDS_LOCK = GATEWAY / "commands.lock"
+GARDIEN_WAKE_COMMAND = "__gateway_wake__"
 
 TARGETS = ("marie", "morpheus", "channel")
 KINDS = ("info", "question", "delivery")
@@ -99,6 +105,32 @@ def _atomic_write(path: Path, text: str) -> None:
     tmp = path.with_name(f"{path.name}.{os.getpid()}.{time.monotonic_ns()}.tmp")
     tmp.write_text(text, encoding="utf-8")
     os.replace(tmp, path)
+
+
+def _wake_gardien() -> None:
+    """Réveille immédiatement la session DISCORD (`/discord_loop`, bloquée dans un
+    `discord_loop.py wait`) en déposant une commande synthétique dans `commands.json`,
+    au lieu d'attendre le prochain message Discord ou le timeout de sécurité (jusqu'à 1h).
+    Ne réveille que si `commands.json` est `idle` (jamais de commande réelle écrasée).
+    Best-effort : une commande synthétique manquée n'est pas grave, le prochain cycle
+    naturel jugera quand même l'outbox — ne doit donc jamais faire échouer l'appelant.
+    """
+    try:
+        with _file_lock(COMMANDS_LOCK):
+            if not COMMANDS.is_file():
+                return
+            cmd = json.loads(COMMANDS.read_text(encoding="utf-8"))
+            if cmd.get("status") != "idle":
+                return
+            cmd["status"] = "pending"
+            cmd["command"] = GARDIEN_WAKE_COMMAND
+            cmd["author"] = "gateway"
+            cmd["author_display"] = "gateway"
+            cmd["author_id"] = None
+            cmd["timestamp"] = int(time.time())
+            _atomic_write(COMMANDS, json.dumps(cmd, ensure_ascii=False, indent=2))
+    except Exception:
+        pass
 
 
 # ------------------------------------------------------------------
@@ -283,6 +315,7 @@ def enqueue(source: str, to: str, body: str, *, kind: str = "info",
         "meta": meta or {},
         "created_at": _now(),
     }, ensure_ascii=False, indent=2))
+    _wake_gardien()
     return req_id
 
 

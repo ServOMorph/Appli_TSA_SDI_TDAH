@@ -138,10 +138,15 @@ Destinataire : le canal Discord, message public (pas d'interlocuteur unique).
 
 **Exception (décision Morphéus 2026-09-04)** : les deux `notify` fixes de `/discord_loop`
 (connexion étape 2, arrêt sur `stop` étape 3e) dérogent à ce ton — formulations figées et
-familières, humour assumé (« Allez ça y'est je me remets au taf » / « Allez, les jeunes, bonne
-nuit, je va me coucher », « va » inclus, volontaire). Ne pas les aligner sur ce ton neutre.
+familières, humour assumé (« Allez ça y'est je me remets au taf » / « J'en ai plein le c... je
+vais me faire un café et je reviens »). Ne pas les aligner sur ce ton neutre.
 Chaînes en dur dans `.claude/commands/discord_loop.md`, hors du jugement de l'agent DISCORD
 (pas de demande outbox pour ces deux messages).
+
+**Exception (décision Morphéus 2026-09-04, 2e)** : le message de mise en file d'attente
+(`bot.py`, fonction `on_message`, branche @-mention) déroge aussi à ce ton — « 📥 En file
+d'attente (N). j'envoie la sauce dès que j'ai fini mon café » (formulation figée, familière).
+Chaîne en dur dans `bot.py`, hors du jugement de l'agent DISCORD.
 
 ### Format
 

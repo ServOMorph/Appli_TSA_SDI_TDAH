@@ -453,3 +453,34 @@ elle y a vraisemblablement eu accès via le déploiement dev `appli-audhd-dev.ne
 message de la session TESTS du 2026-09-05). Signale un effet de zoom indésirable au clic sur
 « Ajouter » depuis Réception, non identifié ni corrigé à ce stade — décision de traitement laissée à
 l'utilisateur (nouvelle demande hors Google Doc, pas encore de roadmap ni de correctif).
+
+### 2026-09-05 — message de livraison v5.92, deuxième correction (bug de livraison expliqué à Marie)
+
+**Dév ->**
+Version 5.92 en ligne.
+
+Ce qui change :
+- Bandeau des jours de l'accueil, logo énergie et cartes des outils : plus de fond coloré, juste un contour de couleur.
+- Nouveau réglage dans Paramètres > Accessibilité : créer des catégories de couleur pour tes tâches (sport, plaisir, travail...), reprises ensuite comme raccourci de couleur pour une tâche.
+- Fiche de tâche refaite : titre dans un bandeau coloré en haut, informations en cases sur deux colonnes modifiables directement au clic. Même présentation pour la création d'une tâche.
+- Le glissement du bandeau des jours est plus fluide, sans saut à la fin du geste.
+- La catégorie « Tâche du jour » est retirée : ajouter une tâche depuis la Boîte de réception ne demande plus que le titre.
+
+Question : pour l'ajout d'une tâche planifiée d'office depuis l'écran d'accueil (dernière étape du retrait de « Tâche du jour »), quel bouton doit ouvrir cet ajout ?
+
+Un bug technique de notre côté a empêché ce message de partir hier soir au moment du déploiement. Si tu as utilisé l'appli entre-temps, elle était déjà en version 5.92 sans que tu sois prévenue. C'est corrigé.
+
+9 tests à faire dans l'écran « Tests à faire », touchant les modifications 3, 33, 34, 35, 36, 38 (plus le retrait de « Tâche du jour » et l'ajout de tâche depuis la Réception, hors numérotation du Doc).
+
+https://appli-audhd.netlify.app/
+
+Détail des changements et questions : https://drive.google.com/open?id=1MAG1JiLDbP13tmNQL5O9g6GyeEmFBGIC
+
+_Suite :_ le message précédent (id `20260905T195125_508415`) a été recontrôlé — il était resté
+`pending`, jamais jugé par le gardien, donc **jamais envoyé** ; le zoom-bug de Marie ci-dessus
+confirme d'ailleurs qu'elle a découvert la v5.92 par le déploiement dev, pas par ce message.
+Bouncé par l'auteur (orchestrateur, pas le gardien — demande jamais jugée, corrigée à l'initiative
+du développeur) avec le motif « ajout d'une explication à Marie sur le bug de livraison »
+(id retour `20260905T201405_361096`, acquitté), puis redéposé avec la phrase expliquant le bug de
+livraison en plus (id `20260905T201428_210121`, `--expect-reply`). **Statut au moment de la
+rédaction : `pending`, en attente de jugement du gardien** — à recontrôler avant d'affirmer un envoi.

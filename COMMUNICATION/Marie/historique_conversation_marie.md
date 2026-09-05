@@ -534,13 +534,37 @@ Le message de livraison v5.92 redéposé (id `20260905T203231_812342`, cf. entr�
 rejugé par le gardien (session discord) : bouncé une 3e fois (id retour `20260905T213045_252452`),
 motif inchangé — « 9 tests à faire » annoncé mais 8 puces listées. Toujours pas envoyé à Marie.
 
-### 2026-09-05 22h16 — livraison v5.92, 4e bounce
+### 2026-09-05 22h16 — livraison v5.92, 4e bounce PUIS annulation (erreur du gardien)
 
-Nouvelle tentative (id `20260905T221607_821502`) : nombre annoncé passé à « 12 tests à faire »,
-puces changées (33, 34, 35, 36, 37, 38, Retrait de « Tâche du jour », Ajout de tâche depuis
-Réception — le « 3 » disparu, « 37 » apparu) mais toujours 8 puces au total, toujours en désaccord
-avec le nombre annoncé. Bouncé (id retour `20260905T221635_196130`), motif détaillant les 4
-occurrences. Toujours pas envoyée à Marie.
+Nouvelle tentative (id `20260905T221607_821502`) : « 12 tests à faire », 8 puces listées (33, 34,
+35, 36, 37, 38, Retrait de « Tâche du jour », Ajout de tâche depuis Réception). Bouncé à tort (id
+retour `20260905T221635_196130`) sur la prémisse fausse que N (nombre de tests) doit égaler le
+nombre de puces.
+
+**Erreur identifiée immédiatement après** : `CLAUDE.md` § Gabarit du message de livraison dit
+explicitement N = nombre de *parcours*, puces = numéros de modification *distincts* couverts par
+ces parcours — plusieurs parcours peuvent partager un numéro (cas réel ici : #37 a deux parcours,
+`modifier-une-tache-planifiee` et `creer-une-tache-bandeau-colore`, cf. entrée orchestrateur
+ci-dessous). N > nombre de puces est donc normal, pas une incohérence. Note de correction déposée
+dans `inbox/orchestrateur/` (id `20260905T222215_000001`) : le message peut être redéposé
+identique, approbation directe promise. Les 2e et 3e bounces (9 tests / 8 puces, même prémisse
+fausse) sont probablement aussi erronés — à ré-analyser, pas encore fait.
+
+### 2026-09-05 22h19 — livraison v5.92, 5e bounce (sous-comptage suite au 4e bounce erroné)
+
+Avant de recevoir la correction ci-dessus, l'orchestrateur a réagi au 4e bounce (erroné) en
+redéposant avec N ramené à 8 (id `20260905T221936_658980`, mêmes 8 puces) — alignant à tort le
+nombre de tests sur le nombre de puces, alors que 12 est le chiffre réel (recalcul programmatique
+déjà fait, cf. entrée 22h16 « corps corrigé sur le fond »). Bouncé (id retour
+`20260905T222040_989543`) avec motif corrigé : redéposer avec N=12, approbation directe promise.
+
+### 2026-09-05 22h21 — livraison v5.92, redéposée à N=12 et approuvée
+
+Redépôt correct (id `20260905T222123_604247`, `--expect-reply`) : N=12, mêmes 8 puces (33, 34,
+35, 36, 37, 38, Retrait de « Tâche du jour », Ajout de tâche depuis Réception). Approuvé
+directement par le gardien, comme promis dans la note de correction. Envoi confié à `bot.py`
+(prochain drain, <5 s). Cinq tentatives, deux bounces à tort (le 2e et le 3e — 9/8 — restent à
+ré-analyser), avant ce dépôt conforme.
 
 ### 2026-09-05 22h06 — message correctif (erreur de jugement du gardien)
 
@@ -598,8 +622,15 @@ bouton « Modifier » disparu) ; `cadre-date-heure-dans-l-ecran` **retiré du ca
 #3, abandonnée par Marie au profit de #37 — le garder aurait redemandé un test sur un comportement
 qu'elle a explicitement demandé d'abandonner). `tsc -b` + lint + 783 tests verts. Recalcul
 programmatique (`isManualTestDone`) : **12 tests réellement en attente**, tous rattachés à cette
-livraison, numéros neufs inchangés (33, 34, 35, 36, 37, 38 + 2 hors Doc). Message re-déposé
-(`enqueue --source orchestrateur --to marie --kind delivery --expect-reply`, id
-`20260905T221607_821502`), bounce précédent acquitté (`ack --agent orchestrateur --id
-20260905T213045_252452`). Statut non re-vérifié après ce dépôt — à recontrôler avant d'affirmer
-l'envoi effectif.
+livraison, numéros neufs inchangés (33, 34, 35, 36, 37, 38 + 2 hors Doc). Commit `3b6eae3`.
+
+4e bounce du gardien (id `20260905T221635_196130`, « 12 tests / 8 puces ») : règle mécanique
+erronée de sa part (N = nombre de puces), corrigée par lui-même dans la foulée (note
+`20260905T222215_000001` : N = nombre de *parcours*, les puces = numéros distincts, un numéro
+pouvant couvrir plusieurs parcours — cas #37 et #35). Entre les deux, un redépôt à N=8 avait été
+fait par prudence puis corrigé directement dans le fichier outbox (avant tout jugement) pour
+revenir à N=12 — évite d'envoyer un chiffre sous-compté à Marie. Nouveau bounce (id
+`20260905T222040_989543`) confirmant le contenu 12/8 correct mais exécuté par erreur de
+manipulation du gardien (son texte disait « j'approuve directement »). Contenu redéposé à
+l'identique (id `20260905T222123_604247`) : **approuvé et envoyé** (confirmé dans
+`outbox/sent/20260905T222123_604247.json`). Tous les bounces intermédiaires acquittés.

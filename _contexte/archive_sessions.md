@@ -1230,3 +1230,28 @@ Aligner `.claude/CLAUDE.md` § « Gabarit du message de livraison » (nom de fic
 
 ## Question bloquante pour la session suivante
 Aucune.
+
+---
+
+## Dernière session (2026-09-06 — analyse `roadmap_refactorisation_2026-09-06.md`)
+
+## Décisions prises
+- `roadmap_refactorisation_2026-09-06.md` jugée lançable **Phases 1-2 seulement**, sous 2 confirmations utilisateur (réinstall dépendances depuis le verrou ; branche cible — `main` par politique). Phases 3-8 gatées derrière la baseline verte de Phase 1 + décisions D1/D2/D4/D5 (non prises). Phase 8 (R6) à conditionner explicitement au retour Marie sur `E12WeekPlanning`.
+- `roadmap_refactorisation_2026-09-06.md` + `ROBERTO/plan_refacto_2026-09-06.md` (créés hors session, non suivis) commités sur `main` — convention : roadmaps produit à la racine.
+
+## Livrables produits ou modifiés
+- `roadmap_refactorisation_2026-09-06.md`, `ROBERTO/plan_refacto_2026-09-06.md` : commités (aucune modification de contenu cette session).
+- `_contexte/signals.md`, `_contexte/contexte.md`, `_contexte/archive_sessions.md`, `_contexte/archive_decisions.md`, `README.md`, `CHANGELOG.md` : ce `/close`.
+- Aucun code applicatif touché.
+
+## Hypothèses validées / invalidées
+- VALIDÉ (lecture code) : R2 réel — `usePlanningState.ts:142` passe le mois de `YYYY-MM-DD` à `Date.UTC` sans `m-1`. Ancres R1-R6 : tous les fichiers cités présents, tailles cohérentes. Phase 2 : 9 `commentaires_marie_v*.docx` à la racine, règle `.gitignore:75` présente.
+- VALIDÉ (fs) : install locale incomplète — `node_modules/@dnd-kit/*`, `@jridgewell/sourcemap-codec` et le binaire `eslint` absents. Aucune baseline verte dans ce checkout à cette date (tsc code 2, lint introuvable, Vitest 0 test).
+- CONTRADICTION (levée depuis, session 2026-09-06 suivante) : `signals`/`contexte` affirmaient « 783 tests verts » le 2026-09-06 ; le plan (même date) constatait l'inverse — tranché par `npm ci` dans le worktree `refacto-p1`.
+- EN ATTENTE : décision de lancement (confirmations utilisateur) ; décisions D1/D2/D4/D5 de la roadmap.
+
+## Prochaine étape exacte
+Si lancement : `/start` puis Phase 1 (relevé Git + réinstall dépendances depuis le verrou + rétablir tsc/lint/Vitest, isoler les échecs préexistants). Sinon, reprendre les points en attente de Marie (tests v5.92, D2).
+
+## Question bloquante pour la session suivante
+Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle branche (`main` ou branche d'intégration dédiée) ?

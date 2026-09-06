@@ -1,3 +1,12 @@
+## v5.100 — 2026-09-06
+
+### Corrigé
+- Envoi des retours annotés (retour « E10 » de Marie) : le flux avait été mis en ligne avec la v5.92 sans sa partie serveur. `supabase/feedback.sql` (table `feedback_reports`, fonction `submit_feedback`, bucket privé `feedback`, policy d'upload `anon`) appliqué sur le projet Supabase de production. Message envoyé à Marie via la gateway (`approve` + `drain` forcés depuis la session orchestrateur, hors gardien `discord`, sur instruction explicite) pour relancer les retours en échec et confirmer leur passage à « Envoyé ». Inbox `20260906T184910_113113` acquittée, échange journalisé dans `historique_conversation_marie.md`.
+
+### Analyse
+- Contradiction « 783 tests verts » levée : `npm ci` depuis le fichier de verrouillage dans un worktree Git isolé (`refacto-p1`, detached `f4ac862`, conservé) → `tsc` (app + node) exit 0, `lint` 0 avertissement, Vitest 97 fichiers / 783 tests verts, `bundle:check` OK. Le chiffre est exact ; la cause des échecs était un `node_modules` incomplet sur le checkout partagé, pas le code. Le checkout principal garde un `node_modules` incomplet (réinstallation différée).
+- Volet UX du retour E10 (sous-tâches dans la carte de tâche, heure de fin alignée sur la dernière sous-tâche) : non traité — changement `src/` nécessitant la réinstallation des dépendances sur le checkout principal.
+
 ## v5.99 — 2026-09-06
 
 ### Ajouté

@@ -634,3 +634,31 @@ revenir à N=12 — évite d'envoyer un chiffre sous-compté à Marie. Nouveau b
 manipulation du gardien (son texte disait « j'approuve directement »). Contenu redéposé à
 l'identique (id `20260905T222123_604247`) : **approuvé et envoyé** (confirmé dans
 `outbox/sent/20260905T222123_604247.json`). Tous les bounces intermédiaires acquittés.
+
+### 2026-09-06 — série de tests techniques sur le canal (déposés dans la gateway)
+
+**Dév ->**
+
+Série de tests techniques sur le canal maintenant.
+Quelques messages de test sans intérêt pour toi dans les prochaines minutes.
+Ne pas en tenir compte.
+Je préviens quand c'est terminé.
+
+_Suite :_ message de prévention avant une série de tests développeur sur le bot Discord (hooks de
+zone `/start`/`/close`, file d'attente des commandes en conditions dégradées). Déposé dans la
+gateway (id `20260906T134940_214438`), d'abord `hold` par le gardien (une `pending_reply` de Marie
+active sur la livraison v5.92), puis `approve` sur ordre explicite de Morphéus pour ne pas surprendre
+Marie pendant les tests. Envoyé.
+
+### 2026-09-06 — fin de la série de tests techniques (déposé dans la gateway)
+
+**Dév ->**
+
+Tests techniques sur le canal terminés.
+Les messages de test des dernières heures sont sans objet, ne pas en tenir compte.
+Canal de nouveau normal.
+
+_Suite :_ clôture symétrique du message de prévention ci-dessus. Tests A (hooks de zone) et B1/B2
+(file d'attente des commandes du bot) validés. Déposé dans la gateway (id `20260906T151442_084084`),
+`pending` — partira au prochain cycle `/discord_loop` de la session discord (bot actuellement
+arrêté).

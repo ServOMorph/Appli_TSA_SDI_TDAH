@@ -36,6 +36,9 @@ agents s'arrêtent à `enqueue`, rien ne part sur Discord sans un `approve` d'ic
 - `DISCORD/discord_com/config_bot_discord.json` → `"enabled": true` + token (`.env`) + channel_id configurés
 - Bot Discord lancé automatiquement par `/start discord` (hook `DISCORD/_contexte/on_start.md`,
   section Pré-synthèse, via `bot_manager.py restart`) — rien à lancer manuellement.
+  `restart` (hook, début de session) part d'une instance propre en tuant tout résidu ; l'Étape 1
+  ci-dessous utilise `status` puis `start` (conservateur, ne touche pas une instance déjà saine).
+  Les deux commandes sont volontairement distinctes.
 
 ## Processus
 

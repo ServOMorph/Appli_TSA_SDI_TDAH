@@ -27,3 +27,8 @@ fichiers privés/ignorés et les différences avec la branche publique, y compri
 non publiés. Cette sauvegarde est automatique ; une erreur rclone est non bloquante mais doit être
 signalée. Le script utilise `rclone copy` et ne supprime aucun fichier distant. Les dépendances et
 artefacts régénérables restent exclus.
+
+Cette section s'exécute après l'étape 14 (`git push`) et **même si ce push a échoué** : la
+sauvegarde Drive ne dépend pas du push. Le manifeste `claude-vibecoding-kit/rclone_backup_files.txt`
+est réécrit à chaque passage ; il est gitignoré (aucun résidu à committer, pas de signalement à
+l'étape 15).

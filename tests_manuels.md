@@ -45,23 +45,3 @@ le vrai bot et Discord.
   → `commands.json` reste en `processing`, la file se remplit sans être promue (angle mort connu,
   cf. question ouverte P3 de `signals.md`).
 
-## Hooks de zone `on_start.md`/`on_close.md` — jamais exercés en réel
-
-Ajouté le 2026-09-05. `start.md`/`close.md` chargent désormais `<dossier>/_contexte/on_start.md`
-et `on_close.md` s'ils existent (étapes 4-ter/6-bis et 2-ter/11bis). Fichiers créés pour `discord`
-(relance/arrêt de `bot.py` via `bot_manager.py`, enchaînement `/discord_loop`) et pour la racine
-(snapshot Supabase, backup Drive) — jamais exercés par un `/start`/`/close` réel depuis leur
-création.
-
-À vérifier au prochain `/start discord` puis `/close discord` :
-- `/start discord` relance `bot.py` proprement (`bot_manager.py restart`, ancien PID tué) puis
-  enchaîne `/discord_loop` automatiquement ;
-- `/close discord` arrête `bot.py` (`bot_manager.py stop`) ;
-- un échec de l'un ou l'autre reste non bloquant (message affiché, session poursuit).
-
-Racine : hook `on_start.md` (Pré-synthèse, snapshot Supabase) et hook `on_close.md` (Pré-synthèse
-+ Fin, snapshot + backup Drive) désormais exercés par un `/start` puis un `/close` réels de la
-zone racine (session du 2026-09-06) — les deux échecs possibles restent non bloquants comme prévu.
-Reste à vérifier côté `discord` : `/start discord` (relance `bot_manager.py restart` + enchaînement
-`/discord_loop`) et `/close discord` (`bot_manager.py stop`), jamais exercés.
-

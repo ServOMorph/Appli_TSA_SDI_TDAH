@@ -78,10 +78,6 @@ git status --short
 ```
 Définir `<contexte>` :
 - Sur `main` : `<dossier>/_contexte`.
-- Sur `sync-marie` : `<dossier>/_contexte/branches/sync-marie`. Afficher systématiquement les deux
-  compteurs de divergence. Si le premier (commits de `main` absents de `sync-marie`) est non nul,
-  signaler qu'une intégration contrôlée de `main` est requise avant tout travail fusionnable ou
-  déployable ; ne jamais la lancer automatiquement.
 - Sur une branche `agent/<alias>` correspondant à un alias de `.claude/zones.md` (casse ignorée) :
   `<dossier>/_contexte`, afficher l'écart avec `main`, appliquer le rôle de l'agent. Branche
   isolée : ne pas fusionner, rebaser, déployer ni modifier `main`.
@@ -100,10 +96,6 @@ générique.
 - Une branche `agent/<alias>` correspondant à une zone déclarée dans `.claude/zones.md` peut contenir un travail isolé
   strictement limité à son `agent_role.md`. Elle ne modifie jamais directement `main`, ne
   déclenche aucun déploiement et n'est intégrée qu'après validation explicite de l'utilisateur.
-- `sync-marie` est réservée à l'authentification sécurisée, Supabase et la synchronisation. Elle
-  ne doit pas déclencher `/deploy` ni modifier les artefacts de release ou de tests de Marie.
-- Une intégration de `main` dans `sync-marie` est une opération explicite, jamais implicite dans
-  `/start` ou `/close`.
 
 ## Spécificités projet
 

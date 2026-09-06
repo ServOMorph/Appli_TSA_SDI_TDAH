@@ -176,11 +176,6 @@ Lire `.claude/zones.md` pour obtenir la table des alias → dossiers réels.
 
 **Avant l'étape 2**, identifier la branche Git courante et définir `<contexte>` :
 - Sur `main` : `<contexte>` = `<dossier>/_contexte`. Procédure complète.
-- Sur `sync-marie` : `<contexte>` = `<dossier>/_contexte/branches/sync-marie`. Branche limitée à
-  l'authentification, Supabase et la synchronisation : ne pas modifier `CHANGELOG.md`, `README.md`,
-  `WHATS_NEW`, `manualTestsCatalog.ts`, `tests_manuels.md` ; ne jamais lancer `/deploy`. Afficher
-  `git rev-list --left-right --count main...HEAD` ; si `main` a avancé, signaler l'intégration à
-  planifier, ne jamais lancer merge ou rebase automatiquement.
 - Sur une branche `agent/<alias>` correspondant à un alias déclaré dans `.claude/zones.md` (casse
   ignorée) : `<contexte>` = `<dossier>/_contexte`. Écrire et committer uniquement les livrables
   autorisés par `agent_role.md`, sur cette branche. Ne jamais fusionner, rebaser, déployer ni

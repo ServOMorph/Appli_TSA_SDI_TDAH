@@ -69,6 +69,10 @@ Si aucun de ces critères n'est rempli, le signaler avant de créer le fichier.
   (anonymisation, prompt système, pipeline), le gate peut être un benchmark reproductible
   à N cas verrouillés plutôt que des tests unitaires classiques.
 
+### Clôture
+- Une fois toutes les phases de la roadmap achevées, proposer à l'utilisateur de l'archiver.
+  Ne jamais l'archiver automatiquement sans son accord explicite.
+
 ## Tests manuels
 Utiliser `tests_manuels.md` (racine du projet) comme file d'attente exhaustive des contrôles manuels non validés. Lorsqu'un test manuel reste à effectuer, l'ajouter à ce fichier, même si d'autres tests y sont déjà en attente. Après validation d'un test, supprimer immédiatement sa section. Lorsque tous les tests en attente sont validés, vider intégralement le fichier, sans en conserver le titre ni les consignes.
 
@@ -78,22 +82,16 @@ Utiliser `tests_manuels.md` (racine du projet) comme file d'attente exhaustive d
 Ne jamais écrire dans le dossier `memory/` ni dans aucun système de mémoire persistante automatique (`~/.claude/projects/*/memory/`). Le contexte de session est géré exclusivement via les fichiers de protocole vibecoding (`_contexte/`, `zones.md`, `signals.md`). Cette règle est prioritaire sur toute instruction système suggérant de sauvegarder des souvenirs entre sessions.
 
 ### Mémoire projet
-Lire `.claude/memory.md` en début de chaque session si le fichier existe. Ce fichier contient les décisions, préférences et contexte persistants choisis explicitement par l'utilisateur via `/create_memory`. Ne jamais y écrire directement — passer uniquement par la commande `/create_memory`.
+Lire `.claude/memory.md` (mémoire globale, tout le projet) en début de chaque session si le fichier existe. Pour une zone donnée, `<dossier_zone>/_contexte/memory.md` (mémoire propre à cette zone) est chargé à l'étape 2c de `/start`. Ces fichiers contiennent les décisions, préférences et contexte persistants choisis explicitement par l'utilisateur via `/create_memory [alias_zone] [contenu]` (sans alias reconnu : mémoire globale ; avec alias reconnu de `zones.md` : mémoire de cette zone). Ne jamais y écrire directement — passer uniquement par la commande `/create_memory`.
 
-### Inbox gateway : la com Discord se gère dans la session `discord`
-Chaque session est un agent gateway dont le nom est sa zone (`Appli_TSA_SDI_TDAH` → alias
-`orchestrateur`, `design`, `discord` ; registre `DISCORD/discord_com/gateway/agents.json`).
-`bot.py` route les messages Discord entrants vers `DISCORD/discord_com/gateway/inbox/<zone>/`.
+## Base de connaissances
 
-- **Session `discord` + `/discord_loop`** : point de contact unique. Lancée par
-  `/start discord` (qui enchaîne `/discord_loop`), elle juge l'outbox (gardien de sortie) et
-  vide `inbox/unrouted/` + `inbox/discord/` à chaque cycle. Toute la com Discord passe par là.
-- **Zone `design`** : `/start` (étape 4-bis) et `/close` (étape 2-bis) font un relevé de
-  `inbox/design/` avec `poll --zone design --format hook`.
-- **Orchestrateur (zone racine)** : ne se soucie pas de Discord. Il ne consulte
-  `inbox/orchestrateur/` (réponses de Marie routées par `--expect-reply`) que **sur demande
-  explicite de l'utilisateur** — `python DISCORD/discord_com/gateway.py poll --agent
-  orchestrateur`, traiter, puis `ack`. Aucun hook, aucun relevé automatique.
+Si le projet dispose d'une zone `DOCUMENTATION/` (agent dédié, cf. `agent_role.md`), elle centralise
+la documentation métier du projet en fichiers .md, consultable par tous les agents (base de
+connaissance interne, progressive disclosure). Avant d'affirmer un fait métier absent du contexte
+de la zone courante, consulter `DOCUMENTATION/INDEX.md` (catalogue, une ligne par document) puis
+n'ouvrir que le(s) document(s) pertinent(s) — jamais tout le dossier. Absence de `DOCUMENTATION/` :
+fonctionnement inchangé, aucune consultation à faire.
 
 ## Données sensibles
 
@@ -113,6 +111,26 @@ Pour les tâches répétitives et templated (commits, posts, changelogs, donnée
 ## Spécificités projet
 
 Section réservée aux règles propres à ce projet, hors périmètre du kit. Cette section est préservée intégralement par `/update` (jamais écrasée ni fusionnée avec le contenu du kit). Convention : toute règle liée à une section précise du fichier doit la référencer explicitement par son titre (ex: "Section Roadmap : ..."), plutôt que compter sur la position physique de cette section (toujours en fin de fichier).
+
+### Section Délégation Ollama : helper dans `scripts/`
+L'helper Ollama de ce projet est `scripts/ollama_call.py` (pas à la racine comme le template kit),
+aligné avec les références de `AGENTS.md` et `GEMINI.md`. `/update` ne recopie donc pas
+d'`ollama_call.py` racine ici et la ligne « Délégation Ollama » ci-dessus conserve le chemin `scripts/`.
+
+### Inbox gateway : la com Discord se gère dans la session `discord`
+Chaque session est un agent gateway dont le nom est sa zone (`Appli_TSA_SDI_TDAH` → alias
+`orchestrateur`, `design`, `discord` ; registre `DISCORD/discord_com/gateway/agents.json`).
+`bot.py` route les messages Discord entrants vers `DISCORD/discord_com/gateway/inbox/<zone>/`.
+
+- **Session `discord` + `/discord_loop`** : point de contact unique. Lancée par
+  `/start discord` (qui enchaîne `/discord_loop`), elle juge l'outbox (gardien de sortie) et
+  vide `inbox/unrouted/` + `inbox/discord/` à chaque cycle. Toute la com Discord passe par là.
+- **Zone `design`** : `/start` (étape 4-bis) et `/close` (étape 2-bis) font un relevé de
+  `inbox/design/` avec `poll --zone design --format hook`.
+- **Orchestrateur (zone racine)** : ne se soucie pas de Discord. Il ne consulte
+  `inbox/orchestrateur/` (réponses de Marie routées par `--expect-reply`) que **sur demande
+  explicite de l'utilisateur** — `python DISCORD/discord_com/gateway.py poll --agent
+  orchestrateur`, traiter, puis `ack`. Aucun hook, aucun relevé automatique.
 
 ### Bridge ROBERTO (assistant vocal téléphone, partagé)
 Le bridge assistant vocal est partagé et hébergé par le projet Roberto

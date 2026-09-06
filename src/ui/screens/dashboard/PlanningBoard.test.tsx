@@ -221,7 +221,10 @@ describe('PlanningBoard', () => {
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
     const title = await screen.findByText('Médecin')
     const row = title.closest('[role="button"]') as HTMLElement
-    expect(row.style.alignItems).toBe('flex-start')
+    expect(row.style.flexDirection).toBe('column')
+    expect(row.style.justifyContent).toBe('flex-start')
+    const header = title.parentElement?.parentElement as HTMLElement
+    expect(header.style.alignItems).toBe('flex-start')
   })
 
   it('utilise un fond neutre quand une tâche n’a pas de couleur', async () => {
@@ -348,6 +351,69 @@ describe('PlanningBoard', () => {
     expect(endTimeColumn.parentElement).toBe(card)
     expect(endTimeColumn.style.justifyContent).toBe('space-between')
     expect(card).toContainElement(screen.getByText('Étape 1'))
+  })
+
+  it('déplie les sous-étapes à l’intérieur de la case de la tâche, sous le titre (E10)', async () => {
+    const parent = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', duration_minutes: 60 })
+    const child = baseTask({ id: 'c1', parent_id: 't1', title: 'Étape 1', status: 'inbox' })
+    renderExpanded(
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([parent]),
+        getSubTasks: vi.fn().mockResolvedValue([child]),
+      }),
+    )
+    await userEvent.click(await screen.findByLabelText('0 sur 1 sous-étapes, déplier'))
+
+    const box = screen.getByText('Médecin').closest('[role="button"]') as HTMLElement
+    const step = screen.getByText('Étape 1')
+    expect(box.contains(step)).toBe(true)
+    expect(box.style.flexDirection).toBe('column')
+    const title = screen.getByText('Médecin')
+    expect(box.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(title.compareDocumentPosition(step) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('l’heure de fin reste en bas de la case qui contient les sous-étapes dépliées (E10)', async () => {
+    const parent = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', duration_minutes: 60 })
+    const child = baseTask({ id: 'c1', parent_id: 't1', title: 'Étape 1', status: 'inbox' })
+    renderExpanded(
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([parent]),
+        getSubTasks: vi.fn().mockResolvedValue([child]),
+      }),
+    )
+    await userEvent.click(await screen.findByLabelText('0 sur 1 sous-étapes, déplier'))
+
+    const container = screen.getByText('Médecin').closest('div[style*="background-color"]') as HTMLElement
+    const box = screen.getByText('Médecin').closest('[role="button"]') as HTMLElement
+    const timeCol = screen.getByText('10:00').parentElement as HTMLElement
+    expect(timeCol.style.justifyContent).toBe('space-between')
+    expect(timeCol.style.alignSelf).toBe('stretch')
+    expect(timeCol.parentElement).toBe(container)
+    expect(container.contains(box)).toBe(true)
+    expect(box.contains(screen.getByText('Étape 1'))).toBe(true)
+  })
+
+  it('cliquer une sous-étape dépliée n’ouvre pas la fiche de la tâche parente (E10)', async () => {
+    const goTo = vi.fn()
+    const selectTask = vi.fn()
+    const toggleSubTask = vi.fn().mockResolvedValue(undefined)
+    const parent = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    const child = baseTask({ id: 'c1', parent_id: 't1', title: 'Étape 1', status: 'inbox' })
+    renderExpanded(
+      makeAppContext({
+        goTo,
+        selectTask,
+        toggleSubTask,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([parent]),
+        getSubTasks: vi.fn().mockResolvedValue([child]),
+      }),
+    )
+    await userEvent.click(await screen.findByLabelText('0 sur 1 sous-étapes, déplier'))
+    await userEvent.click(await screen.findByLabelText('Terminer Étape 1'))
+
+    expect(toggleSubTask).toHaveBeenCalledWith(child)
+    expect(goTo).not.toHaveBeenCalledWith('task-detail')
   })
 
   it('cocher une sous-étape dépliée appelle toggleSubTask', async () => {

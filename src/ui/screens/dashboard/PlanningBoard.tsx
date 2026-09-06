@@ -164,8 +164,10 @@ function rowStyle(durationMinutes: number | null | undefined): React.CSSProperti
   )
   return {
     display: 'flex',
-    alignItems: 'flex-start',
-    gap: 'var(--spacing-sm)',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
+    gap: '6px',
     padding: '10px 12px',
     borderRadius: 'var(--radius-md)',
     cursor: 'pointer',
@@ -179,6 +181,13 @@ function rowStyle(durationMinutes: number | null | undefined): React.CSSProperti
     textAlign: 'left',
     fontFamily: 'var(--font-body)',
   }
+}
+
+const rowHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: 'var(--spacing-sm)',
+  width: '100%',
 }
 
 const monthBarStyle: React.CSSProperties = {
@@ -287,7 +296,7 @@ const subTaskListStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: '4px',
-  padding: '0 12px 10px 30px',
+  paddingLeft: '26px',
 }
 
 function rowContainerStyle(tint: React.CSSProperties): React.CSSProperties {
@@ -599,66 +608,74 @@ export function PlanningBoard() {
                     }
                   }}
                 >
-                  {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
-                  <span style={titleColStyle}>
-                    <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
-                    {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
-                  </span>
-                  {hasSubs && (
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`${done} sur ${subs.length} sous-étapes, ${expanded ? 'replier' : 'déplier'}`}
-                      style={expandBtnStyle}
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        toggleExpand(block.item.id)
-                      }}
-                    >
-                      {done}/{subs.length} {expanded ? '▾' : '▸'}
+                  <div style={rowHeaderStyle}>
+                    {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
+                    <span style={titleColStyle}>
+                      <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
+                      {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
                     </span>
-                  )}
-                  {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
-                  <input
-                    type="checkbox"
-                    checked={completed}
-                    onClick={(event) => event.stopPropagation()}
-                    onChange={() => handleComplete(block)}
-                    aria-label={`Terminer ${blockDisplayTitle(block)}`}
-                    style={taskCheckboxStyle}
-                  />
-                  {canPostpone && (
-                    <button
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        handleReport(block)
-                      }}
-                      aria-label={`Reporter ${blockDisplayTitle(block)}`}
-                      style={taskActionStyle}
-                    >
-                      Reporter
-                    </button>
+                    {hasSubs && (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${done} sur ${subs.length} sous-étapes, ${expanded ? 'replier' : 'déplier'}`}
+                        style={expandBtnStyle}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          toggleExpand(block.item.id)
+                        }}
+                      >
+                        {done}/{subs.length} {expanded ? '▾' : '▸'}
+                      </span>
+                    )}
+                    {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
+                    <input
+                      type="checkbox"
+                      checked={completed}
+                      onClick={(event) => event.stopPropagation()}
+                      onChange={() => handleComplete(block)}
+                      aria-label={`Terminer ${blockDisplayTitle(block)}`}
+                      style={taskCheckboxStyle}
+                    />
+                    {canPostpone && (
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          handleReport(block)
+                        }}
+                        aria-label={`Reporter ${blockDisplayTitle(block)}`}
+                        style={taskActionStyle}
+                      >
+                        Reporter
+                      </button>
+                    )}
+                  </div>
+
+                  {expanded && hasSubs && (
+                    <div style={subTaskListStyle}>
+                      {subs.map((st) => (
+                        <div
+                          key={st.id}
+                          style={subTaskRowStyle}
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isCompleted(st)}
+                            onChange={() => handleToggleSubTaskRow(block.item.id, st)}
+                            aria-label={`Terminer ${st.title}`}
+                            style={taskCheckboxStyle}
+                          />
+                          <span
+                            style={{ textDecoration: isCompleted(st) ? 'line-through' : 'none', flex: 1 }}
+                          >
+                            {st.title}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-
-                {expanded && hasSubs && (
-                  <div style={{ ...subTaskListStyle, color: tint.color }}>
-                    {subs.map((st) => (
-                      <div key={st.id} style={subTaskRowStyle}>
-                        <input
-                          type="checkbox"
-                          checked={isCompleted(st)}
-                          onChange={() => handleToggleSubTaskRow(block.item.id, st)}
-                          aria-label={`Terminer ${st.title}`}
-                          style={taskCheckboxStyle}
-                        />
-                        <span style={{ textDecoration: isCompleted(st) ? 'line-through' : 'none', flex: 1 }}>
-                          {st.title}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           )

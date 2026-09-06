@@ -257,13 +257,17 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'sous-etapes-dans-la-carte-planning',
+    revision: 1,
     title: 'Sous-étapes dans la carte du planning',
     category: 'Accueil / Planning',
     steps: [
-      'Créez une tâche planifiée aujourd’hui avec une heure de début, une durée et au moins deux sous-étapes.',
-      'Sur l’accueil, touchez le compteur de sous-étapes de sa carte pour les déplier : elles doivent rester dans le fond coloré de la même carte.',
-      'Regardez l’heure de fin : elle doit être en bas à gauche de cette carte, alignée après la dernière sous-étape.',
-      'Touchez à nouveau le compteur : les sous-étapes se replient sans modifier l’heure de début ni de fin.',
+      'Créez une tâche planifiée aujourd’hui avec une heure de début, une durée courte (par exemple 30 min) et au moins quatre sous-étapes.',
+      'Sur l’accueil, touchez le compteur de sous-étapes de sa carte pour les déplier.',
+      'Les sous-étapes doivent s’afficher à l’intérieur de la carte, juste sous le titre — pas en dessous de la carte.',
+      'La carte doit s’agrandir d’elle-même pour contenir toutes les sous-étapes, même si sa hauteur de base (liée à la durée) était plus petite.',
+      'L’heure de fin doit rester en bas à gauche de la carte, au niveau de la dernière sous-étape — les sous-étapes ne doivent pas commencer au niveau de l’heure de fin.',
+      'Touchez à nouveau le compteur : les sous-étapes se replient, la carte revient à sa hauteur de durée, l’heure de début et l’heure de fin sont inchangées.',
+      'Cochez une sous-étape : elle se barre sans ouvrir la fiche de la tâche.',
     ],
   },
   {

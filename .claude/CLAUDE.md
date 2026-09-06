@@ -259,9 +259,10 @@ Version <X.Y> en ligne.
 validés sur la version déployée). Les puces reprennent les numéros de modification du Google Doc
 `Modifications` couverts par ces parcours (champ `docRefs` de `src/domain/data/manualTestsCatalog.ts`,
 recoupé avec `_contexte/marie_modifications_suivi.md`). Un parcours sans numéro de modification
-(retour hors Doc) est listé par son titre. Le lien du commentaire Drive est ajouté sur sa propre
-ligne, introduit par « Détail des changements et questions : », uniquement s'il y a un commentaire
-utile pour cette livraison.
+(retour hors Doc) est listé par son titre. Le nom du document de commentaires dans le dossier Drive
+partagé (`commentaires_marie_<version>.docx`) est ajouté sur sa propre ligne, introduit par
+« Détail des changements et questions : », uniquement s'il y a un commentaire utile pour cette
+livraison — jamais une URL publique (dossier `Projets/Appli` restreint à comptes nommés).
 
 ### Historique de conversation avec Marie : sauvegarde systématique et immédiate
 Tout message échangé avec Marie — canal Discord via la gateway, bridge ROBERTO en secours — est

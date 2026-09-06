@@ -15,33 +15,33 @@
   réf: historique_conversation_marie.md (2026-09-05, section v5.92), gateway/LOOP.md § 1
 
 ## Contexte chaud
-- `pending_replies` : une entrée active pour Marie (question posée dans la livraison v5.92 — quel bouton pour l'ajout de tâche planifiée depuis l'accueil), toujours sans réponse. Tout message vers Marie non lié à cette question doit être `hold` (règle `LOOP.md`). Exception ponctuelle le 2026-09-06 : une info « série de tests techniques » orchestrateur→marie, d'abord `hold` par la règle, puis `approve` sur ordre explicite de Morphéus pour ses tests canal — décision de circonstance, la règle reste en vigueur.
+- `pending_replies` : une entrée active pour Marie (question posée dans la livraison v5.92 — quel bouton pour l'ajout de tâche planifiée depuis l'accueil), toujours sans réponse. Tout message vers Marie non lié à cette question doit être `hold` (règle `LOOP.md`).
 - Salutation d'ouverture des messages à Marie automatisée : `curate()` (`gateway.py`) tire au hasard dans `gateway/salutations_marie.json` (10 formules) au lieu du fixe « Salut Poulette ! ». L'agent DISCORD n'a plus à taper de salutation dans le `body` — `STYLE.md` à jour. Testé et fonctionnel.
 - Règle de jugement du gabarit de livraison (`LOOP.md` § 1) : N = nombre de *parcours*, les puces = numéros de modification *distincts* couverts (peuvent être moins nombreux si plusieurs parcours partagent un numéro). Ne bouncer que si N < nombre de puces. Erreur commise 3 fois de suite le 2026-09-05 avant d'être identifiée — vigilance à maintenir.
 - `has_pending_reply(author_id)` route vers `inbox/<zone>/` tout message de l'auteur attendu, tagué ou non — le tag `@El Patrone#7381` n'est qu'une convention humaine, pas vérifiée par le code. Un message sans tag qui atterrit ainsi se `ack` sans traitement, `logs/conversation.jsonl` fait office de capture exhaustive.
-- Hooks de zone `on_start.md`/`on_close.md` : exercés en réel le 2026-09-06. `/start discord` → `bot_manager.py restart` (ancien PID tué, nouvelle instance) + enchaînement automatique `/discord_loop` : OK. `/close discord` → section « Fin » de `on_close.md` : `bot_manager.py stop` (résultat dans le bilan du close). Le cas « échec non bloquant » n'a pas été provoqué.
+- Hooks de zone `on_start.md`/`on_close.md` : exercés en réel le 2026-09-06. `on_start.md` enrichi le même jour (2e session) : test/kill/relance `bot.py` (natif), détection/kill process `discord_loop.py wait` orphelin (PowerShell WMI, pas de PID file natif pour ce process), résumé outbox Marie affiché avant la boucle. Pas encore testé en conditions réelles — à valider au prochain `/start discord`.
 - Lacune observée le 2026-09-06 : les cycles `/discord_loop` regroupés (`send` + `done` + `wait` en une commande) ont cessé de vider `inbox/discord/` et `inbox/unrouted/` à chaque tour — un message ADMIN y a stagné jusqu'au relevé du `/close`. Garder le `poll --agent unrouted` + `poll --agent discord` à chaque cycle, même regroupé.
 
 ## Dernière session (2026-09-06)
 <!-- Écrasé intégralement par /close. Synthèse < 25 lignes. -->
 
 ### Décisions prises
-- Bypass ponctuel de la règle `hold` : une info orchestrateur→marie approuvée malgré la `pending_reply` active, sur demande explicite de Morphéus, pour une série de tests techniques du canal. Décision de circonstance, la règle `LOOP.md` reste inchangée.
+- Hook `on_start.md` enrichi : test/kill/relance `bot.py` + détection/kill `discord_loop` orphelin (WMI) + résumé outbox Marie.
+- Bypass ponctuel de la règle `hold` (2e occurrence) : message « Tests techniques terminés » approuvé et envoyé à Marie sur demande explicite de Morphéus, malgré la `pending_reply` v5.92 active. Décision de circonstance, la règle `LOOP.md` reste inchangée.
 
 ### Livrables produits ou modifiés
-- Aucun fichier de code ou de doc modifié. Session d'exploitation de la boucle `/discord_loop` (19 cycles) et de premier exercice réel des hooks de zone.
+- `DISCORD/_contexte/on_start.md` : section Pré-synthèse enrichie (3 points).
 
 ### Hypothèses validées / invalidées
-- VALIDÉ : hook `on_start.md` (Pré-synthèse) — `bot_manager.py restart` tue l'ancien PID (114400) et relance proprement (65640), enchaînement `/discord_loop` automatique.
-- VALIDÉ : réveil gateway `__gateway_wake__` sort du `wait` en < 1 s et déclenche un tour de jugement d'outbox.
-- VALIDÉ : règle `hold` appliquée correctement (message non lié à la `pending_reply` → `hold`), puis levée sur ordre explicite.
-- INVALIDÉ : rien.
-- EN ATTENTE : section `[discord-auto]` « file d'attente des commandes » — tests de ce cycle séquentiels, pas simultanés.
+- VALIDÉ : réveil gateway `__gateway_wake__` et sortie `TIMEOUT` gérés correctement par la boucle native.
+- VALIDÉ : arrêt propre du process `discord_loop.py wait` en tâche de fond via `TaskStop` au `/close`, `commands.json` resté `idle` (pas d'orphelin laissé par cette session).
+- EN ATTENTE : hook `on_start.md` enrichi non testé en conditions réelles (prochain `/start discord`).
+- EN ATTENTE : section `[discord-auto]` « file d'attente des commandes » — toujours pas de scénario simultané observé.
 - EN ATTENTE : réponse de Marie sur le bouton d'ajout de tâche planifiée (`pending_reply` active).
 - EN ATTENTE : photo/vidéo de Marie pour #3.
 
 ### Prochaine étape exacte
-Prochain `/start discord` : re-vérifier le hook `on_start.md`. Provoquer un scénario 2-3 messages Discord simultanés pendant un traitement pour valider la section « file d'attente des commandes ». Signaler à l'orchestrateur que les hooks `on_start`/`on_close` sont exercés (purge possible de la section correspondante de `tests_manuels.md`, hors périmètre discord).
+Prochain `/start discord` : vérifier les 3 points du hook enrichi (kill/relance `bot.py`, détection/kill `discord_loop` orphelin, résumé outbox Marie affiché). Provoquer un scénario 2-3 messages Discord simultanés pour valider la section « file d'attente des commandes ».
 
 ### Question bloquante pour la session suivante
 Aucune.

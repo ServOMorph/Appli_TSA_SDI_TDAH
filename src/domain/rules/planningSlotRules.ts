@@ -1,4 +1,8 @@
 export function todayStr(): string {
+  if (import.meta.env.DEV) {
+    const fake = localStorage.getItem('dev_fake_date')
+    if (fake) return fake
+  }
   return new Date().toISOString().slice(0, 10)
 }
 

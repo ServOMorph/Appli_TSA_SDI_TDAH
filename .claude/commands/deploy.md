@@ -100,6 +100,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       `grep -m1 '^- Dernière exécution de la revue :' _contexte/marie_modifications_suivi.md`. La date
       qui suit doit être celle du jour. Sinon, s'arrêter — l'étape 0.4 a été sautée : exécuter
       `.claude/revue_googledoc.md` (et présenter son compte-rendu) avant de reprendre.
+  10. **Aucune roadmap avec une phase en cours** : lister les `roadmap_*.md` à la racine du projet
+      (`ls roadmap_*.md`). Pour chacune, relever les statuts de phase (`[EN COURS]`, `[TODO]`,
+      `[TODO — BLOQUÉ]`, `[FAIT]`). Si une phase est `[EN COURS]`, s'arrêter — du travail est en
+      cours et ne doit pas être déployé : demander à l'utilisateur de terminer la phase (ou de la
+      repasser `[TODO]`) avant de relancer `/deploy`. Une roadmap dont les phases sont uniquement
+      `[FAIT]` et/ou `[TODO]`/`[TODO — BLOQUÉ]` ne bloque pas ici (déploiement partiel assumé —
+      voir l'avertissement 4.6).
 
 4. Avertissements — signaler chacun s'il est détecté, puis demander une confirmation explicite unique
    avant de poursuivre (ne pas bloquer seul, ne pas continuer sans réponse de l'utilisateur).
@@ -123,6 +130,11 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       une roadmap active (fichier `roadmap_*.md` à la racine avec une phase la couvrant) ni à une décision
       tracée. S'il y en a, les signaler et demander une confirmation explicite avant de poursuivre. Ne pas
       modifier le registre automatiquement.
+   6. **Roadmap active incomplète (déploiement partiel)** : pour chaque `roadmap_*.md` à la racine ayant
+      encore des phases `[TODO]` ou `[TODO — BLOQUÉ]` (la vérification bloquante 3.10 a déjà écarté le cas
+      `[EN COURS]`), lister les phases restantes et signaler que le déploiement livrera une roadmap
+      partiellement réalisée. Demander une confirmation explicite avant de poursuivre. Ne pas modifier la
+      roadmap automatiquement.
 
 5. Build :
    ```
@@ -162,6 +174,14 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    le réafficher aux versions suivantes. Committer ce vidage séparément après le déploiement (le build
    `dist/<version>` a déjà embarqué le contenu avant le vidage).
 
+8bis. Archivage des roadmaps terminées par cette livraison. Pour chaque `roadmap_*.md` à la racine dont
+   toutes les phases sont `[FAIT]` après ce déploiement : le signaler à l'utilisateur et lui proposer de
+   déplacer le fichier dans `Archives/` (`git mv roadmap_<sujet>.md Archives/`). Ne jamais archiver sans
+   son accord explicite (cf. `CLAUDE.md` § Roadmap, « Clôture »). Une roadmap encore incomplète (phases
+   `[TODO]`/`[TODO — BLOQUÉ]` restantes — déploiement partiel confirmé à l'étape 4.6) reste à la racine.
+   L'archivage confirmé est inclus dans le commit de l'étape 8 (vidage `WHATS_NEW`) ou dans un commit
+   dédié.
+
 9. Préparer les éléments du rapport final : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify,
    résultat de la vérification de fumée et résultat du contrôle de budget bundle (étape 6). Le rapport est
    envoyé après les étapes de communication ci-dessous.
@@ -182,20 +202,24 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     comportement à valider par Marie y a bien été ajouté (sinon l'ajouter avant de poursuivre), sans le recopier
     dans les documents Drive (cf. `CLAUDE.md` § Spécificités projet, « Tests à faire pour Marie : uniquement dans l'appli »).
 
-11. Figer puis publier systématiquement le commentaire de livraison sur Google Drive et obtenir un lien partageable.
+11. Figer puis publier systématiquement le commentaire de livraison dans le dossier Drive partagé.
     - Prendre `COMMUNICATION/Marie/a_transmettre.md`. S'il n'existe pas, créer avant le déploiement un fichier
       avec l'inventaire de l'étape 10, en langage simple.
     - Copier son contenu dans `COMMUNICATION/Marie/livraisons/<version>.md`, précédé de la version et de la date.
       Ce fichier est l'historique immuable de ce qui a été préparé pour Marie à cette livraison.
     - La disponibilité de `pandoc`, `rclone`, de la configuration et du dossier Drive a déjà été validée à l'étape 3.7.
-    - Convertir le commentaire en `.docx`, le publier sous un nom versionné, puis produire son lien :
+    - Convertir le commentaire en `.docx` et le déposer sous un nom versionné dans le dossier `Projets/Appli`,
+      auquel le compte Google de Marie (`rayonnetoi@gmail.com`) a accès en lecture :
       ```
       pandoc COMMUNICATION/Marie/livraisons/<version>.md -o commentaires_marie_<version>.docx
       rclone copyto commentaires_marie_<version>.docx "tsa_gdrive:Projets/Appli/commentaires_marie_<version>.docx" --config .claude/rclone.conf
-      rclone link "tsa_gdrive:Projets/Appli/commentaires_marie_<version>.docx" --config .claude/rclone.conf
       ```
-    - Si la publication ou l'obtention du lien échoue, ne pas prétendre que Marie peut consulter le document ;
-      signaler précisément l'échec et attendre une instruction.
+    - Ne jamais appeler `rclone link` ni produire de lien de partage public : le dossier `Projets/Appli` et son
+      contenu sont en accès restreint (comptes nommés), un lien public rouvrirait chaque docx à « tout
+      utilisateur disposant du lien ». Marie ouvre le document depuis le dossier Drive partagé, par son nom
+      versionné `commentaires_marie_<version>.docx`.
+    - Si le dépôt du docx échoue, ne pas prétendre que Marie peut consulter le document ; signaler précisément
+      l'échec et attendre une instruction.
 
 12. Composer le message de livraison pour Marie à partir de l'inventaire et le **déposer dans la gateway Discord**
     (cf. `CLAUDE.md` § Messages pour Marie). Il doit toujours contenir :
@@ -204,7 +228,9 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - un renvoi vers l'écran « Tests à faire » de l'appli pour les tests à rejouer — sans les énumérer ;
     - les choix ou questions encore attendus, ainsi que les écarts assumés s'ils la concernent ;
     - le lien de production, sur sa propre ligne : `https://appli-audhd.netlify.app/` ;
-    - le lien partageable du commentaire Drive, sur sa propre ligne, introduit par « Détail des changements et questions : ».
+    - le renvoi vers le commentaire détaillé, sur sa propre ligne, introduit par « Détail des changements et
+      questions : », sous la forme du nom du document dans le dossier Drive partagé
+      (`commentaires_marie_<version>.docx`) — jamais une URL publique.
 
     Écrire le corps au fond définitif, **sans** l'encadrement `💻🤖` ni le tag (l'agent DISCORD les pose), puis :
     ```
@@ -236,7 +262,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       les demandes `approved`.
 
 13. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify, résultat de la
-    vérification de fumée, résultat du contrôle de budget bundle, nom et lien du document Drive, inventaire
+    vérification de fumée, résultat du contrôle de budget bundle, nom du document Drive déposé, inventaire
     synthétique, corps du message de livraison déposé dans la gateway (avec son id de demande) et résultat de sa
     vérification d'envoi (étape 12bis) — confirmé sorti, corrigé après bounce, ou en attente signalée à
     l'utilisateur. Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et

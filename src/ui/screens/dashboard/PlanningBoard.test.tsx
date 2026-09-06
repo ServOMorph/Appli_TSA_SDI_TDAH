@@ -220,7 +220,7 @@ describe('PlanningBoard', () => {
     const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '12:00', duration_minutes: 180 })
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
     const title = await screen.findByText('Médecin')
-    const row = title.closest('button') as HTMLElement
+    const row = title.closest('[role="button"]') as HTMLElement
     expect(row.style.alignItems).toBe('flex-start')
   })
 
@@ -402,7 +402,7 @@ describe('PlanningBoard', () => {
     const title = await screen.findByText('Médecin')
 
     const tinted = title.closest('div[style*="background-color"]') as HTMLElement
-    const row = tinted.querySelector('button') as HTMLElement
+    const row = tinted.querySelector('[role="button"]') as HTMLElement
     expect(tinted.style.backgroundColor).toContain('#ff8800')
     expect(row.style.minHeight).toBe('80px')
     expect(row.style.backgroundColor).toBe('')
@@ -436,7 +436,7 @@ describe('PlanningBoard', () => {
     const title = await screen.findByText('Médecin')
 
     const tinted = title.closest('div[style*="background-color"]') as HTMLElement
-    const row = tinted.querySelector('button') as HTMLElement
+    const row = tinted.querySelector('[role="button"]') as HTMLElement
     expect(tinted.style.backgroundColor).not.toContain('color-mix')
     expect(row.style.color).toBe('rgb(255, 255, 255)')
     expect(row.style.textDecoration).toBe('line-through')
@@ -454,7 +454,7 @@ describe('PlanningBoard', () => {
     const title = await screen.findByText('Médecin')
 
     const tinted = title.closest('div[style*="background-color"]') as HTMLElement
-    const row = tinted.querySelector('button') as HTMLElement
+    const row = tinted.querySelector('[role="button"]') as HTMLElement
     expect(row.style.color).not.toBe('rgb(255, 255, 255)')
     expect(row.style.textDecoration).toBe('line-through')
   })

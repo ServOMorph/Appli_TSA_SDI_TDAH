@@ -573,13 +573,21 @@ export function PlanningBoard() {
 
           return (
             <div key={`${block.kind}-${block.item.id}`} style={rowContainerStyle(tint)}>
-              <button
+              <div
+                role="button"
+                tabIndex={0}
                 style={{
                   ...rowStyle(block.item.duration_minutes),
                   color: tint.color,
                   textDecoration: tint.textDecoration,
                 }}
                 onClick={() => openDetail(block.item.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    openDetail(block.item.id)
+                  }
+                }}
               >
                 <span style={timeColStyle}>
                   <span>{block.item.scheduled_start ?? 'Sans horaire'}</span>
@@ -629,7 +637,7 @@ export function PlanningBoard() {
                     Reporter
                   </button>
                 )}
-              </button>
+              </div>
 
               {expanded && hasSubs && (
                 <div style={{ ...subTaskListStyle, color: tint.color }}>

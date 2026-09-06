@@ -22,6 +22,9 @@ e2e/test-results/
 # rclone (jetons OAuth Google Drive locaux au projet)
 .claude/rclone.conf
 
+# Manifeste généré par le hook /close § Fin (backup_project.py --refresh-list)
+claude-vibecoding-kit/rclone_backup_files.txt
+
 # Données personnelles réelles (testeurs)
 donnees_marie/
 

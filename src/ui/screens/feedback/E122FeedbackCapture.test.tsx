@@ -7,7 +7,11 @@ const mocks = vi.hoisted(() => ({
   flattenImage: vi.fn().mockResolvedValue(new Blob(['compressed'], { type: 'image/jpeg' })),
 }))
 
-vi.mock('@/app/repositories', () => ({ feedbackReportRepo: { create: mocks.create }, newId: () => 'feedback-1' }))
+vi.mock('@/app/repositories', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/app/repositories')>()),
+  feedbackReportRepo: { create: mocks.create },
+  newId: () => 'feedback-1',
+}))
 vi.mock('@/data/images/flattenImage', () => ({ flattenImage: mocks.flattenImage }))
 vi.mock('@/data/sync/feedbackClient', () => ({ syncFeedbackNow: vi.fn() }))
 

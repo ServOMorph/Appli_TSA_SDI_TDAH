@@ -8,7 +8,11 @@ import {
   reportTask as reportTaskRule,
   addMinutesToTime,
 } from '@/domain/rules/taskRules'
-import { generateOccurrenceDates, isValidRecurrence } from '@/domain/rules/taskRecurrenceRules'
+import {
+  generateOccurrenceDates,
+  isValidRecurrence,
+  recurrenceMaterializationEndDate,
+} from '@/domain/rules/taskRecurrenceRules'
 import type { Task, TaskStatus } from '@/domain/entities/task'
 import type { RecurrenceFrequency, RecurrenceEndType } from '@/domain/entities/taskRecurrence'
 
@@ -139,13 +143,11 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
       await taskRecurrenceRepo.create(recurrence)
       task = { ...task, recurrence_id: recurrenceId, is_recurrence_root: true }
 
-      const windowEnd = new Date(Date.UTC(...(input.date.split('-').map(Number) as [number, number, number])))
-      windowEnd.setUTCDate(windowEnd.getUTCDate() + RECURRENCE_MATERIALIZATION_DAYS)
       const dates = generateOccurrenceDates(
         recurrence,
         input.date,
         input.date,
-        windowEnd.toISOString().slice(0, 10),
+        recurrenceMaterializationEndDate(input.date, RECURRENCE_MATERIALIZATION_DAYS),
       ).filter((d) => d !== input.date)
 
       for (const date of dates) {

@@ -1255,3 +1255,9 @@ Si lancement : `/start` puis Phase 1 (relevé Git + réinstall dépendances depu
 
 ## Question bloquante pour la session suivante
 Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle branche (`main` ou branche d'intégration dédiée) ?
+---
+## Session du 2026-09-06 — diagnostic E10 et baseline
+
+- Migration des retours appliquée en production par l’utilisateur ; relance demandée à Marie.
+- Baseline isolée à 783 tests passants après réinstallation des dépendances.
+- Suite : exécuter la roadmap de fiabilisation.

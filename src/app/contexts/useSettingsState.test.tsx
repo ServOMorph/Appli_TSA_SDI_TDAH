@@ -1,15 +1,22 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { useState } from 'react'
 import { db, listItemRepo, manualTestResultRepo, toolRepo } from '@/app/repositories'
 import { useSettingsState } from './useSettingsState'
 
 function SettingsPanel() {
   const { createUser, exportData, importData, currentUser } = useSettingsState()
+  const [lastImport, setLastImport] = useState('')
+  async function runImport(data: unknown) {
+    const result = await importData(data)
+    setLastImport(result.ok ? 'ok' : result.error)
+  }
   return (
     <>
       <div data-testid="user">{currentUser?.id ?? 'aucun'}</div>
       <button onClick={() => createUser('student')}>Créer l’utilisateur</button>
+      <output data-testid="import-result">{lastImport}</output>
       <button onClick={() => exportData()}>Exporter</button>
       <button
         onClick={() =>
@@ -62,6 +69,18 @@ function SettingsPanel() {
       >
         Importer format sans description ni sous-tâches
       </button>
+      <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, tasks: {} })}>
+        Importer tableau invalide
+      </button>
+      <button onClick={() => runImport({ version: '3.7', user: { id: 'u1', profile_type: 'student' } })}>
+        Importer version future
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, tasks: [{ id: 'task-1', parent_id: 'inconnue' }] })}>
+        Importer référence orpheline
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u-import', profile_type: 'student' }, tasks: [{ id: 'task-import' }] })}>
+        Importer avec tâche
+      </button>
     </>
   )
 }
@@ -81,6 +100,58 @@ afterEach(async () => {
 })
 
 describe('useSettingsState — résultats des tests manuels', () => {
+  it('rejette les structures invalides, les références orphelines et les versions futures avant écriture', async () => {
+    render(<SettingsPanel />)
+    const cases = [
+      ['Importer tableau invalide', 'tasks doit être une liste'],
+      ['Importer référence orpheline', 'référence tâche parente orpheline'],
+      ['Importer version future', 'version d’export plus récente'],
+    ] as const
+
+    for (const [button, error] of cases) {
+      await act(async () => {
+        await userEvent.click(screen.getByRole('button', { name: button }))
+      })
+      expect(screen.getByTestId('import-result')).toHaveTextContent(error)
+    }
+  })
+
+  it('annule entièrement l’import lorsqu’une écriture échoue', async () => {
+    await db.users.clear()
+    await db.tasks.clear()
+    await db.users.add({ id: 'u-existant', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' })
+    await db.tasks.add({ id: 'task-existante' } as never)
+    const bulkAdd = vi.spyOn(db.tasks, 'bulkAdd').mockRejectedValueOnce(new Error('Panne injectée'))
+
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer avec tâche' }))
+    })
+    await waitFor(() => expect(bulkAdd).toHaveBeenCalledOnce())
+    expect(await db.users.toArray()).toEqual([
+      { id: 'u-existant', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+    ])
+    expect(await db.tasks.toArray()).toEqual([{ id: 'task-existante' }])
+    bulkAdd.mockRestore()
+  })
+
+  it('conserve les retours avec image lors du remplacement par import', async () => {
+    await db.feedbackReports.clear()
+    const report = {
+      id: 'feedback-image', screen_code: 'E117', comment: 'Retour local', image_blob: new Blob(['image']), image_path: null,
+      image_bytes: 5, strokes: [], app_version: '3.6', created_at: '2026-09-06T10:00:00.000Z', sync_status: 'pending' as const, last_attempt_at: null,
+    }
+    await db.feedbackReports.add(report)
+
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer avec tâche' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    const [preserved] = await db.feedbackReports.toArray()
+    expect(preserved).toMatchObject({ ...report, image_blob: expect.anything() })
+  })
+
   it('exporte et restaure les résultats des tests manuels', async () => {
     const createObjectURL = vi.fn().mockReturnValue('blob:test')
     vi.stubGlobal('URL', { createObjectURL, revokeObjectURL: vi.fn() })

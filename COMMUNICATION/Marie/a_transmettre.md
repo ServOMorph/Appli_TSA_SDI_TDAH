@@ -7,3 +7,9 @@ Ce fichier ne contient jamais de liste de tests : tous les tests que Marie doit 
 ## Retours annotés — envoi activé
 
 Le socle serveur qui manquait pour l'envoi des retours (écran « Mes retours ») a été mis en place le 6 septembre 2026. Les retours saisis dans l'application peuvent maintenant partir. Si un retour affiche encore « Échec d'envoi », appuyer sur « Relancer ».
+
+## Planning et séries de tâches
+
+Les sous-tâches restent maintenant dans la carte de leur tâche sur le planning. L’heure de fin apparaît après la dernière sous-tâche.
+
+Les nouvelles tâches répétées ne créent plus de dates trop loin dans le futur.

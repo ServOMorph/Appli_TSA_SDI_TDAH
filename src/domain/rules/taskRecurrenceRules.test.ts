@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { generateOccurrenceDates, nextOccurrenceAfter, isValidRecurrence } from './taskRecurrenceRules'
+import {
+  generateOccurrenceDates,
+  isValidRecurrence,
+  nextOccurrenceAfter,
+  recurrenceMaterializationEndDate,
+} from './taskRecurrenceRules'
 import { makeTaskRecurrence } from '@/test/factories'
 
 describe('taskRecurrenceRules', () => {
@@ -69,6 +74,44 @@ describe('taskRecurrenceRules', () => {
       const recurrence = makeTaskRecurrence({ frequency: 'daily', interval: 1 })
       const dates = generateOccurrenceDates(recurrence, '2026-08-10', '2026-08-01', '2026-08-09')
       expect(dates).toEqual([])
+    })
+  })
+
+  describe('recurrenceMaterializationEndDate', () => {
+    it.each([
+      ['2026-01-31', '2026-05-01'],
+      ['2026-09-06', '2026-12-05'],
+      ['2026-12-01', '2027-03-01'],
+      ['2028-02-29', '2028-05-29'],
+    ])('calcule +90 jours depuis le %s', (anchorDate, expectedEndDate) => {
+      expect(recurrenceMaterializationEndDate(anchorDate, 90)).toBe(expectedEndDate)
+    })
+
+    it('laisse les fins par date et par nombre borner les occurrences dans la fenêtre', () => {
+      const endByDate = makeTaskRecurrence({
+        frequency: 'daily',
+        interval: 1,
+        end_type: 'date',
+        end_date: '2026-09-08',
+      })
+      const endByCount = makeTaskRecurrence({
+        frequency: 'daily',
+        interval: 1,
+        end_type: 'count',
+        end_count: 3,
+      })
+      const windowEnd = recurrenceMaterializationEndDate('2026-09-06', 90)
+
+      expect(generateOccurrenceDates(endByDate, '2026-09-06', '2026-09-06', windowEnd)).toEqual([
+        '2026-09-06',
+        '2026-09-07',
+        '2026-09-08',
+      ])
+      expect(generateOccurrenceDates(endByCount, '2026-09-06', '2026-09-06', windowEnd)).toEqual([
+        '2026-09-06',
+        '2026-09-07',
+        '2026-09-08',
+      ])
     })
   })
 

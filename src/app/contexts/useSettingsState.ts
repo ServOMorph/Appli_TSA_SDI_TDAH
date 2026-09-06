@@ -25,6 +25,56 @@ import type { ManualTestResult } from '@/domain/entities/manualTestResult'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
 
+const IMPORT_TABLES = [
+  db.users, db.tasks, db.taskRecurrences, db.taskExceptions, db.taskCategories,
+  db.lists, db.listItems, db.listItemSubTasks, db.listCategories, db.folders,
+  db.tools, db.energyEntries, db.settings, db.budgetCategories, db.budgetEntries,
+  db.budgetAccounts, db.budgetDeposits, db.budgetIncomeEntries, db.manualTestResults,
+] as const
+
+function readImportArray(data: Record<string, unknown>, key: string): unknown[] {
+  const value = data[key]
+  if (value === undefined) return []
+  if (!Array.isArray(value) || value.some((item) => item === null || typeof item !== 'object')) {
+    throw new Error(`Fichier invalide : ${key} doit être une liste d’éléments.`)
+  }
+  return value
+}
+
+function assertUniqueIds(name: string, items: { id: string }[]) {
+  const ids = new Set<string>()
+  for (const item of items) {
+    if (typeof item.id !== 'string' || !item.id || ids.has(item.id)) {
+      throw new Error(`Fichier invalide : identifiants ${name} absents ou dupliqués.`)
+    }
+    ids.add(item.id)
+  }
+}
+
+function assertReferences(name: string, items: object[], field: string, ids: Set<string>) {
+  if (items.some((item) => {
+    const value = (item as Record<string, unknown>)[field]
+    return typeof value === 'string' && !ids.has(value)
+  })) {
+    throw new Error(`Fichier invalide : référence ${name} orpheline.`)
+  }
+}
+
+function assertSupportedVersion(version: unknown) {
+  if (version === undefined) return
+  if (typeof version !== 'string' || !/^\d+\.\d+(?:\.\d+)?$/.test(version)) {
+    throw new Error('Fichier invalide : version d’export inconnue.')
+  }
+  const parts = version.split('.').map(Number)
+  const major = parts[0]
+  const minor = parts[1]
+  const patch = parts[2] ?? 0
+  const [currentMajor, currentMinor, currentPatch] = [3, 6, 0]
+  if (major > currentMajor || (major === currentMajor && (minor > currentMinor || (minor === currentMinor && patch > currentPatch)))) {
+    throw new Error('Fichier incompatible : version d’export plus récente.')
+  }
+}
+
 export function useSettingsState() {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [settings, setSettings] = useState<Settings | null>(null)
@@ -147,6 +197,11 @@ export function useSettingsState() {
       return { ok: false, error: 'Fichier invalide : JSON attendu.' }
     }
     const data = raw as Record<string, unknown>
+    try {
+      assertSupportedVersion(data.version)
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Fichier invalide.' }
+    }
     const importedUser = data.user
     if (
       !importedUser ||
@@ -157,25 +212,50 @@ export function useSettingsState() {
       return { ok: false, error: 'Fichier invalide : profil utilisateur manquant ou incomplet.' }
     }
     const user = importedUser as User
-    const tasks = Array.isArray(data.tasks) ? (data.tasks as Task[]) : []
-    const taskRecurrences = Array.isArray(data.task_recurrences) ? (data.task_recurrences as TaskRecurrence[]) : []
-    const taskExceptions = Array.isArray(data.task_exceptions) ? (data.task_exceptions as TaskException[]) : []
-    const taskCategories = Array.isArray(data.task_categories) ? (data.task_categories as TaskCategory[]) : []
-    const lists = Array.isArray(data.lists) ? (data.lists as List[]) : []
-    const rawListItems = Array.isArray(data.list_items) ? (data.list_items as (ListItem & { section?: string | null })[]) : []
-    const listItemSubTasks = Array.isArray(data.list_item_sub_tasks)
-      ? (data.list_item_sub_tasks as ListItemSubTask[])
-      : []
-    const listCategories = Array.isArray(data.list_categories) ? (data.list_categories as ListCategory[]) : []
-    const folders = Array.isArray(data.folders) ? (data.folders as Folder[]) : []
-    const tools = Array.isArray(data.tools) ? (data.tools as Tool[]) : []
-    const energyEntries = Array.isArray(data.energy_entries) ? (data.energy_entries as EnergyEntry[]) : []
-    const categories = Array.isArray(data.budget_categories) ? (data.budget_categories as BudgetCategory[]) : []
-    const entries = Array.isArray(data.budget_entries) ? (data.budget_entries as BudgetEntry[]) : []
-    const accounts = Array.isArray(data.budget_accounts) ? (data.budget_accounts as BudgetAccount[]) : []
-    const deposits = Array.isArray(data.budget_deposits) ? (data.budget_deposits as BudgetDeposit[]) : []
-    const incomeEntries = Array.isArray(data.budget_income_entries) ? (data.budget_income_entries as BudgetIncomeEntry[]) : []
-    const manualTestResults = Array.isArray(data.manual_test_results) ? (data.manual_test_results as ManualTestResult[]) : []
+    let tasks: Task[], taskRecurrences: TaskRecurrence[], taskExceptions: TaskException[], taskCategories: TaskCategory[]
+    let lists: List[], rawListItems: (ListItem & { section?: string | null })[], listItemSubTasks: ListItemSubTask[], listCategories: ListCategory[]
+    let folders: Folder[], tools: Tool[], energyEntries: EnergyEntry[], categories: BudgetCategory[], entries: BudgetEntry[]
+    let accounts: BudgetAccount[], deposits: BudgetDeposit[], incomeEntries: BudgetIncomeEntry[], manualTestResults: ManualTestResult[]
+    try {
+      tasks = readImportArray(data, 'tasks') as Task[]
+      taskRecurrences = readImportArray(data, 'task_recurrences') as TaskRecurrence[]
+      taskExceptions = readImportArray(data, 'task_exceptions') as TaskException[]
+      taskCategories = readImportArray(data, 'task_categories') as TaskCategory[]
+      lists = readImportArray(data, 'lists') as List[]
+      rawListItems = readImportArray(data, 'list_items') as (ListItem & { section?: string | null })[]
+      listItemSubTasks = readImportArray(data, 'list_item_sub_tasks') as ListItemSubTask[]
+      listCategories = readImportArray(data, 'list_categories') as ListCategory[]
+      folders = readImportArray(data, 'folders') as Folder[]
+      tools = readImportArray(data, 'tools') as Tool[]
+      energyEntries = readImportArray(data, 'energy_entries') as EnergyEntry[]
+      categories = readImportArray(data, 'budget_categories') as BudgetCategory[]
+      entries = readImportArray(data, 'budget_entries') as BudgetEntry[]
+      accounts = readImportArray(data, 'budget_accounts') as BudgetAccount[]
+      deposits = readImportArray(data, 'budget_deposits') as BudgetDeposit[]
+      incomeEntries = readImportArray(data, 'budget_income_entries') as BudgetIncomeEntry[]
+      manualTestResults = readImportArray(data, 'manual_test_results') as ManualTestResult[]
+      for (const [name, items] of Object.entries({ tasks, taskRecurrences, taskExceptions, taskCategories, lists, rawListItems, listItemSubTasks, listCategories, folders, tools, energyEntries, categories, entries, accounts, deposits, incomeEntries, manualTestResults })) {
+        assertUniqueIds(name, items as { id: string }[])
+      }
+      const taskIds = new Set(tasks.map((item) => item.id))
+      const listIds = new Set(lists.map((item) => item.id))
+      const listItemIds = new Set(rawListItems.map((item) => item.id))
+      const listCategoryIds = new Set(listCategories.map((item) => item.id))
+      const recurrenceIds = new Set(taskRecurrences.map((item) => item.id))
+      const accountIds = new Set(accounts.map((item) => item.id))
+      const categoryIds = new Set(categories.map((item) => item.id))
+      assertReferences('tâche parente', tasks, 'parent_id', taskIds)
+      assertReferences('récurrence de tâche', tasks, 'recurrence_id', recurrenceIds)
+      assertReferences('récurrence', taskExceptions, 'recurrence_id', recurrenceIds)
+      assertReferences('liste', rawListItems, 'list_id', listIds)
+      assertReferences('catégorie de liste', rawListItems, 'category_id', listCategoryIds)
+      assertReferences('élément de liste', listItemSubTasks, 'list_item_id', listItemIds)
+      assertReferences('liste d’outil', tools, 'list_id', listIds)
+      assertReferences('compte budget', deposits, 'account_id', accountIds)
+      assertReferences('catégorie budget', entries, 'category_id', categoryIds)
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'Fichier invalide.' }
+    }
 
     const importedSettings = data.settings
     const now = new Date().toISOString()
@@ -239,28 +319,28 @@ export function useSettingsState() {
     })
 
     try {
-      await clearDatabase()
-      await db.users.add(user)
-      await Promise.all([
-        tasks.length ? db.tasks.bulkAdd(tasks) : Promise.resolve(),
-        taskRecurrences.length ? db.taskRecurrences.bulkAdd(taskRecurrences) : Promise.resolve(),
-        taskExceptions.length ? db.taskExceptions.bulkAdd(taskExceptions) : Promise.resolve(),
-        taskCategories.length ? db.taskCategories.bulkAdd(taskCategories) : Promise.resolve(),
-        lists.length ? db.lists.bulkAdd(lists) : Promise.resolve(),
-        repairedListItems.length ? db.listItems.bulkAdd(repairedListItems) : Promise.resolve(),
-        listItemSubTasks.length ? db.listItemSubTasks.bulkAdd(listItemSubTasks) : Promise.resolve(),
-        repairedCategories.length ? db.listCategories.bulkAdd(repairedCategories) : Promise.resolve(),
-        folders.length ? db.folders.bulkAdd(folders) : Promise.resolve(),
-        repairedTools.length ? db.tools.bulkAdd(repairedTools) : Promise.resolve(),
-        energyEntries.length ? db.energyEntries.bulkAdd(energyEntries) : Promise.resolve(),
-        db.settings.add(settingsData),
-        categories.length ? db.budgetCategories.bulkAdd(categories) : Promise.resolve(),
-        entries.length ? db.budgetEntries.bulkAdd(entries) : Promise.resolve(),
-        accounts.length ? db.budgetAccounts.bulkAdd(accounts) : Promise.resolve(),
-        deposits.length ? db.budgetDeposits.bulkAdd(deposits) : Promise.resolve(),
-        incomeEntries.length ? db.budgetIncomeEntries.bulkAdd(incomeEntries) : Promise.resolve(),
-        manualTestResults.length ? db.manualTestResults.bulkAdd(manualTestResults) : Promise.resolve(),
-      ])
+      await db.transaction('rw', IMPORT_TABLES, async () => {
+        await Promise.all(IMPORT_TABLES.map((table) => table.clear()))
+        await db.users.add(user)
+        if (tasks.length) await db.tasks.bulkAdd(tasks)
+        if (taskRecurrences.length) await db.taskRecurrences.bulkAdd(taskRecurrences)
+        if (taskExceptions.length) await db.taskExceptions.bulkAdd(taskExceptions)
+        if (taskCategories.length) await db.taskCategories.bulkAdd(taskCategories)
+        if (lists.length) await db.lists.bulkAdd(lists)
+        if (repairedListItems.length) await db.listItems.bulkAdd(repairedListItems)
+        if (listItemSubTasks.length) await db.listItemSubTasks.bulkAdd(listItemSubTasks)
+        if (repairedCategories.length) await db.listCategories.bulkAdd(repairedCategories)
+        if (folders.length) await db.folders.bulkAdd(folders)
+        if (repairedTools.length) await db.tools.bulkAdd(repairedTools)
+        if (energyEntries.length) await db.energyEntries.bulkAdd(energyEntries)
+        await db.settings.add(settingsData)
+        if (categories.length) await db.budgetCategories.bulkAdd(categories)
+        if (entries.length) await db.budgetEntries.bulkAdd(entries)
+        if (accounts.length) await db.budgetAccounts.bulkAdd(accounts)
+        if (deposits.length) await db.budgetDeposits.bulkAdd(deposits)
+        if (incomeEntries.length) await db.budgetIncomeEntries.bulkAdd(incomeEntries)
+        if (manualTestResults.length) await db.manualTestResults.bulkAdd(manualTestResults)
+      })
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Échec de l\'import.' }
     }

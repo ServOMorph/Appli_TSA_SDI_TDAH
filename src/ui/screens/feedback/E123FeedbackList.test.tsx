@@ -9,7 +9,10 @@ const mocks = vi.hoisted(() => ({
   markPending: vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock('@/app/repositories', () => ({ feedbackReportRepo: mocks }))
+vi.mock('@/app/repositories', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/app/repositories')>()),
+  feedbackReportRepo: mocks,
+}))
 vi.mock('@/data/sync/feedbackClient', () => ({ syncFeedbackNow: vi.fn().mockResolvedValue(false) }))
 
 import { E123FeedbackList } from '@/ui/screens/feedback/E123FeedbackList'

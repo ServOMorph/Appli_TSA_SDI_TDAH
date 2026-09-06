@@ -211,8 +211,8 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - Convertir le commentaire en `.docx` et le déposer sous un nom versionné dans le dossier `Projets/Appli`,
       auquel le compte Google de Marie (`rayonnetoi@gmail.com`) a accès en lecture :
       ```
-      pandoc COMMUNICATION/Marie/livraisons/<version>.md -o commentaires_marie_<version>.docx
-      rclone copyto commentaires_marie_<version>.docx "tsa_gdrive:Projets/Appli/commentaires_marie_<version>.docx" --config .claude/rclone.conf
+      pandoc COMMUNICATION/Marie/livraisons/<version>.md -o COMMUNICATION/Marie/commentaires/commentaires_marie_<version>.docx
+      rclone copyto COMMUNICATION/Marie/commentaires/commentaires_marie_<version>.docx "tsa_gdrive:Projets/Appli/commentaires_marie_<version>.docx" --config .claude/rclone.conf
       ```
     - Ne jamais appeler `rclone link` ni produire de lien de partage public : le dossier `Projets/Appli` et son
       contenu sont en accès restreint (comptes nommés), un lien public rouvrirait chaque docx à « tout

@@ -12,6 +12,17 @@ annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'u
 reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
 demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
+## Import invalide et rechargement
+
+- Depuis « Export et import des données », sélectionner un JSON contenant une version future ou une liste invalide.
+- Confirmer le remplacement : l’erreur apparaît et le bouton redevient disponible.
+- Recharger l’application : les données présentes avant la tentative sont intactes.
+
+## Horizon d'une série récurrente
+
+- Créer une tâche quotidienne récurrente planifiée le 06/09/2026, sans fin.
+- Dans le planning, vérifier les occurrences du 06/09/2026 au 05/12/2026 incluses, et l'absence d'occurrence le 06/12/2026.
+
 ## Bot Discord — file d'attente des commandes en conditions réelles [discord-auto]
 
 Ajouté le 2026-09-02 (commit `2b75711`). `bot.py` empile désormais dans `commands.json` → `queue[]`
@@ -27,4 +38,3 @@ le vrai bot et Discord.
 - cas dégradé (hors délégation, à provoquer manuellement) : tuer la session pendant un traitement
   → `commands.json` reste en `processing`, la file se remplit sans être promue (angle mort connu,
   cf. question ouverte P3 de `signals.md`).
-

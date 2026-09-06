@@ -287,11 +287,12 @@ const subTaskListStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: '4px',
-  padding: '0 12px 10px 54px',
+  padding: '0 12px 10px 30px',
 }
 
 function rowContainerStyle(tint: React.CSSProperties): React.CSSProperties {
   return {
+    display: 'flex',
     backgroundColor: tint.backgroundColor,
     borderRadius: 'var(--radius-md)',
     overflow: 'hidden',
@@ -573,90 +574,92 @@ export function PlanningBoard() {
 
           return (
             <div key={`${block.kind}-${block.item.id}`} style={rowContainerStyle(tint)}>
-              <div
-                role="button"
-                tabIndex={0}
-                style={{
-                  ...rowStyle(block.item.duration_minutes),
-                  color: tint.color,
-                  textDecoration: tint.textDecoration,
-                }}
-                onClick={() => openDetail(block.item.id)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault()
-                    openDetail(block.item.id)
-                  }
-                }}
-              >
-                <span style={timeColStyle}>
-                  <span>{block.item.scheduled_start ?? 'Sans horaire'}</span>
-                  {block.item.scheduled_start &&
-                    block.item.scheduled_end &&
-                    block.item.scheduled_end !== block.item.scheduled_start && (
-                      <span style={endTimeStyle}>{block.item.scheduled_end}</span>
-                    )}
-                </span>
-                {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
-                <span style={titleColStyle}>
-                  <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
-                  {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
-                </span>
-                {hasSubs && (
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`${done} sur ${subs.length} sous-étapes, ${expanded ? 'replier' : 'déplier'}`}
-                    style={expandBtnStyle}
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      toggleExpand(block.item.id)
-                    }}
-                  >
-                    {done}/{subs.length} {expanded ? '▾' : '▸'}
+              <span style={timeColStyle}>
+                <span>{block.item.scheduled_start ?? 'Sans horaire'}</span>
+                {block.item.scheduled_start &&
+                  block.item.scheduled_end &&
+                  block.item.scheduled_end !== block.item.scheduled_start && (
+                    <span style={endTimeStyle}>{block.item.scheduled_end}</span>
+                  )}
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  style={{
+                    ...rowStyle(block.item.duration_minutes),
+                    color: tint.color,
+                    textDecoration: tint.textDecoration,
+                  }}
+                  onClick={() => openDetail(block.item.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      openDetail(block.item.id)
+                    }
+                  }}
+                >
+                  {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
+                  <span style={titleColStyle}>
+                    <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
+                    {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
                   </span>
-                )}
-                {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
-                <input
-                  type="checkbox"
-                  checked={completed}
-                  onClick={(event) => event.stopPropagation()}
-                  onChange={() => handleComplete(block)}
-                  aria-label={`Terminer ${blockDisplayTitle(block)}`}
-                  style={taskCheckboxStyle}
-                />
-                {canPostpone && (
-                  <button
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      handleReport(block)
-                    }}
-                    aria-label={`Reporter ${blockDisplayTitle(block)}`}
-                    style={taskActionStyle}
-                  >
-                    Reporter
-                  </button>
+                  {hasSubs && (
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${done} sur ${subs.length} sous-étapes, ${expanded ? 'replier' : 'déplier'}`}
+                      style={expandBtnStyle}
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        toggleExpand(block.item.id)
+                      }}
+                    >
+                      {done}/{subs.length} {expanded ? '▾' : '▸'}
+                    </span>
+                  )}
+                  {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
+                  <input
+                    type="checkbox"
+                    checked={completed}
+                    onClick={(event) => event.stopPropagation()}
+                    onChange={() => handleComplete(block)}
+                    aria-label={`Terminer ${blockDisplayTitle(block)}`}
+                    style={taskCheckboxStyle}
+                  />
+                  {canPostpone && (
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        handleReport(block)
+                      }}
+                      aria-label={`Reporter ${blockDisplayTitle(block)}`}
+                      style={taskActionStyle}
+                    >
+                      Reporter
+                    </button>
+                  )}
+                </div>
+
+                {expanded && hasSubs && (
+                  <div style={{ ...subTaskListStyle, color: tint.color }}>
+                    {subs.map((st) => (
+                      <div key={st.id} style={subTaskRowStyle}>
+                        <input
+                          type="checkbox"
+                          checked={isCompleted(st)}
+                          onChange={() => handleToggleSubTaskRow(block.item.id, st)}
+                          aria-label={`Terminer ${st.title}`}
+                          style={taskCheckboxStyle}
+                        />
+                        <span style={{ textDecoration: isCompleted(st) ? 'line-through' : 'none', flex: 1 }}>
+                          {st.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
-
-              {expanded && hasSubs && (
-                <div style={{ ...subTaskListStyle, color: tint.color }}>
-                  {subs.map((st) => (
-                    <div key={st.id} style={subTaskRowStyle}>
-                      <input
-                        type="checkbox"
-                        checked={isCompleted(st)}
-                        onChange={() => handleToggleSubTaskRow(block.item.id, st)}
-                        aria-label={`Terminer ${st.title}`}
-                        style={taskCheckboxStyle}
-                      />
-                      <span style={{ textDecoration: isCompleted(st) ? 'line-through' : 'none', flex: 1 }}>
-                        {st.title}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           )
         })}

@@ -1,13 +1,14 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-06)
 
 ## Contexte chaud
+- **Roadmap de fiabilisation, phases 1 à 4 clôturées côté code (2026-09-06).** Import atomique et validé ; séries futures limitées à 90 jours inclusifs ; docx de livraison déplacés sous `COMMUNICATION/Marie/commentaires/` hors Git. Suite complète : 97 fichiers, 793 tests passants ; TypeScript et lint passants. Le contrôle navigateur de l’horizon reste dans `tests_manuels.md`.
 - **Retour E10 de Marie (2026-09-06, capture `IMG_3397.png` dans `inbox/orchestrateur/`)** — deux volets :
   (1) UX : les sous-tâches s'affichent sous la durée de la tâche et la carte s'allonge seule ; Marie veut les sous-tâches DANS la carte (carte qui s'agrandit au besoin), heure de fin alignée sur la dernière sous-tâche (aujourd'hui les sous-tâches démarrent au niveau de l'heure de fin). **Non traité.**
   (2) Technique : « Échec d'envoi » de tous les retours. Cause = flux de retours annotés livré en v5.92 (`merge f6f5e78`) SANS backend serveur — `supabase/feedback.sql` jamais appliqué sur le projet Supabase de prod (`aslxfetpkuytrqwidxig`). **Migration appliquée par l'utilisateur pendant la session.** Message déposé + `approve`/`drain` forcés depuis la session orchestrateur (hors gardien `discord`, instruction explicite) → envoyé à Marie (Discord `1546260814401634354`, gateway `20260906T204529_830899`, `--expect-reply`) : relancer les retours en échec, confirmer « Envoyé ». Inbox `20260906T184910_113113` acquittée. Journalisé `historique_conversation_marie.md` (`eec75f6`, `b9465b6`).
 - **Contradiction « 783 tests verts » levée** (contrôles menés en amont de la compaction de session). `npm ci` depuis le verrou dans le worktree isolé `refacto-p1` (`D:/ServOMorph/Appli_TSA_SDI_TDAH.worktrees/refacto-p1`, detached `f4ac862`) → tsc `app`/`node` exit 0, lint 0 avertissement, Vitest 97 fichiers / **783 tests verts**, `bundle:check` OK (chunk d'entrée 261,68 kB < 266,43). Le chiffre est exact ; cause = `node_modules` incomplet du checkout partagé, pas le code, pas une annonce non vérifiée. Worktree conservé en l'état (`node_modules` complet).
-- **Checkout principal `d:\ServOMorph\Appli_TSA_SDI_TDAH` : `node_modules` toujours incomplet** (`npm ci` non exécuté — décision différée). Aucune commande `tsc`/`lint`/`Vitest` fonctionnelle sur ce checkout tel quel.
+- **Checkout principal :** contrôles TypeScript, lint et Vitest exécutables et passants durant cette session.
 - Livraison v5.92 à Marie : 12 parcours in-app en attente de sa validation. `_contexte/dernier_deploiement.md` : v5.92, 2026-09-05. `CHANGELOG.md` à v5.100 — non déployé (aucun changement applicatif depuis v5.92).
-- `roadmap_refactorisation_2026-09-06.md` : toutes phases `[TODO]`, non lancée. Verdict inchangé : Phases 1-2 lançables sous 2 confirmations (réinstall dépendances ; branche cible). Phases 3-8 gatées (baseline verte Phase 1 — désormais démontrable via `refacto-p1` — + décisions D1/D2/D4/D5, non prises).
+- `roadmap_refactorisation_2026-09-06.md` : phases 1 à 4 `[FAIT]`; phase 5 à reprendre. D1 à D4 sont actées.
 - `roadmap_supprimer_tache_du_jour.md` : Phase 3 `[TODO — BLOQUÉ]`, attend D2 (réponse de Marie), à regrouper avec sa validation des tests v5.92.
 - Messages canal du 2026-09-06 (prévention + clôture des tests techniques) : tous deux envoyés (`outbox/sent/`).
 - Reste à aligner `.claude/CLAUDE.md` § « Gabarit du message de livraison » (nom de fichier au lieu de « lien »). Écart `/create_memory` (alias de zone) toujours délégué à VibeObs.
@@ -31,7 +32,28 @@
 - [P3] **Durcir `/discord_loop`** : ajouter un `stop` qui notifie Discord « Claude hors ligne » (auto-rattrapage au démarrage fait depuis le 2026-09-03). — fait quand : la commande `stop` de `/discord_loop` notifie Discord — réf : `.claude/commands/discord_loop.md`, `DISCORD/discord_com/bot.py`
 - [P2] **`.claude/commands/create_memory.md` n'implémente pas l'alias de zone** documenté par `start.md` étape 2c. Correctif délégué à VibeObs (message en presse-papier le 2026-09-06). — fait quand : `create_memory.md` reconnaît un premier argument = alias de `.claude/zones.md`, résout le dossier et écrit dans `<dossier>/_contexte/memory.md` — réf : `.claude/commands/create_memory.md`, `.claude/commands/start.md` étape 2c
 
-## Dernière session (2026-09-06 — retour E10 de Marie : diagnostic échec d'envoi + baseline 783 tests levée)
+## Dernière session (2026-09-06 — phases 1 à 4 de la roadmap de fiabilisation)
+
+## Décisions prises
+- D1/D2 : refuser les imports invalides avant toute écriture et conserver les retours avec images hors du remplacement.
+- D3 : conserver les docx versionnés sous `COMMUNICATION/Marie/commentaires/`, hors Git.
+- D4 : corriger uniquement les créations futures de séries récurrentes.
+
+## Livrables produits ou modifiés
+- Planning, import et règles de récurrence corrigés ; tests métier et intégration ajoutés.
+- Roadmap mise à jour : phases 1 à 4 `[FAIT]`.
+
+## Hypothèses validées / invalidées
+- VALIDÉ : une série quotidienne créée le 06/09/2026 produit 91 dates jusqu’au 05/12/2026 inclus.
+- EN ATTENTE : contrôle navigateur développeur de cette série.
+
+## Prochaine étape exacte
+Reprendre la phase 5 : rendre les opérations de série atomiques.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+## Session archivée (2026-09-06 — retour E10 de Marie : diagnostic échec d'envoi + baseline 783 tests levée)
 
 ## Décisions prises
 - Retour E10 de Marie : « Échec d'envoi » des retours = flux de retours annotés livré en v5.92 sans backend serveur. `supabase/feedback.sql` (table `feedback_reports`, RPC `submit_feedback`, bucket privé `feedback`, policy storage `anon`) appliqué en prod par l'utilisateur pendant la session.

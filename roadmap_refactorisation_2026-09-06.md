@@ -63,7 +63,7 @@ node --input-type=module -e 'import { startVitest } from "vitest/node"; const ct
 
 Pour les tests ciblés, remplacer le tableau vide de filtres de `startVitest` par les chemins des tests concernés. Pour le build et Playwright, préparer en phase 1 une configuration de test sans backend réel ni lecture de `.env`. Les commandes ordinaires `npm run build` et `npm run test:e2e` ne dispensent pas de cette préparation.
 
-## Phase 1 — Restaurer les contrôles de référence [TODO]
+## Phase 1 — Restaurer les contrôles de référence [FAIT]
 
 Périmètre : environnement de dépendances et configurations de vérification. Risque : faible pour le code, mais risque d'écraser l'environnement d'une autre session si la remise en état est menée sans coordination.
 
@@ -81,7 +81,7 @@ Périmètre : environnement de dépendances et configurations de vérification. 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 2 — Ranger les commentaires de livraison [TODO]
+## Phase 2 — Ranger les commentaires de livraison [FAIT]
 
 Périmètre : les neuf fichiers `commentaires_marie_v*.docx` aujourd'hui à la racine, la règle correspondante de `.gitignore` et `.claude/commands/deploy.md` étape 11. Risque faible pour le code, mais risque opérationnel si le script conserve un chemin racine ou si un fichier existant est écrasé.
 
@@ -100,7 +100,7 @@ Périmètre : les neuf fichiers `commentaires_marie_v*.docx` aujourd'hui à la r
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 3 — Import validé et atomique [TODO]
+## Phase 3 — Import validé et atomique [FAIT]
 
 Référence : R1, priorité P1. Périmètre prévu par le plan : hook des paramètres, snapshot, interface d'import et tests associés. Nouveaux modules possibles : normalisation pure et service de restauration. Risque élevé : remplacement global des données.
 
@@ -120,7 +120,7 @@ Référence : R1, priorité P1. Périmètre prévu par le plan : hook des param�
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 4 — Corriger l'horizon des récurrences [TODO]
+## Phase 4 — Corriger l'horizon des récurrences [FAIT]
 
 Référence : R2, priorité P2. Périmètre prévu : hook de planification, règles de récurrence et tests métier/intégration. Risque modéré : nombre et dates des occurrences créées.
 

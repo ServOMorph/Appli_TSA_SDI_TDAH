@@ -830,3 +830,53 @@ describe('AppProvider — updateTaskFields / deleteTaskScoped sur une série ré
     await waitFor(() => expect(screen.getByTestId('count').textContent).toBe('0'))
   })
 })
+
+describe('AppProvider — horizon de matérialisation des récurrences', () => {
+  function DailySeriesPanel() {
+    const { createUser, completeOnboarding, createDetailedTask, loading } = useApp()
+    const [dates, setDates] = useState<string[]>([])
+    if (loading) return <div data-testid="loading">chargement</div>
+
+    async function createSeries() {
+      await createDetailedTask({
+        title: 'Série quotidienne horizon',
+        description: '',
+        icon: null,
+        color: null,
+        energyCost: null,
+        essential: false,
+        durationMinutes: 30,
+        date: '2026-09-06',
+        startTime: '09:00',
+        status: 'planned',
+        recurrence: { frequency: 'daily', interval: 1, weekdays: null, end_type: 'never', end_date: null, end_count: null },
+      })
+      setDates(
+        (await db.tasks.toArray())
+          .filter((task) => task.title === 'Série quotidienne horizon')
+          .map((task) => task.scheduled_date ?? ''),
+      )
+    }
+
+    return (
+      <>
+        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={createSeries}>créer série quotidienne</button>
+        <output data-testid="series-dates">{JSON.stringify(dates)}</output>
+      </>
+    )
+  }
+
+  it('enregistre 91 dates quotidiennes du 06/09 au 05/12 inclus', async () => {
+    render(<AppProvider><DailySeriesPanel /></AppProvider>)
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer série quotidienne' }))
+    await waitFor(() => expect(JSON.parse(screen.getByTestId('series-dates').textContent ?? '[]')).toHaveLength(91))
+
+    const dates = JSON.parse(screen.getByTestId('series-dates').textContent ?? '[]') as string[]
+    expect(dates).toContain('2026-09-06')
+    expect(dates).toContain('2026-12-05')
+    expect(dates).not.toContain('2026-12-06')
+  })
+})

@@ -72,4 +72,4 @@ _docs/fichiers/
 
 # Commentaires de livraison .docx générés par /deploy étape 11 (publiés sur Drive ;
 # l'historique figé est dans COMMUNICATION/Marie/livraisons/vX.Y.md)
-commentaires_marie_*.docx
+COMMUNICATION/Marie/commentaires/commentaires_marie_*.docx

@@ -16,6 +16,10 @@ function addDays(date: Date, days: number): Date {
   return new Date(date.getTime() + days * DAY_MS)
 }
 
+export function recurrenceMaterializationEndDate(anchorDate: string, days: number): string {
+  return formatDate(addDays(parseDate(anchorDate), days))
+}
+
 function startOfWeek(date: Date): Date {
   return addDays(date, -date.getUTCDay())
 }

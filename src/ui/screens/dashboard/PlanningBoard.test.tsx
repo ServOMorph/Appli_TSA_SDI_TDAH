@@ -330,6 +330,26 @@ describe('PlanningBoard', () => {
     expect(await screen.findByText('Étape 1')).toBeInTheDocument()
   })
 
+  it('garde les sous-étapes et l’heure de fin dans la même carte', async () => {
+    const parent = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })
+    const child = baseTask({ id: 'c1', parent_id: 't1', title: 'Étape 1', status: 'inbox' })
+    renderExpanded(
+      makeAppContext({
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([parent]),
+        getSubTasks: vi.fn().mockResolvedValue([child]),
+      }),
+    )
+
+    await userEvent.click(await screen.findByLabelText('0 sur 1 sous-étapes, déplier'))
+
+    const card = screen.getByText('Médecin').closest('div[style*="background-color"]') as HTMLElement
+    const endTimeColumn = screen.getByText('10:00').parentElement as HTMLElement
+    expect(card.style.display).toBe('flex')
+    expect(endTimeColumn.parentElement).toBe(card)
+    expect(endTimeColumn.style.justifyContent).toBe('space-between')
+    expect(card).toContainElement(screen.getByText('Étape 1'))
+  })
+
   it('cocher une sous-étape dépliée appelle toggleSubTask', async () => {
     const toggleSubTask = vi.fn().mockResolvedValue(undefined)
     const parent = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00' })

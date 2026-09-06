@@ -2090,3 +2090,12 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 
 ### Modifié
 - `.claude/commands/close.md` : actualisation de la référence GitHub avant la sauvegarde ; échec Drive non bloquant signalé au bilan.
+## v5.101 — 2026-09-06
+
+### Corrigé
+- Les sous-tâches restent visuellement dans leur carte du planning et l’heure de fin s’aligne après la dernière sous-tâche.
+- L’import de données valide son contenu avant écriture et s’annule entièrement en cas d’échec.
+- Les nouvelles séries récurrentes sont limitées à 90 jours après leur date de départ, sans modifier les séries déjà créées.
+
+### Modifié
+- Les commentaires de livraison versionnés sont conservés hors de la racine du projet, dans un dossier local dédié non versionné.

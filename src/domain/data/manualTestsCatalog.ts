@@ -256,6 +256,17 @@ export const manualTestsCatalog: ManualTest[] = [
     ],
   },
   {
+    id: 'sous-etapes-dans-la-carte-planning',
+    title: 'Sous-étapes dans la carte du planning',
+    category: 'Accueil / Planning',
+    steps: [
+      'Créez une tâche planifiée aujourd’hui avec une heure de début, une durée et au moins deux sous-étapes.',
+      'Sur l’accueil, touchez le compteur de sous-étapes de sa carte pour les déplier : elles doivent rester dans le fond coloré de la même carte.',
+      'Regardez l’heure de fin : elle doit être en bas à gauche de cette carte, alignée après la dernière sous-étape.',
+      'Touchez à nouveau le compteur : les sous-étapes se replient sans modifier l’heure de début ni de fin.',
+    ],
+  },
+  {
     id: 'duree-obligatoire-tache-planifiee',
     revision: 1,
     title: 'Durée obligatoire pour une tâche planifiée',

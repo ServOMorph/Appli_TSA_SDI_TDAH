@@ -1261,3 +1261,12 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - Migration des retours appliquée en production par l’utilisateur ; relance demandée à Marie.
 - Baseline isolée à 783 tests passants après réinstallation des dépendances.
 - Suite : exécuter la roadmap de fiabilisation.
+
+---
+
+## Session du 2026-09-06 — roadmap de fiabilisation, phases 1 à 4
+
+- D1/D2 (import rejette l'invalide avant écriture, retours avec images préservés), D3 (docx versionnés hors Git), D4 (seules les créations futures de séries corrigées).
+- Planning, import et règles de récurrence corrigés ; tests métier et intégration ajoutés ; roadmap phases 1 à 4 `[FAIT]`.
+- VALIDÉ : série quotidienne du 06/09/2026 → 91 dates jusqu'au 05/12/2026 inclus. Contrôle navigateur de l'horizon laissé dans `tests_manuels.md`.
+- Suite : reprendre la phase 5 (opérations de série atomiques).

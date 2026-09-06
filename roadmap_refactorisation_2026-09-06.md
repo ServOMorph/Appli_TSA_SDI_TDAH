@@ -138,7 +138,18 @@ Référence : R2, priorité P2. Périmètre prévu : hook de planification, règ
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 5 — Rendre les opérations de série atomiques [TODO]
+## Phase 5 — Rendre les opérations de série atomiques [FAIT]
+
+**Clôturée le 2026-09-07, commit `bbdf662`.** Nouveau service `src/data/services/seriesPersistence.ts`
+(`persistSeriesBatch` — lot préparé en mémoire puis transaction Dexie unique `rw` sur `tasks` +
+`taskRecurrences`, résolution des sous-étapes incluse). `usePlanningState` route créations, éditions
+et suppressions de série par ce service ; l'occurrence isolée non récurrente garde le chemin direct.
+Règles de portée inchangées, UI rafraîchie après commit uniquement. Tests : `seriesPersistence.test.ts`,
+9 cas dont 5 pannes injectées (règle, mi-série, avant suppression de source, édition, suppression) —
+rollback intégral prouvé (source conservée, aucune règle orpheline, aucune série partielle). Contrôle
+navigateur réel : création d'une série quotidienne → série entière + une seule règle. Suite complète
+98 fichiers / 805 tests verts, tsc app+node exit 0, lint 0, budget bundle OK. Contrôle dev ajouté à
+`tests_manuels.md`. Prochaine action : Phase 6.
 
 Référence : R3, priorité P2. Périmètre prévu : planification, dépôts de tâches/récurrences et service de persistance de série. Risque modéré à élevé : opérations multi-enregistrements.
 

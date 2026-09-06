@@ -1,3 +1,11 @@
+## v5.101 — 2026-09-07
+
+### Corrigé
+- Retour E10 de Marie (volet affichage) : sur le planning, les sous-étapes dépliées d'une tâche s'affichent maintenant DANS la carte de la tâche, sous le titre ; la carte s'agrandit pour toutes les contenir et l'heure de fin de la tâche reste alignée sur la dernière sous-étape (avant : sous-étapes sous la case, carte qui s'allongeait seule, sous-étapes démarrant au niveau de l'heure de fin). `PlanningBoard.tsx` passe la ligne de tâche en colonne (en-tête + liste des sous-étapes dans la case `[role="button"]`, `stopPropagation` sur les lignes de sous-étape). Parcours in-app `sous-etapes-dans-la-carte-planning` passé `revision: 1` (repassera « à faire » pour Marie au prochain déploiement). Commit `6f4a8d1`. Non déployé.
+
+### Modifié
+- `roadmap_refactorisation_2026-09-06.md` Phase 5 (R3) `[FAIT]` : les opérations de série de tâches (création depuis une source, édition « toute la série », suppression « toute la série ») sont rendues atomiques. Nouveau service `src/data/services/seriesPersistence.ts` (`persistSeriesBatch`) — le lot de changements est préparé en mémoire puis persisté dans une transaction Dexie unique portant sur `tasks` et `taskRecurrences` (résolution des sous-étapes incluse) ; `usePlanningState` route créations, éditions et suppressions de série par ce service ; l'occurrence isolée non récurrente garde le chemin direct. Règles de portée inchangées, interface rafraîchie après commit uniquement. Un échec en cours d'opération est annulé intégralement : source conservée, aucune règle de récurrence orpheline, aucune série partielle. 9 tests (`seriesPersistence.test.ts`, dont 5 pannes injectées). Contrôle navigateur réel : création d'une série quotidienne → série entière + une seule règle. Suite complète 98 fichiers / 805 tests verts, TypeScript et lint exit 0, budget bundle respecté (262,97 kB < 266,43). Commit `bbdf662`. Non déployé.
+
 ## v5.100 — 2026-09-06
 
 ### Corrigé

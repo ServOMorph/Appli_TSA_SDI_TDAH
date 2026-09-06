@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { newId, taskRepo, taskRecurrenceRepo, todayDate } from '@/app/repositories'
+import { db, newId, taskRepo, todayDate } from '@/app/repositories'
+import { persistSeriesBatch } from '@/data/services/seriesPersistence'
 import {
   createTask as createTaskRule,
   scheduleTask as scheduleTaskRule,
@@ -14,7 +15,11 @@ import {
   recurrenceMaterializationEndDate,
 } from '@/domain/rules/taskRecurrenceRules'
 import type { Task, TaskStatus } from '@/domain/entities/task'
-import type { RecurrenceFrequency, RecurrenceEndType } from '@/domain/entities/taskRecurrence'
+import type {
+  RecurrenceFrequency,
+  RecurrenceEndType,
+  TaskRecurrence,
+} from '@/domain/entities/taskRecurrence'
 
 export interface PlannedSubTask extends Task {
   parentTitle: string
@@ -127,9 +132,10 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     }
 
     const occurrences: Task[] = []
+    let recurrence: TaskRecurrence | undefined
     if (input.recurrence && input.date && isValidRecurrence(input.recurrence)) {
       const recurrenceId = newId()
-      const recurrence = {
+      recurrence = {
         id: recurrenceId,
         frequency: input.recurrence.frequency,
         interval: input.recurrence.interval,
@@ -140,7 +146,6 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
         created_at: now,
         updated_at: now,
       }
-      await taskRecurrenceRepo.create(recurrence)
       task = { ...task, recurrence_id: recurrenceId, is_recurrence_root: true }
 
       const dates = generateOccurrenceDates(
@@ -163,13 +168,11 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
       }
     }
 
-    await taskRepo.create(task)
-    for (const occurrence of occurrences) {
-      await taskRepo.create(occurrence)
-    }
-    if (sourceTaskId) {
-      await taskRepo.deleteWithChildren(sourceTaskId)
-    }
+    await persistSeriesBatch(db, {
+      recurrenceToCreate: recurrence,
+      tasksToCreate: [task, ...occurrences],
+      sourceIdToDelete: sourceTaskId,
+    })
     await reloadTasks()
     await load()
     return task.id
@@ -244,9 +247,9 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
       const targets = series.filter(
         (t) => (t.id === id || !t.recurrence_exception) && (t.scheduled_date ?? '') >= (task.scheduled_date ?? ''),
       )
-      for (const target of targets) {
-        await taskRepo.update(applyFieldEdit(target, edit, false, now))
-      }
+      await persistSeriesBatch(db, {
+        tasksToUpdate: targets.map((target) => applyFieldEdit(target, edit, false, now)),
+      })
     } else {
       let updated = applyFieldEdit(task, edit, true, now)
       if (task.recurrence_id) updated = { ...updated, recurrence_exception: true }
@@ -268,9 +271,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
       const targets = series.filter(
         (t) => (t.id === id || !t.recurrence_exception) && (t.scheduled_date ?? '') >= (task.scheduled_date ?? ''),
       )
-      for (const target of targets) {
-        await taskRepo.deleteWithChildren(target.id)
-      }
+      await persistSeriesBatch(db, { taskIdsToDelete: targets.map((target) => target.id) })
     } else {
       await taskRepo.deleteWithChildren(id)
     }

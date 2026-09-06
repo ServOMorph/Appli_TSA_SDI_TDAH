@@ -23,6 +23,12 @@ demande d'éditer que ce fichier — jamais `discord_loop.md`.
 - Créer une tâche quotidienne récurrente planifiée le 06/09/2026, sans fin.
 - Dans le planning, vérifier les occurrences du 06/09/2026 au 05/12/2026 incluses, et l'absence d'occurrence le 06/12/2026.
 
+## Opérations de série atomiques (Phase 5)
+
+- Créer une tâche récurrente planifiée, puis depuis une occurrence : modifier un champ « pour toute la série », puis supprimer « toutes les occurrences ».
+- Après chaque geste, vérifier dans le planning qu'il ne reste ni occurrence partielle ni série incohérente, et que la règle de récurrence n'est pas orpheline (aucune tâche fantôme, recharger l'appli).
+- Contrôle console (facultatif) : `indexedDB` → store `taskRecurrences` ne contient aucune règle sans occurrence après la suppression de série.
+
 ## Bot Discord — file d'attente des commandes en conditions réelles [discord-auto]
 
 Ajouté le 2026-09-02 (commit `2b75711`). `bot.py` empile désormais dans `commands.json` → `queue[]`

@@ -1202,3 +1202,31 @@ Aligner `.claude/CLAUDE.md` § « Gabarit du message de livraison » : remplacer
 
 ## Question bloquante pour la session suivante
 Aucune.
+
+---
+
+## Dernière session (2026-09-06 — nettoyage refs `sync-marie`, validation tests manuels A / B1 / B2 / C)
+
+## Décisions prises
+- Références à la branche `sync-marie` (supprimée) retirées de `.claude/commands/start.md` et `close.md` : la politique des branches ne mentionne plus que `main` et `agent/<alias>`. Analyse repo : toutes les autres occurrences pointent le fichier archivé `roadmap_sync_marie.md` (légitime) ou de l'historique figé (archives, CHANGELOG, README) — laissées ; `.claude/memory.md` L8 (incident 2026-08-19) laissé tel quel (leçon valide, fichier géré par `/create_memory`).
+- Sections « Hooks de zone » et « SAV Marie dans /close » retirées de `tests_manuels.md` : Tests A et C validés cette session.
+
+## Livrables produits ou modifiés
+- `.claude/commands/start.md`, `.claude/commands/close.md` : blocs `sync-marie` supprimés — commit `c92fe08`.
+- `tests_manuels.md` : section « Hooks de zone » retirée (commit `c92fe08`), section « SAV Marie dans /close » retirée (ce `/close`).
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : journalisation des 2 messages canal du 2026-09-06 (prévention + clôture des tests techniques) — commit `0a9f8bd`.
+- Gateway : message `20260906T151442_084084` (info, orchestrateur->marie) déposé, `pending`.
+- `CHANGELOG.md` v5.98, `_contexte/signals.md`, `_contexte/contexte.md`, `README.md` : ce `/close`.
+
+## Hypothèses validées / invalidées
+- VALIDÉ Test A : hooks de zone `discord` — `/start discord` (`bot_manager.py restart` + enchaînement `/discord_loop`) et `/close discord` (`bot_manager.py stop`, `[OK] PID 65640`). Cas « échec non bloquant » non provoqué (racine ni discord).
+- VALIDÉ Test B1 : file d'attente des commandes du bot en conditions réelles — rafale de 4 messages pendant un traitement, compteur `(1)->(4)`, aucun rejet, reprise FIFO stricte, `!ping` nu immédiat sous charge.
+- VALIDÉ Test B2 : cas dégradé — `discord_loop.py wait` récupère la commande puis sort (= session tombée) -> `commands.json` figé en `processing`, file à 3 sans promotion. Bonus : `recuperer_processing_orphelin()` au restart du bot remet `idle` (seuil `ORPHAN_PROCESSING_MINUTES` forcé à 0 le temps du test, reverté à 15).
+- VALIDÉ Test C : SAV Marie dans `/close` (chemin écriture réelle) — Marie a resynchronisé à 17:09, la Pré-synthèse de ce `/close` a écrit un nouveau snapshot dans `donnees_marie/`, sans afficher `.env` ni le contenu du snapshot.
+- EN ATTENTE : la session `discord` retire la section `[discord-auto]` « Bot Discord — file d'attente » (B1 + B2 couverts) ; son `signals.md` la note encore ouverte.
+
+## Prochaine étape exacte
+Aligner `.claude/CLAUDE.md` § « Gabarit du message de livraison » (nom de fichier `commentaires_marie_<version>.docx` au lieu de « lien »). Reprendre `roadmap_supprimer_tache_du_jour.md` Phase 3 à la réponse de Marie (D2 regroupé avec sa validation des tests v5.92). Committer `DISCORD/_contexte/on_start.md` depuis une session `discord`.
+
+## Question bloquante pour la session suivante
+Aucune.

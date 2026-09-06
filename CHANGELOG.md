@@ -1,3 +1,11 @@
+## v5.99 — 2026-09-06
+
+### Ajouté
+- `roadmap_refactorisation_2026-09-06.md` et `ROBERTO/plan_refacto_2026-09-06.md` : mis sous suivi Git (créés hors session). Roadmap de fiabilisation en huit phases, toutes `[TODO]` — non lancée.
+
+### Analyse
+- Revue de `roadmap_refactorisation_2026-09-06.md` : lançable pour les Phases 1-2 seulement, sous deux confirmations de l'utilisateur (réinstallation des dépendances depuis le verrou sur le checkout partagé ; branche cible — `main` par politique ou branche d'intégration dédiée). Phases 3-6 gatées derrière la baseline verte de Phase 1 et les décisions D1/D2/D4/D5 (non prises) ; Phase 8 conditionnée au retour de Marie sur `E12WeekPlanning`. Vérifications : bug R2 réel (`usePlanningState.ts:142`), ancres R1-R6 présentes, périmètre Phase 2 exact (9 `commentaires_marie_v*.docx` à la racine). `node_modules` incomplet (`@dnd-kit/*`, `@jridgewell/sourcemap-codec`, binaire `eslint` absents) : aucune base de tests verte dans ce checkout, en contradiction avec les « 783 tests verts » datés du même jour — à trancher par la Phase 1. Aucun code applicatif touché.
+
 ## v5.98 — 2026-09-06
 
 ### Modifié

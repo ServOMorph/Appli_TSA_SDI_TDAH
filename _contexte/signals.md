@@ -1,6 +1,7 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-06)
 
 ## Contexte chaud
+- **`roadmap_refactorisation_2026-09-06.md` créée (source : `ROBERTO/plan_refacto_2026-09-06.md`), non lancée** — toutes phases `[TODO]`. Analyse de cette session : lançable **Phases 1-2 seulement**, sous 2 confirmations utilisateur (réinstall dépendances depuis le verrou ; branche cible). Phases 3-8 gatées derrière baseline verte Phase 1 + décisions D1/D2/D4/D5 (non prises). Collisions à surveiller : Phase 8 (R6) = `E12WeekPlanning.tsx`, déjà en question ouverte P3 ; refacto `src/` vs 12 tests v5.92 en attente Marie. Contradiction non levée : `signals`/`contexte` disent « 783 tests verts » le 2026-09-06, le plan (même date) constate tsc/lint/vitest en échec (install locale incomplète : `@dnd-kit/*`, `@jridgewell/sourcemap-codec`, binaire `eslint` absents de `node_modules`).
 - **Livraison v5.92 envoyée à Marie (2026-09-06)**, après 4 bounces du gardien. Cause racine du 3e bounce (« 9 tests / 8 puces ») : le catalogue in-app n'avait aucun test doté de `docRefs: [37]` (refonte de la fiche de tâche, la modification la plus visible de v5.92) — perdu dans l'incident de stash de `Archives/roadmap_demandes_marie_2026-09-04.md` Phase 3 malgré la roadmap `[FAIT]`. Catalogue corrigé : `modifier-une-tache-planifiee` réécrit (édition par case, `docRefs: [37]`, `revision: 1`), nouveau parcours `creer-une-tache-bandeau-colore` (`docRefs: [37]`), `menu-actions-tache-simplifie` (`revision` 2→3) et `duree-obligatoire-tache-planifiee` (`revision: 1`, `docRefs: [25, 37]`) corrigés (référençaient un bouton « Modifier » supprimé), `cadre-date-heure-dans-l-ecran` retiré (#3 abandonnée par Marie au profit de #37). `tsc -b` + lint + 783 tests verts. Recalcul programmatique (`isManualTestDone`) : 12 tests réellement en attente, tous rattachés à v5.92. Commits `3b6eae3`, `7cc652f`.
 - **`roadmap_demandes_marie_2026-09-04.md` (33 reprise Doc, #34-38) et `roadmap_supprimer_tache_du_jour.md` Phases 1-2 : livrées en v5.92, message de livraison envoyé — en attente des tests de Marie** (12 parcours dans l'écran « Tests à faire »).
 - `roadmap_supprimer_tache_du_jour.md` : Phase 3 `[TODO — BLOQUÉ]` toujours, attend D2 (point d'entrée « accueil » pour l'ajout planifié d'office) — à regrouper avec la réponse de Marie sur les tests v5.92, pas à poser isolément.
@@ -15,6 +16,7 @@
 - `DISCORD/_contexte/on_start.md` : modification non commitée (expansion du hook Pré-synthèse en 3 sous-sections — bot, kill `discord_loop` orphelin, résumé outbox Marie) — travail zone `discord`, hors périmètre du `/close` racine, à committer depuis une session `discord`.
 
 ## Questions ouvertes
+- [P1] **Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2) et sur quelle branche ?** Politique projet = `main` (roadmap produit touchant `src/`), mais 8 phases avec changements de comportement commités sur `main` entre deux `/deploy` = exposition à décider. Phase 1 exige une réinstall des dépendances depuis le verrou sur le checkout partagé. — fait quand : l'utilisateur tranche lancement + branche → `/start` puis Phase 1 — réf : `roadmap_refactorisation_2026-09-06.md` § Phase 1, `ROBERTO/plan_refacto_2026-09-06.md` § Décisions à prendre
 - [P2] **D2 — quel point d'entrée « accueil » pour l'ajout de tâche planifiée d'office (Phase 3 de `roadmap_supprimer_tache_du_jour.md`) ?** Interprétation dev = bouton « + » du menu du bas (`BottomNav`, `App.tsx:189`). Ne pas poser isolément à Marie — regrouper avec sa réponse aux tests v5.92. — fait quand : Marie confirme (ou corrige) le point d'entrée → Phase 3 débloquée — réf : `roadmap_supprimer_tache_du_jour.md` § Décisions produit (D2), § Phase 3
 - [P1] **6 demandes (33 reprise Doc, #34 à #38) livrées en v5.92, message de livraison envoyé — pas encore validées par Marie.** — fait quand : Marie valide les 12 parcours du catalogue correspondants (`ok`/`nok` enregistré) → réf : `_contexte/marie_modifications_suivi.md` lignes 33 (reprise Doc)/34-38, `src/domain/data/manualTestsCatalog.ts`
 - [P3] **`E12WeekPlanning.tsx` reproduit le même défaut de saut au relâchement que `PlanningBoard.tsx` avant #38 — non corrigé, hors périmètre de #38.** — fait quand : Marie confirme le même problème sur l'écran « Planning de la semaine » et une phase dédiée le corrige → réf : `roadmap_demandes_marie_2026-09-04.md` (`Archives/`) Phase 4, `src/ui/screens/dashboard/E12WeekPlanning.tsx`
@@ -28,28 +30,25 @@
 - [P3] Durcir `/discord_loop` : reste à ajouter un `stop` qui notifie Discord « Claude hors ligne » (l'auto-rattrapage au démarrage est fait depuis le 2026-09-03). — fait quand : la commande `stop` de `/discord_loop` notifie Discord — réf : `.claude/commands/discord_loop.md`, `DISCORD/discord_com/bot.py`
 - [P2] **`.claude/commands/create_memory.md` n'implémente pas l'alias de zone que `start.md` étape 2c documente** (`/create_memory <alias_zone> <contenu>` écrirait aujourd'hui tout l'argument tel quel dans `.claude/memory.md` racine, jamais dans `<dossier>/_contexte/memory.md`). Signalé à l'agent VibeObs (message composé, copié dans le presse-papier Windows le 2026-09-06), correctif délégué. — fait quand : `create_memory.md` reconnaît un premier argument = alias de `.claude/zones.md`, résout le dossier et écrit dans `<dossier>/_contexte/memory.md` — réf : `.claude/commands/create_memory.md`, `.claude/commands/start.md` étape 2c
 
-## Dernière session (2026-09-06 — nettoyage refs `sync-marie`, validation tests manuels A / B1 / B2 / C)
+## Dernière session (2026-09-06 — analyse `roadmap_refactorisation_2026-09-06.md`)
 
 ## Décisions prises
-- Références à la branche `sync-marie` (supprimée) retirées de `.claude/commands/start.md` et `close.md` : la politique des branches ne mentionne plus que `main` et `agent/<alias>`. Analyse repo : toutes les autres occurrences pointent le fichier archivé `roadmap_sync_marie.md` (légitime) ou de l'historique figé (archives, CHANGELOG, README) — laissées ; `.claude/memory.md` L8 (incident 2026-08-19) laissé tel quel (leçon valide, fichier géré par `/create_memory`).
-- Sections « Hooks de zone » et « SAV Marie dans /close » retirées de `tests_manuels.md` : Tests A et C validés cette session.
+- `roadmap_refactorisation_2026-09-06.md` jugée lançable **Phases 1-2 seulement**, sous 2 confirmations utilisateur (réinstall dépendances depuis le verrou ; branche cible — `main` par politique). Phases 3-8 gatées derrière la baseline verte de Phase 1 + décisions D1/D2/D4/D5 (non prises). Phase 8 (R6) à conditionner explicitement au retour Marie sur `E12WeekPlanning`.
+- `roadmap_refactorisation_2026-09-06.md` + `ROBERTO/plan_refacto_2026-09-06.md` (créés hors session, non suivis) commités sur `main` — convention : roadmaps produit à la racine.
 
 ## Livrables produits ou modifiés
-- `.claude/commands/start.md`, `.claude/commands/close.md` : blocs `sync-marie` supprimés — commit `c92fe08`.
-- `tests_manuels.md` : section « Hooks de zone » retirée (commit `c92fe08`), section « SAV Marie dans /close » retirée (ce `/close`).
-- `COMMUNICATION/Marie/historique_conversation_marie.md` : journalisation des 2 messages canal du 2026-09-06 (prévention + clôture des tests techniques) — commit `0a9f8bd`.
-- Gateway : message `20260906T151442_084084` (info, orchestrateur→marie) déposé, `pending`.
-- `CHANGELOG.md` v5.98, `_contexte/signals.md`, `_contexte/contexte.md`, `README.md` : ce `/close`.
+- `roadmap_refactorisation_2026-09-06.md`, `ROBERTO/plan_refacto_2026-09-06.md` : commités (aucune modification de contenu cette session).
+- `_contexte/signals.md`, `_contexte/contexte.md`, `_contexte/archive_sessions.md`, `_contexte/archive_decisions.md`, `README.md`, `CHANGELOG.md` : ce `/close`.
+- Aucun code applicatif touché.
 
 ## Hypothèses validées / invalidées
-- VALIDÉ Test A : hooks de zone `discord` — `/start discord` (`bot_manager.py restart` + enchaînement `/discord_loop`) et `/close discord` (`bot_manager.py stop`, `[OK] PID 65640`). Cas « échec non bloquant » non provoqué (racine ni discord).
-- VALIDÉ Test B1 : file d'attente des commandes du bot en conditions réelles — rafale de 4 messages pendant un traitement, compteur `(1)→(4)`, aucun rejet, reprise FIFO stricte, `!ping` nu immédiat sous charge.
-- VALIDÉ Test B2 : cas dégradé — `discord_loop.py wait` récupère la commande puis sort (= session tombée) → `commands.json` figé en `processing`, file à 3 sans promotion. Bonus : `recuperer_processing_orphelin()` au restart du bot remet `idle` (seuil `ORPHAN_PROCESSING_MINUTES` forcé à 0 le temps du test, reverté à 15).
-- VALIDÉ Test C : SAV Marie dans `/close` (chemin écriture réelle) — Marie a resynchronisé à 17:09, la Pré-synthèse de ce `/close` a écrit un nouveau snapshot dans `donnees_marie/`, sans afficher `.env` ni le contenu du snapshot.
-- EN ATTENTE : la session `discord` retire la section `[discord-auto]` « Bot Discord — file d'attente » (B1 + B2 couverts) ; son `signals.md` la note encore ouverte.
+- VALIDÉ (lecture code) : R2 réel — `usePlanningState.ts:142` passe le mois de `YYYY-MM-DD` à `Date.UTC` sans `m-1`. Ancres R1-R6 : tous les fichiers cités présents, tailles cohérentes. Phase 2 : 9 `commentaires_marie_v*.docx` à la racine, règle `.gitignore:75` présente.
+- VALIDÉ (fs) : install locale incomplète — `node_modules/@dnd-kit/*`, `@jridgewell/sourcemap-codec` et le binaire `eslint` absents. Aucune baseline verte dans ce checkout aujourd'hui (tsc code 2, lint introuvable, Vitest 0 test).
+- CONTRADICTION non levée : `signals`/`contexte` affirment « 783 tests verts » le 2026-09-06 ; le plan (même date) constate l'inverse. À trancher par la réinstall de Phase 1, pas à supposer.
+- EN ATTENTE : décision de lancement (confirmations utilisateur) ; décisions D1/D2/D4/D5 de la roadmap.
 
 ## Prochaine étape exacte
-Aligner `.claude/CLAUDE.md` § « Gabarit du message de livraison » (nom de fichier `commentaires_marie_<version>.docx` au lieu de « lien »). Reprendre `roadmap_supprimer_tache_du_jour.md` Phase 3 à la réponse de Marie (D2 regroupé avec sa validation des tests v5.92). Committer `DISCORD/_contexte/on_start.md` depuis une session `discord`.
+Si lancement : `/start` puis Phase 1 (relevé Git + réinstall dépendances depuis le verrou + rétablir tsc/lint/Vitest, isoler les échecs préexistants). Sinon, reprendre les points en attente de Marie (tests v5.92, D2).
 
 ## Question bloquante pour la session suivante
-Aucune.
+Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle branche (`main` ou branche d'intégration dédiée) ?

@@ -1,3 +1,14 @@
+## v5.96 — 2026-09-06
+
+### Modifié
+- `/deploy` : fiabilisation de la clôture des roadmaps — vérification bloquante 3.10 (aucune phase `[EN COURS]` avant le build), avertissement 4.6 (déploiement partiel si des phases `[TODO]`/`[TODO — BLOQUÉ]` restent), étape 8bis (archivage des roadmaps entièrement `[FAIT]` après livraison, sur accord de l'utilisateur).
+- `/deploy` : retrait de `rclone link` (étape 11). Le commentaire de livraison n'est plus publié en lien Drive public ; il est déposé dans le dossier `Projets/Appli` restreint (accès par compte, Marie via `rayonnetoi@gmail.com`) et le message de livraison le référence par son nom de fichier versionné, jamais par une URL. Signal de sécurité « lien Drive » reformulé P1 → P3 (accès du dossier Drive et de ses fichiers restreint côté Google).
+
+### Corrigé
+- `index.html` : titre de l'onglet `tsa-scaffold` → `Appli TSA SDI TDAH` (résidu de scaffold aligné sur le nom du manifeste PWA).
+- `planningSlotRules.ts` : `todayStr()` respecte `dev_fake_date` en dev, comme `todayDate()` — le planning et l'énergie affichent le même jour lorsqu'une date est simulée. Effet nul en production.
+- `PlanningBoard.tsx` : ligne de tâche du planning `<button>` → `<div role="button">` avec gestion clavier Enter/Espace — la case à cocher et le bouton « Reporter » ne sont plus imbriqués dans un `<button>` (HTML valide, fin de l'avertissement jsdom au run des tests). Aucun changement visuel.
+
 ## v5.95 — 2026-09-06
 
 ### Modifié

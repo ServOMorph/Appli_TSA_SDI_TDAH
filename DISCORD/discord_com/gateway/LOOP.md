@@ -20,6 +20,7 @@ Pour chaque demande en `pending` (ou `held` repris) :
 | test | verdict |
 |------|---------|
 | Même fond déjà envoyé récemment (`outbox/sent/`, `logs/conversation.jsonl`), rien de neuf | `bounce` « doublon » |
+| Livraison (`kind == delivery`) : nombre de tests annoncé (N) ≠ nombre de puces — **N est le nombre de PARCOURS, les puces sont les numéros de modification DISTINCTS couverts** (`CLAUDE.md` § Gabarit). N > nombre de puces est normal si plusieurs parcours partagent un numéro. Seul N < nombre de puces est une vraie incohérence. Ne jamais bouncer sur N > puces. | `bounce` seulement si N < puces |
 | La question a déjà sa réponse, ou l'info figure déjà dans un message envoyé | `bounce` « réponse déjà connue » |
 | `<placeholder>`, choix non tranché, options de réponse manquantes, TODO | `bounce` « fond non figé » |
 | Message pour Marie truffé de mécanique interne (hash, chemins, jargon) | `bounce` « hors périmètre canal » |

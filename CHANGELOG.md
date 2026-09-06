@@ -1,3 +1,9 @@
+## v5.97 — 2026-09-06
+
+### Modifié
+- Hooks de zone `discord` (`on_start.md` / `on_close.md`) exercés en conditions réelles pour la première fois lors d'un `/start discord` puis `/close discord` : `bot_manager.py restart` + enchaînement automatique `/discord_loop` au démarrage, `bot_manager.py stop` à la section « Fin » à la fermeture — conformes au contrat (cas « échec non bloquant » non provoqué). `DISCORD/_contexte/` (signals, contexte, statut) mis à jour en conséquence.
+- Session `/discord_loop` (19 cycles) : bypass ponctuel de la règle `hold` — une info `orchestrateur→marie` approuvée malgré la `pending_reply` Marie active, sur demande explicite de Morphéus pour une série de tests canal. Décision de circonstance, la règle `LOOP.md` reste inchangée.
+
 ## v5.96 — 2026-09-06
 
 ### Modifié

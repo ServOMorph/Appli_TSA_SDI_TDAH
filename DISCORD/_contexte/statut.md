@@ -6,28 +6,23 @@ Remonte à : Appli_TSA_SDI_TDAH (orchestrateur), cf. `agent_role.md`.
 Point de contact unique Discord du projet : gardien de sortie de la gateway (approve/hold/bounce/merge), routage entrant, boucle `/discord_loop` quasi-permanente.
 
 ## Avancement
-Gateway exercée de bout en bout avec Marie (routage entrant + bounces sortants réels). Bug historique de perte de pièces jointes sur @-mention corrigé (par une autre session, constaté cette session). Deux chaînes de ton figées reformulées sur demande explicite de l'utilisateur.
+Session d'exploitation : 19 cycles `/discord_loop`. Hooks de zone `on_start.md`/`on_close.md` exercés en réel pour la première fois (`bot_manager.py restart` + enchaînement `/discord_loop` au start, `bot_manager.py stop` au close) — conformes. Réveil gateway `__gateway_wake__` validé (< 1 s). Règle `hold` appliquée puis levée sur ordre explicite de Morphéus pour une série de tests canal.
 
 ## Blocages
-- Livraison v5.92 vers Marie bouncée deux fois pour incohérence du nombre de tests annoncé vs puces listées — bloque la livraison tant que l'orchestrateur ne corrige pas le corps.
 - Photo/vidéo de Marie pour #3 (débordement Date/Heure) toujours manquante.
+- `pending_reply` Marie active (bouton d'ajout de tâche planifiée) — toujours sans réponse.
 
 ## Prochain pas
-Relancer `/discord_loop`. Juger la re-soumission de la livraison v5.92 si elle revient. Juger la re-soumission `design` de l'image d'accueil si elle arrive.
+Prochain `/start discord` : re-vérifier `on_start.md`. Provoquer 2-3 messages Discord simultanés pendant un traitement pour valider la section `[discord-auto]` « file d'attente des commandes ». Signaler à l'orchestrateur que les hooks `on_start`/`on_close` sont exercés (purge possible de leur section de `tests_manuels.md`, hors périmètre discord).
 
 ## Commit proposé
-`close(discord): session 2026-09-05 — deux chaînes de ton reformulées, aller-retour gateway exercé avec Marie, [discord-auto] Veille validée`
+`close(discord): session 2026-09-06 — hooks on_start/on_close exercés en réel, 19 cycles /discord_loop, bypass hold ponctuel`
 
 ## Fichiers modifiés
-- `DISCORD/discord_com/bot.py`
-- `DISCORD/discord_com/gateway/STYLE.md`
 - `DISCORD/_contexte/signals.md`, `contexte.md`, `statut.md`
 
 Non commité depuis discord :
-- `tests_manuels.md` (hors périmètre `DISCORD/`+`scripts/` — section `[discord-auto]` « Veille /discord_loop » supprimée, validée cette session)
-- `DISCORD/discord_com/gateway.py` (dans le périmètre, mais modifié par une autre session pendant celle-ci — pièce jointe locale, réveil immédiat du gardien ; non commité par prudence, pas de mon fait)
-
-Déjà commité par une autre session pendant cette session (commit `0786611`) : `.claude/commands/discord_loop.md`, `DISCORD/discord_com/bot.py`, `DISCORD/discord_com/gateway/STYLE.md`.
+- `tests_manuels.md` (hors périmètre `DISCORD/`+`scripts/` — section « Hooks de zone on_start.md/on_close.md » désormais exerçable, purge à faire par l'orchestrateur / session racine).
 
 ## Tests et migrations
-Aucune migration. Comportements observés en conditions réelles (pas de suite de tests automatisés dédiée) : routage entrant Marie, TIMEOUT/relance de `wait`, absence de notification au `/close`.
+Aucune migration. Comportements observés en conditions réelles : hook `on_start.md` (restart + enchaînement), hook `on_close.md` section Fin (stop), réveil `__gateway_wake__`, jugement `hold`/`approve`. Cas « échec non bloquant » des hooks non provoqué. Scénario « messages simultanés » de la file de commandes non observé (tests séquentiels).

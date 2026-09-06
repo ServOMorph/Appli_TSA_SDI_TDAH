@@ -4,8 +4,10 @@
 
 Sauvegarder le dernier snapshot Supabase de Marie avant d'afficher la synthèse :
 ```bash
-( set -a; . ./.env; set +a; python scripts/backup_marie_snapshot.py )
+python scripts/backup_marie_snapshot.py
 ```
 Non bloquant — en cas d'échec (hors ligne, Supabase indisponible), le signaler en une ligne et
-poursuivre `/start`. Le script est idempotent (aucune réécriture si le snapshot courant est déjà
-sauvegardé) et écrit dans `donnees_marie/` (gitignoré). Ne jamais afficher le contenu de `.env`.
+poursuivre `/start`. Le script lit `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` dans
+l'environnement, sinon dans le `.env` à la racine (aucun sourcing shell). Il est idempotent (aucune
+réécriture si le snapshot courant est déjà sauvegardé) et écrit dans `donnees_marie/` (gitignoré).
+Ne jamais afficher le contenu de `.env` ni celui d'un snapshot.

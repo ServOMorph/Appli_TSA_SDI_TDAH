@@ -662,3 +662,37 @@ _Suite :_ clôture symétrique du message de prévention ci-dessus. Tests A (hoo
 (file d'attente des commandes du bot) validés. Déposé dans la gateway (id `20260906T151442_084084`),
 `pending` — partira au prochain cycle `/discord_loop` de la session discord (bot actuellement
 arrêté).
+
+### 2026-09-06 — retour E10 de Marie (écran « Mes retours ») + blocage d'envoi des retours
+
+**Marie ->**
+
+(capture d'écran `IMG_3397.png` de l'écran « Mes retours » de l'appli, postée sur Discord en
+taguant le bot ; message `20260906T184910_113113` routé vers `inbox/orchestrateur/`)
+
+Retour E10 : les sous-tâches s'affichent sous la durée de la tâche et la carte s'allonge toute
+seule. Elle veut les sous-tâches DANS la carte (carte qui s'agrandit au besoin pour toutes les
+contenir), et l'heure de fin de tâche alignée sur la dernière sous-tâche — actuellement les
+sous-tâches commencent à s'afficher au niveau de l'heure de fin.
+Le retour E10 est lui-même bloqué en « Échec d'envoi » dans l'appli.
+
+_Suite :_ ce n'est pas une réponse à la livraison v5.92, mais un nouveau retour. Diagnostic de
+l'échec d'envoi : le flux de retours annotés a été livré en v5.92 (`merge f6f5e78`) SANS son
+backend — `supabase/feedback.sql` (table `feedback_reports`, RPC `submit_feedback`, bucket privé
+`feedback`, policy storage `anon`) jamais appliqué sur le projet Supabase de prod
+(`aslxfetpkuytrqwidxig`). Déjà tracé [P1] dans `TESTS/_contexte/signals.md:5,31`. Tout envoi de
+retour échouait donc côté serveur (`markFailed` → « Échec d'envoi »). `feedback.sql` appliqué
+manuellement par Morphéus dans le SQL Editor Supabase le 2026-09-06. Message déposé dans la
+gateway (id `20260906T204529_830899`, `--expect-reply`) pour demander à Marie de relancer ses
+retours en échec et de confirmer le passage en « Envoyé ». Volet UX (layout sous-tâches dans la
+carte de tâche) : changement `src/`, à traiter séparément, non encore planifié.
+
+**Dév ->** (déposé gateway, id `20260906T204529_830899`, en attente du gardien discord)
+
+La cause du blocage d'envoi des retours est corrigée côté serveur.
+
+Ouvre « Mes retours ».
+Appuie sur « Relancer » sur chaque retour en « Échec d'envoi ».
+Dis-moi si le statut passe à « Envoyé » ou s'il reste bloqué.
+
+Le point sur l'affichage des sous-tâches dans la carte est noté, il sera traité séparément.

@@ -1175,3 +1175,30 @@ Terminer le déploiement en cours, puis redemander à Marie de réimporter et re
 
 ## Question bloquante pour la session suivante
 Aucune.
+
+---
+
+# Session du 2026-09-06 — dettes P3 traitées, /deploy durci liens Drive + clôture roadmap, 3 tests manuels validés en navigateur
+
+## Décisions prises
+- Dette « lien Drive → `.env` » (P1) : signal mal formé (cible `v5.58.md` qui n'a jamais eu de lien ; `.env` inadapté — un lien par livraison). Vrai correctif = accès Drive restreint, fait côté Google par l'utilisateur (dossier `Projets/Appli` + tous ses fichiers, comptes nommés ; Marie via `rayonnetoi@gmail.com`). Pas de réécriture d'historique git, pas de caviardage de `historique_conversation_marie.md` (récit verbatim). Signal reformulé P1 → P3.
+- Dette « clôture roadmaps `/deploy` » (P1) : traitée dans `deploy.md` — 3.10 (bloque phase `[EN COURS]` avant build), 4.6 (avertit déploiement partiel), 8bis (archivage roadmaps entièrement `[FAIT]` après livraison, sur accord).
+- 3 dettes P3 traitées : titre onglet, `todayStr()`/`dev_fake_date`, ligne PlanningBoard `<button>` → `<div role="button">`.
+- Signal « Reliquat gateway Discord v1 » (P3) : clos — aucun appel direct `message_marie.py`/`claude_bridge` restant dans `deploy.md`/`analyser_googledoc.md` (vérifié), `agent_role.md` et `CLAUDE.md` déjà alignés.
+
+## Livrables produits ou modifiés
+- `.claude/commands/deploy.md` : 3.10 + 4.6 + 8bis (clôture roadmap) + retrait `rclone link` (étape 11) + renvoi Drive par nom de fichier, plus d'URL publique (étape 12-13) — commit `fdab3db`, mergé sur `main` en fast-forward.
+- `index.html`, `src/domain/rules/planningSlotRules.ts`, `src/ui/screens/dashboard/PlanningBoard.tsx` (+ `.test.tsx`) : dettes P3 — commit `fdab3db`.
+- `.claude/launch.json` : nouveau (config serveur de dev, prévisualisation navigateur).
+- `CHANGELOG.md` : v5.96. `_contexte/signals.md`, `_contexte/contexte.md`, `README.md` : ce `/close`.
+
+## Hypothèses validées / invalidées
+- VALIDE (test navigateur en session, serveur de dev) : ligne PlanningBoard `<div role="button">` — clic / Entrée / Espace ouvrent la fiche (Espace `preventDefault`, pas de scroll), case à cocher termine sans ouvrir, « Reporter » (mode surcharge) reporte sans ouvrir. Réserve : « aspect inchangé au pixel près » non contrôlable sans état de référence (`rowStyle` neutralise déjà l'apparence bouton).
+- VALIDE (test navigateur) : titre onglet = « Appli TSA SDI TDAH » ; `todayStr()` suit `dev_fake_date` (planning + vue semaine sur la date simulée, retour à la date réelle après retrait).
+- INVALIDE : signal 21 d'origine (« retirer le lien de `v5.58.md`, le stocker dans `.env` ») — `v5.58.md` sans lien, `.env` inadapté. Pivot : accès Drive restreint + `deploy.md` sans `rclone link`.
+
+## Prochaine étape exacte
+Aligner `.claude/CLAUDE.md` § « Gabarit du message de livraison » : remplacer « Le lien du commentaire Drive » par le nom de fichier `commentaires_marie_<version>.docx`. Reprendre `roadmap_supprimer_tache_du_jour.md` Phase 3 à la réponse de Marie sur D2 (regroupée avec sa validation des tests v5.92).
+
+## Question bloquante pour la session suivante
+Aucune.

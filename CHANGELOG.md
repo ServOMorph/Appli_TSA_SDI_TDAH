@@ -1,3 +1,12 @@
+## v5.98 — 2026-09-06
+
+### Modifié
+- `.claude/commands/start.md` et `close.md` : retrait des règles de la branche `sync-marie` (branche auth/Supabase/sync supprimée après fusion complète du socle dans `main`). La politique des branches et la substitution `<contexte>` ne mentionnent plus que `main` et `agent/<alias>`. Analyse repo : les autres occurrences de « sync-marie » visent le fichier archivé `roadmap_sync_marie.md` ou de l'historique figé — conservées.
+- `tests_manuels.md` : sections « Hooks de zone `on_start`/`on_close` » et « SAV Marie dans `/close` (chemin écriture réelle) » retirées — Tests A et C validés (hooks `/start discord`/`/close discord` conformes ; snapshot Supabase de Marie écrit par la Pré-synthèse de ce `/close` après une resynchronisation). Tests B1 (file d'attente `commands.json` du bot sous rafale réelle) et B2 (cas dégradé : `processing` figé sans promotion, recovery `recuperer_processing_orphelin` au restart) validés ; la section `[discord-auto]` correspondante est laissée à la session `discord`.
+
+### Ajouté
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : journalisation des deux messages de canal du 2026-09-06 (prévention puis clôture d'une série de tests techniques). Message de clôture déposé dans la gateway (`pending`).
+
 ## v5.97 — 2026-09-06
 
 ### Modifié

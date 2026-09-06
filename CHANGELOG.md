@@ -1,3 +1,9 @@
+## v5.95 — 2026-09-06
+
+### Modifié
+- Convention de tag `@El Patrone#7381` clarifiée : `bot.py` route un message vers l'inbox d'une zone indépendamment de ce tag (`has_pending_reply`) ; son absence signale du trafic de canal (SAV déjà assuré par `logs/conversation.jsonl`, sans traitement comme réponse). Consignée dans `DISCORD/_contexte/contexte.md`, pas dans `CLAUDE.md` racine.
+- Écart identifié sur `/create_memory` : la commande n'implémente pas l'alias de zone documenté par `start.md` étape 2c (écrit toujours dans `.claude/memory.md` racine). Signalé à l'agent VibeObs, correctif délégué.
+
 ## v5.94 — 2026-09-06
 
 ### Corrigé

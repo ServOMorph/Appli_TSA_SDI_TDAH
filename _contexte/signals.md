@@ -4,7 +4,7 @@
 - **Livraison v5.92 envoyée à Marie (2026-09-06)**, après 4 bounces du gardien. Cause racine du 3e bounce (« 9 tests / 8 puces ») : le catalogue in-app n'avait aucun test doté de `docRefs: [37]` (refonte de la fiche de tâche, la modification la plus visible de v5.92) — perdu dans l'incident de stash de `Archives/roadmap_demandes_marie_2026-09-04.md` Phase 3 malgré la roadmap `[FAIT]`. Catalogue corrigé : `modifier-une-tache-planifiee` réécrit (édition par case, `docRefs: [37]`, `revision: 1`), nouveau parcours `creer-une-tache-bandeau-colore` (`docRefs: [37]`), `menu-actions-tache-simplifie` (`revision` 2→3) et `duree-obligatoire-tache-planifiee` (`revision: 1`, `docRefs: [25, 37]`) corrigés (référençaient un bouton « Modifier » supprimé), `cadre-date-heure-dans-l-ecran` retiré (#3 abandonnée par Marie au profit de #37). `tsc -b` + lint + 783 tests verts. Recalcul programmatique (`isManualTestDone`) : 12 tests réellement en attente, tous rattachés à v5.92. 4e bounce du gardien (règle mécanique erronée de sa part, auto-corrigée) puis une erreur de manipulation de son côté (bounce au lieu d'approve sur un contenu qu'il venait de valider) — contenu redéposé à l'identique, confirmé envoyé (`outbox/sent/20260905T222123_604247.json`). Commits `3b6eae3`, `7cc652f`.
 - **`roadmap_demandes_marie_2026-09-04.md` (33 reprise Doc, #34-38) et `roadmap_supprimer_tache_du_jour.md` Phases 1-2 : livrées en v5.92, message de livraison envoyé — en attente des tests de Marie** (12 parcours dans l'écran « Tests à faire »).
 - `roadmap_supprimer_tache_du_jour.md` : Phase 3 `[TODO — BLOQUÉ]` toujours, attend D2 (point d'entrée « accueil » pour l'ajout planifié d'office) — à regrouper avec la réponse de Marie sur les tests v5.92, pas à poser isolément.
-- **2 réponses de Marie non traitées dans `inbox/orchestrateur/`** (« Ok ça marche tkt », « J'ai fait les tests déjà j'ai vu mdr j'avais capté »), présentes depuis avant cette session — la racine ne les traite que sur demande explicite de l'utilisateur (`gateway.py poll --agent orchestrateur` puis `ack`).
+- Les 2 réponses de Marie précédemment en attente dans `inbox/orchestrateur/` étaient du trafic de canal sans le tag `@El Patrone#7381` (convention : ce tag signifie qu'un message s'adresse au bot) — `ack` sans traitement, SAV déjà assuré par `DISCORD/discord_com/logs/conversation.jsonl`. Règle consignée dans `DISCORD/_contexte/contexte.md` (§ Décisions structurantes, 2026-09-06), pas dans `CLAUDE.md` racine (ne concerne que la zone `discord`, éviter la réinjection dans toutes les sessions).
 - Suivi des demandes du Google Doc de Marie : registre durable `_contexte/marie_modifications_suivi.md` (dernière revue du Doc 2026-09-04, dernière exécution de la revue 2026-09-05).
 - `_contexte/dernier_deploiement.md` : v5.92, 2026-09-05.
 - `tests_manuels.md` : contrôles dev en attente — SAV Marie dans `/close` (chemin écriture réelle, toujours pas exercé faute de resynchro de Marie entre `/start`/`/close`), bot Discord file d'attente `[discord-auto]`, hooks de zone `on_start.md`/`on_close.md` côté `discord` jamais exercés (côté racine : exercés cette session). Les tests Marie restent dans le catalogue in-app.
@@ -28,29 +28,27 @@
 - [P3] Durcir `/discord_loop` : reste à ajouter un `stop` qui notifie Discord « Claude hors ligne » (l'auto-rattrapage au démarrage est fait depuis le 2026-09-03). — fait quand : la commande `stop` de `/discord_loop` notifie Discord — réf : `.claude/commands/discord_loop.md`, `DISCORD/discord_com/bot.py`
 - [P3] `PlanningBoard.tsx` : le bouton « Reporter » (mode surcharge) est imbriqué dans le `<button>` de ligne — HTML invalide, avertissement jsdom au run des tests. — fait quand : le bouton « Reporter » n'est plus descendant du bouton de ligne — réf : `src/ui/screens/dashboard/PlanningBoard.tsx`
 - [P3] Reliquat d'adoption de la gateway Discord v1 (`DISCORD/roadmap_gateway_discord_2026-09-02.md` Phase 3) : MAJ `agent_role.md` orchestrateur + `design`, retrait des appels directs (`message_marie.py`, `claude_bridge`) dans `.claude/commands/deploy.md` et `analyser_googledoc.md`, alignement `.claude/CLAUDE.md`. — fait quand : plus aucun appel direct à `message_marie.py`/`claude_bridge` dans les commandes de l'orchestrateur, ou décision explicite de le porter ailleurs — réf : `DISCORD/roadmap_gateway_discord_2026-09-02.md`
+- [P2] **`.claude/commands/create_memory.md` n'implémente pas l'alias de zone que `start.md` étape 2c documente** (`/create_memory <alias_zone> <contenu>` écrirait aujourd'hui tout l'argument tel quel dans `.claude/memory.md` racine, jamais dans `<dossier>/_contexte/memory.md`). Signalé à l'agent VibeObs (message composé, copié dans le presse-papier Windows le 2026-09-06), correctif délégué. — fait quand : `create_memory.md` reconnaît un premier argument = alias de `.claude/zones.md`, résout le dossier et écrit dans `<dossier>/_contexte/memory.md` — réf : `.claude/commands/create_memory.md`, `.claude/commands/start.md` étape 2c
 
-## Dernière session (2026-09-06 — comblé le trou de test #37, livraison v5.92 envoyée après 4 bounces)
+## Dernière session (2026-09-06 — tag `@El Patrone#7381` clarifié, écart `/create_memory` signalé à VibeObs)
 
 ## Décisions prises
-- Réviser le catalogue in-app maintenant (choix utilisateur) plutôt que de seulement corriger le chiffre du message bounced.
+- Les 2 messages en attente dans `inbox/orchestrateur/` sont du trafic de canal (pas de tag `@El Patrone#7381`) : `ack` sans traitement plutôt qu'un traitement comme réponse actionnable.
+- Règle de tag documentée dans `DISCORD/_contexte/contexte.md` (zone `discord`), pas dans `CLAUDE.md` racine, pour éviter une réinjection dans toutes les sessions du projet.
+- Écart `/create_memory` (pas d'alias de zone) délégué à VibeObs plutôt que corrigé dans cette session.
 
 ## Livrables produits ou modifiés
-- `src/domain/data/manualTestsCatalog.ts` : trou de test #37 comblé (2 parcours), 3 parcours corrigés (référençaient un bouton « Modifier » disparu), 1 retiré (`cadre-date-heure-dans-l-ecran`, #3 abandonnée) — statut : commité (`3b6eae3`).
-- `src/ui/screens/tests/E121ManualTests.test.tsx` : test ajusté à la nouvelle révision — statut : commité (`3b6eae3`).
-- `_contexte/marie_modifications_suivi.md` : précision sur le trou de catalogue #37 — statut : commité (`3b6eae3`).
-- `COMMUNICATION/Marie/historique_conversation_marie.md` : historique complet des 5 tentatives d'envoi — statut : commité (`3b6eae3`, `7cc652f`).
-- `tests_manuels.md` : section hooks de zone mise à jour (racine exercée) — statut : à committer à ce `/close`.
-- `_contexte/archive_sessions.md` : créé, 42 sessions archivées déplacées depuis `signals.md` — statut : à committer à ce `/close`.
+- `DISCORD/_contexte/contexte.md` : nouvelle entrée « Décisions structurantes » (tag `@El Patrone#7381`, routage `has_pending_reply` indifférent au tag) — statut : à committer à ce `/close`.
+- Message décrivant l'écart `/create_memory` : composé et copié dans le presse-papier Windows pour transmission manuelle à VibeObs — statut : hors dépôt, livré par presse-papier.
+- 2 messages `inbox/orchestrateur/` (`20260905T203140_677787`, `20260905T203140_685610`) : `ack` sans traitement.
 
 ## Hypothèses validées / invalidées
-- VALIDE : `tsc -b` + lint + 783 tests verts après révision du catalogue.
-- VALIDE : recalcul programmatique (`isManualTestDone`) confirme 12 tests réellement en attente, tous rattachés à v5.92.
-- INVALIDE : le nombre « 9 » annoncé dans les 3 premières tentatives d'envoi -> corrigé à 12 après recalcul réel.
-- VALIDE : livraison v5.92 effectivement envoyée à Marie (`outbox/sent/20260905T222123_604247.json`), après 4 bounces (dont une auto-correction et une erreur de manipulation côté gardien).
-- VALIDE : hooks de zone racine (`on_start.md`/`on_close.md`) exercés en conditions réelles pour la première fois cette session (Pré-synthèse au `/start`, Pré-synthèse + Fin au `/close`).
+- VALIDE : `bot.py:200-204` (`has_pending_reply(author_id)`) route vers l'inbox sans vérifier la présence du tag `@El Patrone` — le tag est une convention humaine, pas un critère de code.
+- VALIDE : les 2 messages sans tag étaient déjà présents dans `DISCORD/discord_com/logs/conversation.jsonl` (SAV assuré indépendamment du tag).
+- INVALIDE : `/create_memory <alias_zone> <contenu>` fonctionne comme documenté par `start.md` étape 2c -> en réalité `create_memory.md` n'a jamais implémenté cet argument, écrit toujours dans `.claude/memory.md` racine.
 
 ## Prochaine étape exacte
-Traiter les 2 réponses de Marie en attente dans `inbox/orchestrateur/` sur décision explicite de l'utilisateur. Reprendre `roadmap_supprimer_tache_du_jour.md` Phase 3 une fois la réponse de Marie sur D2 reçue (regroupée avec sa validation des tests v5.92).
+Attendre le correctif de VibeObs sur `create_memory.md`. Reprendre `roadmap_supprimer_tache_du_jour.md` Phase 3 une fois la réponse de Marie sur D2 reçue (regroupée avec sa validation des tests v5.92).
 
 ## Question bloquante pour la session suivante
 Aucune.

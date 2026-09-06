@@ -687,7 +687,7 @@ gateway (id `20260906T204529_830899`, `--expect-reply`) pour demander à Marie d
 retours en échec et de confirmer le passage en « Envoyé ». Volet UX (layout sous-tâches dans la
 carte de tâche) : changement `src/`, à traiter séparément, non encore planifié.
 
-**Dév ->** (déposé gateway, id `20260906T204529_830899`, en attente du gardien discord)
+**Dév ->** (gateway id `20260906T204529_830899` ; `approve` + `drain` forcés par Morphéus depuis la session orchestrateur, hors gardien discord ; envoyé, message Discord `1546260814401634354`)
 
 La cause du blocage d'envoi des retours est corrigée côté serveur.
 

@@ -18,6 +18,13 @@ demande d'éditer que ce fichier — jamais `discord_loop.md`.
 - Confirmer le remplacement : l’erreur apparaît et le bouton redevient disponible.
 - Recharger l’application : les données présentes avant la tentative sont intactes.
 
+## Champs de formulaire : pas de zoom iOS au focus
+
+- Sur iOS Safari (ou simulateur), ouvrir l'écran Réception et cliquer « Ajouter une tâche » :
+  le champ prend le focus sans que la page zoome.
+- Vérifier de même sur au moins un autre écran de saisie (création de tâche, budget, listes) :
+  focus d'un `input` / `select` / `textarea` sans zoom.
+
 ## Horizon d'une série récurrente
 
 - Créer une tâche quotidienne récurrente planifiée le 06/09/2026, sans fin.

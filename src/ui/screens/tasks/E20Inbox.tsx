@@ -196,7 +196,7 @@ export function E20Inbox() {
             placeholder="Titre de la tâche"
             aria-label="Titre de la tâche"
             autoFocus
-            style={{ padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', fontSize: 'max(16px, 1rem)' }}
+            style={{ padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
           />
           <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
             <Button onClick={handleAddTask} disabled={!newTaskTitle.trim()}>
@@ -240,7 +240,7 @@ export function E20Inbox() {
                 onChange={(e) => setNewListName(e.target.value)}
                 placeholder="Nouvelle liste"
                 aria-label="Nom de la nouvelle liste"
-                style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)', fontSize: 'max(16px, 1rem)' }}
+                style={{ flex: 1, padding: 'var(--spacing-sm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
               />
               <Button onClick={handleCreateList} disabled={!newListName.trim()}>
                 Créer

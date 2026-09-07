@@ -111,6 +111,12 @@ p {
   color: var(--color-text-muted);
 }
 
+input,
+select,
+textarea {
+  font-size: max(16px, 1rem);
+}
+
 #root {
   min-height: 100svh;
   display: flex;

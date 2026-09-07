@@ -82,6 +82,13 @@ describe('E20Inbox', () => {
       expect(screen.getByLabelText('Titre de la tâche')).toBeDefined()
     })
 
+    it('le champ titre a une taille de police >= 16px (pas de zoom iOS au focus)', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E20Inbox />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
+      expect(screen.getByLabelText('Titre de la tâche').style.fontSize).toBe('max(16px, 1rem)')
+    })
+
     it('valider le champ titre appelle createTaskInbox et referme le champ', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E20Inbox />, ctx)

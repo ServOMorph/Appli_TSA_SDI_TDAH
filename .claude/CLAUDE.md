@@ -252,8 +252,13 @@ Version <X.Y> en ligne.
 
 <lien de l'appli sur sa propre ligne>
 
+Détail des changements et questions : commentaires_marie_<X.Y>.docx
+
 💻🤖
 ```
+
+La ligne « Détail des changements et questions : » n'est présente que s'il y a un commentaire utile
+pour cette livraison ; sinon elle est omise. Elle porte le nom de fichier versionné, jamais une URL.
 
 `<N>` = nombre de parcours actuellement à faire dans l'écran « Tests à faire » (parcours non
 validés sur la version déployée). Les puces reprennent les numéros de modification du Google Doc

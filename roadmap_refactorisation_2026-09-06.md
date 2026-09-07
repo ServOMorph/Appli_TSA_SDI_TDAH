@@ -36,7 +36,7 @@ Les constats datent de l'analyse du 2026-09-06. Les vérifier sur le checkout de
 | D2 — Retours avec images | Distinguer export, remplacement par import et effacement local intégral ; ne pas inclure ou supprimer silencieusement ces retours | Phase 3, avant toute modification de ce périmètre |
 | D3 — Conservation des docx locaux | Conserver les fichiers générés, nommés par version, sous `COMMUNICATION/Marie/commentaires/` et exclus de Git ; le Drive reste le support remis à Marie | Phase 2 |
 | D4 — Séries historiques trop longues | Corriger les créations futures ; traiter les anciennes séries uniquement dans une demande séparée | Phase 4 |
-| D5 — Délai réseau | Valeur initiale proposée : 30 secondes, injectable et évaluée sur des uploads synthétiques | Phase 6 |
+| D5 — Délai réseau | **Tranchée (2026-09-07) : 30 secondes, injectable par appel (`DEFAULT_NETWORK_TIMEOUT_MS`).** Vérifiée sur horloge simulée, pas sur uploads réels. | Phase 6 |
 | D6 — Découpage React supplémentaire | Le retenir uniquement si une mesure ou un besoin de test concret le justifie | Phase 7 |
 | D7 — Geste de semaine | Reproduire le défaut et confirmer le bénéfice de l'extraction, sans trancher les choix produit de navigation | Phase 8 |
 
@@ -167,7 +167,43 @@ Référence : R3, priorité P2. Périmètre prévu : planification, dépôts de 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 6 — Borner les requêtes et fiabiliser la relance [TODO]
+## Phase 6 — Borner les requêtes et fiabiliser la relance [FAIT]
+
+**Clôturée le 2026-09-07 (commit `close` du jour).**
+Changements :
+- `src/data/sync/rpc.ts` : `callRpc(name, params, { timeoutMs })` ; `DEFAULT_NETWORK_TIMEOUT_MS = 30_000`
+  (D5) ; `AbortController` + `setTimeout(abort)` + `clearTimeout` en `finally` ; expiration →
+  `{ data: null, error: Error('rpc <name> a expiré (<ms> ms)') }`. URL, méthode, en-têtes et corps
+  inchangés (seul `signal` ajouté). Contrat non-levant conservé.
+- `src/data/sync/feedbackStorage.ts` : même bornage pour `uploadFeedbackImage` (`timeoutMs`, message
+  « upload du retour a expiré (<ms> ms) »).
+- `src/data/sync/feedbackClient.ts` : `void task.finally(...)` au lieu de `task.then(...)` — le verrou
+  `inFlight` est libéré quel que soit le sort de la promesse. `syncReports` a un `try/catch` global
+  et ne rejette pas aujourd'hui : ce `.finally` est défensif, la garantie matérielle de libération
+  vient du timeout transport (un `fetch` bloqué règle désormais `task`).
+- `src/data/sync/syncClient.ts` : aucun changement de code. Bénéficie du timeout de `callRpc` ;
+  `LAST_ATTEMPT_KEY` déjà écrit avant l'appel → throttle 1 h préservé même sur expiration.
+- Politiques de throttle distinctes conservées : snapshot 1 h, retours 60 s par rapport. Aucune
+  boucle de retry ajoutée.
+
+Tests (+1 fichier, +11 cas → 99 fichiers / 816) :
+- `rpc.test.ts` (+5) et `feedbackStorage.test.ts` (nouveau, 4) : horloge simulée — `signal` transmis
+  à `fetch`, expiration → `{ error }` avec `signal.aborted === true`, délai par défaut appliqué,
+  timer nettoyé (`vi.getTimerCount() === 0`) sur réponse avant expiration.
+- `feedbackClient.test.ts` (+2) : expiration → `markFailed` + verrou libéré + tentative suivante
+  repart ; verrou libéré même si la tentative rejette.
+- `syncClient.test.ts` (+1) : expiration → `false`, throttle conservé (2e appel non relancé).
+
+Commandes et résultats : `tsc -p tsconfig.app.json` exit 0, `tsc -p tsconfig.node.json` exit 0,
+`npm run lint` exit 0, Vitest 99 fichiers / 816 tests verts, `npm run build` + `npm run bundle:check`
+→ budget respecté (chunk d'entrée 262,97 kB < 266,43 ; inchangé, aucun impact bundle).
+
+Décision : D5 tranchée — 30 s, injectable par appel.
+
+Contrôle manuel restant : `tests_manuels.md` § « Bornage des requêtes réseau et reprise après
+coupure (Phase 6) » — reprise après coupure simulée au navigateur, non effectuée.
+
+Prochaine action : checkpoint Phase 6 ci-dessous. Phases 7-8 conditionnelles P3, non planifiées.
 
 Référence : R4, priorité P2. Périmètre prévu : transport RPC, upload des images, client des retours et tests de contrat. Risque modéré sur réseau lent.
 

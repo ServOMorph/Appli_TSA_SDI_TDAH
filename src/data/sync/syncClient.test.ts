@@ -74,6 +74,20 @@ describe('syncNow', () => {
     expect(result).toBe(false)
   })
 
+  it('conserve le throttle après une expiration du délai réseau', async () => {
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({
+      data: null,
+      error: new Error('rpc sync_device_snapshot a expiré (30000 ms)'),
+    })
+
+    await expect(syncNow()).resolves.toBe(false)
+
+    callRpcMock.mockResolvedValue({ data: true, error: null })
+    await expect(syncNow()).resolves.toBe(false)
+    expect(callRpcMock).toHaveBeenCalledTimes(1)
+  })
+
   it('throttle : ne relance pas avant une heure sans force', async () => {
     isSyncEnabledMock.mockReturnValue(true)
     callRpcMock.mockResolvedValue({ data: true, error: null })

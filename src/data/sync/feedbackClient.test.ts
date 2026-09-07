@@ -117,4 +117,30 @@ describe('syncFeedbackNow', () => {
     expect(uploadMock).toHaveBeenCalledTimes(1)
     expect(callRpcMock).toHaveBeenCalledTimes(1)
   })
+
+  it('libère le verrou de tentative après une expiration du délai réseau', async () => {
+    const item = report()
+    repository.getToSync.mockResolvedValue([item])
+    uploadMock.mockResolvedValueOnce({ data: null, error: new Error('upload du retour a expiré (30000 ms)') })
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+    expect(repository.markFailed).toHaveBeenCalledWith(item.id, expect.any(String))
+
+    repository.getToSync.mockClear()
+    uploadMock.mockResolvedValue({ data: { path: 'device-1/report-1.jpg' }, error: null })
+
+    await expect(syncFeedbackNow({ force: true })).resolves.toBe(true)
+    expect(repository.getToSync).toHaveBeenCalledTimes(1)
+  })
+
+  it('libère le verrou même si la tentative rejette', async () => {
+    repository.getToSync.mockRejectedValueOnce(new Error('indexeddb indisponible'))
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+
+    repository.getToSync.mockClear()
+    repository.getToSync.mockResolvedValue([])
+    await syncFeedbackNow({ force: true })
+    expect(repository.getToSync).toHaveBeenCalledTimes(1)
+  })
 })

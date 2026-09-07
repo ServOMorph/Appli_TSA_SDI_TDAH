@@ -29,6 +29,30 @@ demande d'éditer que ce fichier — jamais `discord_loop.md`.
 - Après chaque geste, vérifier dans le planning qu'il ne reste ni occurrence partielle ni série incohérente, et que la règle de récurrence n'est pas orpheline (aucune tâche fantôme, recharger l'appli).
 - Contrôle console (facultatif) : `indexedDB` → store `taskRecurrences` ne contient aucune règle sans occurrence après la suppression de série.
 
+## Hook `on_start.md` discord enrichi (3 points) [discord-auto]
+
+Ajouté le 2026-09-07 (commit `3846793`, enrichissement du hook). Non encore observé en conditions
+réelles. Se valide au prochain `/start discord`, sans provocation manuelle.
+
+À observer :
+- `bot_manager.py restart` : arrêt puis relance effective de `bot.py` (ou message non bloquant si
+  `enabled: false` / échec de démarrage) ;
+- détection d'un éventuel process `discord_loop.py wait` orphelin d'une session précédente et son
+  arrêt (aucun faux positif sur la session courante) ;
+- résumé de l'outbox `to == marie` affiché avant l'enchaînement de la boucle (nombre de `pending`
+  et `held`, motifs de `hold`).
+
+## Bornage des requêtes réseau et reprise après coupure (Phase 6)
+
+- Avec un backend de synchronisation configuré, couper le réseau (DevTools > Network > Offline
+  ou coupure système) puis déclencher un envoi de retour annoté.
+- Vérifier que la tentative se règle d'elle-même après ~30 s (délai `DEFAULT_NETWORK_TIMEOUT_MS`)
+  sans figer l'application : le retour passe en « Échec d'envoi », l'appli reste réactive.
+- Rétablir le réseau, relancer l'envoi : le retour part sans doublon (l'image déjà déposée n'est
+  pas renvoyée) et passe en « Envoyé ».
+- Contrôle console (facultatif) : aucune requête `fetch` vers `/rest/v1/rpc/` ou
+  `/storage/v1/object/feedback/` ne reste « pending » indéfiniment après la coupure.
+
 ## Bot Discord — file d'attente des commandes en conditions réelles [discord-auto]
 
 Ajouté le 2026-09-02 (commit `2b75711`). `bot.py` empile désormais dans `commands.json` → `queue[]`

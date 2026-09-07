@@ -1,3 +1,14 @@
+## v5.103 — 2026-09-07
+
+### Modifié
+- `roadmap_refactorisation_2026-09-06.md` Phase 6 (R4) `[FAIT]` : les appels réseau de synchronisation sont bornés dans le temps et leur relance est fiabilisée. `src/data/sync/rpc.ts` — `callRpc` accepte un délai injectable par appel (`DEFAULT_NETWORK_TIMEOUT_MS = 30_000`, décision D5), une requête qui n'aboutit pas est annulée via `AbortController` après ce délai et renvoie `{ data: null, error: 'rpc <name> a expiré (<ms> ms)' }` sans lever ; le timer est nettoyé dans tous les cas. Même traitement pour `uploadFeedbackImage` (`src/data/sync/feedbackStorage.ts`). `src/data/sync/feedbackClient.ts` — le verrou de tentative (`inFlight`) est libéré quel que soit le sort de la promesse ; un `fetch` bloqué règle désormais la tentative au lieu de figer les envois suivants. `syncClient.ts` inchangé : il hérite du délai de `callRpc` et conserve son throttle d'une heure même sur expiration. Contrats réseau (URL, méthode, en-têtes, corps, forme des erreurs) inchangés ; politiques de throttle distinctes snapshot/retours conservées ; aucune boucle de retry ajoutée. Nouveau fichier `rpc`/`feedbackStorage`/`feedbackClient`/`syncClient` couverts par 11 tests supplémentaires sur horloge simulée (signal transmis, expiration, délai par défaut, nettoyage du timer, libération du verrou après succès/erreur/expiration/rejet). Suite complète 99 fichiers / 816 tests verts, TypeScript et lint exit 0, budget bundle respecté (262,97 kB < 266,43, inchangé). Contrôle navigateur de reprise après coupure ajouté à `tests_manuels.md`. Non déployé.
+
+## v5.102 — 2026-09-07
+
+### Modifié
+- Hook `DISCORD/_contexte/on_start.md` (§ Pré-synthèse) enrichi de trois points, commit `3846793` (session `discord` du 2026-09-06) : test/kill/relance de `bot.py` (déjà géré nativement par `bot_manager.py`, rappel explicite), détection et arrêt d'un process `discord_loop.py wait` orphelin (PowerShell WMI, ce process n'ayant pas de PID file natif), résumé de l'outbox `to == marie` (`pending`/`held` + motifs) affiché avant l'enchaînement de la boucle. Entrée de journal portée par l'orchestrateur, hors périmètre de la session `discord`.
+- Gardien de sortie de la gateway : 2e bypass ponctuel de la règle `hold` (le 1er est journalisé en v5.97). Une info `orchestrateur → marie` (« Tests techniques terminés ») approuvée et envoyée malgré la `pending_reply` Marie de v5.92 active, sur demande explicite de l'utilisateur. Décision de circonstance, règle inchangée.
+
 ## v5.101 — 2026-09-07
 
 ### Corrigé

@@ -8,6 +8,8 @@ Ce fichier ne contient jamais de liste de tests : tous les tests que Marie doit 
 
 Le socle serveur qui manquait pour l'envoi des retours (écran « Mes retours ») a été mis en place le 6 septembre 2026. Les retours saisis dans l'application peuvent maintenant partir. Si un retour affiche encore « Échec d'envoi », appuyer sur « Relancer ».
 
+Un envoi qui n'aboutit pas (réseau coupé en cours de route) s'arrête maintenant tout seul au bout de 30 secondes et repasse en « Échec d'envoi », au lieu de rester bloqué. « Relancer » repart alors sans renvoyer deux fois la même image.
+
 ## Planning et séries de tâches
 
 Les sous-tâches restent maintenant dans la carte de leur tâche sur le planning. L’heure de fin apparaît après la dernière sous-tâche.

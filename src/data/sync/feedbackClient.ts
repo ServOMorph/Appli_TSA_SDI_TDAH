@@ -73,13 +73,15 @@ async function syncReports(force: boolean): Promise<boolean> {
 /**
  * Envoie les retours locaux en attente sans jamais bloquer l'application.
  * L'image deja deposee est conservee localement pour que la relance reutilise
- * le meme chemin si l'appel de metadonnees a echoue.
+ * le meme chemin si l'appel de metadonnees a echoue. Le verrou de tentative
+ * est toujours libere une fois la tentative reglee (succes, echec ou expiration
+ * du delai reseau), y compris si la promesse est rejetee.
  */
 export function syncFeedbackNow(options: { force?: boolean } = {}): Promise<boolean> {
   if (inFlight) return inFlight
   const task = syncReports(options.force ?? false)
   inFlight = task
-  void task.then(() => {
+  void task.finally(() => {
     if (inFlight === task) inFlight = null
   })
   return task

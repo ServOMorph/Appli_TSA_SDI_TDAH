@@ -520,11 +520,13 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'ajouter-une-tache-depuis-la-reception',
+    revision: 1,
     title: 'Ajouter une tâche depuis la Réception',
     category: 'Tâches',
     steps: [
       'Ouvrez « Réception » et touchez « Ajouter une tâche ».',
       'Un champ « Titre de la tâche » doit apparaître à la place du bouton, sans changement d’écran et sans aucun autre champ (pas d’heure, pas de durée, pas de destination).',
+      'Au moment où le champ apparaît, la page ne doit pas zoomer ni se décaler : l’affichage reste exactement à la même échelle.',
       'Saisissez un titre puis touchez « Valider » : le champ se referme et la tâche apparaît dans la liste de Réception.',
       'Sur cette nouvelle tâche, seuls les boutons « Planifier » et « Liste » doivent être proposés.',
       'Touchez de nouveau « Ajouter une tâche » puis « Annuler » : le champ se referme sans rien créer.',

@@ -15,3 +15,7 @@ Un envoi qui n'aboutit pas (réseau coupé en cours de route) s'arrête maintena
 Les sous-tâches restent maintenant dans la carte de leur tâche sur le planning. L’heure de fin apparaît après la dernière sous-tâche.
 
 Les nouvelles tâches répétées ne créent plus de dates trop loin dans le futur.
+
+## Ajout d’une tâche depuis la Réception
+
+Toucher « Ajouter une tâche » depuis la Réception ne fait plus zoomer la page. La correction s’applique à tous les champs de saisie de l’application.

@@ -1270,3 +1270,12 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - Planning, import et règles de récurrence corrigés ; tests métier et intégration ajoutés ; roadmap phases 1 à 4 `[FAIT]`.
 - VALIDÉ : série quotidienne du 06/09/2026 → 91 dates jusqu'au 05/12/2026 inclus. Contrôle navigateur de l'horizon laissé dans `tests_manuels.md`.
 - Suite : reprendre la phase 5 (opérations de série atomiques).
+
+---
+
+## Session du 2026-09-07 — roadmap fiabilisation Phase 6 (borner les requêtes réseau)
+
+- D5 tranchée : délai des appels réseau de synchronisation = 30 s, injectable (`DEFAULT_NETWORK_TIMEOUT_MS`, `src/data/sync/rpc.ts`).
+- `callRpc` / `uploadFeedbackImage` : `AbortController` + `clearTimeout` en `finally`, expiration -> `{ data: null, error: '... a expire' }` sans lever ; `feedbackClient.ts` libere le verrou `inFlight` via `.finally`. Contrats reseau et throttles (snapshot 1 h, retours 60 s) inchanges.
+- Roadmap `roadmap_refactorisation_2026-09-06.md` : phases 1-6 `[FAIT]` ; phases 7-8 conditionnelles P3 non planifiees.
+- +11 tests sur horloge simulee -> 99 fichiers / 816 tests verts. Commit `bbdf662` (Phase 5) puis close du jour.

@@ -1,3 +1,12 @@
+## v5.104 — 2026-09-08
+
+### Corrigé
+- Friction Marie « zoom au clic sur "Ajouter" depuis la Réception » : sur iOS Safari, le focus d'un champ dont la taille de police calculée est inférieure à 16 px force un zoom de page non réversible ; le champ d'ajout de la Réception (`autoFocus`) le déclenchait au clic. Correctif d'abord ciblé sur `E20Inbox` (commit `593acce`) puis généralisé en règle CSS globale `input, select, textarea { font-size: max(16px, 1rem) }` dans `src/index.css` (commit `681be23`, patch inline retiré) : plancher 16 px qui neutralise l'auto-zoom, `1rem` laisse le champ suivre la taille de texte « grande » du réglage d'accessibilité. Test de contrat sur `src/index.css` (`src/index.css.test.ts`). Parcours in-app `ajouter-une-tache-depuis-la-reception` passé `revision: 1` (étape « la page ne doit pas zoomer » ajoutée, repassera « à faire » pour Marie au prochain déploiement). `COMMUNICATION/Marie/a_transmettre.md` complété. Suite complète 100 fichiers / 817 tests verts, TypeScript et lint exit 0, budget bundle inchangé. Non déployé.
+
+### Modifié
+- `.claude/CLAUDE.md` § « Gabarit du message de livraison » aligné sur `.claude/commands/deploy.md` (étape 12) : le gabarit montre désormais la ligne conditionnelle « Détail des changements et questions : commentaires_marie_<X.Y>.docx » (nom de fichier versionné, jamais une URL, omise s'il n'y a pas de commentaire utile). Dette P3 close.
+- `tests_manuels.md` : trois contrôles développeur validés en navigateur/iPhone puis retirés — import invalide et rechargement, horizon d'une série récurrente (occurrences 06/09/2026 → 05/12/2026, aucune le 06/12), opérations de série atomiques (« toute la série » / « toutes les occurrences », aucune règle de récurrence orpheline). Le correctif anti-zoom iOS est vérifié sur iPhone réel. Le contrôle réseau Phase 6 n'est pas reproductible en développement (aucun backend de synchronisation local) : converti en note, à porter au catalogue in-app au prochain `/deploy` avec la question ouverte [P1] « Relancer » de Marie.
+
 ## v5.103 — 2026-09-07
 
 ### Modifié

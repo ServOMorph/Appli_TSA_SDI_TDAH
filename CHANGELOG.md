@@ -1,3 +1,12 @@
+## v5.107 — 2026-09-08
+
+### Ajouté
+- `roadmap_integration_onboard.md` Phase 1 (intégration documentaire) exécutée : les 6 livrables documentaires de la zone `ONBOARD` sont sur `main` sous `TESTS/ONBOARD/` (`decisions_dispositif.md`, `parcours_accueil.md`, `criteres_acceptation.md`, `plan_de_test.md`, `demandes_evolution.md`, `roadmap_accueil_testeurs.md`), extraits par `git checkout agent/onboard -- <fichiers>` sans fusionner ni rebaser la branche. `TESTS/ONBOARD/_contexte/` reste sur la branche (contexte de zone, source de vérité unique dans son worktree). Aucune modification de `.claude/`, `src/`, `supabase/` ni `scripts/`.
+
+### Modifié
+- `TESTS/ONBOARD/demandes_evolution.md` : écarts de l'analyse de la zone code du 2026-09-08 consignés sans réécrire le fond ONBOARD. D1 re-chiffré S (aucune migration Dexie, `settings` déjà sérialisé dans le payload, points de contact réduits à l'entité `Settings` et à l'écran Paramètres) ; D3 re-chiffré S (`--device-id` et rétention `by_device` déjà en place, idempotence `find_duplicate` déjà présente) ; D5 re-chiffré L (touche `curate()` et `bot.py` de la gateway, pas seulement `agents.json`) ; D2 complété du risque de régression DI5 sur la synchronisation de Marie et de la mitigation (flag posé d'office si `sync_last_success_at`, correction de `E116Privacy.tsx`). Tableau de synthèse et note de bas de tableau alignés.
+- `TESTS/ONBOARD/roadmap_accueil_testeurs.md` : critère d'acceptation de la Phase 2 corrigé — « la cible fixée en phase 1 » → « en phase 2 » (la Phase 1 n'a jamais chiffré cette cible, `criteres_acceptation.md` § 3 l'acte).
+
 ## v5.106 — 2026-09-08
 
 ### Ajouté

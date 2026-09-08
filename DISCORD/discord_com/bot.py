@@ -4,7 +4,7 @@ import asyncio
 import json
 import os
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -28,9 +28,12 @@ LOGS_DIR = DIR / "logs"
 CONV_LOG = LOGS_DIR / "conversation.jsonl"
 BACKFILL_LOG = LOGS_DIR / "backfill.jsonl"
 BACKFILL_MARKER = LOGS_DIR / ".backfill_done"
+CATCHUP_LOG = LOGS_DIR / "catchup.jsonl"
 POLL_INTERVAL = 0.5
 ORPHAN_PROCESSING_MINUTES = 15
 GATEWAY_DRAIN_INTERVAL = 5.0
+CATCHUP_MARGE_S = 300   # on remonte un peu avant le dernier entrant loggé (arrêt brutal du bot)
+CATCHUP_DEDUP_S = 180   # |ts réception loggé - created_at Discord| sous ce seuil = même message
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -108,6 +111,105 @@ async def backfill_historique():
         print(f"Erreur backfill_historique : {e}")
 
 
+def _entrants_connus() -> tuple[dict, "datetime | None"]:
+    """Lit conversation.jsonl : {(author_id, content): [ts réception]} des messages entrants
+    déjà journalisés, et le ts de réception le plus récent. Sert de filtre anti-doublon et de
+    borne au rattrapage post-arrêt. ({}, None) si le journal est absent ou sans entrant."""
+    if not CONV_LOG.exists():
+        return {}, None
+    connus: dict = {}
+    dernier = None
+    try:
+        with CONV_LOG.open(encoding="utf-8") as f:
+            for ligne in f:
+                ligne = ligne.strip()
+                if not ligne:
+                    continue
+                try:
+                    e = json.loads(ligne)
+                except json.JSONDecodeError:
+                    continue
+                if e.get("sens") != "user":
+                    continue
+                try:
+                    ts = datetime.fromisoformat(e.get("ts"))
+                except (TypeError, ValueError):
+                    continue
+                connus.setdefault((e.get("author_id"), e.get("content") or ""), []).append(ts)
+                if dernier is None or ts > dernier:
+                    dernier = ts
+    except OSError as ex:
+        print(f"Erreur lecture conversation.jsonl (rattrapage) : {ex}")
+        return {}, None
+    return connus, dernier
+
+
+def _deja_traite(connus: dict, author_id, content: str, created_at) -> bool:
+    for ts in connus.get((author_id, content or ""), ()):
+        if abs((ts - created_at).total_seconds()) <= CATCHUP_DEDUP_S:
+            return True
+    return False
+
+
+async def rattraper_messages_manques():
+    """Rejoue les messages du canal reçus pendant que bot.py était arrêté (session
+    /discord_loop fermée -> on_close stoppe bot.py) : journalisation + routage gateway
+    identiques au temps réel de on_message (hors commandes @bot). Sans ça, toute réponse
+    postée hors ligne n'existe que dans l'historique Discord et échappe à la gateway."""
+    connus, dernier = _entrants_connus()
+    if dernier is None:
+        return  # démarrage à froid : backfill_historique() couvre déjà l'historique complet
+    depuis = dernier - timedelta(seconds=CATCHUP_MARGE_S)
+    bot_id = client.user.id if client.user else None
+    n_log = n_route = n_cmd = n_skip = 0
+    try:
+        async for m in _channel.history(limit=None, after=depuis, oldest_first=True):
+            if m.author.id == bot_id:
+                continue
+            contenu = m.content or ""
+            if _deja_traite(connus, m.author.id, contenu, m.created_at):
+                n_skip += 1
+                continue
+            log_conv("user", str(m.author), m.author.id, contenu, ts=m.created_at.isoformat())
+            n_log += 1
+            if contenu.strip().lower() in ("!ping", "!help"):
+                continue
+            mentionne = bool(bot_id) and any(u.id == bot_id for u in m.mentions)
+            if not mentionne or gateway.has_pending_reply(m.author.id):
+                try:
+                    pieces = [{"filename": a.filename, "url": a.url,
+                               "content_type": a.content_type} for a in m.attachments]
+                    res = gateway.route_inbound(m.author.id, str(m.author), contenu, pieces)
+                    n_route += 1
+                    print(f"Rattrapage -> inbox/{res['routed_to']} ({res['routing']}) : "
+                          f"{res['id']} — {len(pieces)} piece(s) jointe(s)")
+                except Exception as e:  # un routage raté ne coupe pas le rattrapage
+                    print(f"Erreur rattrapage route_inbound : {e}")
+            else:
+                n_cmd += 1
+                print(f"Rattrapage : commande @bot non rejouee de {m.author} "
+                      f"({m.created_at.isoformat()}) : {contenu[:80]!r}")
+    except Exception as e:
+        print(f"Erreur rattraper_messages_manques : {e}")
+        return
+    if n_log or n_cmd:
+        try:
+            LOGS_DIR.mkdir(exist_ok=True)
+            with CATCHUP_LOG.open("a", encoding="utf-8") as f:
+                f.write(json.dumps({
+                    "ts": datetime.now(timezone.utc).isoformat(),
+                    "depuis": depuis.isoformat(),
+                    "logges": n_log, "routes": n_route,
+                    "commandes_non_rejouees": n_cmd, "deja_connus": n_skip,
+                }, ensure_ascii=False) + "\n")
+        except OSError as e:
+            print(f"Erreur ecriture catchup.jsonl : {e}")
+    if n_log or n_cmd:
+        print(f"Rattrapage post-arret : {n_log} journalise(s), {n_route} route(s), "
+              f"{n_cmd} commande(s) @bot non rejouee(s), {n_skip} deja connu(s) "
+              f"— depuis {depuis.isoformat()}")
+
+
 # ------------------------------------------------------------------
 # Commandes autonomes (sans Claude actif)
 # ------------------------------------------------------------------
@@ -170,6 +272,7 @@ async def on_ready():
     print(f"Bot pret -> #{_channel.name}")
     recuperer_processing_orphelin()
     await backfill_historique()
+    await rattraper_messages_manques()
     asyncio.ensure_future(boucle_polling())
 
 

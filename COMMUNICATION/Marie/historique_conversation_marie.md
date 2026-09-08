@@ -696,3 +696,19 @@ Appuie sur « Relancer » sur chaque retour en « Échec d'envoi ».
 Dis-moi si le statut passe à « Envoyé » ou s'il reste bloqué.
 
 Le point sur l'affichage des sous-tâches dans la carte est noté, il sera traité séparément.
+
+### 2026-09-08 — réponse de Marie sur le déblocage d'envoi des retours
+
+**Marie ->**
+@El Patrone c'est bon c'est envoyé merci
+
+_Suite :_ répond au message « Dév -> » du 2026-09-06 (id `20260906T204529_830899`, « La cause du
+blocage d'envoi des retours est corrigée côté serveur… Relancer chaque retour en Échec d'envoi »).
+Marie confirme que les retours en « Échec d'envoi » passent bien à « Envoyé » après relance — le
+correctif serveur (`feedback.sql` appliqué le 2026-09-06 sur le projet Supabase de prod) fonctionne.
+Message posté sur Discord alors que la session `discord` était fermée (donc `bot.py` arrêté par le
+hook `on_close`) : jamais capté ni routé sur le moment, présent uniquement dans l'historique du
+canal, transmis par l'utilisateur. Incident à l'origine du mécanisme de rattrapage au démarrage
+ajouté à `bot.py` le 2026-09-08 (`rattraper_messages_manques`). Le `pending_reply`
+`20260906T204529_830899` reste à purger (routage manuel ou rattrapage). Volet UX E10 (layout
+sous-tâches dans la carte) toujours ouvert, séparé.

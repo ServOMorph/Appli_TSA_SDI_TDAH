@@ -12,30 +12,6 @@ annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'u
 reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
 demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
-## Import invalide et rechargement
-
-- Depuis « Export et import des données », sélectionner un JSON contenant une version future ou une liste invalide.
-- Confirmer le remplacement : l’erreur apparaît et le bouton redevient disponible.
-- Recharger l’application : les données présentes avant la tentative sont intactes.
-
-## Champs de formulaire : pas de zoom iOS au focus
-
-- Sur iOS Safari (ou simulateur), ouvrir l'écran Réception et cliquer « Ajouter une tâche » :
-  le champ prend le focus sans que la page zoome.
-- Vérifier de même sur au moins un autre écran de saisie (création de tâche, budget, listes) :
-  focus d'un `input` / `select` / `textarea` sans zoom.
-
-## Horizon d'une série récurrente
-
-- Créer une tâche quotidienne récurrente planifiée le 06/09/2026, sans fin.
-- Dans le planning, vérifier les occurrences du 06/09/2026 au 05/12/2026 incluses, et l'absence d'occurrence le 06/12/2026.
-
-## Opérations de série atomiques (Phase 5)
-
-- Créer une tâche récurrente planifiée, puis depuis une occurrence : modifier un champ « pour toute la série », puis supprimer « toutes les occurrences ».
-- Après chaque geste, vérifier dans le planning qu'il ne reste ni occurrence partielle ni série incohérente, et que la règle de récurrence n'est pas orpheline (aucune tâche fantôme, recharger l'appli).
-- Contrôle console (facultatif) : `indexedDB` → store `taskRecurrences` ne contient aucune règle sans occurrence après la suppression de série.
-
 ## Hook `on_start.md` discord enrichi (3 points) [discord-auto]
 
 Ajouté le 2026-09-07 (commit `3846793`, enrichissement du hook). Non encore observé en conditions
@@ -49,16 +25,16 @@ réelles. Se valide au prochain `/start discord`, sans provocation manuelle.
 - résumé de l'outbox `to == marie` affiché avant l'enchaînement de la boucle (nombre de `pending`
   et `held`, motifs de `hold`).
 
-## Bornage des requêtes réseau et reprise après coupure (Phase 6)
+## Bornage des requêtes réseau et reprise après coupure (Phase 6) — à porter au catalogue in-app
 
-- Avec un backend de synchronisation configuré, couper le réseau (DevTools > Network > Offline
-  ou coupure système) puis déclencher un envoi de retour annoté.
-- Vérifier que la tentative se règle d'elle-même après ~30 s (délai `DEFAULT_NETWORK_TIMEOUT_MS`)
-  sans figer l'application : le retour passe en « Échec d'envoi », l'appli reste réactive.
-- Rétablir le réseau, relancer l'envoi : le retour part sans doublon (l'image déjà déposée n'est
-  pas renvoyée) et passe en « Envoyé ».
-- Contrôle console (facultatif) : aucune requête `fetch` vers `/rest/v1/rpc/` ou
-  `/storage/v1/object/feedback/` ne reste « pending » indéfiniment après la coupure.
+Pas testable en dev (aucun backend de synchronisation configuré localement). À convertir en
+parcours du catalogue in-app (`src/domain/data/manualTestsCatalog.ts`) au prochain `/deploy`,
+regroupé avec la question ouverte [P1] « Marie confirme-t-elle que "Relancer" fait passer ses
+retours en "Envoyé" ? » (`_contexte/signals.md`). Comportement à faire valider par Marie :
+- couper le réseau (mode avion), déclencher un envoi de retour annoté : la tentative se règle
+  d'elle-même après ~30 s sans figer l'appli, le retour passe « Échec d'envoi » ;
+- rétablir le réseau, relancer : le retour part sans doublon (image déjà déposée non renvoyée)
+  et passe « Envoyé ».
 
 ## Bot Discord — file d'attente des commandes en conditions réelles [discord-auto]
 

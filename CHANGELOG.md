@@ -1,3 +1,10 @@
+## v5.110 — 2026-09-08
+
+### Modifié
+- `roadmap_integration_onboard.md` Phase 4 (dépouillement multi-appareils, D3, résout R1) exécutée. `scripts/backup_marie_snapshot.py` : `select_target()` (une seule ligne retenue, `max` sur `manual_test_results` — perte silencieuse des snapshots des autres testeurs) remplacé par `select_targets()` qui retient la ligne la plus récente de chaque `device_id`. `run_backup()` itère sur ces cibles ; extraction du corps par appareil isolée dans `archive_one(directory, row) -> (code, écrit)`. Un payload refusé (`code 1`) n'interrompt pas les autres appareils. `--device-id` inchangé (la requête filtre, une seule cible en sortie). Idempotence par contenu (`find_duplicate`) et rétention `by_device` (`plan_retention`) inchangées — non réécrites, la rétention par appareil couvrait déjà N appareils.
+- Tests : `scripts/test_backup_marie_snapshot.py` 31 → 35. Classe `SelectTarget` → `SelectTargets` (liste vide, un appareil par ligne, plusieurs lignes d'un appareil → la plus récente, ligne sans `device_id` ignorée). Nouvelle classe `ArchiveOne` (deux appareils → deux archives sans perte ; rejeu → aucune réécriture ; payload refusé n'interrompt pas les autres ; `--device-id` → une seule archive). `PlanRetention` : rétention vérifiée pour trois appareils. `python scripts/test_backup_marie_snapshot.py` : 35 tests verts, `ruff check` OK. Aucun fichier `src/` touché. Non déployé.
+- Constat du gate : un `python scripts/backup_marie_snapshot.py` sans `--device-id` produit désormais une archive datée par appareil actif dans `donnees_marie/`, en un passage de quelques secondes. Les étapes 1-2 de la procédure de repli manuelle de `TESTS/ONBOARD/plan_de_test.md` § 3 (identification de la ligne par testeur, extraction du payload — hypothèse 5 à 10 min par testeur et par cycle) tombent à zéro ; la fusion au journal (étape 3, déjà scriptée) et le traitement des doublons ne relèvent pas de ce coût.
+
 ## v5.109 — 2026-09-08
 
 ### Ajouté

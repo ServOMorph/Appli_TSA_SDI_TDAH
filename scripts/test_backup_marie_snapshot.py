@@ -15,11 +15,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from backup_marie_snapshot import (  # noqa: E402
+    archive_one,
+    build_query,
     build_stamp,
     find_duplicate,
     payload_problem,
     plan_retention,
-    select_target,
+    select_targets,
     serialize_payload,
 )
 
@@ -36,32 +38,87 @@ def row(device_id: str, n_tests: int, n_tasks: int = 1,
     }
 
 
-class SelectTarget(unittest.TestCase):
+class SelectTargets(unittest.TestCase):
     def test_liste_vide(self):
-        self.assertIsNone(select_target([]))
+        self.assertEqual(select_targets([]), [])
 
-    def test_retient_le_plus_de_resultats_de_tests(self):
+    def test_un_appareil_par_ligne_tout_retenu(self):
         rows = [row("aaaaaaaa", 0), row("bbbbbbbb", 49), row("cccccccc", 3)]
-        self.assertEqual(select_target(rows)["device_id"], "bbbbbbbb")
+        self.assertEqual(
+            [r["device_id"] for r in select_targets(rows)],
+            ["aaaaaaaa", "bbbbbbbb", "cccccccc"],
+        )
 
-    def test_payload_absent_compte_pour_zero(self):
-        rows = [{"device_id": "aaaaaaaa", "payload": None}, row("bbbbbbbb", 1)]
-        self.assertEqual(select_target(rows)["device_id"], "bbbbbbbb")
-
-    def test_egalite_retient_le_premier(self):
-        # Comportement de max() : pas de tie-break interne, la premiere ligne gagne.
-        rows = [row("aaaaaaaa", 5), row("bbbbbbbb", 5)]
-        self.assertEqual(select_target(rows)["device_id"], "aaaaaaaa")
-
-    def test_egalite_departagee_par_le_plus_recent(self):
-        # La requete PostgREST renvoie desormais les lignes triees par synced_at
-        # decroissant (&order=synced_at.desc) : a egalite de manual_test_results,
-        # max() retient la premiere, donc la plus recente.
+    def test_plusieurs_lignes_dun_appareil_retient_la_plus_recente(self):
+        # Lignes triees synced_at decroissant par build_query : la premiere vue gagne.
         rows = [
             row("aaaaaaaa", 5, synced_at="2026-09-02T10:00:00+00:00"),
-            row("bbbbbbbb", 5, synced_at="2026-09-01T10:00:00+00:00"),
+            row("aaaaaaaa", 5, synced_at="2026-09-01T10:00:00+00:00"),
+            row("bbbbbbbb", 1, synced_at="2026-09-02T09:00:00+00:00"),
         ]
-        self.assertEqual(select_target(rows)["device_id"], "aaaaaaaa")
+        cibles = select_targets(rows)
+        self.assertEqual([r["device_id"] for r in cibles], ["aaaaaaaa", "bbbbbbbb"])
+        self.assertEqual(cibles[0]["synced_at"], "2026-09-02T10:00:00+00:00")
+
+    def test_ligne_sans_device_id_ignoree(self):
+        rows = [{"payload": {"tasks": [{"id": "t"}]}}, row("bbbbbbbb", 1)]
+        self.assertEqual([r["device_id"] for r in select_targets(rows)], ["bbbbbbbb"])
+
+
+class ArchiveOne(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = Path(self.tmp.name)
+        self.addCleanup(self.tmp.cleanup)
+
+    def test_deux_appareils_deux_archives_aucune_perte(self):
+        cibles = select_targets([
+            row("aaaaaaaa", 3, synced_at="2026-09-02T10:00:00+00:00"),
+            row("bbbbbbbb", 7, synced_at="2026-09-02T11:00:00+00:00"),
+        ])
+        ecrits = 0
+        for r in cibles:
+            code, did_write = archive_one(self.dir, r)
+            self.assertEqual(code, 0)
+            ecrits += int(did_write)
+        self.assertEqual(ecrits, 2)
+        noms = sorted(p.name for p in self.dir.iterdir())
+        self.assertEqual(len(noms), 2)
+        self.assertTrue(any("aaaaaaaa" in n for n in noms))
+        self.assertTrue(any("bbbbbbbb" in n for n in noms))
+
+    def test_rejeu_aucune_reecriture(self):
+        r = row("aaaaaaaa", 3)
+        self.assertEqual(archive_one(self.dir, r), (0, True))
+        avant = {p.name: p.read_text(encoding="utf-8") for p in self.dir.iterdir()}
+        self.assertEqual(archive_one(self.dir, r), (0, False))
+        apres = {p.name: p.read_text(encoding="utf-8") for p in self.dir.iterdir()}
+        self.assertEqual(avant, apres)
+
+    def test_payload_refuse_ninterrompt_pas_les_autres(self):
+        cibles = [
+            {"device_id": "aaaaaaaa", "synced_at": "2026-09-02T10:00:00+00:00", "payload": None},
+            row("bbbbbbbb", 4, synced_at="2026-09-02T11:00:00+00:00"),
+        ]
+        codes = [archive_one(self.dir, r) for r in cibles]
+        self.assertEqual(codes[0], (1, False))
+        self.assertEqual(codes[1], (0, True))
+        noms = [p.name for p in self.dir.iterdir()]
+        self.assertEqual(len(noms), 1)
+        self.assertIn("bbbbbbbb", noms[0])
+
+    def test_device_id_cible_un_seul_appareil(self):
+        # build_query restreint la requete ; select_targets sur les lignes d'un seul
+        # appareil ne produit qu'une cible, donc une archive.
+        self.assertIn("device_id=eq.aaaaaaaa", build_query("aaaaaaaa"))
+        self.assertNotIn("device_id=eq", build_query(None))
+        cibles = select_targets([
+            row("aaaaaaaa", 3, synced_at="2026-09-02T10:00:00+00:00"),
+            row("aaaaaaaa", 3, synced_at="2026-09-01T10:00:00+00:00"),
+        ])
+        self.assertEqual(len(cibles), 1)
+        self.assertEqual(archive_one(self.dir, cibles[0]), (0, True))
+        self.assertEqual(len(list(self.dir.iterdir())), 1)
 
 
 class PayloadProblem(unittest.TestCase):
@@ -202,6 +259,17 @@ class PlanRetention(unittest.TestCase):
         self.assertEqual(len(purge), 4)
         self.assertTrue(any("aaaaaaaa" in n for n in purge))
         self.assertTrue(any("bbbbbbbb" in n for n in purge))
+
+    def test_retention_tient_pour_trois_appareils(self):
+        # Gate ONBOARD Phase 4 : la retention by_device s'applique inchangee pour N appareils.
+        noms = []
+        for device in ("aaaaaaaa", "bbbbbbbb", "cccccccc"):
+            noms += self.noms(device, [f"202609{j:02d}-1200z" for j in range(1, 6)])
+        keep, purge = plan_retention(noms, keep_last=2)
+        for device in ("aaaaaaaa", "bbbbbbbb", "cccccccc"):
+            self.assertEqual(len([n for n in purge if device in n]), 2)
+            self.assertIn(f"snapshot-supabase-{device}-20260901-1200z.json",
+                          [n for n in keep if device in n])
 
     def test_ancien_et_nouveau_format_ordonnes(self):
         noms = [

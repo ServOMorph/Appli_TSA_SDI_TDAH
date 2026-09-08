@@ -4,10 +4,11 @@ Phase 5 : remplace l'archivage qu'assurait l'envoi manuel d'export avant la sync
 Necessite SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans l'environnement (cle service_role,
 jamais la cle anon : RLS bloque tout acces direct a la table).
 
-Selection de l'appareil : par defaut, celui avec le plus de manual_test_results (signal le
-plus fiable observe pour distinguer l'appareil de Marie des appareils de test/dev — seul un
-usage reel prolonge accumule des validations de tests manuels). Passer --device-id pour cibler
-un appareil precis si l'heuristique devient ambigue (plusieurs testeurs, etc.).
+Appareils traites : tous les appareils presents dans device_snapshots, chacun archive
+individuellement (la ligne la plus recente par device_id). Remplace l'ancienne heuristique
+mono-appareil (max manual_test_results), qui perdait en silence les snapshots des autres
+testeurs (roadmap ONBOARD Phase 4, rupture R1). Passer --device-id pour restreindre a un
+seul appareil.
 
 Idempotent par le contenu : n'ecrit rien si une sauvegarde du meme appareil porte deja
 exactement le meme payload. Le synced_at ne peut pas servir de cle — il change a chaque
@@ -41,10 +42,20 @@ def build_query(device_id: str | None) -> str:
     return query
 
 
-def select_target(rows: list[dict]) -> dict | None:
-    if not rows:
-        return None
-    return max(rows, key=lambda r: len((r.get("payload") or {}).get("manual_test_results") or []))
+def select_targets(rows: list[dict]) -> list[dict]:
+    """Retient la ligne la plus recente de chaque appareil.
+
+    Les lignes arrivent triees par synced_at decroissant (build_query : &order=synced_at.desc),
+    donc la premiere vue pour un device_id donne est la plus recente. Tous les appareils actifs
+    du cycle sont ainsi archives, aucun n'est ecarte au profit de celui qui porte le plus de
+    resultats de test manuel (rupture R1).
+    """
+    latest: dict[str, dict] = {}
+    for r in rows:
+        device_id = r.get("device_id")
+        if device_id and device_id not in latest:
+            latest[device_id] = r
+    return list(latest.values())
 
 
 def payload_problem(payload) -> str | None:
@@ -140,6 +151,45 @@ def run_prune(directory: Path, keep_last: int, dry_run: bool) -> None:
     print(f"Retention : {len(purge)} fichier(s) {resume}.")
 
 
+def archive_one(directory: Path, row: dict) -> tuple[int, bool]:
+    """Archive un appareil dans `directory`. Retourne (code, ecrit).
+
+    code 1 = payload refuse : rien n'est ecrit pour cet appareil, les autres restent traites.
+    ecrit = False si une sauvegarde du meme appareil porte deja exactement le meme contenu
+    (idempotence par relance de cycle).
+    """
+    device_id = row["device_id"]
+    payload = row.get("payload")
+    problem = payload_problem(payload)
+    if problem is not None:
+        print(
+            f"ERREUR: {problem} pour l'appareil {device_id} - rien n'a ete ecrit pour cet appareil.",
+            file=sys.stderr,
+        )
+        return 1, False
+
+    device_short = device_id[:8]
+    content = serialize_payload(payload)
+    n_tasks = len(payload.get("tasks") or [])
+    n_tests = len(payload.get("manual_test_results") or [])
+
+    directory.mkdir(exist_ok=True)
+
+    duplicate = find_duplicate(directory, device_short, content)
+    if duplicate is not None:
+        print(f"{device_id} : inchange depuis {duplicate.name} - rien a sauvegarder.")
+        return 0, False
+
+    out_path = directory / f"snapshot-supabase-{device_short}-{build_stamp(row['synced_at'])}.json"
+    out_path.write_text(content, encoding="utf-8")
+
+    print(
+        f"Sauvegarde ecrite : {out_path.name} "
+        f"(app_version={row.get('app_version')}, tasks={n_tasks}, manual_test_results={n_tests})"
+    )
+    return 0, True
+
+
 def run_backup(device_id: str | None) -> int:
     try:
         url, service_key = read_credentials()
@@ -148,43 +198,22 @@ def run_backup(device_id: str | None) -> int:
         print(f"ERREUR: {e} - sauvegarde non effectuee.", file=sys.stderr)
         return 1
 
-    target = select_target(rows)
-    if target is None:
+    targets = select_targets(rows)
+    if not targets:
         print("Aucun snapshot trouve.")
         return 0
 
-    payload = target.get("payload")
-    problem = payload_problem(payload)
-    if problem is not None:
-        print(f"ERREUR: {problem} pour l'appareil {target['device_id']} - rien n'a ete ecrit.", file=sys.stderr)
-        return 1
+    print(f"{len(targets)} appareil(s) a archiver : {', '.join(t['device_id'] for t in targets)}")
 
-    device_short = target["device_id"][:8]
-    synced_at = target["synced_at"]
-    content = serialize_payload(payload)
-    n_tasks = len(payload.get("tasks") or [])
-    n_tests = len(payload.get("manual_test_results") or [])
+    exit_code = 0
+    written = 0
+    for row in targets:
+        code, did_write = archive_one(OUTPUT_DIR, row)
+        exit_code = exit_code or code
+        written += int(did_write)
 
-    print(
-        f"Appareil retenu : {target['device_id']} "
-        f"(synced_at {synced_at} UTC, manual_test_results={n_tests} - critere de selection)"
-    )
-
-    OUTPUT_DIR.mkdir(exist_ok=True)
-
-    duplicate = find_duplicate(OUTPUT_DIR, device_short, content)
-    if duplicate is not None:
-        print(f"Inchange depuis {duplicate.name} - rien a sauvegarder.")
-        return 0
-
-    out_path = OUTPUT_DIR / f"snapshot-supabase-{device_short}-{build_stamp(synced_at)}.json"
-    out_path.write_text(content, encoding="utf-8")
-
-    print(
-        f"Sauvegarde ecrite : {out_path.name} "
-        f"(app_version={target.get('app_version')}, tasks={n_tasks}, manual_test_results={n_tests})"
-    )
-    return 0
+    print(f"Sauvegarde terminee : {written} archive(s) ecrite(s) sur {len(targets)} appareil(s).")
+    return exit_code
 
 
 def main() -> int:

@@ -7,6 +7,7 @@ export type ScreenCode = {
 
 export const SCREEN_CODES: Record<Route['name'], ScreenCode> = {
   welcome: { code: 'E01', label: 'Bienvenue' },
+  consent: { code: 'E04', label: 'Consentement aux données' },
   profile: { code: 'E02', label: 'Profil initial' },
   energy: { code: 'E03', label: 'Énergie initiale' },
   dashboard: { code: 'E10', label: 'Accueil' },

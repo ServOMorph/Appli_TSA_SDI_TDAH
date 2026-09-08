@@ -17,6 +17,7 @@ const E01Welcome = lazy(() => import('@/ui/screens/onboarding/E01Welcome').then(
 const E12WeekPlanning = lazy(() =>
   import('@/ui/screens/dashboard/E12WeekPlanning').then((m) => ({ default: m.E12WeekPlanning })),
 )
+const E04Consent = lazy(() => import('@/ui/screens/onboarding/E04Consent').then((m) => ({ default: m.E04Consent })))
 const E02Profile = lazy(() => import('@/ui/screens/onboarding/E02Profile').then((m) => ({ default: m.E02Profile })))
 const E03Energy = lazy(() => import('@/ui/screens/onboarding/E03Energy').then((m) => ({ default: m.E03Energy })))
 const importE20Inbox = () => import('@/ui/screens/tasks/E20Inbox').then((m) => ({ default: m.E20Inbox }))
@@ -93,7 +94,15 @@ const E78BudgetPrevisions = lazy(() =>
   import('@/ui/screens/tools/E78BudgetPrevisions').then((m) => ({ default: m.E78BudgetPrevisions })),
 )
 
-export const NO_NAV_SCREENS: Screen[] = ['welcome', 'profile', 'energy', 'energy-checkin', 'feedback', 'feedback-list']
+export const NO_NAV_SCREENS: Screen[] = [
+  'welcome',
+  'consent',
+  'profile',
+  'energy',
+  'energy-checkin',
+  'feedback',
+  'feedback-list',
+]
 
 export function activeTabFor(screen: Screen): BottomNavTab | null {
   switch (screen) {
@@ -143,6 +152,8 @@ export function AppScreens() {
     switch (screen) {
       case 'welcome':
         return <E01Welcome />
+      case 'consent':
+        return <E04Consent />
       case 'profile':
         return <E02Profile />
       case 'energy':

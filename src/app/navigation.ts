@@ -1,5 +1,6 @@
 export type Route =
   | { name: 'welcome' }
+  | { name: 'consent' }
   | { name: 'profile' }
   | { name: 'energy' }
   | { name: 'dashboard'; date?: string }

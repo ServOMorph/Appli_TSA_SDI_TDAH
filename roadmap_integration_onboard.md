@@ -93,18 +93,19 @@ Source : `TESTS/ONBOARD/demandes_evolution.md` (D1-D7),
   pas de préprod : cadence plancher de 3-4 semaines avec un sous-ensemble tournant de parcours de
   non-régression. **Ne bloque aucune phase de code ; bloque la mise en service.**
 
-- **DI4 — Rédaction du texte de consentement.** `EN ATTENTE`. La relecture externe est déléguée à
-  `TESTS` par ONBOARD, mais l'écriture du texte n'est assignée à personne.
-  *Reco : rédaction par la zone racine en Phase 2, relecture externe portée par `TESTS` avant la
-  première invitation.* **Bloque la Phase 2.**
+- **DI4 — Rédaction du texte de consentement.** `TRANCHÉE le 2026-09-08`. La relecture externe est
+  déléguée à `TESTS` par ONBOARD, mais l'écriture du texte n'est assignée à personne.
+  **Décision : rédaction par la zone racine en Phase 2, relecture externe portée par `TESTS` avant
+  la première invitation** (gate de mise en service, pas gate de phase — cf. § Mise en service
+  point 3). Débloque la Phase 2.
 
-- **DI5 — Traitement de l'appareil de Marie face au consentement.** `EN ATTENTE`. Conditionner
-  `syncNow()` à un flag couperait sa synchronisation au prochain déploiement.
-  *Reco : poser le flag d'office sur tout appareil portant déjà `sync_last_success_at` en
-  `localStorage` (aucune régression, aucun écran imposé à Marie), et corriger en parallèle le texte
-  de `E116Privacy.tsx` pour qu'elle puisse lire ce qui est réellement envoyé et retirer son accord.*
-  Alternative écartée : lui présenter l'écran bloquant — un refus accidentel arrêterait sa sync en
-  silence. **Bloque la Phase 2.**
+- **DI5 — Traitement de l'appareil de Marie face au consentement.** `TRANCHÉE le 2026-09-08`.
+  Conditionner `syncNow()` à un flag couperait sa synchronisation au prochain déploiement.
+  **Décision : poser le flag d'office sur tout appareil portant déjà `sync_last_success_at` en
+  `localStorage`** (aucune régression, aucun écran imposé à Marie), **et corriger en parallèle le
+  texte de `E116Privacy.tsx`** pour qu'elle puisse lire ce qui est réellement envoyé et retirer son
+  accord. Alternative écartée : lui présenter l'écran bloquant — un refus accidentel arrêterait sa
+  sync en silence. Débloque la Phase 2.
 
 ---
 

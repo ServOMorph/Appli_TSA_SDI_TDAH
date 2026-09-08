@@ -3,6 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('@/data/sync/syncConfig', () => ({
   isSyncEnabled: vi.fn(),
 }))
+vi.mock('@/data/sync/syncConsent', () => ({
+  isSyncConsentGranted: vi.fn(),
+}))
 vi.mock('@/data/sync/rpc', () => ({
   callRpc: vi.fn(),
 }))
@@ -15,11 +18,13 @@ vi.mock('@/data/sync/buildSnapshot', () => ({
 }))
 
 import { isSyncEnabled } from '@/data/sync/syncConfig'
+import { isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { callRpc } from '@/data/sync/rpc'
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { getLastSyncSuccessAt, syncNow } from './syncClient'
 
 const isSyncEnabledMock = vi.mocked(isSyncEnabled)
+const isSyncConsentGrantedMock = vi.mocked(isSyncConsentGranted)
 const callRpcMock = vi.mocked(callRpc)
 const buildSnapshotPayloadMock = vi.mocked(buildSnapshotPayload)
 
@@ -27,6 +32,8 @@ beforeEach(() => {
   localStorage.clear()
   callRpcMock.mockReset()
   isSyncEnabledMock.mockReset()
+  isSyncConsentGrantedMock.mockReset()
+  isSyncConsentGrantedMock.mockReturnValue(true)
   buildSnapshotPayloadMock.mockClear()
 })
 
@@ -36,6 +43,33 @@ describe('syncNow', () => {
     const result = await syncNow()
     expect(result).toBe(false)
     expect(getLastSyncSuccessAt()).toBeNull()
+  })
+
+  it("n'émet aucun RPC si le consentement n'est pas accordé", async () => {
+    isSyncEnabledMock.mockReturnValue(true)
+    isSyncConsentGrantedMock.mockReturnValue(false)
+    callRpcMock.mockResolvedValue({ data: true, error: null })
+
+    const result = await syncNow()
+
+    expect(result).toBe(false)
+    expect(callRpcMock).not.toHaveBeenCalled()
+    expect(localStorage.getItem('sync_last_attempt_at')).toBeNull()
+    expect(getLastSyncSuccessAt()).toBeNull()
+  })
+
+  it('reprend la synchronisation quand le consentement est ensuite retiré', async () => {
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({ data: true, error: null })
+
+    await syncNow()
+    expect(callRpcMock).toHaveBeenCalledTimes(1)
+
+    isSyncConsentGrantedMock.mockReturnValue(false)
+    const result = await syncNow({ force: true })
+
+    expect(result).toBe(false)
+    expect(callRpcMock).toHaveBeenCalledTimes(1)
   })
 
   it('envoie le snapshot via rpc et enregistre le succès', async () => {

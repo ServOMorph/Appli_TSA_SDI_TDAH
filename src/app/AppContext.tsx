@@ -23,6 +23,7 @@ import { useManualTestsState } from '@/app/contexts/useManualTestsState'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { syncNow } from '@/data/sync/syncClient'
+import { backfillSyncConsentFromHistory } from '@/data/sync/syncConsent'
 import { startFeedbackSync } from '@/data/sync/feedbackClient'
 
 export type { Screen, Route } from '@/app/navigation'
@@ -134,6 +135,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function init() {
       try {
+        backfillSyncConsentFromHistory()
         const user = await userRepo.getFirst()
         if (user) {
           if (!user.onboarding_completed) {

@@ -1,3 +1,18 @@
+## v5.108 — 2026-09-08
+
+### Ajouté
+- `roadmap_integration_onboard.md` Phase 2 (consentement, D2) exécutée. Prérequis DI4 et DI5 tranchés par l'utilisateur : DI4 — rédaction du texte de consentement par la zone racine, relecture externe portée par `TESTS` avant la première invitation (gate de mise en service) ; DI5 — flag posé d'office sur tout appareil portant déjà `sync_last_success_at`, aucun écran imposé à Marie, plus correction en parallèle de `E116Privacy.tsx`.
+- `src/data/sync/syncConsent.ts` : flag de consentement à la synchronisation, persistant en `localStorage` (`sync_consent_granted`). `grantSyncConsent` / `revokeSyncConsent` / `isSyncConsentGranted`. `backfillSyncConsentFromHistory()` (DI5) pose le flag d'office et sans écran si `sync_last_success_at` est présent — reprise sans régression pour un appareil ayant déjà synchronisé. Idempotent. Choix du `localStorage` plutôt qu'un champ Dexie sur `User` : l'écran de consentement précède la création de l'utilisateur (inséré entre `welcome` et `profile`), et tout l'état de synchronisation vit déjà dans `localStorage` (`sync_device_id`, `sync_device_secret`, `sync_last_success_at`).
+- Écran `E04` « Consentement aux données » (`src/ui/screens/onboarding/E04Consent.tsx`), route `consent` insérée entre `welcome` et `profile` dans `src/app/navigation.ts`, code écran dans `src/domain/data/screenCodes.ts`, cas de rendu et `NO_NAV_SCREENS` dans `src/App.tsx` (import différé). Texte : nature des données envoyées (tâches, planning, énergie, budget, listes, résultats de tests ; aucune adresse e-mail ni mot de passe), usage (suivi des tests et sauvegarde), hébergement UE, conservation le temps de la participation, droit de retrait dans Paramètres. Deux issues : « J'accepte le partage » (pose le flag puis `profile`) et « Continuer sans partager » (`profile` sans flag). `E01Welcome` renvoie désormais vers `consent` au lieu de `profile`.
+- Parcours in-app `consentement-synchronisation-non-interrompu` ajouté à `src/domain/data/manualTestsCatalog.ts` (catégorie « Paramètres / Profil ») : Marie vérifie qu'aucun écran de consentement n'apparaît à son démarrage et que la case « Partager mes données pour les tests » de l'écran « Vie privée » est cochée.
+
+### Modifié
+- `src/data/sync/syncClient.ts` : `syncNow()` conditionné à `isSyncConsentGranted()` en plus de `isSyncEnabled()`. Aucun `callRpc` n'est émis, aucun `sync_last_attempt_at` n'est posé, tant que le consentement n'est pas accordé. Retrait du consentement : la synchronisation s'arrête au prochain appel.
+- `src/ui/screens/settings/E116Privacy.tsx` : mention « Aucune donnée n'est envoyée à un serveur externe » supprimée (fausse depuis la synchronisation Supabase). Nouvelle carte avec case « Partager mes données pour les tests » reflétant l'état du flag et permettant de l'accorder ou de le retirer ; description de ce qui est réellement envoyé et où (serveur UE), et de l'arrêt immédiat de l'envoi au retrait.
+- `src/app/AppContext.tsx` : `backfillSyncConsentFromHistory()` appelé en tête de l'initialisation, avant le premier `syncNow()`.
+- `roadmap_integration_onboard.md` : DI4 et DI5 passées `TRANCHÉE le 2026-09-08` avec la décision retenue.
+- Tests : `src/data/sync/syncConsent.test.ts` (nouveau, 6), `src/data/sync/syncClient.test.ts` (+2 : aucun RPC sans consentement, arrêt au retrait), `src/ui/screens/onboarding/E04Consent.test.tsx` (nouveau, 3), `src/ui/screens/settings/E116Privacy.test.tsx` (+3), `src/ui/screens/onboarding/E01Welcome.test.tsx` (cible `consent`), `src/domain/data/screenCodes.test.ts` (route `consent`). Suite complète 102 fichiers / 831 tests verts, `tsc -b` exit 0, lint 0, budget bundle respecté (chunk d'entrée 264,14 kB < 266,43). Non déployé.
+
 ## v5.107 — 2026-09-08
 
 ### Ajouté

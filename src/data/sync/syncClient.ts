@@ -1,4 +1,5 @@
 import { isSyncEnabled } from '@/data/sync/syncConfig'
+import { isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { callRpc } from '@/data/sync/rpc'
 import { getDeviceIdentity } from '@/data/sync/deviceIdentity'
 import { buildSnapshotPayload, SNAPSHOT_SCHEMA_VERSION } from '@/data/sync/buildSnapshot'
@@ -32,6 +33,7 @@ export async function syncNow(options: { force?: boolean } = {}): Promise<boolea
   if (!options.force && msSinceLastAttempt() < THROTTLE_MS) return false
 
   if (!isSyncEnabled()) return false
+  if (!isSyncConsentGranted()) return false
 
   localStorage.setItem(LAST_ATTEMPT_KEY, String(now()))
 

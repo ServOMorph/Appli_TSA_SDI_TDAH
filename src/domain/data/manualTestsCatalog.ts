@@ -568,4 +568,16 @@ export const manualTestsCatalog: ManualTest[] = [
       'Touchez « Retirer » : aucune catégorie ne doit plus être sélectionnée et la tâche enregistrée n’a alors aucune couleur.',
     ],
   },
+  {
+    id: 'consentement-synchronisation-non-interrompu',
+    title: 'La synchronisation n’a pas été coupée par le nouvel écran de consentement',
+    category: 'Paramètres / Profil',
+    steps: [
+      'Ouvrez l’application comme d’habitude : aucun nouvel écran « Partage de vos données pour les tests » ne doit apparaître au démarrage (cet écran ne concerne que les nouvelles installations).',
+      'Allez dans Paramètres, puis touchez « Vie privée ».',
+      'Repérez la ligne « Partager mes données pour les tests » : la case doit être cochée.',
+      'Si la case est décochée, cochez-la, puis signalez-le : votre synchronisation avait été interrompue et vient d’être réactivée.',
+      'Touchez « ← Retour » puis rouvrez « Vie privée » : la case doit être restée dans le même état.',
+    ],
+  },
 ]

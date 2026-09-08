@@ -1,8 +1,13 @@
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { E116Privacy } from './E116Privacy'
 import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
+import { grantSyncConsent, isSyncConsentGranted } from '@/data/sync/syncConsent'
+
+afterEach(() => {
+  localStorage.clear()
+})
 
 function renderE116(overrides = {}) {
   const ctx = makeAppContext(overrides)
@@ -52,6 +57,27 @@ describe('E116Privacy', () => {
     await vi.waitFor(() => {
       expect(deleteAllData).toHaveBeenCalled()
     })
+  })
+
+  it('n’affirme plus qu’aucune donnée n’est envoyée à un serveur externe', () => {
+    renderE116()
+    expect(screen.queryByText(/Aucune donnée n'est envoyée/)).not.toBeInTheDocument()
+  })
+
+  it('reflète l’état du consentement de synchronisation', () => {
+    grantSyncConsent()
+    renderE116()
+    expect(screen.getByLabelText('Partager mes données pour les tests')).toBeChecked()
+  })
+
+  it('active puis retire le consentement via la case', () => {
+    renderE116()
+    const box = screen.getByLabelText('Partager mes données pour les tests')
+    expect(box).not.toBeChecked()
+    fireEvent.click(box)
+    expect(isSyncConsentGranted()).toBe(true)
+    fireEvent.click(box)
+    expect(isSyncConsentGranted()).toBe(false)
   })
 
   it('navigue vers settings via Retour', () => {

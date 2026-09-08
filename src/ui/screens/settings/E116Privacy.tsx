@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+import { grantSyncConsent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -39,9 +40,16 @@ const modalBox: React.CSSProperties = {
 export function E116Privacy() {
   const { deleteAllData, goTo } = useApp()
   const [showConfirm, setShowConfirm] = useState(false)
+  const [syncConsent, setSyncConsent] = useState(() => isSyncConsentGranted())
 
   async function handleDelete() {
     await deleteAllData()
+  }
+
+  function toggleSyncConsent(next: boolean) {
+    if (next) grantSyncConsent()
+    else revokeSyncConsent()
+    setSyncConsent(next)
   }
 
   return (
@@ -67,8 +75,32 @@ export function E116Privacy() {
       <Card>
         <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text)' }}>Stockage local</p>
         <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-          Toutes vos données sont stockées uniquement sur votre appareil. Aucune donnée n'est envoyée
-          à un serveur externe.
+          Vos données sont stockées sur votre appareil. Pendant la phase de test, une copie peut
+          aussi être envoyée à l’équipe si vous l’avez accepté (voir ci-dessous).
+        </p>
+      </Card>
+
+      <Card>
+        <label
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', gap: 'var(--spacing-md)' }}
+        >
+          <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>
+            Partager mes données pour les tests
+          </span>
+          <input
+            type="checkbox"
+            checked={syncConsent}
+            onChange={(e) => toggleSyncConsent(e.target.checked)}
+            aria-label="Partager mes données pour les tests"
+            style={{ width: '20px', height: '20px', cursor: 'pointer', flex: '0 0 auto' }}
+          />
+        </label>
+        <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+          Quand c’est activé, une copie de vos tâches, planning, énergie, budget, listes et résultats
+          de tests est envoyée à un serveur situé dans l’Union européenne, pour le suivi des tests et
+          une sauvegarde. Aucune adresse e-mail ni mot de passe. En désactivant, l’envoi s’arrête
+          immédiatement ; les copies déjà transmises sont supprimées sur demande via le canal de
+          retour.
         </p>
       </Card>
 

@@ -1288,3 +1288,13 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - Contrôle réseau Phase 6 non porté au catalogue : différé au prochain `/deploy`, à regrouper avec la question [P1] « Relancer ».
 - VALIDÉ (iPhone réel) : plus de zoom au focus des champs depuis Réception. VALIDÉ (navigateur dev) : import invalide + rechargement, horizon série quotidienne (06/09→05/12/2026, rien le 06/12), opérations de série atomiques sans règle orpheline.
 - 100 fichiers / 817 tests verts, `tsc -b` + lint exit 0. Commits `593acce`, `681be23`, `e4f74d3`.
+
+---
+
+## Session du 2026-09-08 — archivage roadmap fiabilisation, report P7-P8
+
+- Roadmap `roadmap_refactorisation_2026-09-06.md` clôturée sur décision explicite et déplacée en `Archives/` (`git mv`). Phases 1-6 `[FAIT]`, phases 7-8 `[REPORTÉ]`.
+- Phase 7 (composition/état React, D6) : aucune mesure de re-rendus parasites, bénéfice non établi. Phase 8 (geste planning, D7) : défaut `E12WeekPlanning.tsx` non reproduit, Marie non consultée — reste tracée par la question ouverte P3.
+- `_contexte/signals.md` (entrée [P3] Phases 7-8 retirée, réfs repointées vers `Archives/`), `_contexte/contexte.md`, `README.md`, `CHANGELOG.md` (v5.105) alignés.
+- Reco actée : priorité = résorber le delta prod v5.92 ↔ `CHANGELOG` (relance Marie [P1] puis `/deploy`), pas la refacto P3.
+- Aucun code applicatif touché. Suite complète inchangée (100 fichiers / 817 tests verts).

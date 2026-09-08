@@ -35,19 +35,3 @@ retours en "Envoyé" ? » (`_contexte/signals.md`). Comportement à faire valide
   d'elle-même après ~30 s sans figer l'appli, le retour passe « Échec d'envoi » ;
 - rétablir le réseau, relancer : le retour part sans doublon (image déjà déposée non renvoyée)
   et passe « Envoyé ».
-
-## Bot Discord — file d'attente des commandes en conditions réelles [discord-auto]
-
-Ajouté le 2026-09-02 (commit `2b75711`). `bot.py` empile désormais dans `commands.json` → `queue[]`
-tout message reçu pendant que Claude traite déjà une commande, et `boucle_polling` promeut la file
-en FIFO dès le retour à `idle`. Testé seulement en isolation (script hors ligne), pas encore avec
-le vrai bot et Discord.
-
-À observer au fil de l'usage de `/discord_loop` :
-- 2-3 messages reçus pendant un traitement en cours → chacun reçoit « 📥 En file d'attente (N) »,
-  aucun n'est rejeté ; à la fin du traitement, repris un par un dans l'ordre d'arrivée, avec le bon
-  auteur affiché (`[RESTREINT Rayonne Toi]` / `[ADMIN …]`) ;
-- `!ping` / `!help` répondent toujours immédiatement même file non vide ;
-- cas dégradé (hors délégation, à provoquer manuellement) : tuer la session pendant un traitement
-  → `commands.json` reste en `processing`, la file se remplit sans être promue (angle mort connu,
-  cf. question ouverte P3 de `signals.md`).

@@ -1,3 +1,12 @@
+## v5.106 — 2026-09-08
+
+### Ajouté
+- `roadmap_integration_onboard.md` : plan d'intégration dans `main` du cadrage produit par la zone `ONBOARD` (branche `agent/onboard`). Six phases ordonnées par déblocage réel plutôt que par graphe de dépendances : (1) intégration documentaire — extraction des 6 livrables ONBOARD sur `main` sans fusionner la branche (69 commits de retard, modifications `.claude/` déjà présentes) ; (2) écran de consentement conditionnant l'activation de la synchronisation (D2), seul bloquant du jalon « premier pilote invitable », incluant la correction de la mention fausse « aucune donnée n'est envoyée à un serveur externe » de `src/ui/screens/settings/E116Privacy.tsx` et la reprise sans régression de la synchronisation de Marie ; (3) code testeur dans les Paramètres (D1) ; (4) dépouillement multi-appareils dans `scripts/backup_marie_snapshot.py` (D3) ; (5) canaux Discord testeurs et routage gateway (D5) ; (6) généralisation du nommage mono-personne (D7). Bloc « Mise en service » pour les gates humains, le registre `code testeur → device_id` traitant la perte du `localStorage` sans code, et la cadence des cycles. Cinq décisions d'intégration DI1-DI5 en attente d'arbitrage utilisateur (DI4 rédacteur du texte de consentement et DI5 sort de l'appareil de Marie bloquent la phase 2). D4 (identité sur chaque résultat de test) sorti du périmètre. Re-chiffrage : D1 et D3 abaissés à S, D5 relevé à L. Analyse de code préalable confirmant les points de rupture R1-R3 du constat ONBOARD.
+
+### Modifié
+- `tests_manuels.md` : section `[discord-auto]` « Bot Discord — file d'attente des commandes en conditions réelles » retirée sur affirmation explicite de l'utilisateur (« déjà traité et validé »). `DISCORD/_contexte/signals.md` (2026-09-06) la listait encore « jamais observé » — écart signalé, retrait maintenu. Reste une section `[discord-auto]` (hook `on_start.md` discord) et la note « contrôle réseau Phase 6 ».
+- `README.md`, `_contexte/signals.md`, `_contexte/contexte.md` : état reflété. Session précédente déplacée dans `_contexte/archive_sessions.md`, décision du 2026-09-05 dans `_contexte/archive_decisions.md`. Aucun code applicatif touché.
+
 ## v5.105 — 2026-09-08
 
 ### Modifié

@@ -1,3 +1,8 @@
+## v5.105 — 2026-09-08
+
+### Modifié
+- Roadmap `roadmap_refactorisation_2026-09-06.md` clôturée et archivée dans `Archives/` (`git mv`) sur décision explicite de l'utilisateur. Phases 1 à 6 `[FAIT]` (fiabilisation : rangement des commentaires de livraison, import validé et atomique, horizon des récurrences, opérations de série atomiques, bornage des requêtes réseau à 30 s). Phases 7 et 8 passées `[REPORTÉ]` — Phase 7 (composition/état React, décision D6) sans mesure de re-rendus parasites, bénéfice non établi ; Phase 8 (geste du planning, décision D7) double condition non remplie (défaut de `E12WeekPlanning.tsx` non reproduit, Marie non consultée), le sujet reste tracé par la question ouverte P3 de `_contexte/signals.md`. Motif de report consigné dans chaque section de la roadmap et dans « Acceptation finale ». `_contexte/signals.md` et `_contexte/contexte.md` : entrée [P3] Phases 7-8 retirée, contexte chaud, prochaine étape et références Phase 6 repointés vers `Archives/`. `README.md` aligné. Aucun code applicatif touché ; suite complète inchangée (100 fichiers / 817 tests verts sur `main`).
+
 ## v5.104 — 2026-09-08
 
 ### Corrigé

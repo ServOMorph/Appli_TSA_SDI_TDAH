@@ -1279,3 +1279,12 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - `callRpc` / `uploadFeedbackImage` : `AbortController` + `clearTimeout` en `finally`, expiration -> `{ data: null, error: '... a expire' }` sans lever ; `feedbackClient.ts` libere le verrou `inFlight` via `.finally`. Contrats reseau et throttles (snapshot 1 h, retours 60 s) inchanges.
 - Roadmap `roadmap_refactorisation_2026-09-06.md` : phases 1-6 `[FAIT]` ; phases 7-8 conditionnelles P3 non planifiees.
 - +11 tests sur horloge simulee -> 99 fichiers / 816 tests verts. Commit `bbdf662` (Phase 5) puis close du jour.
+
+---
+
+## Session du 2026-09-08 — bug zoom iOS Réception, règle CSS globale, contrôles manuels dev
+
+- Correctif anti-zoom iOS généralisé : règle CSS globale `input,select,textarea { font-size: max(16px, 1rem) }` (`src/index.css`), patch inline `E20Inbox` retiré. Plancher 16 px anti auto-zoom Safari, `1rem` suit la taille de texte « grande » de l'accessibilité.
+- Contrôle réseau Phase 6 non porté au catalogue : différé au prochain `/deploy`, à regrouper avec la question [P1] « Relancer ».
+- VALIDÉ (iPhone réel) : plus de zoom au focus des champs depuis Réception. VALIDÉ (navigateur dev) : import invalide + rechargement, horizon série quotidienne (06/09→05/12/2026, rien le 06/12), opérations de série atomiques sans règle orpheline.
+- 100 fichiers / 817 tests verts, `tsc -b` + lint exit 0. Commits `593acce`, `681be23`, `e4f74d3`.

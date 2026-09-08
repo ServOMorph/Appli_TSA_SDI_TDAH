@@ -222,7 +222,12 @@ Référence : R4, priorité P2. Périmètre prévu : transport RPC, upload des i
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 7 — Clarifier la composition et l'état React [TODO]
+## Phase 7 — Clarifier la composition et l'état React [REPORTÉ]
+
+**Reportée le 2026-09-08 (décision explicite de l'utilisateur, roadmap archivée).** D6 conditionne
+la phase à une mesure de re-rendus parasites ou à un besoin de test concret ; aucune mesure n'a été
+faite et aucune douleur n'est établie. À rouvrir seulement si une perte de perf chiffrée ou un test
+bloqué par le couplage de l'état global apparaît. Non implémentée.
 
 Référence : R5, priorité P3. Périmètre prévu : composition des dépôts, contexte global, snapshot et client des retours. Risque modéré : ordre d'initialisation, compatibilité des imports et mocks.
 
@@ -240,7 +245,13 @@ Référence : R5, priorité P3. Périmètre prévu : composition des dépôts, c
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 8 — Harmoniser le geste du planning si utile [TODO]
+## Phase 8 — Harmoniser le geste du planning si utile [REPORTÉ]
+
+**Reportée le 2026-09-08 (décision explicite de l'utilisateur, roadmap archivée).** Double condition
+non remplie : le défaut de saut de `E12WeekPlanning.tsx` n'a pas été reproduit au navigateur et
+Marie n'a pas confirmé qu'il la gêne. Le sujet reste tracé comme question ouverte P3 de
+`_contexte/signals.md` (`E12WeekPlanning.tsx` reproduit le défaut #38) ; si Marie le signale sur ses
+retours v5.92, ouvrir une phase dédiée à ce moment-là — pas dans cette roadmap. Non implémentée.
 
 Référence : R6, priorité P3. Périmètre prévu : planning jour/semaine et tests associés. Risque ergonomique modéré. Phase conditionnelle à D7.
 
@@ -259,7 +270,13 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ## Acceptation finale et suivi
 
-- [ ] Phases de fiabilisation et de rangement validées ; sort des deux phases P3 conditionnelles explicitement consigné.
+**Roadmap clôturée et archivée le 2026-09-08.** Phases 1 à 6 `[FAIT]` (fiabilisation et rangement).
+Phases 7 et 8 `[REPORTÉ]` : bénéfice non établi (P7, D6 sans mesure) et double condition non remplie
+(P8, D7 — défaut semaine non reproduit, Marie non consultée). Le sort des deux phases P3 est
+explicitement consigné ici et dans leurs sections respectives. Aucun déploiement dans le périmètre
+de cette roadmap.
+
+- [x] Phases de fiabilisation et de rangement validées ; sort des deux phases P3 conditionnelles explicitement consigné.
 - [ ] Suite automatisée, TypeScript et lint verts, avec résultats réellement exécutés et écarts initiaux résolus ou explicitement acceptés.
 - [ ] Build neuf et budget du bundle contrôlés : limites de référence du plan, entrée 266428 octets / 81568 gzip ; entrée avec préchargements 431790 octets / 131317 gzip. Relire la configuration de référence avant mesure.
 - [ ] Parcours navigateur et persistance hors ligne validés ; aucun test exécuté sur une origine ou une base de production.

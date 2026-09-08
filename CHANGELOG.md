@@ -1,3 +1,14 @@
+## v5.109 — 2026-09-08
+
+### Ajouté
+- `roadmap_integration_onboard.md` Phase 3 (code testeur, D1, résout R2) exécutée. DI1 tranchée par l'utilisateur (groupe : un 2ᵉ testeur invité dès que l'app est prête) — Phases 3 à 6 toutes requises avant la première invitation.
+- `Settings.tester_code?: string` (`src/domain/entities/settings.ts`) : identifiant humain d'un testeur additionnel. Champ optionnel non indexé, aucune migration Dexie (store `settings: 'id, user_id'`, version 19 inchangée), au même titre que `ambiance_color?` / `mon_compte_color?`.
+- `src/data/sync/buildSnapshot.test.ts` (nouveau, 2) : `buildSnapshotPayload()` sérialise `settings.tester_code` tel quel ; absent du snapshot quand non renseigné. Le code remonte par le canal `p_payload` existant, distinct de `p_device_id` — lisible sans recoupement avec l'UUID d'appareil.
+
+### Modifié
+- `src/ui/screens/settings/E111Profile.tsx` : carte « Code testeur » — champ de saisie, bouton « Enregistrer le code » désactivé tant que la saisie est identique au code enregistré, confirmation visuelle « Code enregistré : <code> » (`role="status"`) ou « Aucun code enregistré. ». Vider le champ puis enregistrer retire le code (`updateSettings({ tester_code: undefined })`). Aucune modification du payload ni de la signature RPC : `buildSnapshotPayload()` sérialise déjà `settings`.
+- Tests : `src/ui/screens/settings/E111Profile.test.tsx` (+4 : enregistrement via `updateSettings`, confirmation d'un code déjà présent, bouton désactivé sans changement, retrait par champ vidé). Suite complète 103 fichiers / 837 tests verts, `tsc -b` exit 0, lint 0, budget bundle respecté (chunk d'entrée 264,14 kB < 266,43, inchangé — `E111Profile` en import différé). Non déployé.
+
 ## v5.108 — 2026-09-08
 
 ### Ajouté

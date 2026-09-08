@@ -22,7 +22,14 @@ REGISTRE_TEST = {
         "path": "DISCORD",
         "keywords": ["discord", "gateway", "bot", "outbox", "inbox"],
     },
+    "testeurs": {
+        "path": "DISCORD",
+        "keywords": [],
+        "member_ids": [],
+    },
 }
+
+TESTEUR_ID = 900000000000000001
 
 
 class GatewayTest(unittest.TestCase):
@@ -41,11 +48,22 @@ class GatewayTest(unittest.TestCase):
             mock.patch.object(gateway, "LOCK", gw / "state.lock"),
             mock.patch.object(gateway, "DRAIN_LOCK", gw / "drain.lock"),
             mock.patch.object(gateway, "CONV_LOG", root / "logs" / "conversation.jsonl"),
+            mock.patch.object(gateway, "CONFIG_FILE", root / "config_bot_discord.json"),
+            # enqueue() -> _wake_gardien() touche COMMANDS : sans ces patchs, la suite
+            # ecrit "__gateway_wake__" dans le vrai commands.json et reveille la session
+            # /discord_loop en service.
+            mock.patch.object(gateway, "COMMANDS", root / "commands.json"),
+            mock.patch.object(gateway, "COMMANDS_LOCK", gw / "commands.lock"),
         ]
         for p in self._patches:
             p.start()
         gw.mkdir(parents=True, exist_ok=True)
         (gw / "agents.json").write_text(json.dumps(REGISTRE_TEST), encoding="utf-8")
+        (root / "config_bot_discord.json").write_text(json.dumps({
+            "enabled": True,
+            "channel_id": 111,
+            "channels": {"testeurs": 222, "marie_supervision": 333},
+        }), encoding="utf-8")
 
     def tearDown(self):
         for p in self._patches:
@@ -69,7 +87,8 @@ class GatewayTest(unittest.TestCase):
     # -- registre d'agents ---------------------------------------------
 
     def test_agent_names_depuis_le_registre(self):
-        self.assertEqual(gateway.agent_names(), ["orchestrateur", "design", "discord"])
+        self.assertEqual(gateway.agent_names(),
+                         ["orchestrateur", "design", "discord", "testeurs"])
 
     def test_resolve_agent_par_zone_alias_et_casse(self):
         self.assertEqual(gateway.resolve_agent("Appli_TSA_SDI_TDAH"), "orchestrateur")
@@ -669,6 +688,181 @@ class GatewayTest(unittest.TestCase):
     def test_cli_poll_exige_agent_ou_zone(self):
         code, _ = self._run_cli("poll", "--format", "hook")
         self.assertNotEqual(code, 0)
+
+
+class VisibiliteAsymetriqueTest(unittest.TestCase):
+    """ONBOARD Phase 5 — canaux testeurs / supervision, visibilité strictement asymétrique
+    (TESTS/ONBOARD/decisions_dispositif.md Décision 5). channel_id mockés : 111 canal
+    principal, 222 canal testeurs, 333 canal supervision privé de Marie."""
+
+    setUp = GatewayTest.setUp
+    tearDown = GatewayTest.tearDown
+    _envoyer_question = GatewayTest._envoyer_question
+
+    def _registre_avec_testeur(self, *ids):
+        reg = json.loads(json.dumps(REGISTRE_TEST))
+        reg["testeurs"]["member_ids"] = list(ids)
+        gateway.AGENTS_FILE.write_text(json.dumps(reg), encoding="utf-8")
+
+    def _drain_reel(self):
+        """drain() via _discord_post, message_marie stubbé. Retourne la liste des envois
+        capturés : {channel_id, content, mention_ids, attachment_path}."""
+        envois = []
+
+        def _send(token, channel_id, content, allowed_user_ids=None, attachment_path=None):
+            envois.append({
+                "channel_id": channel_id,
+                "content": content,
+                "mention_ids": list(allowed_user_ids or []),
+                "attachment_path": attachment_path,
+            })
+            return "mid"
+
+        with mock.patch.object(gateway.message_marie, "_read_token", lambda: "tok"), \
+             mock.patch.object(gateway.message_marie, "_send", _send):
+            res = gateway.drain()
+        return res, envois
+
+    # -- enqueue : nouvelles cibles ------------------------------------
+
+    def test_enqueue_accepte_testeurs_et_supervision(self):
+        self.assertTrue(gateway.enqueue("discord", "testeurs", "coucou testeurs"))
+        self.assertTrue(gateway.enqueue("discord", "marie_supervision", "note privée"))
+
+    # -- curate : forme par cible ------------------------------------
+
+    def test_curate_testeurs_est_le_corps_brut(self):
+        self.assertEqual(gateway.curate("testeurs", "info", "  Merci du retour  "),
+                         "Merci du retour")
+
+    def test_curate_testeurs_refuse_le_cadre_frame(self):
+        with self.assertRaises(gateway.GatewayError):
+            gateway.curate("testeurs", "info", f"{gateway.FRAME}\nsalut\n{gateway.FRAME}")
+
+    def test_curate_testeurs_refuse_la_mention_de_marie(self):
+        with self.assertRaises(gateway.GatewayError):
+            gateway.curate("testeurs", "info", f"avis de <@{gateway.MARIE_USER_ID}> : ok")
+
+    def test_curate_supervision_tague_marie_sans_cadre_ni_salutation(self):
+        out = gateway.curate("marie_supervision", "info", "Retour E12 d'un testeur à trancher.")
+        self.assertIn(f"<@{gateway.MARIE_USER_ID}>", out)
+        self.assertNotIn(gateway.FRAME, out)
+        self.assertTrue(out.endswith("Retour E12 d'un testeur à trancher."))
+
+    # -- _mention_ids : jamais Marie vers les testeurs ----------------
+
+    def test_mention_ids_testeurs_est_vide(self):
+        self.assertEqual(gateway._mention_ids("testeurs"), [])
+
+    def test_mention_ids_supervision_est_marie(self):
+        self.assertEqual(gateway._mention_ids("marie_supervision"), [gateway.MARIE_USER_ID])
+
+    # -- _channel_id_for : table cible -> canal -----------------------
+
+    def test_channel_id_for_cibles_historiques_canal_unique(self):
+        for cible in ("marie", "morpheus", "channel"):
+            self.assertEqual(gateway._channel_id_for(cible), 111)
+
+    def test_channel_id_for_testeurs_et_supervision(self):
+        self.assertEqual(gateway._channel_id_for("testeurs"), 222)
+        self.assertEqual(gateway._channel_id_for("marie_supervision"), 333)
+
+    def test_channel_id_for_canal_non_configure_leve(self):
+        gateway.CONFIG_FILE.write_text(json.dumps({
+            "enabled": True, "channel_id": 111, "channels": {"testeurs": None},
+        }), encoding="utf-8")
+        with self.assertRaises(gateway.GatewayError):
+            gateway._channel_id_for("testeurs")
+        with self.assertRaises(gateway.GatewayError):
+            gateway._channel_id_for("marie_supervision")
+
+    # -- drain : sortie sur le bon canal, sans fuite ------------------
+
+    def test_message_testeurs_part_sur_le_canal_testeurs_sans_marie(self):
+        rid = gateway.enqueue("discord", "testeurs", "La build casse au démarrage.")
+        gateway.approve(rid)
+        res, envois = self._drain_reel()
+        self.assertEqual(res[0]["status"], "sent")
+        self.assertEqual(len(envois), 1)
+        self.assertEqual(envois[0]["channel_id"], 222)
+        self.assertNotIn(gateway.FRAME, envois[0]["content"])
+        self.assertNotIn(f"<@{gateway.MARIE_USER_ID}>", envois[0]["content"])
+        self.assertEqual(envois[0]["mention_ids"], [])
+
+    def test_message_supervision_part_sur_le_canal_prive_jamais_testeurs(self):
+        rid = gateway.enqueue("discord", "marie_supervision", "Avis attendu sur le retour E12.")
+        gateway.approve(rid)
+        res, envois = self._drain_reel()
+        self.assertEqual(res[0]["status"], "sent")
+        self.assertEqual(envois[0]["channel_id"], 333)
+        self.assertNotEqual(envois[0]["channel_id"], 222)
+        self.assertNotEqual(envois[0]["channel_id"], 111)
+        self.assertIn(f"<@{gateway.MARIE_USER_ID}>", envois[0]["content"])
+        self.assertNotIn(gateway.FRAME, envois[0]["content"])
+
+    def test_message_marie_reste_sur_le_canal_principal(self):
+        rid = gateway.enqueue("orchestrateur", "marie", "Version 6.0 en ligne.")
+        gateway.approve(rid)
+        _, envois = self._drain_reel()
+        self.assertEqual(envois[0]["channel_id"], 111)
+        self.assertTrue(envois[0]["content"].startswith(gateway.FRAME))
+
+    def test_fuite_frame_vers_testeurs_bloque_l_envoi(self):
+        rid = gateway.enqueue("discord", "testeurs",
+                              f"{gateway.FRAME}\navis interne\n{gateway.FRAME}")
+        gateway.approve(rid)
+        res, envois = self._drain_reel()
+        self.assertEqual(envois, [])
+        self.assertEqual(res[0]["status"], "erreur")
+        self.assertIn("asymétrique", res[0]["detail"])
+        self.assertTrue((gateway.OUTBOX / f"{rid}.json").is_file())
+
+    def test_fuite_mention_marie_vers_testeurs_bloque_l_envoi(self):
+        rid = gateway.enqueue("discord", "testeurs",
+                              f"Marie (<@{gateway.MARIE_USER_ID}>) pense que c'est ok")
+        gateway.approve(rid)
+        res, envois = self._drain_reel()
+        self.assertEqual(envois, [])
+        self.assertEqual(res[0]["status"], "erreur")
+
+    def test_gardien_inchange_message_testeurs_non_approuve_ne_part_pas(self):
+        gateway.enqueue("discord", "testeurs", "en attente de jugement")
+        res, envois = self._drain_reel()
+        self.assertEqual(envois, [])
+        self.assertEqual(res[0]["status"], "ignoré")
+
+    # -- route_inbound : entrant testeur / réciprocité ---------------
+
+    def test_route_inbound_testeur_connu_va_dans_inbox_testeurs(self):
+        self._registre_avec_testeur(TESTEUR_ID)
+        r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "l'écran énergie plante")
+        self.assertEqual(r["routed_to"], "testeurs")
+        self.assertEqual(r["routing"], "testeur")
+        self.assertEqual(len(gateway.poll("testeurs")), 1)
+
+    def test_route_inbound_testeur_inconnu_tombe_dans_unrouted(self):
+        r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "un retour")
+        self.assertEqual(r["routed_to"], "unrouted")
+
+    def test_route_inbound_testeur_ne_consomme_pas_le_pending_de_marie(self):
+        self._registre_avec_testeur(TESTEUR_ID)
+        self._envoyer_question(to="marie")
+        r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "retour testeur pendant une question Marie")
+        self.assertEqual(r["routed_to"], "testeurs")
+        self.assertEqual(len(gateway.load_state()["pending_replies"]), 1)
+
+    def test_reponse_de_marie_ne_va_jamais_dans_inbox_testeurs(self):
+        self._registre_avec_testeur(TESTEUR_ID)
+        self._envoyer_question(to="marie")
+        r = gateway.route_inbound(gateway.MARIE_USER_ID, "Marie", "voici mon avis")
+        self.assertEqual(r["routed_to"], "orchestrateur")
+        self.assertEqual(gateway.poll("testeurs"), [])
+
+    def test_tag_explicite_reste_prioritaire_sur_le_routage_testeur(self):
+        self._registre_avec_testeur(TESTEUR_ID)
+        r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "@design: le bouton valider est trop petit")
+        self.assertEqual(r["routed_to"], "design")
+        self.assertEqual(r["routing"], "tag")
 
 
 if __name__ == "__main__":

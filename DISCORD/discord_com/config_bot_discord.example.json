@@ -1,5 +1,9 @@
 {
   "enabled": false,
   "channel_id": "Clic droit sur le salon Discord (mode développeur) → Copier l'ID",
+  "channels": {
+    "testeurs": "channel_id du canal des testeurs (ONBOARD Phase 5 ; null tant qu'il n'existe pas)",
+    "marie_supervision": "channel_id du canal privé de supervision de Marie (ONBOARD Phase 5 ; null tant qu'il n'existe pas)"
+  },
   "admins": ["ID Discord des utilisateurs admin (accès complet). Les autres = lecture seule. Voir ACCES.md"]
 }

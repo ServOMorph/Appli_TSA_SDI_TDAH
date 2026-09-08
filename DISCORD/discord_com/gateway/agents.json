@@ -19,5 +19,10 @@
     "keywords": [
       "discord", "gateway", "bot", "outbox", "inbox"
     ]
+  },
+  "testeurs": {
+    "path": "DISCORD",
+    "keywords": [],
+    "member_ids": []
   }
 }

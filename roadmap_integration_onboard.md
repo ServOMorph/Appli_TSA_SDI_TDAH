@@ -72,11 +72,12 @@ Source : `TESTS/ONBOARD/demandes_evolution.md` (D1-D7),
 
 ## Décisions à trancher
 
-- **DI1 — Périmètre du premier lot.** `EN ATTENTE`. Pilote unique ou groupe de 2 à 5 d'emblée ?
-  *Reco : viser le pilote unique.* La Phase 2 (consentement) suffit à inviter une personne ; le
-  code testeur, le dépouillement multi-appareils et les canaux Discord ne servent qu'à partir du
-  2ᵉ testeur. Le jalon « premier pilote invitable » est atteint **fin de Phase 2**, pas fin de
-  roadmap. Ne bloque aucune phase — détermine où l'on peut s'arrêter.
+- **DI1 — Périmètre du premier lot.** `TRANCHÉE le 2026-09-08`. Pilote unique ou groupe de 2 à 5
+  d'emblée ? **Décision : groupe** — un 2ᵉ testeur doit être invité dès que l'app est prête.
+  Conséquence : **les Phases 3 à 6 sont toutes requises avant la première invitation** (R2 sans
+  Phase 3 = retour sans auteur ; R1 sans Phase 4 = snapshots du 2ᵉ testeur jamais archivés ;
+  visibilité asymétrique sans Phase 5 = l'avis privé de Marie exposé aux testeurs). Le jalon
+  « invitable » passe de fin de Phase 2 à fin de Phase 6, plus les gates humains de mise en service.
 
 - **DI2 — Sort de D4 (identité sur chaque résultat de test).** `EN ATTENTE`.
   *Reco : rétrograder en P2 conditionnel et le sortir de cette roadmap.* Le snapshot est déjà émis

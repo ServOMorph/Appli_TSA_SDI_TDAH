@@ -142,12 +142,24 @@ le bot atterrissait en commande, sans ses pièces jointes, et devait être re-ro
 Tout le reste du trafic du canal (réponse hors pending, message tagué `@design:`) est aussi
 routé mécaniquement par `bot.py` — rien à faire.
 
-Reste à ma charge, après le `wait` : vider `inbox/unrouted/` (relire, re-router en préfixant
-le bon `@agent:`, ou répondre soi-même).
+Reste à ma charge, après le `wait` : vider `inbox/unrouted/` et `inbox/discord/` (relire,
+re-router en préfixant le bon `@agent:`, traiter en interne, ou passer au gardien).
 
 ```bash
 python DISCORD/discord_com/gateway.py poll --agent unrouted
+python DISCORD/discord_com/gateway.py poll --agent discord
 ```
+
+**Aucun `send` / `notify` Discord en vidant un inbox.** Ces messages sont du contexte routé ou
+du trafic mal aiguillé, pas une commande `/discord_loop` : les lire, agir en interne, `ack`.
+Un message d'`inbox/discord` n'appelle une action sortante que s'il est :
+- un `kind: "dead-letter"` (envoi gateway échoué) → diagnostiquer puis `approve` pour retenter ;
+- un `kind: "bounce"` → corriger le fond, re-`enqueue` ;
+- un `routing: "tag"` (`@discord:` explicite) qui exige une réponse → la déposer dans la gateway
+  (`enqueue` → jugement → `bot.py`), jamais un `send` direct.
+Un message `routing: "heuristique"` ou `"aucune"` est ambiant : il ne déclenche jamais de réponse
+sur le canal. Seuls 3c (réponse à une vraie commande `/discord_loop`) et 3e (`stop`) postent
+directement.
 
 Lire la commande et l'**exécuter directement** avec les outils natifs Claude :
 - Questions sur le projet → lire fichiers, analyser, répondre

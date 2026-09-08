@@ -754,6 +754,14 @@ def route_inbound(author_id, author_name: str, content: str,
             routing = "testeur"
         else:
             h = _classer_heuristique(content)
+            # L'agent 'discord' opere la boucle et vide inbox/discord a chaque cycle : un
+            # message qui y tombe est traite comme une instruction adressee. Un simple
+            # recoupement de mots-cles ("discord", "bot", "gateway"...) ne suffit pas —
+            # sinon tout echange de canal mentionnant ces termes declenche une reponse
+            # publique non sollicitee. Seuls le tag explicite @discord:, les dead-letters
+            # et les bounces entrent dans inbox/discord.
+            if h == "discord":
+                h = None
             target = h or "unrouted"
             routing = "heuristique" if h else "aucune"
 

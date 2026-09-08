@@ -590,8 +590,18 @@ class GatewayTest(unittest.TestCase):
         self.assertEqual(r["routed_to"], "design")
 
     def test_heuristique_departage_par_nombre_de_mots_cles(self):
+        r = gateway.route_inbound(7, "X", "commit et deploy de la version, puis revoir le bouton")
+        self.assertEqual(r["routed_to"], "orchestrateur")
+
+    def test_heuristique_n_adresse_jamais_l_agent_discord(self):
         r = gateway.route_inbound(7, "X", "la gateway du bot discord ne route plus l'inbox")
-        self.assertEqual(r["routed_to"], "discord")
+        self.assertEqual(r["routed_to"], "unrouted")
+        self.assertEqual(r["routing"], "aucune")
+
+    def test_heuristique_discord_seul_ne_masque_pas_un_autre_agent(self):
+        r = gateway.route_inbound(7, "X", "le bot discord affiche mal la maquette du bouton")
+        self.assertEqual(r["routed_to"], "design")
+        self.assertEqual(r["routing"], "heuristique")
 
     def test_route_inbound_conserve_les_pieces_jointes(self):
         pieces = [{"filename": "parametres.png", "url": "https://cdn/1.png",

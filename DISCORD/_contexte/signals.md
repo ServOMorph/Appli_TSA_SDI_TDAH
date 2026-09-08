@@ -13,6 +13,9 @@
 - [P3|ouvert] Ré-auditer le 2e et le 3e bounce historiques de la livraison v5.92 (9 tests / 8 puces, avant le 2026-09-05) : probablement erronés eux aussi (même prémisse fausse que le 4e bounce, corrigée depuis). Sans conséquence pratique — le bon message (N=12) est déjà parti.
   fait quand: audit fait, ou jugé sans intérêt (aucune répercussion sur Marie)
   réf: historique_conversation_marie.md (2026-09-05, section v5.92), gateway/LOOP.md § 1
+- [P2|ouvert] Phase 5 de `roadmap_integration_onboard.md` (canaux Discord testeurs + routage gateway, visibilité asymétrique Marie/testeurs) déléguée par l'orchestrateur à cette zone. Périmètre code : `agents.json`, `curate()`, `_mention_ids()`, `_discord_post()` mono-canal, `TARGETS`, entrant `route_inbound`, + suite de tests visibilité asymétrique. Bloqué en amont : les 2 canaux Discord (`#testeurs`, canal privé supervision Marie) n'existent pas — Morphéus doit les créer, poser les permissions et fournir les `channel_id`. Gate = test de visibilité asymétrique dans les deux sens, exige canaux réels + 1 identité testeur.
+  fait quand: canaux créés par Morphéus, code + tests livrés, gate de visibilité asymétrique vert dans les deux sens
+  réf: DISCORD/discord_com/gateway/ONBOARD_phase5_brief.md, roadmap_integration_onboard.md Phase 5
 
 ## Contexte chaud
 - `pending_replies` : une entrée active pour Marie (question posée dans la livraison v5.92 — quel bouton pour l'ajout de tâche planifiée depuis l'accueil), toujours sans réponse. Tout message vers Marie non lié à cette question doit être `hold` (règle `LOOP.md`).

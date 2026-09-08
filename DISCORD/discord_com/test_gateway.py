@@ -25,7 +25,6 @@ REGISTRE_TEST = {
     "testeurs": {
         "path": "DISCORD",
         "keywords": [],
-        "member_ids": [],
     },
 }
 
@@ -62,7 +61,10 @@ class GatewayTest(unittest.TestCase):
         (root / "config_bot_discord.json").write_text(json.dumps({
             "enabled": True,
             "channel_id": 111,
-            "channels": {"testeurs": 222, "marie_supervision": 333},
+            "channels": {
+                "testeurs": {"satine": {"channel_id": 222, "discord_member_id": None}},
+                "supervision": 333,
+            },
         }), encoding="utf-8")
 
     def tearDown(self):
@@ -701,18 +703,24 @@ class GatewayTest(unittest.TestCase):
 
 
 class VisibiliteAsymetriqueTest(unittest.TestCase):
-    """ONBOARD Phase 5 — canaux testeurs / supervision, visibilité strictement asymétrique
-    (TESTS/ONBOARD/decisions_dispositif.md Décision 5). channel_id mockés : 111 canal
-    principal, 222 canal testeurs, 333 canal supervision privé de Marie."""
+    """ONBOARD Phase 5 — un canal par testeur + canal de supervision, visibilité strictement
+    asymétrique (TESTS/ONBOARD/decisions_dispositif.md Décision 5). channel_id mockés : 111
+    canal principal, 222 canal #test-satine, 333 canal de supervision privé de Marie."""
 
     setUp = GatewayTest.setUp
     tearDown = GatewayTest.tearDown
     _envoyer_question = GatewayTest._envoyer_question
 
-    def _registre_avec_testeur(self, *ids):
-        reg = json.loads(json.dumps(REGISTRE_TEST))
-        reg["testeurs"]["member_ids"] = list(ids)
-        gateway.AGENTS_FILE.write_text(json.dumps(reg), encoding="utf-8")
+    def _config_testeurs(self, testeurs: dict, supervision=333):
+        """Réécrit config_bot_discord.json > channels avec `testeurs` (code -> {channel_id,
+        discord_member_id}) et `supervision`."""
+        gateway.CONFIG_FILE.write_text(json.dumps({
+            "enabled": True, "channel_id": 111,
+            "channels": {"testeurs": testeurs, "supervision": supervision},
+        }), encoding="utf-8")
+
+    def _testeur_connu(self, code="satine", member_id=TESTEUR_ID, channel_id=222):
+        self._config_testeurs({code: {"channel_id": channel_id, "discord_member_id": member_id}})
 
     def _drain_reel(self):
         """drain() via _discord_post, message_marie stubbé. Retourne la liste des envois
@@ -735,23 +743,28 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
 
     # -- enqueue : nouvelles cibles ------------------------------------
 
-    def test_enqueue_accepte_testeurs_et_supervision(self):
-        self.assertTrue(gateway.enqueue("discord", "testeurs", "coucou testeurs"))
+    def test_enqueue_accepte_testeur_code_et_supervision(self):
+        self.assertTrue(gateway.enqueue("discord", "testeur:satine", "coucou Satine"))
         self.assertTrue(gateway.enqueue("discord", "marie_supervision", "note privée"))
+
+    def test_enqueue_refuse_cible_testeur_mal_formee(self):
+        for mauvais in ("testeurs", "testeur:", "testeur:Satine", "testeur: satine"):
+            with self.assertRaises(gateway.GatewayError):
+                gateway.enqueue("discord", mauvais, "corps")
 
     # -- curate : forme par cible ------------------------------------
 
-    def test_curate_testeurs_est_le_corps_brut(self):
-        self.assertEqual(gateway.curate("testeurs", "info", "  Merci du retour  "),
+    def test_curate_testeur_est_le_corps_brut(self):
+        self.assertEqual(gateway.curate("testeur:satine", "info", "  Merci du retour  "),
                          "Merci du retour")
 
-    def test_curate_testeurs_refuse_le_cadre_frame(self):
+    def test_curate_testeur_refuse_le_cadre_frame(self):
         with self.assertRaises(gateway.GatewayError):
-            gateway.curate("testeurs", "info", f"{gateway.FRAME}\nsalut\n{gateway.FRAME}")
+            gateway.curate("testeur:satine", "info", f"{gateway.FRAME}\nsalut\n{gateway.FRAME}")
 
-    def test_curate_testeurs_refuse_la_mention_de_marie(self):
+    def test_curate_testeur_refuse_la_mention_de_marie(self):
         with self.assertRaises(gateway.GatewayError):
-            gateway.curate("testeurs", "info", f"avis de <@{gateway.MARIE_USER_ID}> : ok")
+            gateway.curate("testeur:satine", "info", f"avis de <@{gateway.MARIE_USER_ID}> : ok")
 
     def test_curate_supervision_tague_marie_sans_cadre_ni_salutation(self):
         out = gateway.curate("marie_supervision", "info", "Retour E12 d'un testeur à trancher.")
@@ -759,37 +772,46 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
         self.assertNotIn(gateway.FRAME, out)
         self.assertTrue(out.endswith("Retour E12 d'un testeur à trancher."))
 
-    # -- _mention_ids : jamais Marie vers les testeurs ----------------
+    # -- _mention_ids : jamais Marie vers un testeur -----------------
 
-    def test_mention_ids_testeurs_est_vide(self):
-        self.assertEqual(gateway._mention_ids("testeurs"), [])
+    def test_mention_ids_testeur_est_vide(self):
+        self.assertEqual(gateway._mention_ids("testeur:satine"), [])
 
     def test_mention_ids_supervision_est_marie(self):
         self.assertEqual(gateway._mention_ids("marie_supervision"), [gateway.MARIE_USER_ID])
 
-    # -- _channel_id_for : table cible -> canal -----------------------
+    # -- _channel_id_for : cible -> canal ---------------------------
 
     def test_channel_id_for_cibles_historiques_canal_unique(self):
         for cible in ("marie", "morpheus", "channel"):
             self.assertEqual(gateway._channel_id_for(cible), 111)
 
-    def test_channel_id_for_testeurs_et_supervision(self):
-        self.assertEqual(gateway._channel_id_for("testeurs"), 222)
+    def test_channel_id_for_testeur_et_supervision(self):
+        self.assertEqual(gateway._channel_id_for("testeur:satine"), 222)
         self.assertEqual(gateway._channel_id_for("marie_supervision"), 333)
 
+    def test_channel_id_for_deux_testeurs_canaux_distincts(self):
+        self._config_testeurs({
+            "satine": {"channel_id": 222, "discord_member_id": None},
+            "leo": {"channel_id": 444, "discord_member_id": None},
+        })
+        self.assertEqual(gateway._channel_id_for("testeur:satine"), 222)
+        self.assertEqual(gateway._channel_id_for("testeur:leo"), 444)
+
     def test_channel_id_for_canal_non_configure_leve(self):
-        gateway.CONFIG_FILE.write_text(json.dumps({
-            "enabled": True, "channel_id": 111, "channels": {"testeurs": None},
-        }), encoding="utf-8")
+        self._config_testeurs({"satine": {"channel_id": None, "discord_member_id": None}},
+                              supervision=None)
         with self.assertRaises(gateway.GatewayError):
-            gateway._channel_id_for("testeurs")
+            gateway._channel_id_for("testeur:satine")
         with self.assertRaises(gateway.GatewayError):
             gateway._channel_id_for("marie_supervision")
+        with self.assertRaises(gateway.GatewayError):
+            gateway._channel_id_for("testeur:inconnu")
 
     # -- drain : sortie sur le bon canal, sans fuite ------------------
 
-    def test_message_testeurs_part_sur_le_canal_testeurs_sans_marie(self):
-        rid = gateway.enqueue("discord", "testeurs", "La build casse au démarrage.")
+    def test_message_testeur_part_sur_son_canal_sans_marie(self):
+        rid = gateway.enqueue("discord", "testeur:satine", "La build casse au démarrage.")
         gateway.approve(rid)
         res, envois = self._drain_reel()
         self.assertEqual(res[0]["status"], "sent")
@@ -799,14 +821,13 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
         self.assertNotIn(f"<@{gateway.MARIE_USER_ID}>", envois[0]["content"])
         self.assertEqual(envois[0]["mention_ids"], [])
 
-    def test_message_supervision_part_sur_le_canal_prive_jamais_testeurs(self):
+    def test_message_supervision_part_sur_le_canal_prive_jamais_testeur(self):
         rid = gateway.enqueue("discord", "marie_supervision", "Avis attendu sur le retour E12.")
         gateway.approve(rid)
         res, envois = self._drain_reel()
         self.assertEqual(res[0]["status"], "sent")
         self.assertEqual(envois[0]["channel_id"], 333)
         self.assertNotEqual(envois[0]["channel_id"], 222)
-        self.assertNotEqual(envois[0]["channel_id"], 111)
         self.assertIn(f"<@{gateway.MARIE_USER_ID}>", envois[0]["content"])
         self.assertNotIn(gateway.FRAME, envois[0]["content"])
 
@@ -817,8 +838,8 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
         self.assertEqual(envois[0]["channel_id"], 111)
         self.assertTrue(envois[0]["content"].startswith(gateway.FRAME))
 
-    def test_fuite_frame_vers_testeurs_bloque_l_envoi(self):
-        rid = gateway.enqueue("discord", "testeurs",
+    def test_fuite_frame_vers_testeur_bloque_l_envoi(self):
+        rid = gateway.enqueue("discord", "testeur:satine",
                               f"{gateway.FRAME}\navis interne\n{gateway.FRAME}")
         gateway.approve(rid)
         res, envois = self._drain_reel()
@@ -827,50 +848,65 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
         self.assertIn("asymétrique", res[0]["detail"])
         self.assertTrue((gateway.OUTBOX / f"{rid}.json").is_file())
 
-    def test_fuite_mention_marie_vers_testeurs_bloque_l_envoi(self):
-        rid = gateway.enqueue("discord", "testeurs",
+    def test_fuite_mention_marie_vers_testeur_bloque_l_envoi(self):
+        rid = gateway.enqueue("discord", "testeur:satine",
                               f"Marie (<@{gateway.MARIE_USER_ID}>) pense que c'est ok")
         gateway.approve(rid)
         res, envois = self._drain_reel()
         self.assertEqual(envois, [])
         self.assertEqual(res[0]["status"], "erreur")
 
-    def test_gardien_inchange_message_testeurs_non_approuve_ne_part_pas(self):
-        gateway.enqueue("discord", "testeurs", "en attente de jugement")
+    def test_gardien_inchange_message_testeur_non_approuve_ne_part_pas(self):
+        gateway.enqueue("discord", "testeur:satine", "en attente de jugement")
         res, envois = self._drain_reel()
         self.assertEqual(envois, [])
         self.assertEqual(res[0]["status"], "ignoré")
 
     # -- route_inbound : entrant testeur / réciprocité ---------------
 
-    def test_route_inbound_testeur_connu_va_dans_inbox_testeurs(self):
-        self._registre_avec_testeur(TESTEUR_ID)
-        r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "l'écran énergie plante")
-        self.assertEqual(r["routed_to"], "testeurs")
+    def test_route_inbound_testeur_connu_va_dans_inbox_testeur_par_code(self):
+        self._testeur_connu("satine", member_id=TESTEUR_ID)
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "l'écran énergie plante")
+        self.assertEqual(r["routed_to"], "testeurs/satine")
         self.assertEqual(r["routing"], "testeur")
-        self.assertEqual(len(gateway.poll("testeurs")), 1)
+        self.assertEqual(len(gateway.poll("testeurs/satine")), 1)
+
+    def test_route_inbound_deux_testeurs_inbox_distinctes(self):
+        self._config_testeurs({
+            "satine": {"channel_id": 222, "discord_member_id": TESTEUR_ID},
+            "leo": {"channel_id": 444, "discord_member_id": TESTEUR_ID + 1},
+        })
+        gateway.route_inbound(TESTEUR_ID, "Satine", "retour A")
+        gateway.route_inbound(TESTEUR_ID + 1, "Leo", "retour B")
+        self.assertEqual(len(gateway.poll("testeurs/satine")), 1)
+        self.assertEqual(len(gateway.poll("testeurs/leo")), 1)
 
     def test_route_inbound_testeur_inconnu_tombe_dans_unrouted(self):
         r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "un retour")
         self.assertEqual(r["routed_to"], "unrouted")
 
+    def test_route_inbound_testeur_member_id_null_tombe_dans_unrouted(self):
+        self._testeur_connu("satine", member_id=None)
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "un retour")
+        self.assertEqual(r["routed_to"], "unrouted")
+
     def test_route_inbound_testeur_ne_consomme_pas_le_pending_de_marie(self):
-        self._registre_avec_testeur(TESTEUR_ID)
+        self._testeur_connu("satine", member_id=TESTEUR_ID)
         self._envoyer_question(to="marie")
-        r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "retour testeur pendant une question Marie")
-        self.assertEqual(r["routed_to"], "testeurs")
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "retour testeur pendant une question Marie")
+        self.assertEqual(r["routed_to"], "testeurs/satine")
         self.assertEqual(len(gateway.load_state()["pending_replies"]), 1)
 
-    def test_reponse_de_marie_ne_va_jamais_dans_inbox_testeurs(self):
-        self._registre_avec_testeur(TESTEUR_ID)
+    def test_reponse_de_marie_ne_va_jamais_dans_inbox_testeur(self):
+        self._testeur_connu("satine", member_id=TESTEUR_ID)
         self._envoyer_question(to="marie")
         r = gateway.route_inbound(gateway.MARIE_USER_ID, "Marie", "voici mon avis")
         self.assertEqual(r["routed_to"], "orchestrateur")
-        self.assertEqual(gateway.poll("testeurs"), [])
+        self.assertEqual(gateway.poll("testeurs/satine"), [])
 
     def test_tag_explicite_reste_prioritaire_sur_le_routage_testeur(self):
-        self._registre_avec_testeur(TESTEUR_ID)
-        r = gateway.route_inbound(TESTEUR_ID, "Testeur1", "@design: le bouton valider est trop petit")
+        self._testeur_connu("satine", member_id=TESTEUR_ID)
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "@design: le bouton valider est trop petit")
         self.assertEqual(r["routed_to"], "design")
         self.assertEqual(r["routing"], "tag")
 

@@ -2,8 +2,13 @@
   "enabled": false,
   "channel_id": "Clic droit sur le salon Discord (mode développeur) → Copier l'ID",
   "channels": {
-    "testeurs": "channel_id du canal des testeurs (ONBOARD Phase 5 ; null tant qu'il n'existe pas)",
-    "marie_supervision": "channel_id du canal privé de supervision de Marie (ONBOARD Phase 5 ; null tant qu'il n'existe pas)"
+    "testeurs": {
+      "<tester_code>": {
+        "channel_id": "channel_id du canal #test-<code> (ONBOARD Phase 5 ; un salon par testeur)",
+        "discord_member_id": "author_id Discord du testeur (route ses retours vers inbox/testeurs/<code>/) ; null tant qu'il n'a pas rejoint le serveur"
+      }
+    },
+    "supervision": "channel_id du canal privé de supervision de Marie (ONBOARD Phase 5 ; aucun testeur ne le voit)"
   },
   "admins": ["ID Discord des utilisateurs admin (accès complet). Les autres = lecture seule. Voir ACCES.md"]
 }

@@ -18,7 +18,8 @@ via `message_marie._send(..., attachment_path=...)`.
 
 ENTRÉE : `route_inbound(...)` classe les messages Discord entrants et les dépose dans
 `gateway/inbox/<agent>/`. Priorité : tag explicite `@agent:` en tête, sinon réponse
-attendue de cet auteur (`state.pending_replies`), sinon heuristique par mots-clés,
+attendue de cet auteur (`state.pending_replies`), sinon auteur testeur connu
+(`inbox/testeurs/<code>/`), sinon heuristique par mots-clés (jamais l'agent `discord`),
 sinon `inbox/unrouted/`. `bot.py` route ainsi tout message du canal qui n'est pas une
 commande @bot. Les agents lisent via `poll(agent)` et acquittent via `ack(agent, id)`.
 
@@ -43,7 +44,7 @@ CLI :
   python gateway.py route --author-id <id> --text "..."
   python gateway.py agents
 
-Cibles (`--to`)   : marie | morpheus | channel
+Cibles (`--to`)   : marie | morpheus | channel | testeur:<code> | marie_supervision
 Types (`--kind`)  : info | question | delivery
 Statuts outbox    : pending | approved | held | bounced | failed
 """
@@ -77,16 +78,24 @@ COMMANDS = DIR / "commands.json"
 COMMANDS_LOCK = GATEWAY / "commands.lock"
 GARDIEN_WAKE_COMMAND = "__gateway_wake__"
 
-# 'testeurs' et 'marie_supervision' : canaux ONBOARD Phase 5, visibilité strictement asymétrique
-# (TESTS/ONBOARD/decisions_dispositif.md Décision 5). 'testeurs' = canal des testeurs (ils
-# écrivent, Marie lit) : aucun cadre 💻🤖, aucune mention de Marie. 'marie_supervision' = canal
-# privé de Marie (elle lit/écrit, aucun testeur ne le voit). Leurs channel_id vivent dans
-# config_bot_discord.json > channels ; les cibles historiques gardent le channel_id unique.
-TARGETS = ("marie", "morpheus", "channel", "testeurs", "marie_supervision")
+# Canaux ONBOARD Phase 5, visibilité strictement asymétrique (TESTS/ONBOARD/decisions_dispositif.md
+# Décision 5). Un canal par testeur : cible `testeur:<code>` (le testeur écrit, Marie lit) — aucun
+# cadre 💻🤖, aucune mention de Marie. `marie_supervision` = canal privé de Marie (elle lit/écrit,
+# aucun testeur ne le voit). Les channel_id vivent dans config_bot_discord.json > channels
+# (`channels.testeurs.<code>.channel_id`, `channels.supervision`) ; les cibles historiques gardent
+# le channel_id unique.
+TARGETS = ("marie", "morpheus", "channel", "marie_supervision")
 LEGACY_CHANNEL_TARGETS = frozenset({"marie", "morpheus", "channel"})
+_TESTEUR_TARGET_RE = re.compile(r"^testeur:(?P<code>[a-z0-9][a-z0-9_-]*)$")
 KINDS = ("info", "question", "delivery")
 STATUSES = ("pending", "approved", "held", "bounced", "failed")
 APPROUVABLES = ("pending", "held", "failed")
+
+
+def _testeur_code(to: str) -> str | None:
+    """Code testeur d'une cible `testeur:<code>` (minuscule), sinon None."""
+    m = _TESTEUR_TARGET_RE.match(to or "")
+    return m.group("code") if m else None
 
 LOCK_TIMEOUT_S = 5.0
 LOCK_STALE_S = 30.0
@@ -317,8 +326,9 @@ def enqueue(source: str, to: str, body: str, *, kind: str = "info",
     source = (source or "").strip()
     if not source:
         raise GatewayError("source vide")
-    if to not in TARGETS:
-        raise GatewayError(f"cible inconnue : {to!r} (attendu : {', '.join(TARGETS)})")
+    if to not in TARGETS and _testeur_code(to) is None:
+        raise GatewayError(
+            f"cible inconnue : {to!r} (attendu : {', '.join(TARGETS)}, ou testeur:<code>)")
     if kind not in KINDS:
         raise GatewayError(f"type inconnu : {kind!r} (attendu : {', '.join(KINDS)})")
     if not (body or "").strip():
@@ -492,13 +502,13 @@ def curate(to: str, kind: str, body: str) -> str:
         # Canal privé de Marie : elle est taguée (notification) mais sans le cadre ni la
         # salutation de livraison — ce n'est pas un message produit, c'est de la supervision.
         text = f"<@{MARIE_USER_ID}>\n\n{body}"
-    elif to == "testeurs":
-        # Garde-fou de visibilité asymétrique : un message destiné aux testeurs ne doit
+    elif _testeur_code(to):
+        # Garde-fou de visibilité asymétrique : un message destiné à un testeur ne doit
         # jamais porter le cadre 💻🤖 ni la mention de Marie (Décision 5). Le gardien
-        # bounce plutôt que de laisser fuir l'avis de Marie sur le canal testeurs.
+        # bounce plutôt que de laisser fuir l'avis de Marie sur un canal testeur.
         if FRAME in body or f"<@{MARIE_USER_ID}>" in body:
             raise GatewayError(
-                "message 'testeurs' contient le cadre 💻🤖 ou la mention de Marie — "
+                "message testeur contient le cadre 💻🤖 ou la mention de Marie — "
                 "fuite de visibilité asymétrique (decisions_dispositif.md Décision 5)")
         text = body
     else:
@@ -513,17 +523,17 @@ def _mention_ids(to: str) -> list[int]:
         return [MARIE_USER_ID]
     if to == "morpheus":
         return [MORPHEUS_USER_ID]
-    return []  # 'testeurs', 'channel' : aucun ping utilisateur (jamais MARIE_USER_ID)
+    return []  # 'testeur:<code>', 'channel' : aucun ping utilisateur (jamais MARIE_USER_ID)
 
 
 def _channel_id_for(to: str) -> int:
     """channel_id du canal de destination.
 
     Cibles historiques ('marie', 'morpheus', 'channel') : le `channel_id` unique de
-    config_bot_discord.json (comportement inchangé). Cibles Phase 5 ('testeurs',
-    'marie_supervision') : `channels.<cible>` du même fichier. Un canal Phase 5 non
-    configuré lève `GatewayError` — `drain()` passe alors la demande en `failed` et dépose
-    une dead-letter, plutôt que de poster par défaut sur le canal principal (fuite).
+    config_bot_discord.json (comportement inchangé). Cibles Phase 5 : `testeur:<code>` ->
+    `channels.testeurs.<code>.channel_id` ; `marie_supervision` -> `channels.supervision`.
+    Un canal Phase 5 non configuré lève `GatewayError` — `drain()` passe alors la demande en
+    `failed` et dépose une dead-letter, plutôt que de poster par défaut sur le canal principal.
     """
     try:
         cfg = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
@@ -536,12 +546,24 @@ def _channel_id_for(to: str) -> int:
         if not cid:
             raise GatewayError("channel_id absent de config_bot_discord.json")
         return int(cid)
-    cid = (cfg.get("channels") or {}).get(to)
-    if not cid:
-        raise GatewayError(
-            f"canal '{to}' non configuré (config_bot_discord.json > channels.{to}) — "
-            "les channel_id des canaux testeurs / supervision sont fournis par Morphéus")
-    return int(cid)
+    channels = cfg.get("channels") or {}
+    if to == "marie_supervision":
+        cid = channels.get("supervision")
+        if not cid:
+            raise GatewayError(
+                "canal 'supervision' non configuré (config_bot_discord.json > "
+                "channels.supervision) — channel_id fourni par Morphéus")
+        return int(cid)
+    code = _testeur_code(to)
+    if code:
+        entree = (channels.get("testeurs") or {}).get(code)
+        cid = entree.get("channel_id") if isinstance(entree, dict) else None
+        if not cid:
+            raise GatewayError(
+                f"canal testeur '{code}' non configuré (config_bot_discord.json > "
+                f"channels.testeurs.{code}.channel_id) — channel_id fourni par Morphéus")
+        return int(cid)
+    raise GatewayError(f"cible sans canal : {to!r}")
 
 
 def _discord_post(content: str, mention_user_ids: list[int],
@@ -691,28 +713,32 @@ def _target_from_author(author_id) -> str | None:
         return None
 
 
-def _testeur_author_ids() -> set[int]:
-    """author_id Discord des testeurs connus (`agents.json` > testeurs > member_ids).
+def _testeur_code_pour_auteur(author_id) -> str | None:
+    """Code du testeur dont `discord_member_id` == `author_id`
+    (config_bot_discord.json > channels.testeurs.<code>). None si aucun.
 
-    Vide tant que le registre `code testeur -> author_id` n'est pas peuplé (gate de mise en
-    service, ONBOARD Phase 5 point 6) : dans ce cas un message de testeur tombe dans
-    `inbox/unrouted/` et le gardien le route à la main — toléré au démarrage.
+    Vide tant qu'aucun `discord_member_id` n'est renseigné (les testeurs n'ont pas rejoint
+    le serveur) : un retour de testeur tombe alors dans `inbox/unrouted/` et le gardien le
+    route à la main — toléré au démarrage.
     """
-    cfg = load_registry().get("testeurs") or {}
-    out: set[int] = set()
-    for v in cfg.get("member_ids") or []:
-        try:
-            out.add(int(v))
-        except (TypeError, ValueError):
-            pass
-    return out
-
-
-def _est_testeur(author_id) -> bool:
     try:
-        return int(author_id) in _testeur_author_ids()
+        aid = int(author_id)
     except (TypeError, ValueError):
-        return False
+        return None
+    try:
+        cfg = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    for code, entree in ((cfg.get("channels") or {}).get("testeurs") or {}).items():
+        if not isinstance(entree, dict):
+            continue
+        mid = entree.get("discord_member_id")
+        try:
+            if mid is not None and int(mid) == aid:
+                return code
+        except (TypeError, ValueError):
+            continue
+    return None
 
 
 def route_inbound(author_id, author_name: str, content: str,
@@ -744,13 +770,14 @@ def route_inbound(author_id, author_name: str, content: str,
     else:
         to = _target_from_author(author_id)
         pending = _match_pending(load_state(), to)
+        code_testeur = _testeur_code_pour_auteur(author_id)
         if pending:
             target = pending["source"]
             reply_to = pending
             purge = True
             routing = "pending"
-        elif _est_testeur(author_id):
-            target = "testeurs"
+        elif code_testeur:
+            target = f"testeurs/{code_testeur}"
             routing = "testeur"
         else:
             h = _classer_heuristique(content)
@@ -849,7 +876,8 @@ def _main() -> None:
     p_enq = sub.add_parser("enqueue", help="déposer une demande d'envoi")
     p_enq.add_argument("--source", required=True,
                        help=f"agent demandeur ({', '.join(agent_names()) or 'registre vide'})")
-    p_enq.add_argument("--to", required=True, choices=TARGETS)
+    p_enq.add_argument("--to", required=True,
+                       help=f"cible : {' | '.join(TARGETS)} | testeur:<code>")
     p_enq.add_argument("--kind", default="info", choices=KINDS)
     p_enq.add_argument("--expect-reply", action="store_true")
     p_enq.add_argument("--attachment", default=None,

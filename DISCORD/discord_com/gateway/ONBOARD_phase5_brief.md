@@ -89,3 +89,31 @@ de Satine reste sur `#supervision`. Exige les canaux réels + l'identité Satine
 
 Inchangé : le gardien de sortie de la session discord reste le seul à approuver les envois, y
 compris sur les nouveaux canaux.
+
+## Décisions Morphéus 2026-09-08 (après gate `a40a31d`) — passe 3
+
+1. **Supervision fusionnée avec le canal Marie principal.** `channels.supervision` =
+   `1544665195476160512` = `channel_id` principal, définitif et volontaire. Livraisons /
+   questions à Marie et supervision des retours testeurs partagent le salon. La cible
+   `marie_supervision` reste distincte (formatage : tag Marie, sans cadre ni salutation).
+   Rien à changer en config ; le documenter comme choix assumé.
+
+2. **`bot.py` écoute multi-canal entrante — à faire maintenant (passe 3).** Aujourd'hui
+   `on_message` filtre `channel.id != CHANNEL_ID` : un message de Satine dans `#test-satine`
+   est ignoré. À livrer :
+   - `on_message` traite aussi les canaux `#test-<code>` déclarés en
+     `config_bot_discord.json > channels.testeurs`.
+   - Routage entrant **par canal**, pas par `discord_member_id` : le canal identifie le
+     testeur (contourne la collision `MORPHEUS_USER_ID` et le `member_id` null de Satine).
+     Traiter le cas « Marie poste dans `#test-<code>` » (réponse en clair au testeur, pas un
+     retour) — ne pas le classer comme retour testeur.
+   - `route_inbound()` / `_testeur_code_pour_auteur()` : ajouter la résolution par canal.
+   - `/discord_loop` : balayer `inbox/testeurs/<code>/` à chaque cycle (comme `unrouted` /
+     `discord`).
+   - Tests unitaires : events Discord mockés pour `on_message` multi-canal. Vérif live à
+     l'arrivée de Satine sur le serveur.
+   Après cette passe : Phase 5 complète côté entrant. Étendre l'entrée `CHANGELOG.md` v5.111
+   si besoin. Passage Phase 5 → `[FAIT]` au `/close` racine.
+
+3. `discord_member_id` de Satine : reste `null` jusqu'à ce qu'elle rejoigne le serveur
+   (étape de mise en service, pas un blocage de code avec le routage par canal).

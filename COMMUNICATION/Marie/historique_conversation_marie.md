@@ -735,4 +735,20 @@ n'a pas fini de tester v5.92 (décision structurante 2026-09-08). Déposé dans 
 par le gardien de sortie de la session `discord` : `approve` (pas de doublon, version cohérente
 avec `dernier_deploiement.md`, `pending_replies` vide) avec deux retouches de forme STYLE.md § marie
 sans changement de fond — retrait de l'étiquette « Relance : », « déployer » → « mettre en ligne ».
-Envoyé par `bot.py` au drain suivant.
+Envoyé par `bot.py` au drain suivant (Discord `1547194409135644723`, 2026-09-09 10:38 UTC).
+
+**Marie ->** (Discord, transmis par la session `discord` — relance sans `--expect-reply`, routée à la main puis déposée `inbox/orchestrateur/20260909T160323_961174`)
+oui j'y ai accès mais je les ai déjà fait ces tests, donc dans le navigateur avec mes données les tests n'apparaissent pas car déjà validé
+
+_Suite :_ répond à la relance « Dév -> » ci-dessus (2026-09-09, id `20260909T100248_019203`). Pas
+un désaccord : cohérent avec le mécanisme de l'écran « Tests à faire » (`src/domain/rules/manualTestRules.ts`)
+— un parcours disparaît de la liste dès qu'un résultat est enregistré sur sa révision courante,
+`ok` **ou** `nok`. L'écran vide de Marie = elle a enregistré un résultat pour chacun des 12.
+Décalage côté dév = retard d'ingestion : `_contexte/marie_tests_journal.json` s'arrête au
+2026-09-04 18:33 (65 résultats) ; le snapshot v5.92 de Marie en porte ~74 → ~9 résultats de test
+v5.92 jamais ingérés. `marie_modifications_suivi.md` dit encore « validation attendue » pour 33-38
+faute de revue depuis le 2026-09-05. Point de vigilance : le 2026-09-05 Marie a retiré son `ok` sur
+`ajouter-une-tache-depuis-la-reception` à cause d'un zoom (correctif dans le lot non déployé, close
+`548db78`) — le `ok`/`nok` réel des 12 ne sera connu qu'après ingestion du snapshot (`/deploy`
+étape 0.4, lecture `donnees_marie/`). Moitié « relance Marie » de la décision du 2026-09-08 faite,
+« puis /deploy » débloqué.

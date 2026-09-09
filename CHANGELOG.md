@@ -1,3 +1,11 @@
+## v5.115 — 2026-09-09
+
+### Corrigé
+- `scripts/backup_marie_snapshot.py` : angle mort Phase 4 signalé au `/close` précédent. Un appareil de `device_snapshots` sans tâche ni résultat de test, non ciblé explicitement par `--device-id`, est désormais un skip silencieux (`payload_is_empty()`, `archive_one()` renvoie un indicateur `ignore`) au lieu d'une ligne `ERREUR` sur stderr et d'un `exit 1` — un payload malformé ou un appareil vide ciblé explicitement reste une erreur. `run_backup()` compte les appareils ignorés dans son résumé. Vérifié au hook `/close` de ce jour : 89 `device_id`, 0 archive écrite, 77 ignorés, `exit 0`, plus aucune ligne `ERREUR`. `scripts/test_backup_marie_snapshot.py` mis à jour. Commit `982ced2`.
+
+### Ajouté
+- Relance des 12 tests v5.92 en attente déposée dans la gateway Discord à destination de Marie (`--source orchestrateur --to marie --kind info`) — aucune relance depuis la livraison du 2026-09-05. `pending`, en attente du jugement du gardien de sortie (session `discord`). `COMMUNICATION/Marie/historique_conversation_marie.md` mis à jour. Commit `95922b2`.
+
 ## v5.114 — 2026-09-09
 
 ### Modifié

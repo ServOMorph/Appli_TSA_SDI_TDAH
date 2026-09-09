@@ -145,7 +145,8 @@ Destinataire : le canal Discord, message public (pas d'interlocuteur unique).
 familières, humour assumé (« Allez ça y'est je me remets au taf » / « J'en ai plein le c... je
 vais me faire un café et je reviens »). Ne pas les aligner sur ce ton neutre.
 Chaînes en dur dans `.claude/commands/discord_loop.md`, hors du jugement de l'agent DISCORD
-(pas de demande outbox pour ces deux messages).
+(pas de demande outbox pour ces deux messages). Le message de pause du `/close` (hook
+`DISCORD/_contexte/on_close.md` § Fin) réutilise la chaîne de l'arrêt `stop`.
 
 **Exception (décision Morphéus 2026-09-04, 2e)** : le message de mise en file d'attente
 (`bot.py`, fonction `on_message`, branche @-mention) déroge aussi à ce ton — « 📥 En file

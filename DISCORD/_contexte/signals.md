@@ -29,6 +29,7 @@
 - Règle de jugement du gabarit de livraison (`LOOP.md` § 1) : N = nombre de *parcours*, les puces = numéros de modification *distincts* couverts (peuvent être moins nombreux si plusieurs parcours partagent un numéro). Ne bouncer que si N < nombre de puces. Erreur commise 3 fois de suite le 2026-09-05 — vigilance à maintenir.
 - `has_pending_reply(author_id)` route vers `inbox/<zone>/` tout message de l'auteur attendu, tagué ou non — le tag `@El Patrone#7381` n'est qu'une convention humaine, pas vérifiée par le code. Un message sans tag qui atterrit ainsi se `ack` sans traitement, `logs/conversation.jsonl` fait office de capture exhaustive.
 - Lacune observée le 2026-09-06 : les cycles `/discord_loop` regroupés (`send` + `done` + `wait` en une commande) ont cessé de vider `inbox/discord/` et `inbox/unrouted/` à chaque tour. Garder le `poll --agent unrouted` + `poll --agent discord` à chaque cycle, même regroupé.
+- `on_close.md` § Fin (2026-09-09, demande Morphéus) : le `/close` discord poste un message de pause sur le canal de supervision (chaîne figée = celle de l'arrêt `stop`), tue le process `discord_loop.py wait`, puis `bot.py`. Ordre imposé : message d'abord (`bot.py` doit être vivant pour flusher `queue.json`). Cible = `config.channel_id` (== `channels.supervision` tant que la fusion tient).
 
 ## Dernière session (2026-09-08 / 2026-09-09)
 <!-- Écrasé intégralement par /close. Synthèse < 25 lignes. -->

@@ -255,6 +255,6 @@ Envoie "stop" sur Discord pour arrêter.
 - Les réponses >1900 caractères sont envoyées en plusieurs messages
 - Si le bot Discord s'arrête : relancer `python DISCORD/discord_com/bot_manager.py start`
 - `discord_loop.py` gère uniquement queue/commands — Claude gère l'exécution
-- Ne pas notifier Discord lors d'un `/close` : seule la commande `stop` explicite (3e) envoie un message de fin.
+- Un `/close` (zone discord) envoie un message de pause sur le canal de supervision (chaîne figée, identique à `stop`), puis coupe le process `discord_loop.py wait` et `bot.py` — hook `DISCORD/_contexte/on_close.md` § Fin.
 - Le `drain` de la gateway n'est plus manuel : `bot.py` s'en charge. Une demande bloquée en
   `pending` attend un jugement de cette session, pas un `drain`.

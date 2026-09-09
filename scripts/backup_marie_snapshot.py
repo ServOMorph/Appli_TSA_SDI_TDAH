@@ -69,6 +69,19 @@ def payload_problem(payload) -> str | None:
     return None
 
 
+def payload_is_empty(payload) -> bool:
+    """Vrai si le payload est absent ou sans aucune donnee exploitable.
+
+    Distinct d'un payload malforme (mauvais type) : un appareil sans tache ni resultat
+    de test est un appareil fantome (localStorage regenere, cycle avorte), pas une
+    anomalie. Hors ciblage --device-id, un tel appareil est ignore en silence plutot
+    que de lever une erreur (device_snapshots en contient des dizaines).
+    """
+    if payload is None:
+        return True
+    return isinstance(payload, dict) and not (payload.get("tasks") or payload.get("manual_test_results"))
+
+
 def build_stamp(synced_at: str) -> str:
     """Horodatage du nom de fichier, en UTC explicite (suffixe z).
 
@@ -151,22 +164,27 @@ def run_prune(directory: Path, keep_last: int, dry_run: bool) -> None:
     print(f"Retention : {len(purge)} fichier(s) {resume}.")
 
 
-def archive_one(directory: Path, row: dict) -> tuple[int, bool]:
-    """Archive un appareil dans `directory`. Retourne (code, ecrit).
+def archive_one(directory: Path, row: dict, targeted: bool = False) -> tuple[int, bool, bool]:
+    """Archive un appareil dans `directory`. Retourne (code, ecrit, ignore).
 
     code 1 = payload refuse : rien n'est ecrit pour cet appareil, les autres restent traites.
     ecrit = False si une sauvegarde du meme appareil porte deja exactement le meme contenu
     (idempotence par relance de cycle).
+    ignore = True si l'appareil est sans donnee et n'a pas ete cible explicitement par
+    --device-id : skip silencieux (code 0), pas une erreur. Un payload malforme, ou un
+    appareil vide cible explicitement, reste une erreur (code 1).
     """
     device_id = row["device_id"]
     payload = row.get("payload")
     problem = payload_problem(payload)
     if problem is not None:
+        if payload_is_empty(payload) and not targeted:
+            return 0, False, True
         print(
             f"ERREUR: {problem} pour l'appareil {device_id} - rien n'a ete ecrit pour cet appareil.",
             file=sys.stderr,
         )
-        return 1, False
+        return 1, False, False
 
     device_short = device_id[:8]
     content = serialize_payload(payload)
@@ -178,7 +196,7 @@ def archive_one(directory: Path, row: dict) -> tuple[int, bool]:
     duplicate = find_duplicate(directory, device_short, content)
     if duplicate is not None:
         print(f"{device_id} : inchange depuis {duplicate.name} - rien a sauvegarder.")
-        return 0, False
+        return 0, False, False
 
     out_path = directory / f"snapshot-supabase-{device_short}-{build_stamp(row['synced_at'])}.json"
     out_path.write_text(content, encoding="utf-8")
@@ -187,7 +205,7 @@ def archive_one(directory: Path, row: dict) -> tuple[int, bool]:
         f"Sauvegarde ecrite : {out_path.name} "
         f"(app_version={row.get('app_version')}, tasks={n_tasks}, manual_test_results={n_tests})"
     )
-    return 0, True
+    return 0, True, False
 
 
 def run_backup(device_id: str | None) -> int:
@@ -207,12 +225,17 @@ def run_backup(device_id: str | None) -> int:
 
     exit_code = 0
     written = 0
+    skipped = 0
     for row in targets:
-        code, did_write = archive_one(OUTPUT_DIR, row)
+        code, did_write, was_skipped = archive_one(OUTPUT_DIR, row, targeted=device_id is not None)
         exit_code = exit_code or code
         written += int(did_write)
+        skipped += int(was_skipped)
 
-    print(f"Sauvegarde terminee : {written} archive(s) ecrite(s) sur {len(targets)} appareil(s).")
+    resume = f"Sauvegarde terminee : {written} archive(s) ecrite(s) sur {len(targets)} appareil(s)."
+    if skipped:
+        resume += f" {skipped} appareil(s) sans donnee ignore(s)."
+    print(resume)
     return exit_code
 
 

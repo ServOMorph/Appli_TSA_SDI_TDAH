@@ -19,6 +19,7 @@ from backup_marie_snapshot import (  # noqa: E402
     build_query,
     build_stamp,
     find_duplicate,
+    payload_is_empty,
     payload_problem,
     plan_retention,
     select_targets,
@@ -78,8 +79,9 @@ class ArchiveOne(unittest.TestCase):
         ])
         ecrits = 0
         for r in cibles:
-            code, did_write = archive_one(self.dir, r)
+            code, did_write, skipped = archive_one(self.dir, r)
             self.assertEqual(code, 0)
+            self.assertFalse(skipped)
             ecrits += int(did_write)
         self.assertEqual(ecrits, 2)
         noms = sorted(p.name for p in self.dir.iterdir())
@@ -89,23 +91,35 @@ class ArchiveOne(unittest.TestCase):
 
     def test_rejeu_aucune_reecriture(self):
         r = row("aaaaaaaa", 3)
-        self.assertEqual(archive_one(self.dir, r), (0, True))
+        self.assertEqual(archive_one(self.dir, r), (0, True, False))
         avant = {p.name: p.read_text(encoding="utf-8") for p in self.dir.iterdir()}
-        self.assertEqual(archive_one(self.dir, r), (0, False))
+        self.assertEqual(archive_one(self.dir, r), (0, False, False))
         apres = {p.name: p.read_text(encoding="utf-8") for p in self.dir.iterdir()}
         self.assertEqual(avant, apres)
 
-    def test_payload_refuse_ninterrompt_pas_les_autres(self):
+    def test_payload_malforme_ninterrompt_pas_les_autres(self):
         cibles = [
-            {"device_id": "aaaaaaaa", "synced_at": "2026-09-02T10:00:00+00:00", "payload": None},
+            {"device_id": "aaaaaaaa", "synced_at": "2026-09-02T10:00:00+00:00", "payload": "corrompu"},
             row("bbbbbbbb", 4, synced_at="2026-09-02T11:00:00+00:00"),
         ]
         codes = [archive_one(self.dir, r) for r in cibles]
-        self.assertEqual(codes[0], (1, False))
-        self.assertEqual(codes[1], (0, True))
+        self.assertEqual(codes[0], (1, False, False))
+        self.assertEqual(codes[1], (0, True, False))
         noms = [p.name for p in self.dir.iterdir()]
         self.assertEqual(len(noms), 1)
         self.assertIn("bbbbbbbb", noms[0])
+
+    def test_appareil_vide_hors_ciblage_ignore_en_silence(self):
+        # device_snapshots contient des dizaines d'appareils fantomes sans payload :
+        # hors --device-id, ils ne doivent produire ni erreur ni exit 1.
+        for payload in (None, {}, {"tasks": [], "manual_test_results": []}):
+            r = {"device_id": "aaaaaaaa", "synced_at": "2026-09-02T10:00:00+00:00", "payload": payload}
+            self.assertEqual(archive_one(self.dir, r), (0, False, True))
+        self.assertEqual(list(self.dir.iterdir()), [])
+
+    def test_appareil_vide_cible_explicitement_reste_une_erreur(self):
+        r = {"device_id": "aaaaaaaa", "synced_at": "2026-09-02T10:00:00+00:00", "payload": None}
+        self.assertEqual(archive_one(self.dir, r, targeted=True), (1, False, False))
 
     def test_device_id_cible_un_seul_appareil(self):
         # build_query restreint la requete ; select_targets sur les lignes d'un seul
@@ -117,7 +131,7 @@ class ArchiveOne(unittest.TestCase):
             row("aaaaaaaa", 3, synced_at="2026-09-01T10:00:00+00:00"),
         ])
         self.assertEqual(len(cibles), 1)
-        self.assertEqual(archive_one(self.dir, cibles[0]), (0, True))
+        self.assertEqual(archive_one(self.dir, cibles[0]), (0, True, False))
         self.assertEqual(len(list(self.dir.iterdir())), 1)
 
 
@@ -135,6 +149,21 @@ class PayloadProblem(unittest.TestCase):
     def test_payload_sans_donnees_exploitables(self):
         for vide in ({}, {"tasks": [], "manual_test_results": []}, {"autre": 1}):
             self.assertIsNotNone(payload_problem(vide))
+
+
+class PayloadIsEmpty(unittest.TestCase):
+    def test_absent_ou_sans_donnees(self):
+        for vide in (None, {}, {"tasks": [], "manual_test_results": []}, {"autre": 1}):
+            self.assertTrue(payload_is_empty(vide))
+
+    def test_malforme_nest_pas_vide(self):
+        # Un payload du mauvais type est une anomalie a signaler, pas un appareil fantome.
+        self.assertFalse(payload_is_empty("corrompu"))
+        self.assertFalse(payload_is_empty([]))
+
+    def test_avec_donnees(self):
+        self.assertFalse(payload_is_empty({"tasks": [{"id": "t"}]}))
+        self.assertFalse(payload_is_empty({"manual_test_results": [{"id": "r"}]}))
 
 
 class BuildStamp(unittest.TestCase):

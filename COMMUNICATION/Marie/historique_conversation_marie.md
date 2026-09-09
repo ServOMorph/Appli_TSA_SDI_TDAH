@@ -712,3 +712,24 @@ canal, transmis par l'utilisateur. Incident à l'origine du mécanisme de rattra
 ajouté à `bot.py` le 2026-09-08 (`rattraper_messages_manques`). Le `pending_reply`
 `20260906T204529_830899` reste à purger (routage manuel ou rattrapage). Volet UX E10 (layout
 sous-tâches dans la carte) toujours ouvert, séparé.
+
+### 2026-09-09 — relance tests v5.92
+
+**Dév ->**
+Relance : version 5.92 en ligne depuis le 5.
+
+12 tests t'attendent dans l'écran « Tests à faire », correspondant aux modifications :
+• 33 à 38
+• retrait de « Tâche du jour »
+• ajout de tâche depuis la Réception
+
+https://appli-audhd.netlify.app/
+
+Plusieurs correctifs sont prêts. J'attends que ces 12 tests soient passés pour déployer la suite.
+
+_Suite :_ v5.92 livrée le 2026-09-05, 12 parcours in-app jamais validés depuis. Aucune relance sur
+ces tests depuis la livraison (dernière relance datée : 2026-09-01 pour v5.69). Lot v5.93 → v5.114
+prêt (E10 UX, refacto fiabilisation, zoom iOS, ONBOARD Phase 2-3), `/deploy` gelé tant que Marie
+n'a pas fini de tester v5.92 (décision structurante 2026-09-08). Déposé dans la gateway
+(`--source orchestrateur --to marie --kind info`), `pending` — jugé par le gardien de sortie de la
+session `discord` avant tout envoi Discord.

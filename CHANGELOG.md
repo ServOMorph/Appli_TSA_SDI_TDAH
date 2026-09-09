@@ -1,3 +1,8 @@
+## v5.112 — 2026-09-09
+
+### Corrigé
+- `DISCORD/discord_com/gateway.py` `route_inbound()` : l'heuristique par mots-clés ne route plus jamais vers l'agent `discord` (garde `if h == "discord": h = None`). Un message de canal non tagué contenant « discord » / « bot » / « gateway » retombe désormais dans `inbox/unrouted/` (`routing: "aucune"`) au lieu de `inbox/discord/`, que la boucle `/discord_loop` vidait en le traitant comme une instruction — d'où une réponse publique non sollicitée sur le canal. Seuls le tag `@discord:` explicite, les dead-letters et les bounces entrent dans `inbox/discord/`. `.claude/commands/discord_loop.md` § 3b : règle ajoutée — aucun `send`/`notify` Discord en vidant un inbox, seuls une vraie commande `/discord_loop` (3c) et `stop` (3e) postent sur le canal. `DISCORD/discord_com/test_gateway.py` : +2 cas. Commit `18abee5`. Non déployé.
+
 ## v5.111 — 2026-09-08
 
 ### Modifié

@@ -110,7 +110,7 @@ Source : `TESTS/ONBOARD/demandes_evolution.md` (D1-D7),
 
 ---
 
-## Phase 1 — Intégration documentaire du livrable ONBOARD [TODO]
+## Phase 1 — Intégration documentaire du livrable ONBOARD [FAIT]
 
 Rendre la spécification disponible sur `main` avant d'écrire la moindre ligne de code, et clore la
 branche sandbox.
@@ -151,7 +151,7 @@ suite complète reste verte (100 fichiers / 817 tests au 2026-09-08, référence
 
 ---
 
-## Phase 2 — Consentement et activation conditionnelle de la synchronisation (D2) [TODO]
+## Phase 2 — Consentement et activation conditionnelle de la synchronisation (D2) [FAIT]
 
 Pré-requis : **DI4 tranchée** (qui rédige le texte) et **DI5 tranchée** (sort de l'appareil de
 Marie).
@@ -191,7 +191,7 @@ interrompue), conformément à la règle « tous les tests de Marie vivent dans 
 
 ---
 
-## Phase 3 — Code testeur (D1, résout R2) [TODO]
+## Phase 3 — Code testeur (D1, résout R2) [FAIT]
 
 Rattacher un retour à une personne sans recoupement manuel. Ne sert qu'à partir du 2ᵉ testeur
 (cf. DI1).
@@ -219,7 +219,12 @@ snapshot réel (ou simulé en test) porte le code testeur, lisible sans recoupem
 
 ---
 
-## Phase 4 — Dépouillement multi-appareils (D3, résout R1) [TODO]
+## Phase 4 — Dépouillement multi-appareils (D3, résout R1) [FAIT]
+
+> **Suivi 2026-09-09** — exécuté pour la première fois à grande échelle au hook `/close` : `device_snapshots`
+> contient 89 `device_id`, 1 seul avec un payload réel (Marie), ~77 vides. Le script émet alors 77 lignes
+> `ERREUR` + `exit 1` à chaque `/start` / `/close` (hook non bloquant mais bruyant). À corriger : un payload
+> vide hors `--device-id` doit être un skip silencieux, pas une erreur. Tracé dans `_contexte/signals.md`.
 
 Pré-requis : Phase 3 (identification des appareils actifs par code testeur).
 
@@ -247,7 +252,14 @@ tombe à zéro — le constater plutôt que le supposer.
 
 ---
 
-## Phase 5 — Canaux Discord testeurs et routage gateway (D5) [TODO]
+## Phase 5 — Canaux Discord testeurs et routage gateway (D5) [FAIT]
+
+> **Suivi 2026-09-09** — livrée en modèle « un canal Discord par testeur » (cible `testeur:<code>`, salon
+> `#test-<code>`) au lieu des 2 cibles fixes envisagées ; `#supervision` fusionné avec le canal Marie
+> principal (décision Morphéus). Gate de visibilité asymétrique vert en hermétique (channel_id réels, aucun
+> POST), 119 tests Discord. Résiduels portés au bloc « Mise en service » (points 8-10) : vérif live avec
+> Satine, rattrapage post-arrêt `bot.py` pour `#test-<code>`, câblage `discord_member_id` de Satine.
+> Commits `a40a31d`, `508f5dd` (+ briefs `9306ece`, `e326050`, `5079c0b`).
 
 Pré-requis : Phase 3 (un testeur est identifiable).
 
@@ -329,6 +341,18 @@ complétés des recommandations du 2026-09-08.
 7. **Mesure de D6** : compter les changements de `device_id` par testeur sur les 2-3 premiers
    cycles. Si le phénomène est rare, clore D6 définitivement comme limite assumée plutôt que de
    développer une restauration depuis le serveur (authentification déguisée, hors périmètre).
+8. **Vérification live du routage testeur (Phase 5)** : avec un testeur réel sur le serveur Discord
+   (Satine), un round-trip complet — message dans `#test-<code>` routé vers `inbox/testeurs/<code>/`,
+   réponse de Marie visible du testeur dans son canal, commentaire de Marie en `#supervision` invisible
+   du testeur. Le gate de Phase 5 a été passé en hermétique (channel_id réels, aucun POST) ; ceci est
+   la confirmation en conditions réelles.
+9. **Rattrapage post-arrêt `bot.py` pour les canaux testeurs** : aujourd'hui le backfill au redémarrage
+   ne couvre que le canal principal. Un message reçu dans `#test-<code>` pendant que `bot.py` est coupé
+   (le `/close` discord le coupe à chaque fin de session) n'est pas rejoué. À traiter avant d'inviter
+   un testeur dans un cycle actif.
+10. **Câblage `discord_member_id` de chaque testeur** dans `config_bot_discord.json >
+    channels.testeurs.<code>` quand il rejoint le serveur (repli du routage par canal ; contourne la
+    collision `MORPHEUS_USER_ID` tant que le champ est `null`).
 
 ## Hors périmètre de cette roadmap
 

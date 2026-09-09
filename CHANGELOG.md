@@ -1,3 +1,13 @@
+## v5.114 — 2026-09-09
+
+### Modifié
+- `/close` orchestrateur. `roadmap_integration_onboard.md` : **Phases 1 à 5 `[FAIT]`** (exécutées et committées, v5.107 à v5.113). Phase 6 `[TODO]`, prochaine (généralisation du nommage mono-personne, D7 — refacto structurel).
+- Phase 5 livrée en modèle « un canal Discord par testeur » (cible `testeur:<code>`, salon `#test-<code>`) ; `#supervision` fusionné avec le canal Marie principal (décision Morphéus, asymétrie testeur/supervision garantie). Gate de visibilité asymétrique vert en hermétique (channel_id réels, aucun POST), 119 tests Discord. Résiduels portés au bloc « Mise en service » de la roadmap (points 8-10) : vérification live avec Satine, rattrapage post-arrêt `bot.py` pour `#test-<code>`, câblage `discord_member_id` de Satine.
+- Correctif `ruff` E402 sur `DISCORD/discord_com/test_bot.py` (raté par la passe 3 de la zone `discord`).
+- `tests_manuels.md` : section `[discord-auto]` du hook `on_start.md` discord retirée (validée en conditions réelles, purge assignée à la session racine — commit `c232ef2`).
+- **Angle mort Phase 4 constaté** au hook pré-synthèse `/close` : `scripts/backup_marie_snapshot.py` sans `--device-id` voit 89 `device_id` dans `device_snapshots`, 1 seul avec un payload réel (Marie), ~77 vides → 77 lignes `ERREUR` + `exit 1` à chaque `/start` / `/close`. Tracé `_contexte/signals.md` [P2] : un payload vide hors ciblage explicite devrait être un skip silencieux.
+- `_contexte/` : `signals.md` et `contexte.md` réalignés (Phases 1-5 faites, DI1/DI4/DI5 tranchées, DI2/DI3 en attente) ; 5 décisions 2026-09-06 déplacées dans `archive_decisions.md`. `README.md` § État actuel mis à jour.
+
 ## v5.113 — 2026-09-09
 
 ### Modifié

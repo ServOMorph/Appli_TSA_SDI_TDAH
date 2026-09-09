@@ -715,8 +715,8 @@ sous-tâches dans la carte) toujours ouvert, séparé.
 
 ### 2026-09-09 — relance tests v5.92
 
-**Dév ->**
-Relance : version 5.92 en ligne depuis le 5.
+**Dév ->** (texte tel qu'envoyé, après ajustements de forme du gardien de sortie discord ; corps déposé : « Relance : version 5.92 en ligne depuis le 5. » et « … pour déployer la suite. »)
+Version 5.92 en ligne depuis le 5.
 
 12 tests t'attendent dans l'écran « Tests à faire », correspondant aux modifications :
 • 33 à 38
@@ -725,11 +725,14 @@ Relance : version 5.92 en ligne depuis le 5.
 
 https://appli-audhd.netlify.app/
 
-Plusieurs correctifs sont prêts. J'attends que ces 12 tests soient passés pour déployer la suite.
+Plusieurs correctifs sont prêts. J'attends que ces 12 tests soient passés pour mettre la suite en ligne.
 
 _Suite :_ v5.92 livrée le 2026-09-05, 12 parcours in-app jamais validés depuis. Aucune relance sur
 ces tests depuis la livraison (dernière relance datée : 2026-09-01 pour v5.69). Lot v5.93 → v5.114
 prêt (E10 UX, refacto fiabilisation, zoom iOS, ONBOARD Phase 2-3), `/deploy` gelé tant que Marie
 n'a pas fini de tester v5.92 (décision structurante 2026-09-08). Déposé dans la gateway
-(`--source orchestrateur --to marie --kind info`), `pending` — jugé par le gardien de sortie de la
-session `discord` avant tout envoi Discord.
+(`--source orchestrateur --to marie --kind info`), id `20260909T100248_019203`. Jugé le 2026-09-09
+par le gardien de sortie de la session `discord` : `approve` (pas de doublon, version cohérente
+avec `dernier_deploiement.md`, `pending_replies` vide) avec deux retouches de forme STYLE.md § marie
+sans changement de fond — retrait de l'étiquette « Relance : », « déployer » → « mettre en ligne ».
+Envoyé par `bot.py` au drain suivant.

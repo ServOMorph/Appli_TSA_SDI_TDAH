@@ -12,19 +12,6 @@ annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'u
 reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
 demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
-## Hook `on_start.md` discord enrichi (3 points) [discord-auto]
-
-Ajouté le 2026-09-07 (commit `3846793`, enrichissement du hook). Non encore observé en conditions
-réelles. Se valide au prochain `/start discord`, sans provocation manuelle.
-
-À observer :
-- `bot_manager.py restart` : arrêt puis relance effective de `bot.py` (ou message non bloquant si
-  `enabled: false` / échec de démarrage) ;
-- détection d'un éventuel process `discord_loop.py wait` orphelin d'une session précédente et son
-  arrêt (aucun faux positif sur la session courante) ;
-- résumé de l'outbox `to == marie` affiché avant l'enchaînement de la boucle (nombre de `pending`
-  et `held`, motifs de `hold`).
-
 ## Bornage des requêtes réseau et reprise après coupure (Phase 6) — à porter au catalogue in-app
 
 Pas testable en dev (aucun backend de synchronisation configuré localement). À convertir en

@@ -58,6 +58,21 @@ def _role_for(author_id) -> str:
     return "ADMIN" if author_id in ADMINS else "RESTREINT"
 
 
+def _canal_testeur(channel_id: int) -> str | None:
+    """Code du testeur dont `channels.testeurs.<code>.channel_id` == `channel_id`
+    (config_bot_discord.json). None si le canal n'est pas un canal testeur déclaré."""
+    for code, entree in (CONFIG.get("channels") or {}).get("testeurs", {}).items():
+        if not isinstance(entree, dict):
+            continue
+        cid = entree.get("channel_id")
+        try:
+            if cid is not None and int(cid) == int(channel_id):
+                return code
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
 def log_conv(sens: str, author: str, author_id, content: str, ts: str | None = None):
     """Append une ligne JSON dans logs/conversation.jsonl. Jamais bloquant."""
     try:
@@ -280,10 +295,31 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
+
+    code_testeur = None
     if message.channel.id != CHANNEL_ID:
-        return
+        code_testeur = _canal_testeur(message.channel.id)
+        if code_testeur is None:
+            return
 
     log_conv("user", str(message.author), message.author.id, message.content)
+
+    if code_testeur:
+        # Canal #test-<code> : Marie y répond en clair au testeur (visible d'elle et de lui
+        # seuls) — ce n'est pas un retour à router, elle n'attend rien de la gateway ici.
+        if message.author.id == gateway.MARIE_USER_ID:
+            return
+        try:
+            pieces = [{"filename": a.filename, "url": a.url, "content_type": a.content_type}
+                      for a in message.attachments]
+            res = gateway.route_inbound(message.author.id, str(message.author),
+                                        message.content, pieces,
+                                        channel_id=message.channel.id)
+            print(f"Route vers inbox/{res['routed_to']} ({res['routing']}) : {res['id']} "
+                  f"— {len(pieces)} piece(s) jointe(s)")
+        except Exception as e:  # le routage ne doit jamais tuer le bot
+            print(f"Erreur route_inbound : {e}")
+        return
 
     # Commandes autonomes (priorité absolue)
     reponse = await traiter_autonome(message.content)
@@ -400,4 +436,5 @@ async def boucle_polling():
         await asyncio.sleep(POLL_INTERVAL)
 
 
-client.run(TOKEN)
+if __name__ == "__main__":
+    client.run(TOKEN)

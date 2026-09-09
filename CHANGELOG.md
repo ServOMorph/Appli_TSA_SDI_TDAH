@@ -1,3 +1,11 @@
+## v5.113 — 2026-09-09
+
+### Modifié
+- `roadmap_integration_onboard.md` Phase 5 passe 3 (écoute multi-canal entrante) exécutée. `DISCORD/discord_com/bot.py` `on_message` traite désormais aussi les canaux `#test-<code>` déclarés dans `config_bot_discord.json > channels.testeurs` (`_canal_testeur()`), en plus du canal principal — jusqu'ici un message de Satine dans `#test-satine` était ignoré (`channel.id != CHANNEL_ID`). Un message d'un canal testeur est routé vers `inbox/testeurs/<code>/`, sauf si son auteur est Marie (`gateway.MARIE_USER_ID`) : elle y répond en clair au testeur, ce n'est pas un retour à classer — le message n'est ni routé ni transmis à la gateway.
+- `DISCORD/discord_com/gateway.py` `route_inbound()` accepte un paramètre `channel_id` optionnel ; nouvelle fonction `_testeur_code_pour_canal()` qui résout le code testeur par son canal Discord (`channels.testeurs.<code>.channel_id`), prioritaire sur `_testeur_code_pour_auteur()` (fondé sur `discord_member_id`, toujours utilisé en repli si le canal est inconnu). Contourne la collision `MORPHEUS_USER_ID` évoquée dans `ONBOARD_phase5_brief.md` (member_id provisoire de Satine avant qu'elle rejoigne le serveur) et le `discord_member_id` encore `null` d'un testeur qui n'a pas rejoint le serveur.
+- `bot.py` : `client.run(TOKEN)` déplacé sous `if __name__ == "__main__":` pour permettre l'import du module en tests sans connexion réseau.
+- Tests : `DISCORD/discord_com/test_gateway.py` +8 cas (résolution par canal, priorité sur `discord_member_id`, repli si canal inconnu ou non fourni, contournement de la collision `MORPHEUS_USER_ID`). `DISCORD/discord_com/test_bot.py` (nouveau, 7 cas, events Discord mockés) : routage d'un message testeur par son canal, message de Marie dans un canal testeur non routé, canal non déclaré ignoré, deux testeurs sur des canaux distincts, canal principal inchangé. 119 tests Discord verts. Vérification live (canaux réels, arrivée de Satine sur le serveur) hors périmètre de cette passe. `.claude/commands/discord_loop.md` et `DISCORD/discord_com/gateway/LOOP.md` mis à jour (balayage `inbox/testeurs/<code>/`, priorité de routage). Non déployé (bot Discord uniquement, aucun changement `src/`).
+
 ## v5.112 — 2026-09-09
 
 ### Corrigé

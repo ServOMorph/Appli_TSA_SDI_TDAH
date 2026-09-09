@@ -57,20 +57,29 @@ pour le trafic normal.
    est retiré du corps stocké, `raw_content` conserve l'original) ;
 2. réponse attendue de cet auteur (`state.json` → `pending_replies`, entrée la plus récente
    pour sa cible) → `inbox/<source>/`, cette seule entrée retirée ;
-3. heuristique par mots-clés (`keywords` de `gateway/agents.json`, départage au nombre de
+3. testeur connu (ONBOARD Phase 5) : par `channel_id` (canal `#test-<code>` du message,
+   prioritaire) ou à défaut par `discord_member_id` (`config_bot_discord.json >
+   channels.testeurs.<code>`) → `inbox/testeurs/<code>/` ;
+4. heuristique par mots-clés (`keywords` de `gateway/agents.json`, départage au nombre de
    mots-clés trouvés) → `inbox/<agent>/` ;
-4. aucun signal → `inbox/unrouted/`.
+5. aucun signal → `inbox/unrouted/`.
 
-Chaque message routé porte un champ `routing` (`tag` | `pending` | `heuristique` | `aucune`)
-et ses `attachments` (captures de Marie incluses).
+Chaque message routé porte un champ `routing` (`tag` | `pending` | `testeur` | `heuristique` |
+`aucune`) et ses `attachments` (captures de Marie incluses). Un message de Marie posté dans
+un canal `#test-<code>` n'est jamais routé (`bot.py` l'écarte avant d'appeler
+`route_inbound` : elle y répond en clair au testeur, ce n'est pas un retour à classer).
 
 **Reste à ma charge à chaque cycle** : vider `inbox/unrouted/` — relire, puis re-router
-(`gateway.route_inbound` après avoir préfixé le contenu du bon `@agent:`) ou répondre soi-même.
+(`gateway.route_inbound` après avoir préfixé le contenu du bon `@agent:`) ou répondre soi-même
+— et `inbox/testeurs/<code>/` pour chaque testeur déclaré : lire, `ack`, jamais de `send` en
+réponse (le canal appartient au testeur et à Marie, pas à cette boucle).
 
 ```
 python DISCORD/discord_com/gateway.py poll --agent unrouted
 python DISCORD/discord_com/gateway.py poll --agent discord    # bounces et dead-letters
 python DISCORD/discord_com/gateway.py agents                  # registre + réponses attendues
+ls DISCORD/discord_com/gateway/inbox/testeurs/ 2>/dev/null    # codes testeurs avec du courrier
+python DISCORD/discord_com/gateway.py poll --agent testeurs/<code>
 ```
 
 Les autres agents récupèrent leurs messages via `gateway.poll("<agent>")` puis

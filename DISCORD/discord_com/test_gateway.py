@@ -910,6 +910,54 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
         self.assertEqual(r["routed_to"], "design")
         self.assertEqual(r["routing"], "tag")
 
+    # -- route_inbound : résolution testeur par canal (passe 3) ------
+
+    def test_testeur_code_pour_canal_resout_le_canal_declare(self):
+        self._testeur_connu("satine", member_id=None, channel_id=222)
+        self.assertEqual(gateway._testeur_code_pour_canal(222), "satine")
+
+    def test_testeur_code_pour_canal_none_pour_canal_non_declare(self):
+        self._testeur_connu("satine", member_id=None, channel_id=222)
+        self.assertIsNone(gateway._testeur_code_pour_canal(999))
+
+    def test_testeur_code_pour_canal_none_si_channel_id_absent(self):
+        self._testeur_connu("satine", member_id=None, channel_id=222)
+        self.assertIsNone(gateway._testeur_code_pour_canal(None))
+
+    def test_route_inbound_par_canal_fonctionne_sans_discord_member_id(self):
+        """Le canal identifie le testeur même member_id null (testeur pas encore rejoint)."""
+        self._testeur_connu("satine", member_id=None, channel_id=222)
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "l'écran plante", channel_id=222)
+        self.assertEqual(r["routed_to"], "testeurs/satine")
+        self.assertEqual(r["routing"], "testeur")
+
+    def test_route_inbound_par_canal_contourne_la_collision_member_id(self):
+        """Un author_id en collision avec un autre agent connu (ex. Morphéus, cas réel du
+        gate a40a31d) est quand même routé au testeur si le canal le désigne."""
+        self._testeur_connu("satine", member_id=None, channel_id=222)
+        r = gateway.route_inbound(gateway.MORPHEUS_USER_ID, "Satine (member_id provisoire)",
+                                  "retour testeur", channel_id=222)
+        self.assertEqual(r["routed_to"], "testeurs/satine")
+        self.assertEqual(r["routing"], "testeur")
+
+    def test_route_inbound_canal_prioritaire_sur_discord_member_id_d_un_autre_testeur(self):
+        self._config_testeurs({
+            "satine": {"channel_id": 222, "discord_member_id": TESTEUR_ID},
+            "leo": {"channel_id": 444, "discord_member_id": TESTEUR_ID + 1},
+        })
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "retour", channel_id=444)
+        self.assertEqual(r["routed_to"], "testeurs/leo")
+
+    def test_route_inbound_sans_channel_id_retombe_sur_discord_member_id(self):
+        self._testeur_connu("satine", member_id=TESTEUR_ID, channel_id=222)
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "retour sans canal connu")
+        self.assertEqual(r["routed_to"], "testeurs/satine")
+
+    def test_route_inbound_canal_inconnu_retombe_sur_discord_member_id(self):
+        self._testeur_connu("satine", member_id=TESTEUR_ID, channel_id=222)
+        r = gateway.route_inbound(TESTEUR_ID, "Satine", "retour", channel_id=999999)
+        self.assertEqual(r["routed_to"], "testeurs/satine")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -18,10 +18,12 @@ via `message_marie._send(..., attachment_path=...)`.
 
 ENTRÉE : `route_inbound(...)` classe les messages Discord entrants et les dépose dans
 `gateway/inbox/<agent>/`. Priorité : tag explicite `@agent:` en tête, sinon réponse
-attendue de cet auteur (`state.pending_replies`), sinon auteur testeur connu
-(`inbox/testeurs/<code>/`), sinon heuristique par mots-clés (jamais l'agent `discord`),
-sinon `inbox/unrouted/`. `bot.py` route ainsi tout message du canal qui n'est pas une
-commande @bot. Les agents lisent via `poll(agent)` et acquittent via `ack(agent, id)`.
+attendue de cet auteur (`state.pending_replies`), sinon testeur connu — par canal
+d'origine (`channel_id`, `config_bot_discord.json > channels.testeurs.<code>.channel_id`,
+prioritaire) ou à défaut par `discord_member_id` — (`inbox/testeurs/<code>/`), sinon
+heuristique par mots-clés (jamais l'agent `discord`), sinon `inbox/unrouted/`. `bot.py`
+route ainsi tout message du canal qui n'est pas une commande @bot. Les agents lisent via
+`poll(agent)` et acquittent via `ack(agent, id)`.
 
 REGISTRE : un agent = une zone (`gateway/agents.json`). Le nom d'agent est le nom de
 zone, ou son `alias` (`Appli_TSA_SDI_TDAH` -> `orchestrateur`). Les mots-clés de
@@ -717,9 +719,11 @@ def _testeur_code_pour_auteur(author_id) -> str | None:
     """Code du testeur dont `discord_member_id` == `author_id`
     (config_bot_discord.json > channels.testeurs.<code>). None si aucun.
 
-    Vide tant qu'aucun `discord_member_id` n'est renseigné (les testeurs n'ont pas rejoint
-    le serveur) : un retour de testeur tombe alors dans `inbox/unrouted/` et le gardien le
-    route à la main — toléré au démarrage.
+    Fallback de `_testeur_code_pour_canal` (le canal fait foi quand il est connu — voir
+    route_inbound) : reste utile tant qu'un message arrive sans `channel_id` connu, ou pour
+    un canal non déclaré. Vide tant qu'aucun `discord_member_id` n'est renseigné (les
+    testeurs n'ont pas rejoint le serveur) : un retour tombe alors dans `inbox/unrouted/` et
+    le gardien le route à la main — toléré au démarrage.
     """
     try:
         aid = int(author_id)
@@ -741,16 +745,53 @@ def _testeur_code_pour_auteur(author_id) -> str | None:
     return None
 
 
+def _testeur_code_pour_canal(channel_id) -> str | None:
+    """Code du testeur dont `channels.testeurs.<code>.channel_id` == `channel_id`
+    (config_bot_discord.json). None si `channel_id` est absent ou canal non déclaré.
+
+    Le canal identifie le testeur sans dépendre de `discord_member_id` (contourne la
+    collision `MORPHEUS_USER_ID` et le `member_id` null tant qu'un testeur n'a pas rejoint
+    le serveur) — prioritaire sur `_testeur_code_pour_auteur` dans `route_inbound`.
+    """
+    if channel_id is None:
+        return None
+    try:
+        cid = int(channel_id)
+    except (TypeError, ValueError):
+        return None
+    try:
+        cfg = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    for code, entree in ((cfg.get("channels") or {}).get("testeurs") or {}).items():
+        if not isinstance(entree, dict):
+            continue
+        entree_cid = entree.get("channel_id")
+        try:
+            if entree_cid is not None and int(entree_cid) == cid:
+                return code
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
 def route_inbound(author_id, author_name: str, content: str,
-                  attachments: list[dict] | None = None) -> dict:
+                  attachments: list[dict] | None = None, *,
+                  channel_id=None) -> dict:
     """
     Route un message Discord entrant vers `inbox/<agent>/`, par ordre de priorité :
       1. tag explicite `@agent:` en tête (zone ou alias connu du registre) ;
       2. réponse attendue de cet auteur (`state.pending_replies`) -> `inbox/<source>/` ;
-      3. heuristique par mots-clés du registre ;
-      4. `inbox/unrouted/`.
+      3. testeur connu : par `channel_id` (canal `#test-<code>`, prioritaire) ou à défaut
+         par `discord_member_id` -> `inbox/testeurs/<code>/` ;
+      4. heuristique par mots-clés du registre ;
+      5. `inbox/unrouted/`.
     L'appariement 2 retire la seule entrée la plus récente pour la cible de l'auteur ;
     les autres réponses attendues restent en place.
+
+    `channel_id` : canal Discord d'origine du message, s'il est connu (`bot.py` le passe
+    toujours). Permet d'identifier un testeur par son canal `#test-<code>` sans dépendre de
+    son `discord_member_id` (encore `null` tant qu'il n'a pas rejoint le serveur).
 
     `attachments` : pièces jointes Discord (`{filename, url, content_type}`). Une réponse
     peut n'être qu'une image — sans elles le message arriverait vide.
@@ -770,7 +811,7 @@ def route_inbound(author_id, author_name: str, content: str,
     else:
         to = _target_from_author(author_id)
         pending = _match_pending(load_state(), to)
-        code_testeur = _testeur_code_pour_auteur(author_id)
+        code_testeur = _testeur_code_pour_canal(channel_id) or _testeur_code_pour_auteur(author_id)
         if pending:
             target = pending["source"]
             reply_to = pending

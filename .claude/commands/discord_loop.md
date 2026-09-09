@@ -143,11 +143,16 @@ Tout le reste du trafic du canal (réponse hors pending, message tagué `@design
 routé mécaniquement par `bot.py` — rien à faire.
 
 Reste à ma charge, après le `wait` : vider `inbox/unrouted/` et `inbox/discord/` (relire,
-re-router en préfixant le bon `@agent:`, traiter en interne, ou passer au gardien).
+re-router en préfixant le bon `@agent:`, traiter en interne, ou passer au gardien), ainsi
+que `inbox/testeurs/<code>/` pour chaque testeur déclaré (canaux `#test-<code>`, ONBOARD
+Phase 5 — un retour de testeur, à lire et `ack`, jamais de `send` en réponse : Marie répond
+en clair directement dans le canal, `bot.py` ne route pas ses messages qui y arrivent).
 
 ```bash
 python DISCORD/discord_com/gateway.py poll --agent unrouted
 python DISCORD/discord_com/gateway.py poll --agent discord
+ls DISCORD/discord_com/gateway/inbox/testeurs/ 2>/dev/null   # codes testeurs avec du courrier
+python DISCORD/discord_com/gateway.py poll --agent testeurs/<code>
 ```
 
 **Aucun `send` / `notify` Discord en vidant un inbox.** Ces messages sont du contexte routé ou

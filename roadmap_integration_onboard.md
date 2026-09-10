@@ -292,6 +292,17 @@ sortie.
 
 ## Phase 6 — Généralisation du nommage mono-personne (D7) [TODO]
 
+> **Décision 2026-09-10 (Morphéus)** — au lancement de cette phase, Marie **et** Morphéus sont
+> convertis en testeurs à part entière, avec `tester_code`, sur le même modèle que Satine. Aucune
+> identité n'est traitée en exception : il n'y a pas de repli « utilisateur principal », tout
+> `device_id` exploité est rattaché à un `tester_code`. Conséquences pour l'exécution :
+> - `donnees_marie/` et `_contexte/marie_tests_journal.json` sont **migrés** sous le code de Marie
+>   (pas conservés comme chemins spéciaux).
+> - Marie et Morphéus saisissent leur code dans Paramètres > Profil (écran Phase 3) au moment de
+>   la bascule ; prévoir la consigne dans la roadmap d'exécution.
+> - Le nommage par défaut pour un `device_id` sans `tester_code` reste à définir uniquement pour
+>   les appareils fantômes de `device_snapshots` (payload vide), pas pour un utilisateur réel.
+
 Phase de refacto assumée, à ne lancer qu'une fois les phases 2 à 5 livrées : elle touche des
 chemins en dur et un format de journal utilisés par toutes les phases précédentes, et son seul
 risque réel est la régression sur l'historique existant.

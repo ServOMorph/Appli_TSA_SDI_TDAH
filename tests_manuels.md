@@ -45,3 +45,13 @@ retours en "Envoyé" ? » (`_contexte/signals.md`). Comportement à faire valide
   d'elle-même après ~30 s sans figer l'appli, le retour passe « Échec d'envoi » ;
 - rétablir le réseau, relancer : le retour part sans doublon (image déjà déposée non renvoyée)
   et passe « Envoyé ».
+
+## Sauvegarde Drive en attente
+
+Manifeste rafraîchi le 2026-09-10 (225 fichiers). L'upload vers Drive n'est pas exécutable en
+auto-mode (classifieur). À lancer manuellement, dans un terminal normal, depuis la racine du
+projet :
+```
+python claude-vibecoding-kit/backup_project.py . --upload
+```
+Retirer cette section une fois l'upload confirmé effectué.

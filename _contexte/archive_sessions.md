@@ -1329,3 +1329,14 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - INVALIDÉ : « `src/` 837 tests verts » ne couvre que Vitest. `npm run test:e2e` complet 2026-09-10 = 37 passent / 22 échouent sur 59. Dérive onboarding E04 + E21 planifiée (heure + durée obligatoires) depuis v5.108, jamais rattrapée faute de `/deploy` depuis v5.92. Correctif `reset.ts` réduit les échecs sans les augmenter.
 - OBSERVÉ (non tranché) : E21 variante planifiée, « Valider » désactivé tant que heure de début + durée > 0 absentes (`canSubmit`, `E21CreateTaskV2.tsx:165`) — blocage rencontré au test iPhone, cause des échecs `05-overload`.
 - Commit `8db0d92` (v5.117). Fin hook `/close` (`backup_project.py --upload`) bloqué par le classifieur d'auto-mode, non exécuté.
+
+---
+
+## Session du 2026-09-10 — correctifs kit backup_project.py relus et committés
+
+- Aucune décision structurante. Relecture + intégration des correctifs `backup_project.py` fournis par le kit VibeObs (défaut `EXCLUDED_PARTS`, crash d'encodage cp1252).
+- `claude-vibecoding-kit/backup_project.py` : `EXCLUDED_PARTS` étendu (test-results, playwright-report, .pytest_cache, .ruff_cache, .mypy_cache, coverage, htmlcov, .netlify, tmp) ; `sys.stdout/stderr.reconfigure(utf-8, errors=replace)` en tête de `main()` ; `encoding=` explicite sur `subprocess.run(rclone)` et le manifeste. Manifeste 374 -> 222 lignes.
+- `claude-vibecoding-kit/test_backup_project.py` (nouveau, pytest 4/4) : filtrage artefacts, conservation `.env`/`donnees_marie/`, `--refresh-list` exit 0 sur noms non-ASCII.
+- Commit `746afcd` (poussé) + close du jour (`962b8c2`, v5.118). `tmp/` gardé exclu.
+- EN ATTENTE : `--refresh-list --upload` non validé — `rclone copy` vers Drive refusé par le classifieur d'auto-mode (politique). Hook Fin `/close` à lancer manuellement.
+- NON TRAITÉ (préexistant) : `read_config()` `RuntimeError` non capturée sous `--upload` si `rclone_backup.json` manque.

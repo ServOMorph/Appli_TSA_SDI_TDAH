@@ -17,19 +17,30 @@ contenu de `.env` ni celui d'un snapshot (données personnelles de Marie).
 
 ## Fin
 
-Mettre à jour le manifeste des fichiers absents de la branche GitHub suivie puis les copier vers
-Drive :
+Mettre à jour le manifeste des fichiers absents de la branche GitHub suivie, **sans upload** :
 ```bash
 git fetch --quiet
-python claude-vibecoding-kit/backup_project.py . --refresh-list --upload
+python claude-vibecoding-kit/backup_project.py . --refresh-list
 ```
-Afficher le nombre de fichiers et le résultat de la copie dans le bilan. La liste comprend les
-fichiers privés/ignorés et les différences avec la branche publique, y compris les commits locaux
-non publiés. Cette sauvegarde est automatique ; une erreur rclone est non bloquante mais doit être
-signalée. Le script utilise `rclone copy` et ne supprime aucun fichier distant. Les dépendances et
-artefacts régénérables restent exclus.
+L'upload vers Drive (`--upload`) n'est pas lancé ici : sous auto-mode, le classifieur refuse
+systématiquement `rclone copy` vers un cloud (secrets dans le lot). Le manifeste est tenu à jour
+pour un upload différé, à faire hors session.
 
-Cette section s'exécute après l'étape 14 (`git push`) et **même si ce push a échoué** : la
-sauvegarde Drive ne dépend pas du push. Le manifeste `claude-vibecoding-kit/rclone_backup_files.txt`
-est réécrit à chaque passage ; il est gitignoré (aucun résidu à committer, pas de signalement à
-l'étape 15).
+Afficher dans le bilan le nombre de fichiers du manifeste, puis la commande exacte à lancer
+manuellement, dans un terminal normal, depuis la racine du projet :
+```
+python claude-vibecoding-kit/backup_project.py . --upload
+```
+La liste comprend les fichiers privés/ignorés et les différences avec la branche publique, y compris
+les commits locaux non publiés. `--upload` seul lit le manifeste existant, utilise `rclone copy` et
+ne supprime aucun fichier distant.
+
+Garantir la trace : si `tests_manuels.md` (racine du projet) ne contient pas déjà une section
+« Sauvegarde Drive en attente », l'ajouter avec la commande ci-dessus et la date du jour ; sinon
+mettre à jour la date, sans dupliquer. Son retrait suit la règle générale de `tests_manuels.md` :
+supprimée après confirmation que l'upload a été effectué.
+
+Cette section s'exécute après l'étape 14 (`git push`) et **même si ce push a échoué**. Le manifeste
+`claude-vibecoding-kit/rclone_backup_files.txt` est réécrit à chaque passage ; il est gitignoré
+(aucun résidu à committer, pas de signalement à l'étape 15). Non bloquant : signaler tout échec en
+une ligne et poursuivre.

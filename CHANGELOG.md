@@ -1,3 +1,17 @@
+## v5.119 — 2026-09-10
+
+### Décidé
+- **Phase 6 de `roadmap_integration_onboard.md`** : au lancement de cette phase, Marie **et** Morphéus sont convertis en testeurs à part entière avec `tester_code`, sur le modèle de Satine. Aucune identité n'est traitée en exception : pas de repli « utilisateur principal », `donnees_marie/` et `_contexte/marie_tests_journal.json` sont migrés sous le code de Marie, et le nommage par défaut n'est conservé que pour les `device_id` fantômes de `device_snapshots` (payload vide). Blockquote de décision ajouté en tête de la section Phase 6 de la roadmap.
+- Priorisation confirmée : la Phase 6 reste non prioritaire et vient **après** le `/deploy` du lot v5.93 → v5.119 (elle n'a de valeur activable qu'une fois la Phase 3 — code testeur — en production). Chemin critique inchangé : réparer la suite e2e (22 échecs / 59) puis déployer.
+
+### Constaté (lecture de code, aucune modification applicative)
+- Isolation locale des données déjà acquise : `src/data/sync/deviceIdentity.ts` génère `sync_device_id` / `sync_device_secret` une seule fois par navigateur. Un profil de navigateur distinct suffit à obtenir un jeu de données séparé, en local comme dans Supabase (snapshot poussé sous un `device_id` propre).
+- `Settings.tester_code?` (`src/domain/entities/settings.ts:14`) et sa saisie (`src/ui/screens/settings/E111Profile.tsx`) existent ; le code est sérialisé dans le snapshot de synchronisation (`src/data/sync/buildSnapshot.test.ts`).
+- Le dépouillement séparé par testeur n'existe pas : `scripts/backup_marie_snapshot.py` a `OUTPUT_DIR` figé sur `donnees_marie/` (ligne 31) et n'exploite jamais `tester_code`. Aucun dossier `donnees_testeurs/`. C'est l'objet de la Phase 6.
+
+### Modifié
+- `_contexte/on_close.md` (hook Fin de `/close`) : l'`--upload` automatique vers Google Drive est retiré (refusé systématiquement par le classifieur d'auto-mode). Le hook ne fait plus que rafraîchir le manifeste (`backup_project.py . --refresh-list`), afficher la commande d'upload à lancer manuellement et garantir une trace « Sauvegarde Drive en attente » dans `tests_manuels.md`. Résidu non commité d'une session antérieure, intégré ici.
+
 ## v5.118 — 2026-09-10
 
 ### Corrigé

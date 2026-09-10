@@ -1318,3 +1318,14 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - INVALIDÉ (angle mort de suivi) : « 12 parcours v5.92 en attente » n'est pas l'état réel. `manualTestRules.ts` retire un parcours dès qu'un résultat (`ok` OU `nok`) est enregistré à sa révision ; écran vide de Marie = 12 résultats enregistrés. Décalage = retard d'ingestion : `marie_tests_journal.json` s'arrête au 2026-09-04 (65 résultats), snapshot v5.92 de Marie à 74 (`snapshot-supabase-192f2411-20260909-2121z`, tasks 305).
 - EN ATTENTE : `ok`/`nok` réels des 33-38 + commentaires — connus seulement après ingestion du snapshot (`/deploy` étape 0.4). Vigilance : `ajouter-une-tache-depuis-la-reception` marqué `ok` par erreur le 2026-09-05 (zoom), correctif dans le lot non déployé.
 - Commits `4d57184`, `d0bd2ae` + close du jour (`c9c4dca`, v5.116).
+
+---
+
+## Session du 2026-09-10 — préparation test iPhone export/import, e2e suite au rouge découverte
+
+- `e2e/11-export-import-roundtrip.spec.ts` (T59/T60) et section « Export / import » de `tests_manuels.md` : livrables de la session précédente non committés, committés (`8db0d92`). T59/T60 verts (10,4 s).
+- `e2e/helpers/reset.ts` : `completeFastOnboarding()` clique « Continuer sans partager » sur l'écran E04 Consentement (inséré après « Entrer » par ONBOARD Phase 2, v5.108). Sans ce clic tout parcours e2e passant par le helper échouait au 1er écran.
+- Serveur preview LAN monté pour le test iPhone (`vite preview --host 0.0.0.0 --port 4173`, `dist/dev`, `http://192.168.1.162:4173/`) ; règle pare-feu entrante 4173 à créer en admin. Test non joué.
+- INVALIDÉ : « `src/` 837 tests verts » ne couvre que Vitest. `npm run test:e2e` complet 2026-09-10 = 37 passent / 22 échouent sur 59. Dérive onboarding E04 + E21 planifiée (heure + durée obligatoires) depuis v5.108, jamais rattrapée faute de `/deploy` depuis v5.92. Correctif `reset.ts` réduit les échecs sans les augmenter.
+- OBSERVÉ (non tranché) : E21 variante planifiée, « Valider » désactivé tant que heure de début + durée > 0 absentes (`canSubmit`, `E21CreateTaskV2.tsx:165`) — blocage rencontré au test iPhone, cause des échecs `05-overload`.
+- Commit `8db0d92` (v5.117). Fin hook `/close` (`backup_project.py --upload`) bloqué par le classifieur d'auto-mode, non exécuté.

@@ -1,3 +1,14 @@
+## v5.118 — 2026-09-10
+
+### Corrigé
+- `claude-vibecoding-kit/backup_project.py` (hook Fin de `/close`, sauvegarde Drive) : deux défauts. (1) `EXCLUDED_PARTS` incomplet — `test-results`, `playwright-report`, `.pytest_cache`, `.ruff_cache`, `.mypy_cache`, `coverage`, `htmlcov`, `.netlify`, `tmp` entraient dans le manifeste et étaient copiés vers Google Drive ; manifeste 374 → 222 lignes. (2) La boucle d'écho de `--refresh-list` levait `UnicodeEncodeError` sur stdout cp1252 (Windows) dès qu'un chemin du manifeste contenait un caractère non-ASCII (dossiers Playwright avec `—` et `→`), `exit 1` avant même d'atteindre le bloc `--upload`. Correctif : `sys.stdout`/`sys.stderr` forcés en `utf-8`/`errors="replace"` en tête de `main()`, `encoding=` explicite sur `subprocess.run(rclone)` et sur lecture/écriture du manifeste. Correctifs fournis par le kit VibeObs (prompt de délégation rédigé ici), relus et vérifiés : `pytest` 4/4, `--refresh-list` exit 0, `.env` + `DISCORD/discord_com/.env` + `donnees_marie/**` toujours dans le manifeste. Commit `746afcd`.
+
+### Ajouté
+- `claude-vibecoding-kit/test_backup_project.py` (pytest, 4 cas) : filtrage des artefacts régénérables, conservation des vraies sources non publiées, `--refresh-list` exit 0 sur des noms de fichiers non-ASCII (`PYTHONIOENCODING=cp1252`).
+
+### Constaté
+- Le hook Fin de `/close` (`rclone copy` de `.env` et `donnees_marie/` vers Drive) reste refusé par le classifieur d'auto-mode de Claude Code — politique, pas un bug. La sauvegarde Drive de fin de session est à lancer manuellement (`python claude-vibecoding-kit/backup_project.py . --refresh-list --upload`) tant qu'une règle d'autorisation Bash n'est pas ajoutée. Tracé `_contexte/signals.md` [P3], avec le bug préexistant `read_config()` (`RuntimeError` non capturée sous `--upload` si `rclone_backup.json` manque).
+
 ## v5.117 — 2026-09-10
 
 ### Ajouté

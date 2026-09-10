@@ -1298,3 +1298,12 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - `_contexte/signals.md` (entrée [P3] Phases 7-8 retirée, réfs repointées vers `Archives/`), `_contexte/contexte.md`, `README.md`, `CHANGELOG.md` (v5.105) alignés.
 - Reco actée : priorité = résorber le delta prod v5.92 ↔ `CHANGELOG` (relance Marie [P1] puis `/deploy`), pas la refacto P3.
 - Aucun code applicatif touché. Suite complète inchangée (100 fichiers / 817 tests verts).
+
+---
+
+## Session du 2026-09-09 — correctif angle mort Phase 4 + relance Marie v5.92
+
+- Angle mort Phase 4 constaté au `/close` précédent (89 `device_id`, ~77 vides bruyants) corrigé : un appareil sans donnée non ciblé par `--device-id` est un skip silencieux, plus une erreur. `scripts/backup_marie_snapshot.py`, `scripts/test_backup_marie_snapshot.py` (`payload_is_empty()`, `archive_one()` renvoie un troisième indicateur `ignore`, `run_backup()` compte les appareils ignorés). Commit `982ced2`.
+- Relance des 12 tests v5.92 en attente déposée dans la gateway à destination de Marie (`kind: info`, sans réponse attendue) — aucune relance depuis la livraison du 2026-09-05. `historique_conversation_marie.md` mis à jour, gateway outbox `20260909T100248_019203.json` (`pending`). Commit `95922b2`.
+- VALIDÉ : hook `/close` du jour — `backup_marie_snapshot.py` sans `--device-id` termine `exit 0`, 0 archive écrite, 77 appareils ignorés en silence, aucune ligne `ERREUR`.
+- `_contexte/signals.md`, `_contexte/contexte.md`, `CHANGELOG.md` (v5.115) alignés. Deux `/close` orchestrateur ce jour (`a5ce14d` Phase 5 ONBOARD, `85c45c7` correctif + relance).

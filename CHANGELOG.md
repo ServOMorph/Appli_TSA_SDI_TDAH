@@ -1,3 +1,10 @@
+## v5.116 — 2026-09-10
+
+### Modifié
+- `/close` orchestrateur. Relance des 12 tests v5.92 envoyée à Marie sur Discord (`1547194409135644723`, 2026-09-09 10:38 UTC) après jugement du gardien de sortie de la session `discord` : `approve` avec deux retouches de forme `STYLE.md` § marie (retrait de l'étiquette « Relance : », « déployer » → « mettre en ligne »), fond inchangé. Commit `4d57184` aligne l'entrée de `historique_conversation_marie.md` sur le texte réellement envoyé.
+- Réponse de Marie à la relance (routée à la main par la session `discord`, relance sans `--expect-reply`) : elle a déjà fait les 12 tests, l'écran « Tests à faire » est vide de son côté. Ce n'est pas un désaccord — `src/domain/rules/manualTestRules.ts` retire un parcours de la liste dès qu'un résultat (`ok` **ou** `nok`) est enregistré à sa révision courante. Le décalage est un retard d'ingestion : `_contexte/marie_tests_journal.json` s'arrête au 2026-09-04 (65 résultats), le snapshot v5.92 de Marie en porte 74 (`snapshot-supabase-192f2411-20260909-2121z`, tasks 305). Le `/deploy` du lot v5.93 → v5.114 est débloqué : son étape 0.4 ingérera le snapshot et réconciliera les demandes 33-38 dans le journal et `marie_modifications_suivi.md`. Point de vigilance : `ajouter-une-tache-depuis-la-reception` marqué `ok` par erreur par Marie le 2026-09-05 (zoom), correctif dans le lot non déployé. Commit `d0bd2ae`.
+- [P1] « Marie confirme-t-elle que "Relancer" fait passer ses retours en "Envoyé" ? » close : sa réponse du 2026-09-08 (« c'est bon c'est envoyé merci ») retrouvée dans l'inbox de la gateway (`20260908T163729_832191`, rattachée à la requête `20260906T204529_830899`) et `ack` ; `Réponses attendues : 0`.
+
 ## v5.115 — 2026-09-09
 
 ### Corrigé

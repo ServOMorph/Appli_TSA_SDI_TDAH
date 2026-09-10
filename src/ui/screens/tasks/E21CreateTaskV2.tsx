@@ -116,6 +116,7 @@ function fieldCellStyle(color: string | null): React.CSSProperties {
     borderRadius: 'var(--radius-md)',
     border: '1px solid var(--color-border)',
     backgroundColor: color ? pastelBackground(color) : 'var(--color-surface)',
+    minWidth: 0,
   }
 }
 

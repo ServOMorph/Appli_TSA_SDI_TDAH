@@ -23,7 +23,7 @@ function bannerStyle(color: string | null): React.CSSProperties {
 
 const gridStyle: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
   gap: 'var(--spacing-sm)',
 }
 
@@ -61,6 +61,7 @@ function cardStyle(color: string | null, span: boolean | undefined): React.CSSPr
     border: '1px solid var(--color-border)',
     backgroundColor: color ? pastelBackground(color) : 'var(--color-surface)',
     gridColumn: span ? '1 / -1' : undefined,
+    minWidth: 0,
   }
 }
 

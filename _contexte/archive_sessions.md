@@ -1307,3 +1307,14 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - Relance des 12 tests v5.92 en attente déposée dans la gateway à destination de Marie (`kind: info`, sans réponse attendue) — aucune relance depuis la livraison du 2026-09-05. `historique_conversation_marie.md` mis à jour, gateway outbox `20260909T100248_019203.json` (`pending`). Commit `95922b2`.
 - VALIDÉ : hook `/close` du jour — `backup_marie_snapshot.py` sans `--device-id` termine `exit 0`, 0 archive écrite, 77 appareils ignorés en silence, aucune ligne `ERREUR`.
 - `_contexte/signals.md`, `_contexte/contexte.md`, `CHANGELOG.md` (v5.115) alignés. Deux `/close` orchestrateur ce jour (`a5ce14d` Phase 5 ONBOARD, `85c45c7` correctif + relance).
+
+---
+
+## Session du 2026-09-10 — relance Marie v5.92 envoyée, réponse reçue, /deploy débloqué
+
+- Moitié « relance Marie [P1] » de la décision structurante du 2026-09-08 faite : `/deploy` du lot v5.93 -> v5.114 débloqué. Son étape 0.4 ingérera le snapshot v5.92 de Marie et réconciliera les demandes 33-38.
+- [P1] « Marie confirme Relancer -> Envoyé » close : réponse du 2026-09-08 (« c'est bon c'est envoyé merci ») retrouvée dans l'inbox gateway (`20260908T163729_832191`) et `ack` ; `Réponses attendues : 0`.
+- Relance v5.92 envoyée à Marie : gardien de sortie `discord` `approve` avec deux retouches de forme `STYLE.md` § marie (fond inchangé), Discord `1547194409135644723` (2026-09-09 10:38 UTC).
+- INVALIDÉ (angle mort de suivi) : « 12 parcours v5.92 en attente » n'est pas l'état réel. `manualTestRules.ts` retire un parcours dès qu'un résultat (`ok` OU `nok`) est enregistré à sa révision ; écran vide de Marie = 12 résultats enregistrés. Décalage = retard d'ingestion : `marie_tests_journal.json` s'arrête au 2026-09-04 (65 résultats), snapshot v5.92 de Marie à 74 (`snapshot-supabase-192f2411-20260909-2121z`, tasks 305).
+- EN ATTENTE : `ok`/`nok` réels des 33-38 + commentaires — connus seulement après ingestion du snapshot (`/deploy` étape 0.4). Vigilance : `ajouter-une-tache-depuis-la-reception` marqué `ok` par erreur le 2026-09-05 (zoom), correctif dans le lot non déployé.
+- Commits `4d57184`, `d0bd2ae` + close du jour (`c9c4dca`, v5.116).

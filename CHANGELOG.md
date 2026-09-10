@@ -1,3 +1,15 @@
+## v5.117 — 2026-09-10
+
+### Ajouté
+- `e2e/11-export-import-roundtrip.spec.ts` (T59/T60) : round-trip Playwright de l'export/import RGPD des Paramètres — T59 export JSON → « Supprimer toutes les données » → onboarding vierge → réimport → données restaurées, avec assertions de forme du fichier (`version`, `export_date`, `user.profile_type`, `tasks`, présence de `manual_test_results`, **absence de `feedback_reports`**) ; T60 fichier illisible rejeté sans modale, fichier de version future rejeté après confirmation sans effacer les données locales. Verts (10,4 s). Livrable de la session précédente resté non committé, avec la section « Export / import des données » de `tests_manuels.md`.
+
+### Corrigé
+- `e2e/helpers/reset.ts` : `completeFastOnboarding()` clique désormais « Continuer sans partager » sur l'écran E04 Consentement (inséré après « Entrer » par ONBOARD Phase 2, v5.108). Sans ce clic, tout parcours e2e passant par le helper échouait dès le premier écran.
+
+### Constaté
+- **Suite e2e Playwright au rouge** : `npm run test:e2e` complet ce jour = 37 passent / 22 échouent sur 59. Régression accumulée depuis v5.108 (écran E04, E21 variante planifiée qui exige heure de début + durée), jamais rattrapée car aucun `/deploy` depuis v5.92. Le « 837 tests verts » historique ne couvre que les tests unitaires Vitest. Tracé `_contexte/signals.md` [P1] : à solder avant le `/deploy` du lot v5.93 → v5.114. Le correctif `reset.ts` ci-dessus réduit le nombre d'échecs sans l'augmenter.
+- Préparation du test manuel iPhone export/import : serveur `vite preview --host 0.0.0.0 --port 4173` (`http://192.168.1.162:4173/`), règle pare-feu entrante TCP 4173 à créer en PowerShell admin. Non joué — porté à `tests_manuels.md` et `_contexte/signals.md` [P2].
+
 ## v5.116 — 2026-09-10
 
 ### Modifié

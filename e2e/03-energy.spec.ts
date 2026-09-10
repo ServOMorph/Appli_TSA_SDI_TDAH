@@ -49,6 +49,6 @@ test('T25 — Énergie ignorée → badge "Énergie ignorée" visible sur dashbo
 test('T26 — Retour depuis le check-in ramène directement à l’accueil (#29)', async ({ page }) => {
   await page.getByRole('button', { name: "0 énergie planifiée sur 5 disponible aujourd'hui" }).click()
   await expect(page.getByRole('heading', { name: 'Mon énergie maintenant' })).toBeVisible()
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 })

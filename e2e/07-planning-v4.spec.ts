@@ -10,6 +10,7 @@ test('T46 — planifier une tâche à la création, puis modifier son horaire de
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('McDo')
   await page.getByLabel('Heure de début').fill('10:00')
+  await page.getByLabel('Heures', { exact: true }).selectOption('1')
   await page.getByRole('button', { name: 'Valider' }).click()
 
   await expect(page.getByText('McDo')).toBeVisible()
@@ -18,7 +19,7 @@ test('T46 — planifier une tâche à la création, puis modifier son horaire de
   await page.getByText('McDo').click()
   await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
   await page.getByRole('button', { name: 'Modifier Horaire' }).click()
-  await page.getByLabel('Heure').fill('12:00')
+  await page.getByLabel('Heure', { exact: true }).fill('12:00')
   await page.getByRole('button', { name: 'Enregistrer' }).click()
 
   await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
@@ -34,6 +35,7 @@ test('T48 — cliquer une tâche planifiée ouvre sa fiche, renommer et supprime
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('RDV dentiste')
   await page.getByLabel('Heure de début').fill('15:00')
+  await page.getByLabel('Heures', { exact: true }).selectOption('1')
   await page.getByRole('button', { name: 'Valider' }).click()
 
   await page.getByText('RDV dentiste').click()
@@ -53,6 +55,7 @@ test('T49 — Reporter une tâche en surcharge la bascule sur le lendemain (E8)'
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche lourde')
   await page.getByLabel('Heure de début').fill('08:00')
+  await page.getByLabel('Heures', { exact: true }).selectOption('1')
   await page.getByRole('group', { name: 'Coût en énergie' }).getByRole('button', { name: '12', exact: true }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
 

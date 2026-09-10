@@ -14,6 +14,7 @@ async function planOverloadingTask(page: Page, title: string) {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill(title)
   await page.getByLabel('Heure de début').fill('08:00')
+  await page.getByLabel('Heures', { exact: true }).selectOption('1')
   await page.getByRole('group', { name: 'Coût en énergie' }).getByRole('button', { name: '12', exact: true }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
 }

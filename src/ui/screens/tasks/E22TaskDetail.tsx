@@ -390,6 +390,12 @@ export function E22TaskDetail() {
     setPendingDelete(false)
   }
 
+  async function refreshFetchedTask() {
+    if (!selectedTaskId || taskFromLists) return
+    const refreshed = await getTaskById(selectedTaskId)
+    setFetchedTask(refreshed ?? null)
+  }
+
   async function saveField(patch: TaskFieldEdit) {
     if (!selectedTaskId || !task) return
     setExpandedField(null)
@@ -397,6 +403,7 @@ export function E22TaskDetail() {
       setPendingFieldEdit(patch)
     } else {
       await updateTaskFields(selectedTaskId, patch, 'occurrence')
+      await refreshFetchedTask()
     }
   }
 
@@ -405,6 +412,7 @@ export function E22TaskDetail() {
     const patch = pendingFieldEdit
     setPendingFieldEdit(null)
     await updateTaskFields(selectedTaskId, patch, scope)
+    await refreshFetchedTask()
   }
 
   function toggleField(field: FieldKey) {

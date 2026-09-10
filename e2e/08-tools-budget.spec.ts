@@ -37,7 +37,7 @@ test('T52 — configurer le Budget, saisir une dépense, la consulter en fiche e
   await expect(page.getByText(/Solde/)).toBeVisible()
   await expect(page.getByText('50,00 €', { exact: true })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Configurer le budget' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Ouvrir Courses' }).click()
@@ -56,7 +56,7 @@ test('T52 — configurer le Budget, saisir une dépense, la consulter en fiche e
   await expect(page.getByText('Aucune dépense sur cette période.')).toBeVisible()
   await expect(page.getByText(/0,00.*dépensés sur 60,00/)).toBeVisible()
 
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Configurer le budget' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Ouvrir Courses' })).toBeVisible()
 })
@@ -81,7 +81,7 @@ test('T53 — suppression en cascade d’un livret et d’une catégorie, sans d
   await movementDialog.getByRole('button', { name: 'Enregistrer' }).click()
   await expect(page.getByText(/Solde/)).toBeVisible()
 
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByText(/50,00/)).toBeVisible()
 
   await page.getByRole('button', { name: 'Supprimer Livret A' }).click()
@@ -110,8 +110,8 @@ test('T53 — suppression en cascade d’un livret et d’une catégorie, sans d
   await expect(page.getByRole('button', { name: 'Ouvrir Loisirs' })).toHaveCount(0)
   await expect(page.getByText('Aucune catégorie configurée.')).toBeVisible()
 
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Budget' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Ouvrir Mon compte' }).getByText('Non configuré')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Ouvrir Prévisions' }).getByText('Non configuré')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Ouvrir Mes livrets' }).getByText('Aucun livret')).toBeVisible()
 })

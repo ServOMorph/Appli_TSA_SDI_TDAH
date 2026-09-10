@@ -76,14 +76,14 @@ test('T57 — le widget Comptes de l’accueil ouvre le suivi des sous-catégori
   await categoryDialog.getByRole('button', { name: 'Créer' }).click()
   await expect(page.getByRole('button', { name: 'Ouvrir Courses' })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Budget' })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Comptes' }).click()
-  await expect(page.getByRole('heading', { name: 'Comptes' })).toBeVisible()
+  await page.getByRole('button', { name: 'Mon compte', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible()
   await page.getByRole('button', { name: 'Ouvrir Courses' }).click()
 
   await page.getByRole('button', { name: 'Ajouter une dépense' }).click()
@@ -92,10 +92,10 @@ test('T57 — le widget Comptes de l’accueil ouvre le suivi des sous-catégori
   await expenseDialog.getByRole('button', { name: 'Enregistrer' }).click()
   await expect(page.getByText(/15,00.*dépensés sur 60,00/)).toBeVisible()
 
-  await page.getByRole('button', { name: 'Retour' }).click()
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Budget' }).click()
-  await expect(page.getByRole('button', { name: 'Ouvrir Mon compte' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Ouvrir Prévisions' })).toBeVisible()
 })

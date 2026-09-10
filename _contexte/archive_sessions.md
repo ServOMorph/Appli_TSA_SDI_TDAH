@@ -1340,3 +1340,24 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 - Commit `746afcd` (poussé) + close du jour (`962b8c2`, v5.118). `tmp/` gardé exclu.
 - EN ATTENTE : `--refresh-list --upload` non validé — `rclone copy` vers Drive refusé par le classifieur d'auto-mode (politique). Hook Fin `/close` à lancer manuellement.
 - NON TRAITÉ (préexistant) : `read_config()` `RuntimeError` non capturée sous `--upload` si `rclone_backup.json` manque.
+
+---
+
+## Session du 2026-09-10 — cadrage jeu de données testeur Morphéus/Marie, note Phase 6
+
+### Décisions prises
+- Phase 6 ONBOARD : au lancement, Marie ET Morphéus convertis en testeurs avec `tester_code` comme Satine — aucune identité en exception, pas de repli « utilisateur principal » ; `donnees_marie/` + `marie_tests_journal.json` migrés sous le code de Marie.
+- Priorisation confirmée : Phase 6 non prioritaire. Chemin critique = réparer suite e2e (22/59) -> `/deploy` du lot v5.93 -> v5.119, puis Phase 6 (Phase 3 code testeur alors en prod).
+
+### Livrables produits ou modifiés
+- `roadmap_integration_onboard.md` : blockquote « Décision 2026-09-10 (Morphéus) » ajouté en tête de la section Phase 6.
+- `_contexte/on_close.md` : hook Fin — `--upload` automatique retiré (refus classifieur auto-mode), remplacé par manifeste `--refresh-list` seul + commande manuelle + trace dans `tests_manuels.md`. Résidu non commité d'une session précédente, intégré à ce `/close`.
+- `_contexte/signals.md`, `_contexte/contexte.md`, `_contexte/archive_sessions.md`, `README.md`, `CHANGELOG.md` (v5.119) : état après session.
+
+### Hypothèses validées / invalidées
+- VALIDÉ (lecture code) : isolation locale des données déjà acquise — `src/data/sync/deviceIdentity.ts` génère `sync_device_id`/`sync_device_secret` par navigateur.
+- VALIDÉ (lecture code) : `Settings.tester_code?` (`src/domain/entities/settings.ts:14`) et sa saisie (`src/ui/screens/settings/E111Profile.tsx`) existent ; le code est sérialisé dans le snapshot.
+- INVALIDÉ : « dispositif testeur façon Satine prêt » — `scripts/backup_marie_snapshot.py` a `OUTPUT_DIR` codé en dur sur `donnees_marie/` (ligne 31) et n'exploite jamais `tester_code`.
+
+### Prochaine étape exacte
+Réparer la suite e2e Playwright (22 échecs) puis `/deploy` du lot v5.93 -> v5.119.

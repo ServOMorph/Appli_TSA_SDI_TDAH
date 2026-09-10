@@ -1,9 +1,15 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { resetApp } from './helpers/reset'
 
 test.beforeEach(async ({ page }) => {
   await resetApp(page)
 })
+
+/** Depuis v5.108, l'écran E04 Consentement s'insère entre « Entrer » et le profil. */
+async function enterOnboarding(page: Page) {
+  await page.getByRole('button', { name: 'Entrer' }).click()
+  await page.getByRole('button', { name: 'Continuer sans partager' }).click()
+}
 
 test('T01 — écran Welcome affiché au démarrage', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Bienvenue' })).toBeVisible()
@@ -11,20 +17,20 @@ test('T01 — écran Welcome affiché au démarrage', async ({ page }) => {
 })
 
 test('T02 — Entrer → écran Profil', async ({ page }) => {
-  await page.getByRole('button', { name: 'Entrer' }).click()
+  await enterOnboarding(page)
   await expect(page.getByRole('heading', { name: 'Votre profil' })).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/02-profile.png' })
 })
 
 test('T03 — Sélectionner profil Étudiant → écran Énergie', async ({ page }) => {
-  await page.getByRole('button', { name: 'Entrer' }).click()
+  await enterOnboarding(page)
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await expect(page.getByRole('heading', { name: 'Votre énergie maintenant' })).toBeVisible()
   await page.screenshot({ path: 'e2e/screenshots/03-energy.png' })
 })
 
 test('T04 — Saisir énergie et valider → Dashboard', async ({ page }) => {
-  await page.getByRole('button', { name: 'Entrer' }).click()
+  await enterOnboarding(page)
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await page.getByRole('button', { name: '7' }).click()
   await expect(page.getByRole('button', { name: '7' })).toHaveAttribute('aria-pressed', 'true')
@@ -34,19 +40,20 @@ test('T04 — Saisir énergie et valider → Dashboard', async ({ page }) => {
 })
 
 test('T05 — Ignorer énergie → Dashboard', async ({ page }) => {
-  await page.getByRole('button', { name: 'Entrer' }).click()
+  await enterOnboarding(page)
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 })
 
 test('T06 — Ajouter une tâche depuis Dashboard vide → visible sur Dashboard', async ({ page }) => {
-  await page.getByRole('button', { name: 'Entrer' }).click()
+  await enterOnboarding(page)
   await page.getByRole('button', { name: 'Adulte' }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche onboarding test')
   await page.getByLabel('Heure de début').fill('09:00')
+  await page.getByLabel('Heures', { exact: true }).selectOption('1')
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.getByRole('button', { name: 'Accueil' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
@@ -55,7 +62,7 @@ test('T06 — Ajouter une tâche depuis Dashboard vide → visible sur Dashboard
 })
 
 test('T07 — Dashboard vide après onboarding sans tâche', async ({ page }) => {
-  await page.getByRole('button', { name: 'Entrer' }).click()
+  await enterOnboarding(page)
   await page.getByRole('button', { name: 'Adulte' }).click()
   await page.getByRole('button', { name: 'Ignorer' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()

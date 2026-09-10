@@ -95,6 +95,6 @@ test('T38 — Supprimer toutes les données → retour écran Welcome', async ({
 
 test('T39 — Retour paramètres → dashboard', async ({ page }) => {
   await page.getByRole('navigation').getByRole('button', { name: 'Paramètres' }).click()
-  await page.getByRole('button', { name: 'Retour' }).click()
+  await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 })

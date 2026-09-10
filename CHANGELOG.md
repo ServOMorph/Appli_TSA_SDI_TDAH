@@ -1,3 +1,15 @@
+## v5.120 — 2026-09-10
+
+### Corrigé
+- **Suite e2e Playwright réparée : 59/59 verts** (2 exécutions consécutives, `npm run test:e2e`), contre 22 échecs / 59. Redevenue utilisable comme gate avant `/deploy`. 5 causes de dérive tests ↔ app, accumulées faute de `/deploy` depuis v5.92 :
+  1. Écran E04 Consentement (ONBOARD Phase 2, v5.108) inséré entre « Entrer » et le profil — `e2e/01-onboarding.spec.ts` faisait l'onboarding pas à pas sans le franchir. Helper local `enterOnboarding()` (clic « Continuer sans partager »).
+  2. Variante planifiée de E21 : `canSubmit` (`src/ui/screens/tasks/E21CreateTaskV2.tsx`) exige désormais heure de début **et** `durationMinutes > 0` — les tests ne renseignaient que l'heure, « Valider » restait grisé. Ajout de `getByLabel('Heures', { exact: true }).selectOption('1')` dans `05-overload`, `07-planning-v4`, `01-onboarding` (T06).
+  3. Locators ambigus : le bouton flottant `FeedbackFab` (`aria-label="Signaler un retour"`) matchait `getByRole('button', { name: 'Retour' })` ; le `<select>` « Heures » du `DurationRoller` matchait `getByLabel('Heure')`. `{ exact: true }` sur ces locators dans `03-energy`, `04-settings`, `07-planning-v4`, `08-tools-budget`, `09-tools-folders-lists`.
+  4. Renommages d'écrans du Budget non répercutés : widget accueil « Comptes » → « Mon compte », widget budget « Ouvrir Mon compte » → « Ouvrir Prévisions ». Corrigés dans `08-tools-budget`, `09-tools-folders-lists`.
+  5. `e2e/10-feedback.spec.ts` : le mock `route.fulfill({ status: 200 })` simulait un backend fonctionnel — avec la config `.env` présente, le retour partait réellement et passait « Envoyé » au lieu de « En attente d'envoi ». Mock `route.abort()` (vrai « sans backend ») + assertion « En attente d'envoi » **ou** « Échec d'envoi ».
+- **`src/ui/screens/tasks/E22TaskDetail.tsx`** : une tâche **planifiée** ouverte depuis sa fiche est lue via `fetchedTask` (fetch ponctuel, non réactif — elle n'est pas dans `inboxTasks`) ; après une édition inline (titre, horaire, date, icône…) l'écran gardait l'ancienne valeur jusqu'à re-navigation. Ajout de `refreshFetchedTask()` après `updateTaskFields` dans `saveField` et `confirmFieldEditScope`. Angle mort de la refonte fiche de tâche #37 : les tests unitaires ne vérifiaient que l'appel mické à `updateTaskFields`, jamais le re-rendu. Le parcours in-app `modifier-une-tache-planifiee` (revision 1, docRefs [37]) décrit déjà le comportement corrigé — pas encore déployé, aucun bump de révision.
+- Contrôles : Vitest 103 fichiers / 837 tests verts (dont `E22TaskDetail.test.tsx` 27/27), `tsc -b` + `eslint` exit 0.
+
 ## v5.119 — 2026-09-10
 
 ### Décidé

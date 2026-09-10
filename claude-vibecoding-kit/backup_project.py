@@ -11,7 +11,24 @@ from pathlib import Path
 RCLONE = Path(os.environ["LOCALAPPDATA"]) / "rclone" / "rclone.exe"
 CONFIG = Path(__file__).with_name("rclone_backup.json")
 MANIFEST = Path(__file__).with_name("rclone_backup_files.txt")
-EXCLUDED_PARTS = {".git", "node_modules", "__pycache__", "venv", ".venv", "dist", "build"}
+EXCLUDED_PARTS = {
+    ".git",
+    "node_modules",
+    "__pycache__",
+    "venv",
+    ".venv",
+    "dist",
+    "build",
+    "test-results",
+    "playwright-report",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".mypy_cache",
+    "coverage",
+    "htmlcov",
+    ".netlify",
+    "tmp",
+}
 
 
 def is_excluded(path: Path) -> bool:
@@ -51,7 +68,11 @@ def write_manifest(project_path: Path) -> list[str]:
     if manifest_relative and manifest_relative not in files:
         files.append(manifest_relative)
         files.sort()
-    MANIFEST.write_text("\n".join(files) + ("\n" if files else ""), encoding="utf-8")
+    MANIFEST.write_text(
+        "\n".join(files) + ("\n" if files else ""),
+        encoding="utf-8",
+        errors="surrogateescape",
+    )
     return files
 
 
@@ -66,6 +87,12 @@ def read_config() -> str:
 
 
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
     parser = argparse.ArgumentParser()
     parser.add_argument("project_path", type=Path)
     parser.add_argument("--refresh-list", action="store_true")
@@ -85,7 +112,9 @@ def main() -> int:
         if args.refresh_list:
             files = write_manifest(project_path)
         else:
-            files = MANIFEST.read_text(encoding="utf-8").splitlines()
+            files = MANIFEST.read_text(
+                encoding="utf-8", errors="surrogateescape"
+            ).splitlines()
     except (OSError, RuntimeError) as error:
         print(f"ERREUR : {error}")
         return 1
@@ -114,7 +143,9 @@ def main() -> int:
         "--files-from-raw",
         str(MANIFEST),
     ]
-    result = subprocess.run(command, capture_output=True, text=True)
+    result = subprocess.run(
+        command, capture_output=True, text=True, encoding="utf-8", errors="replace"
+    )
     if result.returncode != 0:
         print(f"ERREUR upload : {result.stderr.strip()}")
         return 1

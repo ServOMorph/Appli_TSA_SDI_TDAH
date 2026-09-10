@@ -137,17 +137,26 @@ export function E122FeedbackCapture() {
         </div>
       ) : (
         <>
-          <AnnotationCanvas imageUrl={imageUrl} strokes={strokes} onChange={setStrokes} active={annotating} />
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
-            <Button
-              onClick={() => setAnnotating((current) => !current)}
-              aria-pressed={annotating}
-            >
+          <div
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 2,
+              display: 'flex',
+              gap: 'var(--spacing-sm)',
+              flexWrap: 'wrap',
+              padding: 'var(--spacing-sm) 0',
+              backgroundColor: 'var(--color-background)',
+              borderBottom: '1px solid var(--color-border)',
+            }}
+          >
+            <Button onClick={() => setAnnotating((current) => !current)} aria-pressed={annotating}>
               {annotating ? 'Terminer l’annotation' : 'Annoter l’image'}
             </Button>
             <Button variant="secondary" onClick={() => setStrokes(undoStroke(strokes))} disabled={strokes.length === 0}>Annuler le trait</Button>
             <Button variant="secondary" onClick={() => setStrokes(clearStrokes())} disabled={strokes.length === 0}>Effacer les traits</Button>
           </div>
+          <AnnotationCanvas imageUrl={imageUrl} strokes={strokes} onChange={setStrokes} active={annotating} />
         </>
       )}
       <label htmlFor="feedback-screen-code">Numéro d’écran</label>

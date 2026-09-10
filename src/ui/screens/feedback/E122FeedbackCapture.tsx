@@ -39,6 +39,7 @@ export function E122FeedbackCapture() {
   const [comment, setComment] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [annotating, setAnnotating] = useState(false)
 
   useEffect(() => {
     return () => {
@@ -60,6 +61,7 @@ export function E122FeedbackCapture() {
     setImage(file)
     setImageUrl(URL.createObjectURL(file))
     setStrokes([])
+    setAnnotating(false)
     setError('')
   }
 
@@ -125,7 +127,7 @@ export function E122FeedbackCapture() {
       <button onClick={() => back('dashboard')} aria-label="Retour" style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: 0 }}>← Retour</button>
       <div>
         <h1 style={{ margin: 0 }}>Nouveau retour</h1>
-        <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>Ajoutez une capture et entourez ce qui pose problème.</p>
+        <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>Ajoutez une capture. L’annotation au crayon est facultative : activez-la si vous voulez entourer ce qui pose problème.</p>
       </div>
       <input ref={inputRef} aria-label="Choisir une image" type="file" accept="image/*" hidden onChange={(event) => chooseImage(event.target.files?.[0])} />
       {!imageUrl ? (
@@ -135,8 +137,14 @@ export function E122FeedbackCapture() {
         </div>
       ) : (
         <>
-          <AnnotationCanvas imageUrl={imageUrl} strokes={strokes} onChange={setStrokes} />
-          <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+          <AnnotationCanvas imageUrl={imageUrl} strokes={strokes} onChange={setStrokes} active={annotating} />
+          <div style={{ display: 'flex', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
+            <Button
+              onClick={() => setAnnotating((current) => !current)}
+              aria-pressed={annotating}
+            >
+              {annotating ? 'Terminer l’annotation' : 'Annoter l’image'}
+            </Button>
             <Button variant="secondary" onClick={() => setStrokes(undoStroke(strokes))} disabled={strokes.length === 0}>Annuler le trait</Button>
             <Button variant="secondary" onClick={() => setStrokes(clearStrokes())} disabled={strokes.length === 0}>Effacer les traits</Button>
           </div>

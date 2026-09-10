@@ -7,6 +7,7 @@ type Props = {
   imageUrl: string
   strokes: FeedbackStroke[]
   onChange: (strokes: FeedbackStroke[]) => void
+  active?: boolean
 }
 
 function pointFor(event: PointerEvent<HTMLCanvasElement>): FeedbackPoint {
@@ -31,7 +32,7 @@ function draw(canvas: HTMLCanvasElement, strokes: FeedbackStroke[]) {
   }
 }
 
-export function AnnotationCanvas({ imageUrl, strokes, onChange }: Props) {
+export function AnnotationCanvas({ imageUrl, strokes, onChange, active = true }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [drawing, setDrawing] = useState<FeedbackPoint[] | null>(null)
   const allStrokes = useMemo(() => (drawing ? [...strokes, { points: drawing }] : strokes), [drawing, strokes])
@@ -40,6 +41,10 @@ export function AnnotationCanvas({ imageUrl, strokes, onChange }: Props) {
     const canvas = canvasRef.current
     if (canvas) draw(canvas, allStrokes)
   }, [allStrokes])
+
+  useEffect(() => {
+    if (!active) setDrawing(null)
+  }, [active])
 
   function finishStroke() {
     if (!drawing) return
@@ -55,14 +60,26 @@ export function AnnotationCanvas({ imageUrl, strokes, onChange }: Props) {
         aria-label="Zone d’annotation"
         width={1200}
         height={800}
-        onPointerDown={(event) => {
-          event.currentTarget.setPointerCapture(event.pointerId)
-          setDrawing([pointFor(event)])
+        onPointerDown={
+          active
+            ? (event) => {
+                event.currentTarget.setPointerCapture(event.pointerId)
+                setDrawing([pointFor(event)])
+              }
+            : undefined
+        }
+        onPointerMove={active ? (event) => drawing && setDrawing([...drawing, pointFor(event)]) : undefined}
+        onPointerUp={active ? finishStroke : undefined}
+        onPointerCancel={active ? finishStroke : undefined}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          touchAction: active ? 'none' : 'auto',
+          pointerEvents: active ? 'auto' : 'none',
+          cursor: active ? 'crosshair' : 'default',
         }}
-        onPointerMove={(event) => drawing && setDrawing([...drawing, pointFor(event)])}
-        onPointerUp={finishStroke}
-        onPointerCancel={finishStroke}
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', touchAction: 'none', cursor: 'crosshair' }}
       />
     </div>
   )

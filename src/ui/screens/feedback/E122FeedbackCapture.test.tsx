@@ -46,6 +46,17 @@ describe('E122FeedbackCapture', () => {
     expect(screen.queryByRole('button', { name: 'Choisir une image' })).not.toBeInTheDocument()
   })
 
+  it('n’active le mode trait que sur choix explicite', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    renderWithApp(<E122FeedbackCapture />, makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } }))
+    await userEvent.upload(screen.getByLabelText('Choisir une image'), new File(['image'], 'capture.png', { type: 'image/png' }))
+    const canvas = screen.getByLabelText('Zone d’annotation')
+    expect(canvas.style.pointerEvents).toBe('none')
+    await userEvent.click(screen.getByRole('button', { name: 'Annoter l’image' }))
+    expect(canvas.style.pointerEvents).toBe('auto')
+    expect(screen.getByRole('button', { name: 'Terminer l’annotation' })).toBeInTheDocument()
+  })
+
   it('aplatit puis enregistre le retour local', async () => {
     const { default: userEvent } = await import('@testing-library/user-event')
     const ctx = makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } })

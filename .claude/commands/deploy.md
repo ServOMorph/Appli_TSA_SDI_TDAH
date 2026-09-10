@@ -25,7 +25,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       snapshot le plus récent déjà présent dans `donnees_marie/`. Ne jamais copier ni modifier un
       fichier de `donnees_marie/` à la main (donnée sensible listée dans `CLAUDE.md`).
    2. Analyser le dernier snapshot de `donnees_marie/` dans son intégralité (toutes les tables du
-      payload JSON, pas seulement `manual_test_results`) :
+      payload JSON, pas seulement `manual_test_results`). La lecture de ce snapshot est
+      explicitement autorisée ici — dérogation bornée à cette étape de `/deploy` de l'interdiction
+      `CLAUDE.md` § Données sensibles. Ne jamais afficher son contenu brut ni recopier de données
+      personnelles : n'en restituer que l'analyse.
       - pertes ou incohérences de données par rapport au dernier état connu (journal
         `_contexte/marie_tests_journal.json` pour l'historique des tests, comparaison structurelle du
         reste du payload avec le snapshot précédent analysé) ;
@@ -36,12 +39,23 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    4. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
       réconcilie `_contexte/marie_modifications_suivi.md` et pose le jalon daté « Dernière exécution
       de la revue » dans l'en-tête du registre (contrôlé à l'étape 3.9). Présenter ensuite à
-      l'utilisateur le compte-rendu qu'elle rend (différentiel d'états du registre, ou « Doc
-      inchangé depuis <date> » avec la date comparée) : ne jamais enchaîner à l'étape 1 sans l'avoir
-      affiché. Si elle rapporte que le Google Doc est plus récent que la dernière revue du registre :
-      s'arrêter après la réconciliation et demander à l'utilisateur de lancer `/analyser_googledoc`
-      avant de reprendre `/deploy`.
-   5. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
+      l'utilisateur le compte-rendu qu'elle rend (en-tête « analyse requise » / « réconciliation
+      seule » / « Doc inchangé », différentiel d'états du registre, date comparée) : ne jamais
+      enchaîner à l'étape 1 sans l'avoir affiché. Si le compte-rendu est **« analyse requise »**
+      (au moins une demande numérotée nouvelle ou au texte modifié dans le Doc) : s'arrêter après
+      la réconciliation et le commit de bookkeeping (étape 0.5), et demander à l'utilisateur de
+      lancer `/analyser_googledoc` avant de reprendre `/deploy`. Un compte-rendu
+      **« réconciliation seule »** (Doc touché mais aucune demande nouvelle ni modifiée — p. ex.
+      Marie a seulement retiré des lignes déjà livrées) ne bloque pas : poursuivre.
+   5. Commit du bookkeeping de l'étape 0. Si l'étape 0.3 (ingest) ou la réconciliation du registre
+      à l'étape 0.4 ont modifié `_contexte/marie_tests_journal.json` ou
+      `_contexte/marie_modifications_suivi.md`, les `git add` nommément (jamais `git add -A`) et
+      les committer maintenant, sujet
+      `chore(orchestrateur): /deploy étape 0 — ingest résultats Marie + réconciliation registre`
+      (pied `Co-Authored-By` habituel). Ainsi un arrêt en 0.4 (« analyse requise ») ou en 0.8
+      laisse malgré tout un arbre de travail propre et la vérification bloquante 3.1 reste
+      atteignable au redémarrage, sans résidu de `/deploy`.
+   6. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
       relire les dernières entrées de `COMMUNICATION/Marie/historique_conversation_marie.md` et
       les messages non traités de `gateway/inbox/orchestrateur/`
       (`python DISCORD/discord_com/gateway.py poll --agent orchestrateur`, sans `ack` — relevé de
@@ -49,10 +63,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       la version cible : signaler toute demande, remarque ou confirmation de Marie touchant ces
       changements qui ne serait couverte ni par le code livré, ni par l'inventaire de communication
       à venir (étape 10).
-   6. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
+   7. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
       incohérence, ni friction bloquante, ni changement non revu du Google Doc, ni sujet Discord
       oublié : continuer normalement à l'étape 1.
-   7. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
+   8. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
       les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
       snapshots ou fichiers d'export de `donnees_marie/` pour « résoudre » un problème constaté —
       toute correction porte sur le code ou le journal projet, jamais sur les données sources de Marie.
@@ -136,6 +150,26 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       partiellement réalisée. Demander une confirmation explicite avant de poursuivre. Ne pas modifier la
       roadmap automatiquement.
 
+4bis. Revue de code de la livraison — gate en lecture seule sur le diff cumulé depuis le dernier
+   déploiement. Aucune modification de code n'est faite à cette étape.
+
+   1. Déterminer la base de comparaison : lire le champ `Commit :` de
+      `_contexte/dernier_deploiement.md` (renseigné par l'étape 8 des déploiements suivants). S'il
+      est absent (premier `/deploy` après l'ajout de cette étape) : demander le SHA de référence à
+      l'utilisateur — ne pas deviner, ne pas prendre un point arbitraire.
+   2. Invoquer le skill `code-review` au niveau `high` en lui passant `<base>` comme cible
+      (revue du diff `<base>..HEAD`).
+   3. Findings de correction (`correctness`) confirmés et de forte sévérité : **bloquant**.
+      S'arrêter, présenter chaque finding (`fichier:ligne`, scénario d'échec) et attendre une
+      instruction explicite. Ne jamais corriger automatiquement — la correction se fait dans un
+      nouveau cycle de développement puis `/close`, pas dans `/deploy`.
+   4. Autres findings (correction incertaine, simplification, efficacité) : les lister et demander
+      une confirmation explicite unique avant de poursuivre (même régime que le bloc 4). Ne pas
+      les corriger ici.
+   5. La redondance avec les revues de session (`/close`) est assumée : cette passe cumulée à
+      `high` couvre le lot complet et les interactions entre sessions, qu'aucune revue de session
+      n'a examinés ensemble.
+
 5. Build :
    ```
    npx tsc -b && VITE_APP_VERSION=<version> npx vite build --outDir dist/<version>
@@ -167,7 +201,9 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    indépendante supplémentaire, pas une nouvelle porte bloquante.
 
    Mettre à jour `_contexte/dernier_deploiement.md` (le créer s'il n'existe pas) avec la version, la date et
-   l'URL de production déployées, pour que cette information reste à jour indépendamment de `/close`.
+   l'URL de production déployées, pour que cette information reste à jour indépendamment de `/close`. Y
+   consigner aussi le SHA déployé sous un champ `Commit :` (`git rev-parse HEAD`) : il sert de base à la
+   revue de code cumulée (étape 4bis) du déploiement suivant.
 
    Vider intégralement le tableau `WHATS_NEW` de `src/ui/screens/onboarding/E01Welcome.tsx` (`[]`) : son
    contenu vient d'être publié dans cette version et la modale Nouveautés de l'écran d'accueil ne doit pas

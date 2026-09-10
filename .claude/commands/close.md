@@ -2,7 +2,7 @@
 description: Clôture la session d'une zone — synthèse, mise à jour du contexte, commit
 argument-hint: <zone>
 model: sonnet
-allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), PowerShell(python *backup_file.py*)
+allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), PowerShell(python *backup_file.py*)
 ---
 
 # /close <zone>
@@ -236,6 +236,24 @@ générique.
 - Étape 6 (après) : pour une zone-agent, écrire ou mettre à jour `<contexte>/statut.md` avec :
   objectif, avancement, blocages, prochain pas, commit proposé, fichiers modifiés, tests et
   migrations. Le statut remonte uniquement au parent déclaré dans `agent_role.md`.
+
+- Étape 6 (ajout) — **signalement de dette technique** (rappel mécanique de `CLAUDE.md` § Roadmap) :
+  si la session a introduit de la duplication, un contournement temporaire ou une structure bancale,
+  le noter dans la synthèse (étape 3) et proposer une phase de refacto dédiée dans la roadmap active.
+  Signalement uniquement : ne jamais exécuter le refacto en `/close`, ne jamais créer la phase sans
+  accord explicite de l'utilisateur.
+
+- Étape 9 (avant) — **revue de code de session**, sur `main` uniquement, si la session a modifié des
+  fichiers applicatifs (`src/`) :
+  1. Base de comparaison : le dernier commit `close(...)` (`git log -1 --grep '^close(' --format=%H`),
+     ou le premier commit de la session s'il est plus récent. À défaut de base fiable, revoir le
+     `git diff` du travail non encore commité.
+  2. Invoquer le skill `code-review` au niveau `medium` au minimum sur cette plage.
+  3. Findings de correction (`correctness`) confirmés : les corriger avant le commit de l'étape 13,
+     ou les tracer `[P1]` dans `signals.md` (étape 4) avec la raison explicite du report.
+  4. Findings de simplification ou d'efficacité : les signaler dans la synthèse (étape 3). Ne pas les
+     corriger automatiquement ; `/simplify` reste à la main de l'utilisateur.
+  5. Ne rien lancer si aucun fichier `src/` n'a été touché.
 
 - Étape 8 (README) et étape 9 (`CHANGELOG.md`) : n'exécuter que sur la branche `main`.
 

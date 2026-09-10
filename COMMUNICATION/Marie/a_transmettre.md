@@ -10,6 +10,12 @@ Le socle serveur qui manquait pour l'envoi des retours (écran « Mes retours »
 
 Un envoi qui n'aboutit pas (réseau coupé en cours de route) s'arrête maintenant tout seul au bout de 30 secondes et repasse en « Échec d'envoi », au lieu de rester bloqué. « Relancer » repart alors sans renvoyer deux fois la même image.
 
+Si le partage des données est désactivé (Paramètres > Vie privée), les retours ne peuvent pas partir : ils restent maintenant marqués « En attente d'activation du partage », avec un bouton pour ouvrir directement l'écran Vie privée, au lieu d'un « Échec d'envoi » sans explication. Réactiver le partage envoie aussitôt les retours en attente.
+
+## Retour annoté — le crayon est devenu optionnel
+
+Sur l'écran de saisie d'un retour, le mode dessin au crayon n'est plus actif d'emblée : il faut toucher « Annoter l'image » pour entourer quelque chose, puis « Terminer l'annotation ». On peut ainsi faire défiler la capture sans tracer de trait par accident. « Annuler le trait » et « Effacer les traits » restent disponibles.
+
 ## Planning et séries de tâches
 
 Les sous-tâches restent maintenant dans la carte de leur tâche sur le planning. L’heure de fin apparaît après la dernière sous-tâche.

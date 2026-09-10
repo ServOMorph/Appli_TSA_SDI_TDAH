@@ -2,6 +2,7 @@ import { feedbackReportRepo } from '@/app/repositories'
 import { getDeviceIdentity } from '@/data/sync/deviceIdentity'
 import { callRpc } from '@/data/sync/rpc'
 import { getSyncConfig } from '@/data/sync/syncConfig'
+import { isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { uploadFeedbackImage } from '@/data/sync/feedbackStorage'
 import type { FeedbackReport } from '@/domain/entities/feedbackReport'
 
@@ -57,6 +58,10 @@ async function sendReport(report: FeedbackReport, deviceId: string, deviceSecret
 async function syncReports(force: boolean): Promise<boolean> {
   try {
     if (!getSyncConfig()) return false
+    // Le serveur refuse submit_feedback tant que l'appareil n'a pas de snapshot, ce qui
+    // suppose le partage actif. Sans consentement, on laisse les retours en attente plutot
+    // que de les marquer en echec : ils partiront des l'activation du partage.
+    if (!isSyncConsentGranted()) return false
 
     const reports = await feedbackReportRepo.getToSync()
     const pending = reports.filter((report) => mayRetry(report, force))

@@ -9,6 +9,7 @@ import { isFeedbackReportValid } from '@/domain/rules/feedbackRules'
 import { AnnotationCanvas } from '@/ui/components/AnnotationCanvas'
 import { Button } from '@/ui/components/Button'
 import { clearStrokes, undoStroke } from '@/domain/rules/annotationStrokes'
+import { isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { inputStyle, pageStyle } from '@/ui/styles/budget'
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
@@ -164,6 +165,12 @@ export function E122FeedbackCapture() {
       <label htmlFor="feedback-comment">Commentaire</label>
       <textarea id="feedback-comment" value={comment} onChange={(event) => setComment(event.target.value)} style={inputStyle} rows={4} placeholder="Décrivez ce qui s’est passé." />
       {error && <p role="alert" style={{ margin: 0, color: 'var(--color-error)' }}>{error}</p>}
+      {!isSyncConsentGranted() && (
+        <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
+          Le partage des données est désactivé. Votre retour sera conservé sur cet appareil et envoyé
+          dès que vous l’activez dans Réglages › Confidentialité.
+        </p>
+      )}
       <Button fullWidth onClick={send} disabled={!canSend || saving}>{saving ? 'Enregistrement…' : 'Envoyer'}</Button>
       <Button variant="secondary" fullWidth onClick={() => goTo('feedback-list')}>Voir mes retours</Button>
     </main>

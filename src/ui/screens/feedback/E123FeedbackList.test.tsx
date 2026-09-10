@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
+import { grantSyncConsent } from '@/data/sync/syncConsent'
 
 const mocks = vi.hoisted(() => ({
   getAll: vi.fn().mockResolvedValue([
@@ -18,11 +19,28 @@ vi.mock('@/data/sync/feedbackClient', () => ({ syncFeedbackNow: vi.fn().mockReso
 import { E123FeedbackList } from '@/ui/screens/feedback/E123FeedbackList'
 
 describe('E123FeedbackList', () => {
-  it('affiche un échec et permet de le relancer', async () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mocks.markPending.mockClear()
+  })
+  afterEach(() => localStorage.clear())
+
+  it('affiche un échec et permet de le relancer quand le partage est actif', async () => {
+    grantSyncConsent()
     const { default: userEvent } = await import('@testing-library/user-event')
     renderWithApp(<E123FeedbackList />, makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' } }))
     expect(await screen.findByText('Échec d’envoi')).toBeDefined()
     await userEvent.click(screen.getByRole('button', { name: 'Relancer' }))
     expect(mocks.markPending).toHaveBeenCalledWith('failed-1')
+  })
+
+  it('remplace l’échec par une invite à activer le partage quand il est désactivé', async () => {
+    const goTo = vi.fn()
+    renderWithApp(<E123FeedbackList />, makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' }, goTo }))
+    expect(await screen.findByText('En attente d’activation du partage')).toBeDefined()
+    expect(screen.queryByRole('button', { name: 'Relancer' })).toBeNull()
+    const { default: userEvent } = await import('@testing-library/user-event')
+    await userEvent.click(screen.getByRole('button', { name: 'Ouvrir Confidentialité' }))
+    expect(goTo).toHaveBeenCalledWith('settings-privacy')
   })
 })

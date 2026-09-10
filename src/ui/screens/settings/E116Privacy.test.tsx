@@ -5,8 +5,12 @@ import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
 import { grantSyncConsent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 
+const syncFeedbackNow = vi.fn().mockResolvedValue(false)
+vi.mock('@/data/sync/feedbackClient', () => ({ syncFeedbackNow: (...args: unknown[]) => syncFeedbackNow(...args) }))
+
 afterEach(() => {
   localStorage.clear()
+  syncFeedbackNow.mockClear()
 })
 
 function renderE116(overrides = {}) {
@@ -76,6 +80,7 @@ describe('E116Privacy', () => {
     expect(box).not.toBeChecked()
     fireEvent.click(box)
     expect(isSyncConsentGranted()).toBe(true)
+    expect(syncFeedbackNow).toHaveBeenCalled()
     fireEvent.click(box)
     expect(isSyncConsentGranted()).toBe(false)
   })

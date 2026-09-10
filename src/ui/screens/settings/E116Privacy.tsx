@@ -3,6 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { grantSyncConsent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
+import { syncFeedbackNow } from '@/data/sync/feedbackClient'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -47,8 +48,12 @@ export function E116Privacy() {
   }
 
   function toggleSyncConsent(next: boolean) {
-    if (next) grantSyncConsent()
-    else revokeSyncConsent()
+    if (next) {
+      grantSyncConsent()
+      void syncFeedbackNow({ force: true })
+    } else {
+      revokeSyncConsent()
+    }
     setSyncConsent(next)
   }
 

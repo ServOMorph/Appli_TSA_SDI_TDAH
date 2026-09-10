@@ -1384,3 +1384,30 @@ Réparer la suite e2e Playwright (22 échecs) puis `/deploy` du lot v5.93 -> v5.
 
 ### Prochaine étape exacte
 `/deploy` du lot v5.93 -> v5.120 ; puis Phase 6 ONBOARD.
+
+---
+
+## Dernière session (2026-09-10 — test iPhone export/import + correctifs E21/E122)
+
+## Décisions prises
+- Test dev export/import validé sur iPhone réel : rien à corriger côté `exportData` (`a.click()` iOS Safari opérant sur cet appareil).
+- Correctif collage image `E122` commité puis `/deploy_dev` lancé pour le tester sur iPhone en HTTPS — `navigator.clipboard.read()` exige un contexte sécurisé, impossible sur le preview LAN `http://`. En HTTPS (référence : Roberto via tunnel) le même code fonctionne.
+
+## Livrables produits ou modifiés
+- `src/ui/components/TaskCardLayout.tsx` + `src/ui/screens/tasks/E21CreateTaskV2.tsx` : grille des champs en `repeat(auto-fit, minmax(min(100%, 200px), 1fr))` + `minWidth: 0` — ne déborde plus en largeur mobile. Commit `2060fd3`.
+- `src/ui/screens/feedback/E122FeedbackCapture.tsx` + `.test.tsx` : `onPaste` sur la page (`imageFromClipboard` depuis `event.clipboardData`), message d'erreur explicite quand le presse-papier n'a pas d'image, `pasteImage` conserve le repli sélecteur de fichier. Test unitaire du collage. Commité ce `/close` (v5.121).
+- `tests_manuels.md` : section export/import réduite (test joué) ; note « collage image retour KO iOS » ; note test HTTPS collage.
+- `CHANGELOG.md` v5.121 ; `README.md` § État actuel ; `_contexte/signals.md`, `contexte.md`, `archive_sessions.md`.
+- Commits antérieurs de la session : `2060fd3` (grille), `53b44ed` (tests_manuels).
+
+## Hypothèses validées / invalidées
+- VALIDÉ : round-trip export/import sur iPhone Safari (téléchargement, structure 21 tables `version` 3.6, réimport qui écrase, `feedbackReports` exclu). Point de vigilance `a.click()` iOS ne mord pas.
+- VALIDÉ : « bouton Valider grisé sur E21 planifiée depuis l'accueil » = débordement horizontal de la grille `TaskCardLayout` (introduit par #37, non vu car e2e en viewport Desktop). Corrigé — tâche planifiée créable sur iPhone.
+- INVALIDÉ : le collage image `E122` n'était pas cassé en soi — `clipboard.read()` exige un contexte sécurisé ; le preview LAN `http://` le rend indisponible. Correctif = amélioration (message, `onPaste`), pas réécriture.
+- EN ATTENTE : validation iPhone du collage « Coller une image » sur le build HTTPS (`/deploy_dev`) ; ingestion snapshot v5.92 + `ok`/`nok` des 33-38 (`/deploy` étape 0.4) ; DI2/DI3 ; résiduels mise en service Phase 5 ; Phase 6 ONBOARD.
+
+## Prochaine étape exacte
+`/deploy_dev` en cours : tester « Coller une image » sur `https://appli-audhd-dev.netlify.app` depuis l'iPhone. Puis `/deploy` du lot v5.93 → v5.121. Lancer manuellement la sauvegarde Drive : `python claude-vibecoding-kit/backup_project.py . --upload`.
+
+## Question bloquante pour la session suivante
+Aucune.

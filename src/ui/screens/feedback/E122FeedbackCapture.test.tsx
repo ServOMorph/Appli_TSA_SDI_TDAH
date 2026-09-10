@@ -1,6 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
+import { grantSyncConsent } from '@/data/sync/syncConsent'
 
 const mocks = vi.hoisted(() => ({
   create: vi.fn().mockResolvedValue('feedback-1'),
@@ -27,6 +28,17 @@ describe('E122FeedbackCapture', () => {
       configurable: true,
       value: vi.fn(() => ({ clearRect: vi.fn(), beginPath: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn() })),
     })
+  })
+
+  afterEach(() => localStorage.clear())
+
+  it('signale que le partage est désactivé et masque la note une fois activé', () => {
+    const { unmount } = renderWithApp(<E122FeedbackCapture />, makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } }))
+    expect(screen.getByText(/partage des données est désactivé/i)).toBeInTheDocument()
+    unmount()
+    grantSyncConsent()
+    renderWithApp(<E122FeedbackCapture />, makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } }))
+    expect(screen.queryByText(/partage des données est désactivé/i)).not.toBeInTheDocument()
   })
 
   it('désactive l’envoi sans image', () => {

@@ -25,14 +25,6 @@ Reste à faire, hors test :
 - Instruire Marie sur la procédure de sauvegarde autonome (« Exporter en JSON », sa demande).
 - Consigner l'exclusion `feedbackReports` comme limite connue de la restauration.
 
-## Collage d'image dans un commentaire de retour (iOS Safari) — ne fonctionne pas
-
-Constat 2026-09-10 (Morphéus, iPhone Safari, preview LAN `http://192.168.1.162:4173/`) :
-dans l'appli, au moment de rédiger un commentaire / retour, coller une image depuis le
-presse-papier ne fonctionne pas. À investiguer : flux de capture de retour
-(`E122FeedbackCapture`), gestion du collage presse-papier et repli vers le sélecteur de
-fichier (point D1 de `TESTS/RETOURS/_contexte/statut.md`). Reporté : à traiter plus tard.
-
 ## Bornage des requêtes réseau et reprise après coupure (Phase 6) — à porter au catalogue in-app
 
 Pas testable en dev (aucun backend de synchronisation configuré localement). À convertir en

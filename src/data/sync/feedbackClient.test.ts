@@ -13,15 +13,18 @@ vi.mock('@/data/sync/deviceIdentity', () => ({
   getDeviceIdentity: vi.fn(() => ({ deviceId: 'device-1', deviceSecret: 'secret-1' })),
 }))
 vi.mock('@/data/sync/syncConfig', () => ({ getSyncConfig: vi.fn() }))
+vi.mock('@/data/sync/syncConsent', () => ({ isSyncConsentGranted: vi.fn() }))
 vi.mock('@/data/sync/feedbackStorage', () => ({ uploadFeedbackImage: vi.fn() }))
 vi.mock('@/data/sync/rpc', () => ({ callRpc: vi.fn() }))
 
 import { getSyncConfig } from '@/data/sync/syncConfig'
+import { isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { uploadFeedbackImage } from '@/data/sync/feedbackStorage'
 import { callRpc } from '@/data/sync/rpc'
 import { syncFeedbackNow } from './feedbackClient'
 
 const getSyncConfigMock = vi.mocked(getSyncConfig)
+const consentMock = vi.mocked(isSyncConsentGranted)
 const uploadMock = vi.mocked(uploadFeedbackImage)
 const callRpcMock = vi.mocked(callRpc)
 
@@ -45,6 +48,7 @@ function report(overrides: Partial<FeedbackReport> = {}): FeedbackReport {
 beforeEach(() => {
   vi.clearAllMocks()
   getSyncConfigMock.mockReturnValue({ url: 'https://example.supabase.co', anonKey: 'key' })
+  consentMock.mockReturnValue(true)
   repository.getToSync.mockResolvedValue([])
   repository.markImageUploaded.mockResolvedValue(undefined)
   repository.markSent.mockResolvedValue(undefined)
@@ -89,6 +93,17 @@ describe('syncFeedbackNow', () => {
 
     expect(repository.getToSync).not.toHaveBeenCalled()
     expect(uploadMock).not.toHaveBeenCalled()
+  })
+
+  it('laisse le retour en attente sans le marquer en échec quand le partage est refusé', async () => {
+    consentMock.mockReturnValue(false)
+    repository.getToSync.mockResolvedValue([report()])
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+
+    expect(repository.getToSync).not.toHaveBeenCalled()
+    expect(uploadMock).not.toHaveBeenCalled()
+    expect(repository.markFailed).not.toHaveBeenCalled()
   })
 
   it('relance un retour en échec sans envoyer deux fois une image déjà déposée', async () => {

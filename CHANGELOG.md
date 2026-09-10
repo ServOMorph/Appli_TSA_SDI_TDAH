@@ -1,3 +1,18 @@
+## v5.122 — 2026-09-10
+
+### Modifié
+- **`src/ui/components/AnnotationCanvas.tsx` + `src/ui/screens/feedback/E122FeedbackCapture.tsx`** : le mode annotation au crayon d'un retour n'est plus actif par défaut. `AnnotationCanvas` prend une prop `active` (défaut `false`) : hors mode, le canevas laisse passer les gestes (`pointerEvents: none`, `touchAction: auto`) — la capture se fait défiler sans tracer de trait. Bouton bascule « Annoter l'image » / « Terminer l'annotation » sur E122, `aria-pressed`. Barre d'action (bascule + « Annuler le trait » + « Effacer les traits ») déplacée au-dessus de l'image. Une tentative de barre `position: sticky` est sans effet sur iOS Safari (conteneur de défilement intermédiaire) — laissée en l'état, tracée [P3] dans `signals.md`. Commits `f61d56e`, `7248d41`.
+
+### Corrigé
+- **`src/data/sync/feedbackClient.ts` + `src/ui/screens/feedback/E123FeedbackList.tsx` + `src/ui/screens/settings/E116Privacy.tsx` + `src/ui/screens/feedback/E122FeedbackCapture.tsx`** : un retour saisi alors que le partage des données est désactivé restait bloqué en « Échec d'envoi » sans explication, avec un bouton « Relancer » sans effet. Cause : `submit_feedback` (`supabase/feedback.sql`) refuse tout retour d'un appareil absent de `device_snapshots`, et cette ligne n'est créée que par `sync_device_snapshot`, lui-même conditionné à `isSyncConsentGranted()` (`syncClient.ts:36`) ; `feedbackClient.ts` ne vérifiait jamais le consentement et interprétait le refus serveur comme un échec réseau. Il n'existe pas de RPC léger d'enregistrement d'appareil, et découpler côté serveur impliquerait soit un nouveau RPC non déployable depuis cette session, soit l'envoi de données d'appareil sans consentement (régression de confidentialité). Correctif côté client : `syncReports` sort avant toute tentative si `!isSyncConsentGranted()` — le retour reste `pending` (jamais `failed`), aucun appel réseau ; `E123FeedbackList` affiche « En attente d'activation du partage » et une carte d'invite avec un bouton « Ouvrir Confidentialité » (`goTo('settings-privacy')`) au lieu de « Échec d'envoi » / « Relancer » ; `E122FeedbackCapture` porte une note quand le partage est désactivé ; activer le partage dans `E116Privacy` relance `syncFeedbackNow({ force: true })`, les retours en attente partent aussitôt. Comportement de bord introduit comme atteignable par l'écran de consentement E04 (ONBOARD Phase 2, v5.108, non déployé).
+
+### Vérifié
+- Test iPhone (Safari, site de test HTTPS `appli-audhd-dev`, utilisateur) : bouton « Coller une image » E122 opérant en HTTPS ; retours qui passent « Envoyé » une fois le partage activé — confirme que « Échec d'envoi » venait de l'absence de `device_snapshots`, pas d'un défaut réseau.
+- Contrôles : `tsc -b` exit 0 ; Vitest 103 fichiers / 842 tests verts (feedbackClient, E116Privacy, E122FeedbackCapture, E123FeedbackList mis à jour).
+
+### Connu
+- `scripts/read_feedback_reports.py` renvoie `403 permission denied for table feedback_reports` : il manque `GRANT SELECT ON public.feedback_reports TO service_role` côté Supabase. Les retours sont bien reçus, mais l'outil de dépouillement dev ne les lit pas. Tracé [P2] dans `signals.md`.
+
 ## v5.121 — 2026-09-10
 
 ### Corrigé

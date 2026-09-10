@@ -48,7 +48,7 @@ retours en "Envoyé" ? » (`_contexte/signals.md`). Comportement à faire valide
 
 ## Sauvegarde Drive en attente
 
-Manifeste rafraîchi le 2026-09-10 (225 fichiers). L'upload vers Drive n'est pas exécutable en
+Manifeste rafraîchi le 2026-09-10 (217 fichiers). L'upload vers Drive n'est pas exécutable en
 auto-mode (classifieur). À lancer manuellement, dans un terminal normal, depuis la racine du
 projet :
 ```

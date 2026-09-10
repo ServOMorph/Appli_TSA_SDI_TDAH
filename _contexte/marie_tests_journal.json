@@ -463,6 +463,74 @@
       "test_id": "pastille-nouveaux-tests",
       "created_at": "2026-09-04T18:33:31.156Z",
       "test_revision": 2
+    },
+    {
+      "id": "ac6fa441-20ac-45f2-ac25-d5a2232ecec5",
+      "status": "ok",
+      "comment": null,
+      "test_id": "bandeau-des-jours-colore",
+      "created_at": "2026-09-05T17:42:17.785Z",
+      "test_revision": 2
+    },
+    {
+      "id": "536cf58c-17eb-4f2e-8c02-bbf1998cf4f9",
+      "status": "ok",
+      "comment": null,
+      "test_id": "cadre-date-heure-dans-l-ecran",
+      "created_at": "2026-09-05T17:42:53.032Z",
+      "test_revision": 2
+    },
+    {
+      "id": "017526c7-36d2-49d2-80f3-6fc681f5e604",
+      "status": "ok",
+      "comment": null,
+      "test_id": "consulter-et-modifier-l-energie",
+      "created_at": "2026-09-05T17:46:23.821Z",
+      "test_revision": 3
+    },
+    {
+      "id": "f9b000d3-3f7e-4857-a2ac-df0989a8788f",
+      "status": "ok",
+      "comment": null,
+      "test_id": "plus-de-categorie-tache-du-jour",
+      "created_at": "2026-09-05T17:49:16.534Z"
+    },
+    {
+      "id": "7bde3c64-192a-40b8-9e8b-e223ca05d601",
+      "status": "ok",
+      "comment": null,
+      "test_id": "ajouter-une-tache-depuis-la-reception",
+      "created_at": "2026-09-05T17:49:42.166Z"
+    },
+    {
+      "id": "f62514d0-dbd4-4a07-a5e2-a2f730217e5e",
+      "status": "nok",
+      "comment": "Ça beug un peu, ça apparaît sélectionné mais que quand on reviens sur l’accueil et qu’on reclique dessus, mais pas quand on clique directement sur la categorie",
+      "test_id": "choisir-une-couleur-de-tache-par-categorie",
+      "created_at": "2026-09-05T20:00:35.047Z"
+    },
+    {
+      "id": "d869917a-e217-4df8-ab27-e839c72b88de",
+      "status": "ok",
+      "comment": null,
+      "test_id": "couleur-de-fond-par-outil",
+      "created_at": "2026-09-05T20:00:52.248Z",
+      "test_revision": 4
+    },
+    {
+      "id": "9a5e2d16-7ec9-48cd-afaa-1354b665e919",
+      "status": "ok",
+      "comment": null,
+      "test_id": "configurer-un-code-couleur",
+      "created_at": "2026-09-05T20:01:19.781Z"
+    },
+    {
+      "id": "2be9b6fb-aa50-48f8-bda0-2b530a6ae0f8",
+      "status": "ok",
+      "comment": null,
+      "test_id": "defilement-des-jours-dans-la-case",
+      "created_at": "2026-09-07T20:48:20.919Z",
+      "test_revision": 2
     }
   ]
 }

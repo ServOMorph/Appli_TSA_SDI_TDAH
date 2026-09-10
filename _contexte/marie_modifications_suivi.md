@@ -5,13 +5,13 @@ Source de vérité du suivi Marie, indépendante des roadmaps (qui sont une vue 
 archivée après livraison).
 
 - Google Doc : `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
-- Dernière revue du Doc : 2026-09-04 (date de modification analysée : 2026-09-04 19:48 UTC)
-- Dernière exécution de la revue : 2026-09-05 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
-- Marie a retiré du Doc #3, #19, #21, #22 et #23 à #33 (comportement livré v5.84 conservé pour toutes sauf #3, explicitement abandonnée au profit de #37) et ajouté 34 à 38. Le Doc réutilise le n°33 pour une demande distincte (revient sur #19 : contour seul, plus de fond coloré) — collision de numérotation avec l'ancien #33 (sous-tâches de liste, déjà `livrée v5.84`), non résolue ici, cf. Précisions. Le Doc porte à présent : nouveau 33 (collision), 34 à 38 (à analyser via `/analyser_googledoc`).
-- Dernière mise à jour de ce registre : 2026-09-04 (4e passage) — `/analyser_googledoc` : les 6
-  demandes actives (33 reprise Doc, 34 à 38) analysées contre le code réel et passées à `en cours
-  roadmap_demandes_marie_2026-09-04.md` (Phase 1 : 33 reprise Doc, #34, #36 ; Phase 2 : #35 ;
-  Phase 3 : #37 ; Phase 4 : #38).
+- Dernière revue du Doc : 2026-09-06 (date de modification analysée : 2026-09-06 18:48 UTC)
+- Dernière exécution de la revue : 2026-09-10 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
+- Le Doc ne porte plus que #35, #36, #37, #38. #33 (reprise Doc) et #34 en ont été retirés (comportement `livrée v5.92` conservé). #37 y a été réécrit en « je veux que E21 soit comme E22 » (énoncé détaillé antérieur remplacé) : couverture réelle à re-vérifier via `/analyser_googledoc`.
+- Dernière mise à jour de ce registre : 2026-09-10 (5e passage) — `.claude/revue_googledoc.md`
+  depuis `/deploy` étape 0.4 : Doc réduit à #35-38 (tous `livrée v5.92`) ; #33 (reprise Doc) et
+  #34 marqués `retirée du Google Doc le 2026-09-06` ; #37 marqué texte modifié → compte-rendu
+  « analyse requise », `/analyser_googledoc` à lancer avant de reprendre `/deploy`.
 
 États autorisés : `livrée vX.Y` · `en attente` · `en cours <roadmap>` · `écartée : <motif>`.
 
@@ -50,14 +50,14 @@ archivée après livraison).
 | 31 | Paramètres / Profil | L'outil « Compte » manque dans les réglages de couleur des outils ; tous les outils, y compris les futurs, doivent y apparaître | écartée : retirée du Google Doc le 2026-09-04 (livrée v5.84, parcours `couleur-de-fond-par-outil` rev 3 `ok` le 2026-09-04) | 2026-09-04 |
 | 32 | Paramètres / Profil | Tous les cadres de l'écran « Paramètres » débordent à droite ; ils doivent tenir entièrement dans l'écran | écartée : retirée du Google Doc le 2026-09-04 (livrée v5.84, correctif `width: 100%` sur `<main>` + `flexWrap: wrap` sur la rangée de taille de texte ; parcours `cadres-parametres-tiennent-dans-l-ecran` `ok`) | 2026-09-04 |
 | 33 | Outils : Listes | Les sous-tâches ajoutées à un élément de liste apparaissent automatiquement sur la page de la catégorie de cet élément, pliables/dépliables/cochables (comme les sous-tâches d'une tâche du planning) | écartée : retirée du Google Doc le 2026-09-04 (livrée v5.84, parcours `sous-taches-element-liste-dans-la-categorie` `ok` le 2026-09-04 ; ⚠ le Doc réutilise ce n°33 pour une demande distincte, cf. ligne « 33 (reprise Doc) » et Précisions) | 2026-09-04 |
-| 33 (reprise Doc) | Accueil / Planning | ⚠ Collision de numérotation : Marie réutilise le n°33 dans le Doc pour « finalement je veux que la case des jours de la semaine sur le planning ne soit pas coloré en fond, remet uniquement le contour de la case en couleur » — revient sur #19 (livrée v5.84). Numéro conservé tel quel (non renuméroté) faute de risque de confusion si Marie le réutilise | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) | 2026-09-05 |
-| 34 | Énergie | Le logo énergie de la page d'accueil ne doit plus avoir le fond de case coloré ; même traitement que la case des jours de la semaine du planning (nouveau 33) : contour seul en couleur | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) | 2026-09-05 |
+| 33 (reprise Doc) | Accueil / Planning | ⚠ Collision de numérotation : Marie réutilise le n°33 dans le Doc pour « finalement je veux que la case des jours de la semaine sur le planning ne soit pas coloré en fond, remet uniquement le contour de la case en couleur » — revient sur #19 (livrée v5.84). Numéro conservé tel quel (non renuméroté) faute de risque de confusion si Marie le réutilise | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) ; retirée du Google Doc le 2026-09-06 | 2026-09-06 |
+| 34 | Énergie | Le logo énergie de la page d'accueil ne doit plus avoir le fond de case coloré ; même traitement que la case des jours de la semaine du planning (nouveau 33) : contour seul en couleur | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) ; retirée du Google Doc le 2026-09-06 | 2026-09-06 |
 | 35 | Paramètres / Profil | Accessibilité : nouvelle section « code couleur » — créer des catégories de tâche (ex. sport, plaisir, travail) et leur attribuer une couleur ; à la création d'une tâche, le sélecteur de couleur n'affiche plus que ces catégories configurées (plus le panel complet), la sélection applique la couleur de la catégorie | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 2) | 2026-09-05 |
 | 36 | Paramètres / Profil | Les cartes des outils ne doivent plus avoir de fond coloré ; contour seul en couleur, comme le logo énergie (#34) | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) | 2026-09-05 |
-| 37 | Tâches | Refonte complète de l'écran fiche de tâche (et réutilisation pour la création, cf. #3 abandonnée) : fond non coloré ; l'écran prend toute la hauteur même sans sous-tâches ; titre dans une case centrée en haut, pleine largeur, fond coloré de la couleur de la tâche, logo devant le titre dans la même case ; infos de la tâche en cases sur deux colonnes en dessous, fond coloré de la couleur de la tâche ; conserver « décomposer », « dupliquer », « supprimer » ; retirer « modifier » (modification directe par clic sur la case concernée) | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 3) | 2026-09-05 |
+| 37 | Tâches | Refonte complète de l'écran fiche de tâche (et réutilisation pour la création, cf. #3 abandonnée) : fond non coloré ; l'écran prend toute la hauteur même sans sous-tâches ; titre dans une case centrée en haut, pleine largeur, fond coloré de la couleur de la tâche, logo devant le titre dans la même case ; infos de la tâche en cases sur deux colonnes en dessous, fond coloré de la couleur de la tâche ; conserver « décomposer », « dupliquer », « supprimer » ; retirer « modifier » (modification directe par clic sur la case concernée). ⚠ Énoncé réécrit dans le Doc le 2026-09-06 en « je veux que E21 soit comme E22 » — l'écran de création (E21) doit être aligné sur la fiche refondue (E22) ; couverture par v5.92 à re-vérifier via `/analyser_googledoc` | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 3) ; texte modifié dans le Doc le 2026-09-06, à re-analyser | 2026-09-06 |
 | 38 | Accueil / Planning | Animation du défilement des jours de la semaine à aligner sur celle du sélecteur d'heure de création de tâche : fluide, jours suivants visibles pendant le glissement (pas seulement au relâchement), pas de saut au relâchement — le jour resté dans la case centrale au relâchement doit y rester | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 4 ; référence citée par Marie introuvable dans le code, cf. roadmap § État constaté) | 2026-09-05 |
 
-> Note : les demandes 1 à 17 (retirées du Doc le 28/08), 18 et 20 (retirées le 31/08), 3, 19, 21, 22 et 23 à 33 (retirées le 04/09) restent ici comme historique du traitement. Les demandes 33 (reprise Doc) et 34 à 38, ajoutées par Marie le 04/09, sont à l'état `en attente` : elles doivent passer par `/analyser_googledoc` (état réel vs code, résolution de la collision de numérotation sur 33, création/mise à jour de roadmap) avant tout développement ou déploiement.
+> Note : les demandes 1 à 17 (retirées du Doc le 28/08), 18 et 20 (retirées le 31/08), 3, 19, 21, 22 et 23 à 33 (retirées le 04/09) restent ici comme historique du traitement. Les demandes 33 (reprise Doc) et 34 à 38, ajoutées par Marie le 04/09, ont été livrées en v5.92 (`Archives/roadmap_demandes_marie_2026-09-04.md`). Le Doc au 2026-09-06 ne porte plus que #35, #36, #37, #38 : #33 (reprise Doc) et #34 en ont été retirés (comportement conservé), #37 y a été réécrit (« E21 comme E22 »). Un passage `/analyser_googledoc` est requis pour re-établir la couverture réelle de #37 sous sa nouvelle formulation avant tout redéploiement.
 
 ## Précisions
 
@@ -80,8 +80,34 @@ archivée après livraison).
 
 - **Catalogue in-app incomplet pour #37, découvert au 3e bounce du message de livraison v5.92 (2026-09-05 22h16)** — aucun parcours ne portait `docRefs: [37]` malgré la roadmap `Archives/roadmap_demandes_marie_2026-09-04.md` Phase 3 marquée `[FAIT]` ; perdu dans l'incident de stash qu'elle relate (fusion `agent/retours` concurrente). Corrigé : `modifier-une-tache-planifiee` réécrit pour l'édition par case (`docRefs: [37]`, `revision: 1`) ; nouveau parcours `creer-une-tache-bandeau-colore` (`docRefs: [37]`) pour l'écran de création ; `menu-actions-tache-simplifie` (`revision` 2→3) et `duree-obligatoire-tache-planifiee` (`revision: 1`, `docRefs: [25, 37]`) corrigés — leurs étapes mentionnaient encore un bouton « Modifier » supprimé par #37. `cadre-date-heure-dans-l-ecran` (docRefs `[3]`) **retiré du catalogue** : #3 est abandonnée par Marie (cf. précision ci-dessus), le garder aurait redemandé un test sur un comportement qu'elle a explicitement demandé d'abandonner. `tsc -b` + lint + 783 tests verts.
 
+- **Friction nouvelle (2026-09-10, sur #35)** — ingestion du snapshot `20260910-1620z` : parcours
+  `choisir-une-couleur-de-tache-par-categorie` marqué `nok` par Marie — « ça beug un peu, ça
+  apparaît sélectionné mais que quand on revient sur l'accueil et qu'on reclique dessus, pas quand
+  on clique directement sur la catégorie ». La sélection d'une catégorie du code couleur (#35,
+  `livrée v5.92`) ne se reflète pas immédiatement dans l'UI au clic direct ; elle n'apparaît
+  qu'après un aller-retour accueil + reclic. Glitch de rafraîchissement d'état, pas une perte de
+  fonction. Non qualifié, aucun correctif — à traiter dans le cycle de développement qui suivra
+  `/analyser_googledoc` (couverture de #35 à revoir avec celle de #37).
+
 ## Historique des revues
 
+- 2026-09-10 : revue depuis `/deploy` étape 0.4 (`.claude/revue_googledoc.md`, procédure révisée
+  ce jour — déclenchement de `/analyser_googledoc` sur le contenu du Doc, plus sur la seule date de
+  modification). Google Doc modifié le 2026-09-06 18:48 UTC (> dernière revue 2026-09-04 19:48
+  UTC). Export : demandes #35, #36, #37, #38 uniquement. Classement Doc ↔ registre : #35, #36, #38
+  inchangées ; #33 (reprise Doc) et #34 retirées du Doc → `livrée v5.92` conservée, mention
+  `retirée du Google Doc le 2026-09-06` ajoutée ; **#37 texte modifié** — l'énoncé détaillé
+  (« refonte complète de la fiche/création… on abandonne le correctif cadre date/heure ») réécrit
+  en « je veux que E21 soit comme E22 ». Compte-rendu : **« analyse requise »** → `/deploy`
+  s'arrête à l'étape 0.4, `/analyser_googledoc` à lancer avant de reprendre. Snapshot Supabase
+  `20260910-1620z` analysé au passage : aucune perte, croissance normale (`budget_entries` 34→35,
+  `list_items` 104→106, `list_item_sub_tasks` 50→53). Ingestion journal 65 → 74 (+9 résultats du
+  2026-09-10) : re-validations `ok` de #35 (`configurer-un-code-couleur`), #36
+  (`couleur-de-fond-par-outil`), #37 (`cadre-date-heure-dans-l-ecran`), #38
+  (`defilement-des-jours-dans-la-case`), plus `plus-de-categorie-tache-du-jour`,
+  `consulter-et-modifier-l-energie`, `bandeau-des-jours-colore`,
+  `ajouter-une-tache-depuis-la-reception` ; 1 friction : `choisir-une-couleur-de-tache-par-categorie`
+  `nok` (cf. Précisions, sur #35).
 - 2026-09-05 : `/deploy` v5.92. 33 (reprise Doc), #34, #35, #36, #37, #38 passées `en cours` →
   `livrée v5.92` (code déployé ; validation de Marie encore attendue, cf. catalogue in-app). Message
   de livraison déposé dans la gateway (id `20260905T123341_083860`), question D2 (point d'entrée

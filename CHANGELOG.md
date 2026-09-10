@@ -1,3 +1,13 @@
+## v5.121 — 2026-09-10
+
+### Corrigé
+- **`src/ui/components/TaskCardLayout.tsx` + `src/ui/screens/tasks/E21CreateTaskV2.tsx`** : la grille des champs (`gridTemplateColumns: '1fr 1fr'`) débordait horizontalement en largeur mobile. Sans `min-width: 0`, un élément de grille garde `min-width: auto` et ne rétrécit pas sous la largeur intrinsèque de son contenu (`IconPicker` 5 colonnes, `DurationRoller` 3 `<select>`, `ColorPicker`) — chaque colonne `1fr` s'étirait à la largeur de son plus large contenu, la grille faisait ~2× la largeur de l'écran, la colonne de droite (Couleur, Heure de début, Durée) passait hors écran sur iPhone. Champ Heure inaccessible → `canSubmit` toujours faux → bouton « Valider » grisé à la création d'une tâche planifiée depuis l'accueil. Grille passée en `repeat(auto-fit, minmax(min(100%, 200px), 1fr))` (2 colonnes si la largeur le permet, repli à 1 colonne sur mobile) + `minWidth: 0` sur `fieldCellStyle` (E21) et `cardStyle` (`TaskFieldCard`, partagé avec la fiche E22). Introduit par `40d1474` (refonte fiche #37), lot non déployé ; non vu par la suite e2e qui tourne en viewport Desktop Chrome. Constaté au test manuel iPhone. Commit `2060fd3`.
+- **`src/ui/screens/feedback/E122FeedbackCapture.tsx`** : « Coller une image » retombait silencieusement sur le sélecteur de fichier quand le presse-papier ne contenait pas d'image (`chooseImage(undefined)` sans retour visible). Ajout d'un message explicite dans ce cas. Ajout d'un gestionnaire `onPaste` sur la page : `imageFromClipboard()` extrait l'image de `event.clipboardData` (`items` puis `files`) → chemin de collage fiable pour `Ctrl/Cmd+V` sur desktop et pour un vrai événement `paste`. `navigator.clipboard.read()` (chemin du bouton) exige un contexte sécurisé : sans effet sur le preview LAN `http://`, opérant sur les sites déployés (HTTPS). Test unitaire du collage ajouté.
+
+### Vérifié
+- Test manuel iPhone (Safari, preview LAN) : export JSON téléchargé (message vert, fichier dans Téléchargements), structure complète (21 tables, `version` 3.6), réimport qui écrase (tâche jetable disparue, données d'origine + budget restaurés, aucune erreur), `feedbackReports` hors périmètre de l'export comme prévu. Le point de vigilance `a.click()` sur Blob URL iOS Safari ne mord pas sur cet appareil — aucun correctif côté `exportData`.
+- Contrôles : `tsc -b` + `eslint` exit 0 ; Vitest ciblé E21/E22/E117Export/E122 verts.
+
 ## v5.120 — 2026-09-10
 
 ### Corrigé

@@ -13,6 +13,21 @@ import { inputStyle, pageStyle } from '@/ui/styles/budget'
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
 
+function imageFromClipboard(data: DataTransfer | null): Blob | null {
+  if (!data) return null
+  for (let i = 0; i < data.items.length; i++) {
+    const item = data.items[i]
+    if (item.kind === 'file' && item.type.startsWith('image/')) {
+      const file = item.getAsFile()
+      if (file) return file
+    }
+  }
+  for (let i = 0; i < data.files.length; i++) {
+    if (data.files[i].type.startsWith('image/')) return data.files[i]
+  }
+  return null
+}
+
 export function E122FeedbackCapture() {
   const { back, goTo, route, originScreen } = useApp()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -48,6 +63,13 @@ export function E122FeedbackCapture() {
     setError('')
   }
 
+  function handlePaste(event: React.ClipboardEvent) {
+    const blob = imageFromClipboard(event.clipboardData)
+    if (!blob) return
+    event.preventDefault()
+    chooseImage(blob)
+  }
+
   async function pasteImage() {
     if (!navigator.clipboard?.read) {
       inputRef.current?.click()
@@ -57,7 +79,12 @@ export function E122FeedbackCapture() {
       const items = await navigator.clipboard.read()
       const imageItem = items.find((item) => item.types.some((type) => type.startsWith('image/')))
       const type = imageItem?.types.find((candidate) => candidate.startsWith('image/'))
-      chooseImage(type ? await imageItem?.getType(type) : undefined)
+      const blob = type ? await imageItem?.getType(type) : undefined
+      if (!blob) {
+        setError('Aucune image dans le presse-papier. Copiez une image, ou utilisez « Choisir une image ».')
+        return
+      }
+      chooseImage(blob)
     } catch {
       inputRef.current?.click()
     }
@@ -94,7 +121,7 @@ export function E122FeedbackCapture() {
   }
 
   return (
-    <main style={pageStyle}>
+    <main style={pageStyle} onPaste={handlePaste}>
       <button onClick={() => back('dashboard')} aria-label="Retour" style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: 0 }}>← Retour</button>
       <div>
         <h1 style={{ margin: 0 }}>Nouveau retour</h1>

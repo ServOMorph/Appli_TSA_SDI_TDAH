@@ -1361,3 +1361,26 @@ Lance-t-on `roadmap_refactorisation_2026-09-06.md` (Phases 1-2), et sur quelle b
 
 ### Prochaine étape exacte
 Réparer la suite e2e Playwright (22 échecs) puis `/deploy` du lot v5.93 -> v5.119.
+
+---
+
+## Session du 2026-09-10 — réparation de la suite e2e Playwright
+
+### Décisions prises
+- Correctif applicatif `E22TaskDetail.tsx` : une tâche planifiée ouverte depuis sa fiche (source `fetchedTask`, non réactive) reflète ses éditions inline sans re-navigation — `refreshFetchedTask()` après `updateTaskFields` dans `saveField` / `confirmFieldEditScope`. Angle mort de la refonte fiche #37.
+
+### Livrables produits ou modifiés
+- `e2e/01-onboarding.spec.ts` : helper local `enterOnboarding()` (clic « Continuer sans partager » E04) + durée T06.
+- `e2e/03-energy`, `04-settings`, `08-tools-budget`, `09-tools-folders-lists` : `getByRole('button', { name: 'Retour', exact: true })` (FAB `FeedbackFab` matchait « Retour »).
+- `e2e/05-overload.spec.ts`, `07-planning-v4.spec.ts` : `getByLabel('Heures', { exact: true }).selectOption('1')` pour `canSubmit` variante planifiée ; `getByLabel('Heure', { exact: true })`.
+- `e2e/08-tools-budget.spec.ts`, `09-tools-folders-lists.spec.ts` : renommages écrans budget répercutés.
+- `e2e/10-feedback.spec.ts` : mock `route.abort()` + assertion « En attente d'envoi » OU « Échec d'envoi ».
+- `src/ui/screens/tasks/E22TaskDetail.tsx` : refetch de la tâche affichée après édition inline.
+
+### Hypothèses validées / invalidées
+- VALIDÉ : suite e2e 59/59 verts (2 runs), Vitest 103 fichiers / 837 verts, `tsc -b` + `eslint` exit 0.
+- VALIDÉ : 22 échecs = 5 causes (E04 non franchi ; E21 planifiée exige heure + durée ; locators ambigus ; renommages budget ; mock feedback permissif).
+- INVALIDÉ : T46/T48 = bug app introduit par #37 (fiche tâche planifiée ne répercutait pas les éditions inline), corrigé.
+
+### Prochaine étape exacte
+`/deploy` du lot v5.93 -> v5.120 ; puis Phase 6 ONBOARD.

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
 
@@ -32,6 +32,18 @@ describe('E122FeedbackCapture', () => {
   it('désactive l’envoi sans image', () => {
     renderWithApp(<E122FeedbackCapture />, makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } }))
     expect(screen.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
+  })
+
+  it('attache une image collée dans la page', () => {
+    renderWithApp(<E122FeedbackCapture />, makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } }))
+    const file = new File(['image'], 'capture.png', { type: 'image/png' })
+    const clipboardData = {
+      items: [{ kind: 'file', type: 'image/png', getAsFile: () => file }],
+      files: [file],
+    }
+    fireEvent.paste(screen.getByLabelText('Commentaire'), { clipboardData })
+    expect(screen.getByRole('button', { name: 'Annuler le trait' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Choisir une image' })).not.toBeInTheDocument()
   })
 
   it('aplatit puis enregistre le retour local', async () => {

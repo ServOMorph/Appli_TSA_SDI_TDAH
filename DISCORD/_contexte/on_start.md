@@ -35,9 +35,32 @@ Signaler dans la synthèse `/start` : nombre de messages `pending` et `held` ver
 motif de `hold` s'il y en a. Ne pas les juger ici (le jugement de l'outbox — approve/hold/bounce —
 reste l'étape 3a-bis de la boucle `/discord_loop`, pas de ce hook).
 
+### 4. Messages de Marie non rejoués (angle mort du rattrapage)
+
+Quand `bot.py` était hors service à la réception d'un message qui @-mentionne le bot (pas de
+`pending_reply` en cours), `rattraper_messages_manques()` le journalise dans
+`conversation.jsonl` mais ne le route vers aucune inbox (log serveur uniquement, perdu pour
+la session). Après le restart de l'étape 1 (laisser le temps à `on_ready` de tourner — les
+étapes 2 et 3 suffisent généralement), vérifier s'il en reste pour Marie :
+
+```bash
+python DISCORD/discord_com/marie_non_traites.py --dry-run
+```
+
+`"messages": []` → rien à faire, poursuivre normalement.
+
+Sinon : les afficher intégralement (contenu + horodatage) **à la fin** de la synthèse `/start`,
+juste avant `🎉🎉🎉`, et demander explicitement à l'utilisateur comment les traiter — ne pas
+supposer une action. Ne relancer la commande sans `--dry-run` (qui marque les messages comme
+signalés) qu'une fois l'utilisateur reçu et pris en compte cette liste ; tant que ce n'est pas
+fait, ils doivent réapparaître à chaque `/start` suivant.
+
 ## Post-synthèse
 
-Enchaîner automatiquement `/discord_loop`, sans demander de confirmation. Cette zone n'existe que
-pour faire tourner la boucle Discord en service quasi-permanent (gardien de sortie de l'outbox +
-vidage de `inbox/unrouted/` et `inbox/discord/`) — cf. `.claude/commands/discord_loop.md` § Service
-quasi-permanent.
+S'il reste des messages de Marie non traités signalés à l'étape 4 sans réponse de l'utilisateur
+sur la suite à leur donner, ne pas enchaîner : attendre sa réponse avant de continuer.
+
+Sinon, enchaîner automatiquement `/discord_loop`, sans demander de confirmation. Cette zone
+n'existe que pour faire tourner la boucle Discord en service quasi-permanent (gardien de sortie
+de l'outbox + vidage de `inbox/unrouted/` et `inbox/discord/`) — cf.
+`.claude/commands/discord_loop.md` § Service quasi-permanent.

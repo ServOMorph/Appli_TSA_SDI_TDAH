@@ -29,6 +29,7 @@ CONV_LOG = LOGS_DIR / "conversation.jsonl"
 BACKFILL_LOG = LOGS_DIR / "backfill.jsonl"
 BACKFILL_MARKER = LOGS_DIR / ".backfill_done"
 CATCHUP_LOG = LOGS_DIR / "catchup.jsonl"
+COMMANDES_NON_REJOUEES_LOG = LOGS_DIR / "commandes_non_rejouees.jsonl"
 POLL_INTERVAL = 0.5
 ORPHAN_PROCESSING_MINUTES = 15
 GATEWAY_DRAIN_INTERVAL = 5.0
@@ -204,6 +205,13 @@ async def rattraper_messages_manques():
                 n_cmd += 1
                 print(f"Rattrapage : commande @bot non rejouee de {m.author} "
                       f"({m.created_at.isoformat()}) : {contenu[:80]!r}")
+                with COMMANDES_NON_REJOUEES_LOG.open("a", encoding="utf-8") as f:
+                    f.write(json.dumps({
+                        "ts": m.created_at.isoformat(),
+                        "author": str(m.author),
+                        "author_id": m.author.id,
+                        "content": contenu,
+                    }, ensure_ascii=False) + "\n")
     except Exception as e:
         print(f"Erreur rattraper_messages_manques : {e}")
         return

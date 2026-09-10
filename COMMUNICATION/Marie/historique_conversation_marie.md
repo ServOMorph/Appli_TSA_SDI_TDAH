@@ -752,3 +752,24 @@ faute de revue depuis le 2026-09-05. Point de vigilance : le 2026-09-05 Marie a 
 `548db78`) — le `ok`/`nok` réel des 12 ne sera connu qu'après ingestion du snapshot (`/deploy`
 étape 0.4, lecture `donnees_marie/`). Moitié « relance Marie » de la décision du 2026-09-08 faite,
 « puis /deploy » débloqué.
+
+### 2026-09-10
+
+**Marie ->**
+tu bois pas de café 😂😂😂
+
+_Suite :_ répond au message de pause du `/close` précédent (« J'en ai plein le c... je vais me
+faire un café et je reviens »). Reçu par `bot.py` alors qu'il était hors service (mention du bot,
+pas de `pending_reply` en cours) : journalisé dans `conversation.jsonl` par le rattrapage au
+redémarrage, mais jamais routé vers une inbox — angle mort identifié le 2026-09-10, corrigé le
+jour même (`bot.py` journalise désormais ces cas dans `logs/commandes_non_rejouees.jsonl`,
+surfacé automatiquement au `/start` discord suivant). Traité manuellement dans la session en
+cours, sur instruction directe de l'utilisateur.
+
+**Dév ->**
+Et ça c'est du poulet ???
+[pièce jointe : ad4afc6f-07f0-49db-8a14-1266efbf7023.png — illustration humoristique]
+
+_Suite :_ réponse à la remarque de Marie ci-dessus. Déposée dans la gateway
+(`--source discord --to marie --kind info`), id `20260910T104654_197549`. Jugée par le gardien de
+sortie (session `discord`) : `approve` sans retouche.

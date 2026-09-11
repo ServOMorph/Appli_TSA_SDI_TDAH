@@ -773,3 +773,16 @@ Et ça c'est du poulet ???
 _Suite :_ réponse à la remarque de Marie ci-dessus. Déposée dans la gateway
 (`--source discord --to marie --kind info`), id `20260910T104654_197549`. Jugée par le gardien de
 sortie (session `discord`) : `approve` sans retouche.
+
+### 2026-09-11
+
+**Dév ->**
+#37 : l'écran de création d'une tâche et l'écran de détail partagent déjà la même mise en page depuis la dernière version.
+Concrètement, qu'est-ce qui diffère encore entre les deux et te gêne ?
+
+_Suite :_ demande #37 du Google Doc réécrite par Marie le 2026-09-06 (« je veux que E21 soit comme
+E22 »), remplaçant l'énoncé détaillé du 2026-09-04 déjà livré v5.92. `/analyser_googledoc` constate
+que E21/E22 partagent déjà `TaskCardLayout` depuis cette livraison ; l'écart restant est ambigu.
+Question posée via la gateway (`--source orchestrateur --to marie --kind question --expect-reply`),
+id `20260911T160059_542394`. Décision produit isolée dans `roadmap_demandes_marie_2026-09-10.md`
+§ Décisions non tranchées ; aucun code engagé tant que la réponse n'est pas reçue.

@@ -8,10 +8,10 @@ archivée après livraison).
 - Dernière revue du Doc : 2026-09-06 (date de modification analysée : 2026-09-06 18:48 UTC)
 - Dernière exécution de la revue : 2026-09-10 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
 - Le Doc ne porte plus que #35, #36, #37, #38. #33 (reprise Doc) et #34 en ont été retirés (comportement `livrée v5.92` conservé). #37 y a été réécrit en « je veux que E21 soit comme E22 » (énoncé détaillé antérieur remplacé) : couverture réelle à re-vérifier via `/analyser_googledoc`.
-- Dernière mise à jour de ce registre : 2026-09-10 (5e passage) — `.claude/revue_googledoc.md`
-  depuis `/deploy` étape 0.4 : Doc réduit à #35-38 (tous `livrée v5.92`) ; #33 (reprise Doc) et
-  #34 marqués `retirée du Google Doc le 2026-09-06` ; #37 marqué texte modifié → compte-rendu
-  « analyse requise », `/analyser_googledoc` à lancer avant de reprendre `/deploy`.
+- Dernière mise à jour de ce registre : 2026-09-10 (6e passage) — `/analyser_googledoc` : #35
+  rouverte `en cours roadmap_demandes_marie_2026-09-10.md` (régression confirmée par code) ; #36 et
+  #38 reconfirmées `livrée v5.92` (retests `ok` de Marie) ; #37 clarification demandée à Marie
+  (aucune phase de code tant que la réponse n'est pas reçue).
 
 États autorisés : `livrée vX.Y` · `en attente` · `en cours <roadmap>` · `écartée : <motif>`.
 
@@ -52,10 +52,10 @@ archivée après livraison).
 | 33 | Outils : Listes | Les sous-tâches ajoutées à un élément de liste apparaissent automatiquement sur la page de la catégorie de cet élément, pliables/dépliables/cochables (comme les sous-tâches d'une tâche du planning) | écartée : retirée du Google Doc le 2026-09-04 (livrée v5.84, parcours `sous-taches-element-liste-dans-la-categorie` `ok` le 2026-09-04 ; ⚠ le Doc réutilise ce n°33 pour une demande distincte, cf. ligne « 33 (reprise Doc) » et Précisions) | 2026-09-04 |
 | 33 (reprise Doc) | Accueil / Planning | ⚠ Collision de numérotation : Marie réutilise le n°33 dans le Doc pour « finalement je veux que la case des jours de la semaine sur le planning ne soit pas coloré en fond, remet uniquement le contour de la case en couleur » — revient sur #19 (livrée v5.84). Numéro conservé tel quel (non renuméroté) faute de risque de confusion si Marie le réutilise | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) ; retirée du Google Doc le 2026-09-06 | 2026-09-06 |
 | 34 | Énergie | Le logo énergie de la page d'accueil ne doit plus avoir le fond de case coloré ; même traitement que la case des jours de la semaine du planning (nouveau 33) : contour seul en couleur | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) ; retirée du Google Doc le 2026-09-06 | 2026-09-06 |
-| 35 | Paramètres / Profil | Accessibilité : nouvelle section « code couleur » — créer des catégories de tâche (ex. sport, plaisir, travail) et leur attribuer une couleur ; à la création d'une tâche, le sélecteur de couleur n'affiche plus que ces catégories configurées (plus le panel complet), la sélection applique la couleur de la catégorie | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 2) | 2026-09-05 |
-| 36 | Paramètres / Profil | Les cartes des outils ne doivent plus avoir de fond coloré ; contour seul en couleur, comme le logo énergie (#34) | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) | 2026-09-05 |
-| 37 | Tâches | Refonte complète de l'écran fiche de tâche (et réutilisation pour la création, cf. #3 abandonnée) : fond non coloré ; l'écran prend toute la hauteur même sans sous-tâches ; titre dans une case centrée en haut, pleine largeur, fond coloré de la couleur de la tâche, logo devant le titre dans la même case ; infos de la tâche en cases sur deux colonnes en dessous, fond coloré de la couleur de la tâche ; conserver « décomposer », « dupliquer », « supprimer » ; retirer « modifier » (modification directe par clic sur la case concernée). ⚠ Énoncé réécrit dans le Doc le 2026-09-06 en « je veux que E21 soit comme E22 » — l'écran de création (E21) doit être aligné sur la fiche refondue (E22) ; couverture par v5.92 à re-vérifier via `/analyser_googledoc` | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 3) ; texte modifié dans le Doc le 2026-09-06, à re-analyser | 2026-09-06 |
-| 38 | Accueil / Planning | Animation du défilement des jours de la semaine à aligner sur celle du sélecteur d'heure de création de tâche : fluide, jours suivants visibles pendant le glissement (pas seulement au relâchement), pas de saut au relâchement — le jour resté dans la case centrale au relâchement doit y rester | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 4 ; référence citée par Marie introuvable dans le code, cf. roadmap § État constaté) | 2026-09-05 |
+| 35 | Paramètres / Profil | Accessibilité : nouvelle section « code couleur » — créer des catégories de tâche (ex. sport, plaisir, travail) et leur attribuer une couleur ; à la création d'une tâche, le sélecteur de couleur n'affiche plus que ces catégories configurées (plus le panel complet), la sélection applique la couleur de la catégorie | en cours `roadmap_demandes_marie_2026-09-10.md` (Phase 1 — régression : sélection de couleur par catégorie non reflétée immédiatement dans E22, `choisir-une-couleur-de-tache-par-categorie` `nok` le 2026-09-10, `E22TaskDetail.tsx:399-407`) | 2026-09-10 |
+| 36 | Paramètres / Profil | Les cartes des outils ne doivent plus avoir de fond coloré ; contour seul en couleur, comme le logo énergie (#34) | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 1) ; reconfirmée `ok` par Marie le 2026-09-10 (`couleur-de-fond-par-outil`) | 2026-09-10 |
+| 37 | Tâches | Refonte complète de l'écran fiche de tâche (et réutilisation pour la création, cf. #3 abandonnée) : fond non coloré ; l'écran prend toute la hauteur même sans sous-tâches ; titre dans une case centrée en haut, pleine largeur, fond coloré de la couleur de la tâche, logo devant le titre dans la même case ; infos de la tâche en cases sur deux colonnes en dessous, fond coloré de la couleur de la tâche ; conserver « décomposer », « dupliquer », « supprimer » ; retirer « modifier » (modification directe par clic sur la case concernée). ⚠ Énoncé réécrit dans le Doc le 2026-09-06 en « je veux que E21 soit comme E22 » — l'écran de création (E21) doit être aligné sur la fiche refondue (E22) ; couverture par v5.92 à re-vérifier via `/analyser_googledoc` | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 3 ; portée d'origine) ; texte modifié dans le Doc le 2026-09-06 — E21/E22 partagent déjà `TaskCardLayout` depuis v5.92, l'écart restant est ambigu ; clarification demandée à Marie via la gateway le 2026-09-10 (`roadmap_demandes_marie_2026-09-10.md` § Décisions non tranchées) | 2026-09-10 |
+| 38 | Accueil / Planning | Animation du défilement des jours de la semaine à aligner sur celle du sélecteur d'heure de création de tâche : fluide, jours suivants visibles pendant le glissement (pas seulement au relâchement), pas de saut au relâchement — le jour resté dans la case centrale au relâchement doit y rester | livrée v5.92 (`roadmap_demandes_marie_2026-09-04.md` Phase 4 ; référence citée par Marie introuvable dans le code, cf. roadmap § État constaté) ; reconfirmée `ok` par Marie le 2026-09-10 (`defilement-des-jours-dans-la-case`) | 2026-09-10 |
 
 > Note : les demandes 1 à 17 (retirées du Doc le 28/08), 18 et 20 (retirées le 31/08), 3, 19, 21, 22 et 23 à 33 (retirées le 04/09) restent ici comme historique du traitement. Les demandes 33 (reprise Doc) et 34 à 38, ajoutées par Marie le 04/09, ont été livrées en v5.92 (`Archives/roadmap_demandes_marie_2026-09-04.md`). Le Doc au 2026-09-06 ne porte plus que #35, #36, #37, #38 : #33 (reprise Doc) et #34 en ont été retirés (comportement conservé), #37 y a été réécrit (« E21 comme E22 »). Un passage `/analyser_googledoc` est requis pour re-établir la couverture réelle de #37 sous sa nouvelle formulation avant tout redéploiement.
 
@@ -91,6 +91,18 @@ archivée après livraison).
 
 ## Historique des revues
 
+- 2026-09-10 : `/analyser_googledoc` sur les 4 demandes actives du Doc (#35-38). Code réel consulté
+  (`E22TaskDetail.tsx`, `usePlanningState.ts`, `ColorPicker.tsx`, `E21CreateTaskV2.tsx`). #36 et #38
+  reconfirmées `livrée v5.92` sans écart (retests `ok` de Marie le 2026-09-10). #35 : régression
+  confirmée par lecture de code — `E22TaskDetail.tsx:399-407` (`saveField`) replie le champ Couleur
+  de façon synchrone avant la fin de la sauvegarde asynchrone, empêchant tout retour visuel
+  immédiat lors d'une sélection par catégorie ; repassée `en cours`, roadmap créée
+  (`roadmap_demandes_marie_2026-09-10.md`, Phase 1). #37 : énoncé du Doc jugé ambigu par rapport au
+  code déjà livré (E21/E22 partagent `TaskCardLayout` depuis v5.92) — décision produit isolée dans
+  la roadmap, question posée à Marie via la gateway (`--expect-reply`), aucun code engagé. Différentiel
+  d'états : #35 `livrée v5.92` → `en cours` ; #36, #38 inchangées (reconfirmées) ; #37 inchangée
+  (portée d'origine), clarification en attente. `COMMUNICATION/Marie/a_transmettre.md` non modifié
+  (aucune phase encore livrée).
 - 2026-09-10 : revue depuis `/deploy` étape 0.4 (`.claude/revue_googledoc.md`, procédure révisée
   ce jour — déclenchement de `/analyser_googledoc` sur le contenu du Doc, plus sur la seule date de
   modification). Google Doc modifié le 2026-09-06 18:48 UTC (> dernière revue 2026-09-04 19:48

@@ -40,7 +40,15 @@ Garantir la trace : si `tests_manuels.md` (racine du projet) ne contient pas dé
 mettre à jour la date, sans dupliquer. Son retrait suit la règle générale de `tests_manuels.md` :
 supprimée après confirmation que l'upload a été effectué.
 
+Si cette mise à jour a modifié `tests_manuels.md`, le committer immédiatement, seul et nommément
+(jamais `git add -A`), message type `chore(orchestrateur): trace sauvegarde Drive (manifeste
+<date>)`. Objectif : ce hook s'exécutant après le commit/push de l'étape 14, son propre résidu ne
+doit jamais atteindre un `/deploy` enchaîné juste après (étape 1 de `deploy.md`) — un arbre non
+propre y est bloquant (étape 3.1) et ce résidu serait garanti à chaque clôture sans ce commit
+dédié. Tenter aussi le `git push` de ce commit (silencieusement si le remote est indisponible : la
+prochaine session le pousse).
+
 Cette section s'exécute après l'étape 14 (`git push`) et **même si ce push a échoué**. Le manifeste
 `claude-vibecoding-kit/rclone_backup_files.txt` est réécrit à chaque passage ; il est gitignoré
-(aucun résidu à committer, pas de signalement à l'étape 15). Non bloquant : signaler tout échec en
-une ligne et poursuivre.
+(aucun résidu à committer, pas de signalement à l'étape 15 au-delà du commit ci-dessus). Non
+bloquant : signaler tout échec en une ligne et poursuivre.

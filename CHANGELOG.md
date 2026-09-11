@@ -1,3 +1,19 @@
+## v5.123 — 2026-09-11
+
+### Décidé
+- **Gate `/deploy` étape 0.4** : le déclenchement de `/analyser_googledoc` repose désormais sur le contenu du Google Doc de Marie (demande numérotée nouvelle, ou au texte modifié sur le fond) plutôt que sur la seule date de modification — un Doc simplement touché (retrait de lignes déjà livrées) ne bloque plus `/deploy`. Constat en conditions réelles : le Doc modifié le 2026-09-06 ne retirait que #33 (reprise Doc) et #34 (déjà livrées, sans conséquence), mais réécrivait #37 (« refonte complète de l'écran fiche de tâche... » → « je veux que E21 soit comme E22 ») — seul ce dernier point justifiait un arrêt. `.claude/revue_googledoc.md` restructuré : classement Doc ↔ registre par type d'écart (nouvelle / texte modifié / retirée / inchangée), compte-rendu typé (« analyse requise » / « réconciliation seule » / « Doc inchangé »).
+- **`/deploy` nouvelle étape 4bis** : revue de code cumulée (`code-review high`) sur le diff `<dernier déploiement>..HEAD`, lecture seule, bloquante sur `correctness` confirmé de forte sévérité (avertissement simple sinon). Étape 8 consigne désormais le SHA déployé (`Commit :` dans `_contexte/dernier_deploiement.md`) comme base de la revue du déploiement suivant. Étape 0.2 : dérogation explicite et bornée à `CLAUDE.md` § Données sensibles pour lire le snapshot `donnees_marie/` (contenu jamais affiché). Nouvelle étape 0.5 : commit du bookkeeping de l'étape 0 (journal de tests + registre Marie), pour qu'un arrêt en 0.4/0.8 laisse un arbre de travail propre.
+- **`/close` nouvelle étape 9 (avant le commit)** : revue de code de session (`code-review medium` minimum) sur `main` si `src/` a été touché — correction ou traçage `[P1]` des findings `correctness` confirmés. Étape 6 (ajout) : signalement mécanique de dette technique vers la roadmap active (rappel `CLAUDE.md` § Roadmap), jamais d'exécution ni de création de phase automatique.
+- **#37** (Doc réécrit le 2026-09-06 en « je veux que E21 soit comme E22 ») : plutôt que d'interpréter l'énoncé à sa place, une question a été posée à Marie via la gateway (`--expect-reply`, id `20260911T160059_542394`) — aucun code engagé avant sa réponse.
+
+### Modifié
+- `.claude/commands/deploy.md`, `.claude/commands/close.md`, `.claude/revue_googledoc.md` : gates ci-dessus.
+- `_contexte/marie_modifications_suivi.md`, `_contexte/marie_tests_journal.json` : ingestion du snapshot Supabase `20260910-1620z` de Marie (65 → 74 résultats) et réconciliation des demandes 33-38.
+
+### Constaté (lecture de code, `/analyser_googledoc`)
+- **#36** (cartes outils sans fond coloré) et **#38** (animation du défilement des jours) confirmées `livrée v5.92`, retests `ok` de Marie le 2026-09-10, aucune régression.
+- **#35** (code couleur par catégorie) : régression confirmée par lecture de code — `src/ui/screens/tasks/E22TaskDetail.tsx:399-407` (`saveField`) replie le champ Couleur de façon synchrone dès le clic, avant la résolution de `updateTaskFields` + `refreshFetchedTask` ; le bouton catégorie cliqué n'affiche donc jamais son état sélectionné, visible seulement après un remontage de l'écran. Roadmap créée : `roadmap_demandes_marie_2026-09-10.md` (Phase 1, correctif non encore développé).
+
 ## v5.122 — 2026-09-10
 
 ### Modifié

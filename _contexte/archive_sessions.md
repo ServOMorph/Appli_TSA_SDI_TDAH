@@ -1411,3 +1411,30 @@ Réparer la suite e2e Playwright (22 échecs) puis `/deploy` du lot v5.93 -> v5.
 
 ## Question bloquante pour la session suivante
 Aucune.
+---
+## Dernière session (2026-09-10 — mode annotation E122 facultatif + découplage retour ↔ consentement)
+
+## Décisions prises
+- Mode annotation crayon E122 : OFF par défaut, bouton bascule « Annoter l'image » / « Terminer l'annotation » (`f61d56e`) ; barre d'action déplacée au-dessus de l'image (`7248d41`).
+- Barre d'annotation `position: sticky` KO sur iOS Safari : laissée en l'état sur décision utilisateur (« ne change rien »), tracée [P3].
+- « Échec d'envoi » des retours = couplage au consentement sync. Contrat serveur : `submit_feedback` (`supabase/feedback.sql`) exige une ligne `device_snapshots`, créée seulement après un `sync_device_snapshot` consenti (`syncClient.ts:36`). Pas de RPC léger d'enregistrement d'appareil. Découpler côté serveur = nouveau RPC (non déployable d'ici) ou push de données sans consentement (régression vie privée) — écarté. Correctif retenu : ne plus marquer « échec », expliquer, guider vers Réglages › Confidentialité, et repartir automatiquement à l'activation.
+
+## Livrables produits ou modifiés
+- `src/data/sync/feedbackClient.ts` (+ `.test.ts`) : `syncReports` sort avant toute tentative si `!isSyncConsentGranted()` — le retour reste `pending`, jamais `failed`, aucun appel réseau.
+- `src/ui/screens/settings/E116Privacy.tsx` (+ `.test.tsx`) : activer « Partager mes données » relance `syncFeedbackNow({ force: true })` — les retours en attente partent aussitôt.
+- `src/ui/screens/feedback/E123FeedbackList.tsx` (+ `.test.tsx`) : sans consentement, carte d'invite + bouton « Ouvrir Confidentialité » (`goTo('settings-privacy')`), statut « En attente d'activation du partage » au lieu de « Échec d'envoi » / « Relancer ».
+- `src/ui/screens/feedback/E122FeedbackCapture.tsx` (+ `.test.tsx`) : note explicite quand le partage est désactivé ; mode annotation facultatif ; barre au-dessus de l'image.
+- `src/ui/components/AnnotationCanvas.tsx` : prop `active` (défaut `false`) — pointeur inerte (`pointerEvents: none`, `touchAction: auto`) hors mode annotation.
+- `CHANGELOG.md` v5.122 ; `README.md` § État actuel ; `_contexte/signals.md`, `contexte.md`, `archive_sessions.md`.
+- Commits de la session : `f61d56e` (annotation facultative), `7248d41` (barre au-dessus) + ce `/close` (v5.122).
+
+## Hypothèses validées / invalidées
+- VALIDÉ (utilisateur, iPhone via `https://appli-audhd-dev.netlify.app`) : collage « Coller une image » E122 fonctionne en HTTPS ; les retours passent « Envoyé » une fois le partage activé — confirme que « Échec d'envoi » venait de l'absence de `device_snapshots`, pas d'un défaut réseau.
+- INVALIDÉ : barre d'annotation `position: sticky` ne tient pas sur iOS Safari — abandonnée pour l'instant.
+- EN ATTENTE : dépouillement dev des retours reçus (`read_feedback_reports.py` → `403`, manque `GRANT SELECT ... TO service_role`) ; `/deploy` du lot v5.93 → v5.122 ; ingestion snapshot v5.92 + `ok`/`nok` des 33-38 ; DI2/DI3 ; résiduels mise en service Phase 5 ; Phase 6 ONBOARD.
+
+## Prochaine étape exacte
+`/deploy` du lot v5.93 → v5.122 (gate e2e vert). Appliquer `GRANT SELECT ON public.feedback_reports TO service_role` dans Supabase pour débloquer `read_feedback_reports.py`. Lancer manuellement la sauvegarde Drive : `python claude-vibecoding-kit/backup_project.py . --upload`.
+
+## Question bloquante pour la session suivante
+Aucune.

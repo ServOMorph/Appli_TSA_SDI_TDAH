@@ -818,3 +818,13 @@ _Suite :_ relance pour récupérer les pièces jointes du message ci-dessus. Dé
 (`--kind question --expect-reply`), id `20260912T061449_057883`. Le bug de routage étant corrigé
 (bot redémarré), sa prochaine réponse — pièces jointes incluses — devrait cette fois atteindre
 `inbox/orchestrateur/` normalement.
+
+**Dév ->**
+#37 : d'après ta vidéo et ton screen, tu veux que la création (E21) reprenne le mode replié de la fiche (E22) — champs en pastilles qui s'ouvrent au clic, plutôt que tout affiché en même temps ?
+Confirme et je lance le développement.
+
+_Suite :_ pièces jointes finalement transmises directement par l'utilisateur (fichiers locaux),
+visionnées (extraction d'images ffmpeg de la vidéo E21, comparée au screen E22) — écart confirmé,
+détail dans `roadmap_demandes_marie_2026-09-10.md` § Décisions non tranchées. Confirmation de
+compréhension déposée dans la gateway (`--kind question --expect-reply`), id
+`20260912T061902_354912`, avant toute phase de code sur #37.

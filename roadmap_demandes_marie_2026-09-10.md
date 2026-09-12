@@ -12,7 +12,7 @@ Source : Google Doc « Modifications » de Marie, modifié le 2026-09-06 18:48 U
 | #37 | Tâches | Réécrit dans le Doc le 2026-09-06 (« je veux que E21 soit comme E22 »), remplace l'énoncé détaillé du 2026-09-04 (refonte de la fiche, déjà livrée v5.92). E21CreateTaskV2 et E22TaskDetail partagent déjà `TaskCardLayout`, bandeau titre coloré et cellules teintées depuis cette livraison ; l'écart restant qui gêne Marie n'est pas déductible du texte seul | Décision produit — clarification demandée |
 | #38 | Accueil / Planning | Livrée v5.92, reconfirmée `ok` par Marie le 2026-09-10 (`defilement-des-jours-dans-la-case`) | Aucun — déjà livrée |
 
-## Phase 1 — Correctif sélection de couleur par catégorie (#35) [TODO]
+## Phase 1 — Correctif sélection de couleur par catégorie (#35) [FAIT]
 
 - **Constat** : `E22TaskDetail.tsx` fonction `saveField` (lignes 399-407) appelle
   `setExpandedField(null)` de façon synchrone dès le clic sur une catégorie, avant la résolution de
@@ -35,6 +35,17 @@ Source : Google Doc « Modifications » de Marie, modifié le 2026-09-06 18:48 U
   catalogue in-app (nouvelle `revision`) au moment du déploiement du correctif.
 - **Critère de sortie** : tests verts, `tsc -b` + lint clean, parcours revalidé `ok` par Marie sur
   une prochaine livraison.
+- **Réalisé (2026-09-12)** : `setExpandedField(null)` déplacé après `await updateTaskFields` +
+  `await refreshFetchedTask` dans la branche non récurrente de `saveField` (choix retenu : champ
+  ouvert le temps de la sauvegarde), avec un identifiant de champ (`field?: FieldKey`) et un jeton
+  de sauvegarde (`saveTokenRef`) pour ne refermer que le champ réellement concerné par la
+  sauvegarde qui vient d'aboutir — trouvé par `code-review medium` (repli intempestif d'un champ
+  fraîchement rouvert si l'utilisateur en change pendant qu'une sauvegarde précédente est encore en
+  vol, ou si deux sauvegardes se chevauchent sur le même champ). Tests `E22TaskDetail.test.tsx`
+  mis à jour (3 tests de régression + `waitFor`/`aria-expanded` sur les assertions asynchrones
+  affectées) ; suite complète 847 tests verts, `tsc -b` + lint clean. Parcours
+  `choisir-une-couleur-de-tache-par-categorie` passé en `revision: 1`.
+  Reste dû, hors code : déploiement et validation `ok` de Marie.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
@@ -353,6 +353,7 @@ export function E22TaskDetail() {
   const [editingTitle, setEditingTitle] = useState(false)
   const [draftTitle, setDraftTitle] = useState('')
   const [expandedField, setExpandedField] = useState<FieldKey | null>(null)
+  const saveTokenRef = useRef(0)
   const [draftStart, setDraftStart] = useState('')
   const [draftDuration, setDraftDuration] = useState<number | null>(null)
 
@@ -396,14 +397,18 @@ export function E22TaskDetail() {
     setFetchedTask(refreshed ?? null)
   }
 
-  async function saveField(patch: TaskFieldEdit) {
+  async function saveField(patch: TaskFieldEdit, field?: FieldKey) {
     if (!selectedTaskId || !task) return
-    setExpandedField(null)
     if (task.recurrence_id) {
+      setExpandedField(null)
       setPendingFieldEdit(patch)
     } else {
+      const token = field ? ++saveTokenRef.current : saveTokenRef.current
       await updateTaskFields(selectedTaskId, patch, 'occurrence')
       await refreshFetchedTask()
+      if (field && token === saveTokenRef.current) {
+        setExpandedField((current) => (current === field ? null : current))
+      }
     }
   }
 
@@ -417,6 +422,7 @@ export function E22TaskDetail() {
 
   function toggleField(field: FieldKey) {
     if (!task) return
+    saveTokenRef.current++
     setExpandedField((current) => {
       if (current === field) return null
       if (field === 'time') {
@@ -441,7 +447,7 @@ export function E22TaskDetail() {
   }
 
   async function saveTime() {
-    await saveField({ startTime: draftStart || null, durationMinutes: draftDuration })
+    await saveField({ startTime: draftStart || null, durationMinutes: draftDuration }, 'time')
   }
 
   async function handleDuplicate() {
@@ -579,7 +585,7 @@ export function E22TaskDetail() {
           expanded={expandedField === 'icon'}
           onToggle={() => toggleField('icon')}
         >
-          <IconPicker value={task.icon} onChange={(v) => saveField({ icon: v })} />
+          <IconPicker value={task.icon} onChange={(v) => saveField({ icon: v }, 'icon')} />
         </TaskFieldCard>
 
         <TaskFieldCard
@@ -589,7 +595,7 @@ export function E22TaskDetail() {
           expanded={expandedField === 'color'}
           onToggle={() => toggleField('color')}
         >
-          <ColorPicker value={task.color} onChange={(v) => saveField({ color: v })} categories={taskCategories} />
+          <ColorPicker value={task.color} onChange={(v) => saveField({ color: v }, 'color')} categories={taskCategories} />
         </TaskFieldCard>
 
         <TaskFieldCard
@@ -603,7 +609,7 @@ export function E22TaskDetail() {
             type="date"
             aria-label="Date"
             defaultValue={task.scheduled_date ?? todayStr()}
-            onChange={(e) => saveField({ date: e.target.value })}
+            onChange={(e) => saveField({ date: e.target.value }, 'date')}
             style={inputStyle}
           />
         </TaskFieldCard>
@@ -641,7 +647,7 @@ export function E22TaskDetail() {
                 key={v}
                 type="button"
                 style={energyGridButtonStyle(task.energy_cost === v)}
-                onClick={() => saveField({ energyCost: task.energy_cost === v ? null : v })}
+                onClick={() => saveField({ energyCost: task.energy_cost === v ? null : v }, 'energy')}
               >
                 {v}
               </button>
@@ -672,7 +678,7 @@ export function E22TaskDetail() {
             aria-label="Description"
             defaultValue={task.description}
             rows={3}
-            onBlur={(e) => saveField({ description: e.target.value })}
+            onBlur={(e) => saveField({ description: e.target.value }, 'description')}
             style={{ ...inputStyle, width: '100%', resize: 'vertical', boxSizing: 'border-box' }}
           />
         </TaskFieldCard>

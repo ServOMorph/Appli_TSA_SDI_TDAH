@@ -12,30 +12,6 @@ annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'u
 reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
 demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
-## Export / import des données (E117Export) — suite à donner
-
-Test manuel iPhone joué le 2026-09-10 (Morphéus, iPhone Safari, preview LAN) : téléchargement
-JSON OK (message vert, fichier dans Téléchargements), structure complète (21 tables,
-`version` 3.6), réimport qui écrase bien (tâche jetable disparue, données d'origine + budget
-restaurés, aucune erreur), `feedbackReports` absent de l'export comme prévu. Le point de
-vigilance `a.click()` iOS Safari ne mord pas sur cet appareil. Variante planifiée E21
-également OK après correctif du débordement de grille `TaskCardLayout`.
-
-Reste à faire, hors test :
-- Instruire Marie sur la procédure de sauvegarde autonome (« Exporter en JSON », sa demande).
-- Consigner l'exclusion `feedbackReports` comme limite connue de la restauration.
-
-## Bornage des requêtes réseau et reprise après coupure (Phase 6) — à porter au catalogue in-app
-
-Pas testable en dev (aucun backend de synchronisation configuré localement). À convertir en
-parcours du catalogue in-app (`src/domain/data/manualTestsCatalog.ts`) au prochain `/deploy`,
-regroupé avec la question ouverte [P1] « Marie confirme-t-elle que "Relancer" fait passer ses
-retours en "Envoyé" ? » (`_contexte/signals.md`). Comportement à faire valider par Marie :
-- couper le réseau (mode avion), déclencher un envoi de retour annoté : la tentative se règle
-  d'elle-même après ~30 s sans figer l'appli, le retour passe « Échec d'envoi » ;
-- rétablir le réseau, relancer : le retour part sans doublon (image déjà déposée non renvoyée)
-  et passe « Envoyé ».
-
 ## Sauvegarde Drive en attente
 
 Manifeste rafraîchi le 2026-09-11 (229 fichiers). L'upload vers Drive n'est pas exécutable en

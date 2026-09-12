@@ -1,3 +1,19 @@
+## v5.124 — 2026-09-12
+
+### Corrigé
+- **Bug de routage Discord** : un message de Marie qui @-mentionne le bot après consommation de son `--expect-reply` tombait en « Mode commande Claude » au lieu du routage gateway, perdant le message et ses pièces jointes. `DISCORD/discord_com/bot.py` (`on_message` + `rattraper_messages_manques`) : tout message de `gateway.MARIE_USER_ID` route désormais vers la gateway sans condition de mention/`pending_reply`. 2 tests de régression (`test_bot.py`, 121 tests Discord verts), `ruff` clean. Commit `94962bb`, bot redémarré.
+- **#35 — sélection de couleur par catégorie sans retour visuel immédiat** (`E22TaskDetail.tsx`) : `saveField` refermait le champ Couleur avant la fin de la sauvegarde asynchrone. Corrigé avec un identifiant de champ et un jeton de sauvegarde (`saveTokenRef`, invalidé à chaque bascule manuelle) pour ne refermer que le champ réellement concerné, après trois effets de bord trouvés et corrigés en itérant `code-review medium` jusqu'à passe blanche (fermeture d'un champ différent ouvert entre-temps, sauvegarde périmée du même champ, sauvegarde sans champ — titre, case Obligatoire — invalidant à tort le jeton d'un autre champ). `roadmap_demandes_marie_2026-09-10.md` Phase 1 `[FAIT]`. Parcours `choisir-une-couleur-de-tache-par-categorie` passé en `revision: 1`.
+
+### Constaté
+- **#37 — contenu récupéré et confirmé** : les pièces jointes de Marie (vidéo E21, capture E22), perdues par le bug de routage ci-dessus puis transmises par l'utilisateur, montrent que la fiche de tâche existante (E22) replie ses champs en pastilles dépliables au tap, alors que l'écran de création (E21) les laisse tous dépliés en permanence (long défilement). Reformulation proposée à Marie (mode compact d'E22 à reprendre sur E21), envoyée via la gateway, `en attente` de confirmation avant toute phase de code.
+
+### Ajouté
+- Parcours in-app `coupure-reseau-pendant-un-envoi-de-retour` (`manualTestsCatalog.ts`), portant le contrôle réseau Phase 6 de la roadmap de fiabilisation au catalogue de Marie.
+
+### Modifié
+- `COMMUNICATION/Marie/a_transmettre.md` : sélection de couleur corrigée, procédure d'export autonome (« Exporter en JSON ») et limite connue (`feedbackReports` non restauré) communiquées à Marie.
+- `tests_manuels.md` : sections « Export / import » et « Bornage des requêtes réseau » closes et retirées.
+
 ## v5.123 — 2026-09-11
 
 ### Décidé

@@ -25,3 +25,11 @@ Les nouvelles tâches répétées ne créent plus de dates trop loin dans le fut
 ## Ajout d’une tâche depuis la Réception
 
 Toucher « Ajouter une tâche » depuis la Réception ne fait plus zoomer la page. La correction s’applique à tous les champs de saisie de l’application.
+
+## Sélection de couleur par catégorie
+
+Sur la fiche d'une tâche, toucher une catégorie de couleur l'affiche maintenant sélectionnée tout de suite. Avant, il fallait revenir sur l'accueil et rouvrir la tâche pour le voir.
+
+## Sauvegarde autonome de vos données
+
+Pour sauvegarder vos données vous-même : Paramètres > Export et import > « Exporter en JSON ». Le fichier téléchargé contient vos tâches, listes, budget et réglages ; il ne contient pas l'historique de vos retours déjà envoyés au développeur (ce sont des données de test, pas des données à restaurer).

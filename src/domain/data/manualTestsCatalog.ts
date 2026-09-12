@@ -558,14 +558,26 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'choisir-une-couleur-de-tache-par-categorie',
+    revision: 1,
     title: 'Choisir une couleur de tâche par catégorie',
     category: 'Tâches',
     docRefs: [35],
     steps: [
       'Sans catégorie configurée (voir « Configurer un code couleur de tâche »), commencez la création d’une tâche : le champ « Couleur » doit proposer le sélecteur habituel (une pastille de couleur à toucher).',
       'Configurez au moins une catégorie dans Paramètres > Accessibilité, puis revenez créer ou modifier une tâche : le champ « Couleur » doit maintenant proposer les catégories par leur nom et leur pastille, à la place du sélecteur habituel.',
-      'Touchez une catégorie : elle doit apparaître sélectionnée, et la tâche enregistrée doit prendre la couleur de cette catégorie.',
+      'Touchez une catégorie : elle doit apparaître sélectionnée directement au clic, sans avoir besoin de revenir sur l’accueil ni de rouvrir la tâche.',
+      'Vérifiez que la tâche enregistrée prend bien la couleur de cette catégorie.',
       'Touchez « Retirer » : aucune catégorie ne doit plus être sélectionnée et la tâche enregistrée n’a alors aucune couleur.',
+    ],
+  },
+  {
+    id: 'coupure-reseau-pendant-un-envoi-de-retour',
+    title: 'Coupure réseau pendant l’envoi d’un retour',
+    category: 'Paramètres / Profil',
+    steps: [
+      'Ouvrez un retour annoté prêt à être envoyé, activez le mode avion, puis touchez « Envoyer ».',
+      'Attendez environ 30 secondes sans toucher l’appli : l’envoi doit s’arrêter de lui-même, sans que l’appli reste bloquée, et le retour doit passer en « Échec d’envoi ».',
+      'Désactivez le mode avion, puis touchez « Relancer » sur ce retour : il doit repartir sans dupliquer l’image déjà déposée, et passer en « Envoyé ».',
     ],
   },
   {

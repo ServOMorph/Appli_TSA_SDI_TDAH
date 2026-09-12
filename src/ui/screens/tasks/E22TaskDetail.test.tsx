@@ -206,7 +206,122 @@ describe('E22TaskDetail', () => {
       renderWithApp(<E22TaskDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
       fireEvent.change(screen.getByLabelText('Choisir une couleur'), { target: { value: '#ff8800' } })
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { color: '#ff8800' }, 'occurrence')
+      await waitFor(() => {
+        expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { color: '#ff8800' }, 'occurrence')
+      })
+    })
+
+    it('clic sur Couleur : la sélection reste visible jusqu’à la fin de l’enregistrement (#35)', async () => {
+      const task = makeTask({ color: null })
+      const category: TaskCategory = { id: 'cat-1', name: 'Voyage', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+      let resolveUpdate: () => void = () => {}
+      const updateTaskFields = vi.fn().mockImplementation(
+        () => new Promise<void>((resolve) => { resolveUpdate = resolve })
+      )
+      const ctx = makeAppContext({
+        selectedTaskId: 'task-1',
+        inboxTasks: [task],
+        taskCategories: [category],
+        updateTaskFields,
+      })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Voyage' }))
+      expect(screen.getByRole('button', { name: 'Modifier Couleur' })).toHaveAttribute('aria-expanded', 'true')
+      resolveUpdate()
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Modifier Couleur' })).toHaveAttribute('aria-expanded', 'false')
+      })
+    })
+
+    it('changer de champ pendant l’enregistrement d’un autre ne referme pas le nouveau (#35)', async () => {
+      const task = makeTask({ color: null, scheduled_date: '2026-09-05' })
+      const category: TaskCategory = { id: 'cat-1', name: 'Voyage', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+      let resolveUpdate: () => void = () => {}
+      const updateTaskFields = vi.fn().mockImplementation(
+        () => new Promise<void>((resolve) => { resolveUpdate = resolve })
+      )
+      const ctx = makeAppContext({
+        selectedTaskId: 'task-1',
+        inboxTasks: [task],
+        taskCategories: [category],
+        updateTaskFields,
+      })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Voyage' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Date' }))
+      expect(screen.getByRole('button', { name: 'Modifier Couleur' })).toHaveAttribute('aria-expanded', 'false')
+      expect(screen.getByRole('button', { name: 'Modifier Date' })).toHaveAttribute('aria-expanded', 'true')
+      resolveUpdate()
+      await waitFor(() => {
+        expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { color: '#4a7c99' }, 'occurrence')
+      })
+      expect(screen.getByRole('button', { name: 'Modifier Date' })).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('une sauvegarde périmée du même champ ne referme pas une sélection plus récente (#35)', async () => {
+      const task = makeTask({ energy_cost: null })
+      const resolvers: Array<() => void> = []
+      const updateTaskFields = vi.fn().mockImplementation(
+        () => new Promise<void>((resolve) => { resolvers.push(resolve) })
+      )
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task], updateTaskFields })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Coût en énergie' }))
+      await userEvent.click(screen.getByRole('button', { name: '3' }))
+      await userEvent.click(screen.getByRole('button', { name: '5' }))
+      expect(resolvers).toHaveLength(2)
+      resolvers[0]()
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(screen.getByRole('button', { name: 'Modifier Coût en énergie' })).toHaveAttribute('aria-expanded', 'true')
+      resolvers[1]()
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Modifier Coût en énergie' })).toHaveAttribute('aria-expanded', 'false')
+      })
+    })
+
+    it('refermer puis rouvrir le même champ pendant l’envoi ne le referme pas au retour du réseau (#35)', async () => {
+      const task = makeTask({ energy_cost: null })
+      let resolveUpdate: () => void = () => {}
+      const updateTaskFields = vi.fn().mockImplementation(
+        () => new Promise<void>((resolve) => { resolveUpdate = resolve })
+      )
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task], updateTaskFields })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Coût en énergie' }))
+      await userEvent.click(screen.getByRole('button', { name: '5' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Coût en énergie' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Coût en énergie' }))
+      expect(screen.getByRole('button', { name: 'Modifier Coût en énergie' })).toHaveAttribute('aria-expanded', 'true')
+      resolveUpdate()
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(screen.getByRole('button', { name: 'Modifier Coût en énergie' })).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('une sauvegarde sans champ (Obligatoire) ne bloque pas la fermeture d’un champ en cours (#35)', async () => {
+      const task = makeTask({ color: null, essential: false })
+      const category: TaskCategory = { id: 'cat-1', name: 'Voyage', color: '#4a7c99', position: 0, created_at: '2026-09-05T00:00:00Z' }
+      let resolveColor: () => void = () => {}
+      const updateTaskFields = vi.fn()
+        .mockImplementationOnce(() => new Promise<void>((resolve) => { resolveColor = resolve }))
+        .mockResolvedValue(undefined)
+      const ctx = makeAppContext({
+        selectedTaskId: 'task-1',
+        inboxTasks: [task],
+        taskCategories: [category],
+        updateTaskFields,
+      })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Voyage' }))
+      await userEvent.click(screen.getByLabelText('Obligatoire'))
+      resolveColor()
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Modifier Couleur' })).toHaveAttribute('aria-expanded', 'false')
+      })
     })
 
     it('clic sur Couleur : propose les catégories configurées', async () => {
@@ -225,7 +340,9 @@ describe('E22TaskDetail', () => {
       renderWithApp(<E22TaskDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Modifier Date' }))
       fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2026-09-10' } })
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { date: '2026-09-10' }, 'occurrence')
+      await waitFor(() => {
+        expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { date: '2026-09-10' }, 'occurrence')
+      })
     })
 
     it('clic sur Horaire : heure + durée, Enregistrer envoie les deux', async () => {
@@ -236,7 +353,9 @@ describe('E22TaskDetail', () => {
       fireEvent.change(screen.getByLabelText('Heure'), { target: { value: '09:00' } })
       await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
       await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { startTime: '09:00', durationMinutes: 60 }, 'occurrence')
+      await waitFor(() => {
+        expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { startTime: '09:00', durationMinutes: 60 }, 'occurrence')
+      })
     })
 
     it('clic sur Coût en énergie : sélectionner une valeur enregistre et replie', async () => {
@@ -265,7 +384,9 @@ describe('E22TaskDetail', () => {
       const textarea = screen.getByLabelText('Description')
       await userEvent.type(textarea, 'Apporter le carnet de santé')
       fireEvent.blur(textarea)
-      expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { description: 'Apporter le carnet de santé' }, 'occurrence')
+      await waitFor(() => {
+        expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { description: 'Apporter le carnet de santé' }, 'occurrence')
+      })
     })
 
     it('tâche récurrente : propose occurrence/série avant d’enregistrer un champ modifié', async () => {

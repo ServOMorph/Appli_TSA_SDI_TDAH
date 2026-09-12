@@ -16,6 +16,18 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 12 septembre 2026, un bug a été trouvé et corrigé dans la messagerie Discord : un message de
+Marie envoyé après qu'elle a déjà répondu à une question posée pouvait être perdu, pièces jointes
+comprises, s'il mentionnait le nom du bot par réflexe. C'est ce qui était arrivé à un message
+important sur la dernière demande en cours (une comparaison entre deux écrans de tâche, vidéo et
+capture d'écran à l'appui) ; les fichiers ont été récupérés et montrent que la fiche de tâche
+existante (E22) replie ses champs en petites pastilles qu'on déplie en touchant, alors que l'écran
+de création (E21) affiche tout déplié en permanence sur un long défilement — c'est cet écart que
+Marie veut voir corrigé, reformulation envoyée pour confirmation avant tout développement. Dans la
+foulée, la régression déjà repérée sur le choix d'une couleur par catégorie (elle ne s'affichait
+pas tout de suite) a été corrigée, un contrôle de coupure réseau a rejoint le catalogue de tests, et
+la procédure de sauvegarde autonome des données a été précisée pour Marie.
+
 Le 11 septembre 2026, le processus de mise en ligne a été renforcé : une relecture du code est désormais faite avant chaque déploiement (elle porte sur l'ensemble des changements accumulés depuis la dernière mise en ligne, ne corrige jamais rien automatiquement) et une revue de code est faite à chaque fin de session de travail. Au passage, les dernières demandes de Marie sur son document de suivi ont été revues : deux modifications déjà en ligne sont reconfirmées après de nouveaux essais réussis, une régression a été repérée (le choix d'une couleur par catégorie ne s'affiche pas tout de suite dans la fiche d'une tâche — correction prévue) et une clarification a été demandée à Marie sur une dernière demande dont l'énoncé a changé, avant d'y toucher. La mise en ligne du lot de travail accumulé depuis la v5.92 est en cours de préparation.
 
 Au 10 septembre 2026, la **v5.92** reste en production et un lot de travail non déployé s'est accumulé (jusqu'à la v5.123 du journal des changements) : améliorations d'affichage, corrections de fiabilité, correctif de zoom sur iPhone, refonte de la fiche de tâche, et les premières briques du dispositif d'accueil de testeurs additionnels (écran de consentement à la synchronisation, code testeur dans le profil). La refonte du dispositif d'accueil des testeurs est planifiée en six phases (`roadmap_integration_onboard.md`) : les cinq premières sont réalisées, la sixième — généraliser le nommage aujourd'hui centré sur une seule personne — est cadrée pour transformer aussi bien la testeuse principale que le développeur en testeurs identifiés par un code, sur le même modèle que les nouveaux testeurs. Elle sera menée après le prochain déploiement.

@@ -1,6 +1,6 @@
 """Acces partage a la table Supabase device_snapshots (roadmap_sav_snapshot_marie.md, Phase 3).
 
-Consomme par backup_marie_snapshot.py et read_device_snapshots.py : une seule implementation
+Consomme par backup_testeur_snapshots.py et read_device_snapshots.py : une seule implementation
 de la garde d'environnement et de la requete HTTP. SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY
 (cle service_role, jamais la cle anon : RLS bloque tout acces direct) ne sont jamais affichees
 ni journalisees.

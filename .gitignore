@@ -26,7 +26,7 @@ e2e/test-results/
 claude-vibecoding-kit/rclone_backup_files.txt
 
 # Données personnelles réelles (testeurs)
-donnees_marie/
+donnees_testeurs/
 
 # Netlify CLI local state
 .netlify/

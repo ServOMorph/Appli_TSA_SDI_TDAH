@@ -1,8 +1,8 @@
-"""Auto-tests de backup_marie_snapshot.py (roadmap_sav_snapshot_marie.md, Phase 1).
+"""Auto-tests de backup_testeur_snapshots.py (roadmap_integration_onboard.md, Phase 6).
 
-Bibliotheque standard uniquement : `python scripts/test_backup_marie_snapshot.py`.
+Bibliotheque standard uniquement : `python scripts/test_backup_testeur_snapshots.py`.
 Ne couvre que les fonctions pures — le chemin reseau reste verifie a la main
-(cf. tests_manuels.md). Aucun acces aux vraies donnees de Marie : les payloads
+(cf. tests_manuels.md). Aucun acces aux vraies donnees des testeurs : les payloads
 sont synthetiques.
 """
 
@@ -14,7 +14,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from backup_marie_snapshot import (  # noqa: E402
+from backup_testeur_snapshots import (  # noqa: E402
+    UNKNOWN_TESTER_DIRNAME,
     archive_one,
     build_query,
     build_stamp,
@@ -22,20 +23,25 @@ from backup_marie_snapshot import (  # noqa: E402
     payload_is_empty,
     payload_problem,
     plan_retention,
+    resolve_tester_dirname,
     select_targets,
     serialize_payload,
 )
 
 
 def row(device_id: str, n_tests: int, n_tasks: int = 1,
-        synced_at: str = "2026-09-01T18:37:52.246694+00:00") -> dict:
+        synced_at: str = "2026-09-01T18:37:52.246694+00:00",
+        tester_code: str | None = None) -> dict:
+    payload: dict = {
+        "tasks": [{"id": f"t{i}"} for i in range(n_tasks)],
+        "manual_test_results": [{"id": f"r{i}"} for i in range(n_tests)],
+    }
+    if tester_code is not None:
+        payload["settings"] = {"tester_code": tester_code}
     return {
         "device_id": device_id,
         "synced_at": synced_at,
-        "payload": {
-            "tasks": [{"id": f"t{i}"} for i in range(n_tasks)],
-            "manual_test_results": [{"id": f"r{i}"} for i in range(n_tests)],
-        },
+        "payload": payload,
     }
 
 
@@ -73,6 +79,7 @@ class ArchiveOne(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
 
     def test_deux_appareils_deux_archives_aucune_perte(self):
+        # Sans tester_code, les deux appareils tombent dans le meme dossier _sans_code/.
         cibles = select_targets([
             row("aaaaaaaa", 3, synced_at="2026-09-02T10:00:00+00:00"),
             row("bbbbbbbb", 7, synced_at="2026-09-02T11:00:00+00:00"),
@@ -84,7 +91,7 @@ class ArchiveOne(unittest.TestCase):
             self.assertFalse(skipped)
             ecrits += int(did_write)
         self.assertEqual(ecrits, 2)
-        noms = sorted(p.name for p in self.dir.iterdir())
+        noms = sorted(p.name for p in (self.dir / UNKNOWN_TESTER_DIRNAME).iterdir())
         self.assertEqual(len(noms), 2)
         self.assertTrue(any("aaaaaaaa" in n for n in noms))
         self.assertTrue(any("bbbbbbbb" in n for n in noms))
@@ -92,9 +99,10 @@ class ArchiveOne(unittest.TestCase):
     def test_rejeu_aucune_reecriture(self):
         r = row("aaaaaaaa", 3)
         self.assertEqual(archive_one(self.dir, r), (0, True, False))
-        avant = {p.name: p.read_text(encoding="utf-8") for p in self.dir.iterdir()}
+        tester_dir = self.dir / UNKNOWN_TESTER_DIRNAME
+        avant = {p.name: p.read_text(encoding="utf-8") for p in tester_dir.iterdir()}
         self.assertEqual(archive_one(self.dir, r), (0, False, False))
-        apres = {p.name: p.read_text(encoding="utf-8") for p in self.dir.iterdir()}
+        apres = {p.name: p.read_text(encoding="utf-8") for p in tester_dir.iterdir()}
         self.assertEqual(avant, apres)
 
     def test_payload_malforme_ninterrompt_pas_les_autres(self):
@@ -105,7 +113,7 @@ class ArchiveOne(unittest.TestCase):
         codes = [archive_one(self.dir, r) for r in cibles]
         self.assertEqual(codes[0], (1, False, False))
         self.assertEqual(codes[1], (0, True, False))
-        noms = [p.name for p in self.dir.iterdir()]
+        noms = [p.name for p in (self.dir / UNKNOWN_TESTER_DIRNAME).iterdir()]
         self.assertEqual(len(noms), 1)
         self.assertIn("bbbbbbbb", noms[0])
 
@@ -132,7 +140,56 @@ class ArchiveOne(unittest.TestCase):
         ])
         self.assertEqual(len(cibles), 1)
         self.assertEqual(archive_one(self.dir, cibles[0]), (0, True, False))
-        self.assertEqual(len(list(self.dir.iterdir())), 1)
+        self.assertEqual(len(list((self.dir / UNKNOWN_TESTER_DIRNAME).iterdir())), 1)
+
+    def test_deux_testeurs_jamais_melanges(self):
+        # Demande explicite : chaque testeur a ses donnees cloisonnees, dans son propre dossier.
+        cibles = [
+            row("aaaaaaaa", 3, synced_at="2026-09-02T10:00:00+00:00", tester_code="marie"),
+            row("bbbbbbbb", 5, synced_at="2026-09-02T11:00:00+00:00", tester_code="morpheus"),
+        ]
+        for r in cibles:
+            self.assertEqual(archive_one(self.dir, r), (0, True, False))
+        self.assertEqual({p.name for p in self.dir.iterdir()}, {"marie", "morpheus"})
+        marie_noms = [p.name for p in (self.dir / "marie").iterdir()]
+        morpheus_noms = [p.name for p in (self.dir / "morpheus").iterdir()]
+        self.assertEqual(len(marie_noms), 1)
+        self.assertEqual(len(morpheus_noms), 1)
+        self.assertIn("aaaaaaaa", marie_noms[0])
+        self.assertIn("bbbbbbbb", morpheus_noms[0])
+
+    def test_tester_code_normalise_dans_le_nom_de_dossier(self):
+        r = row("aaaaaaaa", 1, tester_code=" Morpheus ")
+        self.assertEqual(archive_one(self.dir, r), (0, True, False))
+        self.assertTrue((self.dir / "morpheus").exists())
+
+
+class ResolveTesterDirname(unittest.TestCase):
+    def test_code_present(self):
+        self.assertEqual(resolve_tester_dirname({"settings": {"tester_code": "satine"}}), "satine")
+
+    def test_code_normalise_minuscule_et_trim(self):
+        self.assertEqual(resolve_tester_dirname({"settings": {"tester_code": " Marie "}}), "marie")
+
+    def test_caracteres_speciaux_remplaces(self):
+        self.assertEqual(resolve_tester_dirname({"settings": {"tester_code": "Marie B."}}), "marie-b")
+
+    def test_code_arbitraire_fonctionne(self):
+        # Gate de sortie de la roadmap : le depouillement fonctionne pour un testeur au nom
+        # arbitraire, pas seulement les identites deja connues du projet.
+        self.assertEqual(resolve_tester_dirname({"settings": {"tester_code": "alpha-01"}}), "alpha-01")
+
+    def test_code_absent(self):
+        self.assertEqual(resolve_tester_dirname({"settings": {}}), UNKNOWN_TESTER_DIRNAME)
+        self.assertEqual(resolve_tester_dirname({}), UNKNOWN_TESTER_DIRNAME)
+
+    def test_code_vide_apres_normalisation(self):
+        self.assertEqual(resolve_tester_dirname({"settings": {"tester_code": "   "}}), UNKNOWN_TESTER_DIRNAME)
+        self.assertEqual(resolve_tester_dirname({"settings": {"tester_code": "!!!"}}), UNKNOWN_TESTER_DIRNAME)
+
+    def test_settings_absent_ou_mal_type(self):
+        self.assertEqual(resolve_tester_dirname({"settings": None}), UNKNOWN_TESTER_DIRNAME)
+        self.assertEqual(resolve_tester_dirname({"settings": "corrompu"}), UNKNOWN_TESTER_DIRNAME)
 
 
 class PayloadProblem(unittest.TestCase):

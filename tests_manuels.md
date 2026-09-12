@@ -12,6 +12,18 @@ annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'u
 reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
 demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
+## Vérifier le classement du snapshot de Marie après saisie de son code testeur
+
+Depuis la Phase 6 `roadmap_integration_onboard.md`, tant que Marie n'a pas saisi son `tester_code`
+(`marie`) dans Paramètres > Profil, ses nouveaux snapshots Supabase tombent dans
+`donnees_testeurs/_sans_code/` au lieu de `donnees_testeurs/marie/` (constaté au hook `/close` du
+2026-09-12 : `snapshot-supabase-192f2411-20260912-0951z.json` archivé en `_sans_code/`). Risque
+concret : `/deploy` étape 0.1-0.2 continue de lire `donnees_testeurs/marie/`, qui ne contiendra
+alors que l'historique migré (dernier daté du 2026-09-11), pas le snapshot réellement le plus
+récent. Une fois que Marie a saisi son code : vérifier que le prochain
+`python scripts/backup_testeur_snapshots.py` range bien son snapshot dans `marie/` et non plus dans
+`_sans_code/`, et que `/deploy` analyse alors le bon fichier. Retirer cette section une fois vérifié.
+
 ## Sauvegarde Drive en attente
 
 Manifeste rafraîchi le 2026-09-12 (254 fichiers). L'upload vers Drive n'est pas exécutable en

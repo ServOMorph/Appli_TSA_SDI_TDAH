@@ -16,6 +16,16 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 12 septembre 2026, la sixième et dernière phase du dispositif d'accueil des testeurs
+(`roadmap_integration_onboard.md`) a été réalisée : plus aucun script ne dépend du nom d'une
+personne en particulier. Le script de sauvegarde développeur et le journal des résultats de tests
+manuels rangent désormais chaque testeur sous son propre code (`donnees_testeurs/<code>/`,
+`_contexte/tests_journaux/<code>.json`), après une migration sans perte de l'historique existant
+(74 résultats de tests, 61 sauvegardes archivées). Objectif immédiat : ajouter le développeur
+lui-même comme testeur (code `morpheus`) pour valider tout le dispositif avant la première
+invitation de Satine. Reste à faire, hors code : Marie et le développeur doivent chacun saisir leur
+code testeur dans Paramètres > Profil sur leur appareil.
+
 Le 12 septembre 2026, le lot accumulé depuis la v5.92 a été mis en ligne : la **v5.124** est en
 production (revue de code cumulée sans correction nécessaire, budget du bundle respecté, contrôle
 de fumée réussi). Neuf parcours attendent Marie dans l'écran « Tests à faire ». Deux roadmaps
@@ -59,7 +69,7 @@ Le 5 septembre 2026, un mécanisme générique de « hooks de zone » a été aj
 
 `roadmap_demandes_marie_2026-09-02.md` (demandes 23 à 33) est complète et déployée : texte des tâches sans couleur lisible une fois cochées ; couleur d'un outil appliquée à sa carte d'accueil ; sur le planning, nom et heure de début en haut de la case, heure de fin en bas, durée obligatoire pour planifier une tâche à une heure ; l'outil « Comptes » renommé « Mon compte » et l'écran Budget équivalent renommé « Prévisions » ; « Solde du mois » en tête de « Mon compte » qui baisse à chaque dépense ; carte « Prévisions » du Budget en positif et vert ; réglage de couleur pour la carte « Mon compte » ; retour de l'écran d'énergie directement vers l'accueil, avec suppression de l'ancien écran « Mon énergie » ; sous-tâches d'un élément de liste dépliables et cochables depuis la page de la catégorie ; et la correction des cadres qui débordaient à droite dans Paramètres > Accessibilité et dans le formulaire de tâche (traitée sur deux captures d'écran de Marie). Marie doit maintenant valider ces changements sur son téléphone : seize parcours l'attendent dans l'écran « Tests à faire ».
 
-La synchronisation automatique des données de test vers Supabase (livrée en v5.69) reste en place : les données de chaque appareil sont sauvegardées toutes seules, sans export ni envoi manuel. Un script développeur (`scripts/backup_marie_snapshot.py`, lancé à chaque `/start` et `/close`) archive une copie datée du dernier snapshot de Marie dans `donnees_marie/`, pour pallier l'absence d'historique côté Supabase.
+La synchronisation automatique des données de test vers Supabase (livrée en v5.69) reste en place : les données de chaque appareil sont sauvegardées toutes seules, sans export ni envoi manuel. Un script développeur (`scripts/backup_testeur_snapshots.py`, lancé à chaque `/start` et `/close`) archive une copie datée du dernier snapshot de chaque testeur dans `donnees_testeurs/<tester_code>/`, pour pallier l'absence d'historique côté Supabase.
 
 La roadmap `roadmap_sav_snapshot_marie.md` (trois phases) est close : les dix défauts relevés au test du 1er septembre 2026 sont corrigés. Une coupure réseau donne maintenant un message court au lieu d'une longue erreur technique ; une sauvegarde n'est réécrite que si le contenu a réellement changé (et non à chaque changement d'heure de synchronisation) ; le nom de fichier est horodaté en temps universel sans ambiguïté ; le script refuse d'écrire une sauvegarde vide. L'accès à Supabase est désormais partagé entre le script de sauvegarde et le script de lecture développeur. Un nettoyage du dossier `donnees_marie/` est disponible à la demande (`--prune`), jamais automatique. Une batterie de 31 tests automatiques couvre ces comportements. La sauvegarde est lancée à l'ouverture **et** à la clôture de chaque session de travail, pour raccourcir le délai pendant lequel une perte de données chez Marie pourrait effacer la dernière copie utilisable.
 

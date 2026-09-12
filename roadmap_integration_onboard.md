@@ -290,7 +290,7 @@ sortie.
 
 ---
 
-## Phase 6 — Généralisation du nommage mono-personne (D7) [TODO]
+## Phase 6 — Généralisation du nommage mono-personne (D7) [FAIT]
 
 > **Décision 2026-09-10 (Morphéus)** — au lancement de cette phase, Marie **et** Morphéus sont
 > convertis en testeurs à part entière, avec `tester_code`, sur le même modèle que Satine. Aucune
@@ -321,6 +321,37 @@ enregistré pour Marie reste lisible après renommage, sans perte.
 **Gate de sortie** : tests ci-dessus verts, et relecture explicite du `.gitignore` — `donnees_marie/`
 est un dossier de données sensibles (`.claude/CLAUDE.md` § Données sensibles) ; son remplacement ne
 doit pas exposer de données au versionnage.
+
+**Réalisé (2026-09-12)** : déclenché par la demande explicite de Morphéus de s'ajouter comme
+testeur (`tester_code = "morpheus"`) avant Satine, pour valider le dispositif en conditions réelles.
+- `scripts/backup_marie_snapshot.py` → renommé `scripts/backup_testeur_snapshots.py` (`git mv`,
+  historique préservé). `OUTPUT_DIR` : `donnees_marie/` → `donnees_testeurs/`. Nouvelle fonction
+  `resolve_tester_dirname(payload)` : résout `payload.settings.tester_code` (normalisé
+  minuscule/caractères sûrs), range chaque appareil sous `donnees_testeurs/<tester_code>/` ; un
+  appareil sans code va sous `donnees_testeurs/_sans_code/`, jamais deviné. `run_prune` itère
+  désormais sur chaque sous-dossier de testeur.
+- `scripts/ingest_manual_tests.py` : nouvel argument `--tester <code>` (prioritaire), sinon déduit
+  de `export_data.settings.tester_code`, sinon erreur explicite (jamais de défaut deviné). Journal
+  devenu `_contexte/tests_journaux/<code>.json` (un fichier par testeur, cloisonné).
+- Migration one-shot (script jetable, aucune lecture de contenu, dispatch par nom de fichier
+  uniquement) : `_contexte/marie_tests_journal.json` (74 entrées) → `_contexte/tests_journaux/marie.json`
+  (`git mv`, contenu identique) ; `donnees_marie/` (61 fichiers) → `donnees_testeurs/` : 34 fichiers
+  du device connu de Marie (`192f2411`) vers `donnees_testeurs/marie/`, 27 restants vers
+  `donnees_testeurs/_sans_code/`. Aucune perte vérifiée (comptage avant/après, 74 entrées du journal
+  inchangées).
+- Configuration mise à jour (chemins/nom de script) : `.gitignore`, `.claude/CLAUDE.md` § Données
+  sensibles, `_contexte/on_start.md`, `_contexte/on_close.md`, `.claude/commands/deploy.md` étape 0
+  (comportement inchangé : seul le snapshot de Marie conditionne le go/no-go produit,
+  `ingest_manual_tests.py ... --tester marie` désormais explicite), `.claude/commands/traiter_export_marie.md`,
+  `README.md`, `AGENTS.md`, `GEMINI.md`. Documentation historique figée (`Archives/`, `CHANGELOG.md`,
+  `historique_conversation_marie.md`) non touchée, hors périmètre.
+- Tests : `scripts/test_backup_testeur_snapshots.py` (49 tests, dont cloisonnement explicite
+  « deux testeurs jamais mélangés » et `resolve_tester_dirname` avec un code arbitraire type
+  `alpha-01`) et nouveau `scripts/test_ingest_manual_tests.py` (10 tests) verts. Aucun fichier `src/`
+  touché.
+- **Reste dû, hors code** : Morphéus (et Marie) saisissent leur `tester_code` (`morpheus` / `marie`)
+  dans Paramètres > Profil sur leur propre appareil — action manuelle, le champ existe depuis la
+  Phase 3.
 
   **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
   Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

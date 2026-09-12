@@ -8,7 +8,7 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
 # /traiter_export_marie [chemin]
 
 > **Repli manuel — hors flux nominal.** Depuis la bascule du 2026-09-01 (`roadmap_sync_marie.md` Phase 5), les données de Marie arrivent par synchronisation
-> automatique (Supabase). `/start` archive le dernier snapshot daté dans `donnees_marie/` (`scripts/backup_marie_snapshot.py`) et `/deploy` étape 0 analyse ce snapshot. Cette
+> automatique (Supabase). `/start` archive le dernier snapshot daté dans `donnees_testeurs/marie/` (`scripts/backup_testeur_snapshots.py`) et `/deploy` étape 0 analyse ce snapshot. Cette
 > commande ne sert plus qu'aux cas résiduels : Marie transmet encore un export JSON manuel, ou il faut ré-ingérer un ancien export. Elle n'est plus appelée par `/deploy`.
 
 ## Procédure
@@ -16,19 +16,19 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
 1. Localiser l'export.
    - Si $ARGUMENTS est fourni : l'utiliser comme chemin source.
    - Sinon : demander à l'utilisateur le chemin du fichier reçu (hors dépôt — jamais dans
-     `donnees_marie/` avant cette commande).
+     `donnees_testeurs/` avant cette commande).
 
 2. Lire l'export source et en extraire `export_date` et `version`.
    - JSON invalide ou clés `export_date`/`version` absentes : s'arrêter, signaler le fichier
      comme corrompu ou hors format attendu.
 
-3. Comparer à `donnees_marie/` (donnée sensible, lecture déjà couverte par l'exécution de cette
-   commande — ne jamais y écrire hors de cette étape).
+3. Comparer à `donnees_testeurs/marie/` (donnée sensible, lecture déjà couverte par l'exécution de
+   cette commande — ne jamais y écrire hors de cette étape).
    - Lister les exports déjà présents, identifier le plus récent par `export_date` (pas par nom
      de fichier ni date de modification).
    - Si l'export source a un `export_date` antérieur ou égal au plus récent déjà présent :
      s'arrêter, signaler qu'il n'apporte rien de nouveau (doublon ou export plus ancien).
-   - Sinon : c'est le nouvel export à traiter. Le copier dans `donnees_marie/` sous un nom
+   - Sinon : c'est le nouvel export à traiter. Le copier dans `donnees_testeurs/marie/` sous un nom
      normalisé `export-audhd-<export_date AAAA-MM-JJ>-<HHhMM>.json` (dérivé de `export_date`, pas
      de l'heure de réception) — ne jamais écraser un fichier existant du dossier.
 
@@ -45,7 +45,7 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
 
 5. Repérer les frictions signalées par Marie :
    - tous les commentaires non vides des résultats `nok` de `manual_test_results` ;
-   - pour chaque nouveau commentaire (résultat absent du journal `_contexte/marie_tests_journal.json`
+   - pour chaque nouveau commentaire (résultat absent du journal `_contexte/tests_journaux/marie.json`
      avant ingestion), déterminer s'il décrit un bug applicatif réel, un problème de formulation du
      test dans `manualTestsCatalog.ts`, ou une demande d'évolution — sans corriger le code ni le
      catalogue automatiquement.
@@ -57,7 +57,7 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
 
 6. Ingérer les résultats de tests :
    ```
-   python scripts/ingest_manual_tests.py <export copié à l'étape 3>
+   python scripts/ingest_manual_tests.py <export copié à l'étape 3> --tester marie
    ```
    Rapporter le nombre d'entrées ajoutées et déjà connues (sortie du script).
 
@@ -66,7 +66,7 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
    un éventuel changement du Doc et réconcilie le registre, sans créer de roadmap.
 
 8. Rapporter à l'utilisateur, sans corriger automatiquement :
-   - version et date de l'export traité, nom du fichier créé dans `donnees_marie/` ;
+   - version et date de l'export traité, nom du fichier créé dans `donnees_testeurs/marie/` ;
    - résultat de l'ingestion (ajoutés / déjà connus) ;
    - toute perte ou incohérence de données détectée à l'étape 4 ;
    - chaque friction détectée à l'étape 5, avec sa nature (bug applicatif / formulation de test /
@@ -75,6 +75,6 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
      registre et nouvelles demandes ;
    - si rien à signaler : le dire explicitement plutôt que rester silencieux sur ce point.
 
-9. Ne jamais committer `donnees_marie/` (gitignoré). Si `_contexte/marie_tests_journal.json` ou
+9. Ne jamais committer `donnees_testeurs/` (gitignoré). Si `_contexte/tests_journaux/marie.json` ou
    `_contexte/marie_modifications_suivi.md` ont été modifiés, ne pas les committer automatiquement —
    le signaler dans le rapport et laisser le commit à la charge du prochain `/close`.

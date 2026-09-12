@@ -2,18 +2,19 @@
 
 ## Pré-synthèse
 
-Sauvegarder le dernier snapshot Supabase de Marie avant de produire la synthèse (étape 3) :
+Sauvegarder le dernier snapshot Supabase de chaque testeur actif avant de produire la synthèse
+(étape 3) :
 ```bash
-python scripts/backup_marie_snapshot.py
+python scripts/backup_testeur_snapshots.py
 ```
 Non bloquant — en cas d'échec (hors ligne, Supabase indisponible), le signaler en une ligne et
 poursuivre la clôture. Symétrique du hook `/start` : sauvegarder aussi en fin de session réduit la
-fenêtre pendant laquelle une perte de données locale chez Marie, suivie d'une resynchronisation,
+fenêtre pendant laquelle une perte de données locale chez un testeur, suivie d'une resynchronisation,
 écraserait le dernier bon snapshot côté Supabase — le schéma fait un `upsert` d'une ligne unique par
 `device_id`, sans aucun historique. Le script lit `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` dans
 l'environnement, sinon dans le `.env` à la racine (aucun sourcing shell). Il est idempotent et écrit
-dans `donnees_marie/` (gitignoré : sans effet sur le commit de l'étape 10). Ne jamais afficher le
-contenu de `.env` ni celui d'un snapshot (données personnelles de Marie).
+dans `donnees_testeurs/<tester_code>/` (gitignoré : sans effet sur le commit de l'étape 10). Ne
+jamais afficher le contenu de `.env` ni celui d'un snapshot (données personnelles des testeurs).
 
 ## Fin
 

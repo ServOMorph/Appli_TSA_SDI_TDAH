@@ -1,22 +1,28 @@
-"""Sauvegarde locale du snapshot Supabase de Marie dans donnees_marie/ (roadmap_sync_marie.md,
-Phase 5 : remplace l'archivage qu'assurait l'envoi manuel d'export avant la sync automatique).
+"""Sauvegarde locale des snapshots Supabase des testeurs dans donnees_testeurs/<tester_code>/
+(roadmap_integration_onboard.md, Phase 6 : generalise l'archivage mono-personne herite de
+roadmap_sync_marie.md Phase 5).
 
 Necessite SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans l'environnement (cle service_role,
 jamais la cle anon : RLS bloque tout acces direct a la table).
 
 Appareils traites : tous les appareils presents dans device_snapshots, chacun archive
-individuellement (la ligne la plus recente par device_id). Remplace l'ancienne heuristique
-mono-appareil (max manual_test_results), qui perdait en silence les snapshots des autres
-testeurs (roadmap ONBOARD Phase 4, rupture R1). Passer --device-id pour restreindre a un
-seul appareil.
+individuellement (la ligne la plus recente par device_id). Passer --device-id pour restreindre
+a un seul appareil.
+
+Chaque appareil est range sous le dossier de son testeur (`Settings.tester_code`, serialise
+dans `payload.settings`), normalise en minuscules. Un appareil sans code testeur (fantome,
+localStorage regenere, cycle avorte) est range dans `_sans_code/`, jamais suppose appartenir a
+un testeur en particulier. Plusieurs appareils d'un meme testeur cohabitent dans son dossier,
+distingues par device_id court dans le nom de fichier.
 
 Idempotent par le contenu : n'ecrit rien si une sauvegarde du meme appareil porte deja
 exactement le meme payload. Le synced_at ne peut pas servir de cle — il change a chaque
-relance de l'app par Marie, meme quand ses donnees n'ont pas bouge.
+relance de l'app, meme quand les donnees n'ont pas bouge.
 
-Retention : --prune purge donnees_marie/ en gardant les --keep-last (defaut 30) snapshots les
-plus recents par appareil plus le premier de chaque mois ; --dry-run liste sans supprimer. La
-purge n'est jamais automatique : /start et /close appellent le script sans ces options.
+Retention : --prune purge chaque dossier de donnees_testeurs/ en gardant les --keep-last
+(defaut 30) snapshots les plus recents par appareil plus le premier de chaque mois ; --dry-run
+liste sans supprimer. La purge n'est jamais automatique : /start et /close appellent le script
+sans ces options.
 """
 
 import argparse
@@ -28,11 +34,28 @@ from pathlib import Path
 
 from _supabase import SupabaseError, fetch_snapshots, read_credentials
 
-OUTPUT_DIR = Path(__file__).resolve().parent.parent / "donnees_marie"
+OUTPUT_DIR = Path(__file__).resolve().parent.parent / "donnees_testeurs"
+UNKNOWN_TESTER_DIRNAME = "_sans_code"
 RETENTION_KEEP_LAST = 30
 
 _ENTRY_RE = re.compile(r"^snapshot-supabase-([0-9a-f]{8})-(.+)\.json$")
 _STAMP_RE = re.compile(r"^(\d{4})-?(\d{2})-?(\d{2})-(\d{2})(\d{2})")
+_TESTER_DIRNAME_RE = re.compile(r"[^a-z0-9_-]+")
+
+
+def resolve_tester_dirname(payload: dict) -> str:
+    """Nom du sous-dossier de testeur pour ce payload, jamais lie a une identite en dur.
+
+    Lit `payload.settings.tester_code`, normalise en minuscules et restreint aux caracteres
+    surs pour un nom de dossier. Code absent, vide apres normalisation, ou payload sans table
+    `settings` exploitable : range sous `_sans_code`, jamais devine.
+    """
+    settings = payload.get("settings") if isinstance(payload, dict) else None
+    code = settings.get("tester_code") if isinstance(settings, dict) else None
+    if not isinstance(code, str):
+        return UNKNOWN_TESTER_DIRNAME
+    normalized = _TESTER_DIRNAME_RE.sub("-", code.strip().lower()).strip("-")
+    return normalized or UNKNOWN_TESTER_DIRNAME
 
 
 def build_query(device_id: str | None) -> str:
@@ -149,23 +172,30 @@ def plan_retention(filenames: list[str], keep_last: int = RETENTION_KEEP_LAST) -
 
 def run_prune(directory: Path, keep_last: int, dry_run: bool) -> None:
     if not directory.exists():
-        print("Retention : donnees_marie/ absent, rien a purger.")
+        print("Retention : donnees_testeurs/ absent, rien a purger.")
         return
-    names = [p.name for p in directory.iterdir() if p.is_file()]
-    _, purge = plan_retention(names, keep_last=keep_last)
-    if not purge:
+    tester_dirs = [d for d in directory.iterdir() if d.is_dir()]
+    if not tester_dirs:
         print("Retention : rien a purger.")
         return
-    for name in purge:
-        print(f"{'A purger' if dry_run else 'Purge'} : {name}")
-        if not dry_run:
-            (directory / name).unlink()
+    total_purge = 0
+    for tester_dir in sorted(tester_dirs):
+        names = [p.name for p in tester_dir.iterdir() if p.is_file()]
+        _, purge = plan_retention(names, keep_last=keep_last)
+        for name in purge:
+            print(f"{'A purger' if dry_run else 'Purge'} : {tester_dir.name}/{name}")
+            if not dry_run:
+                (tester_dir / name).unlink()
+        total_purge += len(purge)
+    if not total_purge:
+        print("Retention : rien a purger.")
+        return
     resume = "listes (dry-run, rien supprime)" if dry_run else "purges"
-    print(f"Retention : {len(purge)} fichier(s) {resume}.")
+    print(f"Retention : {total_purge} fichier(s) {resume}.")
 
 
 def archive_one(directory: Path, row: dict, targeted: bool = False) -> tuple[int, bool, bool]:
-    """Archive un appareil dans `directory`. Retourne (code, ecrit, ignore).
+    """Archive un appareil sous `directory/<tester_dirname>/`. Retourne (code, ecrit, ignore).
 
     code 1 = payload refuse : rien n'est ecrit pour cet appareil, les autres restent traites.
     ecrit = False si une sauvegarde du meme appareil porte deja exactement le meme contenu
@@ -186,23 +216,24 @@ def archive_one(directory: Path, row: dict, targeted: bool = False) -> tuple[int
         )
         return 1, False, False
 
+    tester_dir = directory / resolve_tester_dirname(payload)
     device_short = device_id[:8]
     content = serialize_payload(payload)
     n_tasks = len(payload.get("tasks") or [])
     n_tests = len(payload.get("manual_test_results") or [])
 
-    directory.mkdir(exist_ok=True)
+    tester_dir.mkdir(parents=True, exist_ok=True)
 
-    duplicate = find_duplicate(directory, device_short, content)
+    duplicate = find_duplicate(tester_dir, device_short, content)
     if duplicate is not None:
-        print(f"{device_id} : inchange depuis {duplicate.name} - rien a sauvegarder.")
+        print(f"{device_id} : inchange depuis {tester_dir.name}/{duplicate.name} - rien a sauvegarder.")
         return 0, False, False
 
-    out_path = directory / f"snapshot-supabase-{device_short}-{build_stamp(row['synced_at'])}.json"
+    out_path = tester_dir / f"snapshot-supabase-{device_short}-{build_stamp(row['synced_at'])}.json"
     out_path.write_text(content, encoding="utf-8")
 
     print(
-        f"Sauvegarde ecrite : {out_path.name} "
+        f"Sauvegarde ecrite : {tester_dir.name}/{out_path.name} "
         f"(app_version={row.get('app_version')}, tasks={n_tasks}, manual_test_results={n_tests})"
     )
     return 0, True, False
@@ -242,7 +273,7 @@ def run_backup(device_id: str | None) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--device-id", help="UUID de l'appareil a sauvegarder (defaut : heuristique manual_test_results)")
-    parser.add_argument("--prune", action="store_true", help="Purge donnees_marie/ selon la retention apres la sauvegarde")
+    parser.add_argument("--prune", action="store_true", help="Purge donnees_testeurs/ selon la retention apres la sauvegarde")
     parser.add_argument("--dry-run", action="store_true", help="Avec --prune : liste les fichiers a purger sans rien supprimer")
     parser.add_argument("--keep-last", type=int, default=RETENTION_KEEP_LAST, help=f"Snapshots recents conserves par appareil (defaut {RETENTION_KEEP_LAST})")
     args = parser.parse_args()

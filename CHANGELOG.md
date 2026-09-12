@@ -1,3 +1,8 @@
+## v5.125 — 2026-09-12
+
+### Modifié
+- **Phase 6 `roadmap_integration_onboard.md` (généralisation du nommage mono-personne)** : `scripts/backup_marie_snapshot.py` renommé `scripts/backup_testeur_snapshots.py` (dépouillement paramétré par `tester_code`, `donnees_testeurs/<code>/`, repli `_sans_code/` pour un appareil non identifié). `scripts/ingest_manual_tests.py` : nouvel argument `--tester`, journal désormais un fichier par testeur (`_contexte/tests_journaux/<code>.json`). Migration sans perte de l'historique existant (74 résultats de tests, 61 sauvegardes archivées). Config et hooks mis à jour en conséquence (`.gitignore`, `on_start.md`, `on_close.md`, `deploy.md`, `traiter_export_marie.md`). Déclenché pour ajouter le développeur comme testeur (`morpheus`) avant la première invitation de Satine. Reste dû, hors code : Marie et le développeur saisissent leur code testeur dans Paramètres > Profil.
+
 ## v5.124 — 2026-09-12
 
 ### Corrigé

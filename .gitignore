@@ -73,3 +73,6 @@ _docs/fichiers/
 # Commentaires de livraison .docx générés par /deploy étape 11 (publiés sur Drive ;
 # l'historique figé est dans COMMUNICATION/Marie/livraisons/vX.Y.md)
 COMMUNICATION/Marie/commentaires/commentaires_marie_*.docx
+
+# Scratchpad de session (artefacts transitoires, jamais commités)
+scratchpad/

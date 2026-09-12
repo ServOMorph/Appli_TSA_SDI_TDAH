@@ -850,3 +850,37 @@ Détail des changements et questions : commentaires_marie_v5.124.docx
 _Suite :_ message de livraison de `/deploy` (lot v5.93 → v5.124). Déposé dans la gateway
 (`--kind delivery`), id `20260912T091855_376439`. `commentaires_marie_v5.124.docx` déposé dans le
 dossier Drive partagé. Jugement du gardien de sortie (session `discord`) à venir.
+
+### 2026-09-12 (suite) — retours de Marie sur v5.124
+
+**Marie ->** (gateway, `inbox/orchestrateur/20260912T095110_830980`)
+@El Patrone #37 oui
+
+**Marie ->** (gateway, `inbox/orchestrateur/20260912T095411_200449`)
+Ok ca va pas il fait de la merde
+
+**Marie ->** (transmis par l'utilisateur, canal/heure non précisés dans le message reçu)
+J'ai plus mes données, et il comprend rien.
+
+_Suite :_ « #37 oui » confirme vraisemblablement la compréhension du 2026-09-12 (id
+`20260912T061902_354912`) sur le mode replié E21/E22. Les deux autres messages signalent un
+problème sur la v5.124 fraîchement déployée. Vérification faite côté serveur (autorisée
+explicitement par l'utilisateur) : le snapshot Supabase du jour de son appareil (`192f2411`,
+2026-09-12 09h51 UTC, `donnees_testeurs/_sans_code/`, `tester_code` toujours absent) contient 354
+tâches, 116 éléments de listes, 74 résultats de tests, budget/énergie non vides — ses données
+existent bien côté Supabase à cette heure, aucune perte serveur constatée. Cause du ressenti de
+perte non identifiée (affichage local, appareil différent, cache vidé ?) : clarification demandée
+ci-dessous avant toute action corrective. Rollback vers une version antérieure explicitement écarté
+(ne restaurerait aucune donnée, reviendrait très loin en arrière, risque de régressions déjà
+corrigées et de désynchronisation avec le schéma actuel) — décision de l'utilisateur après mise en
+balance des risques.
+
+**Dév ->**
+Tes données du jour sont sur le serveur, rien n'est perdu de notre côté.
+Sur quel écran tu ne les vois plus : écran vide, message d'erreur, ou autre chose ?
+Même téléphone et même appli que d'habitude, ou tu as changé quelque chose (réinstallation, cache vidé, nouvel appareil) ?
+Sur « il fait de la merde » : dis-moi précisément ce qui se passe, étape par étape.
+
+_Suite :_ déposé dans la gateway (`--source orchestrateur --to marie --kind question
+--expect-reply`), id `20260912T103859_204601`. En attente du jugement du gardien de sortie (session
+`discord`).

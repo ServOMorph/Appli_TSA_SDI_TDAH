@@ -882,5 +882,8 @@ Même téléphone et même appli que d'habitude, ou tu as changé quelque chose 
 Sur « il fait de la merde » : dis-moi précisément ce qui se passe, étape par étape.
 
 _Suite :_ déposé dans la gateway (`--source orchestrateur --to marie --kind question
---expect-reply`), id `20260912T103859_204601`. En attente du jugement du gardien de sortie (session
-`discord`).
+--expect-reply`), id `20260912T103859_204601`. Resté `pending` — aucune session `discord`/`bot.py`
+active pour le juger. Mode urgent créé dans `gateway.py` (`enqueue --urgent` : `approve` + `drain`
+immédiats, bypass du gardien, réservé aux cas bloquants — cf. `gateway/README.md` § Mode urgent,
+`CLAUDE.md` § Communication Discord) sur demande explicite de l'utilisateur. Message envoyé avec
+ce contournement (`approve` puis `drain` manuels), Discord message id `1548287657682141188`.

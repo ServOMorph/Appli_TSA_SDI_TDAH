@@ -828,3 +828,25 @@ visionnées (extraction d'images ffmpeg de la vidéo E21, comparée au screen E2
 détail dans `roadmap_demandes_marie_2026-09-10.md` § Décisions non tranchées. Confirmation de
 compréhension déposée dans la gateway (`--kind question --expect-reply`), id
 `20260912T061902_354912`, avant toute phase de code sur #37.
+
+**Dév ->**
+Version v5.124 en ligne.
+
+9 tests à faire, correspondant aux modifications :
+• #4
+• #5
+• #25
+• #35
+• #37
+• Sous-étapes dans la carte du planning
+• Ajouter une tâche depuis la Réception
+• Coupure réseau pendant l'envoi d'un retour
+• La synchronisation n'a pas été coupée par le nouvel écran de consentement
+
+https://appli-audhd.netlify.app/
+
+Détail des changements et questions : commentaires_marie_v5.124.docx
+
+_Suite :_ message de livraison de `/deploy` (lot v5.93 → v5.124). Déposé dans la gateway
+(`--kind delivery`), id `20260912T091855_376439`. `commentaires_marie_v5.124.docx` déposé dans le
+dossier Drive partagé. Jugement du gardien de sortie (session `discord`) à venir.

@@ -52,6 +52,18 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   Les deux pièces jointes n'ont jamais atteint la gateway (bug de routage `bot.py` — un message qui
   @-mentionne le bot après consommation d'un `--expect-reply` tombait en mode commande au lieu
   d'être routé, cf. `_contexte/marie_modifications_suivi.md` #37 ; corrigé commit `94962bb`, bot
-  redémarré). **Irrécupérables** : à redemander explicitement à Marie avant toute analyse de code
-  ou développement sur #37 — le doute porte maintenant sur le fond (un écart réel existe selon
-  elle), pas seulement sur la formulation.
+  redémarré). **Irrécupérables** depuis nos fichiers : redemandées à Marie (gateway, id
+  `20260912T061449_057883`), transmises directement par l'utilisateur (fichiers locaux).
+  **2026-09-12** — pièces jointes visionnées (`IMG_3440.png` = E22, `ScreenRecording_09-11-2026
+  19-09-38_1.mov` = E21, extraction d'images ffmpeg). Écart réel confirmé, distinct de ce qui avait
+  été vérifié le 2026-09-10 : le partage de style (`TaskCardLayout`, teinte de couleur) est bien
+  réel, mais **le mode d'interaction des champs diffère totalement** :
+  - E22 : champs repliés en pastilles compactes (« Icône : Aucune », « Couleur : Aucune couleur »,
+    etc.), grille 2 colonnes, dépliées seulement au tap (`expandedField`/`toggleField`,
+    `E22TaskDetail.tsx`).
+  - E21 : champs **toujours dépliés en plein** — bloc « Icône » occupant tout l'écran avec sa
+    grille de 15 icônes visible en permanence, idem « Couleur », « Coût en énergie » (grille 1-12
+    toujours ouverte) — long scroll de sections jamais repliées (`E21CreateTaskV2.tsx`).
+  #37 sous sa formulation actuelle signifie vraisemblablement : reprendre sur E21 le mode compact
+  replié/dépliable au tap d'E22, plutôt que la liste de sections toujours ouvertes. À confirmer
+  auprès de Marie avant de créer une phase de code (reformulation proposée, pas encore envoyée).

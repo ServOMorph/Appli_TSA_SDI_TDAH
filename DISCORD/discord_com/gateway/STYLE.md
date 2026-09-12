@@ -12,9 +12,7 @@ relire la section du destinataire concerné (`to` de la demande) et ajuster le c
 fichier `gateway/outbox/<id>.json` en conséquence.
 
 **Préséance** : sur la forme d'un message sortant, ce fichier prime sur `.claude/CLAUDE.md`
-§ « Messages pour Marie ». Divergence assumée (décision Morphéus) : STYLE.md impose une
-ouverture (salutation pour Marie, `Salut ma poule !` pour Morphéus) là où CLAUDE.md dit « pas
-de salutation ». CLAUDE.md reste la référence pour le fond (gabarit de livraison, contenu
+§ « Messages pour Marie ». CLAUDE.md reste la référence pour le fond (gabarit de livraison, contenu
 attendu).
 
 Ordre : d'abord les tests de `LOOP.md` (doublon, fond non figé, incohérence de version…), puis
@@ -22,10 +20,8 @@ mise en forme selon ce fichier, puis `approve`.
 
 ## Ce qui est posé automatiquement (ne pas le mettre dans `body`)
 
-- `to == marie` : `curate()` ajoute l'encadrement `💻🤖`, le tag `<@1368654289584656394>` après
-  le premier `💻🤖`, puis une salutation tirée au hasard dans `gateway/salutations_marie.json`
-  (une ligne vide avant le contenu). Le `body` ne contient ni l'encadrement, ni le tag, ni la
-  salutation.
+- `to == marie` : `curate()` ajoute l'encadrement `💻🤖` et le tag `<@1368654289584656394>` après
+  le premier `💻🤖`. Le `body` ne contient ni l'encadrement ni le tag.
 - `to == morpheus` / `to == channel` : aucun encadrement, corps transmis tel quel.
 
 ---
@@ -56,10 +52,7 @@ Destinataire : testeuse produit. Aucun contexte technique. Utilise l'appli sur t
 
 ### Ton
 
-- **La salutation d'ouverture est ajoutée automatiquement par `curate()`** (tirage aléatoire
-  dans `gateway/salutations_marie.json`, une ligne vide avant le contenu) — ne jamais l'écrire
-  soi-même dans le `body`.
-- Hyper synthétique ensuite. Aucune autre formule de politesse : pas de remerciement, pas de
+- Hyper synthétique. Aucune formule de politesse : pas de salutation, pas de remerciement, pas de
   formule de clôture, pas de « n'hésite pas ».
 - Une idée par phrase. Phrases courtes, voix active, présent.
 - Aller droit à l'information : ce qui est fait, ce qu'elle doit vérifier.
@@ -88,8 +81,7 @@ Destinataire : testeuse produit. Aucun contexte technique. Utilise l'appli sur t
 Gabarit figé dans `.claude/CLAUDE.md` § « Messages pour Marie » (section « Gabarit du message
 de livraison »). Le corps déposé n'inclut ni `💻🤖` ni le tag. Vérifier avant `approve` :
 
-- Salutation posée automatiquement par `curate()`, puis « Version X.Y en ligne. » — ne pas
-  écrire de salutation dans le `body`.
+- Corps commence par « Version X.Y en ligne. »
 - Nombre de tests = parcours non validés de l'écran « Tests à faire » sur la version déployée.
 - Puces = numéros de modification du Doc couverts (`docRefs` de `manualTestsCatalog.ts`).
 - Lien de l'appli sur sa propre ligne.

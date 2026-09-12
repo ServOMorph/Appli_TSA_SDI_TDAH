@@ -489,7 +489,7 @@ def merge(req_ids: list[str]) -> dict:
 
 def _salutation_marie() -> str:
     salutations = json.loads(SALUTATIONS_MARIE.read_text(encoding="utf-8"))
-    return random.choice(salutations)
+    return random.choice(salutations) if salutations else ""
 
 
 def curate(to: str, kind: str, body: str) -> str:
@@ -499,7 +499,10 @@ def curate(to: str, kind: str, body: str) -> str:
         raise GatewayError("corps vide")
     if to == "marie":
         salutation = _salutation_marie()
-        text = f"{FRAME}\n<@{MARIE_USER_ID}>\n{salutation}\n\n{body}\n{FRAME}"
+        if salutation:
+            text = f"{FRAME}\n<@{MARIE_USER_ID}>\n{salutation}\n\n{body}\n{FRAME}"
+        else:
+            text = f"{FRAME}\n<@{MARIE_USER_ID}>\n\n{body}\n{FRAME}"
     elif to == "marie_supervision":
         # Canal privé de Marie : elle est taguée (notification) mais sans le cadre ni la
         # salutation de livraison — ce n'est pas un message produit, c'est de la supervision.

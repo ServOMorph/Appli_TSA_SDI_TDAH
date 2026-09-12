@@ -14,7 +14,7 @@ demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
 ## Sauvegarde Drive en attente
 
-Manifeste rafraîchi le 2026-09-11 (229 fichiers). L'upload vers Drive n'est pas exécutable en
+Manifeste rafraîchi le 2026-09-12 (251 fichiers). L'upload vers Drive n'est pas exécutable en
 auto-mode (classifieur). À lancer manuellement, dans un terminal normal, depuis la racine du
 projet :
 ```

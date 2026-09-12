@@ -26,6 +26,7 @@ class FakeAuthor:
     def __init__(self, author_id, name="Auteur"):
         self.id = author_id
         self._name = name
+        self.display_name = name
 
     def __str__(self):
         return self._name
@@ -146,6 +147,37 @@ class OnMessageMultiCanalTest(unittest.TestCase):
                 "routed_to": "unrouted", "id": "1", "routing": "aucune"}) as m:
             self._on_message(message)
         m.assert_called_once()
+
+    def test_message_de_marie_mentionnant_le_bot_route_vers_gateway(self):
+        """Trou de protocole (2026-09-11) : une fois son `--expect-reply` consommé
+        (`has_pending_reply` redevient False), un message suivant de Marie qui @-mentionne le
+        bot par réflexe tombait en mode commande — perte du message et de ses pièces jointes
+        (vidéo/écran d'un bug remonté sur #37). Marie ne doit jamais atterrir en mode commande,
+        mention ou pas."""
+        bot_user = FakeAuthor(999999, "El Patrone")
+        with mock.patch.object(type(bot.client), "user", new_callable=mock.PropertyMock,
+                                return_value=bot_user):
+            message = FakeMessage(MARIE_ID, "@El Patrone voici une précision",
+                                  CANAL_PRINCIPAL, mentions=[bot_user], author_name="Marie")
+            with mock.patch.object(gateway, "route_inbound", return_value={
+                    "routed_to": "orchestrateur", "id": "1", "routing": "reponse"}) as m:
+                self._on_message(message)
+        m.assert_called_once_with(MARIE_ID, "Marie", "@El Patrone voici une précision", [])
+        self.assertEqual(bot.lire(bot.COMMANDS)["status"], "idle")
+
+    def test_message_d_un_autre_auteur_mentionnant_le_bot_reste_en_mode_commande(self):
+        """Garde-fou : le correctif ci-dessus est spécifique à Marie, le mode commande reste
+        disponible pour les autres auteurs (ex. Morphéus)."""
+        bot_user = FakeAuthor(999999, "El Patrone")
+        with mock.patch.object(type(bot.client), "user", new_callable=mock.PropertyMock,
+                                return_value=bot_user), \
+             mock.patch.object(bot, "envoyer", mock.AsyncMock()):
+            message = FakeMessage(TESTEUR_ID, "@El Patrone explique-moi ce bug",
+                                  CANAL_PRINCIPAL, mentions=[bot_user], author_name="Quelqu'un")
+            with mock.patch.object(gateway, "route_inbound") as m:
+                self._on_message(message)
+        m.assert_not_called()
+        self.assertEqual(bot.lire(bot.COMMANDS)["status"], "pending")
 
 
 if __name__ == "__main__":

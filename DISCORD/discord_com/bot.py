@@ -191,7 +191,8 @@ async def rattraper_messages_manques():
             if contenu.strip().lower() in ("!ping", "!help"):
                 continue
             mentionne = bool(bot_id) and any(u.id == bot_id for u in m.mentions)
-            if not mentionne or gateway.has_pending_reply(m.author.id):
+            if (not mentionne or gateway.has_pending_reply(m.author.id)
+                    or m.author.id == gateway.MARIE_USER_ID):
                 try:
                     pieces = [{"filename": a.filename, "url": a.url,
                                "content_type": a.content_type} for a in m.attachments]
@@ -344,11 +345,13 @@ async def on_message(message):
         ecrire(QUEUE, q)
         return
 
-    # Sans @-mention du bot, ou réponse attendue de cet auteur (même en @-mentionnant le bot
-    # par réflexe en répondant) : ce n'est pas une commande /discord_loop, c'est du trafic de
-    # canal. Il part vers la gateway, qui le route dans l'inbox de l'agent concerné, pièces
-    # jointes incluses.
-    if client.user not in message.mentions or gateway.has_pending_reply(message.author.id):
+    # Sans @-mention du bot, réponse attendue de cet auteur (même en @-mentionnant le bot par
+    # réflexe en répondant), ou message de Marie (jamais d'usage légitime du mode commande) :
+    # ce n'est pas une commande /discord_loop, c'est du trafic de canal. Il part vers la
+    # gateway, qui le route dans l'inbox de l'agent concerné, pièces jointes incluses.
+    if (client.user not in message.mentions
+            or gateway.has_pending_reply(message.author.id)
+            or message.author.id == gateway.MARIE_USER_ID):
         try:
             pieces = [{"filename": a.filename, "url": a.url, "content_type": a.content_type}
                       for a in message.attachments]

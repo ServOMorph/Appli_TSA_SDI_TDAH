@@ -1,3 +1,11 @@
+## v5.126 — 2026-09-12
+
+### Ajouté
+- **Mode urgent de la gateway Discord** (`gateway.py enqueue --urgent`) : contourne le gardien de sortie quand le circuit normal est bloqué (aucune session `discord` ni `bot.py` active) — `approve` + `drain` immédiats dans le même appel, envoi Discord réel indépendant de `bot.py`. Reste appliqué : mise en forme mécanique (cadre 💻🤖, tag, limite 2000 caractères) et garde-fou de visibilité asymétrique testeur ; la relecture humaine (ton, regroupement, dédoublonnage, `hold`) est sautée — réservé aux cas bloquants, jamais un usage par défaut. 3 tests unitaires ajoutés (124 tests Discord verts). Documenté dans `gateway/README.md` et `CLAUDE.md`.
+
+### Constaté
+- **Incident signalé par Marie sur v5.124** (« j'ai plus mes données », « il fait de la merde ») : son snapshot Supabase du jour (09h51 UTC) contient bien 354 tâches, 116 éléments de listes, 74 résultats de tests — aucune perte constatée côté serveur à cette heure. Rollback vers une version antérieure explicitement écarté (ne restaurerait aucune donnée, réintroduirait des régressions déjà corrigées, risque de désynchronisation avec le schéma actuel). Message de diagnostic envoyé (mode urgent, faute de session `discord`/`bot.py` active) ; aucune suite engagée avant sa réponse.
+
 ## v5.125 — 2026-09-12
 
 ### Modifié

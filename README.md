@@ -33,6 +33,15 @@ restent hors de ce lot, phases encore ouvertes : la généralisation du nommage 
 (`roadmap_integration_onboard.md` Phase 6) et le point d'entrée « accueil » pour une tâche
 planifiée d'office (`roadmap_supprimer_tache_du_jour.md` Phase 3, bloquée en attendant Marie).
 
+Le 12 septembre 2026, Marie a signalé un problème sur la version tout juste mise en ligne
+(« j'ai plus mes données », « il fait de la merde »). Vérification faite : ses données sont bien
+présentes sur le serveur à cette heure-là, rien n'a été perdu de ce côté. Un rollback vers une
+version précédente a été envisagé puis écarté (il n'aurait rien restauré et aurait réintroduit des
+défauts déjà corrigés). Un message lui a été envoyé pour comprendre précisément ce qui se passe de
+son côté ; aucune suite n'est engagée avant sa réponse. Ce message a dû être forcé en direct, car
+aucune session de surveillance Discord n'était active pour le relire avant envoi — un nouveau mode
+« urgent » a été ajouté à cet effet, réservé aux cas où le circuit habituel est bloqué.
+
 Le 12 septembre 2026, un bug a été trouvé et corrigé dans la messagerie Discord : un message de
 Marie envoyé après qu'elle a déjà répondu à une question posée pouvait être perdu, pièces jointes
 comprises, s'il mentionnait le nom du bot par réflexe. C'est ce qui était arrivé à un message

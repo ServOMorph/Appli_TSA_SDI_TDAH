@@ -76,5 +76,11 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
     grille de 15 icônes visible en permanence, idem « Couleur », « Coût en énergie » (grille 1-12
     toujours ouverte) — long scroll de sections jamais repliées (`E21CreateTaskV2.tsx`).
   #37 sous sa formulation actuelle signifie vraisemblablement : reprendre sur E21 le mode compact
-  replié/dépliable au tap d'E22, plutôt que la liste de sections toujours ouvertes. À confirmer
-  auprès de Marie avant de créer une phase de code (reformulation proposée, pas encore envoyée).
+  replié/dépliable au tap d'E22, plutôt que la liste de sections toujours ouvertes. Confirmation de
+  compréhension envoyée le 2026-09-12 (gateway id `20260912T061902_354912`).
+  **2026-09-12 (suite)** — Marie répond « oui » (gateway id `20260912T095110_830980`, non `ack`),
+  mais dans la foulée signale un incident sur v5.124 (« j'ai plus mes données », « il fait de la
+  merde »). Message de diagnostic envoyé en mode urgent (id `20260912T103859_204601`) pour clarifier
+  l'incident avant d'agir. **Aucune phase de code sur #37 tant que la réponse à ce diagnostic n'est
+  pas reçue** (décision explicite de l'utilisateur, cf. `signals.md`) — le « oui » seul n'est pas
+  traité comme un feu vert isolé, à recouper avec sa réponse.

@@ -786,3 +786,13 @@ que E21/E22 partagent déjà `TaskCardLayout` depuis cette livraison ; l'écart 
 Question posée via la gateway (`--source orchestrateur --to marie --kind question --expect-reply`),
 id `20260911T160059_542394`. Décision produit isolée dans `roadmap_demandes_marie_2026-09-10.md`
 § Décisions non tranchées ; aucun code engagé tant que la réponse n'est pas reçue.
+
+**Marie ->** (`inbox/orchestrateur/20260911T170845_890966`, non `ack` — relevé lecture seule à l'étape 0.6 de `/deploy`)
+Quelques un pas beaucoup
+
+_Suite :_ répond à la question ci-dessus sur #37 (« qu'est-ce qui diffère encore… »), ~1h08 après.
+Ne nomme aucune différence précise (« quelques-unes, pas beaucoup »). Le Doc « Modifications » a
+été modifié 4 minutes plus tard (2026-09-11 17:12 UTC, cf. `marie_modifications_suivi.md`) —
+vraisemblablement le moment où elle a retiré #35, #36, #38 du Doc, concomitant avec cette réponse.
+N'apporte pas de quoi trancher la couverture de #37 : reste à décider (relance pour préciser, ou
+autre traitement) avant de développer quoi que ce soit sur #37.

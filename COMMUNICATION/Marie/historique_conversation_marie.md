@@ -809,3 +809,12 @@ commande) au lieu de la gateway — bug corrigé le jour même (`94962bb`), bot 
 pièces jointes sont irrécupérables depuis nos fichiers ; à redemander à Marie. #37 reste en
 attente de clarification, mise à jour de `roadmap_demandes_marie_2026-09-10.md`
 § Décisions non tranchées et de `_contexte/marie_modifications_suivi.md`.
+
+**Dév ->**
+#37 : bug technique le 11/09, ta vidéo E21 + ton screen E22 ne sont jamais arrivés.
+Tu peux les renvoyer ?
+
+_Suite :_ relance pour récupérer les pièces jointes du message ci-dessus. Déposée dans la gateway
+(`--kind question --expect-reply`), id `20260912T061449_057883`. Le bug de routage étant corrigé
+(bot redémarré), sa prochaine réponse — pièces jointes incluses — devrait cette fois atteindre
+`inbox/orchestrateur/` normalement.

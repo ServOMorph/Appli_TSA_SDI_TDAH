@@ -16,6 +16,13 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 12 septembre 2026, le lot accumulé depuis la v5.92 a été mis en ligne : la **v5.124** est en
+production (revue de code cumulée sans correction nécessaire, budget du bundle respecté, contrôle
+de fumée réussi). Neuf parcours attendent Marie dans l'écran « Tests à faire ». Deux roadmaps
+restent hors de ce lot, phases encore ouvertes : la généralisation du nommage testeur
+(`roadmap_integration_onboard.md` Phase 6) et le point d'entrée « accueil » pour une tâche
+planifiée d'office (`roadmap_supprimer_tache_du_jour.md` Phase 3, bloquée en attendant Marie).
+
 Le 12 septembre 2026, un bug a été trouvé et corrigé dans la messagerie Discord : un message de
 Marie envoyé après qu'elle a déjà répondu à une question posée pouvait être perdu, pièces jointes
 comprises, s'il mentionnait le nom du bot par réflexe. C'est ce qui était arrivé à un message

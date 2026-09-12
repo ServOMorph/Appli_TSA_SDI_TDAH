@@ -46,3 +46,12 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   (`TaskCardLayout`, bandeau titre coloré, cellules teintées) depuis cette livraison. Question posée
   à Marie via la gateway le 2026-09-10 (`--expect-reply`) : ce qui, concrètement, diffère encore
   entre les deux écrans et la gêne. Aucune phase de code tant que la réponse n'est pas reçue.
+  **2026-09-11** — réponse partielle « Quelques un pas beaucoup » (rien de nommé), puis message
+  Discord (@-mention du bot, hors gateway) : **« non ce ne sont pas les mêmes »**, contredisant le
+  constat ci-dessus — Marie annonce un enregistrement d'écran d'E21 et un screen d'E22 à l'appui.
+  Les deux pièces jointes n'ont jamais atteint la gateway (bug de routage `bot.py` — un message qui
+  @-mentionne le bot après consommation d'un `--expect-reply` tombait en mode commande au lieu
+  d'être routé, cf. `_contexte/marie_modifications_suivi.md` #37 ; corrigé commit `94962bb`, bot
+  redémarré). **Irrécupérables** : à redemander explicitement à Marie avant toute analyse de code
+  ou développement sur #37 — le doute porte maintenant sur le fond (un écart réel existe selon
+  elle), pas seulement sur la formulation.

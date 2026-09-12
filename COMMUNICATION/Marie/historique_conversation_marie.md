@@ -796,3 +796,16 @@ Ne nomme aucune différence précise (« quelques-unes, pas beaucoup »). Le Doc
 vraisemblablement le moment où elle a retiré #35, #36, #38 du Doc, concomitant avec cette réponse.
 N'apporte pas de quoi trancher la couverture de #37 : reste à décider (relance pour préciser, ou
 autre traitement) avant de développer quoi que ce soit sur #37.
+
+**Marie ->** (canal Discord principal, ~2026-09-11 17:10 UTC — captée uniquement via une capture d'écran transmise par l'utilisateur, cf. bug ci-dessous)
+@El Patrone non ce ne sont pas les même, je te mets un enregistrement d'écran de E21 et un screen de E22
+[pièces jointes : un enregistrement d'écran (E21) + un screenshot (E22) — jamais reçues par la gateway, cf. `bot.py` § trou de protocole du 2026-09-11]
+
+_Suite :_ précision immédiate à sa réponse « Quelques un pas beaucoup » ci-dessus — **elle affirme
+qu'E21 et E22 ne sont pas les mêmes**, contredisant l'évaluation de `/analyser_googledoc` du
+2026-09-10 (E21/E22 jugés déjà alignés via `TaskCardLayout` depuis v5.92). Message et pièces
+jointes perdus : en @-mentionnant le bot, le message est tombé dans `commands.json` (mode
+commande) au lieu de la gateway — bug corrigé le jour même (`94962bb`), bot redémarré. Les deux
+pièces jointes sont irrécupérables depuis nos fichiers ; à redemander à Marie. #37 reste en
+attente de clarification, mise à jour de `roadmap_demandes_marie_2026-09-10.md`
+§ Décisions non tranchées et de `_contexte/marie_modifications_suivi.md`.

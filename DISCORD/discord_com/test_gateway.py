@@ -304,6 +304,34 @@ class GatewayTest(unittest.TestCase):
         gateway.approve(rid)
         self.assertEqual(gateway.list_outbox()[0]["status"], "approved")
 
+    # -- mode urgent : bypass du gardien ---------------------------------
+
+    def test_enqueue_urgent_approuve_et_envoie_immediatement(self):
+        with mock.patch.object(gateway.message_marie, "_read_token", lambda: "tok"), \
+             mock.patch.object(gateway.message_marie, "_send",
+                                lambda *a, **k: "mid"):
+            rid = gateway.enqueue("orchestrateur", "marie", "urgent", urgent=True)
+        self.assertFalse((gateway.OUTBOX / f"{rid}.json").is_file())
+        sent = json.loads((gateway.SENT / f"{rid}.json").read_text(encoding="utf-8"))
+        self.assertEqual(sent["status"], "approved")
+        self.assertTrue(sent["urgent"])
+        self.assertEqual(sent["discord_message_id"], "mid")
+
+    def test_enqueue_sans_urgent_reste_pending_sans_envoi(self):
+        rid = gateway.enqueue("orchestrateur", "marie", "normal")
+        data = self._demande(rid)
+        self.assertEqual(data["status"], "pending")
+        self.assertFalse(data["urgent"])
+
+    def test_enqueue_urgent_echec_envoi_reste_dans_l_outbox_en_failed(self):
+        def _echoue(*a, **k):
+            raise RuntimeError("Discord indisponible")
+        with mock.patch.object(gateway.message_marie, "_read_token", lambda: "tok"), \
+             mock.patch.object(gateway.message_marie, "_send", _echoue):
+            rid = gateway.enqueue("orchestrateur", "marie", "urgent qui casse", urgent=True)
+        self.assertFalse((gateway.SENT / f"{rid}.json").is_file())
+        self.assertEqual(self._demande(rid)["status"], "failed")
+
     # -- gardien de sortie : bounce -------------------------------------
 
     def test_bounce_ecrit_dans_inbox_source_avec_motif(self):

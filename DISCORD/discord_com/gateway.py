@@ -10,6 +10,16 @@ Seules les demandes `approved` sortent ; `bot.py` les draine automatiquement.
 cf. `discord_loop.md` 3b) si elle dort dans un `wait`, au lieu d'attendre le prochain message
 Discord ou le timeout de sécurité (jusqu'à 1h).
 
+MODE URGENT (`enqueue --urgent`) : contourne délibérément le gardien — pas d'attente de
+`bot.py` ni d'une session DISCORD active. La demande est `approve`e puis `drain`ée dans le
+même appel, envoi Discord réel immédiat (indépendant de `bot.py`, cf. `message_marie.py`).
+Seuls restent appliqués : la mise en forme mécanique (`curate` — cadre 💻🤖, tag, limite
+2000 caractères) et le garde-fou de visibilité asymétrique testeur. Tout le reste du travail
+du gardien (ton, regroupement, dédoublonnage, `hold` d'un sujet en attente) est sauté : le
+message part tel quel, sans relecture. Réservé aux cas où le circuit normal est bloqué
+(aucune session DISCORD active, `bot.py` arrêté) et où le message ne peut pas attendre —
+jamais un usage par défaut.
+
 `enqueue(..., attachment_path=...)` joint un fichier local au message (copié sous
 `gateway/outbox/attachments/`, limite `MAX_ATTACHMENT_BYTES`) — utile pour un contenu qui doit
 rester copiable en un seul bloc au-delà des 2000 caractères Discord. Le corps (`body`/`--text`)
@@ -34,6 +44,8 @@ CLI :
                             --expect-reply --file corps.txt
   python gateway.py enqueue --source design --to marie --kind delivery \
                             --file corps.txt --attachment prompt.txt
+  python gateway.py enqueue --source orchestrateur --to marie --kind question \
+                            --expect-reply --file corps.txt --urgent   # bypass gardien, envoi immédiat
   python gateway.py list
   python gateway.py approve --id <id>
   python gateway.py hold    --id <id> [--reason "..."]
@@ -318,12 +330,18 @@ def has_pending_reply(author_id) -> bool:
 
 def enqueue(source: str, to: str, body: str, *, kind: str = "info",
             expect_reply: bool = False, meta: dict | None = None,
-            attachment_path: str | None = None) -> str:
+            attachment_path: str | None = None, urgent: bool = False) -> str:
     """
     Dépose une demande d'envoi dans l'outbox, en `pending`. Retourne l'id de la demande.
     Rien ne part sur Discord tant que le gardien (agent DISCORD) ne l'a pas `approve`.
     `attachment_path` : fichier local joint au message (copié sous
     `gateway/outbox/attachments/`, limite `MAX_ATTACHMENT_BYTES`).
+
+    `urgent=True` : contourne le gardien — la demande est `approve`e puis `drain`ée dans la
+    foulée, envoi Discord réel avant le retour de l'appel (indépendant de `bot.py`). Seule la
+    mise en forme mécanique (`curate`) et le garde-fou de visibilité testeur restent appliqués ;
+    aucune relecture humaine. À réserver aux cas où le circuit normal (session DISCORD /
+    `bot.py`) est bloqué et où le message ne peut pas attendre.
     """
     source = (source or "").strip()
     if not source:
@@ -363,8 +381,13 @@ def enqueue(source: str, to: str, body: str, *, kind: str = "info",
         "meta": meta or {},
         "attachment": attachment,
         "created_at": _now(),
+        "urgent": bool(urgent),
     }, ensure_ascii=False, indent=2))
-    _wake_gardien()
+    if urgent:
+        approve(req_id)
+        drain()
+    else:
+        _wake_gardien()
     return req_id
 
 
@@ -926,6 +949,9 @@ def _main() -> None:
     p_enq.add_argument("--expect-reply", action="store_true")
     p_enq.add_argument("--attachment", default=None,
                        help="fichier local joint au message (copié dans l'outbox)")
+    p_enq.add_argument("--urgent", action="store_true",
+                       help="bypass le gardien : approve + drain immédiats, envoi réel avant "
+                            "le retour de la commande (à réserver aux cas bloquants)")
     g = p_enq.add_mutually_exclusive_group(required=True)
     g.add_argument("--text", help="corps du message")
     g.add_argument("--file", help="corps depuis un fichier UTF-8")
@@ -982,10 +1008,23 @@ def _main() -> None:
         try:
             req_id = enqueue(args.source, args.to, body, kind=args.kind,
                              expect_reply=args.expect_reply,
-                             attachment_path=args.attachment)
+                             attachment_path=args.attachment,
+                             urgent=args.urgent)
         except GatewayError as e:
             raise SystemExit(f"Erreur : {e}")
-        print(f"Demande déposée : {req_id} (outbox/{req_id}.json)")
+        if not args.urgent:
+            print(f"Demande déposée : {req_id} (outbox/{req_id}.json)")
+        elif (SENT / f"{req_id}.json").is_file():
+            envoye = json.loads((SENT / f"{req_id}.json").read_text(encoding="utf-8"))
+            print(f"Demande {req_id} envoyée immédiatement (mode urgent), "
+                  f"message Discord {envoye.get('discord_message_id')}.")
+        else:
+            statut = "inconnu"
+            path = OUTBOX / f"{req_id}.json"
+            if path.is_file():
+                statut = json.loads(path.read_text(encoding="utf-8")).get("status")
+            raise SystemExit(f"Demande {req_id} déposée en mode urgent mais PAS envoyée "
+                             f"(statut : {statut}) — voir inbox/discord/ pour la dead-letter.")
 
     elif args.cmd == "list":
         items = list_outbox()

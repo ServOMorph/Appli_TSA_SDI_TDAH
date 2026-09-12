@@ -172,6 +172,15 @@ l'orchestrateur, ni une commande, ni l'agent DISCORD ne l'appellent à la main. 
 `approved` ne part pas, c'est que `bot.py` est arrêté : le signaler à l'utilisateur, ne pas
 contourner.
 
+**Exception (2026-09-12) — mode urgent.** `enqueue --urgent` (ou `enqueue(..., urgent=True)`)
+contourne délibérément ce qui précède : `approve` + `drain` immédiats dans le même appel, envoi
+Discord réel avant le retour de la commande, indépendant de `bot.py`. Seuls restent appliqués
+la mise en forme mécanique (cadre 💻🤖, tag, limite 2000 caractères) et le garde-fou de
+visibilité asymétrique testeur — tout le travail de relecture du gardien (ton, regroupement,
+dédoublonnage, `hold`) est sauté. Réservé aux cas où le circuit normal est bloqué (aucune
+session DISCORD active, `bot.py` arrêté) et où le message ne peut pas attendre ; jamais un
+usage par défaut. Détail : `DISCORD/discord_com/gateway/README.md` § Mode urgent.
+
 **Gardien de sortie.** Tout autre agent s'arrête à `enqueue` : la demande naît en `pending` et
 ne sort pas tant que l'agent DISCORD ne l'a pas jugée. Il ajuste ton / format / longueur /
 moment / regroupement **sans jamais changer le fond**, puis tranche :

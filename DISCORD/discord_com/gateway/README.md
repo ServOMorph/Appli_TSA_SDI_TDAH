@@ -85,6 +85,25 @@ et archive dans `outbox/sent/`. Plus personne ne lance `drain` à la main.
 Un échec d'envoi ne coupe pas la boucle : la demande passe en `failed` et une alerte
 `kind: "dead-letter"` est déposée dans `inbox/discord/`.
 
+## Mode urgent (`--urgent`) : contourner le gardien
+
+Réservé aux cas où le circuit normal est bloqué (aucune session DISCORD active, `bot.py`
+arrêté) et où le message ne peut pas attendre :
+
+```
+python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie \
+  --kind question --expect-reply --file corps.txt --urgent
+```
+
+`enqueue(..., urgent=True)` fait `approve` + `drain` dans le même appel : envoi Discord réel
+avant le retour de la commande, indépendant de `bot.py` (transport REST direct via
+`message_marie._send`, cf. son en-tête). Restent appliqués : la mise en forme mécanique
+(cadre 💻🤖, tag, limite 2000 caractères) et le garde-fou de visibilité asymétrique testeur.
+Tout le reste du travail du gardien (ton, regroupement, dédoublonnage, `hold` d'un sujet en
+attente) est sauté — le message part tel quel, sans relecture humaine. Ce n'est jamais un
+usage par défaut ; le circuit normal (`enqueue` sans `--urgent`, jugement du gardien) reste la
+règle.
+
 ## Recevoir un renvoi (`bounce`)
 
 Un message rejeté par le gardien arrive dans **ton propre `inbox/`** avec

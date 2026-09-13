@@ -1027,3 +1027,11 @@ joint était déjà la donnée appauvrie par l'import raté (voir correction ajo
 demandée des comptages entre snapshots (354/116 stable jusqu'au 12/09 09h51 UTC vs 318/104 dans
 le fichier précédent). Id gateway `20260913T192239_518093`, Discord `1548775950219743382`,
 `--expect-reply`, pièce jointe `restauration-marie-2026-09-12-0951z.json`.
+
+### 2026-09-13
+
+**Marie ->** elle a récupéré ses données
+
+_Suite :_ répond au message de correction du 19h22 UTC (id `20260913T192239_518093`) — import du
+fichier `restauration-marie-2026-09-12-0951z.json` réussi, données réapparues. Incident perte de
+données clos.

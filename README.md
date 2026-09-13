@@ -16,6 +16,12 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 13 septembre 2026, deux roadmaps achevées ou abandonnées ont été rangées. Le dispositif
+d'accueil des testeurs (`roadmap_integration_onboard.md`, six phases toutes réalisées) est archivé.
+La suppression de la catégorie « Tâche du jour » (`roadmap_supprimer_tache_du_jour.md`) est retirée
+du suivi : ses deux premières phases étaient en ligne, sa dernière phase (ajouter une tâche planifiée
+d'office depuis l'accueil) reste à faire mais son point d'entrée sera tranché directement avec Marie.
+
 Le 13 septembre 2026, la demande #37 de Marie (reprendre sur l'écran de création de tâche le même
 mode d'affichage replié/dépliable que la fiche de tâche existante) a été développée : les champs
 Icône, Couleur, Date, Horaire et Coût en énergie de l'écran de création se replient désormais en
@@ -111,7 +117,7 @@ La roadmap `roadmap_gateway_discord_service.md` (trois phases) est close et arch
 
 Le 3 septembre 2026, Marie a transmis les deux captures d'écran demandées (Paramètres et formulaire de tâche) : la phase 10 de `roadmap_demandes_marie_2026-09-02.md` a été débloquée et corrigée le jour même, puis `/deploy` a été relancé (cible v5.84). Marie a depuis testé la v5.84 sur son téléphone : huit nouveaux résultats de parcours, dépouillés et réconciliés dans le registre de suivi des demandes — le débordement de l'écran Paramètres (#32) est validé, celui du formulaire de tâche (#3) échoue pour la 3e fois (nouvelle piste identifiée, appareil de Marie inconnu).
 
-La roadmap `roadmap_supprimer_tache_du_jour.md` (demande de Marie du 4 septembre 2026, hors Google Doc) est en cours, pas encore déployée : la catégorie « Tâche du jour » est retirée du code (les tâches déjà classées ainsi repartent automatiquement en Réception) et l'ajout d'une tâche depuis la Réception ne demande plus que son titre. La dernière phase — une tâche ajoutée depuis l'accueil serait planifiée d'office — reste bloquée en attendant la réponse de Marie sur le point d'entrée concerné.
+La demande de Marie du 4 septembre 2026 (hors Google Doc) de retirer la catégorie « Tâche du jour » a été traitée en deux phases, en ligne depuis la v5.92 : la catégorie est retirée du code (les tâches déjà classées ainsi repartent automatiquement en Réception) et l'ajout d'une tâche depuis la Réception ne demande plus que son titre. Sa dernière phase — une tâche ajoutée depuis l'accueil serait planifiée d'office — reste à faire ; la roadmap qui la portait (`roadmap_supprimer_tache_du_jour.md`) a été retirée le 13 septembre 2026, le point d'entrée devant être tranché directement avec Marie.
 
 Les branches Git obsolètes ont été supprimées le 31 août 2026 et `main` a été vérifié (build, tests et lint verts, arbre propre, synchronisé avec le distant). Les roadmaps `roadmap_bundle_2026-08-31.md` (bundle JavaScript ramené de 767 à 242 ko, −68 % : retrait de la bibliothèque cliente Supabase du navigateur, chargement différé des écrans, garde-fou automatique bloquant tout déploiement en cas de régression de taille) et `roadmap_e2e_2026-09-01.md` (57 tests end-to-end repassés au vert) sont closes et archivées dans `Archives/`. Le travail du bundle a été déployé en v5.84.
 

@@ -1,3 +1,8 @@
+## v5.131 — 2026-09-13
+
+### Modifié
+- **Nettoyage de deux roadmaps.** `roadmap_integration_onboard.md` (six phases toutes `[FAIT]`) archivée vers `Archives/`. `roadmap_supprimer_tache_du_jour.md` supprimée sur décision explicite de l'utilisateur : ses phases 1-2 restent en ligne, sa Phase 3 (ajout de tâche planifiée d'office depuis l'accueil) reste à faire mais son point d'entrée sera tranché directement avec Marie, hors suivi système. Aucun changement de code applicatif.
+
 ## v5.130 — 2026-09-13
 
 ### Modifié

@@ -20,11 +20,19 @@ Le 13 septembre 2026, la demande #37 de Marie (reprendre sur l'écran de créati
 mode d'affichage replié/dépliable que la fiche de tâche existante) a été développée : les champs
 Icône, Couleur, Date, Horaire et Coût en énergie de l'écran de création se replient désormais en
 petites cases dépliables au toucher, comme sur la fiche d'une tâche existante. Reste à faire, hors
-code : déploiement et validation par Marie. Le même jour, l'incident qu'elle avait signalé sur la
-v5.124 a par ailleurs été résolu : elle avait deux installations distinctes de l'application sur son
-téléphone (une icône sur son écran d'accueil et un onglet Safari, chacune avec ses propres données),
-et consultait la vide — aucune donnée n'a été perdue, ni chez elle ni sur le serveur. Trois défauts
-de fiabilité révélés par cet incident ont aussi été corrigés, sans changement visible pour
+code : déploiement et validation par Marie. Le même jour, un premier diagnostic sur l'incident
+qu'elle avait signalé sur la v5.124 (deux installations distinctes sur son téléphone, aucune donnée
+perdue) s'est révélé faux une fois Marie recontactée : après la mise en ligne, elle ne voyait
+vraiment plus ses données réelles et a importé par erreur un ancien fichier de test sans avoir
+sauvegardé son état courant au préalable — remplacement local irréversible, perte réelle de
+données. Un fichier de restauration a été reconstruit à partir de la dernière sauvegarde connue
+côté serveur et envoyé en urgence ; une vérification plus poussée a ensuite montré que cette
+première sauvegarde était elle-même déjà appauvrie par l'import raté, la bonne sauvegarde
+(antérieure à la mise en ligne) lui a été renvoyée et Marie confirme avoir récupéré ses données.
+Pour éviter que la situation ne se reproduise, la procédure de mise en ligne demande désormais à
+Marie d'exporter ses données dès le tout début de sa préparation et exige une confirmation
+explicite que c'est fait avant de construire la nouvelle version. Trois défauts de fiabilité
+révélés par cet incident ont par ailleurs été corrigés, sans changement visible pour
 l'utilisateur : une sauvegarde ne peut plus être écrasée par un envoi vide venant d'un appareil
 neuf ; un problème technique au démarrage affiche désormais un message clair (« vos données ne sont
 pas perdues, réessayez ») au lieu de l'écran d'un compte neuf, qui aurait pu inquiéter à tort ; et un

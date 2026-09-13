@@ -1,7 +1,8 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-13)
 
 ## Contexte chaud
-- **Nouveau message de Marie non traité (2026-09-13, 16h45 UTC), avec pièce jointe.** Via Safari, un lien envoyé ne lui montre toujours pas ses données — seulement des données de test exportées. Reçu après la clôture de l'incident v5.124 (elle avait répondu « ok » à 11h46 UTC) : pourrait être un rebond du même sujet ou un problème distinct, non vérifié. Inbox gateway `orchestrateur` (`id: 20260913T164521_764543`, `IMG_3397.png`), non `ack`. Zone racine : traitement uniquement sur demande explicite de l'utilisateur (pas de relevé automatique).
+- **Incident perte de données Marie (v5.124) résolu — diagnostic du `/close` du 12/09 corrigé.** Le message du 16h45 UTC (traité cette session) a révélé que le diagnostic « deux installations distinctes, aucune perte » était faux : Marie ne voyait plus ses données réelles et a importé par erreur un ancien fichier de test sans exporter son état courant — perte locale réelle. Fichier de restauration reconstruit depuis le dernier snapshot Supabase connu et envoyé en urgence ; **erreur propre détectée et corrigée en cours de session** : ce premier snapshot (13/09 12h36z, 318 tâches/104 listes) était déjà la donnée appauvrie par l'import raté (dernière activité postérieure au déploiement v5.124) — remplacé par le bon snapshot (12/09 09h51z, 354 tâches/116 listes, antérieur au déploiement), renvoyé en urgence. Marie confirme avoir récupéré ses données (dernier message). Garde-fou ajouté à `/deploy` (étapes 0.1 et 4ter, voir ci-dessous) pour éviter la récidive. Détail complet dans `COMMUNICATION/Marie/historique_conversation_marie.md` (entrées 16h45/19h06/19h22/confirmation).
+- **`.claude/commands/deploy.md` modifié : alerte export Marie + gate de confirmation avant build.** Nouvelle étape 0.1 (tout début de `/deploy`) : alerte urgente à Marie pour exporter ses données avant qu'une nouvelle version soit en ligne. Nouvelle étape 4ter (avant le build) : confirmation explicite de l'utilisateur que Marie a exporté, sinon arrêt. Renumérotation 0.1-0.8 → 0.2-0.9, références internes corrigées. **Jamais exercé en conditions réelles** — premier `/deploy` réel à confirmer.
 - **`roadmap_demandes_marie_2026-09-10.md` : Phase 2 (#37) codée (2026-09-13), passée `[FAIT]`** (cohérent avec la Phase 1). `E21CreateTaskV2.tsx` reprend le mode replié/dépliable au tap d'E22. Gates passés (tests, `tsc`, lint, e2e). Reste dû hors code : déploiement (`CHANGELOG.md` v5.129 déjà bumpé) et validation `ok` de Marie sur le parcours `creer-une-tache-bandeau-colore` (`revision: 1`).
 - **`roadmap_integration_onboard.md` : Phases 1 à 6 `[FAIT]` — roadmap achevée.** À proposer à l'utilisateur : archiver la roadmap (accord explicite requis avant tout archivage).
 - **Phase 5 — modèle « un canal Discord par testeur ».** Cible gateway `testeur:<code>`, salon `#test-<code>` ; `#supervision` fusionné avec le canal Marie principal (décision Morphéus). Câblage local `config_bot_discord.json` (gitignore) : `channels.testeurs.satine.channel_id = 1546945011340542022`, `channels.supervision = 1544665195476160512`. Gate de visibilité asymétrique vert. Premier testeur : Satine (pas encore sur le serveur) ; Morphéus s'ajoute avant elle pour valider le dispositif (`tester_code = "morpheus"`, saisie encore à faire).
@@ -9,6 +10,7 @@
 - `DISCORD/_contexte/` (signals, memory, contexte) : travail de la zone `discord`, hors périmètre du `/close` racine.
 
 ## Questions ouvertes
+- [P2] **Appareil `192f2411` (Marie) pas encore resynchronisé après sa récupération de données.** Au hook `/close` du 2026-09-13 (backup testeurs relancé), le dernier snapshot Supabase reste celui du 13/09 12h36z (318 tâches — l'état appauvri d'avant restauration) : sa resynchronisation montante n'a pas encore eu lieu depuis qu'elle a réimporté le bon fichier. — fait quand : un `backup_testeur_snapshots.py` ultérieur montre un état cohérent avec la récupération (≥354 tâches) pour cet appareil — réf : `donnees_testeurs/marie/`, `COMMUNICATION/Marie/historique_conversation_marie.md` entrée 19h22
 - [P1] **T58 (`10-feedback.spec.ts`) casse la suite e2e — cause non investiguée.** Confirmé préexistant (indépendant du travail #37 de cette session), mais jamais diagnostiqué : `getByText('En attente d'envoi').or(getByText('Échec d'envoi'))` introuvable après création d'un retour avec capture. — fait quand : cause identifiée et corrigée, ou test mis à jour si le comportement attendu a changé — réf : `e2e/10-feedback.spec.ts:26`
 - [P1] **Le prochain snapshot de Marie tombera dans `donnees_testeurs/_sans_code/` tant qu'elle n'a pas saisi son `tester_code`.** Toujours vrai au 2026-09-13. Risque concret : le prochain `/deploy` analyserait un snapshot périmé sans le savoir. — fait quand : Marie a saisi `marie` dans Paramètres > Profil et un `backup_testeur_snapshots.py` ultérieur range bien son snapshot dans `marie/` (vérifié) — réf : `tests_manuels.md` § Vérifier le classement du snapshot de Marie, `roadmap_integration_onboard.md` § Phase 6 (Réalisé), `.claude/commands/deploy.md` étape 0
 - [P1] **Saisir les codes testeur `morpheus` et `marie` dans Paramètres > Profil.** Action manuelle, hors code — le champ existe depuis la Phase 3. Prérequis pour valider le dépouillement multi-testeur en conditions réelles avant d'inviter Satine. — fait quand : les deux codes sont enregistrés et un cycle de sauvegarde les route dans leurs dossiers respectifs (`donnees_testeurs/morpheus/`, `donnees_testeurs/marie/`) — réf : `src/ui/screens/settings/E111Profile.tsx`, `roadmap_integration_onboard.md` § Phase 6 (Réalisé)
@@ -28,31 +30,28 @@
 - [P3] **Hook Fin `/close` (sauvegarde Drive) inexécutable en auto-mode** : `backup_project.py --upload` refusé par le classifieur ; à lancer à la main après chaque `/close` racine, ou ajouter une règle d'autorisation Bash dans `.claude/settings.local.json`. Bug préexistant : `read_config()` lève une `RuntimeError` non capturée sous `--upload` si `rclone_backup.json` manque. — fait quand : la sauvegarde Drive repasse automatique OU la procédure manuelle est actée dans `on_close.md` — réf : `_contexte/on_close.md` § Fin, `claude-vibecoding-kit/backup_project.py`
 - [P3] **Simplification signalée par la revue de code de session (2026-09-13, non corrigée) : `aria-label` redondant sur le champ Heure de début d'`E21CreateTaskV2.tsx`.** Duplique l'association déjà faite par `<label htmlFor="task-start-time">` — dette mineure, `/simplify` à la main de l'utilisateur. — fait quand : redondance retirée ou jugée volontaire — réf : `src/ui/screens/tasks/E21CreateTaskV2.tsx:300`
 
-## Dernière session (2026-09-13 — Phase 2 #37 codée, agent/onboard conservée, .worktrees nettoyé)
+## Dernière session (2026-09-13 — incident perte de données Marie résolu, garde-fou export ajouté à /deploy)
 
 ## Décisions prises
-- Branche git `agent/onboard` conservée (149 commits jamais fusionnés) — question close.
-- Phase 2 `roadmap_demandes_marie_2026-09-10.md` (#37) ouverte et codée : E21 reprend le mode replié/dépliable d'E22.
-- Dossier `.worktrees` (vide, contenu déjà zippé la veille) supprimé.
+- Diagnostic du `/close` précédent (« deux installations, aucune perte ») invalidé : perte de données locale réelle chez Marie (import d'un ancien fichier sans export préalable).
+- Fichier de restauration reconstruit depuis Supabase et envoyé en urgence ; erreur de sélection du snapshot détectée et corrigée dans la foulée (premier envoi déjà appauvri par l'import raté), bon fichier renvoyé.
+- `/deploy` modifié : alerte urgente à Marie en tout début de procédure (étape 0.1) + gate de confirmation explicite avant le build (étape 4ter), pour prévenir la récidive.
 
 ## Livrables produits ou modifiés
-- `src/ui/screens/tasks/E21CreateTaskV2.tsx` : 5 champs convertis en `TaskFieldCard` repliables (Icône, Couleur, Date, Horaire, Coût en énergie).
-- `src/ui/screens/tasks/E21CreateTaskV2.test.tsx` : tests existants adaptés + 4 tests ajoutés.
-- `e2e/01-onboarding.spec.ts`, `e2e/05-overload.spec.ts`, `e2e/07-planning-v4.spec.ts` : ouverture des champs avant interaction.
-- `src/domain/data/manualTestsCatalog.ts` : parcours `creer-une-tache-bandeau-colore` mis à jour (`revision: 1`).
-- `roadmap_demandes_marie_2026-09-10.md` : Phase 2 ajoutée, documentée, laissée `[EN COURS]` (bascule `[FAIT]` à la charge de `/close` — appliquée ici).
-- `COMMUNICATION/Marie/a_transmettre.md`, `src/ui/screens/onboarding/E01Welcome.tsx` (`WHATS_NEW`) : entrée #37 ajoutée.
-- `README.md`, `CHANGELOG.md` (v5.129) : mis à jour.
-- `.worktrees/` : dossier vide supprimé (hors versionnage git).
+- `.claude/commands/deploy.md` : étapes 0.1 (alerte export) et 4ter (gate confirmation) ajoutées, renumérotation 0.1-0.8 → 0.2-0.9 et références internes corrigées.
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : correction de l'analyse du 16h45 UTC, 2 envois urgents (restauration + correctif), confirmation de récupération de Marie.
+- `donnees_testeurs/marie/restauration-marie-2026-09-12-0951z.json` (gitignoré) : fichier de restauration final, snapshot pré-déploiement/pré-import.
+- `tests_manuels.md` : référence d'étape `/deploy` corrigée (renumérotation), nouvelle section de vérification du garde-fou export.
 
 ## Hypothèses validées / invalidées
-- VALIDÉ : l'échec e2e `10-feedback.spec.ts` T58 est préexistant et indépendant du correctif #37 (reproduit à l'identique sur `main` avant modification, via `git stash`).
-- VALIDÉ : `.worktrees` était vide, son contenu déjà zippé (`Appli_TSA_SDI_TDAH.worktrees.zip`, 304 Mo) — suppression sans perte.
-- EN ATTENTE : cause de l'échec T58 (non investiguée, tracée [P1] ci-dessus).
-- EN ATTENTE : nature du nouveau message de Marie (16h45 UTC) — rebond de l'incident v5.124 ou problème distinct, non vérifié.
+- INVALIDÉ : diagnostic « deux installations distinctes, aucune perte » du `/close` du 12/09 — pivot vers perte de données réelle, confirmée par Marie.
+- VALIDÉ : le snapshot du 12/09 09h51 UTC (354 tâches / 116 éléments de listes, dernière activité 11/09 19h00 UTC, avant le déploiement v5.124) est la bonne donnée de restauration.
+- INVALIDÉ (propre erreur) : le snapshot du 13/09 12h36 UTC envoyé en premier était présumé sûr — comptage comparé à l'historique des sauvegardes, il était déjà la donnée post-incident (318/104, activité 12/09 10h00 UTC, après le déploiement).
+- VALIDÉ : Marie confirme avoir récupéré ses données après le second envoi.
+- EN ATTENTE : resynchronisation montante de l'appareil de Marie vers Supabase (toujours sur l'ancien état au moment de ce `/close`, tracé [P2] ci-dessus).
 
 ## Prochaine étape exacte
-`/deploy` du lot v5.129 (Phase 2 #37) pour livrer et faire valider le parcours par Marie. En parallèle : décision sur le nouveau message de Marie (16h45 UTC, non traité), et sur l'archivage de `roadmap_integration_onboard.md`.
+`/deploy` du lot v5.129 (Phase 2 #37), première exécution réelle des nouvelles étapes 0.1/4ter à observer. En parallèle : archivage de `roadmap_integration_onboard.md` toujours en attente d'accord explicite.
 
 ## Question bloquante pour la session suivante
 Aucune.

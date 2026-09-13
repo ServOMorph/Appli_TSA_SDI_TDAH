@@ -1,3 +1,9 @@
+## v5.130 — 2026-09-13
+
+### Modifié
+- **Incident perte de données Marie (v5.124) élucidé et résolu** : le diagnostic « deux installations distinctes, aucune perte » retenu au déploiement précédent était faux. Marie avait en réalité importé par erreur un ancien fichier de test sans avoir exporté son état courant au préalable, effaçant ses données locales. Un fichier de restauration a été reconstruit à partir de la dernière sauvegarde serveur connue et envoyé ; une première sauvegarde s'est révélée déjà appauvrie par l'import raté, corrigée par la bonne sauvegarde (antérieure au déploiement) — Marie confirme avoir récupéré ses données.
+- **`/deploy` durci contre ce type d'incident** : nouvelle étape 0.1 (alerte urgente à Marie pour exporter ses données dès le tout début de la procédure, avant toute mise en ligne) et nouvelle étape 4ter (confirmation explicite requise avant le build que Marie a exporté, sinon arrêt). Aucun changement de code applicatif.
+
 ## v5.129 — 2026-09-13
 
 ### Ajouté

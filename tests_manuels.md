@@ -18,11 +18,22 @@ Depuis la Phase 6 `roadmap_integration_onboard.md`, tant que Marie n'a pas saisi
 (`marie`) dans Paramètres > Profil, ses nouveaux snapshots Supabase tombent dans
 `donnees_testeurs/_sans_code/` au lieu de `donnees_testeurs/marie/` (constaté au hook `/close` du
 2026-09-12 : `snapshot-supabase-192f2411-20260912-0951z.json` archivé en `_sans_code/`). Risque
-concret : `/deploy` étape 0.1-0.2 continue de lire `donnees_testeurs/marie/`, qui ne contiendra
+concret : `/deploy` étape 0.2-0.3 continue de lire `donnees_testeurs/marie/`, qui ne contiendra
 alors que l'historique migré (dernier daté du 2026-09-11), pas le snapshot réellement le plus
 récent. Une fois que Marie a saisi son code : vérifier que le prochain
 `python scripts/backup_testeur_snapshots.py` range bien son snapshot dans `marie/` et non plus dans
 `_sans_code/`, et que `/deploy` analyse alors le bon fichier. Retirer cette section une fois vérifié.
+
+## Vérifier le garde-fou export ajouté à /deploy (étapes 0.1 et 4ter)
+
+Ajouté le 2026-09-13 suite à l'incident de perte de données de Marie (import raté sans export
+préalable). Nouvelle étape 0.1 : alerte urgente à Marie dès le tout début de `/deploy` pour
+exporter ses données avant qu'une nouvelle version soit en ligne. Nouvelle étape 4ter : avant le
+build, confirmation explicite demandée à l'utilisateur que Marie a exporté — sinon arrêt. **Jamais
+exercées en conditions réelles.** Au prochain `/deploy` réel : vérifier que l'étape 0.1 envoie bien
+le message en urgence et le journalise dans `historique_conversation_marie.md`, et que l'étape
+4ter bloque effectivement la suite tant que la confirmation n'est pas donnée. Retirer cette section
+une fois observé.
 
 ## Sauvegarde Drive en attente
 

@@ -32,6 +32,23 @@ alter table device_snapshots enable row level security;
 -- qui contourne RLS) peut lire/ecrire.
 revoke all on device_snapshots from anon;
 
+-- Un payload est considere vide s'il n'a ni tache, ni element de liste, ni entree de budget.
+-- Fonction IMMUTABLE : ne lit aucune table, calcule uniquement a partir de son argument.
+create or replace function is_empty_snapshot_payload(p_payload jsonb)
+returns boolean
+language sql
+immutable
+as $$
+  select coalesce(jsonb_array_length(p_payload -> 'tasks'), 0) = 0
+     and coalesce(jsonb_array_length(p_payload -> 'list_items'), 0) = 0
+     and coalesce(jsonb_array_length(p_payload -> 'budget_entries'), 0) = 0
+$$;
+
+-- Garde anti-ecrasement (roadmap_fiabilite_sync.md Phase 1, 2026-09-13) : un payload vide ne
+-- remplace jamais un payload existant non vide pour le meme device_id. Protege contre un client
+-- qui repousserait une base locale neuve (reinstallation, onboarding recommence) par-dessus la
+-- derniere sauvegarde reelle du meme appareil. N'affecte pas l'insertion initiale (aucune ligne
+-- existante) ni la mise a jour d'un payload deja vide.
 create or replace function sync_device_snapshot(
   p_device_id uuid,
   p_device_secret text,
@@ -54,7 +71,11 @@ begin
         schema_version = excluded.schema_version,
         app_version = excluded.app_version,
         synced_at = now()
-    where device_snapshots.device_secret = excluded.device_secret;
+    where device_snapshots.device_secret = excluded.device_secret
+      and (
+        not is_empty_snapshot_payload(excluded.payload)
+        or is_empty_snapshot_payload(device_snapshots.payload)
+      );
 
   get diagnostics v_rows = row_count;
   return v_rows > 0;
@@ -63,3 +84,6 @@ $$;
 
 revoke all on function sync_device_snapshot(uuid, text, jsonb, text, text) from public;
 grant execute on function sync_device_snapshot(uuid, text, jsonb, text, text) to anon;
+
+-- Usage interne a sync_device_snapshot uniquement : aucun acces direct pour anon.
+revoke all on function is_empty_snapshot_payload(jsonb) from public;

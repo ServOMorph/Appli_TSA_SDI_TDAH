@@ -74,7 +74,7 @@ complète : 848/848 tests passent.
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 3 — Filet de sécurité sur `wipeAllData` [TODO]
+## Phase 3 — Filet de sécurité sur `wipeAllData` [FAIT]
 
 **Problème, réévalué le 2026-09-13.** `AppContext.tsx` efface toute la base locale si un
 utilisateur existe avec `onboarding_completed: false`. Vérifié : ce champ n'est écrit à `false`
@@ -90,6 +90,21 @@ l'onboarding silencieusement au lieu de tout effacer.
 
 **Tests.** Vitest : onboarding incomplet + base vide → wipe inchangé. Onboarding incomplet +
 données présentes → pas de wipe, `onboarding_completed` passe à `true`.
+
+**Fait le 2026-09-13.** `AppContext.tsx` : dans le `useEffect` d'init, quand
+`user.onboarding_completed` est `false`, une nouvelle fonction `hasSignificantData()` vérifie
+`db.tasks`, `db.listItems`, `db.budgetEntries` (compte Dexie direct). Base vide → comportement
+inchangé (`wipeAllData()`). Données présentes → l'utilisateur est mis à jour
+(`onboarding_completed: true`, `userRepo.update`) et le flux continu normalement comme un
+utilisateur avec onboarding déjà complété (chargement des données, navigation
+dashboard/energy-checkin, sync). Deux tests Vitest ajoutés (`AppContext.test.tsx`), tous deux
+isolés du reste de la suite par un nettoyage explicite de `db.users`/`db.energyEntries` en début
+de test (plusieurs tests antérieurs du fichier laissent des utilisateurs et des entrées d'énergie
+en base, non nettoyés par l'`afterEach` global — source d'ambiguïté sur `userRepo.getFirst()`,
+qui retourne `toArray()[0]`, pas le dernier utilisateur créé). Suite complète : 850/850 tests
+passent, `tsc --noEmit` propre.
+
+Toutes les phases de la roadmap sont achevées. Archivage proposé à l'utilisateur.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Une fois cette phase achevée, proposer l'archivage de la roadmap

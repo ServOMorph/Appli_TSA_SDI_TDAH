@@ -978,9 +978,18 @@ utilisé Paramètres > Export et import > Importer un fichier JSON avec un ancie
 sans avoir exporté son état courant avant — remplacement local irréversible, perte de données
 locale confirmée par l'utilisateur. Vérification serveur (métadonnées et comptages seuls) : le
 dernier snapshot Supabase de l'appareil `192f2411` (13/09 12h36 UTC, 318 tâches, 104 éléments de
-listes, 78 résultats de tests) est resté inchangé depuis — aucune synchronisation montante n'a
-propagé l'import erroné côté serveur. Fichier de restauration reconstruit à partir de ce snapshot
-au format d'export attendu par l'import in-app.
+listes, 78 résultats de tests) est resté inchangé depuis. Fichier de restauration reconstruit à
+partir de ce snapshot au format d'export attendu par l'import in-app.
+
+**Correction (19h22 UTC) :** analyse erronée — ce snapshot du 13/09 12h36 UTC n'est pas la bonne
+donnée. Comparaison de l'historique des sauvegardes de l'appareil `192f2411` : 354 tâches /
+116 éléments de listes stables du 11/09 15h46 au 12/09 09h51 UTC (dernière activité réelle
+11/09 19h00 UTC), puis chute à 318 tâches / 104 éléments dans le snapshot 13/09 12h36 UTC, dont
+la dernière activité (12/09 10h00 UTC) est postérieure au commit de déploiement v5.124 (12/09
+11h08 heure locale ≈ 09h08 UTC). La synchronisation montante a donc bien propagé l'import raté
+côté serveur, contrairement à ce qui était écrit plus haut — le snapshot envoyé à Marie était déjà
+la donnée appauvrie. Nouveau fichier de restauration reconstruit à partir du snapshot 12/09 09h51
+UTC (avant le déploiement, avant l'import raté).
 
 **Dév ->**
 Fichier joint = tes données du 13/09 12h36, avant l'import qui a effacé les tiennes.
@@ -994,3 +1003,27 @@ Dis-moi si tes tâches, listes et budget réapparaissent.
 _Suite :_ envoyé en **mode urgent** sur demande explicite de l'utilisateur (aucune session
 `discord`/`bot.py` active), id gateway `20260913T190627_713062`, Discord `1548771873414848562`,
 `--expect-reply`, pièce jointe `restauration-marie-2026-09-13-1236z.json`.
+
+### 2026-09-13 [19h22 UTC]
+
+**Dév ->**
+Le fichier envoyé avant n'était pas le bon : il contenait déjà tes données après l'import raté, donc incomplètes.
+
+Nouveau fichier joint = tes données du 12/09, avant la mise à jour.
+
+Si tu as déjà importé l'ancien fichier : refais l'import avec celui-ci, il remplace tout.
+
+Sinon : ignore le message précédent, n'utilise que celui-ci.
+
+Avant d'importer (si pas déjà fait) : Paramètres > Export et import > Exporter en JSON. Garde ce fichier de côté.
+
+Ensuite : Paramètres > Export et import > Importer un fichier JSON. Choisis le fichier joint (12/09). Confirme le remplacement.
+
+Dis-moi si tes tâches, listes et budget réapparaissent.
+
+_Suite :_ correction du message précédent (id `20260913T190627_713062`, 19h06 UTC) — le fichier
+joint était déjà la donnée appauvrie par l'import raté (voir correction ajoutée à l'entrée
+16h45). Envoyé en **mode urgent** sur demande explicite de l'utilisateur, après vérification
+demandée des comptages entre snapshots (354/116 stable jusqu'au 12/09 09h51 UTC vs 318/104 dans
+le fichier précédent). Id gateway `20260913T192239_518093`, Discord `1548775950219743382`,
+`--expect-reply`, pièce jointe `restauration-marie-2026-09-12-0951z.json`.

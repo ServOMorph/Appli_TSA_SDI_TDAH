@@ -10,7 +10,7 @@ restauration.
 Contexte technique complet : `COMMUNICATION/Marie/historique_conversation_marie.md`
 § 2026-09-12/13 (incident v5.124).
 
-## Phase 1 — Garde serveur anti-écrasement d'un snapshot par un payload vide [EN COURS]
+## Phase 1 — Garde serveur anti-écrasement d'un snapshot par un payload vide [FAIT]
 
 **Problème.** `sync_device_snapshot` (`supabase/schema.sql`) accepte et écrase sans condition
 tout nouveau payload pour un `device_id` donné. Un client qui pousse un payload vide (base locale
@@ -29,10 +29,13 @@ migration automatisée dans ce projet — même pattern que le `GRANT` en attent
 `feedback_reports`, tracé [P2] `signals.md`).
 
 **Gate.** Comportement critique côté serveur, aucune suite de tests SQL dans ce dépôt : gate =
-script Python ad hoc (scratch, non committé) qui pousse un payload vide sur un `device_id` de
-test ayant déjà des données, vérifie que l'existant n'est pas écrasé, puis un payload vide sur un
-`device_id` neuf, vérifie qu'il est accepté. Ajouté à `tests_manuels.md` (vérification en
-conditions réelles après application SQL en prod) avant `[FAIT]`, retiré une fois vérifié.
+script Python ad hoc (scratch, non committé) avec un `device_id` de test fictif (clé anon, comme
+l'app réelle — le RPC n'a de grant `EXECUTE` que pour `anon`). **Vérifié en conditions réelles le
+2026-09-13**, 4 cas : insertion initiale vide (accepté), vide→vide (accepté), non-vide écrase vide
+(accepté), vide tente d'écraser non-vide (bloqué, `payload` inchangé en base). Ligne de test
+laissée en base (`service_role` n'a pas de `GRANT DELETE` sur `device_snapshots` — même
+limitation que `feedback_reports` [P2] `signals.md`) ; aucune donnée réelle, nettoyage manuel
+proposé à l'utilisateur.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

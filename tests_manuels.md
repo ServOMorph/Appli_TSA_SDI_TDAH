@@ -24,17 +24,6 @@ récent. Une fois que Marie a saisi son code : vérifier que le prochain
 `python scripts/backup_testeur_snapshots.py` range bien son snapshot dans `marie/` et non plus dans
 `_sans_code/`, et que `/deploy` analyse alors le bon fichier. Retirer cette section une fois vérifié.
 
-## Appliquer et vérifier la garde anti-écrasement des snapshots (roadmap_fiabilite_sync.md Phase 1)
-
-`supabase/schema.sql` durci : `sync_device_snapshot` refuse désormais d'écraser un payload non
-vide par un payload vide pour le même `device_id`. Modification SQL non exécutée en base — à
-appliquer manuellement dans le SQL Editor Supabase (`create or replace function` sur
-`is_empty_snapshot_payload` et `sync_device_snapshot`, idempotent). Une fois appliqué, vérifier
-avec un `device_id` de test fictif (jamais un appareil réel) : un payload vide écrase un payload
-vide existant (ok), un payload non vide écrase l'existant quel qu'il soit (ok), un payload vide
-n'écrase pas un payload existant non vide (la fonction retourne `false`, `synced_at` et `payload`
-inchangés en base). Retirer cette section une fois les trois cas vérifiés en conditions réelles.
-
 ## Sauvegarde Drive en attente
 
 Manifeste rafraîchi le 2026-09-12 (263 fichiers). L'upload vers Drive n'est pas exécutable en

@@ -1,6 +1,8 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-13)
 
 ## Contexte chaud
+- **Angle mort corrigé : Marie ne voyait jamais la modale « Nouveautés ».** Elle était câblée uniquement sur `E01Welcome.tsx` (écran d'onboarding), or `AppContext.tsx` ne route vers cet écran que si aucun utilisateur n'existe en local — un utilisateur déjà onboardé (Marie) n'y repasse plus jamais. Correctif : bouton « Nouveautés » (avec point rouge tant que la version courante n'a pas été vue) ajouté en haut de l'écran « Tests à faire » (E121), qui ouvre une modale centrée (pattern `modalOverlay`/`modalBox`, cohérent avec le reste de l'écran) — la modale d'onboarding (`WhatsNewModal`, ancrée en bas) reste inchangée pour E01Welcome. Contenu partagé via `src/domain/data/whatsNew.ts` (`WHATS_NEW`, `hasUnseenWhatsNew`, `markWhatsNewSeen`). Test manuel ajouté au catalogue in-app (`consulter-les-nouveautes`), `a_transmettre.md` et `WHATS_NEW` complétés. Suite 859/859 verte, `tsc -b` + lint clean. **Dette signalée (non corrigée) : deux implémentations distinctes du contenu Nouveautés (`WhatsNewModal` bas d'écran vs modale inline centrée d'E121) — risque de dérive si le contenu évolue sans mettre à jour les deux.**
+- **`/deploy_dev` exécuté avec succès (2026-09-13)** : build (`tsc -b` + `vite build --outDir dist/dev`) et déploiement sur `https://appli-audhd-dev.netlify.app` verts, fumée HTTP 200. Vérifié à cette occasion : aucune variable d'environnement Netlify configurée côté dashboard pour aucun des deux sites (`appli-audhd`/`appli-audhd-dev`) — les deux builds tirent leurs valeurs du même `.env` local, bundle garanti identique à code égal entre dev et prod.
 - **Isolation des données multi-testeurs confirmée par le code : par `device_id`, pas par `tester_code`.** `deviceIdentity.ts` génère un `device_id`/`device_secret` unique en `localStorage` par appareil, utilisé pour l'upsert Supabase (une ligne par appareil) — c'est ce qui isole les données de Morphéus de celles de Marie, indépendamment de toute saisie de code. Le `tester_code` (`E111Profile.tsx`) ne sert qu'au classement des snapshots de dépouillement dev (`donnees_testeurs/<code>/` vs `_sans_code/`) : son absence ne crée aucun risque de mélange de données, seulement une gêne de tri côté dev. Ne change donc pas la nature du [P1] tester_code ci-dessous (toujours bloquant pour le dépouillement), mais clarifie qu'aucune donnée n'est en danger tant qu'il n'est pas saisi.
 - **Incident perte de données Marie (v5.124) résolu — diagnostic du `/close` du 12/09 corrigé.** Le message du 16h45 UTC (traité cette session) a révélé que le diagnostic « deux installations distinctes, aucune perte » était faux : Marie ne voyait plus ses données réelles et a importé par erreur un ancien fichier de test sans exporter son état courant — perte locale réelle. Fichier de restauration reconstruit depuis le dernier snapshot Supabase connu et envoyé en urgence ; **erreur propre détectée et corrigée en cours de session** : ce premier snapshot (13/09 12h36z, 318 tâches/104 listes) était déjà la donnée appauvrie par l'import raté (dernière activité postérieure au déploiement v5.124) — remplacé par le bon snapshot (12/09 09h51z, 354 tâches/116 listes, antérieur au déploiement), renvoyé en urgence. Marie confirme avoir récupéré ses données (dernier message). Garde-fou ajouté à `/deploy` (étapes 0.1 et 4ter, voir ci-dessous) pour éviter la récidive. Détail complet dans `COMMUNICATION/Marie/historique_conversation_marie.md` (entrées 16h45/19h06/19h22/confirmation).
 - **`.claude/commands/deploy.md` modifié : alerte export Marie + gate de confirmation avant build.** Nouvelle étape 0.1 (tout début de `/deploy`) : alerte urgente à Marie pour exporter ses données avant qu'une nouvelle version soit en ligne. Nouvelle étape 4ter (avant le build) : confirmation explicite de l'utilisateur que Marie a exporté, sinon arrêt. Renumérotation 0.1-0.8 → 0.2-0.9, références internes corrigées. **Jamais exercé en conditions réelles** — premier `/deploy` réel à confirmer.
@@ -30,21 +32,31 @@
 - [P2] **`.claude/commands/create_memory.md` n'implémente pas l'alias de zone** documenté par `start.md` étape 2c. Correctif délégué à VibeObs. — fait quand : `create_memory.md` reconnaît un premier argument = alias de `.claude/zones.md`, résout le dossier et écrit dans `<dossier>/_contexte/memory.md` — réf : `.claude/commands/create_memory.md`, `.claude/commands/start.md` étape 2c
 - [P3] **Hook Fin `/close` (sauvegarde Drive) inexécutable en auto-mode** : `backup_project.py --upload` refusé par le classifieur ; à lancer à la main après chaque `/close` racine, ou ajouter une règle d'autorisation Bash dans `.claude/settings.local.json`. Bug préexistant : `read_config()` lève une `RuntimeError` non capturée sous `--upload` si `rclone_backup.json` manque. — fait quand : la sauvegarde Drive repasse automatique OU la procédure manuelle est actée dans `on_close.md` — réf : `_contexte/on_close.md` § Fin, `claude-vibecoding-kit/backup_project.py`
 - [P3] **Simplification signalée par la revue de code de session (2026-09-13, non corrigée) : `aria-label` redondant sur le champ Heure de début d'`E21CreateTaskV2.tsx`.** Duplique l'association déjà faite par `<label htmlFor="task-start-time">` — dette mineure, `/simplify` à la main de l'utilisateur. — fait quand : redondance retirée ou jugée volontaire — réf : `src/ui/screens/tasks/E21CreateTaskV2.tsx:300`
+- [P3] **Duplication signalée par la revue de code de session (2026-09-13, non corrigée) : contenu « Nouveautés » rendu par deux implémentations distinctes** (`WhatsNewModal.tsx` pour E01Welcome, modale inline `modalOverlay`/`modalBox` pour E121ManualTests — styles différents demandés explicitement). Risque : une évolution du contenu ou de l'accessibilité dans l'une dérive silencieusement de l'autre. — fait quand : les deux consolidées derrière un composant unique paramétrable, ou dette jugée acceptable et retirée explicitement — réf : `src/ui/components/WhatsNewModal.tsx`, `src/ui/screens/tests/E121ManualTests.tsx`
 
-## Dernière session (2026-09-13 — consultation isolation données multi-testeurs, avant /deploy_dev)
+## Dernière session (2026-09-13 — /deploy_dev exécuté + correctif angle mort « Nouveautés »)
 
 ## Décisions prises
-Aucune — session de consultation, pas de décision produit ni technique.
+- Isolation multi-testeurs confirmée par lecture de code : par `device_id`, pas par `tester_code` (aucun risque de mélange Marie/Morphéus).
+- Point d'entrée « Nouveautés » ajouté sur E121 (« Tests à faire »), sur demande explicite, pour corriger l'angle mort : la modale n'était visible qu'à l'onboarding, jamais revu par un utilisateur déjà onboardé comme Marie. Modale centrée (pattern `modalOverlay`/`modalBox`) plutôt que la modale ancrée en bas de `WhatsNewModal`, avec point rouge tant que non lue.
 
 ## Livrables produits ou modifiés
-Aucun — aucun fichier applicatif touché. Question posée par l'utilisateur (Morphéus a-t-il un jeu de données propre, sans parasiter celui de Marie ?) traitée par lecture de code.
+- `src/domain/data/whatsNew.ts` (nouveau) : `WHATS_NEW` + helpers `hasUnseenWhatsNew`/`markWhatsNewSeen`, source unique.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : utilise les helpers partagés, comportement inchangé.
+- `src/ui/screens/tests/E121ManualTests.tsx` : bouton « Nouveautés » + point rouge + modale centrée.
+- `src/ui/screens/tests/E121ManualTests.test.tsx` : 5 tests ajoutés/ajustés.
+- `src/domain/data/manualTestsCatalog.ts` : test manuel `consulter-les-nouveautes` ajouté (catégorie « Outils : autres »).
+- `COMMUNICATION/Marie/a_transmettre.md`, `whatsNew.ts` (`WHATS_NEW`) : entrées ajoutées pour ce changement.
+- Suite complète 859/859 verte, `tsc -b` + lint clean.
 
 ## Hypothèses validées / invalidées
-- VALIDÉ : l'isolation des données en base Supabase repose sur `device_id`/`device_secret` par appareil (`deviceIdentity.ts`), pas sur `tester_code` — aucun risque de mélange entre testeurs tant qu'ils utilisent des appareils distincts.
-- EN ATTENTE : présence effective d'un jeu de données Morphéus en base — indiscernable des appareils `_sans_code/` tant que le `tester_code` n'est pas saisi côté Paramètres > Profil (cf. [P1] ci-dessus).
+- VALIDÉ : isolation des données par `device_id` (par appareil), indépendante du `tester_code`.
+- VALIDÉ : `/deploy_dev` fonctionne de bout en bout (build, déploiement, fumée HTTP 200).
+- EN ATTENTE : présence effective d'un jeu de données Morphéus en base (cf. [P1] tester_code ci-dessus).
+- Dette signalée (`code-review medium`, non corrigée) : duplication `WhatsNewModal`/modale inline E121 — cf. question ouverte [P3] ci-dessus.
 
 ## Prochaine étape exacte
-Reprendre `/deploy_dev` (étapes 1 à 7, build + déploiement sur le site de test). `/deploy` du lot v5.129 (Phase 2 #37) reste par ailleurs toujours pas exécuté.
+`/deploy` du lot v5.129 (Phase 2 #37) + ce correctif « Nouveautés », toujours pas exécuté.
 
 ## Question bloquante pour la session suivante
 Aucune.

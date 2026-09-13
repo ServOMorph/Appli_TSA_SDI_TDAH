@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { MANUAL_TEST_CATEGORIES, manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
+import { WHATS_NEW, hasUnseenWhatsNew, markWhatsNewSeen } from '@/domain/data/whatsNew'
 import type { ManualTestResult, ManualTestStatus } from '@/domain/entities/manualTestResult'
 import type { ManualTest, ManualTestCategory } from '@/domain/data/manualTestsCatalog'
 import { isManualTestDone, latestManualTestResult } from '@/domain/rules/manualTestRules'
@@ -25,6 +26,8 @@ function formatResultDate(value: string): string {
 export function E121ManualTests() {
   const { back, manualTestResults, submitManualTestResult } = useApp()
   const [selectedTest, setSelectedTest] = useState<ManualTest | null>(null)
+  const [showWhatsNew, setShowWhatsNew] = useState(false)
+  const [hasUnreadWhatsNew, setHasUnreadWhatsNew] = useState(hasUnseenWhatsNew)
   const [selectedStatus, setSelectedStatus] = useState<ManualTestStatus>('ok')
   const [comment, setComment] = useState('')
   const [expandedTestIds, setExpandedTestIds] = useState<Set<string>>(new Set())
@@ -93,6 +96,12 @@ export function E121ManualTests() {
     setSelectedTest(null)
   }
 
+  function closeWhatsNew() {
+    markWhatsNewSeen()
+    setHasUnreadWhatsNew(false)
+    setShowWhatsNew(false)
+  }
+
   return (
     <main
       style={{
@@ -106,13 +115,25 @@ export function E121ManualTests() {
         paddingBottom: 'var(--bottomnav-h)',
       }}
     >
-      <button
-        onClick={() => back('dashboard')}
-        aria-label="Retour"
-        style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: 0 }}
-      >
-        ← Retour
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <button
+          onClick={() => back('dashboard')}
+          aria-label="Retour"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: 0 }}
+        >
+          ← Retour
+        </button>
+        {WHATS_NEW.length > 0 && (
+          <button
+            onClick={() => setShowWhatsNew(true)}
+            aria-label="Voir les nouveautés"
+            style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)', fontSize: '0.875rem', fontWeight: 600, padding: 0 }}
+          >
+            {hasUnreadWhatsNew && <span aria-label="Nouveautés non lues" style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--color-error)', flexShrink: 0 }} />}
+            Nouveautés
+          </button>
+        )}
+      </div>
       <div>
         <h1 style={{ margin: 0 }}>Tests à faire</h1>
         <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>
@@ -237,6 +258,19 @@ export function E121ManualTests() {
             </section>
             <Button fullWidth onClick={saveResult} disabled={!canSubmit}>Enregistrer</Button>
             <Button variant="secondary" fullWidth onClick={() => setSelectedTest(null)}>Annuler</Button>
+          </div>
+        </div>
+      )}
+      {showWhatsNew && (
+        <div role="dialog" aria-modal="true" aria-label="Nouveautés" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Nouveautés</h2>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+              {WHATS_NEW.map((update, index) => (
+                <li key={index}>{update}</li>
+              ))}
+            </ul>
+            <Button fullWidth onClick={closeWhatsNew}>Fermer</Button>
           </div>
         </div>
       )}

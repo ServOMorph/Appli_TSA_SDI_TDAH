@@ -16,6 +16,13 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 13 septembre 2026, `/deploy_dev` (déploiement sur un site de test séparé, sans impact sur la
+production) a été exécuté avec succès pour la première fois. À cette occasion, un défaut a été
+repéré et corrigé : la fenêtre « Nouveautés » qui annonce les derniers changements n'était visible
+qu'à la toute première ouverture de l'application, jamais revue ensuite — un utilisateur ayant déjà
+créé son compte, comme Marie, ne pouvait donc jamais la consulter. Un bouton « Nouveautés », avec un
+point rouge tant qu'il y a du nouveau à lire, a été ajouté en haut de l'écran « Tests à faire ».
+
 Le 13 septembre 2026, deux roadmaps achevées ou abandonnées ont été rangées. Le dispositif
 d'accueil des testeurs (`roadmap_integration_onboard.md`, six phases toutes réalisées) est archivé.
 La suppression de la catégorie « Tâche du jour » (`roadmap_supprimer_tache_du_jour.md`) est retirée

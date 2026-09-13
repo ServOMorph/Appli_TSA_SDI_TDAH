@@ -31,7 +31,7 @@ describe('E121ManualTests', () => {
   it('affiche les tests nouveaux avec une pastille rouge', () => {
     renderWithApp(<E121ManualTests />)
 
-    for (const category of ['Accueil / Planning', 'Tâches', 'Outils : Budget', 'Outils : Listes', 'Énergie', 'Paramètres / Profil']) {
+    for (const category of ['Accueil / Planning', 'Tâches', 'Outils : Budget', 'Outils : Listes', 'Outils : autres', 'Énergie', 'Paramètres / Profil']) {
       expandCategory(category)
     }
 
@@ -165,6 +165,40 @@ describe('E121ManualTests', () => {
     expect(screen.getByRole('heading', { name: 'Historique' })).toBeInTheDocument()
     expect(screen.getByText('Le bouton est absent.')).toBeInTheDocument()
     expect(within(screen.getByRole('region', { name: 'Historique du test' })).getAllByText('Non validé')).toHaveLength(2)
+  })
+
+  it('affiche un point rouge sur Nouveautés tant que la version courante n’a pas été vue', () => {
+    renderWithApp(<E121ManualTests />)
+
+    expect(screen.getByLabelText('Nouveautés non lues')).toBeInTheDocument()
+  })
+
+  it('affiche les nouveautés au clic sur le bouton dédié', () => {
+    renderWithApp(<E121ManualTests />)
+
+    expect(screen.queryByRole('dialog', { name: 'Nouveautés' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Voir les nouveautés' }))
+
+    expect(screen.getByRole('dialog', { name: 'Nouveautés' })).toBeInTheDocument()
+  })
+
+  it('ferme les nouveautés et retire le point rouge au clic sur Fermer', () => {
+    renderWithApp(<E121ManualTests />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Voir les nouveautés' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+
+    expect(screen.queryByRole('dialog', { name: 'Nouveautés' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Nouveautés non lues')).not.toBeInTheDocument()
+  })
+
+  it('n’affiche pas de point rouge si la version courante a déjà été vue', () => {
+    const version = import.meta.env.VITE_APP_VERSION ?? 'dev'
+    localStorage.setItem('whats_new_seen_version', version)
+    renderWithApp(<E121ManualTests />)
+
+    expect(screen.queryByLabelText('Nouveautés non lues')).not.toBeInTheDocument()
   })
 
 })

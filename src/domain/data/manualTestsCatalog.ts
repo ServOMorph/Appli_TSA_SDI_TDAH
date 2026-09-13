@@ -595,4 +595,15 @@ export const manualTestsCatalog: ManualTest[] = [
       'Touchez « ← Retour » puis rouvrez « Vie privée » : la case doit être restée dans le même état.',
     ],
   },
+  {
+    id: 'consulter-les-nouveautes',
+    title: 'Consulter les nouveautés depuis l’écran Tests à faire',
+    category: 'Outils : autres',
+    steps: [
+      'Sur l’écran « Tests à faire », en haut à côté de « ← Retour », repérez le bouton « Nouveautés » : un point rouge doit être visible dessus.',
+      'Touchez « Nouveautés » : une fenêtre s’ouvre au centre de l’écran avec la liste des changements récents.',
+      'Touchez « Fermer » : la fenêtre se ferme et le point rouge a disparu du bouton.',
+      'Quittez l’écran puis revenez sur « Tests à faire » : le point rouge ne doit plus réapparaître tant qu’aucune nouveauté n’a été ajoutée.',
+    ],
+  },
 ]

@@ -34,6 +34,10 @@ Sur la fiche d'une tâche, toucher une catégorie de couleur l'affiche maintenan
 
 Sur l'écran de création d'une tâche (bouton « Ajouter une tâche »), les champs Icône, Couleur, Date, Horaire et Coût en énergie sont maintenant repliés par défaut : ils s'affichent en petites cases, comme sur la fiche d'une tâche déjà créée. Toucher une case la déplie, choisir une valeur la replie aussitôt.
 
+## Bouton Nouveautés sur l'écran Tests à faire
+
+Un bouton « Nouveautés » est ajouté en haut de l'écran « Tests à faire », à côté de « ← Retour ». Un point rouge s'affiche dessus tant qu'il y a du nouveau à lire. Toucher le bouton ouvre une fenêtre au centre de l'écran avec la liste des derniers changements ; toucher « Fermer » referme la fenêtre et retire le point rouge.
+
 ## Sauvegarde autonome de vos données
 
 Pour sauvegarder vos données vous-même : Paramètres > Export et import > « Exporter en JSON ». Le fichier téléchargé contient vos tâches, listes, budget et réglages ; il ne contient pas l'historique de vos retours déjà envoyés au développeur (ce sont des données de test, pas des données à restaurer).

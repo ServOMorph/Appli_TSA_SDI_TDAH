@@ -2,19 +2,11 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
-
-const WHATS_NEW: string[] = [
-  'Création d\'une tâche : les champs Icône, Couleur, Date, Horaire et Coût en énergie se replient maintenant en petites cases, comme sur la fiche d\'une tâche déjà créée. Toucher une case la déplie, choisir une valeur la replie.',
-]
-
-const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
-const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'
+import { WHATS_NEW, hasUnseenWhatsNew, markWhatsNewSeen } from '@/domain/data/whatsNew'
 
 export function E01Welcome() {
   const { goTo } = useApp()
-  const [showWhatsNew, setShowWhatsNew] = useState(
-    () => WHATS_NEW.length > 0 && localStorage.getItem(WHATS_NEW_SEEN_STORAGE_KEY) !== WHATS_NEW_VERSION,
-  )
+  const [showWhatsNew, setShowWhatsNew] = useState(hasUnseenWhatsNew)
 
   return (
     <main
@@ -49,7 +41,7 @@ export function E01Welcome() {
           <WhatsNewModal
             updates={WHATS_NEW}
             onClose={() => {
-              localStorage.setItem(WHATS_NEW_SEEN_STORAGE_KEY, WHATS_NEW_VERSION)
+              markWhatsNewSeen()
               setShowWhatsNew(false)
             }}
           />

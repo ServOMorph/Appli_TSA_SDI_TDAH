@@ -1,3 +1,8 @@
+## v5.132 — 2026-09-13
+
+### Ajouté
+- **Point d'entrée « Nouveautés » sur l'écran « Tests à faire ».** La modale « Nouveautés » n'était visible qu'à l'onboarding (`E01Welcome.tsx`), jamais revue par un utilisateur déjà onboardé (Marie) : `AppContext.tsx` ne route vers cet écran que si aucun utilisateur n'existe en local. Correctif : bouton « Nouveautés » (point rouge tant que la version courante n'a pas été vue) ajouté en haut de l'écran « Tests à faire » (`E121ManualTests.tsx`), ouvrant une modale centrée (`modalOverlay`/`modalBox`) — la modale de l'onboarding reste inchangée. Contenu partagé via `src/domain/data/whatsNew.ts` (source unique). Test manuel `consulter-les-nouveautes` ajouté au catalogue in-app. Suite complète 859/859 verts, `tsc -b` + lint clean. Reste dû, hors code : déploiement.
+
 ## v5.131 — 2026-09-13
 
 ### Modifié

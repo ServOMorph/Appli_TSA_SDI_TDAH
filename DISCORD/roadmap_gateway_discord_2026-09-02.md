@@ -29,7 +29,7 @@ L'agent DISCORD est **l'unique passerelle** entrée/sortie Discord.
 
 - Identité « Rayonne Toi » (`rayonnetoi_59304`, id `1368654289584656394`) : supposée Marie par
   `message_marie.py`, comportement observé = compte de test. À confirmer avant tout envoi réel.
-- Double canal vers Marie : bridge ROBERTO (`POST /send`, `CLAUDE.md`) vs Discord. À unifier.
+- Canal unique vers Marie : Discord via la gateway.
 - Point de défaillance unique : si l'agent DISCORD ne tourne pas, l'`outbox/` s'accumule sans
   livraison. Tradeoff assumé ; l'`outbox/` est durable et rejouée au démarrage.
 

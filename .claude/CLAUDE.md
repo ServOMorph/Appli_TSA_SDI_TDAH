@@ -132,33 +132,6 @@ Chaque session est un agent gateway dont le nom est sa zone (`Appli_TSA_SDI_TDAH
   explicite de l'utilisateur** — `python DISCORD/discord_com/gateway.py poll --agent
   orchestrateur`, traiter, puis `ack`. Aucun hook, aucun relevé automatique.
 
-### Bridge ROBERTO (assistant vocal téléphone, partagé)
-Le bridge assistant vocal est partagé et hébergé par le projet Roberto
-(`D:\ServOMorph\Roberto\com_telephone\`). Ce projet n'en contient qu'un raccordement léger :
-`ROBERTO/com_telephone/README.md` (détail) et la commande `/roberto` (`.claude/commands/roberto.md`)
-qui met la session en écoute du log TSA.
-
-**Périmètre depuis le 2026-09-02** : le canal des **messages produit à Marie** est Discord via la
-gateway (voir § Messages pour Marie). Le bridge ROBERTO reste le canal **vocal / de secours** avec
-l'utilisateur (Morphéus) — questions/validations quand le bridge est actif, convention `!<commande>` —
-et n'est plus le vecteur des messages à Marie.
-
-- **Log surveillé** : `D:\ServOMorph\Roberto\com_telephone\voice-code-bridge\server\logs\messages_tsa.log`.
-  Le verrou du Monitor actif est `ROBERTO/com_telephone/_commands/monitor_tsa.lock` (se fier à ce
-  fichier, jamais à la mémoire de conversation).
-- **`POST /send` obligatoirement avec `"project": "tsa"`** (`http://127.0.0.1:5000/send`, loopback
-  uniquement). Une requête sans `project` valide est rejetée en HTTP 400.
-- Dès que le bridge est actif : toute question destinée à l'utilisateur (décision, choix,
-  validation) passe par `POST /send` (avec `options`/`recommended` si choix fermé), jamais par une
-  question bloquante terminal. Toute réponse à un message reçu via le log repart par `POST /send`,
-  même si elle est déjà écrite dans la conversation Claude Code (canaux étanches).
-- **Convention `!<commande>`** : un message téléphone commençant par `!` (ex. `!close`) est une
-  instruction directe — appliquer `.claude/commands/<commande>.md` de ce projet, reste du message =
-  arguments, actions git incluses sans confirmation terminal supplémentaire (l'envoi depuis le
-  téléphone vaut confirmation). Commande inconnue : le signaler par `POST /send` plutôt que deviner.
-- Prérequis : les 3 process partagés doivent tourner (démarrés côté Roberto via
-  `com_manager.py start`). Rien à lancer depuis ce projet.
-
 ### Communication Discord : par la gateway uniquement
 Depuis le 2026-09-02, **tout envoi Discord** (Marie, Morphéus, canal) — quel que soit l'agent
 (orchestrateur, design, commandes) — passe par la gateway : dépôt via

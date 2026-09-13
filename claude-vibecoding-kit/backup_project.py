@@ -1,6 +1,7 @@
 """Copie explicite des fichiers absents de la branche GitHub suivie."""
 
 import argparse
+import fnmatch
 import json
 import os
 import subprocess
@@ -28,11 +29,27 @@ EXCLUDED_PARTS = {
     "htmlcov",
     ".netlify",
     "tmp",
+    "donnees_testeurs",
+}
+SENSITIVE_FILE_PATTERNS = {
+    ".env",
+    ".env.*",
+    "*.pem",
+    "*.key",
+    "*.p12",
+    "*.pfx",
+    "credentials*.json",
+    "token*.json",
+    "rclone.conf",
+    "settings.local.json",
+    "SECRETS.local.md",
 }
 
 
 def is_excluded(path: Path) -> bool:
-    return any(part in EXCLUDED_PARTS for part in path.parts)
+    return any(part in EXCLUDED_PARTS for part in path.parts) or any(
+        fnmatch.fnmatch(path.name, pattern) for pattern in SENSITIVE_FILE_PATTERNS
+    )
 
 
 def git_paths(project_path: Path, *args: str) -> list[Path]:
@@ -56,8 +73,10 @@ def non_public_files(project_path: Path) -> list[str]:
     )
     files: set[str] = set()
     for candidate in candidates:
+        if is_excluded(candidate):
+            continue
         absolute = project_path / candidate
-        if absolute.is_file() and not is_excluded(candidate):
+        if absolute.is_file():
             files.add(candidate.as_posix())
     return sorted(files)
 
@@ -76,14 +95,16 @@ def write_manifest(project_path: Path) -> list[str]:
     return files
 
 
-def read_config() -> str:
+def read_config() -> tuple[str, str]:
     try:
-        remote = json.loads(CONFIG.read_text(encoding="utf-8"))["remote"].strip()
+        config = json.loads(CONFIG.read_text(encoding="utf-8"))
+        remote = config["remote"].strip()
+        drive_folder = config["folder"].strip()
     except (FileNotFoundError, KeyError, json.JSONDecodeError, AttributeError) as error:
         raise RuntimeError(f"Compte Google Drive non configuré dans {CONFIG}.") from error
-    if not remote:
+    if not remote or not drive_folder or drive_folder in {".", ".."} or "/" in drive_folder or "\\" in drive_folder:
         raise RuntimeError(f"Compte Google Drive non configuré dans {CONFIG}.")
-    return remote
+    return remote, drive_folder
 
 
 def main() -> int:
@@ -97,7 +118,9 @@ def main() -> int:
     parser.add_argument("project_path", type=Path)
     parser.add_argument("--refresh-list", action="store_true")
     parser.add_argument("--show-list", action="store_true")
-    parser.add_argument("--upload", action="store_true")
+    operation = parser.add_mutually_exclusive_group()
+    operation.add_argument("--upload", action="store_true")
+    operation.add_argument("--check", action="store_true")
     args = parser.parse_args()
     project_path = args.project_path.resolve()
 
@@ -115,6 +138,7 @@ def main() -> int:
             files = MANIFEST.read_text(
                 encoding="utf-8", errors="surrogateescape"
             ).splitlines()
+            files = [file for file in files if not is_excluded(Path(file))]
     except (OSError, RuntimeError) as error:
         print(f"ERREUR : {error}")
         return 1
@@ -124,7 +148,7 @@ def main() -> int:
         for relative in files:
             print(relative)
 
-    if not args.upload:
+    if not args.upload and not args.check:
         return 0
     if not files:
         print("Aucun fichier absent de la branche GitHub suivie à copier.")
@@ -133,23 +157,19 @@ def main() -> int:
         print(f"ERREUR : rclone introuvable à {RCLONE}")
         return 1
 
-    remote = read_config()
-    drive_dest = f"{remote}:BackUps/{project_path.name}"
-    command = [
-        str(RCLONE),
-        "copy",
-        str(project_path),
-        drive_dest,
-        "--files-from-raw",
-        str(MANIFEST),
-    ]
+    remote, drive_folder = read_config()
+    drive_dest = f"{remote}:BackUps/{drive_folder}"
+    command = [str(RCLONE), "check" if args.check else "copy", str(project_path), drive_dest]
+    if args.check:
+        command.append("--one-way")
+    command += ["--files-from-raw", str(MANIFEST)]
     result = subprocess.run(
         command, capture_output=True, text=True, encoding="utf-8", errors="replace"
     )
     if result.returncode != 0:
-        print(f"ERREUR upload : {result.stderr.strip()}")
+        print(f"ERREUR {'contrôle' if args.check else 'upload'} : {result.stderr.strip()}")
         return 1
-    print(f"Copie OK : {len(files)} fichier(s) vers {drive_dest}")
+    print(f"{'Contrôle' if args.check else 'Copie'} OK : {len(files)} fichier(s) vers {drive_dest}")
     return 0
 
 

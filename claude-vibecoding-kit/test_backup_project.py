@@ -30,7 +30,10 @@ def test_is_excluded_artefacts_regenerables():
 def test_is_excluded_conserve_les_vraies_sources():
     assert not bp.is_excluded(Path("src/app.py"))
     assert not bp.is_excluded(Path("e2e/specs/onboarding.spec.ts"))
-    assert not bp.is_excluded(Path(".env"))
+    assert bp.is_excluded(Path(".env"))
+    assert bp.is_excluded(Path(".claude/rclone.conf"))
+    assert bp.is_excluded(Path("donnees_testeurs/marie/export.json"))
+    assert bp.is_excluded(Path("SECRETS.local.md"))
     assert not bp.is_excluded(Path("donnees_marie/registre.json"))
 
 
@@ -56,7 +59,7 @@ def test_non_public_files_exclut_les_artefacts(monkeypatch, tmp_path):
 
     monkeypatch.setattr(bp, "git_paths", lambda project_path, *args: reponses[args])
 
-    assert bp.non_public_files(tmp_path) == [".env", "src/app.py"]
+    assert bp.non_public_files(tmp_path) == ["src/app.py"]
 
 
 def _git(cwd, *args):

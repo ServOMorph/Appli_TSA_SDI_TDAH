@@ -9,8 +9,7 @@ La gateway est operationnelle des deux cotes :
 Doc : DISCORD/discord_com/gateway/README.md.
 
 DECISIONS MORPHEUS (2026-09-02) — actees, integrees
-1. Canal Marie = Discord via la gateway. Le bridge ROBERTO (POST /send) devient secours/vocal,
-   plus le canal principal des messages produit a Marie.
+1. Canal Marie = Discord via la gateway. L'intégration bridge ROBERTO a été retirée du projet.
 2. Identite « Rayonne Toi » (id 1368654289584656394) = bien Marie. La reponse en attente
    (gateway/state.json -> pending_reply) est exploitable telle quelle.
 
@@ -26,9 +25,8 @@ CE QUE TU DOIS FAIRE (Phase 3, cote orchestrateur — hors de mon perimetre)
    pointer vers DISCORD/discord_com/gateway/README.md.
 3. Retirer les appels directs (message_marie.py, claude_bridge) de tes commandes :
    deploy.md, analyser_googledoc.md, et toute autre qui poste sur Discord.
-4. CLAUDE.md — sections « Messages pour Marie » et « Bridge ROBERTO » : elles imposent
-   aujourd'hui POST /send project:tsa pour Marie. Avec la decision 1, les aligner sur
-   « canal Marie = Discord via gateway ». Sans ca, l'instruction existante contredit la cible.
+4. CLAUDE.md — vérifier que les sections « Messages pour Marie » restent alignées sur
+   « canal Marie = Discord via gateway ».
 5. Cablage /discord_loop : a l'etape 3b de .claude/commands/discord_loop.md (perimetre racine),
    si le message recu n'est pas pour l'agent DISCORD, le passer a
    gateway.route_inbound(author_id, author_name, content) puis reboucler sur wait sans send.

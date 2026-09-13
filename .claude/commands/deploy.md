@@ -17,7 +17,25 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    porte que sur celui de Marie (`donnees_testeurs/marie/`), seule testeuse dont les retours
    conditionnent le déploiement (roadmap_integration_onboard.md § Phase 6). `/traiter_export_marie`
    ne subsiste que comme repli manuel (voir son en-tête) et ne fait pas partie de ce flux.
-   1. Rafraîchir la sauvegarde locale du dernier snapshot Supabase de Marie (idempotent — ne
+   1. Alerter Marie en urgence, avant toute autre analyse : lui demander d'exporter ses données
+      maintenant (Paramètres > Export et import > Exporter en JSON), avant qu'une nouvelle version
+      ne soit disponible. Objectif : lui laisser le temps de sauvegarder son état courant avant
+      que la suite de `/deploy` ne rende une nouvelle version accessible (cf. incident du
+      2026-09-13 — import d'un ancien fichier sans export préalable, perte de données locales,
+      `COMMUNICATION/Marie/historique_conversation_marie.md`). Rédiger le corps (gabarit CLAUDE.md
+      § Messages pour Marie, fond seul, sans `💻🤖` ni tag) et déposer en urgence :
+      ```
+      python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie \
+        --kind question --expect-reply --urgent --file <corps.txt>
+      ```
+      Mode urgent justifié : fenêtre de risque réelle, le reste de `/deploy` ne doit pas attendre
+      la relecture normale du gardien de sortie (cf. CLAUDE.md § Communication Discord, « mode
+      urgent »). Consigner immédiatement le message dans
+      `COMMUNICATION/Marie/historique_conversation_marie.md` et committer cette mise à jour
+      séparément, sujet `chore(orchestrateur): /deploy étape 0.1 — alerte export Marie` (pied
+      `Co-Authored-By` habituel). Ne pas attendre sa réponse ici : sa confirmation est
+      recontrôlée juste avant le build, à l'étape 4ter.
+   2. Rafraîchir la sauvegarde locale du dernier snapshot Supabase de Marie (idempotent — ne
       réécrit rien si `/start` l'a déjà produite cette session), en chargeant `.env` dans le seul
       environnement de la commande :
       ```
@@ -26,7 +44,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       Échec (hors ligne, Supabase indisponible) : le signaler en une ligne et poursuivre avec le
       snapshot le plus récent déjà présent dans `donnees_testeurs/marie/`. Ne jamais copier ni
       modifier un fichier de `donnees_testeurs/` à la main (donnée sensible listée dans `CLAUDE.md`).
-   2. Analyser le dernier snapshot de `donnees_testeurs/marie/` dans son intégralité (toutes les
+   3. Analyser le dernier snapshot de `donnees_testeurs/marie/` dans son intégralité (toutes les
       tables du payload JSON, pas seulement `manual_test_results`). La lecture de ce snapshot est
       explicitement autorisée ici — dérogation bornée à cette étape de `/deploy` de l'interdiction
       `CLAUDE.md` § Données sensibles. Ne jamais afficher son contenu brut ni recopier de données
@@ -36,29 +54,29 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
         du reste du payload avec le snapshot précédent analysé) ;
       - frictions signalées par Marie elle-même (commentaires des résultats `nok` dans
         `manual_test_results`).
-   3. Ingérer les résultats de tests via
+   4. Ingérer les résultats de tests via
       `python scripts/ingest_manual_tests.py <dernier snapshot> --tester marie`
       (dédoublonnage par `id`, jamais d'écrasement d'une entrée existante).
-   4. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
+   5. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
       réconcilie `_contexte/marie_modifications_suivi.md` et pose le jalon daté « Dernière exécution
       de la revue » dans l'en-tête du registre (contrôlé à l'étape 3.9). Présenter ensuite à
       l'utilisateur le compte-rendu qu'elle rend (en-tête « analyse requise » / « réconciliation
       seule » / « Doc inchangé », différentiel d'états du registre, date comparée) : ne jamais
       enchaîner à l'étape 1 sans l'avoir affiché. Si le compte-rendu est **« analyse requise »**
       (au moins une demande numérotée nouvelle ou au texte modifié dans le Doc) : s'arrêter après
-      la réconciliation et le commit de bookkeeping (étape 0.5), et demander à l'utilisateur de
+      la réconciliation et le commit de bookkeeping (étape 0.6), et demander à l'utilisateur de
       lancer `/analyser_googledoc` avant de reprendre `/deploy`. Un compte-rendu
       **« réconciliation seule »** (Doc touché mais aucune demande nouvelle ni modifiée — p. ex.
       Marie a seulement retiré des lignes déjà livrées) ne bloque pas : poursuivre.
-   5. Commit du bookkeeping de l'étape 0. Si l'étape 0.3 (ingest) ou la réconciliation du registre
-      à l'étape 0.4 ont modifié `_contexte/tests_journaux/marie.json` ou
+   6. Commit du bookkeeping de l'étape 0. Si l'étape 0.4 (ingest) ou la réconciliation du registre
+      à l'étape 0.5 ont modifié `_contexte/tests_journaux/marie.json` ou
       `_contexte/marie_modifications_suivi.md`, les `git add` nommément (jamais `git add -A`) et
       les committer maintenant, sujet
       `chore(orchestrateur): /deploy étape 0 — ingest résultats Marie + réconciliation registre`
-      (pied `Co-Authored-By` habituel). Ainsi un arrêt en 0.4 (« analyse requise ») ou en 0.8
+      (pied `Co-Authored-By` habituel). Ainsi un arrêt en 0.5 (« analyse requise ») ou en 0.9
       laisse malgré tout un arbre de travail propre et la vérification bloquante 3.1 reste
       atteignable au redémarrage, sans résidu de `/deploy`.
-   6. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
+   7. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
       relire les dernières entrées de `COMMUNICATION/Marie/historique_conversation_marie.md` et
       les messages non traités de `gateway/inbox/orchestrateur/`
       (`python DISCORD/discord_com/gateway.py poll --agent orchestrateur`, sans `ack` — relevé de
@@ -66,10 +84,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       la version cible : signaler toute demande, remarque ou confirmation de Marie touchant ces
       changements qui ne serait couverte ni par le code livré, ni par l'inventaire de communication
       à venir (étape 10).
-   7. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
+   8. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
       incohérence, ni friction bloquante, ni changement non revu du Google Doc, ni sujet Discord
       oublié : continuer normalement à l'étape 1.
-   8. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
+   9. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
       les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
       snapshots ou fichiers d'export de `donnees_testeurs/marie/` pour « résoudre » un problème
       constaté — toute correction porte sur le code ou le journal projet, jamais sur les données
@@ -116,7 +134,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       déploiement de production depuis une autre branche n'est pas autorisé.
    9. **Revue du Google Doc exécutée cette session** :
       `grep -m1 '^- Dernière exécution de la revue :' _contexte/marie_modifications_suivi.md`. La date
-      qui suit doit être celle du jour. Sinon, s'arrêter — l'étape 0.4 a été sautée : exécuter
+      qui suit doit être celle du jour. Sinon, s'arrêter — l'étape 0.5 a été sautée : exécuter
       `.claude/revue_googledoc.md` (et présenter son compte-rendu) avant de reprendre.
   10. **Aucune roadmap avec une phase en cours** : lister les `roadmap_*.md` à la racine du projet
       (`ls roadmap_*.md`). Pour chacune, relever les statuts de phase (`[EN COURS]`, `[TODO]`,
@@ -173,6 +191,17 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    5. La redondance avec les revues de session (`/close`) est assumée : cette passe cumulée à
       `high` couvre le lot complet et les interactions entre sessions, qu'aucune revue de session
       n'a examinés ensemble.
+
+4ter. Confirmation de l'export de Marie — gate bloquant côté humain, avant de lancer la dist.
+   Demander explicitement à l'utilisateur si Marie a confirmé avoir exporté ses données
+   (`Paramètres > Export et import > Exporter en JSON`) depuis l'alerte envoyée à l'étape 0.1.
+   - Confirmé par l'utilisateur : poursuivre à l'étape 5.
+   - Pas confirmé, ou pas de réponse : s'arrêter avant le build. Ne jamais lancer `npx vite build`
+     ni le déploiement Netlify tant que cette confirmation n'a pas été donnée explicitement par
+     l'utilisateur.
+   Ne pas trancher seul en consultant `inbox/orchestrateur/` à la place de l'utilisateur : côté
+   zone racine, ce relevé reste une décision explicite de l'utilisateur (CLAUDE.md § Inbox
+   gateway) — la confirmation vient de lui, pas d'un poll automatique.
 
 5. Build :
    ```

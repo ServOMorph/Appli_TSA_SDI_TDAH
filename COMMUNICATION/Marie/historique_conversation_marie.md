@@ -1,7 +1,7 @@
 # Historique de conversation avec Marie
 
-Journal des échanges avec Marie. **Depuis le 2026-09-02, le canal est Discord** (via la gateway
-`DISCORD/discord_com/` ; le bridge ROBERTO reste un secours vocal). Fichier renommé de
+Journal des échanges avec Marie. **Depuis le 2026-09-02, le canal est Discord** via la gateway
+`DISCORD/discord_com/`. Fichier renommé de
 `historique_whatsapp.md` en `historique_conversation_marie.md` le 2026-09-03. Alimenté au fil de
 l'eau : messages composés pour Marie ajoutés dans le tour où ils
 sont rédigés, réponses de Marie ajoutées dans le tour où elles arrivent (l'utilisateur peut aussi
@@ -887,3 +887,17 @@ active pour le juger. Mode urgent créé dans `gateway.py` (`enqueue --urgent` :
 immédiats, bypass du gardien, réservé aux cas bloquants — cf. `gateway/README.md` § Mode urgent,
 `CLAUDE.md` § Communication Discord) sur demande explicite de l'utilisateur. Message envoyé avec
 ce contournement (`approve` puis `drain` manuels), Discord message id `1548287657682141188`.
+
+### 2026-09-13 — réponse de Marie au diagnostic
+
+**Marie ->** (gateway, `inbox/orchestrateur/20260913T111239_395975` ; texte complet transmis par
+l'utilisateur, la gateway tronque à « etc »)
+bah je n'ai plus aucune données, ni les taches que j'avais planifier, ni pour mon budget, je n'ai
+plus rien dans mes listes, fin l'application apparaît vierge, d'habitude quand j'actualise sur
+safari mes données apparaissent là ce n'est pas le cas
+
+_Suite :_ répond à la question de diagnostic du 2026-09-12 (id `20260912T103859_204601`).
+Précisions apportées : écran = l'application entière (vierge, aucune tâche/liste/budget), appareil
+= Safari (comportement habituel : actualiser fait réapparaître les données — ne fonctionne plus
+ici). Pas encore de précision sur un éventuel changement d'appareil/réinstallation/vidage de cache.
+Traitement (analyse, action corrective) non engagé à ce tour — décision de l'utilisateur à prendre.

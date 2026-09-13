@@ -1438,3 +1438,30 @@ Aucune.
 
 ## Question bloquante pour la session suivante
 Aucune.
+---
+## Dernière session (2026-09-13 — /deploy_dev exécuté + correctif angle mort « Nouveautés »)
+
+## Décisions prises
+- Isolation multi-testeurs confirmée par lecture de code : par `device_id`, pas par `tester_code` (aucun risque de mélange Marie/Morphéus).
+- Point d'entrée « Nouveautés » ajouté sur E121 (« Tests à faire »), sur demande explicite, pour corriger l'angle mort : la modale n'était visible qu'à l'onboarding, jamais revu par un utilisateur déjà onboardé comme Marie. Modale centrée (pattern `modalOverlay`/`modalBox`) plutôt que la modale ancrée en bas de `WhatsNewModal`, avec point rouge tant que non lue.
+
+## Livrables produits ou modifiés
+- `src/domain/data/whatsNew.ts` (nouveau) : `WHATS_NEW` + helpers `hasUnseenWhatsNew`/`markWhatsNewSeen`, source unique.
+- `src/ui/screens/onboarding/E01Welcome.tsx` : utilise les helpers partagés, comportement inchangé.
+- `src/ui/screens/tests/E121ManualTests.tsx` : bouton « Nouveautés » + point rouge + modale centrée.
+- `src/ui/screens/tests/E121ManualTests.test.tsx` : 5 tests ajoutés/ajustés.
+- `src/domain/data/manualTestsCatalog.ts` : test manuel `consulter-les-nouveautes` ajouté (catégorie « Outils : autres »).
+- `COMMUNICATION/Marie/a_transmettre.md`, `whatsNew.ts` (`WHATS_NEW`) : entrées ajoutées pour ce changement.
+- Suite complète 859/859 verte, `tsc -b` + lint clean.
+
+## Hypothèses validées / invalidées
+- VALIDÉ : isolation des données par `device_id` (par appareil), indépendante du `tester_code`.
+- VALIDÉ : `/deploy_dev` fonctionne de bout en bout (build, déploiement, fumée HTTP 200).
+- EN ATTENTE : présence effective d'un jeu de données Morphéus en base (cf. [P1] tester_code ci-dessus).
+- Dette signalée (`code-review medium`, non corrigée) : duplication `WhatsNewModal`/modale inline E121 — cf. question ouverte [P3] ci-dessus.
+
+## Prochaine étape exacte
+`/deploy` du lot v5.129 (Phase 2 #37) + ce correctif « Nouveautés », toujours pas exécuté.
+
+## Question bloquante pour la session suivante
+Aucune.

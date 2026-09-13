@@ -1,3 +1,10 @@
+## v5.133 — 2026-09-13
+
+### Modifié
+- **Catalogue de tests manuels vidé (46 → 0), décision explicite de l'utilisateur.** Sauvegarde intégrale sur disque (`Archives/manualTestsCatalog_backup_2026-09-13.md`) avant suppression. Motif : ni Marie ni le développeur ne doivent plus voir ces tests dans l'appli. Rupture de couverture de test (15 tests) réparée par des fixtures factices (`vi.mock`), sans supprimer d'assertion. Conséquence : les parcours de preuve de #35 et #37 (Phases 1-2 de `roadmap_demandes_marie_2026-09-10.md`, codées mais non encore déployées) ont disparu du catalogue, plus rejouables en l'état avant leur prochaine livraison.
+- **`WHATS_NEW` vidé** (`src/domain/data/whatsNew.ts`), même décision : le bouton « Nouveautés » ajouté en v5.132 sur l'écran « Tests à faire » n'a plus rien à afficher et ne s'affiche donc plus (fonctionnalité dormante, pas retirée du code).
+- **Roadmap `roadmap_retours_conversationnels.md` créée** : transformer un retour annoté en fil de discussion (réponse de l'agent, puis clôture explicite par le testeur), 5 phases, aucune démarrée. Suite complète 859/859 verts, `tsc -b` + `eslint` clean.
+
 ## v5.132 — 2026-09-13
 
 ### Ajouté

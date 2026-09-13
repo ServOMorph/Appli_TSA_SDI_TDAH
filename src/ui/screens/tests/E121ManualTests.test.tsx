@@ -4,6 +4,53 @@ import { makeAppContext, renderWithApp } from '@/test/testUtils'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 import { E121ManualTests } from './E121ManualTests'
 
+// Le catalogue réel (src/domain/data/manualTestsCatalog.ts) a été vidé le 2026-09-13 (décision
+// utilisateur, contenu sauvegardé dans Archives/manualTestsCatalog_backup_2026-09-13.md). Ces
+// tests vérifient le comportement de l'écran, pas un contenu réel : catalogue factice, une entrée
+// par catégorie pour couvrir le regroupement, plus une entrée révisée pour couvrir la logique de
+// révision.
+vi.mock('@/domain/data/manualTestsCatalog', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/domain/data/manualTestsCatalog')>()
+  return {
+    ...actual,
+    manualTestsCatalog: [
+      { id: 'fixture-accueil', title: 'Fixture accueil', category: 'Accueil / Planning', steps: ['Étape 1'] },
+      {
+        id: 'menu-actions-tache-simplifie',
+        title: 'Menu d’actions simplifié sur la fiche d’une tâche',
+        category: 'Tâches',
+        revision: 3,
+        steps: ['Étape 1'],
+      },
+      // Test compagnon : garde la catégorie « Tâches » visible une fois le test ci-dessus masqué.
+      { id: 'fixture-tache-secondaire', title: 'Fixture tâche secondaire', category: 'Tâches', steps: ['Étape 1'] },
+      { id: 'fixture-budget', title: 'Fixture budget', category: 'Outils : Budget', steps: ['Étape 1'] },
+      { id: 'creer-une-liste', title: 'Créer une liste', category: 'Outils : Listes', steps: ['Étape 1', 'Étape 2'] },
+      // Test compagnon : garde la catégorie « Outils : Listes » visible une fois le test ci-dessus masqué.
+      { id: 'fixture-liste-secondaire', title: 'Fixture liste secondaire', category: 'Outils : Listes', steps: ['Étape 1'] },
+      { id: 'fixture-autres', title: 'Fixture autres', category: 'Outils : autres', steps: ['Étape 1'] },
+      { id: 'fixture-energie', title: 'Fixture énergie', category: 'Énergie', steps: ['Étape 1'] },
+      { id: 'fixture-parametres', title: 'Fixture paramètres', category: 'Paramètres / Profil', steps: ['Étape 1'] },
+    ],
+  }
+})
+
+// WHATS_NEW (src/domain/data/whatsNew.ts) a été vidé le 2026-09-13 (décision utilisateur). Ces
+// tests vérifient le comportement du bouton/de la pastille « Nouveautés », pas un contenu réel :
+// contenu factice non vide. `hasUnseenWhatsNew` réécrite pour lire ce contenu factice (la version
+// réelle ferme sur le `WHATS_NEW` du module réel, qui reste vide).
+vi.mock('@/domain/data/whatsNew', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/domain/data/whatsNew')>()
+  const FIXTURE_WHATS_NEW = ['Fixture nouveauté pour les tests.']
+  return {
+    ...actual,
+    WHATS_NEW: FIXTURE_WHATS_NEW,
+    hasUnseenWhatsNew: () =>
+      FIXTURE_WHATS_NEW.length > 0 &&
+      localStorage.getItem(actual.WHATS_NEW_SEEN_STORAGE_KEY) !== actual.WHATS_NEW_VERSION,
+  }
+})
+
 afterEach(() => {
   localStorage.clear()
 })

@@ -7,6 +7,20 @@ import type { Task } from '@/domain/entities/task'
 import { makeTask as baseTask } from '@/test/factories'
 import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 
+// Le catalogue réel a été vidé le 2026-09-13 (décision utilisateur, sauvegarde dans
+// Archives/manualTestsCatalog_backup_2026-09-13.md). Ces tests vérifient la pastille « nouveaux
+// tests disponibles », pas un contenu réel : catalogue factice avec une entrée révisée.
+vi.mock('@/domain/data/manualTestsCatalog', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/domain/data/manualTestsCatalog')>()
+  return {
+    ...actual,
+    manualTestsCatalog: [
+      { id: 'fixture-un', title: 'Fixture un', category: 'Outils : Listes', steps: ['Étape 1'] },
+      { id: 'fixture-revise', title: 'Fixture révisé', category: 'Tâches', revision: 2, steps: ['Étape 1'] },
+    ],
+  }
+})
+
 function makeTaskV2(overrides: Partial<Task> = {}): Task {
   return baseTask({
     id: 'taskv2-1',

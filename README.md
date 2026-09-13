@@ -16,6 +16,13 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 13 septembre 2026, le catalogue de tests manuels a été entièrement vidé (les 46 tests
+précédents sauvegardés sur disque avant suppression) sur décision explicite de l'utilisateur, pour
+que ni lui ni Marie ne voient plus ces tests dans l'application. Le bouton « Nouveautés » de
+l'écran « Tests à faire » (voir ci-dessous) n'affiche plus rien pour la même raison. Une nouvelle
+feuille de route a par ailleurs été ouverte pour transformer un retour annoté en un fil de
+discussion avec réponse du développeur, clos par le testeur une fois la modification validée.
+
 Le 13 septembre 2026, `/deploy_dev` (déploiement sur un site de test séparé, sans impact sur la
 production) a été exécuté avec succès pour la première fois. À cette occasion, un défaut a été
 repéré et corrigé : la fenêtre « Nouveautés » qui annonce les derniers changements n'était visible

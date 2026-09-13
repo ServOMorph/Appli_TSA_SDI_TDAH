@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { manualTestsCatalog } from './manualTestsCatalog'
 
 describe('manualTestsCatalog', () => {
-  it('contient au moins un test à faire', () => {
-    expect(manualTestsCatalog.length).toBeGreaterThan(0)
+  // Catalogue vidé le 2026-09-13 (décision utilisateur) : les 46 tests précédents sont
+  // sauvegardés dans Archives/manualTestsCatalog_backup_2026-09-13.md.
+  it('est vide (tests retirés de l’appli le 2026-09-13)', () => {
+    expect(manualTestsCatalog.length).toBe(0)
   })
 
   it('donne un identifiant unique à chaque test', () => {

@@ -1,3 +1,8 @@
+## v5.128 — 2026-09-13
+
+### Modifié
+- **Nettoyage des worktrees Git obsolètes** : suppression de `.worktrees/ONBOARD` (branche `agent/onboard`, jamais fusionnée dans `main` mais contenu déjà retranscrit à la main dans le code applicatif — historique conservé dans `.git`) et `.worktrees/refacto-p1` (déjà fusionné, pur doublon). `.claude/zones.md` et `TESTS/team.md` mis à jour en conséquence. Aucun changement de code applicatif.
+
 ## v5.127 — 2026-09-13
 
 ### Ajouté

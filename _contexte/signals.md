@@ -28,31 +28,28 @@
 - [P2] **Périodicité d'une catégorie de dépense modifiable après création ?** (impact sur l'historique). — fait quand : décision actée avec l'utilisateur — réf : `Archives/roadmap_v5.1.md` § Q à trancher
 - [P3] **Durcir `/discord_loop`** : ajouter un `stop` qui notifie Discord « Claude hors ligne ». — fait quand : la commande `stop` de `/discord_loop` notifie Discord — réf : `.claude/commands/discord_loop.md`, `DISCORD/discord_com/bot.py`
 - [P2] **`.claude/commands/create_memory.md` n'implémente pas l'alias de zone** documenté par `start.md` étape 2c. Correctif délégué à VibeObs. — fait quand : `create_memory.md` reconnaît un premier argument = alias de `.claude/zones.md`, résout le dossier et écrit dans `<dossier>/_contexte/memory.md` — réf : `.claude/commands/create_memory.md`, `.claude/commands/start.md` étape 2c
+- [P3] **Supprimer la branche git `agent/onboard` (149 commits, jamais fusionnée dans `main`) ?** Son worktree (`.worktrees/ONBOARD`) a été supprimé le 2026-09-13 (aucun changement non commité perdu), le contenu produit a déjà été retranscrit à la main dans `main` (`roadmap_integration_onboard.md`). La branche elle-même est conservée par précaution, décision de suppression volontairement différée. — fait quand : décision explicite (suppression ou conservation actée) — réf : `TESTS/team.md`, `roadmap_integration_onboard.md`
 - [P3] **Hook Fin `/close` (sauvegarde Drive) inexécutable en auto-mode** : `backup_project.py --upload` refusé par le classifieur ; à lancer à la main après chaque `/close` racine, ou ajouter une règle d'autorisation Bash dans `.claude/settings.local.json`. Bug préexistant : `read_config()` lève une `RuntimeError` non capturée sous `--upload` si `rclone_backup.json` manque. — fait quand : la sauvegarde Drive repasse automatique OU la procédure manuelle est actée dans `on_close.md` — réf : `_contexte/on_close.md` § Fin, `claude-vibecoding-kit/backup_project.py`
 
-## Dernière session (2026-09-13 — roadmap_fiabilite_sync.md Phases 2-3 livrées et archivée)
+## Dernière session (2026-09-13 — nettoyage worktrees ONBOARD/refacto-p1)
 
 ## Décisions prises
-- Phase 2 (écran `init-error` distinct de `welcome` sur exception d'init) et Phase 3 (filet de sécurité `wipeAllData`) exécutées telles que cadrées dans la roadmap, sans extension de périmètre.
-- Roadmap archivée sur confirmation explicite de l'utilisateur une fois ses 3 phases `[FAIT]`.
-- Finding de la revue de code de session (`hasSignificantData` ignorait `energyEntries`) corrigé avant clôture plutôt que tracé en dette — correction directe, un seul champ ajouté.
+- Suppression des worktrees `ONBOARD` et `refacto-p1` (`.worktrees/`) : `refacto-p1` déjà fusionné dans `main` (ancêtre direct, `f4ac862`), `ONBOARD` sans changement non commité — aucune perte, historique conservé dans `.git`.
+- Suppression de la branche `agent/onboard` (149 commits non fusionnés) explicitement différée à l'utilisateur.
+- `zones.md` et `TESTS/team.md` nettoyés des références `ONBOARD`/`RETOURS` obsolètes.
 
 ## Livrables produits ou modifiés
-- `src/app/AppContext.tsx` : `init-error` sur exception d'init ; `hasSignificantData()` (tasks/listItems/budgetEntries/energyEntries) avant tout `wipeAllData()` déclenché par un onboarding incomplet.
-- `src/App.tsx`, `src/app/navigation.ts`, `src/domain/data/screenCodes.ts(.test.ts)` : câblage de l'écran `init-error` (import statique, registre de codes écran).
-- `src/ui/screens/system/InitError.tsx` : nouvel écran (message rassurant + bouton Réessayer).
-- `src/app/AppContext.test.tsx` : 5 tests ajoutés (init-error sur exception, wipe si base vide, complétion silencieuse si tâche/énergie présente).
-- `roadmap_fiabilite_sync.md` → `Archives/roadmap_fiabilite_sync.md` : archivée, 3 phases `[FAIT]`.
-- `roadmap_demandes_marie_2026-09-10.md` : addendum 2026-09-13 (#37 débloqué, aucune phase créée).
-- `CHANGELOG.md`, `README.md` : bump et synthèse de session.
+- `.claude/zones.md` : retrait des lignes `ONBOARD`/`RETOURS`.
+- `TESTS/team.md` : table Membres vidée, note explicative sur le retrait des deux membres.
+- `.worktrees/ONBOARD`, `.worktrees/refacto-p1` : supprimés (`git worktree remove`, hors périmètre du commit git).
 
 ## Hypothèses validées / invalidées
-- VALIDÉ : la revue de code (medium, diff `738dad3..HEAD`) a trouvé un vrai trou de couverture dans le filet de sécurité Phase 3 (énergie du jour non comptée), corrigé avant clôture.
-- INVALIDÉ : aucun.
-- EN ATTENTE : décision sur l'ouverture d'une phase de code pour #37 (débloqué mais non planifié).
+- VALIDÉ : `refacto-p1` (commit `f4ac862`) est ancêtre direct de `main` — suppression sans perte.
+- VALIDÉ : `ONBOARD` propre (aucun commit local en attente), contenu déjà retranscrit dans `main`.
+- EN ATTENTE : décision sur la suppression de la branche git `agent/onboard`.
 
 ## Prochaine étape exacte
-Aucune roadmap `[EN COURS]` sur la zone racine. Décider si #37 (E21 reprend le mode replié/dépliable d'E22, confirmé par Marie) ouvre une phase de code dédiée.
+Aucune roadmap `[EN COURS]`. Décisions en attente : ouverture d'une phase de code pour #37, suppression ou conservation de `agent/onboard`.
 
 ## Question bloquante pour la session suivante
 Aucune.

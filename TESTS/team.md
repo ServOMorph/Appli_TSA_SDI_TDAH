@@ -8,10 +8,12 @@
 
 ## Membres
 
+Aucun membre actif. `ONBOARD` (worktree supprimé le 2026-09-13, travail intégré dans `main`)
+et `RETOURS` (worktree déjà absent, branche `agent/retours` inexistante) ne sont plus des
+membres actifs de cette équipe.
+
 | Alias | Mode | Worktree | Branche | Rôle |
 |---|---|---|---|---|
-| ONBOARD | sandbox | dédié | `agent/onboard` | Préparer l'accueil de testeurs sans modifier l'application. |
-| RETOURS | code | dédié | `agent/retours` | Concevoir et réaliser le flux de retours annotés. |
 
 ## Contrat de coordination
 

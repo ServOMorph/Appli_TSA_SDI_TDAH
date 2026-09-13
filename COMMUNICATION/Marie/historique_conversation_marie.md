@@ -901,3 +901,47 @@ Précisions apportées : écran = l'application entière (vierge, aucune tâche/
 = Safari (comportement habituel : actualiser fait réapparaître les données — ne fonctionne plus
 ici). Pas encore de précision sur un éventuel changement d'appareil/réinstallation/vidage de cache.
 Traitement (analyse, action corrective) non engagé à ce tour — décision de l'utilisateur à prendre.
+
+**Dév ->**
+N'ouvre plus l'application pour le moment.
+
+Tes données sont sauvegardées de notre côté, rien n'est perdu.
+
+Chaque ouverture de l'application risque d'écraser cette sauvegarde.
+
+On a identifié la cause, on prépare la restauration de tes données.
+
+Je te préviens dès que tu peux la rouvrir.
+
+_Suite :_ envoyé en **mode urgent** (aucune session `discord`/`bot.py` active), id gateway
+`20260913T114451_052775`, Discord `1548660734706065409`, `--expect-reply`. Motif : le diagnostic de
+code ouvert ce jour établit que la synchronisation est exclusivement montante (aucune restauration
+possible depuis le serveur) et que `buildSnapshotPayload` n'a aucune garde contre une base vide —
+une ouverture de l'app après effacement local peut donc écraser la dernière sauvegarde serveur de
+Marie, seule copie récente de ses données. Sauvegarde du 2026-09-12 09h51 UTC vérifiée intacte au
+`/start` du jour (serveur + copie locale archivée).
+
+**Dév ->** (RÉDIGÉ, NON ENVOYÉ — envoi bloqué par le classifieur, en attente de déblocage)
+Correction de mon message précédent : tu peux rouvrir l'application, il n'y a aucun risque.
+
+Tes données ne sont pas perdues. Tout est là : tes tâches, ton budget, tes listes.
+
+Ce qui se passe : il y a deux installations de l'application sur ton téléphone. Une qui contient toutes tes données, une qui est vide. Tu es tombée sur la vide.
+
+Ouvre ce lien dans Safari : https://appli-audhd.netlify.app
+
+Dis-moi si tes données réapparaissent.
+
+Dis-moi aussi comment tu ouvres l'application d'habitude : par une icône sur ton écran d'accueil, ou par Safari ?
+
+_Suite :_ **le message précédent (« n'ouvre plus l'application ») repose sur une hypothèse
+infirmée depuis** — à corriger auprès de Marie dès que l'envoi est possible. Comptage Supabase du
+2026-09-13 (métadonnées et nombres seuls) : l'appareil `192f2411` a synchronisé le jour même à
+11h11 avec 318 tâches, 104 éléments de listes, 78 résultats de tests, budget complet (665 éléments,
+profil créé le 2026-08-12, 28 jours d'usage) — **aucune donnée perdue**. Un second appareil
+`32f1f844` (profil créé le 2026-09-03, 3 jours d'usage seulement, 0 tâche, 6 éléments = liste To Do
+et outils par défaut) a synchronisé une minute plus tard, à 11h12. Marie dispose donc de deux
+installations distinctes (stockages séparés : icône écran d'accueil vs Safari, ou deux URL) et
+consulte la vide. Le risque d'écrasement redouté ne s'est pas matérialisé : les `device_id` étant
+distincts, l'installation vide n'écrase pas la pleine. Écart non expliqué à ce stade : 354 tâches
+au 2026-09-12 09h51 contre 318 au 2026-09-13 11h11.

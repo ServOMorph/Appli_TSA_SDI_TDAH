@@ -1,5 +1,6 @@
 export type Route =
   | { name: 'welcome' }
+  | { name: 'init-error' }
   | { name: 'consent' }
   | { name: 'profile' }
   | { name: 'energy' }
@@ -37,7 +38,7 @@ export type Screen = Route['name']
 export type NavStack = [Route, ...Route[]]
 
 /** Écrans qui repartent d'une pile neuve : y arriver n'empile pas un retour. */
-const ROOT_SCREENS: Screen[] = ['welcome', 'dashboard', 'energy-checkin']
+const ROOT_SCREENS: Screen[] = ['welcome', 'init-error', 'dashboard', 'energy-checkin']
 
 export function isRootScreen(name: Screen): boolean {
   return ROOT_SCREENS.includes(name)

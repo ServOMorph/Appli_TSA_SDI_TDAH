@@ -152,6 +152,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error("Échec de l'initialisation de l'application", error)
+        setStack([{ name: 'init-error' }])
       } finally {
         setLoading(false)
       }

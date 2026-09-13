@@ -4,6 +4,7 @@ import type { Route } from '@/app/navigation'
 
 const ROUTES: Route[] = [
   { name: 'welcome' },
+  { name: 'init-error' },
   { name: 'consent' },
   { name: 'profile' },
   { name: 'energy' },

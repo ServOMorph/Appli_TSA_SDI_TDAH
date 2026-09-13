@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { AppProvider, useApp } from '@/app/AppContext'
 import { E10Dashboard } from '@/ui/screens/dashboard/E10Dashboard'
+import { InitError } from '@/ui/screens/system/InitError'
 import { DevResetButton } from '@/ui/components/DevResetButton'
 import { BottomNav, type BottomNavTab } from '@/ui/components/BottomNav'
 import { ScreenLoading } from '@/ui/components/ScreenLoading'
@@ -96,6 +97,7 @@ const E78BudgetPrevisions = lazy(() =>
 
 export const NO_NAV_SCREENS: Screen[] = [
   'welcome',
+  'init-error',
   'consent',
   'profile',
   'energy',
@@ -152,6 +154,8 @@ export function AppScreens() {
     switch (screen) {
       case 'welcome':
         return <E01Welcome />
+      case 'init-error':
+        return <InitError />
       case 'consent':
         return <E04Consent />
       case 'profile':

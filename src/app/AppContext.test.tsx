@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useState } from 'react'
 import { AppProvider, useApp } from './AppContext'
-import { db } from '@/app/repositories'
+import { db, userRepo } from '@/app/repositories'
 
 /**
  * Les tâches créées par un test (y compris les tests qui s'appuient sur `inboxTasks[0]`
@@ -224,6 +224,25 @@ describe('AppProvider', () => {
     const originalError = console.error
     console.error = () => {}
     expect(() => render(<ScreenIndicator />)).toThrow()
+    console.error = originalError
+  })
+
+  it('affiche init-error si l\'initialisation lève une exception, pas welcome', async () => {
+    const originalError = console.error
+    console.error = () => {}
+    const getFirstSpy = vi.spyOn(userRepo, 'getFirst').mockRejectedValueOnce(new Error('IndexedDB indisponible'))
+
+    render(
+      <AppProvider>
+        <ScreenIndicator />
+      </AppProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.queryByText('loading')).toBeNull()
+    })
+    expect(screen.getByTestId('screen').textContent).toBe('init-error')
+
+    getFirstSpy.mockRestore()
     console.error = originalError
   })
 })

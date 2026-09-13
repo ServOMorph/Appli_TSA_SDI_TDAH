@@ -40,7 +40,7 @@ proposé à l'utilisateur.
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 2 — Erreur d'initialisation visible côté client [TODO]
+## Phase 2 — Erreur d'initialisation visible côté client [FAIT]
 
 **Problème.** `AppContext.tsx` (`useEffect` d'init) : le `catch` se limite à
 `console.error(...)`, invisible pour l'utilisateur. Toute erreur pendant l'init (ouverture
@@ -57,6 +57,19 @@ exception.
 **Tests.** Vitest : mock de `userRepo.getFirst` (ou d'une étape suivante de `init()`) qui rejette
 → vérifier que le stack de navigation n'est pas `welcome` mais l'écran d'erreur dédié. Cas
 nominal (aucun utilisateur, pas d'exception) inchangé, testé en non-régression.
+
+**Fait le 2026-09-13.** Nouvel écran racine `init-error` (`Route`/`Screen` dans `navigation.ts`,
+composant `src/ui/screens/system/InitError.tsx`, import statique dans `App.tsx` — pas de lazy
+loading, pour ne pas dépendre d'un chunk supplémentaire en cas d'échec précoce). Le `catch` de
+l'`useEffect` d'init dans `AppContext.tsx` bascule désormais `setStack([{ name: 'init-error' }])`
+en plus du `console.error` existant ; le cas « aucun utilisateur » (`if (user)` non déclenché)
+reste inchangé sur `welcome`. Écran : message rassurant (données locales non perdues) + bouton
+« Réessayer » qui recharge la page. Test Vitest ajouté (`AppContext.test.tsx`) : `userRepo.getFirst`
+mocké en rejet → écran final `init-error`, pas `welcome`. Effet de bord découvert en testant :
+`SCREEN_CODES` (`screenCodes.ts`, `Record<Route['name'], ScreenCode>`) et sa liste de test
+(`screenCodes.test.ts`) sont un registre exhaustif des écrans navigables, non détecté par `tsc`
+faute d'erreur de type sur l'objet littéral — complétés pour `init-error` (code `E00`). Suite
+complète : 848/848 tests passent.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

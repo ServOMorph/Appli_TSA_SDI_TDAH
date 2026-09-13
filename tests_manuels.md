@@ -37,7 +37,7 @@ une fois observé.
 
 ## Sauvegarde Drive en attente
 
-Manifeste rafraîchi le 2026-09-13 (213 fichiers). L'upload vers Drive n'est pas exécutable en
+Manifeste rafraîchi le 2026-09-13 (218 fichiers). L'upload vers Drive n'est pas exécutable en
 auto-mode (classifieur). À lancer manuellement, dans un terminal normal, depuis la racine du
 projet :
 ```

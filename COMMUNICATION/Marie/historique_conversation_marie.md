@@ -963,3 +963,34 @@ _Suite :_ Confirmation de l'architecture souhaitée pour la modification #37 —
 **Marie ->** ok
 
 _Suite :_ Acknowledgement du message d'urgence de correction (11h44, id `20260913T114451_052775`) — les données ne sont pas perdues, deux installations distinctes. Réponse reçue après envoi du second message de correction (id `20260913T120820_513655`, 12h08) qui confirmait qu'il y a aucun risque à rouvrir l'application.
+
+### 2026-09-13 [16h45 UTC]
+
+**Marie ->** (gateway, `inbox/orchestrateur/20260913T164521_764543`)
+non je l'ouvre par safari, et quand je clique sur le lien que tu m'a envoyer j'ai toujours pas mes
+données. Les données qui apparaissent sont celles que j'ai exporté pour tester, mais toutes mes
+données ne sont pas la
+
+_Suite :_ répond aux deux questions du message du 12h08 (id `20260913T120820_513655`) : elle
+ouvre toujours par Safari (jamais d'icône), et le lien envoyé ne montre pas ses données réelles.
+L'utilisateur l'a jointe directement (hors gateway) : voyant l'appli sans ses données, elle a
+utilisé Paramètres > Export et import > Importer un fichier JSON avec un ancien fichier de test,
+sans avoir exporté son état courant avant — remplacement local irréversible, perte de données
+locale confirmée par l'utilisateur. Vérification serveur (métadonnées et comptages seuls) : le
+dernier snapshot Supabase de l'appareil `192f2411` (13/09 12h36 UTC, 318 tâches, 104 éléments de
+listes, 78 résultats de tests) est resté inchangé depuis — aucune synchronisation montante n'a
+propagé l'import erroné côté serveur. Fichier de restauration reconstruit à partir de ce snapshot
+au format d'export attendu par l'import in-app.
+
+**Dév ->**
+Fichier joint = tes données du 13/09 12h36, avant l'import qui a effacé les tiennes.
+
+Avant d'importer : Paramètres > Export et import > Exporter en JSON. Garde ce fichier de côté.
+
+Ensuite : Paramètres > Export et import > Importer un fichier JSON. Choisis le fichier joint. Confirme le remplacement.
+
+Dis-moi si tes tâches, listes et budget réapparaissent.
+
+_Suite :_ envoyé en **mode urgent** sur demande explicite de l'utilisateur (aucune session
+`discord`/`bot.py` active), id gateway `20260913T190627_713062`, Discord `1548771873414848562`,
+`--expect-reply`, pièce jointe `restauration-marie-2026-09-13-1236z.json`.

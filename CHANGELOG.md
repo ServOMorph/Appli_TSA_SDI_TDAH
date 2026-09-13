@@ -1,3 +1,14 @@
+## v5.127 — 2026-09-13
+
+### Ajouté
+- **Écran `init-error`** (`roadmap_fiabilite_sync.md` Phase 2) : une exception pendant l'initialisation de l'application (ouverture IndexedDB, migration Dexie, quota dépassé) affiche désormais un écran dédié (« vos données ne sont pas perdues, réessayez ») au lieu de laisser l'utilisateur sur l'écran d'un compte neuf, indiscernable d'une vraie perte de données — hypothèse retenue pour le ressenti « j'ai plus mes données » de Marie sur Safari.
+
+### Corrigé
+- **Filet de sécurité sur l'effacement d'un onboarding incomplet** (`roadmap_fiabilite_sync.md` Phase 3) : l'application efface toute la base locale si un compte existe avec l'onboarding non terminé. Avant d'effacer, elle vérifie désormais qu'aucune tâche, élément de liste, entrée de budget ou d'énergie n'existe déjà ; si des données sont présentes malgré l'onboarding incomplet, il est complété silencieusement au lieu de tout effacer.
+
+### Constaté
+- **Incident v5.124 résolu** : Marie a deux installations distinctes de l'application sur son téléphone (icône écran d'accueil et Safari, stockages séparés), et consultait celle qui était vide. Aucune perte de données, ni côté serveur ni côté local. Sa confirmation sur #37 (E21 reprend le mode replié/dépliable d'E22) reste valable ; aucune phase de code encore engagée dessus.
+
 ## v5.126 — 2026-09-12
 
 ### Ajouté

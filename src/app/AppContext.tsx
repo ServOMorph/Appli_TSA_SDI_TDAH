@@ -178,12 +178,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   async function hasSignificantData(): Promise<boolean> {
-    const [taskCount, listItemCount, budgetEntryCount] = await Promise.all([
+    const [taskCount, listItemCount, budgetEntryCount, energyEntryCount] = await Promise.all([
       db.tasks.count(),
       db.listItems.count(),
       db.budgetEntries.count(),
+      db.energyEntries.count(),
     ])
-    return taskCount > 0 || listItemCount > 0 || budgetEntryCount > 0
+    return taskCount > 0 || listItemCount > 0 || budgetEntryCount > 0 || energyEntryCount > 0
   }
 
   async function wipeAllData() {

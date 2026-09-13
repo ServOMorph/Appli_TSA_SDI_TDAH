@@ -300,6 +300,33 @@ describe('AppProvider', () => {
     expect(user?.onboarding_completed).toBe(true)
     expect(await db.tasks.count()).toBe(1)
   })
+
+  it('ne wipe pas une entrée d\'énergie du jour même sans tâche, liste ni budget', async () => {
+    await Promise.all([db.users.clear(), db.energyEntries.clear()])
+    const { unmount } = render(
+      <AppProvider>
+        <ScreenIndicator />
+        <CreateUserButton />
+        <EnergyButton />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'créer' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy'))
+    await userEvent.click(screen.getByRole('button', { name: 'sauvegarder énergie' }))
+    unmount()
+
+    render(
+      <AppProvider>
+        <ScreenIndicator />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    expect(screen.getByTestId('screen').textContent).toBe('dashboard')
+    const user = await userRepo.getFirst()
+    expect(user?.onboarding_completed).toBe(true)
+    expect(await db.energyEntries.count()).toBe(1)
+  })
 })
 
 describe('AppProvider — opérations tâches inbox', () => {

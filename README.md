@@ -16,6 +16,18 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 13 septembre 2026, l'incident signalé par Marie sur la v5.124 est résolu : elle a deux
+installations distinctes de l'application sur son téléphone (une icône sur son écran d'accueil et
+un onglet Safari, chacune avec ses propres données), et elle consultait la vide. Aucune donnée n'a
+été perdue, ni chez elle ni sur le serveur. Sa demande #37 (reprendre sur l'écran de création le
+même mode d'affichage replié/dépliable que la fiche de tâche existante) est confirmée, mais aucun
+développement n'a encore commencé dessus. Dans la foulée, trois défauts de fiabilité révélés par cet
+incident ont été corrigés, sans changement visible pour l'utilisateur : une sauvegarde ne peut plus
+être écrasée par un envoi vide venant d'un appareil neuf ; un problème technique au démarrage
+affiche désormais un message clair (« vos données ne sont pas perdues, réessayez ») au lieu de
+l'écran d'un compte neuf, qui aurait pu inquiéter à tort ; et un compte resté à mi-chemin de sa
+création avec des données déjà présentes ne les efface plus par erreur.
+
 Le 12 septembre 2026, la sixième et dernière phase du dispositif d'accueil des testeurs
 (`roadmap_integration_onboard.md`) a été réalisée : plus aucun script ne dépend du nom d'une
 personne en particulier. Le script de sauvegarde développeur et le journal des résultats de tests

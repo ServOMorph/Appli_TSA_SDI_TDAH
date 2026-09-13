@@ -84,3 +84,10 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   l'incident avant d'agir. **Aucune phase de code sur #37 tant que la réponse à ce diagnostic n'est
   pas reçue** (décision explicite de l'utilisateur, cf. `signals.md`) — le « oui » seul n'est pas
   traité comme un feu vert isolé, à recouper avec sa réponse.
+  **2026-09-13** — Incident v5.124 élucidé et clos (deux installations distinctes sur son
+  téléphone, aucune perte de données ni côté serveur ni côté local ; détail dans
+  `COMMUNICATION/Marie/historique_conversation_marie.md` § 2026-09-13). Marie répond « ok » au
+  message de correction (11h46 UTC) — **le blocage est levé**. Sa confirmation « oui » du
+  2026-09-12 sur l'architecture #37 (E21 reprend le mode replié/dépliable d'E22) reste donc valable
+  et peut être recoupée sans réserve. Aucune phase de code créée à ce stade — reste une décision à
+  prendre (créer une Phase 2 dédiée sur ce lot, ou l'intégrer à une roadmap ultérieure).

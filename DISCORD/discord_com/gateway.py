@@ -330,7 +330,8 @@ def has_pending_reply(author_id) -> bool:
 
 def enqueue(source: str, to: str, body: str, *, kind: str = "info",
             expect_reply: bool = False, meta: dict | None = None,
-            attachment_path: str | None = None, urgent: bool = False) -> str:
+            attachment_path: str | None = None, urgent: bool = False,
+            reply_to_agent: str | None = None) -> str:
     """
     Dépose une demande d'envoi dans l'outbox, en `pending`. Retourne l'id de la demande.
     Rien ne part sur Discord tant que le gardien (agent DISCORD) ne l'a pas `approve`.
@@ -382,6 +383,7 @@ def enqueue(source: str, to: str, body: str, *, kind: str = "info",
         "attachment": attachment,
         "created_at": _now(),
         "urgent": bool(urgent),
+        "reply_to_agent": reply_to_agent or None,
     }, ensure_ascii=False, indent=2))
     if urgent:
         approve(req_id)
@@ -839,7 +841,7 @@ def route_inbound(author_id, author_name: str, content: str,
         pending = _match_pending(load_state(), to)
         code_testeur = _testeur_code_pour_canal(channel_id) or _testeur_code_pour_auteur(author_id)
         if pending:
-            target = pending["source"]
+            target = pending.get("reply_to_agent") or pending["source"]
             reply_to = pending
             purge = True
             routing = "pending"
@@ -952,6 +954,8 @@ def _main() -> None:
     p_enq.add_argument("--urgent", action="store_true",
                        help="bypass le gardien : approve + drain immédiats, envoi réel avant "
                             "le retour de la commande (à réserver aux cas bloquants)")
+    p_enq.add_argument("--reply-to-agent", default=None,
+                       help="agent qui traite les réponses attendues (défaut: source)")
     g = p_enq.add_mutually_exclusive_group(required=True)
     g.add_argument("--text", help="corps du message")
     g.add_argument("--file", help="corps depuis un fichier UTF-8")
@@ -1009,7 +1013,8 @@ def _main() -> None:
             req_id = enqueue(args.source, args.to, body, kind=args.kind,
                              expect_reply=args.expect_reply,
                              attachment_path=args.attachment,
-                             urgent=args.urgent)
+                             urgent=args.urgent,
+                             reply_to_agent=args.reply_to_agent)
         except GatewayError as e:
             raise SystemExit(f"Erreur : {e}")
         if not args.urgent:

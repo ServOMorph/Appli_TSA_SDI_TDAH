@@ -1,6 +1,7 @@
 # Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-13)
 
 ## Contexte chaud
+- **Isolation des données multi-testeurs confirmée par le code : par `device_id`, pas par `tester_code`.** `deviceIdentity.ts` génère un `device_id`/`device_secret` unique en `localStorage` par appareil, utilisé pour l'upsert Supabase (une ligne par appareil) — c'est ce qui isole les données de Morphéus de celles de Marie, indépendamment de toute saisie de code. Le `tester_code` (`E111Profile.tsx`) ne sert qu'au classement des snapshots de dépouillement dev (`donnees_testeurs/<code>/` vs `_sans_code/`) : son absence ne crée aucun risque de mélange de données, seulement une gêne de tri côté dev. Ne change donc pas la nature du [P1] tester_code ci-dessous (toujours bloquant pour le dépouillement), mais clarifie qu'aucune donnée n'est en danger tant qu'il n'est pas saisi.
 - **Incident perte de données Marie (v5.124) résolu — diagnostic du `/close` du 12/09 corrigé.** Le message du 16h45 UTC (traité cette session) a révélé que le diagnostic « deux installations distinctes, aucune perte » était faux : Marie ne voyait plus ses données réelles et a importé par erreur un ancien fichier de test sans exporter son état courant — perte locale réelle. Fichier de restauration reconstruit depuis le dernier snapshot Supabase connu et envoyé en urgence ; **erreur propre détectée et corrigée en cours de session** : ce premier snapshot (13/09 12h36z, 318 tâches/104 listes) était déjà la donnée appauvrie par l'import raté (dernière activité postérieure au déploiement v5.124) — remplacé par le bon snapshot (12/09 09h51z, 354 tâches/116 listes, antérieur au déploiement), renvoyé en urgence. Marie confirme avoir récupéré ses données (dernier message). Garde-fou ajouté à `/deploy` (étapes 0.1 et 4ter, voir ci-dessous) pour éviter la récidive. Détail complet dans `COMMUNICATION/Marie/historique_conversation_marie.md` (entrées 16h45/19h06/19h22/confirmation).
 - **`.claude/commands/deploy.md` modifié : alerte export Marie + gate de confirmation avant build.** Nouvelle étape 0.1 (tout début de `/deploy`) : alerte urgente à Marie pour exporter ses données avant qu'une nouvelle version soit en ligne. Nouvelle étape 4ter (avant le build) : confirmation explicite de l'utilisateur que Marie a exporté, sinon arrêt. Renumérotation 0.1-0.8 → 0.2-0.9, références internes corrigées. **Jamais exercé en conditions réelles** — premier `/deploy` réel à confirmer.
 - **`roadmap_demandes_marie_2026-09-10.md` : Phase 2 (#37) codée (2026-09-13), passée `[FAIT]`** (cohérent avec la Phase 1). `E21CreateTaskV2.tsx` reprend le mode replié/dépliable au tap d'E22. Gates passés (tests, `tsc`, lint, e2e). Reste dû hors code : déploiement (`CHANGELOG.md` v5.129 déjà bumpé) et validation `ok` de Marie sur le parcours `creer-une-tache-bandeau-colore` (`revision: 1`).
@@ -30,23 +31,20 @@
 - [P3] **Hook Fin `/close` (sauvegarde Drive) inexécutable en auto-mode** : `backup_project.py --upload` refusé par le classifieur ; à lancer à la main après chaque `/close` racine, ou ajouter une règle d'autorisation Bash dans `.claude/settings.local.json`. Bug préexistant : `read_config()` lève une `RuntimeError` non capturée sous `--upload` si `rclone_backup.json` manque. — fait quand : la sauvegarde Drive repasse automatique OU la procédure manuelle est actée dans `on_close.md` — réf : `_contexte/on_close.md` § Fin, `claude-vibecoding-kit/backup_project.py`
 - [P3] **Simplification signalée par la revue de code de session (2026-09-13, non corrigée) : `aria-label` redondant sur le champ Heure de début d'`E21CreateTaskV2.tsx`.** Duplique l'association déjà faite par `<label htmlFor="task-start-time">` — dette mineure, `/simplify` à la main de l'utilisateur. — fait quand : redondance retirée ou jugée volontaire — réf : `src/ui/screens/tasks/E21CreateTaskV2.tsx:300`
 
-## Dernière session (2026-09-13 — nettoyage des roadmaps achevée/abandonnée)
+## Dernière session (2026-09-13 — consultation isolation données multi-testeurs, avant /deploy_dev)
 
 ## Décisions prises
-- `roadmap_integration_onboard.md` archivée (accord explicite de l'utilisateur) : `Archives/roadmap_integration_onboard.md`.
-- `roadmap_supprimer_tache_du_jour.md` supprimée (décision explicite de l'utilisateur) : le point d'entrée de sa Phase 3 (ex-D2) sera tranché directement avec Marie, hors suivi système.
+Aucune — session de consultation, pas de décision produit ni technique.
 
 ## Livrables produits ou modifiés
-- `Archives/roadmap_integration_onboard.md` : déplacée depuis la racine (`git mv`).
-- `roadmap_supprimer_tache_du_jour.md` : supprimée (`git rm`).
-- `_contexte/contexte.md` : État actuel + Décisions structurantes mis à jour ; références à `roadmap_integration_onboard.md` corrigées vers son nouveau chemin.
-- `_contexte/signals.md` : question ouverte D2 retirée, réfs vers `roadmap_integration_onboard.md` corrigées.
+Aucun — aucun fichier applicatif touché. Question posée par l'utilisateur (Morphéus a-t-il un jeu de données propre, sans parasiter celui de Marie ?) traitée par lecture de code.
 
 ## Hypothèses validées / invalidées
-Aucune — session de rangement, pas d'investigation technique.
+- VALIDÉ : l'isolation des données en base Supabase repose sur `device_id`/`device_secret` par appareil (`deviceIdentity.ts`), pas sur `tester_code` — aucun risque de mélange entre testeurs tant qu'ils utilisent des appareils distincts.
+- EN ATTENTE : présence effective d'un jeu de données Morphéus en base — indiscernable des appareils `_sans_code/` tant que le `tester_code` n'est pas saisi côté Paramètres > Profil (cf. [P1] ci-dessus).
 
 ## Prochaine étape exacte
-`/deploy` du lot v5.129 (Phase 2 #37), toujours pas exécuté — première exécution réelle des étapes 0.1/4ter (garde-fou export Marie) à observer.
+Reprendre `/deploy_dev` (étapes 1 à 7, build + déploiement sur le site de test). `/deploy` du lot v5.129 (Phase 2 #37) reste par ailleurs toujours pas exécuté.
 
 ## Question bloquante pour la session suivante
 Aucune.

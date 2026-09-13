@@ -943,5 +943,11 @@ profil créé le 2026-08-12, 28 jours d'usage) — **aucune donnée perdue**. Un
 et outils par défaut) a synchronisé une minute plus tard, à 11h12. Marie dispose donc de deux
 installations distinctes (stockages séparés : icône écran d'accueil vs Safari, ou deux URL) et
 consulte la vide. Le risque d'écrasement redouté ne s'est pas matérialisé : les `device_id` étant
-distincts, l'installation vide n'écrase pas la pleine. Écart non expliqué à ce stade : 354 tâches
-au 2026-09-12 09h51 contre 318 au 2026-09-13 11h11.
+distincts, l'installation vide n'écrase pas la pleine. **Écart 354 → 318 tâches élucidé**
+(comparaison de l'archive locale du 12/09 et du serveur du 13/09, sur identifiants et métadonnées
+techniques, autorisation explicite de l'utilisateur) : 37 tâches supprimées dont 31 terminées et 26
+sous-tâches, plus 1 catégorie de budget avec ses 9 entrées (cascade `useBudgetState.ts:107`) et 1
+catégorie de liste avec ses éléments — profil d'un ménage volontaire, pas d'une perte. Aucune
+suppression automatique n'existe dans le code hors les retours de feedback (rétention 30 jours,
+`feedbackRules.ts`). Les résultats de tests manuels passent de 74 à 78 sur la même période :
+Marie a continué à tester dans l'installation pleine entre le 12 et le 13.

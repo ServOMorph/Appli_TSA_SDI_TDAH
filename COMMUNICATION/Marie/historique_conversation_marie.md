@@ -951,3 +951,15 @@ catégorie de liste avec ses éléments — profil d'un ménage volontaire, pas 
 suppression automatique n'existe dans le code hors les retours de feedback (rétention 30 jours,
 `feedbackRules.ts`). Les résultats de tests manuels passent de 74 à 78 sur la même période :
 Marie a continué à tester dans l'installation pleine entre le 12 et le 13.
+
+### 2026-09-12 [09h51 UTC]
+
+**Marie ->** #37 oui
+
+_Suite :_ Confirmation de l'architecture souhaitée pour la modification #37 — la création (E21) doit reprendre le mode replié de la fiche (E22), avec champs en pastilles qui s'ouvrent au clic. Développement lancé suite à cette confirmation.
+
+### 2026-09-13 [11h46 UTC]
+
+**Marie ->** ok
+
+_Suite :_ Acknowledgement du message d'urgence de correction (11h44, id `20260913T114451_052775`) — les données ne sont pas perdues, deux installations distinctes. Réponse reçue après envoi du second message de correction (id `20260913T120820_513655`, 12h08) qui confirmait qu'il y a aucun risque à rouvrir l'application.

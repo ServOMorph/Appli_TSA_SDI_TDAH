@@ -90,6 +90,11 @@ function RefreshButton() {
   return <button onClick={() => refreshDashboard()}>rafraîchir</button>
 }
 
+function InboxCreateButton() {
+  const { createTaskInbox } = useApp()
+  return <button onClick={() => createTaskInbox('Tâche orpheline')}>créer tâche</button>
+}
+
 describe('AppProvider', () => {
   it('démarre en mode loading puis affiche welcome si aucun utilisateur', async () => {
     render(
@@ -244,6 +249,56 @@ describe('AppProvider', () => {
 
     getFirstSpy.mockRestore()
     console.error = originalError
+  })
+
+  it('efface les données si l\'onboarding reste incomplet et la base ne contient rien de significatif', async () => {
+    await Promise.all([db.users.clear(), db.energyEntries.clear()])
+    const { unmount } = render(
+      <AppProvider>
+        <ScreenIndicator />
+        <CreateUserButton />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'créer' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy'))
+    unmount()
+
+    render(
+      <AppProvider>
+        <ScreenIndicator />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    expect(screen.getByTestId('screen').textContent).toBe('welcome')
+    expect(await userRepo.getFirst()).toBeUndefined()
+  })
+
+  it('complète l\'onboarding silencieusement si des données existent malgré onboarding_completed=false', async () => {
+    await Promise.all([db.users.clear(), db.energyEntries.clear()])
+    const { unmount } = render(
+      <AppProvider>
+        <ScreenIndicator />
+        <CreateUserButton />
+        <InboxCreateButton />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'créer' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy'))
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
+    unmount()
+
+    render(
+      <AppProvider>
+        <ScreenIndicator />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    expect(screen.getByTestId('screen').textContent).toBe('energy-checkin')
+    const user = await userRepo.getFirst()
+    expect(user?.onboarding_completed).toBe(true)
+    expect(await db.tasks.count()).toBe(1)
   })
 })
 

@@ -10,7 +10,7 @@ import {
   previousRoute,
   canGoBack as stackCanGoBack,
 } from '@/app/navigation'
-import { energyRepo, settingsRepo, todayDate, userRepo } from '@/app/repositories'
+import { db, energyRepo, settingsRepo, todayDate, userRepo } from '@/app/repositories'
 import { useBudgetState } from '@/app/contexts/useBudgetState'
 import { useEnergyState } from '@/app/contexts/useEnergyState'
 import { useListsState } from '@/app/contexts/useListsState'
@@ -138,12 +138,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         backfillSyncConsentFromHistory()
         const user = await userRepo.getFirst()
         if (user) {
+          let effectiveUser = user
           if (!user.onboarding_completed) {
-            await wipeAllData()
-            return
+            if (await hasSignificantData()) {
+              effectiveUser = { ...user, onboarding_completed: true, updated_at: new Date().toISOString() }
+              await userRepo.update(effectiveUser)
+            } else {
+              await wipeAllData()
+              return
+            }
           }
-          setCurrentUser(user)
-          const s = await settingsRepo.getByUserId(user.id)
+          setCurrentUser(effectiveUser)
+          const s = await settingsRepo.getByUserId(effectiveUser.id)
           if (s) setSettings(s)
           const entry = await energyRepo.getByDate(todayDate())
           await loadAll()
@@ -170,6 +176,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     document.addEventListener('visibilitychange', onVisibilityChange)
     return () => document.removeEventListener('visibilitychange', onVisibilityChange)
   }, [])
+
+  async function hasSignificantData(): Promise<boolean> {
+    const [taskCount, listItemCount, budgetEntryCount] = await Promise.all([
+      db.tasks.count(),
+      db.listItems.count(),
+      db.budgetEntries.count(),
+    ])
+    return taskCount > 0 || listItemCount > 0 || budgetEntryCount > 0
+  }
 
   async function wipeAllData() {
     await clearDatabase()

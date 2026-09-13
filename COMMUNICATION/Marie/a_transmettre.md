@@ -30,6 +30,10 @@ Toucher « Ajouter une tâche » depuis la Réception ne fait plus zoomer la pag
 
 Sur la fiche d'une tâche, toucher une catégorie de couleur l'affiche maintenant sélectionnée tout de suite. Avant, il fallait revenir sur l'accueil et rouvrir la tâche pour le voir.
 
+## Création d'une tâche : les champs se replient comme sur la fiche
+
+Sur l'écran de création d'une tâche (bouton « Ajouter une tâche »), les champs Icône, Couleur, Date, Horaire et Coût en énergie sont maintenant repliés par défaut : ils s'affichent en petites cases, comme sur la fiche d'une tâche déjà créée. Toucher une case la déplie, choisir une valeur la replie aussitôt.
+
 ## Sauvegarde autonome de vos données
 
 Pour sauvegarder vos données vous-même : Paramètres > Export et import > « Exporter en JSON ». Le fichier téléchargé contient vos tâches, listes, budget et réglages ; il ne contient pas l'historique de vos retours déjà envoyés au développeur (ce sont des données de test, pas des données à restaurer).

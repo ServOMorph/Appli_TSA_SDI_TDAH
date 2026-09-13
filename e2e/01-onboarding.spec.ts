@@ -52,6 +52,7 @@ test('T06 — Ajouter une tâche depuis Dashboard vide → visible sur Dashboard
   await page.getByRole('button', { name: 'Ignorer' }).click()
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche onboarding test')
+  await page.getByRole('button', { name: 'Modifier Horaire' }).click()
   await page.getByLabel('Heure de début').fill('09:00')
   await page.getByLabel('Heures', { exact: true }).selectOption('1')
   await page.getByRole('button', { name: 'Valider' }).click()

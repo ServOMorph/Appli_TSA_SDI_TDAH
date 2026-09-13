@@ -9,8 +9,10 @@ test.beforeEach(async ({ page }) => {
 test('T46 — planifier une tâche à la création, puis modifier son horaire depuis sa fiche', async ({ page }) => {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('McDo')
+  await page.getByRole('button', { name: 'Modifier Horaire' }).click()
   await page.getByLabel('Heure de début').fill('10:00')
   await page.getByLabel('Heures', { exact: true }).selectOption('1')
+  await page.getByRole('button', { name: 'Fermer' }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
 
   await expect(page.getByText('McDo')).toBeVisible()
@@ -34,6 +36,7 @@ test('T47 — le planning épuré ne propose plus de grille ni de glisser-dépos
 test('T48 — cliquer une tâche planifiée ouvre sa fiche, renommer et supprimer', async ({ page }) => {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('RDV dentiste')
+  await page.getByRole('button', { name: 'Modifier Horaire' }).click()
   await page.getByLabel('Heure de début').fill('15:00')
   await page.getByLabel('Heures', { exact: true }).selectOption('1')
   await page.getByRole('button', { name: 'Valider' }).click()
@@ -54,8 +57,11 @@ test('T48 — cliquer une tâche planifiée ouvre sa fiche, renommer et supprime
 test('T49 — Reporter une tâche en surcharge la bascule sur le lendemain (E8)', async ({ page }) => {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche lourde')
+  await page.getByRole('button', { name: 'Modifier Horaire' }).click()
   await page.getByLabel('Heure de début').fill('08:00')
   await page.getByLabel('Heures', { exact: true }).selectOption('1')
+  await page.getByRole('button', { name: 'Fermer' }).click()
+  await page.getByRole('button', { name: 'Modifier Coût en énergie' }).click()
   await page.getByRole('group', { name: 'Coût en énergie' }).getByRole('button', { name: '12', exact: true }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
 

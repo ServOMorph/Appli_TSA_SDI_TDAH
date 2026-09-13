@@ -5,13 +5,15 @@ import { IconPicker } from '@/ui/components/IconPicker'
 import { ColorPicker } from '@/ui/components/ColorPicker'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
-import { TaskCardLayout } from '@/ui/components/TaskCardLayout'
+import { TaskCardLayout, TaskFieldCard } from '@/ui/components/TaskCardLayout'
 import { todayDate } from '@/app/repositories'
+import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
-import { pastelBackground } from '@/ui/styles/ambiance'
 import type { Screen } from '@/app/AppContext'
 import type { RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
 import type { TaskStatus } from '@/domain/entities/task'
+
+type FieldKey = 'icon' | 'color' | 'date' | 'time' | 'energy'
 
 type Destination = 'todo' | 'planned'
 
@@ -107,19 +109,6 @@ function energyGridButtonStyle(selected: boolean): React.CSSProperties {
   }
 }
 
-function fieldCellStyle(color: string | null): React.CSSProperties {
-  return {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 'var(--spacing-xs)',
-    padding: 'var(--spacing-md)',
-    borderRadius: 'var(--radius-md)',
-    border: '1px solid var(--color-border)',
-    backgroundColor: color ? pastelBackground(color) : 'var(--color-surface)',
-    minWidth: 0,
-  }
-}
-
 const subTaskRowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -160,6 +149,7 @@ export function E21CreateTaskV2() {
   const [durationMinutes, setDurationMinutes] = useState<number | null>(null)
   const [recurring, setRecurring] = useState(false)
   const [recurrence, setRecurrence] = useState<RecurrenceRuleInput>(DEFAULT_RECURRENCE)
+  const [expandedField, setExpandedField] = useState<FieldKey | null>(null)
   const effectiveDestination = (originScreen ? FORCED_DESTINATION_BY_ORIGIN[originScreen] : undefined) ?? DEFAULT_DESTINATION
   const isPlanned = effectiveDestination === 'planned'
   const hasDuration = durationMinutes != null && durationMinutes > 0
@@ -168,6 +158,10 @@ export function E21CreateTaskV2() {
 
   function returnToOrigin() {
     back('inbox')
+  }
+
+  function toggleField(field: FieldKey) {
+    setExpandedField((current) => (current === field ? null : field))
   }
 
   function addSubTaskEntry() {
@@ -235,39 +229,75 @@ export function E21CreateTaskV2() {
             </div>
           }
         >
-          <div style={fieldCellStyle(color)}>
-            <span style={labelStyle}>Icône</span>
-            <IconPicker value={icon} onChange={setIcon} />
-          </div>
+          <TaskFieldCard
+            label="Icône"
+            value={icon ?? 'Aucune'}
+            color={color}
+            expanded={expandedField === 'icon'}
+            onToggle={() => toggleField('icon')}
+          >
+            <IconPicker
+              value={icon}
+              onChange={(v) => {
+                setIcon(v)
+                setExpandedField(null)
+              }}
+            />
+          </TaskFieldCard>
 
-          <div style={fieldCellStyle(color)}>
-            <span style={labelStyle}>Couleur</span>
-            <ColorPicker value={color} onChange={setColor} categories={taskCategories} />
-          </div>
+          <TaskFieldCard
+            label="Couleur"
+            value={color ?? 'Aucune couleur'}
+            color={color}
+            expanded={expandedField === 'color'}
+            onToggle={() => toggleField('color')}
+          >
+            <ColorPicker
+              value={color}
+              onChange={(v) => {
+                setColor(v)
+                setExpandedField(null)
+              }}
+              categories={taskCategories}
+            />
+          </TaskFieldCard>
 
           {isPlanned && (
-            <div style={fieldCellStyle(color)}>
-              <label htmlFor="task-date" style={labelStyle}>
-                Date
-              </label>
+            <TaskFieldCard
+              label="Date"
+              value={formatFrenchDate(date)}
+              color={color}
+              expanded={expandedField === 'date'}
+              onToggle={() => toggleField('date')}
+            >
               <input
-                id="task-date"
                 type="date"
+                aria-label="Date"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                onChange={(e) => {
+                  setDate(e.target.value)
+                  setExpandedField(null)
+                }}
                 style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
               />
-            </div>
+            </TaskFieldCard>
           )}
 
           {isPlanned && (
-            <div style={fieldCellStyle(color)}>
+            <TaskFieldCard
+              label="Horaire"
+              value={startTime ? `${startTime} (${durationMinutes ?? 0} min)` : 'Non planifié'}
+              color={color}
+              expanded={expandedField === 'time'}
+              onToggle={() => toggleField('time')}
+            >
               <label htmlFor="task-start-time" style={labelStyle}>
                 Heure de début
               </label>
               <input
                 id="task-start-time"
                 type="time"
+                aria-label="Heure de début"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
                 style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
@@ -284,24 +314,35 @@ export function E21CreateTaskV2() {
                   La durée est obligatoire pour planifier la tâche.
                 </p>
               )}
-            </div>
+              <Button fullWidth type="button" onClick={() => setExpandedField(null)}>
+                Fermer
+              </Button>
+            </TaskFieldCard>
           )}
 
-          <div style={fieldCellStyle(color)}>
-            <span style={labelStyle}>Coût en énergie</span>
+          <TaskFieldCard
+            label="Coût en énergie"
+            value={energyCost ?? 'Non défini'}
+            color={color}
+            expanded={expandedField === 'energy'}
+            onToggle={() => toggleField('energy')}
+          >
             <div style={energyGridStyle} role="group" aria-label="Coût en énergie">
               {ENERGY_OPTIONS.map((v) => (
                 <button
                   key={v}
                   type="button"
                   style={energyGridButtonStyle(energyCost === v)}
-                  onClick={() => setEnergyCost((current) => (current === v ? null : v))}
+                  onClick={() => {
+                    setEnergyCost((current) => (current === v ? null : v))
+                    setExpandedField(null)
+                  }}
                 >
                   {v}
                 </button>
               ))}
             </div>
-          </div>
+          </TaskFieldCard>
         </TaskCardLayout>
 
         <div style={fieldGroupStyle}>

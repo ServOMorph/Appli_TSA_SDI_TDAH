@@ -1,3 +1,8 @@
+## v5.129 — 2026-09-13
+
+### Ajouté
+- **Phase 2 `roadmap_demandes_marie_2026-09-10.md` (#37) : E21 reprend le mode compact replié/dépliable d'E22.** `E21CreateTaskV2.tsx` : les champs Icône, Couleur, Date, Horaire (heure + durée réunies) et Coût en énergie, jusqu'ici toujours dépliés en grille, sont désormais des `TaskFieldCard` repliées par défaut (déjà partagé avec E22TaskDetail) — un seul champ ouvert à la fois, fermeture à la sélection pour Icône/Couleur/Date/Énergie, bouton « Fermer » explicite pour Horaire. Parcours in-app `creer-une-tache-bandeau-colore` mis à jour (`revision: 1`). Suite complète 855 tests verts (+4), `tsc -b` + lint clean, e2e 58/59 verts (`10-feedback.spec.ts` T58 en échec, préexistant et confirmé indépendant, hors périmètre). Reste dû, hors code : déploiement et validation `ok` de Marie.
+
 ## v5.128 — 2026-09-13
 
 ### Modifié

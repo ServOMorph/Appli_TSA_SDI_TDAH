@@ -335,14 +335,17 @@ export const manualTestsCatalog: ManualTest[] = [
   },
   {
     id: 'creer-une-tache-bandeau-colore',
-    title: 'Créer une tâche avec le bandeau et les cases colorées',
+    revision: 1,
+    title: 'Créer une tâche avec le bandeau et les cases colorées, repliées comme sur la fiche',
     category: 'Tâches',
     docRefs: [37],
     steps: [
       'Depuis le menu du bas, touchez « Ajouter une tâche » : l’écran de création s’ouvre avec un bandeau en haut portant le champ « Titre de la tâche ».',
-      'Choisissez une icône puis une couleur : le bandeau et les cases en dessous se teintent de cette couleur.',
-      'Activez la planification pour faire apparaître les cases « Date » et « Heure de début » sur la même grille à deux colonnes que « Icône », « Couleur » et « Coût en énergie ».',
-      'Vérifiez que cette présentation (bandeau titre coloré en haut, cases en dessous) est la même que sur la fiche d’une tâche déjà créée.',
+      'Sous le bandeau, vérifiez que les cases « Icône », « Couleur » et « Coût en énergie » sont repliées (elles affichent juste leur nom et « Aucune »/« Non défini », pas la grille de choix).',
+      'Touchez la case « Icône » : elle se déplie avec la grille d’icônes ; choisissez-en une : la case se replie aussitôt et affiche l’icône choisie. Le bandeau se teinte quand vous faites de même avec « Couleur ».',
+      'Touchez une autre case pendant que « Couleur » est encore dépliée (par exemple « Coût en énergie ») : « Couleur » se replie automatiquement, une seule case reste ouverte à la fois.',
+      'Depuis un point d’entrée qui planifie la tâche d’office (accueil ou planning), vérifiez que « Date » et « Horaire » apparaissent aussi repliées dans la même grille à deux colonnes ; dépliez « Horaire », saisissez l’heure et la durée, puis touchez « Fermer » : la case se replie et affiche l’heure et la durée choisies.',
+      'Vérifiez que cette présentation (bandeau titre coloré en haut, cases repliées/dépliables en dessous) est la même que sur la fiche d’une tâche déjà créée.',
     ],
   },
   {

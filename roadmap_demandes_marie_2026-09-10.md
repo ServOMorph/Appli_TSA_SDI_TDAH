@@ -89,5 +89,59 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   `COMMUNICATION/Marie/historique_conversation_marie.md` § 2026-09-13). Marie répond « ok » au
   message de correction (11h46 UTC) — **le blocage est levé**. Sa confirmation « oui » du
   2026-09-12 sur l'architecture #37 (E21 reprend le mode replié/dépliable d'E22) reste donc valable
-  et peut être recoupée sans réserve. Aucune phase de code créée à ce stade — reste une décision à
-  prendre (créer une Phase 2 dédiée sur ce lot, ou l'intégrer à une roadmap ultérieure).
+  et peut être recoupée sans réserve. **Décision (2026-09-13, utilisateur) : Phase 2 dédiée ouverte
+  ci-dessous.**
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
+
+---
+
+## Phase 2 — E21 reprend le mode compact replié/dépliable d'E22 (#37) [FAIT]
+
+- **Constat** : `E21CreateTaskV2.tsx` affiche les champs Icône, Couleur, Date, Heure de début
+  (+Durée) et Coût en énergie en blocs `fieldCellStyle` toujours dépliés — grille de 15 icônes,
+  palette de couleurs et grille d'énergie 1-12 visibles en permanence, long scroll de sections
+  jamais repliées. `E22TaskDetail.tsx` a le même jeu de champs, mais via `TaskFieldCard`
+  (`src/ui/components/TaskCardLayout.tsx`) : replié en pastille compacte (`label` + `value`),
+  dépliage au tap (`expandedField`/`toggleField`), un seul champ ouvert à la fois. Écart confirmé
+  par Marie (captures E21/E22 du 2026-09-12, cf. § Décisions produit ci-dessus).
+- **Fichiers pressentis** : `src/ui/screens/tasks/E21CreateTaskV2.tsx` (remplacer les blocs
+  `fieldCellStyle` par `TaskFieldCard`, ajouter l'état `expandedField`/`toggleField`) ;
+  `src/ui/components/TaskCardLayout.tsx` réutilisé tel quel (déjà partagé par E22).
+- **Périmètre** : Icône, Couleur, Date, Horaire (heure + durée réunies sous un seul champ, comme
+  dans E22), Coût en énergie. Sous-tâches, Description, Obligatoire et Récurrence restent hors
+  périmètre — non visés par le constat (blocs de saisie simples, pas des sélecteurs en grille) et
+  non repliés dans E22 lui-même pour Sous-tâches/Obligatoire/Récurrence.
+- **Comportement** : un seul champ ouvert à la fois. Icône/Couleur/Date/Énergie se referment dès la
+  sélection d'une valeur (pas de sauvegarde asynchrone à attendre côté création, contrairement à
+  E22). Horaire se referme sur une action explicite (bouton, par symétrie avec le bouton
+  « Enregistrer » d'E22) car deux champs (heure, durée) s'y saisissent successivement.
+- **Tests** : `E21CreateTaskV2.test.tsx` — mettre à jour les tests qui interagissaient directement
+  avec les champs désormais repliés (couleur, énergie, date, heure/durée) pour déplier au préalable
+  (`Modifier <Label>`), ajouter la couverture repliement/dépliement (`aria-expanded`) et un seul
+  champ ouvert à la fois, à l'image de `E22TaskDetail.test.tsx`.
+- **Test manuel** : mettre à jour le parcours concerné du catalogue in-app
+  (`src/domain/data/manualTestsCatalog.ts`) pour couvrir le mode replié/dépliable d'E21.
+- **Critère de sortie** : suite complète verte, `tsc -b` + lint clean, parcours revalidé `ok` par
+  Marie sur une prochaine livraison.
+- **Réalisé (2026-09-13)** : les 5 blocs `fieldCellStyle` d'`E21CreateTaskV2.tsx` (Icône, Couleur,
+  Date, Heure de début, Coût en énergie) remplacés par `TaskFieldCard` (déjà utilisé par E22),
+  avec un état `expandedField`/`toggleField` répliquant le comportement d'E22 : un seul champ
+  ouvert à la fois. Icône/Couleur/Date/Énergie se referment dès la sélection d'une valeur (pas de
+  sauvegarde asynchrone côté création, contrairement à E22) ; Heure de début et Durée réunies sous
+  un champ « Horaire » unique, qui ne se referme que sur un bouton « Fermer » explicite. Fonction
+  `fieldCellStyle` devenue inutile, supprimée. Tests `E21CreateTaskV2.test.tsx` mis à jour (champs
+  désormais dépliés avant interaction) + 4 tests ajoutés (un seul champ ouvert à la fois, fermeture
+  après sélection pour Icône/Énergie, Horaire qui reste ouvert jusqu'à « Fermer »). 3 fichiers e2e
+  (`01-onboarding.spec.ts`, `05-overload.spec.ts`, `07-planning-v4.spec.ts`) mis à jour pour ouvrir
+  Horaire/Énergie avant d'y interagir. Suite complète 855 tests verts (+4), `tsc -b` + lint clean,
+  e2e 58/59 verts (`10-feedback.spec.ts` T58 en échec, **préexistant et confirmé indépendant de ce
+  changement** — reproduit à l'identique sur `main` avant ce correctif, hors périmètre #37,
+  non traité ici). Parcours in-app `creer-une-tache-bandeau-colore` mis à jour (`revision: 1`) pour
+  décrire le mode replié/dépliable.
+  Reste dû, hors code : déploiement (bump `CHANGELOG.md`/version, à la charge de `/deploy`) et
+  validation `ok` de Marie.
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

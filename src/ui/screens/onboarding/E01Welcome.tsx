@@ -3,7 +3,9 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 
-const WHATS_NEW: string[] = []
+const WHATS_NEW: string[] = [
+  'Création d\'une tâche : les champs Icône, Couleur, Date, Horaire et Coût en énergie se replient maintenant en petites cases, comme sur la fiche d\'une tâche déjà créée. Toucher une case la déplie, choisir une valeur la replie.',
+]
 
 const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

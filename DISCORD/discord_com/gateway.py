@@ -99,7 +99,7 @@ GARDIEN_WAKE_COMMAND = "__gateway_wake__"
 # (`channels.testeurs.<code>.channel_id`, `channels.supervision`) ; les cibles historiques gardent
 # le channel_id unique.
 TARGETS = ("marie", "morpheus", "channel", "marie_supervision")
-LEGACY_CHANNEL_TARGETS = frozenset({"marie", "morpheus", "channel"})
+LEGACY_CHANNEL_TARGETS = frozenset({"marie", "channel"})
 _TESTEUR_TARGET_RE = re.compile(r"^testeur:(?P<code>[a-z0-9][a-z0-9_-]*)$")
 KINDS = ("info", "question", "delivery")
 STATUSES = ("pending", "approved", "held", "bounced", "failed")
@@ -559,10 +559,11 @@ def _mention_ids(to: str) -> list[int]:
 def _channel_id_for(to: str) -> int:
     """channel_id du canal de destination.
 
-    Cibles historiques ('marie', 'morpheus', 'channel') : le `channel_id` unique de
-    config_bot_discord.json (comportement inchangé). Cibles Phase 5 : `testeur:<code>` ->
-    `channels.testeurs.<code>.channel_id` ; `marie_supervision` -> `channels.supervision`.
-    Un canal Phase 5 non configuré lève `GatewayError` — `drain()` passe alors la demande en
+    Cibles historiques ('marie', 'channel') : le `channel_id` unique de
+    config_bot_discord.json (comportement inchangé). Cibles à canal dédié : `morpheus` ->
+    `channels.morpheus` ; `testeur:<code>` -> `channels.testeurs.<code>.channel_id` ;
+    `marie_supervision` -> `channels.supervision`.
+    Un canal dédié non configuré lève `GatewayError` — `drain()` passe alors la demande en
     `failed` et dépose une dead-letter, plutôt que de poster par défaut sur le canal principal.
     """
     try:
@@ -577,6 +578,13 @@ def _channel_id_for(to: str) -> int:
             raise GatewayError("channel_id absent de config_bot_discord.json")
         return int(cid)
     channels = cfg.get("channels") or {}
+    if to == "morpheus":
+        cid = channels.get("morpheus")
+        if not cid:
+            raise GatewayError(
+                "canal 'morpheus' non configuré (config_bot_discord.json > "
+                "channels.morpheus)")
+        return int(cid)
     if to == "marie_supervision":
         cid = channels.get("supervision")
         if not cid:

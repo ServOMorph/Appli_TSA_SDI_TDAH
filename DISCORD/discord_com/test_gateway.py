@@ -64,6 +64,7 @@ class GatewayTest(unittest.TestCase):
             "channels": {
                 "testeurs": {"satine": {"channel_id": 222, "discord_member_id": None}},
                 "supervision": 333,
+                "morpheus": 555,
             },
         }), encoding="utf-8")
 
@@ -811,12 +812,22 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
     # -- _channel_id_for : cible -> canal ---------------------------
 
     def test_channel_id_for_cibles_historiques_canal_unique(self):
-        for cible in ("marie", "morpheus", "channel"):
+        for cible in ("marie", "channel"):
             self.assertEqual(gateway._channel_id_for(cible), 111)
 
     def test_channel_id_for_testeur_et_supervision(self):
         self.assertEqual(gateway._channel_id_for("testeur:satine"), 222)
         self.assertEqual(gateway._channel_id_for("marie_supervision"), 333)
+
+    def test_channel_id_for_morpheus_canal_dedie(self):
+        self.assertEqual(gateway._channel_id_for("morpheus"), 555)
+
+    def test_channel_id_for_morpheus_non_configure_leve(self):
+        gateway.CONFIG_FILE.write_text(json.dumps({
+            "enabled": True, "channel_id": 111, "channels": {},
+        }), encoding="utf-8")
+        with self.assertRaises(gateway.GatewayError):
+            gateway._channel_id_for("morpheus")
 
     def test_channel_id_for_deux_testeurs_canaux_distincts(self):
         self._config_testeurs({

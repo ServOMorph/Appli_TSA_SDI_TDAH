@@ -12,7 +12,7 @@ describe('FeedbackFab', () => {
     expect(ctx.goTo).toHaveBeenCalledWith({ name: 'feedback', sourceScreen: 'dashboard' })
   })
 
-  it.each(['feedback', 'feedback-list'] as const)('est masqué sur %s', (screenName) => {
+  it.each(['feedback', 'feedback-list', 'feedback-detail'] as const)('est masqué sur %s', (screenName) => {
     renderWithApp(<FeedbackFab />, makeAppContext({ screen: screenName, route: { name: screenName } }))
     expect(screen.queryByRole('button', { name: 'Signaler un retour' })).toBeNull()
   })

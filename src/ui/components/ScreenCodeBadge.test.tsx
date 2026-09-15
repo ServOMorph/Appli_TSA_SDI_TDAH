@@ -6,7 +6,7 @@ import { makeAppContext, renderWithApp } from '@/test/testUtils'
 describe('ScreenCodeBadge', () => {
   it.each([
     ['dashboard', 'E10', 'Accueil'],
-    ['manual-tests', 'E121', 'Tests à faire'],
+    ['feedback-list', 'E123', 'Mes retours'],
     ['budget-settings', 'E74', 'Paramètres du budget'],
   ] as const)('affiche le code de la route %s', (screenName, code, label) => {
     renderWithApp(

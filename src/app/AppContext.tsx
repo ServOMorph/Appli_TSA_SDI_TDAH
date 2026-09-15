@@ -19,7 +19,6 @@ import { useToolsState } from '@/app/contexts/useToolsState'
 import { useSettingsState, type ImportResult } from '@/app/contexts/useSettingsState'
 import { useTasksState } from '@/app/contexts/useTasksState'
 import { usePlanningState } from '@/app/contexts/usePlanningState'
-import { useManualTestsState } from '@/app/contexts/useManualTestsState'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { syncNow } from '@/data/sync/syncClient'
@@ -58,7 +57,6 @@ type AppContextValue = NavigationValue &
   Omit<ReturnType<typeof useTaskCategoriesState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useToolsState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useBudgetState>, 'load' | 'reset'> &
-  Omit<ReturnType<typeof useManualTestsState>, 'load' | 'reset'> &
   Omit<
     ReturnType<typeof useSettingsState>,
     'load' | 'reset' | 'setCurrentUser' | 'setSettings' | 'clearDatabase' | 'completeOnboarding' | 'importData'
@@ -90,7 +88,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const taskCategories = useTaskCategoriesState()
   const tools = useToolsState(lists.load)
   const budget = useBudgetState()
-  const manualTests = useManualTestsState()
   const session = useSettingsState()
 
   const { load: loadTasks, reset: resetTasks, ...tasksValue } = tasks
@@ -100,7 +97,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { load: loadTaskCategories, reset: resetTaskCategories, ...taskCategoriesValue } = taskCategories
   const { load: loadTools, reset: resetTools, ...toolsValue } = tools
   const { load: loadBudget, reset: resetBudget, ...budgetValue } = budget
-  const { load: loadManualTests, reset: resetManualTests, ...manualTestsValue } = manualTests
   const {
     reset: resetSession,
     setCurrentUser,
@@ -128,7 +124,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       loadTaskCategories(),
       loadTools(),
       loadBudget(),
-      loadManualTests(),
     ])
   }
 
@@ -196,7 +191,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     resetTaskCategories()
     resetTools()
     resetBudget()
-    resetManualTests()
     resetSession()
     setStack([{ name: 'welcome' }])
   }
@@ -239,7 +233,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...taskCategoriesValue,
         ...toolsValue,
         ...budgetValue,
-        ...manualTestsValue,
         ...sessionValue,
         createUser,
       }}

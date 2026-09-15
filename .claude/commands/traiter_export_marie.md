@@ -1,8 +1,8 @@
 ---
-description: Traite l'arrivée d'un nouvel export de Marie — analyse, détection de pertes/frictions, ingestion du journal de tests
+description: Traite l'arrivée d'un nouvel export de Marie — analyse, détection de pertes/frictions
 argument-hint: [chemin de l'export JSON]
 model: sonnet
-allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(mv:*), Bash(ls:*), Bash(test -f:*), Bash(rclone:*), Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*)
+allowed-tools: Bash(cp:*), Bash(mv:*), Bash(ls:*), Bash(test -f:*), Bash(rclone:*), Bash(git status:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*)
 ---
 
 # /traiter_export_marie [chemin]
@@ -34,47 +34,36 @@ allowed-tools: Bash(python scripts/ingest_manual_tests.py:*), Bash(cp:*), Bash(m
 
 4. Analyser le payload complet par rapport au dernier export précédemment traité (celui identifié
    à l'étape 3 avant la copie) :
-   - pour chaque table du JSON (pas seulement `manual_test_results`) : comparer les identifiants
-     présents pour détecter une perte de données (entrée disparue sans suppression volontaire
-     plausible) ;
+   - pour chaque table du JSON : comparer les identifiants présents pour détecter une perte de
+     données (entrée disparue sans suppression volontaire plausible) ;
    - repérer les changements structurels (nouveau champ, champ disparu, migration de schéma) et
      vérifier qu'ils correspondent à une évolution connue du code (`git log`, `CHANGELOG.md`) —
      sinon les signaler comme incohérence ;
    - toute perte ou incohérence trouvée : la documenter précisément (table, identifiant, nature de
      l'écart) pour le rapport de l'étape 8.
 
-5. Repérer les frictions signalées par Marie :
-   - tous les commentaires non vides des résultats `nok` de `manual_test_results` ;
-   - pour chaque nouveau commentaire (résultat absent du journal `_contexte/tests_journaux/marie.json`
-     avant ingestion), déterminer s'il décrit un bug applicatif réel, un problème de formulation du
-     test dans `manualTestsCatalog.ts`, ou une demande d'évolution — sans corriger le code ni le
-     catalogue automatiquement.
-   - Pour chaque nouveau retour qui reste utile à communiquer, ajouter une entrée courte dans
-     `COMMUNICATION/Marie/a_transmettre.md`, sous « Retour d'export déjà corrigé » ou « Questions où nous avons
-     besoin de ton choix ». Ne pas y recopier les retours déjà clos ou invalidés. Un comportement à faire
-     revalider par Marie va dans le catalogue in-app `manualTestsCatalog.ts`, jamais dans ce fichier
-     (cf. `CLAUDE.md` § Spécificités projet).
+5. Repérer les frictions signalées par Marie : retiré le 2026-09-15
+   (roadmap_retours_conversationnels.md, Phase 6) — `manual_test_results` n'existe plus dans les
+   exports (catalogue de tests in-app retiré). Les frictions de Marie remontent désormais
+   directement en retours (`python scripts/reply_feedback_report.py`), indépendamment de cet
+   export JSON. Pour un retour qui reste utile à communiquer, ajouter une entrée courte dans
+   `COMMUNICATION/Marie/a_transmettre.md`, sous « Retour d'export déjà corrigé » ou « Questions où
+   nous avons besoin de ton choix » — jamais une liste de tests (cf. `CLAUDE.md` § Spécificités
+   projet, « Validation des retours par Marie »).
 
-6. Ingérer les résultats de tests :
-   ```
-   python scripts/ingest_manual_tests.py <export copié à l'étape 3> --tester marie
-   ```
-   Rapporter le nombre d'entrées ajoutées et déjà connues (sortie du script).
-
-7. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Reprendre son
-   compte-rendu dans le rapport de l'étape 8. Cette revue ne bloque pas la commande : elle détecte
+6. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Reprendre son
+   compte-rendu dans le rapport de l'étape 7. Cette revue ne bloque pas la commande : elle détecte
    un éventuel changement du Doc et réconcilie le registre, sans créer de roadmap.
 
-8. Rapporter à l'utilisateur, sans corriger automatiquement :
+7. Rapporter à l'utilisateur, sans corriger automatiquement :
    - version et date de l'export traité, nom du fichier créé dans `donnees_testeurs/marie/` ;
-   - résultat de l'ingestion (ajoutés / déjà connus) ;
    - toute perte ou incohérence de données détectée à l'étape 4 ;
    - chaque friction détectée à l'étape 5, avec sa nature (bug applicatif / formulation de test /
      demande d'évolution) et une proposition de traitement ;
-   - le compte-rendu de la revue du Google Doc (étape 7) : Doc inchangé, ou différentiel d'états du
+   - le compte-rendu de la revue du Google Doc (étape 6) : Doc inchangé, ou différentiel d'états du
      registre et nouvelles demandes ;
    - si rien à signaler : le dire explicitement plutôt que rester silencieux sur ce point.
 
-9. Ne jamais committer `donnees_testeurs/` (gitignoré). Si `_contexte/tests_journaux/marie.json` ou
-   `_contexte/marie_modifications_suivi.md` ont été modifiés, ne pas les committer automatiquement —
-   le signaler dans le rapport et laisser le commit à la charge du prochain `/close`.
+8. Ne jamais committer `donnees_testeurs/` (gitignoré). Si `_contexte/marie_modifications_suivi.md`
+   a été modifié, ne pas le committer automatiquement — le signaler dans le rapport et laisser le
+   commit à la charge du prochain `/close`.

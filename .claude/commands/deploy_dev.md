@@ -27,10 +27,9 @@ qu'une version soit prête à sortir.
    par `/close` à son étape 12), ne pas bloquer — signaler que du code non commité va être
    déployé et continuer.
 
-3. **Catalogue des tests manuels pour Marie à jour** : `test -f src/domain/data/manualTestsCatalog.ts`
-   (cf. `roadmap_tests_marie.md`). Si absent, ignorer silencieusement — fonctionnalité pas encore livrée.
-   S'il existe, lire son contenu et signaler s'il semble ne pas refléter l'état actuel du code (changements
-   non commités ou récents touchant un écran soumis à Marie). Non bloquant, ne pas modifier le catalogue.
+3. **Catalogue des tests manuels pour Marie** : retiré le 2026-09-15
+   (roadmap_retours_conversationnels.md, Phase 6) — `src/domain/data/manualTestsCatalog.ts`
+   n'existe plus, ce gate est désormais sans objet.
 
 4. Build, sans version ni dossier dédié (écrasé à chaque appel) :
    ```

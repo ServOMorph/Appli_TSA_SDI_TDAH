@@ -41,9 +41,6 @@ const E90OverloadRecovery = lazy(() =>
 const E120Resources = lazy(() =>
   import('@/ui/screens/resources/E120Resources').then((m) => ({ default: m.E120Resources })),
 )
-const E121ManualTests = lazy(() =>
-  import('@/ui/screens/tests/E121ManualTests').then((m) => ({ default: m.E121ManualTests })),
-)
 const importE110Settings = () =>
   import('@/ui/screens/settings/E110Settings').then((m) => ({ default: m.E110Settings }))
 const E110Settings = lazy(importE110Settings)
@@ -52,6 +49,9 @@ const E122FeedbackCapture = lazy(() =>
 )
 const E123FeedbackList = lazy(() =>
   import('@/ui/screens/feedback/E123FeedbackList').then((m) => ({ default: m.E123FeedbackList })),
+)
+const E124FeedbackDetail = lazy(() =>
+  import('@/ui/screens/feedback/E124FeedbackDetail').then((m) => ({ default: m.E124FeedbackDetail })),
 )
 const E111Profile = lazy(() =>
   import('@/ui/screens/settings/E111Profile').then((m) => ({ default: m.E111Profile })),
@@ -104,6 +104,7 @@ export const NO_NAV_SCREENS: Screen[] = [
   'energy-checkin',
   'feedback',
   'feedback-list',
+  'feedback-detail',
 ]
 
 export function activeTabFor(screen: Screen): BottomNavTab | null {
@@ -180,12 +181,12 @@ export function AppScreens() {
         return <E90OverloadRecovery />
       case 'resources':
         return <E120Resources />
-      case 'manual-tests':
-        return <E121ManualTests />
       case 'feedback':
         return <E122FeedbackCapture />
       case 'feedback-list':
         return <E123FeedbackList />
+      case 'feedback-detail':
+        return <E124FeedbackDetail />
       case 'settings':
         return <E110Settings />
       case 'settings-profile':

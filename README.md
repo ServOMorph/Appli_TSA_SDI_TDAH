@@ -1,6 +1,6 @@
 # Assistant AuDHD — planification et gestion d'énergie neuroinclusive
 
-Assistant AuDHD est une application web progressive (PWA) conçue pour aider les personnes AuDHD (TSA et TDAH) à alléger leur charge mentale. Construite avec React, TypeScript, Vite et Dexie.js, elle fournit un système local de soutien aux fonctions exécutives : tâches, planification, énergie, outils personnels et tests manuels.
+Assistant AuDHD est une application web progressive (PWA) conçue pour aider les personnes AuDHD (TSA et TDAH) à alléger leur charge mentale. Construite avec React, TypeScript, Vite et Dexie.js, elle fournit un système local de soutien aux fonctions exécutives : tâches, planification, énergie et outils personnels.
 
 **English summary.** Assistant AuDHD is a neuroinclusive React and TypeScript PWA for autistic and ADHD people. It stores data locally with IndexedDB and helps users manage tasks, daily planning, energy, and personal tools without a cloud account.
 
@@ -12,9 +12,24 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 - Planification quotidienne et suivi d'énergie, avec un mode de récupération en cas de surcharge.
 - Listes, dossiers et outil Budget, organisés pour réduire les frictions de l'usage quotidien.
 - Export et import local des données ; le stockage applicatif repose sur IndexedDB.
-- Catalogue de tests manuels en langage clair, destiné à recueillir et archiver les retours d'usage.
+- Signalement d'un retour depuis n'importe quel écran (capture annotée + commentaire), suivi dans un fil de discussion avec l'équipe jusqu'à validation par le testeur lui-même.
 
 ## État actuel
+
+Le 15 septembre 2026, la feuille de route « retours conversationnels » ouverte le 13 septembre est
+achevée : un retour signalé depuis l'application n'aboutit plus dans le vide. Une fois la
+modification faite, l'équipe y répond directement dans l'application ; le testeur relit la réponse
+et valide lui-même quand il est satisfait. Le bouton d'accès aux retours a été déplacé sur
+l'accueil (icône en haut à droite) et le catalogue de tests manuels, devenu redondant avec cette
+nouvelle boucle, a été entièrement retiré de l'application. Deux bugs découverts en testant ce
+nouveau parcours ont été corrigés : le bouton « Relancer » d'un envoi resté en attente ne faisait
+parfois rien au clic, et le petit cercle rouge signalant une nouvelle réponse pouvait rester éteint
+jusqu'au rechargement de l'application. Treize anciens retours, jamais traités et envoyés avant la
+mise en place de cette boucle, ont été supprimés sur décision explicite pour repartir sur une base
+saine ; leur contenu a été sauvegardé au préalable. Une régression a été repérée dans la foulée : la
+fenêtre « Nouveautés » qui annonce les derniers changements n'est plus accessible du tout pour un
+utilisateur ayant déjà un compte (elle vivait sur l'écran de tests manuels, désormais supprimé) —
+un nouvel emplacement reste à décider.
 
 Le 15 septembre 2026, deux ajustements sur la messagerie Discord avec Marie. Les messages qui lui
 sont envoyés ne commencent plus par une phrase d'ouverture tirée au hasard (sur demande explicite) :

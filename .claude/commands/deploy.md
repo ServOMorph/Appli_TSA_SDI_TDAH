@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/ingest_manual_tests.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -45,38 +45,34 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       snapshot le plus récent déjà présent dans `donnees_testeurs/marie/`. Ne jamais copier ni
       modifier un fichier de `donnees_testeurs/` à la main (donnée sensible listée dans `CLAUDE.md`).
    3. Analyser le dernier snapshot de `donnees_testeurs/marie/` dans son intégralité (toutes les
-      tables du payload JSON, pas seulement `manual_test_results`). La lecture de ce snapshot est
-      explicitement autorisée ici — dérogation bornée à cette étape de `/deploy` de l'interdiction
-      `CLAUDE.md` § Données sensibles. Ne jamais afficher son contenu brut ni recopier de données
-      personnelles : n'en restituer que l'analyse.
-      - pertes ou incohérences de données par rapport au dernier état connu (journal
-        `_contexte/tests_journaux/marie.json` pour l'historique des tests, comparaison structurelle
-        du reste du payload avec le snapshot précédent analysé) ;
-      - frictions signalées par Marie elle-même (commentaires des résultats `nok` dans
-        `manual_test_results`).
-   4. Ingérer les résultats de tests via
-      `python scripts/ingest_manual_tests.py <dernier snapshot> --tester marie`
-      (dédoublonnage par `id`, jamais d'écrasement d'une entrée existante).
-   5. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
+      tables du payload JSON). La lecture de ce snapshot est explicitement autorisée ici —
+      dérogation bornée à cette étape de `/deploy` de l'interdiction `CLAUDE.md` § Données
+      sensibles. Ne jamais afficher son contenu brut ni recopier de données personnelles : n'en
+      restituer que l'analyse.
+      - pertes ou incohérences de données par rapport au dernier état connu (comparaison
+        structurelle du payload avec le snapshot précédent analysé) ;
+      - frictions signalées par Marie : voir désormais ses retours (`scripts/reply_feedback_report.py`),
+        plus dans ce snapshot depuis le retrait du catalogue de tests in-app (`manual_test_results`
+        n'existe plus dans les exports, roadmap_retours_conversationnels.md Phase 6).
+   4. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
       réconcilie `_contexte/marie_modifications_suivi.md` et pose le jalon daté « Dernière exécution
       de la revue » dans l'en-tête du registre (contrôlé à l'étape 3.9). Présenter ensuite à
       l'utilisateur le compte-rendu qu'elle rend (en-tête « analyse requise » / « réconciliation
       seule » / « Doc inchangé », différentiel d'états du registre, date comparée) : ne jamais
       enchaîner à l'étape 1 sans l'avoir affiché. Si le compte-rendu est **« analyse requise »**
       (au moins une demande numérotée nouvelle ou au texte modifié dans le Doc) : s'arrêter après
-      la réconciliation et le commit de bookkeeping (étape 0.6), et demander à l'utilisateur de
+      la réconciliation et le commit de bookkeeping (étape 0.5), et demander à l'utilisateur de
       lancer `/analyser_googledoc` avant de reprendre `/deploy`. Un compte-rendu
       **« réconciliation seule »** (Doc touché mais aucune demande nouvelle ni modifiée — p. ex.
       Marie a seulement retiré des lignes déjà livrées) ne bloque pas : poursuivre.
-   6. Commit du bookkeeping de l'étape 0. Si l'étape 0.4 (ingest) ou la réconciliation du registre
-      à l'étape 0.5 ont modifié `_contexte/tests_journaux/marie.json` ou
-      `_contexte/marie_modifications_suivi.md`, les `git add` nommément (jamais `git add -A`) et
-      les committer maintenant, sujet
-      `chore(orchestrateur): /deploy étape 0 — ingest résultats Marie + réconciliation registre`
-      (pied `Co-Authored-By` habituel). Ainsi un arrêt en 0.5 (« analyse requise ») ou en 0.9
+   5. Commit du bookkeeping de l'étape 0. Si la réconciliation du registre à l'étape 0.4 a modifié
+      `_contexte/marie_modifications_suivi.md`, le `git add` nommément (jamais `git add -A`) et le
+      committer maintenant, sujet
+      `chore(orchestrateur): /deploy étape 0 — réconciliation registre`
+      (pied `Co-Authored-By` habituel). Ainsi un arrêt en 0.4 (« analyse requise ») ou en 0.8
       laisse malgré tout un arbre de travail propre et la vérification bloquante 3.1 reste
       atteignable au redémarrage, sans résidu de `/deploy`.
-   7. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
+   6. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
       relire les dernières entrées de `COMMUNICATION/Marie/historique_conversation_marie.md` et
       les messages non traités de `gateway/inbox/orchestrateur/`
       (`python DISCORD/discord_com/gateway.py poll --agent orchestrateur`, sans `ack` — relevé de
@@ -84,10 +80,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       la version cible : signaler toute demande, remarque ou confirmation de Marie touchant ces
       changements qui ne serait couverte ni par le code livré, ni par l'inventaire de communication
       à venir (étape 10).
-   8. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
+   7. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
       incohérence, ni friction bloquante, ni changement non revu du Google Doc, ni sujet Discord
       oublié : continuer normalement à l'étape 1.
-   9. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
+   8. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
       les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
       snapshots ou fichiers d'export de `donnees_testeurs/marie/` pour « résoudre » un problème
       constaté — toute correction porte sur le code ou le journal projet, jamais sur les données
@@ -134,7 +130,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       déploiement de production depuis une autre branche n'est pas autorisé.
    9. **Revue du Google Doc exécutée cette session** :
       `grep -m1 '^- Dernière exécution de la revue :' _contexte/marie_modifications_suivi.md`. La date
-      qui suit doit être celle du jour. Sinon, s'arrêter — l'étape 0.5 a été sautée : exécuter
+      qui suit doit être celle du jour. Sinon, s'arrêter — l'étape 0.4 a été sautée : exécuter
       `.claude/revue_googledoc.md` (et présenter son compte-rendu) avant de reprendre.
   10. **Aucune roadmap avec une phase en cours** : lister les `roadmap_*.md` à la racine du projet
       (`ls roadmap_*.md`). Pour chacune, relever les statuts de phase (`[EN COURS]`, `[TODO]`,
@@ -156,11 +152,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       qu'il sera écrasé par ce build.
    3. **Tests manuels en attente** : lire `tests_manuels.md`. S'il contient autre chose que le fichier vide,
       lister les points en attente et signaler qu'un déploiement prod interviendrait avant leur validation.
-   4. **Catalogue des tests manuels pour Marie à jour** : `test -f src/domain/data/manualTestsCatalog.ts`
-      (cf. `roadmap_tests_marie.md`). Si absent, ignorer silencieusement — fonctionnalité pas encore livrée.
-      S'il existe, lire son contenu et le comparer aux changements de la version en cours de déploiement
-      (`CHANGELOG.md`) : si une fonctionnalité soumise à Marie a changé sans que le catalogue n'ait été mis à
-      jour, le signaler. Ne pas modifier le catalogue automatiquement.
+   4. **Catalogue des tests manuels pour Marie** : retiré le 2026-09-15
+      (roadmap_retours_conversationnels.md, Phase 6) — `src/domain/data/manualTestsCatalog.ts`
+      n'existe plus, ce gate est désormais sans objet. La validation par Marie passe par ses retours
+      (cf. `CLAUDE.md` § Spécificités projet, « Validation des retours par Marie »).
    5. **Demandes Marie en attente non planifiées** : lire `_contexte/marie_modifications_suivi.md`. Si absent,
       ignorer silencieusement. S'il existe, lister toute demande à l'état `en attente` qui n'est rattachée ni à
       une roadmap active (fichier `roadmap_*.md` à la racine avec une phase la couvrant) ni à une décision
@@ -259,17 +254,16 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - les changements de la version cible dans `CHANGELOG.md` et `WHATS_NEW` ;
     - les roadmaps terminées ou modifiées par cette livraison, y compris leurs écarts assumés et décisions non tranchées ;
     - `COMMUNICATION/Marie/a_transmettre.md` ;
-    - les tests Marie ajoutés ou modifiés dans `manualTestsCatalog.ts` ;
-    - les retours nouveaux du dernier export de Marie et les actions encore ouvertes dans la partie active de `_contexte/signals.md`.
+    - les retours ouverts de Marie nécessitant une réponse (`python scripts/reply_feedback_report.py`)
+      et les actions encore ouvertes dans la partie active de `_contexte/signals.md`.
 
     L'inventaire doit distinguer explicitement : ce qui est livré, les choix attendus d'elle, les écarts assumés
     et les retours de ses exports déjà corrigés. Ne pas reprendre les archives ou les signaux historiques clos
     comme des demandes encore actives.
 
-    Les tests que Marie doit refaire ne figurent PAS dans l'inventaire de communication : ils vivent uniquement
-    dans le catalogue in-app (`manualTestsCatalog.ts`, écran « Tests à faire »). Vérifier ici que tout nouveau
-    comportement à valider par Marie y a bien été ajouté (sinon l'ajouter avant de poursuivre), sans le recopier
-    dans les documents Drive (cf. `CLAUDE.md` § Spécificités projet, « Tests à faire pour Marie : uniquement dans l'appli »).
+    Il n'existe plus de liste de tests à faire à inclure dans l'inventaire : la validation par Marie passe
+    par le fil de discussion de ses retours (cf. `CLAUDE.md` § Spécificités projet, « Validation des retours
+    par Marie »), pas par un document de livraison.
 
 11. Figer puis publier systématiquement le commentaire de livraison dans le dossier Drive partagé.
     - Prendre `COMMUNICATION/Marie/a_transmettre.md`. S'il n'existe pas, créer avant le déploiement un fichier
@@ -294,7 +288,6 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     (cf. `CLAUDE.md` § Messages pour Marie). Il doit toujours contenir :
     - une annonce brève de la version disponible ;
     - les changements effectivement livrés ;
-    - un renvoi vers l'écran « Tests à faire » de l'appli pour les tests à rejouer — sans les énumérer ;
     - les choix ou questions encore attendus, ainsi que les écarts assumés s'ils la concernent ;
     - le lien de production, sur sa propre ligne : `https://appli-audhd.netlify.app/` ;
     - le renvoi vers le commentaire détaillé, sur sa propre ligne, introduit par « Détail des changements et

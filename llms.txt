@@ -33,7 +33,7 @@ npm run test:e2e
 - `src/ui/` : composants et écrans React, styles et composants d'accessibilité cognitive.
 - `src/app/` : navigation, providers et coordination de l'état applicatif.
 - `src/test/` : configuration Vitest, factories et utilitaires de test.
-- `scripts/` : outils de développement et `ingest_manual_tests.py`, qui fusionne les résultats de tests manuels sans écraser les entrées existantes.
+- `scripts/` : outils de développement.
 
 ## Fonctionnalités actuelles
 

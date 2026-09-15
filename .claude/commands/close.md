@@ -200,23 +200,18 @@ générique.
   l'orchestrateur ne touche `inbox/orchestrateur/` que sur demande explicite de l'utilisateur.
 
 - Étape 6 (ajouts) :
-  - Sur `main` uniquement, si `src/domain/data/manualTestsCatalog.ts` existe : examiner les
-    évolutions de la session et mettre à jour ce catalogue pour chaque test à demander à Marie. Le
-    catalogue couvre tous les tests Marie encore pertinents à la fin de l'évolution, en langage
-    clair, sans détails techniques ni chemins locaux. Ne pas y ajouter les validations internes
-    réservées au développement.
-  - Relire l'intégralité de la conversation pour repérer tout test manuel dont la nécessité a été
-    actée en discussion (nouveau scénario, comportement à valider) et non encore tracé. Pour
-    chacun : vérification technique réservée au développeur (fichier local, détail d'implémentation,
-    contrôle de régression) → `tests_manuels.md` (créer avec la consigne standard s'il n'existe pas
-    encore) ; comportement à valider par Marie sur son appareil réel → `manualTestsCatalog.ts`, en
-    langage clair, sans jargon ni chemin local. Ne rien ajouter si aucun test n'a été décidé — ne
-    pas en inventer. Objectif : que `/deploy` (avertissements 4.4 et 4.5) reflète l'état réel des
-    tests décidés pendant la session.
+  - Relire l'intégralité de la conversation pour repérer toute vérification technique réservée au
+    développeur (fichier local, détail d'implémentation, contrôle de régression) actée en discussion
+    et non encore tracée : l'ajouter à `tests_manuels.md` (créer avec la consigne standard s'il
+    n'existe pas encore). Un comportement à valider par Marie n'a plus de fichier dédié : il passe
+    par un retour qu'elle signale elle-même dans l'appli (« Mes retours »), cf. `CLAUDE.md` §
+    Spécificités projet, « Validation des retours par Marie » (roadmap_retours_conversationnels.md,
+    Phase 6 — le catalogue de tests in-app est retiré). Ne rien ajouter à `tests_manuels.md` si
+    aucun contrôle développeur n'a été décidé — ne pas en inventer.
   - Vérifier `COMMUNICATION/Marie/a_transmettre.md` : chaque changement visible pour Marie,
     décision attendue, écart assumé ou retour d'export encore pertinent de la session doit y
-    figurer, en langage simple. Ce fichier ne contient jamais de liste de tests (ils vivent
-    uniquement dans le catalogue in-app, cf. `CLAUDE.md` § Spécificités projet). Ne pas déplacer
+    figurer, en langage simple. Ce fichier ne contient jamais de liste de tests (cf. `CLAUDE.md` §
+    Spécificités projet, « Validation des retours par Marie »). Ne pas déplacer
     les documents de `COMMUNICATION/Marie/livraisons/` (historique figé des messages publiés).
   - Sur `main` uniquement, si la session a introduit un changement visible pour Marie (nouvelle
     fonctionnalité, écran, comportement modifié — pas un correctif interne ni un refacto), ajouter

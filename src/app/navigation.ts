@@ -13,9 +13,9 @@ export type Route =
   | { name: 'energy-checkin' }
   | { name: 'overload-recovery' }
   | { name: 'resources' }
-  | { name: 'manual-tests' }
   | { name: 'feedback'; sourceScreen?: Screen }
   | { name: 'feedback-list' }
+  | { name: 'feedback-detail'; reportId?: string }
   | { name: 'settings' }
   | { name: 'settings-profile' }
   | { name: 'settings-accessibility' }

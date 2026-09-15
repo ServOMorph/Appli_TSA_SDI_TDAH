@@ -31,7 +31,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(19)
+    expect(db.verno).toBe(24)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -211,7 +211,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -295,7 +295,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -334,7 +334,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
 
     const migratedItem = await upgraded.listItems.get('existing-item')
     expect(migratedItem).toMatchObject({ checked: false })
@@ -387,7 +387,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
     expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
 
@@ -433,7 +433,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     expect(await upgraded.budgetCategories.get('income-1')).toBeUndefined()
     expect(await upgraded.budgetCategories.get('expense-1')).toBeDefined()
 
@@ -482,7 +482,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     expect(await upgraded.listItems.get('item-1')).toMatchObject({ description: '' })
     expect(upgraded.listItemSubTasks).toBeDefined()
 
@@ -527,7 +527,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     expect(await upgraded.tools.get('tool-1')).toMatchObject({ color: null })
 
     await upgraded.delete()
@@ -596,7 +596,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     expect(await upgraded.tasks.get('task-today')).toMatchObject({
       status: 'inbox',
       scheduled_date: null,
@@ -638,9 +638,278 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(19)
+    expect(upgraded.verno).toBe(24)
     expect(await upgraded.users.get('user-1')).toMatchObject({ id: 'user-1' })
     expect(await upgraded.feedbackReports.toArray()).toEqual([])
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 19 database by adding feedback messages and marking existing reports open', async () => {
+    const name = `migration-v20-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(19).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+      lists: 'id',
+      listItems: 'id, list_id, position, checked, category_id',
+      listItemSubTasks: 'id, list_item_id, position',
+      listCategories: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
+      budgetIncomeEntries: 'id, date',
+      taskRecurrences: 'id',
+      taskExceptions: 'id, recurrence_id',
+      folders: 'id, position',
+      tools: 'id, type, folder_id, position',
+      manualTestResults: 'id, test_id',
+      taskCategories: 'id, position',
+      feedbackReports: 'id, created_at, sync_status',
+    })
+    await legacy.open()
+    await legacy.table('feedbackReports').add({
+      id: 'report-1',
+      screen_code: 'E20',
+      comment: 'Le bouton est masqué',
+      image_blob: new Blob(['image']),
+      image_path: null,
+      image_bytes: 5,
+      strokes: [],
+      app_version: '5.84',
+      created_at: '2026-09-04T10:00:00.000Z',
+      sync_status: 'sent',
+      last_attempt_at: '2026-09-04T10:10:00.000Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(24)
+    expect(await upgraded.feedbackReports.get('report-1')).toMatchObject({
+      sync_status: 'sent',
+      resolution_status: 'open',
+      validated_at: null,
+    })
+    expect(await upgraded.feedbackMessages.toArray()).toEqual([])
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 20 database by preparing feedback closures and messages for sync', async () => {
+    const name = `migration-v21-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(20).stores({
+      users: 'id',
+      tasks: 'id, parent_id, status, position, scheduled_date, recurrence_id',
+      lists: 'id',
+      listItems: 'id, list_id, position, checked, category_id',
+      listItemSubTasks: 'id, list_item_id, position',
+      listCategories: 'id, list_id, position',
+      energyEntries: 'id, entry_date',
+      settings: 'id, user_id',
+      budgetCategories: 'id, period, position',
+      budgetEntries: 'id, category_id, date',
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
+      budgetIncomeEntries: 'id, date',
+      taskRecurrences: 'id',
+      taskExceptions: 'id, recurrence_id',
+      folders: 'id, position',
+      tools: 'id, type, folder_id, position',
+      manualTestResults: 'id, test_id',
+      taskCategories: 'id, position',
+      feedbackReports: 'id, created_at, sync_status',
+      feedbackMessages: 'id, report_id, created_at, sync_status',
+    })
+    await legacy.open()
+    await legacy.table('feedbackReports').bulkAdd([
+      {
+        id: 'report-open',
+        screen_code: 'E20',
+        comment: 'Le bouton est masqué',
+        image_blob: new Blob(['image']),
+        image_path: null,
+        image_bytes: 5,
+        strokes: [],
+        app_version: '5.84',
+        created_at: '2026-09-04T10:00:00.000Z',
+        sync_status: 'sent',
+        last_attempt_at: '2026-09-04T10:10:00.000Z',
+        resolution_status: 'open',
+        validated_at: null,
+      },
+      {
+        id: 'report-validated',
+        screen_code: 'E21',
+        comment: 'Déjà validé avant la Phase 3',
+        image_blob: new Blob(['image']),
+        image_path: null,
+        image_bytes: 5,
+        strokes: [],
+        app_version: '5.84',
+        created_at: '2026-09-05T10:00:00.000Z',
+        sync_status: 'sent',
+        last_attempt_at: '2026-09-05T10:10:00.000Z',
+        resolution_status: 'validated',
+        validated_at: '2026-09-06T09:00:00.000Z',
+      },
+    ])
+    await legacy.table('feedbackMessages').add({
+      id: 'message-1',
+      report_id: 'report-open',
+      author: 'user',
+      body: 'Toujours pas de retour visuel',
+      created_at: '2026-09-04T11:00:00.000Z',
+      sync_status: 'pending',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(24)
+    expect(await upgraded.feedbackReports.get('report-open')).toMatchObject({
+      resolution_sync_status: 'sent',
+      resolution_last_attempt_at: null,
+    })
+    expect(await upgraded.feedbackReports.get('report-validated')).toMatchObject({
+      resolution_sync_status: 'pending',
+      resolution_last_attempt_at: null,
+    })
+    expect(await upgraded.feedbackMessages.get('message-1')).toMatchObject({ last_attempt_at: null })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 21 database by marking user messages read and agent messages unread', async () => {
+    const name = `migration-v22-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(21).stores({
+      feedbackReports: 'id, created_at, sync_status',
+      feedbackMessages: 'id, report_id, created_at, sync_status',
+    })
+    await legacy.open()
+    await legacy.table('feedbackMessages').bulkAdd([
+      {
+        id: 'from-user',
+        report_id: 'report-1',
+        author: 'user',
+        body: 'Toujours pas de retour visuel',
+        created_at: '2026-09-04T11:00:00.000Z',
+        sync_status: 'sent',
+        last_attempt_at: '2026-09-04T11:05:00.000Z',
+      },
+      {
+        id: 'from-agent',
+        report_id: 'report-1',
+        author: 'agent',
+        body: 'Le correctif est en ligne',
+        created_at: '2026-09-05T09:00:00.000Z',
+        sync_status: 'sent',
+        last_attempt_at: null,
+      },
+    ])
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(24)
+    expect(await upgraded.feedbackMessages.get('from-user')).toMatchObject({ read_at: '2026-09-04T11:00:00.000Z' })
+    expect(await upgraded.feedbackMessages.get('from-agent')).toMatchObject({ read_at: null })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 22 database by backfilling resolution fields on reports written without them', async () => {
+    const name = `migration-v23-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(22).stores({
+      feedbackReports: 'id, created_at, sync_status',
+      feedbackMessages: 'id, report_id, created_at, sync_status',
+    })
+    await legacy.open()
+    await legacy.table('feedbackReports').bulkAdd([
+      {
+        id: 'written-by-old-client',
+        screen_code: 'E121',
+        comment: 'test de retour 1',
+        image_blob: new Blob(['image']),
+        image_path: null,
+        image_bytes: 5,
+        strokes: [],
+        app_version: '5.133',
+        created_at: '2026-09-15T06:55:31.130Z',
+        sync_status: 'sent',
+        last_attempt_at: '2026-09-15T06:55:32.000Z',
+      },
+      {
+        id: 'already-complete',
+        screen_code: 'E10',
+        comment: 'Déjà validé',
+        image_blob: new Blob(['image']),
+        image_path: null,
+        image_bytes: 5,
+        strokes: [],
+        app_version: '5.133',
+        created_at: '2026-09-14T10:00:00.000Z',
+        sync_status: 'sent',
+        last_attempt_at: null,
+        resolution_status: 'validated',
+        validated_at: '2026-09-14T11:00:00.000Z',
+        resolution_sync_status: 'sent',
+        resolution_last_attempt_at: '2026-09-14T11:00:05.000Z',
+      },
+    ])
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(24)
+    expect(await upgraded.feedbackReports.get('written-by-old-client')).toMatchObject({
+      resolution_status: 'open',
+      validated_at: null,
+      resolution_sync_status: 'sent',
+      resolution_last_attempt_at: null,
+    })
+    expect(await upgraded.feedbackReports.get('already-complete')).toMatchObject({
+      resolution_status: 'validated',
+      validated_at: '2026-09-14T11:00:00.000Z',
+      resolution_sync_status: 'sent',
+      resolution_last_attempt_at: '2026-09-14T11:00:05.000Z',
+    })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 23 database by dropping the obsolete manual test results table', async () => {
+    const name = `migration-v24-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(23).stores({
+      manualTestResults: 'id, test_id',
+      feedbackReports: 'id, created_at, sync_status',
+    })
+    await legacy.open()
+    await legacy.table('manualTestResults').add({
+      id: 'result-1',
+      test_id: 'creer-une-liste',
+      status: 'ok',
+      comment: null,
+      created_at: '2026-08-14T09:00:00.000Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(24)
+    expect(upgraded.tables.map((t) => t.name)).not.toContain('manualTestResults')
 
     await upgraded.delete()
   })

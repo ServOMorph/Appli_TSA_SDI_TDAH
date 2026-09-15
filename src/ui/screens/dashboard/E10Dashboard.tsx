@@ -1,5 +1,5 @@
 import { useApp } from '@/app/AppContext'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
@@ -9,8 +9,8 @@ import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
-import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
-import { hasPendingManualTests } from '@/domain/rules/manualTestRules'
+import { feedbackMessageRepo } from '@/app/repositories'
+import { syncFeedbackNow } from '@/data/sync/feedbackClient'
 
 export const PLANNING_HEIGHT_PX = 325
 
@@ -37,14 +37,24 @@ export function E10Dashboard() {
     tools,
     lists,
     selectList,
-    manualTestResults,
     settings,
   } = useApp()
   const [showCreateTool, setShowCreateTool] = useState(false)
+  const [hasUnreadFeedback, setHasUnreadFeedback] = useState(false)
 
   const rootFolders = folders
   const rootTools = tools.filter((t) => t.folder_id === null)
-  const hasNewManualTests = hasPendingManualTests(manualTestsCatalog, manualTestResults)
+
+  useEffect(() => {
+    function checkUnread() {
+      void feedbackMessageRepo.getUnreadReportIds().then((ids) => setHasUnreadFeedback(ids.length > 0))
+    }
+    checkUnread()
+    // La synchronisation globale (startFeedbackSync, demarrage de l'appli) tourne en parallele du
+    // montage de ce tableau de bord : sans ce second appel, une reponse d'agent recue juste apres
+    // le premier controle local restait invisible tant que l'ecran n'etait pas remonte.
+    void syncFeedbackNow().then(checkUnread)
+  }, [])
 
   function openTool(toolId: string) {
     const tool = rootTools.find((t) => t.id === toolId)
@@ -73,8 +83,8 @@ export function E10Dashboard() {
         overloadActive={overloadMode}
         plannedCost={getRemainingPlannedCost(todayPlannedTasks)}
         onResourcesClick={() => goTo('resources')}
-        onManualTestsClick={() => goTo('manual-tests')}
-        hasNewManualTests={hasNewManualTests}
+        onFeedbackClick={() => goTo('feedback-list')}
+        hasUnreadFeedback={hasUnreadFeedback}
         onOverloadClick={() => goTo('overload-recovery')}
         ambianceColor={settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR}
       />

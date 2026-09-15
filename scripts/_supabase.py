@@ -88,6 +88,32 @@ def fetch_snapshots(url: str, service_key: str, query: str) -> list[dict]:
     return fetch_rows(url, service_key, "device_snapshots", query)
 
 
+def insert_row(url: str, service_key: str, table: str, row: dict) -> dict:
+    request = urllib.request.Request(
+        f"{url.rstrip('/')}/rest/v1/{quote(table, safe='_')}",
+        data=json.dumps(row).encode("utf-8"),
+        method="POST",
+        headers={
+            "apikey": service_key,
+            "Authorization": f"Bearer {service_key}",
+            "Content-Type": "application/json",
+            "Prefer": "return=representation",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            return data[0] if isinstance(data, list) else data
+    except urllib.error.HTTPError as e:
+        raise SupabaseError(
+            f"insertion Supabase echouee ({e.code}) : {e.read().decode('utf-8')}"
+        ) from e
+    except urllib.error.URLError as e:
+        raise SupabaseError(f"Supabase injoignable ({e.reason})") from e
+    except TimeoutError as e:
+        raise SupabaseError(f"Supabase n'a pas repondu en {HTTP_TIMEOUT_SECONDS} s") from e
+
+
 def download_storage_object(url: str, service_key: str, bucket: str, path: str) -> bytes:
     request = urllib.request.Request(
         f"{url.rstrip('/')}/storage/v1/object/{quote(bucket, safe='')}/{quote(path, safe='/')}",

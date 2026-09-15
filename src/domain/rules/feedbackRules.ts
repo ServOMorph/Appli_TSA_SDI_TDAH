@@ -11,6 +11,13 @@ export function isFeedbackReportValid(
   )
 }
 
+const MAX_MESSAGE_LENGTH = 2000
+
+export function isFeedbackMessageValid(body: string): boolean {
+  const trimmed = body.trim()
+  return trimmed.length > 0 && trimmed.length <= MAX_MESSAGE_LENGTH
+}
+
 export function sentFeedbackIdsToPurge(
   reports: FeedbackReport[],
   referenceDate: Date,

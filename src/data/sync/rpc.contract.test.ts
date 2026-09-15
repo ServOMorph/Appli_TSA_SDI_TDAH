@@ -52,4 +52,58 @@ describe('contrat PostgREST émis par callRpc (comparé à la référence SDK)',
     expect(headers.get('Content-Type')).toBe('application/json')
     expect(JSON.parse(init.body as string)).toEqual(PARAMS)
   })
+
+  it('émet un POST sur /rest/v1/rpc/submit_feedback_message avec les mêmes garanties (Phase 3)', async () => {
+    const params = {
+      p_id: 'message-1',
+      p_device_id: 'device-1',
+      p_device_secret: 'secret-1',
+      p_report_id: 'report-1',
+      p_author: 'user',
+      p_body: 'Toujours pas de retour visuel',
+      p_created_at: '2026-09-14T10:00:00.000Z',
+    }
+
+    const { data, error } = await callRpc<boolean>('submit_feedback_message', params)
+
+    expect(error).toBeNull()
+    expect(data).toBe(true)
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe(`${SUPABASE_URL}/rest/v1/rpc/submit_feedback_message`)
+    expect(JSON.parse(init.body as string)).toEqual(params)
+  })
+
+  it('émet un POST sur /rest/v1/rpc/close_feedback_report avec les mêmes garanties (Phase 3)', async () => {
+    const params = {
+      p_device_id: 'device-1',
+      p_device_secret: 'secret-1',
+      p_report_id: 'report-1',
+      p_resolved_at: '2026-09-14T12:00:00.000Z',
+    }
+
+    const { data, error } = await callRpc<boolean>('close_feedback_report', params)
+
+    expect(error).toBeNull()
+    expect(data).toBe(true)
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe(`${SUPABASE_URL}/rest/v1/rpc/close_feedback_report`)
+    expect(JSON.parse(init.body as string)).toEqual(params)
+  })
+
+  it('émet un POST sur /rest/v1/rpc/fetch_feedback_messages avec les mêmes garanties (Phase 4)', async () => {
+    const params = {
+      p_device_id: 'device-1',
+      p_device_secret: 'secret-1',
+      p_since: '2026-09-01T00:00:00.000Z',
+    }
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify([]), { status: 200 }))
+
+    const { data, error } = await callRpc<unknown[]>('fetch_feedback_messages', params)
+
+    expect(error).toBeNull()
+    expect(data).toEqual([])
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe(`${SUPABASE_URL}/rest/v1/rpc/fetch_feedback_messages`)
+    expect(JSON.parse(init.body as string)).toEqual(params)
+  })
 })

@@ -112,6 +112,15 @@ Pour les tâches répétitives et templated (commits, posts, changelogs, donnée
 
 Section réservée aux règles propres à ce projet, hors périmètre du kit. Cette section est préservée intégralement par `/update` (jamais écrasée ni fusionnée avec le contenu du kit). Convention : toute règle liée à une section précise du fichier doit la référencer explicitement par son titre (ex: "Section Roadmap : ..."), plutôt que compter sur la position physique de cette section (toujours en fin de fichier).
 
+### Réponses aux retours testeurs (`scripts/reply_feedback_report.py`)
+Règle de rédaction (roadmap_retours_conversationnels.md, Phase 5) : réponse **synthétique, sans
+jargon, sans nom de fichier ni de commit**, une idée par phrase — alignée sur le style exigé pour
+les messages à Marie. Un retour reste ouvert tant que le testeur ne l'a pas validé lui-même dans
+E124 : ce script dépose une réponse d'agent mais n'appelle jamais `close_feedback_report`, il ne
+clôt jamais un retour à la place du testeur. Décision du 2026-09-14 : aucune automatisation,
+appel explicite du script en session quand un retour est traité — pas de rattachement à `/close`
+ni `/deploy`.
+
 ### Section Délégation Ollama : helper dans `scripts/`
 L'helper Ollama de ce projet est `scripts/ollama_call.py` (pas à la racine comme le template kit),
 aligné avec les références de `AGENTS.md` et `GEMINI.md`. `/update` ne recopie donc pas
@@ -228,10 +237,6 @@ gateway n'inclut ni les `💻🤖` ni le tag, la gateway / l'agent DISCORD les a
 
 Version <X.Y> en ligne.
 
-<N> tests à faire, correspondant aux modifications :
-• <n° de modification du Google Doc>
-• <n° …>
-
 <lien de l'appli sur sa propre ligne>
 
 Détail des changements et questions : commentaires_marie_<X.Y>.docx
@@ -242,14 +247,12 @@ Détail des changements et questions : commentaires_marie_<X.Y>.docx
 La ligne « Détail des changements et questions : » n'est présente que s'il y a un commentaire utile
 pour cette livraison ; sinon elle est omise. Elle porte le nom de fichier versionné, jamais une URL.
 
-`<N>` = nombre de parcours actuellement à faire dans l'écran « Tests à faire » (parcours non
-validés sur la version déployée). Les puces reprennent les numéros de modification du Google Doc
-`Modifications` couverts par ces parcours (champ `docRefs` de `src/domain/data/manualTestsCatalog.ts`,
-recoupé avec `_contexte/marie_modifications_suivi.md`). Un parcours sans numéro de modification
-(retour hors Doc) est listé par son titre. Le nom du document de commentaires dans le dossier Drive
-partagé (`commentaires_marie_<version>.docx`) est ajouté sur sa propre ligne, introduit par
-« Détail des changements et questions : », uniquement s'il y a un commentaire utile pour cette
-livraison — jamais une URL publique (dossier `Projets/Appli` restreint à comptes nommés).
+**Modifié le 2026-09-15 (roadmap_retours_conversationnels.md, Phase 6)** : la bulle « `<N>` tests à
+faire, correspondant aux modifications » a été retirée du gabarit — le catalogue de tests in-app qui
+l'alimentait (`manualTestsCatalog.ts`, écran « Tests à faire ») a été retiré (voir section
+« Validation des retours par Marie » ci-dessous). Le message de livraison ne renvoie donc plus vers
+une liste de tests à faire. **Aucune livraison réelle n'a encore utilisé ce gabarit modifié** :
+relire ce paragraphe avant le prochain `/deploy` et ajuster si le rendu ne convient pas.
 
 ### Historique de conversation avec Marie : sauvegarde systématique et immédiate
 Tout message échangé avec Marie — canal Discord via la gateway, bridge ROBERTO en secours — est
@@ -276,16 +279,20 @@ curatée des questions / réponses / décisions produit :
   durable, distincte de `a_transmettre.md` (commentaires de livraison en attente uniquement) et des
   `livraisons/vX.Y.md` (historique figé des livraisons).
 
-### Tests à faire pour Marie : uniquement dans l'appli
-Tous les tests que Marie doit effectuer vivent dans le catalogue in-app
-(`src/domain/data/manualTestsCatalog.ts`, écran « Tests à faire »). Ne jamais lister de tests à
-refaire ailleurs :
+### Validation des retours par Marie : via le fil de discussion (remplace le catalogue de tests)
+**Décision du 2026-09-15 (roadmap_retours_conversationnels.md, Phase 6)** : le catalogue de tests
+in-app (« Tests à faire », `src/domain/data/manualTestsCatalog.ts`, écran et icône retirés du code)
+est obsolète et remplacé par la boucle de retours conversationnels. Principe : Marie signale un
+problème depuis l'appli (bouton « Signaler un retour », suivi dans « Mes retours » — icône en haut
+à droite de l'Accueil) ; une fois corrigé, l'agent dépose une réponse via
+`scripts/reply_feedback_report.py` (voir section « Réponses aux retours testeurs » ci-dessus) ;
+Marie relit la réponse dans le fil de discussion (écran E124) et valide elle-même le retour —
+jamais l'agent à sa place. Il n'existe donc plus de liste de tests à faire proactive : la
+validation porte sur les problèmes effectivement remontés, pas sur un parcours prédéfini. Ne jamais
+recréer de liste de tests à refaire ailleurs :
 - `COMMUNICATION/Marie/a_transmettre.md` et les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md`
   ne contiennent que des **commentaires de livraison** (ce qui change, décisions attendues, écarts
   assumés) — aucune liste de tests, aucune étape de test.
-- Le message de livraison déposé par `/deploy` dans la gateway Discord renvoie vers l'écran
-  « Tests à faire » de l'appli pour les tests, sans les énumérer.
-Chaque comportement à valider par Marie doit donc être ajouté au catalogue in-app (Section « Tests
-manuels » : le catalogue, pas `tests_manuels.md`, qui reste réservé aux contrôles développeur).
 Cette règle prime sur toute étape de `/deploy`, `/close` ou `/analyser_googledoc` qui mentionnerait
-une rubrique « Tests à refaire » dans les documents de communication.
+encore l'écran « Tests à faire » ou une rubrique « Tests à refaire » dans les documents de
+communication — ces mentions sont désormais obsolètes et doivent être corrigées, pas suivies.

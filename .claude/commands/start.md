@@ -92,7 +92,7 @@ générique.
 ## Politique des branches
 
 - `main` est la seule branche autorisée pour les évolutions produit générales, les retours et
-  tests de Marie, `CHANGELOG.md`, `WHATS_NEW`, `manualTestsCatalog.ts` et tout déploiement.
+  tests de Marie, `CHANGELOG.md`, `WHATS_NEW` et tout déploiement.
 - Une branche `agent/<alias>` correspondant à une zone déclarée dans `.claude/zones.md` peut contenir un travail isolé
   strictement limité à son `agent_role.md`. Elle ne modifie jamais directement `main`, ne
   déclenche aucun déploiement et n'est intégrée qu'après validation explicite de l'utilisateur.

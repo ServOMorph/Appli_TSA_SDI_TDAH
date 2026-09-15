@@ -1,4 +1,6 @@
 export type FeedbackSyncStatus = 'pending' | 'sent' | 'failed'
+export type FeedbackResolutionStatus = 'open' | 'validated'
+export type FeedbackResolutionSyncStatus = 'pending' | 'sent' | 'failed'
 
 export interface FeedbackPoint {
   x: number
@@ -21,4 +23,8 @@ export interface FeedbackReport {
   created_at: string
   sync_status: FeedbackSyncStatus
   last_attempt_at: string | null
+  resolution_status: FeedbackResolutionStatus
+  validated_at: string | null
+  resolution_sync_status: FeedbackResolutionSyncStatus
+  resolution_last_attempt_at: string | null
 }

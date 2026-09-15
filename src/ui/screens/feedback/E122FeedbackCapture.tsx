@@ -113,6 +113,10 @@ export function E122FeedbackCapture() {
         created_at: new Date().toISOString(),
         sync_status: 'pending',
         last_attempt_at: null,
+        resolution_status: 'open',
+        validated_at: null,
+        resolution_sync_status: 'sent',
+        resolution_last_attempt_at: null,
       })
       void syncFeedbackNow()
       goTo('feedback-list')

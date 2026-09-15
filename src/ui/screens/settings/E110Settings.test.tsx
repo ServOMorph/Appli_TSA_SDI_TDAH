@@ -27,6 +27,11 @@ describe('E110Settings', () => {
     expect(screen.getByText('Export et import')).toBeInTheDocument()
   })
 
+  it('n’affiche plus l’entrée Mes retours, déplacée sur l’icône de l’Accueil (roadmap_retours_conversationnels.md, Phase 6)', () => {
+    renderE110()
+    expect(screen.queryByText('Mes retours')).toBeNull()
+  })
+
   it('navigue vers settings-profile au clic Profil', () => {
     const goTo = vi.fn()
     renderE110({ goTo })

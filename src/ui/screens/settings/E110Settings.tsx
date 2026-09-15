@@ -75,7 +75,9 @@ export function E110Settings() {
                 aria-label={entry.label}
               >
                 <Card>
-                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text)' }}>{entry.label}</p>
+                  <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text)' }}>
+                    {entry.label}
+                  </p>
                   <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
                     {entry.description}
                   </p>

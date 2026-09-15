@@ -1,3 +1,31 @@
+## v5.135 — 2026-09-15
+
+### Ajouté
+- **Fil de discussion sur un retour signalé** (`roadmap_retours_conversationnels.md`, 6 phases) :
+  un retour envoyé depuis l'application (écran E122) ouvre désormais un fil de discussion (écran
+  E124) — l'équipe y répond une fois la modification faite, le testeur peut relancer un échange et
+  valide lui-même quand il est satisfait. Le retour disparaît alors de « Mes retours ».
+- Icône « Mes retours » sur l'écran d'accueil (en haut à droite), avec pastille de notification
+  quand une réponse n'a pas encore été lue.
+
+### Modifié
+- **Catalogue de tests manuels in-app entièrement retiré**, remplacé par la boucle de retours
+  ci-dessus (décision produit explicite : la validation par Marie passe désormais par ses propres
+  signalements, plus par une liste de tests à rejouer). L'entrée « Mes retours » de Paramètres est
+  retirée, redondante avec la nouvelle icône d'accueil.
+
+### Corrigé
+- Le bouton « Relancer » d'un envoi de retour resté en attente pouvait rester sans effet visible au
+  clic (verrou de synchronisation ne retentant pas l'envoi dans certains enchaînements).
+- La pastille de nouvelle réponse sur l'icône « Mes retours » ne se recalculait qu'une fois au
+  chargement de l'accueil, manquant une réponse reçue juste après par la synchronisation de fond.
+- Un échec d'enregistrement local (quota, navigation privée) en ajoutant un commentaire ou en
+  validant un retour dans le fil de discussion (E124) restait silencieux, sans message d'erreur.
+
+### Retiré
+- `scripts/ingest_manual_tests.py` (devenu sans effet depuis le retrait du catalogue de tests
+  in-app, le champ qu'il consommait n'existant plus dans les exports).
+
 ## v5.134 — 2026-09-15
 
 ### Modifié

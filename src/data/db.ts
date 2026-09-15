@@ -18,8 +18,8 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
-import type { ManualTestResult } from '@/domain/entities/manualTestResult'
 import type { FeedbackReport } from '@/domain/entities/feedbackReport'
+import type { FeedbackMessage } from '@/domain/entities/feedbackMessage'
 
 function migrationId(): string {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
@@ -50,8 +50,8 @@ export class AppDatabase extends Dexie {
   taskExceptions!: Table<TaskException>
   folders!: Table<Folder>
   tools!: Table<Tool>
-  manualTestResults!: Table<ManualTestResult>
   feedbackReports!: Table<FeedbackReport>
+  feedbackMessages!: Table<FeedbackMessage>
 
   constructor(name = 'appli-tsa-sdi-tdah') {
     super(name)
@@ -398,6 +398,69 @@ export class AppDatabase extends Dexie {
       taskCategories: 'id, position',
       feedbackReports: 'id, created_at, sync_status',
     })
+    this.version(20)
+      .stores({
+        feedbackMessages: 'id, report_id, created_at, sync_status',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('feedbackReports')
+          .toCollection()
+          .modify((report) => {
+            report.resolution_status = 'open'
+            report.validated_at = null
+          })
+      })
+    this.version(21)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table('feedbackReports')
+          .toCollection()
+          .modify((report) => {
+            report.resolution_sync_status = report.resolution_status === 'validated' ? 'pending' : 'sent'
+            report.resolution_last_attempt_at = null
+          })
+        await tx
+          .table('feedbackMessages')
+          .toCollection()
+          .modify((message) => {
+            message.last_attempt_at = null
+          })
+      })
+    this.version(22)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table('feedbackMessages')
+          .toCollection()
+          .modify((message) => {
+            message.read_at = message.author === 'user' ? message.created_at : null
+          })
+      })
+    // Rattrapage des retours ecrits sans les champs de resolution (ligne creee par une version du
+    // client anterieure aux v20/v21 mais posee apres leur migration, cas observe en dev avec un
+    // onglet en etat HMR mixte) : sans ce filet, getOpen() les masque definitivement.
+    this.version(23)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table('feedbackReports')
+          .toCollection()
+          .modify((report) => {
+            if (report.resolution_status === undefined) report.resolution_status = 'open'
+            if (report.validated_at === undefined) report.validated_at = null
+            if (report.resolution_sync_status === undefined) {
+              report.resolution_sync_status = report.resolution_status === 'validated' ? 'pending' : 'sent'
+            }
+            if (report.resolution_last_attempt_at === undefined) report.resolution_last_attempt_at = null
+          })
+      })
+    // Catalogue de tests manuels rendu obsolete (roadmap_retours_conversationnels.md, Phase 6) :
+    // le suivi/validation passe desormais par le fil de discussion des retours (Phases 3 a 5).
+    // Les resultats historiques locaux ne sont pas repris ailleurs ; le catalogue lui-meme etait
+    // deja vide depuis le 2026-09-13 (sauvegarde : Archives/manualTestsCatalog_backup_2026-09-13.md).
+    this.version(24).stores({ manualTestResults: null })
   }
 }
 

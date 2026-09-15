@@ -19,6 +19,10 @@ describe('FeedbackReportRepository', () => {
     created_at: '2026-09-04T10:00:00.000Z',
     sync_status: 'pending',
     last_attempt_at: null,
+    resolution_status: 'open',
+    validated_at: null,
+    resolution_sync_status: 'sent',
+    resolution_last_attempt_at: null,
     ...overrides,
   })
 
@@ -70,6 +74,52 @@ describe('FeedbackReportRepository', () => {
     expect(await db.feedbackReports.get('feedback-1')).toMatchObject({
       sync_status: 'sent',
       last_attempt_at: '2026-09-04T10:11:00.000Z',
+    })
+  })
+
+  it('retourne uniquement les retours ouverts', async () => {
+    await repo.create(report({ id: 'open' }))
+    await repo.create(report({ id: 'validated', resolution_status: 'validated', validated_at: '2026-09-04T12:00:00.000Z' }))
+
+    expect((await repo.getOpen()).map((item) => item.id)).toEqual(['open'])
+  })
+
+  it('valide un retour, le retire de la liste des retours ouverts et prépare sa clôture serveur', async () => {
+    await repo.create(report())
+
+    await repo.validate('feedback-1', '2026-09-04T12:00:00.000Z')
+
+    expect(await db.feedbackReports.get('feedback-1')).toMatchObject({
+      resolution_status: 'validated',
+      validated_at: '2026-09-04T12:00:00.000Z',
+      resolution_sync_status: 'pending',
+    })
+    expect(await repo.getOpen()).toEqual([])
+  })
+
+  it('retourne uniquement les clôtures à synchroniser, pour un retour déjà envoyé', async () => {
+    await repo.create(report({ id: 'not-validated' }))
+    await repo.create(report({ id: 'not-sent', sync_status: 'pending', resolution_status: 'validated', resolution_sync_status: 'pending' }))
+    await repo.create(report({ id: 'to-close', sync_status: 'sent', resolution_status: 'validated', resolution_sync_status: 'pending' }))
+    await repo.create(report({ id: 'already-closed', sync_status: 'sent', resolution_status: 'validated', resolution_sync_status: 'sent' }))
+    await repo.create(report({ id: 'failed-once', sync_status: 'sent', resolution_status: 'validated', resolution_sync_status: 'failed' }))
+
+    expect((await repo.getToCloseSync()).map((item) => item.id).sort()).toEqual(['failed-once', 'to-close'])
+  })
+
+  it('met à jour le statut de synchronisation de la clôture', async () => {
+    await repo.create(report({ resolution_status: 'validated', resolution_sync_status: 'pending' }))
+
+    await repo.markResolutionFailed('feedback-1', '2026-09-04T13:00:00.000Z')
+    expect(await db.feedbackReports.get('feedback-1')).toMatchObject({
+      resolution_sync_status: 'failed',
+      resolution_last_attempt_at: '2026-09-04T13:00:00.000Z',
+    })
+
+    await repo.markResolutionSent('feedback-1', '2026-09-04T13:05:00.000Z')
+    expect(await db.feedbackReports.get('feedback-1')).toMatchObject({
+      resolution_sync_status: 'sent',
+      resolution_last_attempt_at: '2026-09-04T13:05:00.000Z',
     })
   })
 })

@@ -76,3 +76,6 @@ COMMUNICATION/Marie/commentaires/commentaires_marie_*.docx
 
 # Scratchpad de session (artefacts transitoires, jamais commités)
 scratchpad/
+
+# Artefacts du serveur MCP Playwright (captures/console de session, jamais commités)
+.playwright-mcp/

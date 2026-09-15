@@ -5,21 +5,18 @@ import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E10Dashboard, PLANNING_HEIGHT_PX } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
 import { makeTask as baseTask } from '@/test/factories'
-import { manualTestsCatalog } from '@/domain/data/manualTestsCatalog'
 
-// Le catalogue réel a été vidé le 2026-09-13 (décision utilisateur, sauvegarde dans
-// Archives/manualTestsCatalog_backup_2026-09-13.md). Ces tests vérifient la pastille « nouveaux
-// tests disponibles », pas un contenu réel : catalogue factice avec une entrée révisée.
-vi.mock('@/domain/data/manualTestsCatalog', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/domain/data/manualTestsCatalog')>()
-  return {
-    ...actual,
-    manualTestsCatalog: [
-      { id: 'fixture-un', title: 'Fixture un', category: 'Outils : Listes', steps: ['Étape 1'] },
-      { id: 'fixture-revise', title: 'Fixture révisé', category: 'Tâches', revision: 2, steps: ['Étape 1'] },
-    ],
-  }
-})
+const mocks = vi.hoisted(() => ({
+  getUnreadReportIds: vi.fn().mockResolvedValue([]),
+  syncFeedbackNow: vi.fn().mockResolvedValue(false),
+}))
+
+vi.mock('@/app/repositories', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/app/repositories')>()),
+  feedbackMessageRepo: { getUnreadReportIds: mocks.getUnreadReportIds },
+}))
+
+vi.mock('@/data/sync/feedbackClient', () => ({ syncFeedbackNow: mocks.syncFeedbackNow }))
 
 function makeTaskV2(overrides: Partial<Task> = {}): Task {
   return baseTask({
@@ -40,6 +37,11 @@ async function renderDashboard(ctx = makeAppContext()) {
 }
 
 describe('E10Dashboard', () => {
+  beforeEach(() => {
+    mocks.getUnreadReportIds.mockReset().mockResolvedValue([])
+    mocks.syncFeedbackNow.mockClear()
+  })
+
   describe('énergie (intégration)', () => {
     it('affiche la pill Mon énergie si todayEnergyStatus null', async () => {
       await renderDashboard()
@@ -107,59 +109,31 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('resources')
     })
 
-    it('navigue vers les tests à faire et affiche une pastille si un test est nouveau', async () => {
+    it('navigue vers Mes retours et affiche une pastille si une réponse n’est pas lue', async () => {
+      mocks.getUnreadReportIds.mockResolvedValue(['report-1'])
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
-      expect(screen.getByLabelText('Nouveaux tests disponibles')).toBeDefined()
-      await userEvent.click(screen.getByRole('button', { name: 'Tests à faire, nouveaux tests disponibles' }))
-      expect(ctx.goTo).toHaveBeenCalledWith('manual-tests')
+      expect(await screen.findByLabelText('Nouvelle réponse disponible')).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Mes retours, nouvelle réponse disponible' }))
+      expect(ctx.goTo).toHaveBeenCalledWith('feedback-list')
     })
 
-    it('masque la pastille des tests quand tous les tests ont déjà été vus', async () => {
-      const ctx = makeAppContext({
-        manualTestResults: manualTestsCatalog.map((test) => ({
-          id: `result-${test.id}`,
-          test_id: test.id,
-          test_revision: test.revision,
-          status: 'ok' as const,
-          comment: null,
-          created_at: '2026-08-14T10:00:00.000Z',
-        })),
-      })
-      await renderDashboard(ctx)
-      expect(screen.queryByLabelText('Nouveaux tests disponibles')).toBeNull()
-      expect(screen.getByRole('button', { name: 'Tests à faire' })).toBeDefined()
+    it('n’affiche pas de pastille sans réponse non lue', async () => {
+      const ctx = makeAppContext()
+      renderWithApp(<E10Dashboard />, ctx)
+      await screen.findByRole('button', { name: 'Mes retours' })
+      await vi.waitFor(() => expect(mocks.syncFeedbackNow).toHaveBeenCalled())
+      expect(screen.queryByLabelText('Nouvelle réponse disponible')).toBeNull()
     })
 
-    it('masque la pastille dès qu’un test a un résultat, même « Non validé »', async () => {
-      const ctx = makeAppContext({
-        manualTestResults: manualTestsCatalog.map((test) => ({
-          id: `result-${test.id}`,
-          test_id: test.id,
-          test_revision: test.revision,
-          status: 'nok' as const,
-          comment: 'Retour de test',
-          created_at: '2026-08-14T10:00:00.000Z',
-        })),
-      })
-      await renderDashboard(ctx)
-      expect(screen.queryByLabelText('Nouveaux tests disponibles')).toBeNull()
-    })
-
-    it('affiche la pastille quand un test révisé n’a été validé que sur une ancienne révision', async () => {
-      const revised = manualTestsCatalog.find((test) => test.revision !== undefined)!
-      const ctx = makeAppContext({
-        manualTestResults: manualTestsCatalog.map((test) => ({
-          id: `result-${test.id}`,
-          test_id: test.id,
-          test_revision: test.id === revised.id ? (revised.revision ?? 0) - 1 : test.revision,
-          status: 'ok' as const,
-          comment: null,
-          created_at: '2026-08-14T10:00:00.000Z',
-        })),
-      })
-      await renderDashboard(ctx)
-      expect(screen.getByLabelText('Nouveaux tests disponibles')).toBeDefined()
+    it('fait apparaître la pastille une fois la synchronisation de fond terminée, même absente au premier rendu', async () => {
+      // Bug reel (roadmap_retours_conversationnels.md, Phase 6) : la synchronisation globale
+      // demarree en meme temps que ce tableau de bord pouvait recevoir une reponse d'agent apres
+      // le premier controle local, sans jamais le declencher a nouveau.
+      mocks.getUnreadReportIds.mockResolvedValueOnce([]).mockResolvedValueOnce(['report-1'])
+      renderWithApp(<E10Dashboard />)
+      expect(screen.queryByLabelText('Nouvelle réponse disponible')).toBeNull()
+      expect(await screen.findByLabelText('Nouvelle réponse disponible')).toBeDefined()
     })
 
     it('n\'affiche pas d\'icône Planning dans la TopBar', async () => {

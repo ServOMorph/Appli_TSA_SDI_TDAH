@@ -2,7 +2,7 @@ import { useApp } from '@/app/AppContext'
 
 export function FeedbackFab() {
   const { screen, goTo } = useApp()
-  if (screen === 'feedback' || screen === 'feedback-list') return null
+  if (screen === 'feedback' || screen === 'feedback-list' || screen === 'feedback-detail') return null
 
   return (
     <button

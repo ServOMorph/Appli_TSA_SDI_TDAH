@@ -10,8 +10,8 @@ interface TopBarProps {
   overloadActive: boolean
   plannedCost: number
   onResourcesClick: () => void
-  onManualTestsClick: () => void
-  hasNewManualTests: boolean
+  onFeedbackClick: () => void
+  hasUnreadFeedback: boolean
   onOverloadClick: () => void
   ambianceColor: string
 }
@@ -71,8 +71,8 @@ export function TopBar({
   overloadActive,
   plannedCost,
   onResourcesClick,
-  onManualTestsClick,
-  hasNewManualTests,
+  onFeedbackClick,
+  hasUnreadFeedback,
   onOverloadClick,
   ambianceColor,
 }: TopBarProps) {
@@ -135,9 +135,9 @@ export function TopBar({
                 </svg>
               </button>
               <button
-                onClick={onManualTestsClick}
-                aria-label={hasNewManualTests ? 'Tests à faire, nouveaux tests disponibles' : 'Tests à faire'}
-                title="Tests à faire"
+                onClick={onFeedbackClick}
+                aria-label={hasUnreadFeedback ? 'Mes retours, nouvelle réponse disponible' : 'Mes retours'}
+                title="Mes retours"
                 style={{
                   position: 'relative',
                   background: 'none',
@@ -149,12 +149,11 @@ export function TopBar({
                 }}
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M9 11l3 3L22 4" />
-                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
-                {hasNewManualTests && (
+                {hasUnreadFeedback && (
                   <span
-                    aria-label="Nouveaux tests disponibles"
+                    aria-label="Nouvelle réponse disponible"
                     style={{ position: 'absolute', top: 2, right: 2, width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--color-error)', border: '1px solid var(--color-surface)' }}
                   />
                 )}

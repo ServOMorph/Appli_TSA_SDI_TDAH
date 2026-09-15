@@ -21,7 +21,6 @@ import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
-import type { ManualTestResult } from '@/domain/entities/manualTestResult'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
 
@@ -29,7 +28,7 @@ const IMPORT_TABLES = [
   db.users, db.tasks, db.taskRecurrences, db.taskExceptions, db.taskCategories,
   db.lists, db.listItems, db.listItemSubTasks, db.listCategories, db.folders,
   db.tools, db.energyEntries, db.settings, db.budgetCategories, db.budgetEntries,
-  db.budgetAccounts, db.budgetDeposits, db.budgetIncomeEntries, db.manualTestResults,
+  db.budgetAccounts, db.budgetDeposits, db.budgetIncomeEntries,
 ] as const
 
 function readImportArray(data: Record<string, unknown>, key: string): unknown[] {
@@ -176,7 +175,6 @@ export function useSettingsState() {
       db.taskRecurrences.clear(),
       db.taskExceptions.clear(),
       db.taskCategories.clear(),
-      db.manualTestResults.clear(),
     ])
   }
 
@@ -185,8 +183,7 @@ export function useSettingsState() {
    * de la base (§clearDatabase) par le contenu du fichier. Accepte les exports v3.0 (avant
    * l'ajout de `folders`/`tools`/`task_recurrences`/`task_exceptions` à l'export) en recréant
    * l'entrée Outil manquante pour chaque liste qui n'en a pas, ainsi que l'entrée Outil Budget
-   * (`tableau_comptage`) si elle est absente. Les exports plus anciens sans résultats de tests
-   * manuels sont acceptés avec un historique vide. Les exports antérieurs à v3.3 (avant l'ajout
+   * (`tableau_comptage`) si elle est absente. Les exports antérieurs à v3.3 (avant l'ajout
    * de `list_categories`) sont acceptés en recréant une catégorie par valeur de `section` sur
    * les éléments de liste, comme le fait la migration Dexie v12 à l'installation. Les exports
    * antérieurs à v3.5 (avant `description`/`list_item_sub_tasks`) sont acceptés avec une
@@ -215,7 +212,7 @@ export function useSettingsState() {
     let tasks: Task[], taskRecurrences: TaskRecurrence[], taskExceptions: TaskException[], taskCategories: TaskCategory[]
     let lists: List[], rawListItems: (ListItem & { section?: string | null })[], listItemSubTasks: ListItemSubTask[], listCategories: ListCategory[]
     let folders: Folder[], tools: Tool[], energyEntries: EnergyEntry[], categories: BudgetCategory[], entries: BudgetEntry[]
-    let accounts: BudgetAccount[], deposits: BudgetDeposit[], incomeEntries: BudgetIncomeEntry[], manualTestResults: ManualTestResult[]
+    let accounts: BudgetAccount[], deposits: BudgetDeposit[], incomeEntries: BudgetIncomeEntry[]
     try {
       tasks = readImportArray(data, 'tasks') as Task[]
       taskRecurrences = readImportArray(data, 'task_recurrences') as TaskRecurrence[]
@@ -233,8 +230,7 @@ export function useSettingsState() {
       accounts = readImportArray(data, 'budget_accounts') as BudgetAccount[]
       deposits = readImportArray(data, 'budget_deposits') as BudgetDeposit[]
       incomeEntries = readImportArray(data, 'budget_income_entries') as BudgetIncomeEntry[]
-      manualTestResults = readImportArray(data, 'manual_test_results') as ManualTestResult[]
-      for (const [name, items] of Object.entries({ tasks, taskRecurrences, taskExceptions, taskCategories, lists, rawListItems, listItemSubTasks, listCategories, folders, tools, energyEntries, categories, entries, accounts, deposits, incomeEntries, manualTestResults })) {
+      for (const [name, items] of Object.entries({ tasks, taskRecurrences, taskExceptions, taskCategories, lists, rawListItems, listItemSubTasks, listCategories, folders, tools, energyEntries, categories, entries, accounts, deposits, incomeEntries })) {
         assertUniqueIds(name, items as { id: string }[])
       }
       const taskIds = new Set(tasks.map((item) => item.id))
@@ -339,7 +335,6 @@ export function useSettingsState() {
         if (accounts.length) await db.budgetAccounts.bulkAdd(accounts)
         if (deposits.length) await db.budgetDeposits.bulkAdd(deposits)
         if (incomeEntries.length) await db.budgetIncomeEntries.bulkAdd(incomeEntries)
-        if (manualTestResults.length) await db.manualTestResults.bulkAdd(manualTestResults)
       })
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Échec de l\'import.' }

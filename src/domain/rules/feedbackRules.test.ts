@@ -15,6 +15,10 @@ function report(overrides: Partial<FeedbackReport> = {}): FeedbackReport {
     created_at: '2026-08-01T10:00:00.000Z',
     sync_status: 'sent',
     last_attempt_at: '2026-08-01T10:10:00.000Z',
+    resolution_status: 'open',
+    validated_at: null,
+    resolution_sync_status: 'sent',
+    resolution_last_attempt_at: null,
     ...overrides,
   }
 }

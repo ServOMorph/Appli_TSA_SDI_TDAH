@@ -2,7 +2,7 @@
 
 Ce fichier est la source unique des **commentaires de livraison** en attente pour Marie. Il est rédigé simplement, sans détails techniques. À chaque déploiement, son contenu est figé dans `livraisons/vX.Y.md`, publié sur Drive et repris dans le message WhatsApp.
 
-Ce fichier ne contient jamais de liste de tests : tous les tests que Marie doit refaire vivent dans l'écran « Tests à faire » de l'appli.
+Ce fichier ne contient jamais de liste de tests : l'écran « Tests à faire » n'existe plus. Un problème se signale désormais directement via « Mes retours » ; la validation se fait dans la réponse reçue là-bas, pas via une liste séparée.
 
 ## Retours annotés — envoi activé
 
@@ -34,9 +34,9 @@ Sur la fiche d'une tâche, toucher une catégorie de couleur l'affiche maintenan
 
 Sur l'écran de création d'une tâche (bouton « Ajouter une tâche »), les champs Icône, Couleur, Date, Horaire et Coût en énergie sont maintenant repliés par défaut : ils s'affichent en petites cases, comme sur la fiche d'une tâche déjà créée. Toucher une case la déplie, choisir une valeur la replie aussitôt.
 
-## Écran Tests à faire remis à zéro
+## Mes retours : réponse directe dans l'application
 
-L'écran « Tests à faire » ne contient plus aucun test pour l'instant : la liste précédente a été retirée. De nouveaux tests y seront ajoutés au fur et à mesure des prochaines livraisons.
+Un retour envoyé depuis l'application ouvre maintenant un vrai échange : une fois le problème corrigé, la réponse arrive directement dans « Mes retours », en touchant le retour concerné. Il suffit de la lire et de toucher « Valider » si c'est bon, ou d'écrire un nouveau message si ce n'est pas encore satisfaisant. L'icône pour y accéder est maintenant en haut à droite de l'écran d'accueil (elle a remplacé « Tests à faire », qui n'existe plus) ; un petit cercle rouge apparaît dessus quand une réponse n'a pas encore été lue.
 
 ## Sauvegarde autonome de vos données
 

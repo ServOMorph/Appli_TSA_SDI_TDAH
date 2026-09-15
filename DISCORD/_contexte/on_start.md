@@ -60,7 +60,13 @@ fait, ils doivent réapparaître à chaque `/start` suivant.
 S'il reste des messages de Marie non traités signalés à l'étape 4 sans réponse de l'utilisateur
 sur la suite à leur donner, ne pas enchaîner : attendre sa réponse avant de continuer.
 
-Sinon, enchaîner automatiquement `/discord_loop`, sans demander de confirmation. Cette zone
+Sinon, poster un message de reprise sur `marie_supervision` via la gateway :
+```bash
+python DISCORD/discord_com/gateway.py enqueue --source discord --to marie_supervision \
+  --kind info --text "Service Discord reprend."
+```
+
+Puis enchaîner automatiquement `/discord_loop`, sans demander de confirmation. Cette zone
 n'existe que pour faire tourner la boucle Discord en service quasi-permanent (gardien de sortie
 de l'outbox + vidage de `inbox/unrouted/` et `inbox/discord/`) — cf.
 `.claude/commands/discord_loop.md` § Service quasi-permanent.

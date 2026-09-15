@@ -1,3 +1,15 @@
+## v5.134 — 2026-09-15
+
+### Modifié
+- **Messages Discord à Marie sans salutation d'ouverture aléatoire** (demande explicite de
+  l'utilisateur) : `gateway/salutations_marie.json` vidé, `curate()` gère la liste vide sans
+  erreur — un message part directement au tag puis au corps.
+- **Corrigé un bug de routage des réponses attendues** : une réponse à une demande `expect_reply`
+  partait toujours vers l'agent `source` de la demande, pas forcément celui qui devait la traiter
+  (cas vécu le 13/09 : message urgent créé côté `discord`, réponse à router manuellement vers
+  `orchestrateur`). `enqueue()` accepte désormais `--reply-to-agent <agent>`. Aucun changement de
+  code applicatif.
+
 ## v5.133 — 2026-09-13
 
 ### Modifié

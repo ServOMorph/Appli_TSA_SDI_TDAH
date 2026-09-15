@@ -16,6 +16,12 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 15 septembre 2026, deux ajustements sur la messagerie Discord avec Marie. Les messages qui lui
+sont envoyés ne commencent plus par une phrase d'ouverture tirée au hasard (sur demande explicite) :
+ils vont directement au contenu. Un bug a par ailleurs été corrigé : une réponse de Marie à un
+message urgent pouvait, dans de rares cas, ne pas atterrir directement chez la bonne personne côté
+développement et exiger un aiguillage manuel — c'est désormais automatique.
+
 Le 13 septembre 2026, le catalogue de tests manuels a été entièrement vidé (les 46 tests
 précédents sauvegardés sur disque avant suppression) sur décision explicite de l'utilisateur, pour
 que ni lui ni Marie ne voient plus ces tests dans l'application. Le bouton « Nouveautés » de

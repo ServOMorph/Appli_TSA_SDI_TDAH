@@ -1,4 +1,4 @@
-# Signals — discord   (MAJ 2026-09-10)
+# Signals — discord   (MAJ 2026-09-15)
 
 ## Actions ouvertes
 - [P1|ouvert] ONBOARD Phase 5 passe 3 (brief `5079c0b`) : `bot.py` `on_message` multi-canal + routage entrant PAR CANAL (contourne la collision `MORPHEUS_USER_ID` / `discord_member_id` de Satine à `null`) + balayage `inbox/testeurs/<code>/` dans la boucle `/discord_loop` + tests avec events Discord mockés. Puis franchir le checkpoint `/compact` de la Phase 5.
@@ -18,6 +18,18 @@
   réf: DISCORD/discord_com/gateway/STYLE.md
 
 ## Contexte chaud
+- **Routage des réponses attendues corrigé (2026-09-15, commit `826dc54`)** : `enqueue()` accepte
+  désormais `--reply-to-agent <agent>`. Sans lui, une réponse à une demande `expect_reply` part vers
+  l'agent `source` de la demande (comportement historique, inchangé par défaut) — pas forcément
+  l'agent qui doit la traiter. Découvert le 2026-09-13 : un message urgent créé avec `--source
+  discord` a fait router la réponse de Marie vers `inbox/discord/` au lieu d'`inbox/orchestrateur/`,
+  nécessitant un routage manuel (`route --author-id ... --text "@orchestrateur: ..."`). Toute
+  demande `expect_reply` dont la réponse doit atterrir ailleurs que chez son `source` doit
+  désormais passer `--reply-to-agent`.
+- **Salutations amusantes désactivées pour Marie (2026-09-15, commit `740d8d8`, demande explicite
+  utilisateur)** : `gateway/salutations_marie.json` vidé (`[]`). `_salutation_marie()` et `curate()`
+  gèrent la liste vide sans crash — un message à Marie part directement à `<@1368654289584656394>`
+  suivi du corps, sans plus de ligne de salutation. `STYLE.md` § marie mis à jour en conséquence.
 - `state.json` = `pending_replies: []` (vérifié 2026-09-09). L'entrée que ce fichier annonçait « active pour Marie » (bouton d'ajout de tâche planifiée, livraison v5.92) était périmée. Aucune réponse Marie n'est routée automatiquement tant qu'un `enqueue --expect-reply` ne recrée pas d'entrée.
 - Relance des 12 tests v5.92 (demande `20260909T100248_019203`, orchestrateur -> marie, `kind: info`) : jugée `approve` par le gardien le 2026-09-09 (pas de doublon — dernière relance = 2026-09-01 pour v5.69 ; version cohérente avec `_contexte/dernier_deploiement.md` = v5.92 / 2026-09-05 ; `pending_replies` vide). Deux retouches de forme STYLE.md § marie sans changement de fond : retrait de l'étiquette « Relance : », « déployer » -> « mettre en ligne ». Envoyée par `bot.py` (Discord `1547194409135644723`, 2026-09-09 10:38 UTC).
 - Réponse de Marie à cette relance (2026-09-09) : « oui j'y ai accès mais je les ai déjà fait ces tests, donc dans le navigateur avec mes données les tests n'apparaissent pas car déjà validé ». Relance sans `--expect-reply` -> pas de routage auto, tombée en commande `/discord_loop`, routée à la main vers `inbox/orchestrateur/20260909T160323_961174`, orchestrateur notifié (session parallèle). Écran « Tests à faire » vide côté Marie = mécanisme normal (un parcours disparaît dès qu'un résultat `ok`/`nok` est enregistré). Décalage côté dév = retard d'ingestion : `_contexte/marie_tests_journal.json` s'arrête au 2026-09-04, ~9 résultats v5.92 jamais ingérés. Traitement produit à la charge de l'orchestrateur (`/deploy` étape 0.4).
@@ -30,24 +42,32 @@
 - Lacune observée le 2026-09-06 : les cycles `/discord_loop` regroupés (`send` + `done` + `wait` en une commande) ont cessé de vider `inbox/discord/` et `inbox/unrouted/` à chaque tour. Garder le `poll --agent unrouted` + `poll --agent discord` à chaque cycle, même regroupé. Corollaire vérifié le 2026-09-09 : un `wait` lancé via `&` dans une commande groupée se détache (process orphelin non suivi, aucun réveil) — toujours lancer `discord_loop.py wait` seul en tâche de fond.
 - `on_close.md` § Fin (2026-09-09, demande Morphéus) : le `/close` discord poste un message de pause sur le canal de supervision (chaîne figée = celle de l'arrêt `stop`), tue le process `discord_loop.py wait`, puis `bot.py`. Ordre imposé : message d'abord (`bot.py` doit être vivant pour flusher `queue.json`). Cible = `config.channel_id` (== `channels.supervision` tant que la fusion tient).
 
-## Dernière session (2026-09-09 / 2026-09-10)
+## Dernière session (2026-09-12 / 2026-09-15)
 <!-- Écrasé intégralement par /close. Synthèse < 25 lignes. -->
 
 ### Décisions prises
-- Aucune décision structurante. Session purement opérationnelle : `/start discord` + boucle `/discord_loop` en service.
+- Salutations amusantes désactivées pour Marie (demande explicite utilisateur).
+- Bug de routage des réponses attendues corrigé (`reply_to_agent`), cf. Contexte chaud.
 
 ### Livrables produits ou modifiés
-- Aucun livrable de code (aucune modification versionnée dans `DISCORD/` ou `scripts/`).
-- Jugement gardien : demande `20260909T100248_019203` (relance 12 tests v5.92) -> `approve` avec 2 retouches de forme STYLE.md § marie (fond inchangé). Envoyée (Discord `1547194409135644723`).
-- Routage manuel : réponse de Marie à la relance -> `inbox/orchestrateur/20260909T160323_961174`, orchestrateur notifié.
-- `/close` : `DISCORD/_contexte/` (signals, contexte, statut).
+- `DISCORD/discord_com/gateway.py` : `reply_to_agent` (enqueue + CLI + `route_inbound`), gestion
+  liste de salutations vide (commits `826dc54`, `740d8d8`).
+- `DISCORD/discord_com/gateway/salutations_marie.json` : vidé.
+- `DISCORD/discord_com/gateway/STYLE.md` : sections salutation/livraison mises à jour.
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : message correctif incident v5.124,
+  réponses #37 et incident consignées (commits `f3eb63e`, `c2e0a31`).
+- Jugement gardien : relance #37 (`20260912T061449_057883`) -> `approve` ; confirmation architecture
+  #37 (`20260912T061902_354912`) -> `hold` puis `approve` après réponse ; livraison v5.124
+  (`20260912T091855_376439`) -> `approve`.
 
 ### Hypothèses validées / invalidées
-- INVALIDÉ (signals périmé) : la `pending_reply` « active pour Marie » annoncée par signals.md — `state.json` = `pending_replies: []` (vérifié).
-- VALIDÉ : Marie a fait les 12 tests v5.92 (écran « Tests à faire » vide côté elle = mécanisme normal) ; décalage dév = retard d'ingestion du snapshot (~9 résultats non ingérés).
-- VALIDÉ : hooks `on_start` (rattrapé après oubli initial) et `on_close` exercés en conditions réelles.
-- EN ATTENTE : ingestion snapshot v5.92 de Marie (orchestrateur / `/deploy` étape 0.4).
-- EN ATTENTE : Phase 5 passe 3 ; `discord_member_id` Satine ; photo/vidéo #3 ; section `morpheus` STYLE.md.
+- VALIDÉ : le routage par défaut vers l'agent `source` d'une demande `expect_reply` (au lieu de
+  l'agent qui doit traiter la réponse) a causé un routage manuel le 2026-09-13 — corrigé.
+- VALIDÉ : le signalement de Marie du 13/09 (« toujours pas mes données ») était un second
+  incident distinct du diagnostic initial (deux installations) — pris en charge et résolu par
+  l'orchestrateur (mauvais import côté Marie), hors périmètre discord.
+- EN ATTENTE (inchangé depuis 2026-09-10) : Phase 5 passe 3 ; `discord_member_id` Satine ;
+  photo/vidéo #3 ; section `morpheus` STYLE.md.
 
 ### Prochaine étape exacte
 Passe 3 de la Phase 5 (brief `5079c0b`) : `bot.py` `on_message` multi-canal + routage entrant par canal + balayage `inbox/testeurs/<code>/` dans `/discord_loop` + tests events mockés. Puis franchir le checkpoint `/compact` de la Phase 5.

@@ -29,7 +29,7 @@ Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
 ### Étape 3 : Poster le message de reprise
 
 ```bash
-python DISCORD/discord_com/gateway.py enqueue --source discord --to marie_supervision \
+python DISCORD/discord_com/gateway.py enqueue --source discord --to morpheus \
   --kind info --text "Service Discord reprend."
 ```
 

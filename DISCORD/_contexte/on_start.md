@@ -60,9 +60,9 @@ fait, ils doivent réapparaître à chaque `/start` suivant.
 S'il reste des messages de Marie non traités signalés à l'étape 4 sans réponse de l'utilisateur
 sur la suite à leur donner, ne pas enchaîner : attendre sa réponse avant de continuer.
 
-Sinon, poster un message de reprise sur `marie_supervision` via la gateway :
+Sinon, poster un message de reprise sur le canal Morphéus via la gateway :
 ```bash
-python DISCORD/discord_com/gateway.py enqueue --source discord --to marie_supervision \
+python DISCORD/discord_com/gateway.py enqueue --source discord --to morpheus \
   --kind info --text "Service Discord reprend."
 ```
 

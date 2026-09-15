@@ -21,7 +21,7 @@ Get-CimInstance Win32_Process -Filter "Name='python.exe'" |
 ### Étape 2 : Poster le message de pause
 
 ```bash
-python DISCORD/discord_com/gateway.py enqueue --source discord --to marie_supervision \
+python DISCORD/discord_com/gateway.py enqueue --source discord --to morpheus \
   --kind info --text "Service Discord en pause."
 ```
 

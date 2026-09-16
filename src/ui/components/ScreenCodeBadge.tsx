@@ -13,6 +13,7 @@ export function ScreenCodeBadge() {
         top: 'var(--spacing-sm)',
         right: 'var(--spacing-sm)',
         zIndex: 50,
+        pointerEvents: 'none',
         borderRadius: 'var(--radius-sm)',
         padding: '2px 6px',
         background: 'color-mix(in srgb, var(--color-background) 88%, transparent)',

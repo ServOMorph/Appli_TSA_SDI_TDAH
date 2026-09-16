@@ -1,6 +1,7 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-15)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-09-16)
 
 ## Contexte chaud
+- **Session dev tooling + synchronisation manuelle (2026-09-16, retrouvée et close a posteriori — le `/close` initial n'avait pas pu s'exécuter).** Tunnel HTTPS local (cloudflared, `vite.config.ts`) et commande `/dev_display` : outillage dev général, sans lien avec `roadmap_experience_accueil_testeurs.md`, jamais testé sur téléphone réel (`tests_manuels.md`). `SyncStatusCard.tsx` (écran Paramètres) gagne un bouton « Synchroniser maintenant » (sync forcée), visible par tout testeur ayant le partage activé — ajouté à `a_transmettre.md`/`WHATS_NEW`. Badge version (`__APP_DEV_VERSION__`) retiré du panneau dev (`DevResetButton`, redondant avec `ScreenCodeBadge`) sur confirmation explicite — contredisait `CHANGELOG.md` v5.25 (« affichée en permanence »), CHANGELOG mis à jour. `ScreenCodeBadge.tsx` : `pointerEvents: none`, ne bloque plus les clics dessous. Revue de code de session (medium) : 1 correctif appliqué (garde de démontage sur `sync()`), 1 point tranché avec l'utilisateur (retrait de badge). Suite complète 875/875 verts, `tsc -b` + `eslint` clean.
 - **`roadmap_retours_conversationnels.md` terminée (6 phases, 2026-09-14/15).** Fil de discussion sur un retour (E124), lecture serveur → client, outil développeur de réponse (`scripts/reply_feedback_report.py`), catalogue de tests in-app (E121 « Tests à faire ») entièrement retiré et remplacé par l'icône « Mes retours » sur l'Accueil. Round-trip complet vérifié en conditions réelles (Supabase réel, navigateur réel via MCP Playwright). Deux bugs de concurrence trouvés et corrigés en cours de route (verrou `syncFeedbackNow`/bouton Relancer, pastille de l'icône Accueil non réactive à la synchronisation de fond). 13 anciens retours Supabase (antérieurs à cette fonctionnalité, jamais répondus, aucun fil) purgés de la base sur décision explicite de l'utilisateur pour repartir de zéro ; sauvegarde intégrale du texte dans `Archives/feedback_reports_backup_2026-09-15.md`. Détail phase par phase et décisions tranchées : `roadmap_retours_conversationnels.md`.
 - **Revue de code de session (2026-09-15, `code-review` niveau medium) sur le diff complet depuis `4b42d79`.** 15 pistes relevées ; 2 corrections de robustesse confirmées et appliquées dans `E124FeedbackDetail.tsx` (`sendReply`/`validate` sans gestion d'erreur, incohérent avec le même pattern déjà présent dans `E122FeedbackCapture.tsx` — désormais un message d'erreur `role="alert"` s'affiche en cas d'échec Dexie, +2 tests). Les autres pistes de correction sont tracées en `[P1]` ci-dessous (pas corrigées, decision reportée) ; les pistes de simplification/efficacité sont listées en fin de synthèse de session, non corrigées (`/simplify` à la main de l'utilisateur).
 - **Suite complète : Vitest 869 verts, `tsc -b` + `eslint` exit 0** (reconfirmé au `/close` du 2026-09-15, après les 2 correctifs de robustesse ci-dessus).
@@ -39,24 +40,26 @@
 - [P3] **Simplification signalée par la revue de code de session (2026-09-13, non corrigée) : `aria-label` redondant sur le champ Heure de début d'`E21CreateTaskV2.tsx`.** Duplique l'association déjà faite par `<label htmlFor="task-start-time">` — dette mineure, `/simplify` à la main de l'utilisateur. — fait quand : redondance retirée ou jugée volontaire — réf : `src/ui/screens/tasks/E21CreateTaskV2.tsx:300`
 - [P3] **Simplifications/duplications signalées par la revue de code de session (2026-09-15, non corrigées, `/simplify` à la main de l'utilisateur) sur `roadmap_retours_conversationnels.md` :** `formatDateTime` (E124FeedbackDetail.tsx) duplique `formatSyncDate` (SyncStatusCard.tsx) ; `STATUS_LABELS` dupliqué entre E123FeedbackList.tsx et E124FeedbackDetail.tsx ; `feedbackMessagesCursor.ts` répète le pattern localStorage déjà utilisé par `deviceIdentity.ts`/`syncConsent.ts` sans helper commun, aucun des trois ne gère les erreurs (mode privé, quota) ; `syncMessages`/`syncClosures`/`fetchMessages` s'enchaînent en `await` séquentiels dans `feedbackClient.ts` alors qu'ils sont indépendants (`Promise.all` possible) ; `fetchMessages` n'a pas de throttle et est désormais déclenché par le montage de E10Dashboard/E123/E124, ce qui contredit son propre commentaire (« moments discrets ») ; `isFeedbackMessageValid` impose 2000 caractères max sans équivalent sur `FeedbackReport.comment`, rendu dans le même fil. — fait quand : traité via `/simplify` ou dette jugée acceptable — réf : `src/ui/screens/feedback/E124FeedbackDetail.tsx`, `src/ui/screens/feedback/E123FeedbackList.tsx`, `src/data/sync/feedbackMessagesCursor.ts`, `src/data/sync/feedbackClient.ts`, `src/domain/rules/feedbackRules.ts`
 
-## Dernière session (2026-09-16 — documentation et onboarding code testeur)
+## Dernière session (2026-09-16 — dev tooling + synchronisation manuelle, close a posteriori)
 
 ## Décisions prises
-- `.claude/CLAUDE.md` est la source canonique des instructions ; ses deux miroirs sont synchronisés à l'identique.
-- Le code testeur est demandé pendant l'onboarding, avant le profil, et n'est plus modifiable depuis Paramètres > Profil.
+- Retrait volontaire du badge version (`__APP_DEV_VERSION__`) du panneau dev, redondant avec `ScreenCodeBadge` — CHANGELOG.md mis à jour en conséquence.
+- Tunnel cloudflared + `/dev_display` : outillage dev général, sans lien avec `roadmap_experience_accueil_testeurs.md`.
 
 ## Livrables produits ou modifiés
-- `DOCUMENTATION/` : index, concepts, guides, décisions et spécifications publiés ; phases 1 à 6 de la roadmap documentaire clôturées.
-- `src/` et tests associés : écran E05, navigation et persistance du code testeur pendant l'onboarding.
-- `CHANGELOG.md`, `README.md` et `COMMUNICATION/Marie/a_transmettre.md` : état de livraison actualisé.
+- `vite.config.ts` : `allowedHosts: ['.serenia-tech.fr']` (tunnel HTTPS local).
+- `.claude/commands/dev_display.md` (nouveau) : bascule l'affichage de l'outil dev via `VITE_HIDE_DEV_TOOLS`.
+- `DevResetButton.tsx` : simplifié, respecte `VITE_HIDE_DEV_TOOLS` ; badges version/code écran retirés.
+- `ScreenCodeBadge.tsx` : `pointerEvents: none`.
+- `SyncStatusCard.tsx`/test : bouton « Synchroniser maintenant » + garde de démontage (revue de code).
+- `COMMUNICATION/Marie/a_transmettre.md`, `src/domain/data/whatsNew.ts` : entrées ajoutées.
 
 ## Hypothèses validées / invalidées
-- VALIDE : suite de tests, build TypeScript/Vite et lint passent.
-- EN ATTENTE : les avertissements `act(...)` des tests ne sont pas traités dans cette session.
+- VALIDE : suite complète 875/875, `tsc -b` + `eslint` clean.
+- EN ATTENTE : tunnel cloudflared jamais testé depuis un téléphone réel (`tests_manuels.md`).
 
 ## Prochaine étape exacte
-Faire `/compact`, puis exécuter la phase 7 de la roadmap documentaire : contrôle final des liens,
-contradictions, indexation et règle de maintenance.
+Aucune suite programmée pour ce sujet ; reprendre au besoin.
 
 ## Question bloquante pour la session suivante
 Aucune.

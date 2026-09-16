@@ -1,10 +1,6 @@
-import { useApp } from '@/app/AppContext'
-import { SCREEN_CODES } from '@/domain/data/screenCodes'
-
 export function DevResetButton() {
-  const { screen } = useApp()
-
   if (!import.meta.env.DEV) return null
+  if (import.meta.env.VITE_HIDE_DEV_TOOLS === '1') return null
 
   const realToday = new Date().toISOString().slice(0, 10)
   const fakeDate = localStorage.getItem('dev_fake_date') ?? ''
@@ -37,31 +33,6 @@ export function DevResetButton() {
         gap: '4px',
       }}
     >
-      <span
-        style={{
-          fontSize: '0.7rem',
-          fontWeight: 700,
-          color: '#374151',
-          background: 'rgba(0,0,0,0.08)',
-          borderRadius: '3px',
-          padding: '1px 6px',
-          fontFamily: 'monospace',
-        }}
-      >
-        {__APP_DEV_VERSION__}
-      </span>
-      <span
-        style={{
-          fontSize: '0.7rem',
-          color: '#6b7280',
-          background: 'rgba(0,0,0,0.05)',
-          borderRadius: '3px',
-          padding: '1px 6px',
-          fontFamily: 'monospace',
-        }}
-      >
-        {SCREEN_CODES[screen].code}
-      </span>
       <input
         type="date"
         value={fakeDate || realToday}

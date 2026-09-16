@@ -35,6 +35,13 @@ le message en urgence et le journalise dans `historique_conversation_marie.md`, 
 4ter bloque effectivement la suite tant que la confirmation n'est pas donnée. Retirer cette section
 une fois observé.
 
+## Vérifier le tunnel cloudflared sur téléphone réel
+
+Ajouté le 2026-09-16 (`vite.config.ts`, `allowedHosts: ['.serenia-tech.fr']`) pour afficher le site
+de développement local directement sur téléphone sans passer par Netlify. Jamais testé en
+conditions réelles depuis un appareil mobile. Retirer cette section une fois le tunnel confirmé
+fonctionnel depuis un téléphone.
+
 ## Sauvegarde Drive en attente
 
 Manifeste rafraîchi le 2026-09-16 (219 fichiers). L'upload vers Drive n'est pas exécutable en

@@ -1,3 +1,22 @@
+## v5.136 — 2026-09-16
+
+### Ajouté
+- Écran Paramètres : bouton « Synchroniser maintenant » sur la carte de synchronisation — envoie
+  immédiatement les données de test sans attendre le prochain envoi automatique, avec message
+  d'erreur clair en cas d'échec.
+- Commande `/dev_display` : bascule l'affichage du panneau dev (haut à droite) via
+  `VITE_HIDE_DEV_TOOLS` dans `.env.local`.
+- Tunnel HTTPS local (cloudflared, `vite.config.ts` `allowedHosts`) pour tester le site de
+  développement directement sur téléphone sans passer par un déploiement Netlify.
+
+### Modifié
+- Panneau dev (`DevResetButton`) simplifié : badges version et code écran retirés, redondants
+  avec le repère de nom d'écran déjà affiché sur chaque page.
+
+### Corrigé
+- Le repère de nom d'écran affiché en haut à droite de chaque écran interceptait les clics sur les
+  boutons situés dessous ; il est désormais purement informatif (`pointer-events: none`).
+
 ## v5.135 — 2026-09-15
 
 ### Ajouté

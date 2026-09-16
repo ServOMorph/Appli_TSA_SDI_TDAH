@@ -48,6 +48,10 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  server: {
+    // Tunnel HTTPS local (cloudflared) pour tester sur téléphone sans passer par Netlify.
+    allowedHosts: ['.serenia-tech.fr'],
+  },
   build: {
     // Dossier par defaut de npm run build / npm run test:e2e — jamais une reference de mesure.
     // /deploy impose toujours --outDir dist/<version>, qui prime sur cette valeur. dist/dev est

@@ -16,6 +16,11 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 16 septembre 2026, un bouton « Synchroniser maintenant » a été ajouté à l'écran Paramètres : il
+permet d'envoyer immédiatement les données de test, sans attendre l'envoi automatique, avec un
+message clair en cas d'échec. Le petit repère de nom d'écran affiché en haut à droite ne bloque
+plus les boutons qui se trouvent dessous.
+
 Le 16 septembre 2026, le code testeur est demandé pendant l'accueil, avant le choix du profil, puis conservé en lecture seule dans Paramètres > Profil. La base de connaissances `DOCUMENTATION/` est désormais disponible avec un index, des concepts, des guides, des décisions et des spécifications ; les instructions des assistants sont alignées sur la même source canonique.
 
 Le 15 septembre 2026, la feuille de route « retours conversationnels » ouverte le 13 septembre est

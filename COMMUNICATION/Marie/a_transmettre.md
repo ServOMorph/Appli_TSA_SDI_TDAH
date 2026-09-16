@@ -42,6 +42,14 @@ Un retour envoyé depuis l'application ouvre maintenant un vrai échange : une f
 
 Pour sauvegarder vos données vous-même : Paramètres > Export et import > « Exporter en JSON ». Le fichier téléchargé contient vos tâches, listes, budget et réglages ; il ne contient pas l'historique de vos retours déjà envoyés au développeur (ce sont des données de test, pas des données à restaurer).
 
+## Synchronisation manuelle depuis Paramètres
+
+Dans Paramètres, un bouton « Synchroniser maintenant » permet d'envoyer vos données de test tout de suite, sans attendre l'envoi automatique. Si l'envoi échoue, un message l'indique clairement.
+
+## Le repère d'écran ne bloque plus les boutons
+
+Le petit repère affiché en haut à droite de chaque écran ne gêne plus les boutons ou zones qui se trouvent juste dessous.
+
 ## Votre identifiant pendant l’accueil
 
 Pendant la première ouverture de l'application, juste après le choix sur le partage des données, un écran permet maintenant d'indiquer votre identifiant. Pourriez-vous y écrire « marie » ? Cela nous aide à bien suivre vos données de notre côté. Ce code reste ensuite affiché dans Paramètres > Profil.

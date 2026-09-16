@@ -1035,3 +1035,20 @@ le fichier précédent). Id gateway `20260913T192239_518093`, Discord `154877595
 _Suite :_ répond au message de correction du 19h22 UTC (id `20260913T192239_518093`) — import du
 fichier `restauration-marie-2026-09-12-0951z.json` réussi, données réapparues. Incident perte de
 données clos.
+
+### 2026-09-16
+
+**Dév ->**
+Nouvelle version bientôt en ligne.
+
+Exporte tes données maintenant : Paramètres > Export et import > Exporter en JSON.
+
+Garde ce fichier de côté avant la mise à jour.
+
+Confirme-moi une fois fait.
+
+_Suite :_ alerte `/deploy` étape 0.1 (garde-fou ajouté le 2026-09-13 après l'incident de perte de
+données, jamais exercé en conditions réelles jusqu'ici, cf. `tests_manuels.md`). Envoyé en **mode
+urgent** (justifié par la procédure elle-même : fenêtre de risque réelle avant le build). Id
+gateway `20260916T125042_899231`, Discord `1549764473798008873`, `--expect-reply`. Confirmation
+recontrôlée à l'étape 4ter avant le build.

@@ -44,21 +44,26 @@
 - [P3] **Simplification signalée par la revue de code de session (2026-09-13, non corrigée) : `aria-label` redondant sur le champ Heure de début d'`E21CreateTaskV2.tsx`.** Duplique l'association déjà faite par `<label htmlFor="task-start-time">` — dette mineure, `/simplify` à la main de l'utilisateur. — fait quand : redondance retirée ou jugée volontaire — réf : `src/ui/screens/tasks/E21CreateTaskV2.tsx:300`
 - [P3] **Simplifications/duplications signalées par la revue de code de session (2026-09-15, non corrigées, `/simplify` à la main de l'utilisateur) sur `roadmap_retours_conversationnels.md` :** `formatDateTime` (E124FeedbackDetail.tsx) duplique `formatSyncDate` (SyncStatusCard.tsx) ; `STATUS_LABELS` dupliqué entre E123FeedbackList.tsx et E124FeedbackDetail.tsx ; `feedbackMessagesCursor.ts` répète le pattern localStorage déjà utilisé par `deviceIdentity.ts`/`syncConsent.ts` sans helper commun, aucun des trois ne gère les erreurs (mode privé, quota) ; `syncMessages`/`syncClosures`/`fetchMessages` s'enchaînent en `await` séquentiels dans `feedbackClient.ts` alors qu'ils sont indépendants (`Promise.all` possible) ; `fetchMessages` n'a pas de throttle et est désormais déclenché par le montage de E10Dashboard/E123/E124, ce qui contredit son propre commentaire (« moments discrets ») ; `isFeedbackMessageValid` impose 2000 caractères max sans équivalent sur `FeedbackReport.comment`, rendu dans le même fil. — fait quand : traité via `/simplify` ou dette jugée acceptable — réf : `src/ui/screens/feedback/E124FeedbackDetail.tsx`, `src/ui/screens/feedback/E123FeedbackList.tsx`, `src/data/sync/feedbackMessagesCursor.ts`, `src/data/sync/feedbackClient.ts`, `src/domain/rules/feedbackRules.ts`
 
-## Dernière session (2026-09-16 — correctif garde-fou serveur trouvé par la revue de code /deploy, cycle interrompu puis clos)
+## Dernière session (2026-09-16 — correctif garde-fou serveur, /deploy v5.138 relancé jusqu'au build puis arrêté sur échec Netlify)
 
 ## Décisions prises
-- Sur demande explicite de l'utilisateur : correction immédiate du finding bloquant de la revue de code `/deploy` (étape 4bis) plutôt que d'accepter le risque, avant de relancer `/deploy` depuis le début.
+- Sur demande explicite de l'utilisateur : correction immédiate du finding bloquant de la revue de code `/deploy` (étape 4bis, `is_empty_snapshot_payload`) plutôt que d'accepter le risque, avant de relancer `/deploy` depuis le début.
+- Sur les findings non bloquants de la 2e revue de code (schema.sql robustesse, feedback.sql sans limite de taille, InitError, dette de duplication) : tracés en dette (`signals.md`), pas corrigés dans ce cycle, `/deploy` a repris sans les traiter.
+- Sur l'échec Netlify (étape 7, 403 Forbidden) : arrêt de `/deploy` plutôt que retenter automatiquement ou modifier `.env` sans instruction.
 
 ## Livrables produits ou modifiés
 - `supabase/schema.sql` : `is_empty_snapshot_payload()` vérifie désormais aussi `energy_entries`, alignée sur le garde-fou client `hasSignificantData()`. **Reste à appliquer manuellement sur la base Supabase de production** (cf. [P1] ci-dessus).
 - `CHANGELOG.md` : entrée v5.138 (correctif).
+- `dist/v5.138/` : build de production généré (budget bundle respecté), **non déployé**.
 
 ## Hypothèses validées / invalidées
 - VALIDE (vérifié en lisant le code, pas seulement les rapports d'agents) : `manual_test_results` absent de `buildSnapshot.ts` alors que `backup_testeur_snapshots.py` s'appuie encore dessus ; `'tester-code'` absent de `NO_NAV_SCREENS` ; `is_empty_snapshot_payload` n'incluait pas `energy_entries` contrairement à `hasSignificantData()` ; `resolve_tester_dirname` collisionne sur les accents ; test e2e `11-export-import-roundtrip.spec.ts:46` obsolète.
 - INVALIDE : le rapport d'un des 10 angles de revue jugeait `is_empty_snapshot_payload` « voulu » — infirmé par lecture directe du code (incohérence confirmée avec `hasSignificantData()`).
+- VALIDE : build v5.138 et budget bundle OK (229.11 kB chunk d'entrée, seuil 266.43 kB).
+- INVALIDE : `.env` contenait un token/site Netlify valide pour ce déploiement — le déploiement a échoué en 403 Forbidden, cause exacte non diagnostiquée (jamais affiché le contenu de `.env`).
 
 ## Prochaine étape exacte
-Relancer `/deploy` depuis le début (le correctif ci-dessus change la version cible et invalide l'état déjà vérifié de ce cycle).
+Vérifier/renouveler `NETLIFY_AUTH_TOKEN` et `NETLIFY_SITE_ID` dans `.env`, puis relancer `/deploy` (étapes 0-6 déjà validées le 2026-09-16, `dist/v5.138` déjà prêt) — ou reprendre directement à l'étape 7 si la procédure le permet.
 
 ## Question bloquante pour la session suivante
-Aucune.
+Le token/site Netlify est-il à corriger, ou le déploiement doit-il se faire autrement ?

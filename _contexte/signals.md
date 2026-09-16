@@ -11,6 +11,8 @@
 - **Phase 5 — modèle « un canal Discord par testeur ».** Cible gateway `testeur:<code>`, salon `#test-<code>` ; `#supervision` fusionné avec le canal Marie principal (décision Morphéus). Câblage local `config_bot_discord.json` (gitignore) : `channels.testeurs.satine.channel_id = 1546945011340542022`, `channels.supervision = 1544665195476160512`. Gate de visibilité asymétrique vert. Premier testeur : Satine (pas encore sur le serveur) ; Morphéus s'ajoute avant elle pour valider le dispositif (`tester_code = "morpheus"`, saisie encore à faire).
 - e2e non rejoué depuis le 2026-09-13 : dernier état connu 58/59 (`10-feedback.spec.ts` T58 en échec, confirmé préexistant, hors périmètre, viewport Desktop Chrome uniquement).
 - `DISCORD/_contexte/` (signals, memory, contexte) : travail de la zone `discord`, hors périmètre du `/close` racine.
+- **Zone `DOCUMENTATION` créée (2026-09-16, session tierce)** — `zones.md` (alias `documentation`), `DOCUMENTATION/agent_role.md` et `_contexte/` confirmés présents ; `INDEX.md` et les sous-dossiers (`10_concepts/`, `20_guides/`, `30_decisions/`, `40_specs/`) pas encore créés. Périmètre annoncé : documentation métier + technique, progressive disclosure. Migration du paragraphe « Spécificités projet » de `CLAUDE.md` vers `DOCUMENTATION/` annoncée mais différée (session dédiée ultérieure). Aucune action prise depuis la racine — pour info, cf. `CLAUDE.md` § Base de connaissances (consulter `INDEX.md` avant d'affirmer un fait métier, une fois créé).
+- **`roadmap_experience_accueil_testeurs.md` créée (2026-09-16).** Distincte de l'intégration technique ONBOARD (close) : porte sur le déroulé humain du parcours d'accueil, construite par itérations. Phase 1 `[EN COURS]` : pilote `RaphTest` joué par l'utilisateur sur le site dev, frictions à consigner. Phase 2 volontairement vide, à définir selon les frictions relevées + demandes explicites (ex. étape de visio d'accueil). Corrélat : `decisions_dispositif.md` § 3 corrigé le même jour (profil testeur non nécessairement AuDHD, décision du 2026-09-04 levée).
 
 ## Questions ouvertes
 - [P1] **Parcours de validation de #35 et #37 sans équivalent depuis le retrait complet du catalogue in-app (Phase 6, 2026-09-15).** Le catalogue n'existe plus du tout (pas seulement vidé) : la seule voie de validation restante est que Marie signale elle-même un problème via « Mes retours » si #35/#37 ne fonctionnent pas comme attendu — aucune liste de tests proactive à lui faire rejouer (cf. `CLAUDE.md` § Validation des retours par Marie). — fait quand : décision explicite de considérer #35/#37 tacitement validés en l'absence de retour signalé après leur prochaine livraison, ou tout autre mécanisme de confirmation explicite tranché avec l'utilisateur — réf : `_contexte/marie_modifications_suivi.md`, `roadmap_demandes_marie_2026-09-10.md`, `.claude/CLAUDE.md` § Validation des retours par Marie
@@ -37,24 +39,25 @@
 - [P3] **Simplification signalée par la revue de code de session (2026-09-13, non corrigée) : `aria-label` redondant sur le champ Heure de début d'`E21CreateTaskV2.tsx`.** Duplique l'association déjà faite par `<label htmlFor="task-start-time">` — dette mineure, `/simplify` à la main de l'utilisateur. — fait quand : redondance retirée ou jugée volontaire — réf : `src/ui/screens/tasks/E21CreateTaskV2.tsx:300`
 - [P3] **Simplifications/duplications signalées par la revue de code de session (2026-09-15, non corrigées, `/simplify` à la main de l'utilisateur) sur `roadmap_retours_conversationnels.md` :** `formatDateTime` (E124FeedbackDetail.tsx) duplique `formatSyncDate` (SyncStatusCard.tsx) ; `STATUS_LABELS` dupliqué entre E123FeedbackList.tsx et E124FeedbackDetail.tsx ; `feedbackMessagesCursor.ts` répète le pattern localStorage déjà utilisé par `deviceIdentity.ts`/`syncConsent.ts` sans helper commun, aucun des trois ne gère les erreurs (mode privé, quota) ; `syncMessages`/`syncClosures`/`fetchMessages` s'enchaînent en `await` séquentiels dans `feedbackClient.ts` alors qu'ils sont indépendants (`Promise.all` possible) ; `fetchMessages` n'a pas de throttle et est désormais déclenché par le montage de E10Dashboard/E123/E124, ce qui contredit son propre commentaire (« moments discrets ») ; `isFeedbackMessageValid` impose 2000 caractères max sans équivalent sur `FeedbackReport.comment`, rendu dans le même fil. — fait quand : traité via `/simplify` ou dette jugée acceptable — réf : `src/ui/screens/feedback/E124FeedbackDetail.tsx`, `src/ui/screens/feedback/E123FeedbackList.tsx`, `src/data/sync/feedbackMessagesCursor.ts`, `src/data/sync/feedbackClient.ts`, `src/domain/rules/feedbackRules.ts`
 
-## Dernière session (2026-09-16 — revue de l'état du dispositif ONBOARD, lancement d'un pilote d'accueil, `/deploy_dev`)
+## Dernière session (2026-09-16 — roadmap « expérience d'accueil » créée, profil testeur corrigé, pilote RaphTest lancé)
 
 ## Décisions prises
-- Pas de nouveau chantier de code pour « revoir l'onboard » : les 6 phases d'intégration sont déjà livrées et re-vérifiées par grep dans le code réel (E04Consent.tsx, `tester_code` dans Settings/E111Profile, E116Privacy.tsx corrigé), pas seulement lues dans la roadmap archivée.
-- DI2 constatée caduque (voir « Questions ouvertes » ci-dessus) : rien à coder ni trancher.
-- Prochaine validation retenue : répétition à blanc (point 2 de la checklist Mise en service) — l'utilisateur teste lui-même le parcours d'accueil comme un nouveau testeur, sur le site dev, avec un `tester_code` dédié distinct de `marie`/`morpheus` (dev et prod partagent le même Supabase, confirmé via `.env.example` : une seule `VITE_SUPABASE_URL`).
-- Pour du futur travail de code sur l'onboard pendant qu'un `/deploy` Marie est en attente : l'isoler sur une branche plutôt que sur `main` (`agent/onboard` existe toujours, son worktree a été retiré le 2026-09-13, sa suppression avait été explicitement différée) — `main` reste ainsi exactement ce que `/deploy` livrerait à Marie.
+- Profil testeur non nécessairement AuDHD : décision du 2026-09-04 (`TESTS/ONBOARD/decisions_dispositif.md` § 3) levée explicitement par l'utilisateur — lui-même et Satine ne le sont pas, c'est volontaire.
+- `roadmap_experience_accueil_testeurs.md` créée : distincte de l'intégration technique ONBOARD (close) — porte sur le déroulé humain du parcours, construite par itérations plutôt qu'en un lot (visio d'accueil et autres étapes à ajouter au fil des sessions, pas définies d'avance).
+- `tests_manuels.md` : entrée « tester le parcours d'accueil » retirée, absorbée par la Phase 1 de la nouvelle roadmap (éviter le double suivi).
+- Zone `DOCUMENTATION` (créée par une session tierce) : vérifiée existante, aucune action prise depuis la racine à ce stade (voir « Contexte chaud »).
 
 ## Livrables produits ou modifiés
-- Aucun fichier applicatif modifié, aucun commit de code.
-- `/deploy_dev` lancé (dernier déploiement dev daté du 2026-09-13, bien avant la livraison « retours conversationnels » — résultat à l'issue de cette clôture, dans la suite de `/deploy_dev`).
+- `TESTS/ONBOARD/decisions_dispositif.md` : § 3 corrigé.
+- `roadmap_experience_accueil_testeurs.md` (nouveau) : Phase 1 `[EN COURS]`, Phase 2 `[TODO]` volontairement vide.
+- `tests_manuels.md` : entrée obsolète retirée.
+- Aucun fichier applicatif modifié.
 
 ## Hypothèses validées / invalidées
-- VALIDÉ : les 6 phases de code d'intégration ONBOARD sont réellement en place dans `src/`, pas seulement déclarées `[FAIT]` sur le papier.
-- INVALIDÉ : DI2 supposée « en attente » dans la roadmap archivée — en réalité rendue sans objet par un retrait de code postérieur (15/09) jamais répercuté dans ce document.
+- EN ATTENTE : le pilote `RaphTest` n'a pas encore été rejoué par l'utilisateur au moment de cette clôture — aucune friction encore consignée dans la roadmap.
 
 ## Prochaine étape exacte
-Utilisateur teste `TESTS/ONBOARD/parcours_accueil.md` sur `https://appli-audhd-dev.netlify.app` (navigation privée ou téléphone), `tester_code` dédié. Vérifier ensuite avec `scripts/backup_testeur_snapshots.py` (le dossier `donnees_testeurs/<code>/` doit apparaître) et, si un retour est déposé, `scripts/reply_feedback_report.py`.
+L'utilisateur rejoue `TESTS/ONBOARD/parcours_accueil.md` sur `https://appli-audhd-dev.netlify.app`, `tester_code = RaphTest`. Les frictions rencontrées sont à consigner dans la Phase 1 de `roadmap_experience_accueil_testeurs.md`, qui détermine le contenu de la Phase 2.
 
 ## Question bloquante pour la session suivante
 Aucune.

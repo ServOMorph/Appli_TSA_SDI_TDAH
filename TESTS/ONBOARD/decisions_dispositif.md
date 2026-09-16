@@ -29,7 +29,10 @@ synchronisation, posé après acceptation de l'écran.
 
 ## 3. Profil et volume des testeurs
 
-**Décision : petit groupe (2 à 5 testeurs), profil AuDHD proche de celui de Marie.**
+**Décision révisée le 2026-09-16 : petit groupe (2 à 5 testeurs), profil libre — pas nécessairement
+AuDHD.** Décision initiale du 2026-09-04 (« profil AuDHD proche de celui de Marie ») explicitement
+levée par l'utilisateur : c'est volontaire, les premiers testeurs additionnels (l'utilisateur
+lui-même, Satine) ne sont pas AuDHD.
 
 Le dispositif reste dimensionné pour un suivi individuel : pas de tableau de bord de suivi
 automatisé ni de relance de masse. Si le volume augmente significativement, ce point est à

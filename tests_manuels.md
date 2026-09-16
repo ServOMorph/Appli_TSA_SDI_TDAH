@@ -12,6 +12,17 @@ annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'u
 reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
 demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
+## Tester le parcours d'accueil en pilote avant d'inviter Satine
+
+Décidé le 2026-09-16 : avant d'inviter Satine, l'utilisateur rejoue lui-même le parcours d'accueil
+(`TESTS/ONBOARD/parcours_accueil.md`, seul document de référence, sans aide développeur) sur le
+site de préprod `https://appli-audhd-dev.netlify.app`, en navigation privée ou sur son téléphone,
+avec un `tester_code` dédié (pas `marie` ni `morpheus` — dev et prod partagent le même Supabase).
+Vérifications attendues après le parcours : `python scripts/backup_testeur_snapshots.py` fait
+apparaître un dossier `donnees_testeurs/<code choisi>/` ; si un retour est déposé pendant le test,
+`python scripts/reply_feedback_report.py` le liste. Retirer cette section une fois le parcours
+rejoué et les deux vérifications confirmées.
+
 ## Vérifier le classement du snapshot de Marie après saisie de son code testeur
 
 Depuis la Phase 6 `roadmap_integration_onboard.md`, tant que Marie n'a pas saisi son `tester_code`

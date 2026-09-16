@@ -17,19 +17,19 @@ describe('E04Consent', () => {
     expect(screen.getByText('Conservation et effacement')).toBeInTheDocument()
   })
 
-  it('accorde le consentement et passe au profil au clic sur J’accepte', async () => {
+  it('accorde le consentement et passe au code testeur au clic sur J’accepte', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E04Consent />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'J’accepte le partage' }))
     expect(isSyncConsentGranted()).toBe(true)
-    expect(ctx.goTo).toHaveBeenCalledWith('profile')
+    expect(ctx.goTo).toHaveBeenCalledWith('tester-code')
   })
 
-  it('passe au profil sans accorder le consentement au clic sur Continuer sans partager', async () => {
+  it('passe au code testeur sans accorder le consentement au clic sur Continuer sans partager', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E04Consent />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Continuer sans partager' }))
     expect(isSyncConsentGranted()).toBe(false)
-    expect(ctx.goTo).toHaveBeenCalledWith('profile')
+    expect(ctx.goTo).toHaveBeenCalledWith('tester-code')
   })
 })

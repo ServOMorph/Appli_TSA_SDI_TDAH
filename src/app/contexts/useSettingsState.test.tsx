@@ -2,7 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useState } from 'react'
-import { db, listItemRepo, toolRepo } from '@/app/repositories'
+import { db, listItemRepo, settingsRepo, toolRepo } from '@/app/repositories'
 import { useSettingsState } from './useSettingsState'
 
 function SettingsPanel() {
@@ -16,6 +16,7 @@ function SettingsPanel() {
     <>
       <div data-testid="user">{currentUser?.id ?? 'aucun'}</div>
       <button onClick={() => createUser('student')}>Créer l’utilisateur</button>
+      <button onClick={() => createUser('student', ' RaphTest ')}>Créer l’utilisateur avec code testeur</button>
       <output data-testid="import-result">{lastImport}</output>
       <button onClick={() => exportData()}>Exporter</button>
       <button
@@ -84,6 +85,26 @@ function readBlob(blob: Blob): Promise<string> {
 
 afterEach(async () => {
   await db.budgetIncomeEntries.clear()
+})
+
+describe('useSettingsState — createUser', () => {
+  it('enregistre le code testeur, nettoyé des espaces, dès la création des settings', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur avec code testeur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    const userId = screen.getByTestId('user').textContent as string
+    const settings = await settingsRepo.getByUserId(userId)
+    expect(settings?.tester_code).toBe('RaphTest')
+  })
+
+  it('ne fixe pas de code testeur quand aucun n’est fourni', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    const userId = screen.getByTestId('user').textContent as string
+    const settings = await settingsRepo.getByUserId(userId)
+    expect(settings?.tester_code).toBeUndefined()
+  })
 })
 
 describe('useSettingsState — export/import', () => {

@@ -46,6 +46,8 @@ type SessionValue = {
   deleteAllData: () => Promise<void>
   refreshDashboard: () => Promise<void>
   importData: (raw: unknown) => Promise<ImportResult>
+  pendingTesterCode: string
+  setPendingTesterCode: (code: string) => void
 }
 
 type AppContextValue = NavigationValue &
@@ -67,6 +69,7 @@ export const AppContext = createContext<AppContextValue | null>(null)
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [stack, setStack] = useState<NavStack>([{ name: 'welcome' }])
   const [loading, setLoading] = useState(true)
+  const [pendingTesterCode, setPendingTesterCode] = useState('')
 
   const route = currentRoute(stack)
   const goTo = useCallback((target: Screen | Route) => setStack((prev) => pushRoute(prev, target)), [])
@@ -109,7 +112,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   } = session
 
   async function createUser(profile: Parameters<typeof createUserAndSeedTools>[0]) {
-    await createUserAndSeedTools(profile)
+    await createUserAndSeedTools(profile, pendingTesterCode)
     await Promise.all([loadLists(), loadTools()])
   }
 
@@ -226,6 +229,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         deleteAllData: wipeAllData,
         refreshDashboard: loadAll,
         importData,
+        pendingTesterCode,
+        setPendingTesterCode,
         ...tasksValue,
         ...planningValue,
         ...energyValue,

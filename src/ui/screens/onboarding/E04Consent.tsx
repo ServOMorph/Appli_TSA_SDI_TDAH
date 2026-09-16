@@ -8,11 +8,11 @@ export function E04Consent() {
 
   function accept() {
     grantSyncConsent()
-    goTo('profile')
+    goTo('tester-code')
   }
 
   function decline() {
-    goTo('profile')
+    goTo('tester-code')
   }
 
   return (

@@ -53,32 +53,13 @@ describe('E111Profile', () => {
     expect(goTo).toHaveBeenCalledWith('settings')
   })
 
-  it('enregistre le code testeur saisi via updateSettings', () => {
-    const updateSettings = vi.fn().mockResolvedValue(undefined)
-    renderE111({ settings: baseSettings, updateSettings })
-    const input = screen.getByLabelText('Code testeur')
-    fireEvent.change(input, { target: { value: '  alpha-01 ' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer le code' }))
-    expect(updateSettings).toHaveBeenCalledWith({ tester_code: 'alpha-01' })
-  })
-
-  it('affiche une confirmation quand un code est déjà enregistré', () => {
+  it('affiche le code testeur enregistré', () => {
     renderE111({ settings: { ...baseSettings, tester_code: 'alpha-01' } })
-    expect(screen.getByRole('status')).toHaveTextContent('Code enregistré : alpha-01')
-    expect(screen.getByRole('button', { name: 'Enregistrer le code' })).toBeDisabled()
+    expect(screen.getByLabelText('code testeur')).toHaveTextContent('alpha-01')
   })
 
-  it('désactive le bouton tant que la saisie est identique au code enregistré', () => {
+  it('affiche Aucun code enregistré quand aucun code n’est défini', () => {
     renderE111({ settings: baseSettings })
-    expect(screen.getByRole('button', { name: 'Enregistrer le code' })).toBeDisabled()
-    expect(screen.getByText('Aucun code enregistré.')).toBeInTheDocument()
-  })
-
-  it('retire le code quand le champ est vidé puis enregistré', () => {
-    const updateSettings = vi.fn().mockResolvedValue(undefined)
-    renderE111({ settings: { ...baseSettings, tester_code: 'alpha-01' }, updateSettings })
-    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: '' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer le code' }))
-    expect(updateSettings).toHaveBeenCalledWith({ tester_code: undefined })
+    expect(screen.getByLabelText('code testeur')).toHaveTextContent('Aucun code enregistré')
   })
 })

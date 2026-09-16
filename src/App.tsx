@@ -19,6 +19,9 @@ const E12WeekPlanning = lazy(() =>
   import('@/ui/screens/dashboard/E12WeekPlanning').then((m) => ({ default: m.E12WeekPlanning })),
 )
 const E04Consent = lazy(() => import('@/ui/screens/onboarding/E04Consent').then((m) => ({ default: m.E04Consent })))
+const E05TesterCode = lazy(() =>
+  import('@/ui/screens/onboarding/E05TesterCode').then((m) => ({ default: m.E05TesterCode })),
+)
 const E02Profile = lazy(() => import('@/ui/screens/onboarding/E02Profile').then((m) => ({ default: m.E02Profile })))
 const E03Energy = lazy(() => import('@/ui/screens/onboarding/E03Energy').then((m) => ({ default: m.E03Energy })))
 const importE20Inbox = () => import('@/ui/screens/tasks/E20Inbox').then((m) => ({ default: m.E20Inbox }))
@@ -159,6 +162,8 @@ export function AppScreens() {
         return <InitError />
       case 'consent':
         return <E04Consent />
+      case 'tester-code':
+        return <E05TesterCode />
       case 'profile':
         return <E02Profile />
       case 'energy':

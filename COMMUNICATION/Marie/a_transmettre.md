@@ -41,3 +41,7 @@ Un retour envoyé depuis l'application ouvre maintenant un vrai échange : une f
 ## Sauvegarde autonome de vos données
 
 Pour sauvegarder vos données vous-même : Paramètres > Export et import > « Exporter en JSON ». Le fichier téléchargé contient vos tâches, listes, budget et réglages ; il ne contient pas l'historique de vos retours déjà envoyés au développeur (ce sont des données de test, pas des données à restaurer).
+
+## Votre identifiant pendant l’accueil
+
+Pendant la première ouverture de l'application, juste après le choix sur le partage des données, un écran permet maintenant d'indiquer votre identifiant. Pourriez-vous y écrire « marie » ? Cela nous aide à bien suivre vos données de notre côté. Ce code reste ensuite affiché dans Paramètres > Profil.

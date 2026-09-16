@@ -22,6 +22,8 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     todayPlannedTasks: [],
     settings: null,
     overloadMode: false,
+    pendingTesterCode: '',
+    setPendingTesterCode: vi.fn(),
     updateSettings: vi.fn().mockResolvedValue(undefined),
     exportData: vi.fn().mockResolvedValue(undefined),
     importData: vi.fn().mockResolvedValue({ ok: true }),

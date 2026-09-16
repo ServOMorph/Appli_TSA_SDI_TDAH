@@ -2,6 +2,7 @@ export type Route =
   | { name: 'welcome' }
   | { name: 'init-error' }
   | { name: 'consent' }
+  | { name: 'tester-code' }
   | { name: 'profile' }
   | { name: 'energy' }
   | { name: 'dashboard'; date?: string }

@@ -16,6 +16,8 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 16 septembre 2026, le code testeur est demandé pendant l'accueil, avant le choix du profil, puis conservé en lecture seule dans Paramètres > Profil. La base de connaissances `DOCUMENTATION/` est désormais disponible avec un index, des concepts, des guides, des décisions et des spécifications ; les instructions des assistants sont alignées sur la même source canonique.
+
 Le 15 septembre 2026, la feuille de route « retours conversationnels » ouverte le 13 septembre est
 achevée : un retour signalé depuis l'application n'aboutit plus dans le vide. Une fois la
 modification faite, l'équipe y répond directement dans l'application ; le testeur relit la réponse

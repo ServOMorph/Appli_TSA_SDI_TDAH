@@ -2431,3 +2431,12 @@ Bascule vers roadmap V4 — voir `roadmap_v4.md`. `roadmap_v3.md` (7 phases, int
 
 ### Modifié
 - Les commentaires de livraison versionnés sont conservés hors de la racine du projet, dans un dossier local dédié non versionné.
+## v5.136 — 2026-09-16
+
+### Ajouté
+- Le code testeur peut être renseigné pendant l'onboarding, avant la création du profil.
+- Base de connaissances du projet : index, concepts, guides, décisions et spécifications.
+
+### Modifié
+- Les instructions des assistants sont alignées sur `.claude/CLAUDE.md`.
+- Le code testeur est affiché en lecture seule dans Paramètres > Profil après l'onboarding.

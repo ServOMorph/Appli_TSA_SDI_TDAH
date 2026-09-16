@@ -93,7 +93,7 @@ export function useSettingsState() {
     setSettings(null)
   }
 
-  async function createUser(profile: ProfileType) {
+  async function createUser(profile: ProfileType, testerCode?: string) {
     const now = new Date().toISOString()
     const userId = newId()
     const user: User = {
@@ -103,12 +103,14 @@ export function useSettingsState() {
       created_at: now,
       updated_at: now,
     }
+    const trimmedTesterCode = testerCode?.trim()
     const defaultSettings: Settings = {
       id: newId(),
       user_id: userId,
       dark_mode: false,
       font_size: 'medium',
       reduced_motion: false,
+      ...(trimmedTesterCode ? { tester_code: trimmedTesterCode } : {}),
     }
     await userRepo.create(user)
     await settingsRepo.create(defaultSettings)

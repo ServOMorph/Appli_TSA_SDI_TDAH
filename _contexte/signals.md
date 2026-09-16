@@ -39,25 +39,24 @@
 - [P3] **Simplification signalée par la revue de code de session (2026-09-13, non corrigée) : `aria-label` redondant sur le champ Heure de début d'`E21CreateTaskV2.tsx`.** Duplique l'association déjà faite par `<label htmlFor="task-start-time">` — dette mineure, `/simplify` à la main de l'utilisateur. — fait quand : redondance retirée ou jugée volontaire — réf : `src/ui/screens/tasks/E21CreateTaskV2.tsx:300`
 - [P3] **Simplifications/duplications signalées par la revue de code de session (2026-09-15, non corrigées, `/simplify` à la main de l'utilisateur) sur `roadmap_retours_conversationnels.md` :** `formatDateTime` (E124FeedbackDetail.tsx) duplique `formatSyncDate` (SyncStatusCard.tsx) ; `STATUS_LABELS` dupliqué entre E123FeedbackList.tsx et E124FeedbackDetail.tsx ; `feedbackMessagesCursor.ts` répète le pattern localStorage déjà utilisé par `deviceIdentity.ts`/`syncConsent.ts` sans helper commun, aucun des trois ne gère les erreurs (mode privé, quota) ; `syncMessages`/`syncClosures`/`fetchMessages` s'enchaînent en `await` séquentiels dans `feedbackClient.ts` alors qu'ils sont indépendants (`Promise.all` possible) ; `fetchMessages` n'a pas de throttle et est désormais déclenché par le montage de E10Dashboard/E123/E124, ce qui contredit son propre commentaire (« moments discrets ») ; `isFeedbackMessageValid` impose 2000 caractères max sans équivalent sur `FeedbackReport.comment`, rendu dans le même fil. — fait quand : traité via `/simplify` ou dette jugée acceptable — réf : `src/ui/screens/feedback/E124FeedbackDetail.tsx`, `src/ui/screens/feedback/E123FeedbackList.tsx`, `src/data/sync/feedbackMessagesCursor.ts`, `src/data/sync/feedbackClient.ts`, `src/domain/rules/feedbackRules.ts`
 
-## Dernière session (2026-09-16 — roadmap « expérience d'accueil » créée, profil testeur corrigé, pilote RaphTest lancé)
+## Dernière session (2026-09-16 — documentation et onboarding code testeur)
 
 ## Décisions prises
-- Profil testeur non nécessairement AuDHD : décision du 2026-09-04 (`TESTS/ONBOARD/decisions_dispositif.md` § 3) levée explicitement par l'utilisateur — lui-même et Satine ne le sont pas, c'est volontaire.
-- `roadmap_experience_accueil_testeurs.md` créée : distincte de l'intégration technique ONBOARD (close) — porte sur le déroulé humain du parcours, construite par itérations plutôt qu'en un lot (visio d'accueil et autres étapes à ajouter au fil des sessions, pas définies d'avance).
-- `tests_manuels.md` : entrée « tester le parcours d'accueil » retirée, absorbée par la Phase 1 de la nouvelle roadmap (éviter le double suivi).
-- Zone `DOCUMENTATION` (créée par une session tierce) : vérifiée existante, aucune action prise depuis la racine à ce stade (voir « Contexte chaud »).
+- `.claude/CLAUDE.md` est la source canonique des instructions ; ses deux miroirs sont synchronisés à l'identique.
+- Le code testeur est demandé pendant l'onboarding, avant le profil, et n'est plus modifiable depuis Paramètres > Profil.
 
 ## Livrables produits ou modifiés
-- `TESTS/ONBOARD/decisions_dispositif.md` : § 3 corrigé.
-- `roadmap_experience_accueil_testeurs.md` (nouveau) : Phase 1 `[EN COURS]`, Phase 2 `[TODO]` volontairement vide.
-- `tests_manuels.md` : entrée obsolète retirée.
-- Aucun fichier applicatif modifié.
+- `DOCUMENTATION/` : index, concepts, guides, décisions et spécifications publiés ; phases 1 à 6 de la roadmap documentaire clôturées.
+- `src/` et tests associés : écran E05, navigation et persistance du code testeur pendant l'onboarding.
+- `CHANGELOG.md`, `README.md` et `COMMUNICATION/Marie/a_transmettre.md` : état de livraison actualisé.
 
 ## Hypothèses validées / invalidées
-- EN ATTENTE : le pilote `RaphTest` n'a pas encore été rejoué par l'utilisateur au moment de cette clôture — aucune friction encore consignée dans la roadmap.
+- VALIDE : suite de tests, build TypeScript/Vite et lint passent.
+- EN ATTENTE : les avertissements `act(...)` des tests ne sont pas traités dans cette session.
 
 ## Prochaine étape exacte
-L'utilisateur rejoue `TESTS/ONBOARD/parcours_accueil.md` sur `https://appli-audhd-dev.netlify.app`, `tester_code = RaphTest`. Les frictions rencontrées sont à consigner dans la Phase 1 de `roadmap_experience_accueil_testeurs.md`, qui détermine le contenu de la Phase 2.
+Faire `/compact`, puis exécuter la phase 7 de la roadmap documentaire : contrôle final des liens,
+contradictions, indexation et règle de maintenance.
 
 ## Question bloquante pour la session suivante
 Aucune.

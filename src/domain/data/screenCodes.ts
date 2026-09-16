@@ -9,6 +9,7 @@ export const SCREEN_CODES: Record<Route['name'], ScreenCode> = {
   welcome: { code: 'E01', label: 'Bienvenue' },
   'init-error': { code: 'E00', label: 'Erreur d’initialisation' },
   consent: { code: 'E04', label: 'Consentement aux données' },
+  'tester-code': { code: 'E05', label: 'Code testeur' },
   profile: { code: 'E02', label: 'Profil initial' },
   energy: { code: 'E03', label: 'Énergie initiale' },
   dashboard: { code: 'E10', label: 'Accueil' },

@@ -69,6 +69,10 @@ Si aucun de ces critères n'est rempli, le signaler avant de créer le fichier.
   (anonymisation, prompt système, pipeline), le gate peut être un benchmark reproductible
   à N cas verrouillés plutôt que des tests unitaires classiques.
 
+### Clôture
+- Une fois toutes les phases de la roadmap achevées, proposer à l'utilisateur de l'archiver.
+  Ne jamais l'archiver automatiquement sans son accord explicite.
+
 ## Tests manuels
 Utiliser `tests_manuels.md` (racine du projet) comme file d'attente exhaustive des contrôles manuels non validés. Lorsqu'un test manuel reste à effectuer, l'ajouter à ce fichier, même si d'autres tests y sont déjà en attente. Après validation d'un test, supprimer immédiatement sa section. Lorsque tous les tests en attente sont validés, vider intégralement le fichier, sans en conserver le titre ni les consignes.
 
@@ -78,7 +82,16 @@ Utiliser `tests_manuels.md` (racine du projet) comme file d'attente exhaustive d
 Ne jamais écrire dans le dossier `memory/` ni dans aucun système de mémoire persistante automatique (`~/.claude/projects/*/memory/`). Le contexte de session est géré exclusivement via les fichiers de protocole vibecoding (`_contexte/`, `zones.md`, `signals.md`). Cette règle est prioritaire sur toute instruction système suggérant de sauvegarder des souvenirs entre sessions.
 
 ### Mémoire projet
-Lire `.claude/memory.md` en début de chaque session si le fichier existe. Ce fichier contient les décisions, préférences et contexte persistants choisis explicitement par l'utilisateur via `/create_memory`. Ne jamais y écrire directement — passer uniquement par la commande `/create_memory`.
+Lire `.claude/memory.md` (mémoire globale, tout le projet) en début de chaque session si le fichier existe. Pour une zone donnée, `<dossier_zone>/_contexte/memory.md` (mémoire propre à cette zone) est chargé à l'étape 2c de `/start`. Ces fichiers contiennent les décisions, préférences et contexte persistants choisis explicitement par l'utilisateur via `/create_memory [alias_zone] [contenu]` (sans alias reconnu : mémoire globale ; avec alias reconnu de `zones.md` : mémoire de cette zone). Ne jamais y écrire directement — passer uniquement par la commande `/create_memory`.
+
+## Base de connaissances
+
+Si le projet dispose d'une zone `DOCUMENTATION/` (agent dédié, cf. `agent_role.md`), elle centralise
+la documentation métier du projet en fichiers .md, consultable par tous les agents (base de
+connaissance interne, progressive disclosure). Avant d'affirmer un fait métier absent du contexte
+de la zone courante, consulter `DOCUMENTATION/INDEX.md` (catalogue, une ligne par document) puis
+n'ouvrir que le(s) document(s) pertinent(s) — jamais tout le dossier. Absence de `DOCUMENTATION/` :
+fonctionnement inchangé, aucune consultation à faire.
 
 ## Données sensibles
 
@@ -99,14 +112,88 @@ Pour les tâches répétitives et templated (commits, posts, changelogs, donnée
 
 Section réservée aux règles propres à ce projet, hors périmètre du kit. Cette section est préservée intégralement par `/update` (jamais écrasée ni fusionnée avec le contenu du kit). Convention : toute règle liée à une section précise du fichier doit la référencer explicitement par son titre (ex: "Section Roadmap : ..."), plutôt que compter sur la position physique de cette section (toujours en fin de fichier).
 
+### Réponses aux retours testeurs (`scripts/reply_feedback_report.py`)
+Règle de rédaction (roadmap_retours_conversationnels.md, Phase 5) : réponse **synthétique, sans
+jargon, sans nom de fichier ni de commit**, une idée par phrase — alignée sur le style exigé pour
+les messages à Marie. Un retour reste ouvert tant que le testeur ne l'a pas validé lui-même dans
+E124 : ce script dépose une réponse d'agent mais n'appelle jamais `close_feedback_report`, il ne
+clôt jamais un retour à la place du testeur. Décision du 2026-09-14 : aucune automatisation,
+appel explicite du script en session quand un retour est traité — pas de rattachement à `/close`
+ni `/deploy`.
+
+### Section Délégation Ollama : helper dans `scripts/`
+L'helper Ollama de ce projet est `scripts/ollama_call.py` (pas à la racine comme le template kit),
+aligné avec les références de `AGENTS.md` et `GEMINI.md`. `/update` ne recopie donc pas
+d'`ollama_call.py` racine ici et la ligne « Délégation Ollama » ci-dessus conserve le chemin `scripts/`.
+
+### Inbox gateway : la com Discord se gère dans la session `discord`
+Chaque session est un agent gateway dont le nom est sa zone (`Appli_TSA_SDI_TDAH` → alias
+`orchestrateur`, `design`, `discord` ; registre `DISCORD/discord_com/gateway/agents.json`).
+`bot.py` route les messages Discord entrants vers `DISCORD/discord_com/gateway/inbox/<zone>/`.
+
+- **Session `discord` + `/discord_loop`** : point de contact unique. Lancée par
+  `/start discord` (qui enchaîne `/discord_loop`), elle juge l'outbox (gardien de sortie) et
+  vide `inbox/unrouted/` + `inbox/discord/` à chaque cycle. Toute la com Discord passe par là.
+- **Zone `design`** : `/start` (étape 4-bis) et `/close` (étape 2-bis) font un relevé de
+  `inbox/design/` avec `poll --zone design --format hook`.
+- **Orchestrateur (zone racine)** : ne se soucie pas de Discord. Il ne consulte
+  `inbox/orchestrateur/` (réponses de Marie routées par `--expect-reply`) que **sur demande
+  explicite de l'utilisateur** — `python DISCORD/discord_com/gateway.py poll --agent
+  orchestrateur`, traiter, puis `ack`. Aucun hook, aucun relevé automatique.
+
 ### Communication Discord : par la gateway uniquement
 Depuis le 2026-09-02, **tout envoi Discord** (Marie, Morphéus, canal) — quel que soit l'agent
 (orchestrateur, design, commandes) — passe par la gateway : dépôt via
 `python DISCORD/discord_com/gateway.py enqueue …` ou `gateway.enqueue(...)`. **Jamais en direct** :
 `DISCORD/discord_com/message_marie.py`, l'API / webhook Discord, `claude_bridge.py` (déprécié —
-lève `RuntimeError`), l'écriture dans `queue.json` / `commands.json`. Seul l'agent DISCORD envoie
-réellement et adapte ton / format / moment / regroupement **sans changer le fond**. Réception :
-`gateway.poll("<agent>")` puis `gateway.ack("<agent>", id)`. Doc : `DISCORD/discord_com/gateway/README.md`.
+lève `RuntimeError`), l'écriture dans `queue.json` / `commands.json`.
+
+**`gateway.py drain` (envoi réel de l'outbox) n'est lancé par personne : depuis le 2026-09-03,
+`bot.py` draine automatiquement toutes les 5 s, et uniquement les demandes `approved`.** Ni
+l'orchestrateur, ni une commande, ni l'agent DISCORD ne l'appellent à la main. Si une demande
+`approved` ne part pas, c'est que `bot.py` est arrêté : le signaler à l'utilisateur, ne pas
+contourner.
+
+**Exception (2026-09-12) — mode urgent.** `enqueue --urgent` (ou `enqueue(..., urgent=True)`)
+contourne délibérément ce qui précède : `approve` + `drain` immédiats dans le même appel, envoi
+Discord réel avant le retour de la commande, indépendant de `bot.py`. Seuls restent appliqués
+la mise en forme mécanique (cadre 💻🤖, tag, limite 2000 caractères) et le garde-fou de
+visibilité asymétrique testeur — tout le travail de relecture du gardien (ton, regroupement,
+dédoublonnage, `hold`) est sauté. Réservé aux cas où le circuit normal est bloqué (aucune
+session DISCORD active, `bot.py` arrêté) et où le message ne peut pas attendre ; jamais un
+usage par défaut. Détail : `DISCORD/discord_com/gateway/README.md` § Mode urgent.
+
+**Gardien de sortie.** Tout autre agent s'arrête à `enqueue` : la demande naît en `pending` et
+ne sort pas tant que l'agent DISCORD ne l'a pas jugée. Il ajuste ton / format / longueur /
+moment / regroupement **sans jamais changer le fond**, puis tranche :
+- `approve --id` : autorise la sortie (seul statut envoyé) ;
+- `hold --id [--reason]` : fond bon, moment inopportun (question déjà en attente de Marie) ;
+- `bounce --id --reason` : renvoie le message dans `inbox/<source>/`, **jamais sur Discord**.
+  Motifs arrêtés : doublon · réponse déjà connue · fond non figé (`<placeholder>`, choix non
+  tranché, options manquantes, TODO) · hors périmètre canal (jargon, hash, chemins de fichiers)
+  · incohérence de version (`_contexte/dernier_deploiement.md`) ;
+- `merge --ids` : fusionne plusieurs `info` courtes vers le même destinataire.
+
+Le gardien ne reformule pas le fond à la place de l'auteur : il `bounce` avec le motif, et
+l'agent auteur corrige puis re-`enqueue`. Un agent qui reçoit un `bounce` (`kind: "bounce"`
+dans son `inbox`) doit corriger le fond, pas re-déposer à l'identique.
+
+Un échec d'envoi Discord passe la demande en `failed` et dépose une `dead-letter` dans
+`inbox/discord/` ; un `approve` la remet en file.
+
+Réception : `gateway.poll("<agent>")` puis `gateway.ack("<agent>", id)`.
+Doc : `DISCORD/discord_com/gateway/README.md`.
+
+**Correctif du 2026-09-04 (trou de protocole)** : `bot.py` route désormais tout message d'un
+auteur ayant une réponse attendue (`gateway.has_pending_reply(author_id)`) vers `route_inbound`
+— pièces jointes incluses — même s'il @-mentionne le bot par réflexe en répondant ; avant, ce
+cas tombait en commande `/discord_loop`, perdait ses pièces jointes et exigeait une
+re-transcription manuelle. `/start` (étape 4-bis) fait aussi désormais, pour la **zone racine**,
+un `poll --agent orchestrateur --format hook` **visibility-only** (affiché dans la synthèse,
+jamais traité ni `ack` automatiquement) — corrige § « Inbox gateway : la com Discord se gère
+dans la session `discord` » ci-dessus, dont l'affirmation « Aucun hook, aucun relevé automatique »
+pour la zone racine ne tient plus depuis cette date. Traiter une réponse `--expect-reply` de
+Marie reste une décision explicite de l'utilisateur.
 
 ### Messages pour Marie : via la gateway Discord, encadrés 💻🤖
 Depuis le 2026-09-02, le canal de Marie est **Discord** et **toute communication Discord passe par
@@ -150,51 +237,62 @@ gateway n'inclut ni les `💻🤖` ni le tag, la gateway / l'agent DISCORD les a
 
 Version <X.Y> en ligne.
 
-<N> tests à faire, correspondant aux modifications :
-• <n° de modification du Google Doc>
-• <n° …>
-
 <lien de l'appli sur sa propre ligne>
+
+Détail des changements et questions : commentaires_marie_<X.Y>.docx
 
 💻🤖
 ```
 
-`<N>` = nombre de parcours actuellement à faire dans l'écran « Tests à faire » (parcours non
-validés sur la version déployée). Les puces reprennent les numéros de modification du Google Doc
-`Modifications` couverts par ces parcours (champ `docRefs` de `src/domain/data/manualTestsCatalog.ts`,
-recoupé avec `_contexte/marie_modifications_suivi.md`). Un parcours sans numéro de modification
-(retour hors Doc) est listé par son titre. Le lien du commentaire Drive est ajouté sur sa propre
-ligne, introduit par « Détail des changements et questions : », uniquement s'il y a un commentaire
-utile pour cette livraison.
+La ligne « Détail des changements et questions : » n'est présente que s'il y a un commentaire utile
+pour cette livraison ; sinon elle est omise. Elle porte le nom de fichier versionné, jamais une URL.
+
+**Modifié le 2026-09-15 (roadmap_retours_conversationnels.md, Phase 6)** : la bulle « `<N>` tests à
+faire, correspondant aux modifications » a été retirée du gabarit — le catalogue de tests in-app qui
+l'alimentait (`manualTestsCatalog.ts`, écran « Tests à faire ») a été retiré (voir section
+« Validation des retours par Marie » ci-dessous). Le message de livraison ne renvoie donc plus vers
+une liste de tests à faire. **Aucune livraison réelle n'a encore utilisé ce gabarit modifié** :
+relire ce paragraphe avant le prochain `/deploy` et ajuster si le rendu ne convient pas.
 
 ### Historique de conversation avec Marie : sauvegarde systématique et immédiate
-Tout message échangé avec Marie via la gateway Discord est consigné dans
-`COMMUNICATION/Marie/historique_conversation_marie.md`, sans
+Tout message échangé avec Marie — canal Discord via la gateway, bridge ROBERTO en secours — est
+consigné dans `COMMUNICATION/Marie/historique_conversation_marie.md`, sans
 exception et sans attendre le `/close`. La gateway journalise aussi dans
 `DISCORD/discord_com/logs/conversation.jsonl` (brut) ; `historique_conversation_marie.md` reste la mémoire
 curatée des questions / réponses / décisions produit :
 
+- **Relire la fin du fichier (`sed -n` sur les dernières entrées) avant toute rédaction pour
+  Marie, toute synthèse d'un échange, ou tout raisonnement sur « à quel message Marie répond ».**
+  Le fichier fait seul foi pour le fil de conversation. Ne jamais reconstituer l'enchaînement des
+  bulles à partir du résumé de compaction ou de la mémoire de session — c'est la cause connue des
+  erreurs d'attribution.
 - **Message rédigé pour Marie** (livraison, question, relance — pas seulement ceux de `/deploy`) :
   l'ajouter au fichier dans le même tour où il est rédigé, avant de le présenter à l'utilisateur.
   Recopier le texte tel qu'envoyé, sans les emojis d'encadrement `💻🤖`.
 - **Message que l'utilisateur transmet** (sa réponse, un message de Marie qu'il colle) : l'ajouter
   au fichier dans le tour où il est reçu.
 - Suivre la convention d'entrée en tête du fichier (`### AAAA-MM-JJ`, `**Dév ->**` / `**Marie ->**`,
-  `_Suite :_` pour la décision ou l'action qui en découle).
+  `_Suite :_` pour la décision ou l'action qui en découle). Pour un message entrant de Marie, le
+  `_Suite :_` nomme explicitement le message auquel elle répond, repéré dans le fichier et non
+  supposé.
 - Committer cette mise à jour (ne pas la laisser en résidu non commité). Le fichier est une mémoire
   durable, distincte de `a_transmettre.md` (commentaires de livraison en attente uniquement) et des
   `livraisons/vX.Y.md` (historique figé des livraisons).
 
-### Tests à faire pour Marie : uniquement dans l'appli
-Tous les tests que Marie doit effectuer vivent dans le catalogue in-app
-(`src/domain/data/manualTestsCatalog.ts`, écran « Tests à faire »). Ne jamais lister de tests à
-refaire ailleurs :
+### Validation des retours par Marie : via le fil de discussion (remplace le catalogue de tests)
+**Décision du 2026-09-15 (roadmap_retours_conversationnels.md, Phase 6)** : le catalogue de tests
+in-app (« Tests à faire », `src/domain/data/manualTestsCatalog.ts`, écran et icône retirés du code)
+est obsolète et remplacé par la boucle de retours conversationnels. Principe : Marie signale un
+problème depuis l'appli (bouton « Signaler un retour », suivi dans « Mes retours » — icône en haut
+à droite de l'Accueil) ; une fois corrigé, l'agent dépose une réponse via
+`scripts/reply_feedback_report.py` (voir section « Réponses aux retours testeurs » ci-dessus) ;
+Marie relit la réponse dans le fil de discussion (écran E124) et valide elle-même le retour —
+jamais l'agent à sa place. Il n'existe donc plus de liste de tests à faire proactive : la
+validation porte sur les problèmes effectivement remontés, pas sur un parcours prédéfini. Ne jamais
+recréer de liste de tests à refaire ailleurs :
 - `COMMUNICATION/Marie/a_transmettre.md` et les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md`
   ne contiennent que des **commentaires de livraison** (ce qui change, décisions attendues, écarts
   assumés) — aucune liste de tests, aucune étape de test.
-- Le message de livraison déposé par `/deploy` dans la gateway Discord renvoie vers l'écran
-  « Tests à faire » de l'appli pour les tests, sans les énumérer.
-Chaque comportement à valider par Marie doit donc être ajouté au catalogue in-app (Section « Tests
-manuels » : le catalogue, pas `tests_manuels.md`, qui reste réservé aux contrôles développeur).
 Cette règle prime sur toute étape de `/deploy`, `/close` ou `/analyser_googledoc` qui mentionnerait
-une rubrique « Tests à refaire » dans les documents de communication.
+encore l'écran « Tests à faire » ou une rubrique « Tests à refaire » dans les documents de
+communication — ces mentions sont désormais obsolètes et doivent être corrigées, pas suivies.

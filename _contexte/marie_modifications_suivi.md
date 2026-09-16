@@ -6,7 +6,7 @@ archivée après livraison).
 
 - Google Doc : `https://docs.google.com/document/d/1rEFlDkLnqCQKPlNY0g9pPvYEkWz9XYbVYdzKlwhiuhw/edit`
 - Dernière revue du Doc : 2026-09-11 (date de modification analysée : 2026-09-11 17:12 UTC)
-- Dernière exécution de la revue : 2026-09-12 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
+- Dernière exécution de la revue : 2026-09-16 (jalon vérifié par `/deploy` étape 3.9 ; mis à jour à chaque passage de `.claude/revue_googledoc.md`, que le Doc ait changé ou non)
 - Le Doc ne porte plus que #37 (« je veux que E21 soit comme E22 », énoncé inchangé depuis le 2026-09-06). #35, #36 et #38 en ont été retirés le 2026-09-11 — comportements `livrée v5.92` (ou `en cours` pour #35) conservés, le Doc n'est pas la source d'état.
 - Dernière mise à jour de ce registre : 2026-09-13 — catalogue in-app vidé, cf. Historique des revues.
 - **Catalogue in-app vidé le 2026-09-13** (décision explicite de l'utilisateur) : les 46 parcours de

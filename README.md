@@ -16,6 +16,11 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 16 septembre 2026, une vérification de sécurité côté serveur a été renforcée : un appareil dont
+les seules données réelles seraient des mesures d'énergie était mal protégé contre un écrasement
+accidentel lors d'une réinstallation. La correction a été trouvée par une relecture approfondie du
+code avant la mise en ligne, avant qu'elle n'affecte quiconque.
+
 Le 16 septembre 2026, la procédure de mise en production a été renforcée : le message annonçant une
 nouvelle version à Marie doit désormais être relu et validé explicitement avant tout envoi. Le
 parcours d'accueil d'un nouveau testeur a par ailleurs été rejoué intégralement par l'équipe

@@ -32,7 +32,12 @@ alter table device_snapshots enable row level security;
 -- qui contourne RLS) peut lire/ecrire.
 revoke all on device_snapshots from anon;
 
--- Un payload est considere vide s'il n'a ni tache, ni element de liste, ni entree de budget.
+-- Un payload est considere vide s'il n'a ni tache, ni element de liste, ni entree de budget,
+-- ni entree d'energie. Alignee sur le meme ensemble de tables que le garde-fou client jumeau
+-- hasSignificantData() (src/app/AppContext.tsx) : les deux doivent juger "significatif" de la
+-- meme facon, sinon un appareil dont les seules donnees reelles vivent dans une table protegee
+-- cote client mais pas ici (ex: uniquement des entrees d'energie) se voit silencieusement
+-- ecraser cote serveur par une reinstallation vide (garde-fou cense l'empecher).
 -- Fonction IMMUTABLE : ne lit aucune table, calcule uniquement a partir de son argument.
 create or replace function is_empty_snapshot_payload(p_payload jsonb)
 returns boolean
@@ -42,6 +47,7 @@ as $$
   select coalesce(jsonb_array_length(p_payload -> 'tasks'), 0) = 0
      and coalesce(jsonb_array_length(p_payload -> 'list_items'), 0) = 0
      and coalesce(jsonb_array_length(p_payload -> 'budget_entries'), 0) = 0
+     and coalesce(jsonb_array_length(p_payload -> 'energy_entries'), 0) = 0
 $$;
 
 -- Garde anti-ecrasement (roadmap_fiabilite_sync.md Phase 1, 2026-09-13) : un payload vide ne

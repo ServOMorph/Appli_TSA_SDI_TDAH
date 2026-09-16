@@ -1,3 +1,14 @@
+## v5.138 — 2026-09-16
+
+### Corrigé
+- **Garde-fou serveur anti-écrasement incomplet** (`supabase/schema.sql`, `is_empty_snapshot_payload`) :
+  ne vérifiait que `tasks`/`list_items`/`budget_entries`, contrairement au garde-fou client jumeau
+  `hasSignificantData()` (`src/app/AppContext.tsx`) qui couvre en plus les entrées d'énergie. Un
+  appareil dont les seules données réelles étaient des entrées d'énergie pouvait voir son historique
+  serveur silencieusement écrasé par une réinstallation vide. Trouvé par la revue de code cumulée de
+  `/deploy` (niveau `high`, diff depuis v5.124). **À appliquer manuellement dans le SQL Editor du
+  projet Supabase** (ce fichier n'est pas exécuté automatiquement par `/deploy`).
+
 ## v5.137 — 2026-09-16
 
 ### Modifié

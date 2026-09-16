@@ -26,7 +26,7 @@ en conséquence.
 
 ---
 
-## Phase 1 — Pilote RaphTest : rejouer le parcours actuel, consigner les frictions [EN COURS]
+## Phase 1 — Pilote RaphTest : rejouer le parcours actuel, consigner les frictions [FAIT]
 
 - L'utilisateur rejoue `parcours_accueil.md` sur le site de préprod
   (`https://appli-audhd-dev.netlify.app`), en tant que nouveau testeur, sans aide développeur en

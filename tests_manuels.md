@@ -24,16 +24,18 @@ récent. Une fois que Marie a saisi son code : vérifier que le prochain
 `python scripts/backup_testeur_snapshots.py` range bien son snapshot dans `marie/` et non plus dans
 `_sans_code/`, et que `/deploy` analyse alors le bon fichier. Retirer cette section une fois vérifié.
 
-## Vérifier le garde-fou export ajouté à /deploy (étapes 0.1 et 4ter)
+## Vérifier le garde-fou export ajouté à /deploy (étape 4ter)
 
 Ajouté le 2026-09-13 suite à l'incident de perte de données de Marie (import raté sans export
 préalable). Nouvelle étape 0.1 : alerte urgente à Marie dès le tout début de `/deploy` pour
 exporter ses données avant qu'une nouvelle version soit en ligne. Nouvelle étape 4ter : avant le
-build, confirmation explicite demandée à l'utilisateur que Marie a exporté — sinon arrêt. **Jamais
-exercées en conditions réelles.** Au prochain `/deploy` réel : vérifier que l'étape 0.1 envoie bien
-le message en urgence et le journalise dans `historique_conversation_marie.md`, et que l'étape
-4ter bloque effectivement la suite tant que la confirmation n'est pas donnée. Retirer cette section
-une fois observé.
+build, confirmation explicite demandée à l'utilisateur que Marie a exporté — sinon arrêt.
+
+**Étape 0.1 observée en conditions réelles le 2026-09-16** : message envoyé en mode urgent
+(id gateway `20260916T125042_899231`, Discord `1549764473798008873`) et journalisé dans
+`historique_conversation_marie.md` (commit `cb2339c`). Reste à observer : que l'étape 4ter bloque
+effectivement la suite du même `/deploy` tant que la confirmation n'est pas donnée. Retirer cette
+section une fois observé.
 
 ## Vérifier le tunnel cloudflared sur téléphone réel
 

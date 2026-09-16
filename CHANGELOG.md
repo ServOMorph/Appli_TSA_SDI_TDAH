@@ -1,3 +1,14 @@
+## v5.137 — 2026-09-16
+
+### Modifié
+- **`/deploy` durci** : nouvelle étape 12bis — validation humaine bloquante du corps du message de
+  livraison avant tout dépôt en gateway (ancienne étape 12bis renommée 12ter, référence de l'étape
+  13 corrigée). Aucun changement de code applicatif.
+- **`roadmap_experience_accueil_testeurs.md` Phase 1 terminée** : parcours d'accueil rejoué
+  intégralement par l'utilisateur (`tester_code = RaphTest`) sur le site de préprod, 2 frictions
+  consignées et déjà corrigées (code testeur demandé pendant l'onboarding, clavier iOS). Aucun
+  changement de code applicatif.
+
 ## v5.136 — 2026-09-16
 
 ### Ajouté

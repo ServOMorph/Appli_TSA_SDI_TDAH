@@ -16,6 +16,11 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 16 septembre 2026, la procédure de mise en production a été renforcée : le message annonçant une
+nouvelle version à Marie doit désormais être relu et validé explicitement avant tout envoi. Le
+parcours d'accueil d'un nouveau testeur a par ailleurs été rejoué intégralement par l'équipe
+elle-même sur le site de test, sans aide, afin d'en corriger les points d'inconfort.
+
 Le 16 septembre 2026, un bouton « Synchroniser maintenant » a été ajouté à l'écran Paramètres : il
 permet d'envoyer immédiatement les données de test, sans attendre l'envoi automatique, avec un
 message clair en cas d'échec. Le petit repère de nom d'écran affiché en haut à droite ne bloque

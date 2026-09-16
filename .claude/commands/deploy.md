@@ -284,8 +284,8 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - Si le dépôt du docx échoue, ne pas prétendre que Marie peut consulter le document ; signaler précisément
       l'échec et attendre une instruction.
 
-12. Composer le message de livraison pour Marie à partir de l'inventaire et le **déposer dans la gateway Discord**
-    (cf. `CLAUDE.md` § Messages pour Marie). Il doit toujours contenir :
+12. Composer le message de livraison pour Marie à partir de l'inventaire (cf. `CLAUDE.md` § Messages
+    pour Marie). Il doit toujours contenir :
     - une annonce brève de la version disponible ;
     - les changements effectivement livrés ;
     - les choix ou questions encore attendus, ainsi que les écarts assumés s'ils la concernent ;
@@ -294,14 +294,21 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       questions : », sous la forme du nom du document dans le dossier Drive partagé
       (`commentaires_marie_<version>.docx`) — jamais une URL publique.
 
-    Écrire le corps au fond définitif, **sans** l'encadrement `💻🤖` ni le tag (l'agent DISCORD les pose), puis :
-    ```
-    python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie --kind delivery --file <corps.txt>
-    ```
-    Ne jamais appeler `DISCORD/discord_com/message_marie.py`, l'API Discord ou `claude_bridge` en direct.
-    L'agent DISCORD ajuste ton, format et moment d'envoi sans changer le fond ; relever l'id de demande renvoyé.
+    Écrire le corps au fond définitif, **sans** l'encadrement `💻🤖` ni le tag (l'agent DISCORD les pose).
 
-12bis. Vérifier que le message est effectivement sorti de l'outbox. Le dépôt en gateway (étape 12) ne
+12bis. Validation du message de livraison — gate bloquant côté humain, avant tout dépôt en gateway.
+    Afficher à l'utilisateur le corps intégral composé à l'étape 12 et attendre sa confirmation explicite.
+    - Confirmé : déposer le message tel quel dans la gateway Discord :
+      ```
+      python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie --kind delivery --file <corps.txt>
+      ```
+      Ne jamais appeler `DISCORD/discord_com/message_marie.py`, l'API Discord ou `claude_bridge` en direct.
+      L'agent DISCORD ajuste ensuite ton, format et moment d'envoi sans changer le fond ; relever l'id de
+      demande renvoyé.
+    - Demande de modification du fond : réécrire le corps en conséquence et le représenter à l'utilisateur
+      avant tout dépôt. Ne jamais déposer un corps non validé.
+
+12ter. Vérifier que le message est effectivement sorti de l'outbox. Le dépôt en gateway (étape 12bis) ne
     garantit pas l'envoi : le gardien Discord peut `bounce`, ou `bot.py` peut échouer à drainer. Depuis le
     réveil synthétique de la gateway (`_wake_gardien`), la demande est en général jugée en quelques secondes
     à quelques minutes plutôt que d'attendre jusqu'à 1h — recontrôler à ce rythme, sans `sleep` bloquant.
@@ -326,6 +333,6 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 13. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify, résultat de la
     vérification de fumée, résultat du contrôle de budget bundle, nom du document Drive déposé, inventaire
     synthétique, corps du message de livraison déposé dans la gateway (avec son id de demande) et résultat de sa
-    vérification d'envoi (étape 12bis) — confirmé sorti, corrigé après bounce, ou en attente signalée à
+    vérification d'envoi (étape 12ter) — confirmé sorti, corrigé après bounce, ou en attente signalée à
     l'utilisateur. Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et
     attendre une confirmation explicite.

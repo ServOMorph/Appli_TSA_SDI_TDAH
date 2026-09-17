@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
+import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 
 const backBtnStyle: React.CSSProperties = {
@@ -11,6 +13,17 @@ const backBtnStyle: React.CSSProperties = {
   alignSelf: 'flex-start',
 }
 
+const inputStyle: React.CSSProperties = {
+  flex: 1,
+  padding: '10px 12px',
+  borderRadius: 'var(--radius-md)',
+  border: '1px solid var(--color-border)',
+  fontSize: '1rem',
+  fontFamily: 'var(--font-body)',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-text)',
+}
+
 const profileLabels: Record<string, string> = {
   teenager: 'Adolescent',
   student: 'Étudiant',
@@ -18,13 +31,14 @@ const profileLabels: Record<string, string> = {
 }
 
 export function E111Profile() {
-  const { currentUser, settings, goTo } = useApp()
+  const { currentUser, settings, updateSettings, goTo } = useApp()
 
   const profileLabel = currentUser?.profile_type
     ? (profileLabels[currentUser.profile_type] ?? currentUser.profile_type)
     : 'Non défini'
 
   const testerCode = settings?.tester_code ?? ''
+  const [testerCodeInput, setTesterCodeInput] = useState(testerCode)
 
   return (
     <main
@@ -59,9 +73,25 @@ export function E111Profile() {
         <p style={{ margin: '0 0 var(--spacing-xs)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
           Code testeur
         </p>
-        <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text)' }} aria-label="code testeur">
-          {testerCode || 'Aucun code enregistré'}
-        </p>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+          <input
+            type="text"
+            aria-label="Code testeur"
+            value={testerCodeInput}
+            onChange={(e) => setTesterCodeInput(e.target.value)}
+            placeholder="Aucun code enregistré"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            style={inputStyle}
+          />
+          <Button
+            onClick={() => updateSettings({ tester_code: testerCodeInput.trim() || undefined })}
+            disabled={testerCodeInput.trim() === testerCode}
+          >
+            Enregistrer
+          </Button>
+        </div>
       </Card>
 
       <Card>

@@ -55,11 +55,24 @@ describe('E111Profile', () => {
 
   it('affiche le code testeur enregistré', () => {
     renderE111({ settings: { ...baseSettings, tester_code: 'alpha-01' } })
-    expect(screen.getByLabelText('code testeur')).toHaveTextContent('alpha-01')
+    expect(screen.getByLabelText('Code testeur')).toHaveValue('alpha-01')
   })
 
-  it('affiche Aucun code enregistré quand aucun code n’est défini', () => {
+  it('affiche un champ vide quand aucun code n’est défini', () => {
     renderE111({ settings: baseSettings })
-    expect(screen.getByLabelText('code testeur')).toHaveTextContent('Aucun code enregistré')
+    expect(screen.getByLabelText('Code testeur')).toHaveValue('')
+  })
+
+  it('désactive Enregistrer tant que le code n’a pas changé', () => {
+    renderE111({ settings: { ...baseSettings, tester_code: 'alpha-01' } })
+    expect(screen.getByRole('button', { name: 'Enregistrer' })).toBeDisabled()
+  })
+
+  it('enregistre le nouveau code testeur saisi', () => {
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE111({ settings: baseSettings, updateSettings })
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'marie' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    expect(updateSettings).toHaveBeenCalledWith({ tester_code: 'marie' })
   })
 })

@@ -1,3 +1,12 @@
+## v5.139 — 2026-09-17
+
+### Corrigé
+- **Code testeur enfin modifiable dans Paramètres > Profil** (`E111Profile.tsx`). Le champ n'était
+  affiché qu'en lecture seule depuis son introduction, alors que l'écran d'onboarding
+  (`E05TesterCode.tsx`) promettait de pouvoir le renseigner plus tard à cet endroit — un testeur
+  déjà onboardé avant l'ajout de cette fonctionnalité (Marie) n'avait donc aucun moyen de le
+  saisir. Ajout d'un champ de saisie et d'un bouton « Enregistrer ».
+
 ## v5.138 — 2026-09-16
 
 ### Corrigé

@@ -1071,3 +1071,15 @@ d'où le changement d'adresse (`appli-audhd.netlify.app` -> `appli-marie.netlify
 **mode urgent** sur demande explicite de l'utilisateur (contourne le gardien de sortie plutôt que
 de lancer `bot.py`/`discord_loop` à la main). Id gateway `20260917T181219_547607`, Discord
 `1550207798690840586`. `commentaires_marie_v5.138.docx` déposé dans le dossier Drive partagé.
+
+**Dév ->**
+Nouveau champ dans Paramètres > Profil : Code testeur.
+
+Écris « marie » dedans, puis touche Enregistrer.
+
+Ça nous aide à bien suivre tes données de notre côté.
+
+_Suite :_ le champ existait déjà mais restait en lecture seule (bug corrigé en v5.139, déployé
+manuellement sur le même compte juste après v5.138, fumée 200 confirmée — HTML servi référence
+bien le chunk `index-BffPFktZ.js` de ce build). Déposé en **mode urgent** sur demande explicite
+de l'utilisateur. Id gateway `20260917T182521_905162`, Discord `1550211079857111163`.

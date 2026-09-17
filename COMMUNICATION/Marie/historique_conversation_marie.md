@@ -1052,3 +1052,22 @@ données, jamais exercé en conditions réelles jusqu'ici, cf. `tests_manuels.md
 urgent** (justifié par la procédure elle-même : fenêtre de risque réelle avant le build). Id
 gateway `20260916T125042_899231`, Discord `1549764473798008873`, `--expect-reply`. Confirmation
 recontrôlée à l'étape 4ter avant le build.
+
+### 2026-09-17
+
+**Dév ->**
+Version v5.138 en ligne.
+
+Nouvelle adresse (l'ancienne ne fonctionne plus) :
+https://appli-marie.netlify.app/
+
+Mets à jour le raccourci sur ton écran d'accueil avec cette adresse.
+
+Détail des changements et questions : commentaires_marie_v5.138.docx
+
+_Suite :_ message de livraison de `/deploy` (lot v5.125 → v5.138). Déploiement Netlify effectué
+manuellement sur un nouveau compte (crédits épuisés jusqu'au 24/09 sur l'ancien, 403 répétés),
+d'où le changement d'adresse (`appli-audhd.netlify.app` -> `appli-marie.netlify.app`). Déposé en
+**mode urgent** sur demande explicite de l'utilisateur (contourne le gardien de sortie plutôt que
+de lancer `bot.py`/`discord_loop` à la main). Id gateway `20260917T181219_547607`, Discord
+`1550207798690840586`. `commentaires_marie_v5.138.docx` déposé dans le dossier Drive partagé.

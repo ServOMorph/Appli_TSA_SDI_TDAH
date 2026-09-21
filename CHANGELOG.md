@@ -1,3 +1,12 @@
+## v5.141 — 2026-09-21
+
+### Modifié
+- **Décisions produit actées sans changement de code.** #35 (code couleur par catégorie) et #37 Phase 2 (écran de création repliable comme la fiche de tâche) déclarés tacitement validés : déployés respectivement depuis v5.124 et v5.129, aucun retour contraire de Marie depuis malgré un usage actif du nouveau canal de retours. Identité de l'appareil `103c9b92…` confirmée (Marie, import manuel de ses données sur la nouvelle adresse). Relocalisation de la modale « Nouveautés » actée : bouton sur `E123FeedbackList.tsx` avec pastille non-lu, à coder.
+
+### Constaté
+- **Bug de synchronisation trouvé** : `updateSettings()` (`useSettingsState.ts`) ne déclenche jamais de `syncNow()` — un changement de paramètre (ex. code testeur) reste local jusqu'au prochain cycle de visibilité de l'application. Confirmé sur l'appareil `103c9b92` (sync du 09:36 UTC), `tester_code` toujours absent côté serveur.
+- **7 nouveaux retours testeur non traités** (device `103c9b92`, 19-20 septembre), traitement reporté à la prochaine session.
+
 ## v5.140 — 2026-09-21
 
 ### Corrigé

@@ -16,6 +16,16 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 21 septembre 2026 (suite de session), la question de la récupération des données de la testeuse
+principale sur la nouvelle adresse est résolue : elle a retrouvé et réimporté elle-même ses données,
+sans intervention côté développement. Un défaut a par ailleurs été identifié dans l'envoi automatique
+des réglages vers le serveur : après avoir enregistré un identifiant testeur, l'envoi n'est pas
+immédiat et n'a lieu qu'au prochain changement de visibilité de l'application — correction prévue à
+une prochaine session. Deux anciennes demandes restées sans confirmation (le choix d'une couleur par
+catégorie de tâche, et l'alignement de l'écran de création de tâche sur celui déjà existant) sont
+considérées satisfaites, faute de signalement contraire depuis leur mise en ligne. Sept nouveaux
+retours ont par ailleurs été signalés par la testeuse ; leur traitement est prévu au prochain cycle.
+
 Le 21 septembre 2026, la version en production a changé d'adresse : les crédits du compte
 d'hébergement précédent étant épuisés, l'application est désormais publiée sur un nouveau compte,
 à une nouvelle adresse communiquée à la testeuse principale. Un vrai défaut a été corrigé au

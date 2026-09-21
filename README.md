@@ -16,6 +16,16 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 21 septembre 2026, la version en production a changé d'adresse : les crédits du compte
+d'hébergement précédent étant épuisés, l'application est désormais publiée sur un nouveau compte,
+à une nouvelle adresse communiquée à la testeuse principale. Un vrai défaut a été corrigé au
+passage : le code testeur, jusque-là affiché en lecture seule dans Paramètres > Profil, peut
+maintenant y être saisi ou modifié directement, comme le promettait l'écran d'accueil pour les
+testeuses et testeurs déjà inscrits avant l'ajout de ce champ. Le changement d'adresse ayant pour
+conséquence attendue de repartir d'un stockage local vide (les données sont stockées sur
+l'appareil, pas sur un compte), la question de la récupération des données réelles de la testeuse
+principale sur la nouvelle adresse reste ouverte.
+
 Le 16 septembre 2026, une vérification de sécurité côté serveur a été renforcée : un appareil dont
 les seules données réelles seraient des mesures d'énergie était mal protégé contre un écrasement
 accidentel lors d'une réinstallation. La correction a été trouvée par une relecture approfondie du

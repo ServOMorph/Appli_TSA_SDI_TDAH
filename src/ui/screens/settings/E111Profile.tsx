@@ -86,7 +86,11 @@ export function E111Profile() {
             style={inputStyle}
           />
           <Button
-            onClick={() => updateSettings({ tester_code: testerCodeInput.trim() || undefined })}
+            onClick={() => {
+              const trimmed = testerCodeInput.trim()
+              updateSettings({ tester_code: trimmed || undefined })
+              setTesterCodeInput(trimmed)
+            }}
             disabled={testerCodeInput.trim() === testerCode}
           >
             Enregistrer

@@ -1,3 +1,12 @@
+## v5.140 — 2026-09-21
+
+### Corrigé
+- **Désynchronisation d'affichage du code testeur** (`E111Profile.tsx`) : après enregistrement, le
+  champ de saisie pouvait conserver des espaces superflus (ex. `" marie"`) alors que la valeur
+  réellement sauvegardée était déjà nettoyée (`"marie"`), rendant le bouton Enregistrer désactivé
+  tout en affichant un texte différent de la valeur persistée. Trouvé par la revue de code de
+  session (`/close`).
+
 ## v5.139 — 2026-09-17
 
 ### Corrigé

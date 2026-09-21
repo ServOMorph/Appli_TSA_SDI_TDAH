@@ -1,12 +1,19 @@
+vi.mock('@/data/sync/syncClient', () => ({
+  syncNow: vi.fn(),
+}))
+
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useState } from 'react'
 import { db, listItemRepo, settingsRepo, toolRepo } from '@/app/repositories'
+import { syncNow } from '@/data/sync/syncClient'
 import { useSettingsState } from './useSettingsState'
 
+const syncNowMock = vi.mocked(syncNow)
+
 function SettingsPanel() {
-  const { createUser, exportData, importData, currentUser } = useSettingsState()
+  const { createUser, exportData, importData, updateSettings, currentUser } = useSettingsState()
   const [lastImport, setLastImport] = useState('')
   async function runImport(data: unknown) {
     const result = await importData(data)
@@ -17,6 +24,7 @@ function SettingsPanel() {
       <div data-testid="user">{currentUser?.id ?? 'aucun'}</div>
       <button onClick={() => createUser('student')}>Créer l’utilisateur</button>
       <button onClick={() => createUser('student', ' RaphTest ')}>Créer l’utilisateur avec code testeur</button>
+      <button onClick={() => updateSettings({ tester_code: 'marie' })}>Modifier les réglages</button>
       <output data-testid="import-result">{lastImport}</output>
       <button onClick={() => exportData()}>Exporter</button>
       <button
@@ -85,6 +93,7 @@ function readBlob(blob: Blob): Promise<string> {
 
 afterEach(async () => {
   await db.budgetIncomeEntries.clear()
+  syncNowMock.mockClear()
 })
 
 describe('useSettingsState — createUser', () => {
@@ -104,6 +113,25 @@ describe('useSettingsState — createUser', () => {
     const userId = screen.getByTestId('user').textContent as string
     const settings = await settingsRepo.getByUserId(userId)
     expect(settings?.tester_code).toBeUndefined()
+  })
+})
+
+describe('useSettingsState — updateSettings', () => {
+  it('déclenche une synchronisation après écriture des réglages', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    const userId = screen.getByTestId('user').textContent as string
+
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier les réglages' }))
+    })
+
+    await waitFor(async () => {
+      const settings = await settingsRepo.getByUserId(userId)
+      expect(settings?.tester_code).toBe('marie')
+    })
+    expect(syncNowMock).toHaveBeenCalled()
   })
 })
 

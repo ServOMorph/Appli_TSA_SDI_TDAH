@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/repositories'
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
+import { syncNow } from '@/data/sync/syncClient'
 import { createList } from '@/domain/rules/listRules'
 import { createTool } from '@/domain/rules/toolRules'
 import type { Settings } from '@/domain/entities/settings'
@@ -141,6 +142,7 @@ export function useSettingsState() {
     const updated = { ...s, ...patch }
     await settingsRepo.update(updated)
     setSettings(updated)
+    void syncNow()
   }
 
   async function exportData() {

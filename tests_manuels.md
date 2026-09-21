@@ -46,7 +46,7 @@ fonctionnel depuis un téléphone.
 
 ## Sauvegarde Drive en attente
 
-Manifeste rafraîchi le 2026-09-16 (220 fichiers). L'upload vers Drive n'est pas exécutable en
+Manifeste rafraîchi le 2026-09-21 (250 fichiers). L'upload vers Drive n'est pas exécutable en
 auto-mode (classifieur). À lancer manuellement, dans un terminal normal, depuis la racine du
 projet :
 ```

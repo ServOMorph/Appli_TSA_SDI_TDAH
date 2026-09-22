@@ -20,18 +20,21 @@ export function E123FeedbackList() {
   const consentGranted = isSyncConsentGranted()
   const hasUnsent = reports.some((report) => report.sync_status !== 'sent')
 
-  async function load() {
+  async function load(isActive: () => boolean = () => true) {
     const [openReports, unread] = await Promise.all([
       feedbackReportRepo.getOpen(),
       feedbackMessageRepo.getUnreadReportIds(),
     ])
+    if (!isActive()) return
     setReports(openReports)
     setUnreadReportIds(unread)
   }
 
   useEffect(() => {
-    void load()
-    void syncFeedbackNow().then(() => { void load() })
+    let active = true
+    void load(() => active)
+    void syncFeedbackNow().then(() => { if (active) void load(() => active) })
+    return () => { active = false }
   }, [])
 
   async function retry(id: string) {

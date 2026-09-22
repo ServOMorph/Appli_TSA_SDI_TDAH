@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { AppContext } from '@/app/AppContext'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
 
 const REPORT = {
@@ -138,6 +139,31 @@ describe('E124FeedbackDetail', () => {
     await screen.findByText('Le bouton est masqué')
     expect(screen.queryByRole('button', { name: 'Valider' })).toBeNull()
     expect(screen.getByText('La validation sera possible une fois ce retour envoyé.')).toBeInTheDocument()
+  })
+
+  it('ignore la réponse d’un chargement obsolète si le retour affiché a changé entre-temps', async () => {
+    const REPORT_2 = { ...REPORT, id: 'report-2', comment: 'Deuxième retour' }
+    let resolveReport1: (value: typeof REPORT) => void = () => {}
+    const report1Promise = new Promise<typeof REPORT>((resolve) => { resolveReport1 = resolve })
+    mocks.getById.mockImplementation((id: string) => (id === 'report-1' ? report1Promise : Promise.resolve(REPORT_2)))
+    mocks.getByReport.mockResolvedValue([])
+
+    const { rerender } = renderWithApp(
+      <E124FeedbackDetail />,
+      makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }),
+    )
+
+    rerender(
+      <AppContext.Provider value={makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-2' } })}>
+        <E124FeedbackDetail />
+      </AppContext.Provider>,
+    )
+    await screen.findByText('Deuxième retour')
+
+    resolveReport1(REPORT)
+    await Promise.resolve()
+    expect(screen.getByText('Deuxième retour')).toBeInTheDocument()
+    expect(screen.queryByText('Le bouton est masqué')).toBeNull()
   })
 
   it('affiche une erreur si la validation ne peut pas être enregistrée', async () => {

@@ -35,15 +35,16 @@ export function E124FeedbackDetail() {
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState('')
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (isActive: () => boolean = () => true) => {
     if (!reportId) {
-      setLoaded(true)
+      if (isActive()) setLoaded(true)
       return
     }
     const [foundReport, foundMessages] = await Promise.all([
       feedbackReportRepo.getById(reportId),
       feedbackMessageRepo.getByReport(reportId),
     ])
+    if (!isActive()) return
     setReport(foundReport ?? null)
     setMessages(foundMessages)
     setLoaded(true)
@@ -53,12 +54,16 @@ export function E124FeedbackDetail() {
   }, [reportId])
 
   useEffect(() => {
-    void load()
+    let active = true
+    void load(() => active)
+    return () => { active = false }
   }, [load])
 
   useEffect(() => {
     if (!reportId) return
-    void syncFeedbackNow().then(() => { void load() })
+    let active = true
+    void syncFeedbackNow().then(() => { if (active) void load(() => active) })
+    return () => { active = false }
   }, [reportId, load])
 
   useEffect(() => {

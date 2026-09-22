@@ -293,6 +293,6 @@ recréer de liste de tests à refaire ailleurs :
 - `COMMUNICATION/Marie/a_transmettre.md` et les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md`
   ne contiennent que des **commentaires de livraison** (ce qui change, décisions attendues, écarts
   assumés) — aucune liste de tests, aucune étape de test.
-Cette règle prime sur toute étape de `/deploy`, `/close` ou `/analyser_googledoc` qui mentionnerait
-encore l'écran « Tests à faire » ou une rubrique « Tests à refaire » dans les documents de
-communication — ces mentions sont désormais obsolètes et doivent être corrigées, pas suivies.
+Cette règle prime sur toute étape de `/deploy` ou `/close` qui mentionnerait encore l'écran « Tests
+à faire » ou une rubrique « Tests à refaire » dans les documents de communication — ces mentions
+sont désormais obsolètes et doivent être corrigées, pas suivies.

@@ -16,6 +16,12 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 22 septembre 2026 (suite de session), le circuit de traitement des commentaires de Marie sur
+Google Doc, devenu obsolète depuis le passage aux retours signalés dans l'application, a été
+retiré : plus aucune commande ne le référence. Une nouvelle commande dédiée au traitement des
+retours testeurs signalés dans l'application a été créée, pour organiser leur analyse et leur
+correction par lots.
+
 Le 22 septembre 2026, la suite de tests automatisés de bout en bout, cassée depuis l'ajout de
 l'étape « code testeur » à l'accueil (16 septembre) sans que la cause en ait été recherchée, a été
 réparée : les 59 scénarios repassent au vert. Plusieurs correctifs trouvés la session précédente

@@ -40,7 +40,7 @@ allowed-tools: Bash(cp:*), Bash(mv:*), Bash(ls:*), Bash(test -f:*), Bash(rclone:
      vérifier qu'ils correspondent à une évolution connue du code (`git log`, `CHANGELOG.md`) —
      sinon les signaler comme incohérence ;
    - toute perte ou incohérence trouvée : la documenter précisément (table, identifiant, nature de
-     l'écart) pour le rapport de l'étape 8.
+     l'écart) pour le rapport de l'étape 6.
 
 5. Repérer les frictions signalées par Marie : retiré le 2026-09-15
    (roadmap_retours_conversationnels.md, Phase 6) — `manual_test_results` n'existe plus dans les
@@ -51,19 +51,11 @@ allowed-tools: Bash(cp:*), Bash(mv:*), Bash(ls:*), Bash(test -f:*), Bash(rclone:
    nous avons besoin de ton choix » — jamais une liste de tests (cf. `CLAUDE.md` § Spécificités
    projet, « Validation des retours par Marie »).
 
-6. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Reprendre son
-   compte-rendu dans le rapport de l'étape 7. Cette revue ne bloque pas la commande : elle détecte
-   un éventuel changement du Doc et réconcilie le registre, sans créer de roadmap.
-
-7. Rapporter à l'utilisateur, sans corriger automatiquement :
+6. Rapporter à l'utilisateur, sans corriger automatiquement :
    - version et date de l'export traité, nom du fichier créé dans `donnees_testeurs/marie/` ;
    - toute perte ou incohérence de données détectée à l'étape 4 ;
    - chaque friction détectée à l'étape 5, avec sa nature (bug applicatif / formulation de test /
      demande d'évolution) et une proposition de traitement ;
-   - le compte-rendu de la revue du Google Doc (étape 6) : Doc inchangé, ou différentiel d'états du
-     registre et nouvelles demandes ;
    - si rien à signaler : le dire explicitement plutôt que rester silencieux sur ce point.
 
-8. Ne jamais committer `donnees_testeurs/` (gitignoré). Si `_contexte/marie_modifications_suivi.md`
-   a été modifié, ne pas le committer automatiquement — le signaler dans le rapport et laisser le
-   commit à la charge du prochain `/close`.
+7. Ne jamais committer `donnees_testeurs/` (gitignoré).

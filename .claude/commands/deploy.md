@@ -9,7 +9,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 
 ## Procédure
 
-0. Traiter les données synchronisées de Marie et revoir le Google Doc avant toute chose.
+0. Traiter les données synchronisées de Marie avant toute chose.
    Depuis la bascule du 2026-09-01 (`roadmap_sync_marie.md` Phase 5), les données de Marie
    arrivent par synchronisation automatique (Supabase) : plus aucun export ni envoi manuel à
    réclamer. `/start` archive déjà le dernier snapshot daté de chaque testeur dans
@@ -54,25 +54,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       - frictions signalées par Marie : voir désormais ses retours (`scripts/reply_feedback_report.py`),
         plus dans ce snapshot depuis le retrait du catalogue de tests in-app (`manual_test_results`
         n'existe plus dans les exports, roadmap_retours_conversationnels.md Phase 6).
-   4. Revue du Google Doc de Marie : exécuter la procédure `.claude/revue_googledoc.md`. Elle
-      réconcilie `_contexte/marie_modifications_suivi.md` et pose le jalon daté « Dernière exécution
-      de la revue » dans l'en-tête du registre (contrôlé à l'étape 3.9). Présenter ensuite à
-      l'utilisateur le compte-rendu qu'elle rend (en-tête « analyse requise » / « réconciliation
-      seule » / « Doc inchangé », différentiel d'états du registre, date comparée) : ne jamais
-      enchaîner à l'étape 1 sans l'avoir affiché. Si le compte-rendu est **« analyse requise »**
-      (au moins une demande numérotée nouvelle ou au texte modifié dans le Doc) : s'arrêter après
-      la réconciliation et le commit de bookkeeping (étape 0.5), et demander à l'utilisateur de
-      lancer `/analyser_googledoc` avant de reprendre `/deploy`. Un compte-rendu
-      **« réconciliation seule »** (Doc touché mais aucune demande nouvelle ni modifiée — p. ex.
-      Marie a seulement retiré des lignes déjà livrées) ne bloque pas : poursuivre.
-   5. Commit du bookkeeping de l'étape 0. Si la réconciliation du registre à l'étape 0.4 a modifié
-      `_contexte/marie_modifications_suivi.md`, le `git add` nommément (jamais `git add -A`) et le
-      committer maintenant, sujet
-      `chore(orchestrateur): /deploy étape 0 — réconciliation registre`
-      (pied `Co-Authored-By` habituel). Ainsi un arrêt en 0.4 (« analyse requise ») ou en 0.8
-      laisse malgré tout un arbre de travail propre et la vérification bloquante 3.1 reste
-      atteignable au redémarrage, sans résidu de `/deploy`.
-   6. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
+   4. Vérifier les échanges Discord avec Marie en lien avec les modifications de cette version :
       relire les dernières entrées de `COMMUNICATION/Marie/historique_conversation_marie.md` et
       les messages non traités de `gateway/inbox/orchestrateur/`
       (`python DISCORD/discord_com/gateway.py poll --agent orchestrateur`, sans `ack` — relevé de
@@ -80,10 +62,9 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       la version cible : signaler toute demande, remarque ou confirmation de Marie touchant ces
       changements qui ne serait couverte ni par le code livré, ni par l'inventaire de communication
       à venir (étape 10).
-   7. Si l'analyse (snapshot + revue du Doc + échanges Discord) ne révèle ni perte, ni
-      incohérence, ni friction bloquante, ni changement non revu du Google Doc, ni sujet Discord
-      oublié : continuer normalement à l'étape 1.
-   8. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
+   5. Si l'analyse (snapshot + échanges Discord) ne révèle ni perte, ni incohérence, ni friction
+      bloquante, ni sujet Discord oublié : continuer normalement à l'étape 1.
+   6. Sinon : s'arrêter, exposer précisément les problèmes trouvés à l'utilisateur et lui proposer de
       les traiter avant de poursuivre le déploiement. Ne jamais supprimer, écraser ni modifier les
       snapshots ou fichiers d'export de `donnees_testeurs/marie/` pour « résoudre » un problème
       constaté — toute correction porte sur le code ou le journal projet, jamais sur les données
@@ -128,17 +109,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       correctement à Marie.
    8. **Branche de production** : `git branch --show-current` doit retourner `main`. Sinon, s'arrêter : un
       déploiement de production depuis une autre branche n'est pas autorisé.
-   9. **Revue du Google Doc exécutée cette session** :
-      `grep -m1 '^- Dernière exécution de la revue :' _contexte/marie_modifications_suivi.md`. La date
-      qui suit doit être celle du jour. Sinon, s'arrêter — l'étape 0.4 a été sautée : exécuter
-      `.claude/revue_googledoc.md` (et présenter son compte-rendu) avant de reprendre.
-  10. **Aucune roadmap avec une phase en cours** : lister les `roadmap_*.md` à la racine du projet
+   9. **Aucune roadmap avec une phase en cours** : lister les `roadmap_*.md` à la racine du projet
       (`ls roadmap_*.md`). Pour chacune, relever les statuts de phase (`[EN COURS]`, `[TODO]`,
       `[TODO — BLOQUÉ]`, `[FAIT]`). Si une phase est `[EN COURS]`, s'arrêter — du travail est en
       cours et ne doit pas être déployé : demander à l'utilisateur de terminer la phase (ou de la
       repasser `[TODO]`) avant de relancer `/deploy`. Une roadmap dont les phases sont uniquement
       `[FAIT]` et/ou `[TODO]`/`[TODO — BLOQUÉ]` ne bloque pas ici (déploiement partiel assumé —
-      voir l'avertissement 4.6).
+      voir l'avertissement 4.5).
 
 4. Avertissements — signaler chacun s'il est détecté, puis demander une confirmation explicite unique
    avant de poursuivre (ne pas bloquer seul, ne pas continuer sans réponse de l'utilisateur).
@@ -156,13 +133,8 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       (roadmap_retours_conversationnels.md, Phase 6) — `src/domain/data/manualTestsCatalog.ts`
       n'existe plus, ce gate est désormais sans objet. La validation par Marie passe par ses retours
       (cf. `CLAUDE.md` § Spécificités projet, « Validation des retours par Marie »).
-   5. **Demandes Marie en attente non planifiées** : lire `_contexte/marie_modifications_suivi.md`. Si absent,
-      ignorer silencieusement. S'il existe, lister toute demande à l'état `en attente` qui n'est rattachée ni à
-      une roadmap active (fichier `roadmap_*.md` à la racine avec une phase la couvrant) ni à une décision
-      tracée. S'il y en a, les signaler et demander une confirmation explicite avant de poursuivre. Ne pas
-      modifier le registre automatiquement.
-   6. **Roadmap active incomplète (déploiement partiel)** : pour chaque `roadmap_*.md` à la racine ayant
-      encore des phases `[TODO]` ou `[TODO — BLOQUÉ]` (la vérification bloquante 3.10 a déjà écarté le cas
+   5. **Roadmap active incomplète (déploiement partiel)** : pour chaque `roadmap_*.md` à la racine ayant
+      encore des phases `[TODO]` ou `[TODO — BLOQUÉ]` (la vérification bloquante 3.9 a déjà écarté le cas
       `[EN COURS]`), lister les phases restantes et signaler que le déploiement livrera une roadmap
       partiellement réalisée. Demander une confirmation explicite avant de poursuivre. Ne pas modifier la
       roadmap automatiquement.

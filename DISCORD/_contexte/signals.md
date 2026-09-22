@@ -9,7 +9,7 @@
   réf: DISCORD/discord_com/gateway/ONBOARD_phase5_brief.md (§ Identifiants), DISCORD/discord_com/config_bot_discord.json
 - [P1|ouvert] #3 (débordement cadres Date/Heure) : modèle téléphone (iPhone 13) et navigateur (Safari) reçus de Marie le 2026-09-04/05, mais la photo/vidéo du débordement demandée reste manquante.
   fait quand: une pièce jointe (photo/vidéo) de Marie liée à #3 est présente dans gateway/inbox/orchestrateur/
-  réf: historique_conversation_marie.md (2026-09-04/05), _contexte/marie_modifications_suivi.md (#3)
+  réf: historique_conversation_marie.md (2026-09-04/05), Archives/marie_modifications_suivi.md (#3)
 - [P2|ouvert] Appliquer réellement l'étape 3d-bis (`[discord-auto]`) à chaque cycle. Appliquée à chaque `TIMEOUT` de la session 2026-09-09/10 (rien à valider). Section restante : « Bot Discord — file d'attente des commandes » (scénario 2-3 messages simultanés pendant un traitement, FIFO + auteurs affichés) jamais observé — les messages arrivent un par un. La section « Hooks de zone on_start.md/on_close.md » est exerçable (on_start + on_close réels) : sa purge de `tests_manuels.md` revient à l'orchestrateur / session racine (fichier hors périmètre discord), le point « échec non bloquant » reste non observé.
   fait quand: la section correspondante disparaît de tests_manuels.md une fois son scénario observé en conditions réelles
   réf: tests_manuels.md, .claude/commands/discord_loop.md § 3d-bis

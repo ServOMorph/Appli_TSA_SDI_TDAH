@@ -1,3 +1,16 @@
+## v6.0 — 2026-09-22
+
+### Supprimé
+- **Workflow Google Doc de commentaires retiré.** Commande `/analyser_googledoc` supprimée, ainsi
+  que `.claude/revue_googledoc.md` (procédure partagée devenue orpheline). Étapes liées retirées de
+  `/deploy` et `/traiter_export_marie`. `_contexte/marie_modifications_suivi.md` archivé dans
+  `Archives/marie_modifications_suivi.md` (registre historique, plus alimenté).
+
+### Ajouté
+- **Commande `/traiter_retours`** : analyse et traitement organisé des retours testeurs déposés via
+  « Mes retours » (E122-E124) — lecture, clarification, roadmap groupée par phases, correctifs
+  testés, dépôt de réponse par phase (`scripts/reply_feedback_report.py`), synthèse finale.
+
 ## v5.142 — 2026-09-22
 
 ### Corrigé

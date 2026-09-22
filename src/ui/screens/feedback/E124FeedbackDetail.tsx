@@ -152,8 +152,11 @@ export function E124FeedbackDetail() {
       <label htmlFor="feedback-reply">Ajouter un commentaire</label>
       <textarea id="feedback-reply" value={reply} onChange={(event) => setReply(event.target.value)} style={inputStyle} rows={3} placeholder="Écrivez votre message." />
       <Button fullWidth onClick={sendReply} disabled={!canSend || sending}>{sending ? 'Envoi…' : 'Envoyer'}</Button>
-      {report.resolution_status === 'open' && (
+      {report.resolution_status === 'open' && report.sync_status === 'sent' && (
         <Button variant="secondary" fullWidth onClick={() => setConfirmingValidate(true)}>Valider</Button>
+      )}
+      {report.resolution_status === 'open' && report.sync_status !== 'sent' && (
+        <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>La validation sera possible une fois ce retour envoyé.</p>
       )}
       {confirmingValidate && (
         <div role="dialog" aria-modal="true" aria-label="Valider ce retour" style={modalOverlay}>

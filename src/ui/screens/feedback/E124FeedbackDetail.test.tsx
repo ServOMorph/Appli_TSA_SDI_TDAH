@@ -119,6 +119,14 @@ describe('E124FeedbackDetail', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Le commentaire n’a pas pu être enregistré sur cet appareil.')
   })
 
+  it('masque le bouton Valider et explique pourquoi quand le retour n’est pas encore envoyé', async () => {
+    mocks.getById.mockResolvedValue({ ...REPORT, sync_status: 'failed' as const })
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    await screen.findByText('Le bouton est masqué')
+    expect(screen.queryByRole('button', { name: 'Valider' })).toBeNull()
+    expect(screen.getByText('La validation sera possible une fois ce retour envoyé.')).toBeInTheDocument()
+  })
+
   it('affiche une erreur si la validation ne peut pas être enregistrée', async () => {
     mocks.validate.mockRejectedValueOnce(new Error('quota exceeded'))
     renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))

@@ -119,6 +119,19 @@ describe('E124FeedbackDetail', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Le commentaire n’a pas pu être enregistré sur cet appareil.')
   })
 
+  it('affiche un indicateur d’échec sur un message qui n’a pas pu être envoyé', async () => {
+    mocks.getByReport.mockResolvedValue([{ ...AGENT_MESSAGE, id: 'message-3', author: 'user' as const, body: 'Ceci a échoué', sync_status: 'failed' as const }])
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    expect(await screen.findByText('Ceci a échoué')).toBeInTheDocument()
+    expect(screen.getByText('Échec d’envoi')).toBeInTheDocument()
+  })
+
+  it('n’affiche pas d’indicateur d’échec sur un message envoyé', async () => {
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    await screen.findByText(AGENT_MESSAGE.body)
+    expect(screen.queryByText('Échec d’envoi')).toBeNull()
+  })
+
   it('masque le bouton Valider et explique pourquoi quand le retour n’est pas encore envoyé', async () => {
     mocks.getById.mockResolvedValue({ ...REPORT, sync_status: 'failed' as const })
     renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))

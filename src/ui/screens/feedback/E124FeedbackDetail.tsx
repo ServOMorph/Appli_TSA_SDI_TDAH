@@ -16,6 +16,7 @@ interface ThreadEntry {
   author: FeedbackMessage['author']
   body: string
   created_at: string
+  sync_status: FeedbackMessage['sync_status']
 }
 
 function formatDateTime(iso: string): string {
@@ -120,8 +121,8 @@ export function E124FeedbackDetail() {
   }
 
   const thread: ThreadEntry[] = [
-    { id: report.id, author: 'user' as const, body: report.comment, created_at: report.created_at },
-    ...messages.map((message): ThreadEntry => ({ id: message.id, author: message.author, body: message.body, created_at: message.created_at })),
+    { id: report.id, author: 'user' as const, body: report.comment, created_at: report.created_at, sync_status: report.sync_status },
+    ...messages.map((message): ThreadEntry => ({ id: message.id, author: message.author, body: message.body, created_at: message.created_at, sync_status: message.sync_status })),
   ].filter((entry) => entry.body.trim().length > 0)
 
   return (
@@ -146,6 +147,9 @@ export function E124FeedbackDetail() {
             <strong>{entry.author === 'agent' ? 'Équipe' : 'Vous'}</strong>
             <p style={{ margin: 'var(--spacing-sm) 0 0' }}>{entry.body}</p>
             <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>{formatDateTime(entry.created_at)}</span>
+            {entry.sync_status === 'failed' && (
+              <span style={{ display: 'block', color: 'var(--color-error)', fontSize: '0.8125rem', marginTop: 'var(--spacing-xs)' }}>Échec d’envoi</span>
+            )}
           </Card>
         ))}
       </section>

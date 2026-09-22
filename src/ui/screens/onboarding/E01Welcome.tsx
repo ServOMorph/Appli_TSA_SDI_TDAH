@@ -1,12 +1,8 @@
-import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
-import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
-import { WHATS_NEW, hasUnseenWhatsNew, markWhatsNewSeen } from '@/domain/data/whatsNew'
 
 export function E01Welcome() {
   const { goTo } = useApp()
-  const [showWhatsNew, setShowWhatsNew] = useState(hasUnseenWhatsNew)
 
   return (
     <main
@@ -37,15 +33,6 @@ export function E01Welcome() {
             borderRadius: 'var(--radius-md)',
           }}
         />
-        {showWhatsNew && (
-          <WhatsNewModal
-            updates={WHATS_NEW}
-            onClose={() => {
-              markWhatsNewSeen()
-              setShowWhatsNew(false)
-            }}
-          />
-        )}
       </div>
       <Button fullWidth onClick={() => goTo('consent')} style={{ flex: '0 0 auto' }}>
         {import.meta.env.VITE_APP_VERSION ? `Entrer dans la ${import.meta.env.VITE_APP_VERSION}` : 'Entrer'}

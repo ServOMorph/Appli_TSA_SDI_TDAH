@@ -14,15 +14,17 @@ demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
 ## Vérifier le classement du snapshot de Marie après saisie de son code testeur
 
-Depuis la Phase 6 `roadmap_integration_onboard.md`, tant que Marie n'a pas saisi son `tester_code`
-(`marie`) dans Paramètres > Profil, ses nouveaux snapshots Supabase tombent dans
-`donnees_testeurs/_sans_code/` au lieu de `donnees_testeurs/marie/` (constaté au hook `/close` du
-2026-09-12 : `snapshot-supabase-192f2411-20260912-0951z.json` archivé en `_sans_code/`). Risque
-concret : `/deploy` étape 0.2-0.3 continue de lire `donnees_testeurs/marie/`, qui ne contiendra
-alors que l'historique migré (dernier daté du 2026-09-11), pas le snapshot réellement le plus
-récent. Une fois que Marie a saisi son code : vérifier que le prochain
-`python scripts/backup_testeur_snapshots.py` range bien son snapshot dans `marie/` et non plus dans
-`_sans_code/`, et que `/deploy` analyse alors le bon fichier. Retirer cette section une fois vérifié.
+Depuis la Phase 6 `roadmap_integration_onboard.md`, tant que le `tester_code` (`marie`) n'est pas
+enregistré côté serveur, ses snapshots Supabase tombent dans `donnees_testeurs/_sans_code/` au lieu
+de `donnees_testeurs/marie/`. L'appareil concerné est désormais identifié : `103c9b92…` (identité
+confirmée le 2026-09-21, remplace la référence à `192f2411`). Cause du blocage actuel connue et
+corrigée en code (`updateSettings()` déclenche `syncNow()`, commit `72481be`) mais pas encore
+déployée — reconfirmé au hook `/close` du 2026-09-22 :
+`snapshot-supabase-103c9b92-20260922-1145z.json` toujours archivé en `_sans_code/`. Risque concret :
+`/deploy` étape 0.2-0.3 lirait `donnees_testeurs/marie/`, qui ne contient pas le snapshot le plus
+récent. Une fois le correctif déployé et un cycle de synchronisation passé : vérifier que le
+prochain `python scripts/backup_testeur_snapshots.py` range bien le snapshot de `103c9b92` dans
+`marie/` et non plus dans `_sans_code/`. Retirer cette section une fois vérifié.
 
 ## Vérifier le garde-fou export ajouté à /deploy (étape 4ter)
 

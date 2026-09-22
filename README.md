@@ -16,6 +16,13 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 22 septembre 2026, la suite de tests automatisés de bout en bout, cassée depuis l'ajout de
+l'étape « code testeur » à l'accueil (16 septembre) sans que la cause en ait été recherchée, a été
+réparée : les 59 scénarios repassent au vert. Plusieurs correctifs trouvés la session précédente
+(envoi immédiat des réglages modifiés, nouvel emplacement de la fenêtre « Nouveautés », validation
+d'un retour non encore envoyé, indicateur d'échec d'envoi dans le fil de discussion) restent
+corrigés dans le code mais pas encore mis en ligne.
+
 Le 21 septembre 2026 (suite de session), la question de la récupération des données de la testeuse
 principale sur la nouvelle adresse est résolue : elle a retrouvé et réimporté elle-même ses données,
 sans intervention côté développement. Un défaut a par ailleurs été identifié dans l'envoi automatique

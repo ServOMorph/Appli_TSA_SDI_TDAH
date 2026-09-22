@@ -38,6 +38,14 @@ Sur l'écran de création d'une tâche (bouton « Ajouter une tâche »), les ch
 
 Un retour envoyé depuis l'application ouvre maintenant un vrai échange : une fois le problème corrigé, la réponse arrive directement dans « Mes retours », en touchant le retour concerné. Il suffit de la lire et de toucher « Valider » si c'est bon, ou d'écrire un nouveau message si ce n'est pas encore satisfaisant. L'icône pour y accéder est maintenant en haut à droite de l'écran d'accueil (elle a remplacé « Tests à faire », qui n'existe plus) ; un petit cercle rouge apparaît dessus quand une réponse n'a pas encore été lue.
 
+Si un message que vous envoyez dans cet échange n'arrive pas à partir, il est maintenant marqué « Échec d'envoi » directement dans la conversation, comme c'était déjà le cas pour le tout premier retour.
+
+Le bouton « Valider » n'apparaît plus tant que votre retour n'a pas fini de partir (pas de réseau, ou partage désactivé) : un message indique qu'il faut attendre l'envoi avant de pouvoir le clore.
+
+## Nouveautés : nouvel emplacement
+
+Le bouton « Nouveautés », qui annonçait les derniers changements, a été déplacé sur l'écran « Mes retours » (il n'était plus visible nulle part depuis le retrait de « Tests à faire »). Un petit point rouge y apparaît tant qu'il y a du nouveau à lire.
+
 ## Sauvegarde autonome de vos données
 
 Pour sauvegarder vos données vous-même : Paramètres > Export et import > « Exporter en JSON ». Le fichier téléchargé contient vos tâches, listes, budget et réglages ; il ne contient pas l'historique de vos retours déjà envoyés au développeur (ce sont des données de test, pas des données à restaurer).

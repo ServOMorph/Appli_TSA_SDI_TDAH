@@ -1,3 +1,20 @@
+## v5.142 — 2026-09-22
+
+### Corrigé
+- **Suite e2e réparée (59/59)** : cause racine trouvée par exécution réelle des tests — l'écran
+  Code testeur (`E05TesterCode`, ajouté le 2026-09-16 entre le consentement et le choix du profil)
+  n'était pas géré par les helpers d'onboarding des tests automatisés (`e2e/helpers/reset.ts`,
+  `e2e/01-onboarding.spec.ts`), désynchronisés depuis le 2026-09-10 — 10 des 11 fichiers de tests
+  en étaient affectés, pas seulement `10-feedback.spec.ts` (T58). L'assertion de T58 a aussi été
+  alignée sur le comportement réel (statut d'envoi masqué tant que le partage n'est pas activé).
+  L'assertion de T59 (`11-export-import-roundtrip.spec.ts`) attendait encore `manual_test_results`
+  dans l'export, un champ retiré du schéma local depuis le retrait du catalogue de tests in-app —
+  cause distincte, sans rapport avec l'onboarding, également corrigée.
+- **`E124FeedbackDetail.tsx` : un message qui échoue à l'envoi juste après sa rédaction ne montrait
+  jamais l'indicateur « Échec d'envoi ».** Trouvé par la revue de code de ce `/close` : `sendReply()`
+  déclenchait la synchronisation en tâche de fond sans jamais recharger le fil ensuite, contrairement
+  au bouton « Relancer » d'E123FeedbackList qui suit déjà ce schéma.
+
 ## v5.141 — 2026-09-21
 
 ### Modifié

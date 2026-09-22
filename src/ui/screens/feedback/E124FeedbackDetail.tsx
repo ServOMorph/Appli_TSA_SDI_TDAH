@@ -93,7 +93,7 @@ export function E124FeedbackDetail() {
       })
       setReply('')
       await load()
-      void syncFeedbackNow()
+      void syncFeedbackNow().then(() => load())
     } catch {
       setError('Le commentaire n’a pas pu être enregistré sur cet appareil.')
     } finally {

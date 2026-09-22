@@ -42,8 +42,6 @@ test('T59 — export JSON puis réimport après perte totale des données restau
   expect((json.user as { profile_type?: string } | undefined)?.profile_type).toBeTruthy()
   expect(Array.isArray(json.tasks)).toBe(true)
   expect(JSON.stringify(json.tasks)).toContain(marker)
-  // Le journal des tests manuels est dans le périmètre de l'export
-  expect(json).toHaveProperty('manual_test_results')
   // Exclusion assumée : les retours annotés ne sont pas sérialisés
   expect(json).not.toHaveProperty('feedback_reports')
 

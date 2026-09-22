@@ -5,10 +5,14 @@ test.beforeEach(async ({ page }) => {
   await resetApp(page)
 })
 
-/** Depuis v5.108, l'écran E04 Consentement s'insère entre « Entrer » et le profil. */
+/**
+ * Depuis v5.108, l'écran E04 Consentement s'insère entre « Entrer » et le profil.
+ * Depuis le 2026-09-16, l'écran E05 Code testeur s'insère entre le consentement et le profil.
+ */
 async function enterOnboarding(page: Page) {
   await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Continuer sans partager' }).click()
+  await page.getByRole('button', { name: 'Continuer' }).click()
 }
 
 test('T01 — écran Welcome affiché au démarrage', async ({ page }) => {

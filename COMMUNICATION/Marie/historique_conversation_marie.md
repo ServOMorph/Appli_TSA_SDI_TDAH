@@ -1095,3 +1095,19 @@ _Suite :_ renvoi du message précédent — l'utilisateur avait supprimé le mes
 `1550211079857111163` en pensant le correctif buggé, avant la vérification en conditions réelles
 (Playwright, dev + production) confirmant qu'il fonctionne. Redéposé en **mode urgent** sur
 demande explicite. Id gateway `20260917T184308_811343`, Discord `1550215558102786149`.
+
+### 2026-09-23
+
+**Dév ->**
+Question sur les routines.
+Tu as demandé des flèches pour naviguer parmi les prochains jours, sur l'écran où tu choisis les jours de la semaine pour une routine.
+Deux façons possibles de faire ces flèches :
+1. Elles font avancer d'une semaine complète (les 7 prochains jours, lundi à dimanche).
+2. Elles font glisser les 7 jours affichés d'un jour à la fois (par exemple passer de lundi-dimanche à mardi-lundi).
+Laquelle tu préfères ? Réponds juste "1" ou "2".
+
+_Suite :_ point resté ambigu dans son retour initial (`229113cc`, `roadmap_routine_2026-09-23.md`
+§ Phase 3) sur le sélecteur 7 jours de la planification de routine. Déposé en gateway (id
+`20260923T172745_810418`), en attente de la revue du gardien de sortie puis de la réponse de
+Marie. Phase 3 de la roadmap ne peut pas trancher le comportement du sélecteur tant que la réponse
+n'est pas arrivée.

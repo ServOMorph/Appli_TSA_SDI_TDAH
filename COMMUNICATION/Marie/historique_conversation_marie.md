@@ -1106,8 +1106,13 @@ Deux façons possibles de faire ces flèches :
 2. Elles font glisser les 7 jours affichés d'un jour à la fois (par exemple passer de lundi-dimanche à mardi-lundi).
 Laquelle tu préfères ? Réponds juste "1" ou "2".
 
+**Marie ->**
+1
+
 _Suite :_ point resté ambigu dans son retour initial (`229113cc`, `roadmap_routine_2026-09-23.md`
-§ Phase 3) sur le sélecteur 7 jours de la planification de routine. Déposé en gateway (id
-`20260923T172745_810418`), en attente de la revue du gardien de sortie puis de la réponse de
-Marie. Phase 3 de la roadmap ne peut pas trancher le comportement du sélecteur tant que la réponse
-n'est pas arrivée.
+§ Phase 3) sur le sélecteur 7 jours de la planification de routine, désormais tranché : les flèches
+font avancer/reculer d'une semaine calendaire complète (lundi à dimanche), pas un glissement
+jour par jour. Question déposée en gateway en **mode forcé** sur demande explicite de
+l'utilisateur (id `20260923T172745_810418`, approuvée manuellement puis `bot.py` relancé pour la
+drainer — revue normale du gardien de sortie sautée). Réponse reçue et transmise par l'utilisateur,
+confirmée dans `gateway/inbox/orchestrateur/` (id `20260923T175246_310881`, acquittée).

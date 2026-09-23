@@ -21,6 +21,7 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetDepositCategory } from '@/domain/entities/budgetDepositCategory'
 import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
@@ -29,7 +30,7 @@ const IMPORT_TABLES = [
   db.users, db.tasks, db.taskRecurrences, db.taskExceptions, db.taskCategories,
   db.lists, db.listItems, db.listItemSubTasks, db.listCategories, db.folders,
   db.tools, db.energyEntries, db.settings, db.budgetCategories, db.budgetEntries,
-  db.budgetAccounts, db.budgetDeposits, db.budgetIncomeEntries,
+  db.budgetAccounts, db.budgetDeposits, db.budgetDepositCategories, db.budgetIncomeEntries,
 ] as const
 
 function readImportArray(data: Record<string, unknown>, key: string): unknown[] {
@@ -69,7 +70,7 @@ function assertSupportedVersion(version: unknown) {
   const major = parts[0]
   const minor = parts[1]
   const patch = parts[2] ?? 0
-  const [currentMajor, currentMinor, currentPatch] = [3, 6, 0]
+  const [currentMajor, currentMinor, currentPatch] = [3, 7, 0]
   if (major > currentMajor || (major === currentMajor && (minor > currentMinor || (minor === currentMinor && patch > currentPatch)))) {
     throw new Error('Fichier incompatible : version d’export plus récente.')
   }
@@ -173,6 +174,7 @@ export function useSettingsState() {
       db.budgetEntries.clear(),
       db.budgetAccounts.clear(),
       db.budgetDeposits.clear(),
+      db.budgetDepositCategories.clear(),
       db.budgetIncomeEntries.clear(),
       db.folders.clear(),
       db.tools.clear(),
@@ -216,7 +218,7 @@ export function useSettingsState() {
     let tasks: Task[], taskRecurrences: TaskRecurrence[], taskExceptions: TaskException[], taskCategories: TaskCategory[]
     let lists: List[], rawListItems: (ListItem & { section?: string | null })[], listItemSubTasks: ListItemSubTask[], listCategories: ListCategory[]
     let folders: Folder[], tools: Tool[], energyEntries: EnergyEntry[], categories: BudgetCategory[], entries: BudgetEntry[]
-    let accounts: BudgetAccount[], deposits: BudgetDeposit[], incomeEntries: BudgetIncomeEntry[]
+    let accounts: BudgetAccount[], deposits: BudgetDeposit[], depositCategories: BudgetDepositCategory[], incomeEntries: BudgetIncomeEntry[]
     try {
       tasks = readImportArray(data, 'tasks') as Task[]
       taskRecurrences = readImportArray(data, 'task_recurrences') as TaskRecurrence[]
@@ -233,8 +235,9 @@ export function useSettingsState() {
       entries = readImportArray(data, 'budget_entries') as BudgetEntry[]
       accounts = readImportArray(data, 'budget_accounts') as BudgetAccount[]
       deposits = readImportArray(data, 'budget_deposits') as BudgetDeposit[]
+      depositCategories = readImportArray(data, 'budget_deposit_categories') as BudgetDepositCategory[]
       incomeEntries = readImportArray(data, 'budget_income_entries') as BudgetIncomeEntry[]
-      for (const [name, items] of Object.entries({ tasks, taskRecurrences, taskExceptions, taskCategories, lists, rawListItems, listItemSubTasks, listCategories, folders, tools, energyEntries, categories, entries, accounts, deposits, incomeEntries })) {
+      for (const [name, items] of Object.entries({ tasks, taskRecurrences, taskExceptions, taskCategories, lists, rawListItems, listItemSubTasks, listCategories, folders, tools, energyEntries, categories, entries, accounts, deposits, depositCategories, incomeEntries })) {
         assertUniqueIds(name, items as { id: string }[])
       }
       const taskIds = new Set(tasks.map((item) => item.id))
@@ -244,6 +247,7 @@ export function useSettingsState() {
       const recurrenceIds = new Set(taskRecurrences.map((item) => item.id))
       const accountIds = new Set(accounts.map((item) => item.id))
       const categoryIds = new Set(categories.map((item) => item.id))
+      const depositCategoryIds = new Set(depositCategories.map((item) => item.id))
       assertReferences('tâche parente', tasks, 'parent_id', taskIds)
       assertReferences('récurrence de tâche', tasks, 'recurrence_id', recurrenceIds)
       assertReferences('récurrence', taskExceptions, 'recurrence_id', recurrenceIds)
@@ -252,6 +256,8 @@ export function useSettingsState() {
       assertReferences('élément de liste', listItemSubTasks, 'list_item_id', listItemIds)
       assertReferences('liste d’outil', tools, 'list_id', listIds)
       assertReferences('compte budget', deposits, 'account_id', accountIds)
+      assertReferences('sous-catégorie de livret', deposits, 'category_id', depositCategoryIds)
+      assertReferences('compte budget', depositCategories, 'account_id', accountIds)
       assertReferences('catégorie budget', entries, 'category_id', categoryIds)
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Fichier invalide.' }
@@ -337,6 +343,7 @@ export function useSettingsState() {
         if (categories.length) await db.budgetCategories.bulkAdd(categories)
         if (entries.length) await db.budgetEntries.bulkAdd(entries)
         if (accounts.length) await db.budgetAccounts.bulkAdd(accounts)
+        if (depositCategories.length) await db.budgetDepositCategories.bulkAdd(depositCategories)
         if (deposits.length) await db.budgetDeposits.bulkAdd(deposits)
         if (incomeEntries.length) await db.budgetIncomeEntries.bulkAdd(incomeEntries)
       })

@@ -63,6 +63,13 @@ describe('E112Accessibility', () => {
     expect(updateSettings).toHaveBeenCalledWith({ dark_mode: true })
   })
 
+  it('appelle updateSettings avec energy_checkin_always true au cochage (#ed6ab7df)', () => {
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE112({ updateSettings })
+    fireEvent.click(screen.getByLabelText('Afficher mon énergie à chaque connexion'))
+    expect(updateSettings).toHaveBeenCalledWith({ energy_checkin_always: true })
+  })
+
   it('le <main> tient dans la fenêtre et la rangée de taille de texte peut passer à la ligne (#32)', () => {
     renderE112()
     const main = document.querySelector('main') as HTMLElement

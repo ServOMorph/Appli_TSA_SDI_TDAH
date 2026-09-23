@@ -62,6 +62,50 @@ Le petit repère affiché en haut à droite de chaque écran ne gêne plus les b
 
 Pendant la première ouverture de l'application, juste après le choix sur le partage des données, un écran permet maintenant d'indiquer votre identifiant. Pourriez-vous y écrire « marie » ? Cela nous aide à bien suivre vos données de notre côté. Ce code peut aussi être renseigné ou modifié à tout moment dans Paramètres > Profil.
 
+## Tâches et fiche de tâche
+
+Les sous-tâches ajoutées à la création d'une tâche répétée apparaissent maintenant sur tous les
+jours concernés, pas seulement sur le premier.
+
+Sur la fiche d'une tâche, l'icône et la couleur s'affichent maintenant normalement (avant, un texte
+brut illisible apparaissait). La durée est maintenant enregistrée dès la création. La fiche permet
+aussi de définir ou modifier la récurrence directement, sans repasser par la création.
+
+Le bouton « Annuler » lors de la création d'une tâche revient maintenant à l'écran d'où vous veniez,
+comme le fait déjà « Retour ».
+
+## Accueil
+
+Les outils restent maintenant visibles même en mode surcharge.
+
+Une tâche se coche maintenant automatiquement quand toutes ses sous-tâches sont cochées.
+
+Un nouveau repère affiche l'énergie totale planifiée pour la journée affichée.
+
+Le bandeau des jours reste maintenant centré à l'écran : ce sont les jours qui défilent autour,
+plutôt que la case sélectionnée qui se déplace.
+
+## Mon énergie maintenant
+
+Nouveau réglage dans Paramètres > Accessibilité : « Afficher mon énergie à chaque connexion ».
+Activé, l'écran s'affiche à chaque ouverture de l'application et à chaque retour au premier plan.
+Désactivé (réglage par défaut), rien ne change.
+
+## Planning de la semaine
+
+Chaque case affiche maintenant le nom complet de la tâche et sa couleur, et le planning occupe
+toute la page.
+
+## Livrets
+
+Un livret permet maintenant de créer des catégories à l'intérieur : chacune a son propre sous-total,
+qui s'ajoute au total du livret. Un mouvement peut aussi rester hors catégorie, il compte alors
+seulement dans le total du livret.
+
+## Mes retours
+
+Le bouton « Nouveau retour » est remonté en haut de l'écran.
+
 ## Adresse de l'application changée
 
 L'adresse a changé : `https://appli-marie.netlify.app/`. Mettez à jour le raccourci sur votre écran d'accueil avec cette nouvelle adresse ; l'ancienne ne fonctionnera plus.

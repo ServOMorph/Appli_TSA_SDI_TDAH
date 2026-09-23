@@ -3,10 +3,11 @@ import { useApp } from '@/app/AppContext'
 import type { Task } from '@/domain/entities/task'
 import type { PlannedSubTask } from '@/app/AppContext'
 import { BatteryCost } from '@/ui/components/BatteryCost'
+import { BatteryIcon } from '@/ui/components/BatteryIcon'
 import { TaskIcon } from '@/ui/components/TaskIcon'
 import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle, plannedTaskTintStyle } from '@/ui/styles/ambiance'
-import { isCompleted } from '@/domain/rules/taskRules'
+import { isCompleted, getTotalPlannedEnergy } from '@/domain/rules/taskRules'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@/domain/rules/planningSlotRules'
 
 const DATE_STRIP_RADIUS = 2
@@ -210,6 +211,16 @@ const planningLogoBtnStyle: React.CSSProperties = {
   minWidth: '32px',
 }
 
+const totalEnergyBadgeStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '3px',
+  color: 'var(--color-text-muted)',
+  fontSize: '0.8125rem',
+  fontVariantNumeric: 'tabular-nums',
+  flexShrink: 0,
+}
+
 const todayBtnStyle: React.CSSProperties = {
   background: 'none',
   border: '1px solid var(--color-border)',
@@ -257,6 +268,17 @@ const titleTextStyle: React.CSSProperties = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+}
+
+const ENERGY_COL_WIDTH_PX = 34
+
+// Largeur réservée même sans énergie affichée : sinon le compteur de sous-étapes se décale selon
+// les lignes, cassant l'alignement de sa colonne (#37f9f912).
+const energyColStyle: React.CSSProperties = {
+  minWidth: `${ENERGY_COL_WIDTH_PX}px`,
+  flexShrink: 0,
+  display: 'flex',
+  alignItems: 'center',
 }
 
 const taskCheckboxStyle: React.CSSProperties = {
@@ -480,6 +502,7 @@ export function PlanningBoard() {
     ...scheduledTasks.map((t): PlanBlock => ({ kind: 'task', item: t })),
     ...scheduledSubTasks.map((s): PlanBlock => ({ kind: 'subtask', item: s })),
   ])
+  const totalEnergy = getTotalPlannedEnergy(blocks.map((b) => b.item))
 
   const displayDateObj = new Date(displayDate + 'T12:00:00')
 
@@ -515,11 +538,17 @@ export function PlanningBoard() {
             {formatMonthYear(displayDate)}
           </button>
         </div>
-        {!isToday && (
-          <button style={todayBtnStyle} onClick={() => jumpTo(todayStr())}>
-            Aujourd'hui
-          </button>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+          <span style={totalEnergyBadgeStyle} aria-label={`${totalEnergy} énergie planifiée ce jour`}>
+            <BatteryIcon size={16} />
+            {totalEnergy}
+          </span>
+          {!isToday && (
+            <button style={todayBtnStyle} onClick={() => jumpTo(todayStr())}>
+              Aujourd'hui
+            </button>
+          )}
+        </div>
       </div>
       <div
         aria-label="Bandeau des jours de la semaine"
@@ -554,7 +583,7 @@ export function PlanningBoard() {
                   transition: phase === 'dragging' ? 'none' : 'transform 0.2s ease-out',
                   ...(scale > 1 ? { position: 'relative', zIndex: 2 } : null),
                 }}
-                onClick={() => updateDisplayDate(d)}
+                onClick={() => jumpTo(d)}
                 aria-current={isDisplayed ? 'date' : undefined}
                 aria-label={d}
                 aria-hidden={isBuffer || undefined}
@@ -628,7 +657,9 @@ export function PlanningBoard() {
                         {done}/{subs.length} {expanded ? '▾' : '▸'}
                       </span>
                     )}
-                    {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
+                    <span style={energyColStyle}>
+                      {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
+                    </span>
                     <input
                       type="checkbox"
                       checked={completed}

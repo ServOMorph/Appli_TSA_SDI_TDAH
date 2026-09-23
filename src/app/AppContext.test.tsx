@@ -45,6 +45,15 @@ function EnergyButton() {
   )
 }
 
+function EnergyAlwaysButton() {
+  const { updateSettings } = useApp()
+  return (
+    <button onClick={() => updateSettings({ energy_checkin_always: true })}>
+      activer énergie systématique
+    </button>
+  )
+}
+
 function addOneDay(date: string): string {
   const d = new Date(date + 'T12:00:00')
   d.setDate(d.getDate() + 1)
@@ -327,6 +336,33 @@ describe('AppProvider', () => {
     expect(user?.onboarding_completed).toBe(true)
     expect(await db.energyEntries.count()).toBe(1)
   })
+
+  it('relance l\'app sur energy-checkin si le réglage énergie systématique est actif, même avec une entrée du jour déjà renseignée (#ed6ab7df)', async () => {
+    await Promise.all([db.users.clear(), db.energyEntries.clear()])
+    const { unmount } = render(
+      <AppProvider>
+        <ScreenIndicator />
+        <CreateUserButton />
+        <EnergyButton />
+        <EnergyAlwaysButton />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'créer' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy'))
+    await userEvent.click(screen.getByRole('button', { name: 'sauvegarder énergie' }))
+    await userEvent.click(screen.getByRole('button', { name: 'activer énergie systématique' }))
+    unmount()
+
+    render(
+      <AppProvider>
+        <ScreenIndicator />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    expect(screen.getByTestId('screen').textContent).toBe('energy-checkin')
+    expect(await db.energyEntries.count()).toBe(1)
+  })
 })
 
 describe('AppProvider — opérations tâches inbox', () => {
@@ -433,6 +469,70 @@ describe('AppProvider — sous-tâches', () => {
       await userEvent.click(screen.getByRole('button', { name: 'ops sous-tâches' }))
     })
     await waitFor(() => expect(screen.getByTestId('done')).toBeInTheDocument())
+  })
+})
+
+describe('AppProvider — coche automatique de la tâche parente (#cd7529b6)', () => {
+  function AutoCompletePanel() {
+    const { createTaskInbox, inboxTasks, addSubTask, getSubTasks, toggleSubTask } = useApp()
+    const first = inboxTasks[0]
+
+    async function addTwoSubTasks() {
+      if (!first) return
+      await addSubTask(first.id, 'Sous-tâche 1')
+      await addSubTask(first.id, 'Sous-tâche 2')
+    }
+
+    async function toggleFirstSubTask() {
+      if (!first) return
+      const [sub] = await getSubTasks(first.id)
+      await toggleSubTask(sub)
+    }
+
+    async function toggleAllSubTasks() {
+      if (!first) return
+      const subs = await getSubTasks(first.id)
+      for (const sub of subs) await toggleSubTask(sub)
+    }
+
+    return (
+      <>
+        <button onClick={() => createTaskInbox('Tâche parente')}>créer tâche</button>
+        <button onClick={addTwoSubTasks} disabled={!first}>ajouter sous-tâches</button>
+        <button onClick={toggleFirstSubTask} disabled={!first}>cocher une sous-tâche</button>
+        <button onClick={toggleAllSubTasks} disabled={!first}>cocher toutes les sous-tâches</button>
+        <div data-testid="inbox-count">{inboxTasks.length}</div>
+      </>
+    )
+  }
+
+  it('coche automatiquement la tâche parente quand toutes les sous-tâches sont cochées', async () => {
+    render(<AppProvider><AutoCompletePanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'ajouter sous-tâches' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'ajouter sous-tâches' }))
+    })
+    expect(screen.getByTestId('inbox-count')).toHaveTextContent('1')
+
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'cocher toutes les sous-tâches' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('inbox-count')).toHaveTextContent('0'))
+  })
+
+  it('ne coche pas la tâche parente tant qu’une sous-tâche reste non cochée', async () => {
+    render(<AppProvider><AutoCompletePanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'ajouter sous-tâches' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'ajouter sous-tâches' }))
+    })
+
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'cocher une sous-tâche' }))
+    })
+    expect(screen.getByTestId('inbox-count')).toHaveTextContent('1')
   })
 })
 
@@ -547,6 +647,7 @@ describe('AppProvider — settings et données', () => {
         <div data-testid="user-id">{currentUser?.id ?? 'none'}</div>
         <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
         <button onClick={() => updateSettings({ font_size: 'large' })}>changer font</button>
+        <button onClick={() => updateSettings({ energy_checkin_always: true })}>activer énergie systématique</button>
         <button onClick={() => exportData()}>exporter</button>
         <button onClick={() => deleteAllData()}>supprimer tout</button>
         <button
@@ -621,6 +722,35 @@ describe('AppProvider — settings et données', () => {
     })
     expect(screen.getByTestId('screen').textContent).toBe('dashboard')
     expect(screen.getByTestId('user-id').textContent).toBe(userIdBefore)
+  })
+
+  it('redirige vers energy-checkin au retour au premier plan si le réglage énergie systématique est actif (#ed6ab7df)', async () => {
+    render(<AppProvider><DataPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'activer énergie systématique' }))
+    })
+
+    Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true })
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'))
+    })
+
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy-checkin'))
+  })
+
+  it('ne redirige pas vers energy-checkin au retour au premier plan si le réglage énergie systématique est inactif (#ed6ab7df)', async () => {
+    render(<AppProvider><DataPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+
+    Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true })
+    await act(async () => {
+      document.dispatchEvent(new Event('visibilitychange'))
+    })
+
+    expect(screen.getByTestId('screen').textContent).toBe('dashboard')
   })
 })
 
@@ -929,6 +1059,261 @@ describe('AppProvider — updateTaskFields / deleteTaskScoped sur une série ré
     await waitFor(() => expect(screen.getByTestId('op-count').textContent).toBe('2'))
     await userEvent.click(screen.getByRole('button', { name: 'inspecter semaine suivante' }))
     await waitFor(() => expect(screen.getByTestId('count').textContent).toBe('0'))
+  })
+})
+
+describe('AppProvider — création d\'une série récurrente dont la date de création ne correspond pas au motif', () => {
+  function MismatchedAnchorPanel() {
+    const { createUser, completeOnboarding, createDetailedTask, getPlannedTasksForDate, loading } = useApp()
+    const [countOnCreationDate, setCountOnCreationDate] = useState<number>(-1)
+    const [countOnFirstMatch, setCountOnFirstMatch] = useState<number>(-1)
+    if (loading) return <div data-testid="loading">chargement</div>
+
+    // 2026-09-21 est un lundi ; la série ne doit avoir lieu que mardi (2026-09-22) et vendredi (2026-09-25).
+    async function createSeries() {
+      await createDetailedTask({
+        title: 'Salle',
+        description: '',
+        icon: null,
+        color: null,
+        energyCost: 1,
+        essential: false,
+        durationMinutes: 20,
+        date: '2026-09-21',
+        startTime: '11:20',
+        status: 'planned',
+        recurrence: { frequency: 'weekly', interval: 1, weekdays: [2, 5], end_type: 'never', end_date: null, end_count: null },
+      })
+    }
+
+    async function inspect() {
+      const onCreationDate = (await getPlannedTasksForDate('2026-09-21')).filter((t) => t.title === 'Salle')
+      const onFirstMatch = (await getPlannedTasksForDate('2026-09-22')).filter((t) => t.title === 'Salle')
+      setCountOnCreationDate(onCreationDate.length)
+      setCountOnFirstMatch(onFirstMatch.length)
+    }
+
+    return (
+      <>
+        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={createSeries}>créer série</button>
+        <button onClick={inspect}>inspecter</button>
+        <div data-testid="count-creation-date">{countOnCreationDate}</div>
+        <div data-testid="count-first-match">{countOnFirstMatch}</div>
+      </>
+    )
+  }
+
+  it('ne planifie pas la série le jour de création si ce jour ne fait pas partie du motif choisi', async () => {
+    render(
+      <AppProvider>
+        <MismatchedAnchorPanel />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer série' }))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter' }))
+    await waitFor(() => expect(screen.getByTestId('count-creation-date').textContent).toBe('0'))
+    expect(screen.getByTestId('count-first-match').textContent).toBe('1')
+  })
+})
+
+describe('AppProvider — sous-tâches saisies à la création d\'une tâche récurrente', () => {
+  function RecurringWithSubTasksPanel() {
+    const { createUser, completeOnboarding, createDetailedTask, getPlannedTasksForDate, getSubTasks, loading } = useApp()
+    const [subTaskCountByOccurrence, setSubTaskCountByOccurrence] = useState<string>('')
+    if (loading) return <div data-testid="loading">chargement</div>
+
+    async function createSeries() {
+      await createDetailedTask({
+        title: 'Routine',
+        description: '',
+        icon: null,
+        color: null,
+        energyCost: 1,
+        essential: false,
+        durationMinutes: 10,
+        date: '2026-09-21',
+        startTime: '09:00',
+        status: 'planned',
+        recurrence: { frequency: 'daily', interval: 1, weekdays: null, end_type: 'never', end_date: null, end_count: null },
+        subTaskTitles: ['Café', 'Douche'],
+      })
+    }
+
+    async function inspect() {
+      const rootDayTasks = await getPlannedTasksForDate('2026-09-21')
+      const nextDayTasks = await getPlannedTasksForDate('2026-09-22')
+      const rootSubs = await getSubTasks(rootDayTasks[0]?.id ?? '')
+      const nextSubs = await getSubTasks(nextDayTasks[0]?.id ?? '')
+      setSubTaskCountByOccurrence(`${rootSubs.length}/${nextSubs.length}`)
+    }
+
+    return (
+      <>
+        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={createSeries}>créer série</button>
+        <button onClick={inspect}>inspecter</button>
+        <div data-testid="subtask-counts">{subTaskCountByOccurrence}</div>
+      </>
+    )
+  }
+
+  it('duplique les sous-tâches saisies à la création sur chaque occurrence matérialisée', async () => {
+    render(
+      <AppProvider>
+        <RecurringWithSubTasksPanel />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer série' }))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter' }))
+    await waitFor(() => expect(screen.getByTestId('subtask-counts').textContent).toBe('2/2'))
+  })
+})
+
+describe('AppProvider — ajout ou modification de la récurrence depuis la fiche de tâche', () => {
+  function AddRecurrencePanel() {
+    const { createUser, completeOnboarding, createDetailedTask, setTaskRecurrence, getPlannedTasksForDate, loading } = useApp()
+    const [taskId, setTaskId] = useState<string | null>(null)
+    const [counts, setCounts] = useState<string>('')
+    if (loading) return <div data-testid="loading">chargement</div>
+
+    async function createLoneTask() {
+      const id = await createDetailedTask({
+        title: 'Lecture',
+        description: '',
+        icon: null,
+        color: null,
+        energyCost: 1,
+        essential: false,
+        durationMinutes: 15,
+        date: '2026-09-21',
+        startTime: '20:00',
+        status: 'planned',
+        recurrence: null,
+      })
+      setTaskId(id)
+    }
+
+    async function addRecurrence() {
+      if (!taskId) return
+      await setTaskRecurrence(taskId, {
+        frequency: 'daily',
+        interval: 1,
+        weekdays: null,
+        end_type: 'never',
+        end_date: null,
+        end_count: null,
+      })
+    }
+
+    async function inspect() {
+      const day1 = (await getPlannedTasksForDate('2026-09-21')).filter((t) => t.title === 'Lecture')
+      const day2 = (await getPlannedTasksForDate('2026-09-22')).filter((t) => t.title === 'Lecture')
+      setCounts(`${day1.length}/${day2.length}`)
+    }
+
+    return (
+      <>
+        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={createLoneTask}>créer tâche seule</button>
+        <button onClick={addRecurrence}>ajouter récurrence</button>
+        <button onClick={inspect}>inspecter</button>
+        <div data-testid="task-id">{taskId ?? ''}</div>
+        <div data-testid="counts">{counts}</div>
+      </>
+    )
+  }
+
+  it('ajoute une récurrence à une tâche qui n\'en avait pas et matérialise les occurrences futures', async () => {
+    render(
+      <AppProvider>
+        <AddRecurrencePanel />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche seule' }))
+    // Attend que l'id de la tâche créée soit disponible avant d'agir dessus : `createDetailedTask`
+    // écrit dans IndexedDB (Dexie), dont la résolution n'est pas garantie dans le même flush
+    // d'act() qu'un clic — un clic immédiat suivant risquerait de lire un état React pas encore
+    // commité (`taskId` toujours null).
+    await waitFor(() => expect(screen.getByTestId('task-id').textContent).not.toBe(''))
+    await userEvent.click(screen.getByRole('button', { name: 'ajouter récurrence' }))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter' }))
+    await waitFor(() => expect(screen.getByTestId('counts').textContent).toBe('1/1'))
+  })
+
+  function ChangeRecurrenceRulePanel() {
+    const { createUser, completeOnboarding, createDetailedTask, setTaskRecurrence, getPlannedTasksForDate, loading } = useApp()
+    const [taskId, setTaskId] = useState<string | null>(null)
+    const [counts, setCounts] = useState<string>('')
+    if (loading) return <div data-testid="loading">chargement</div>
+
+    // 2026-09-22 est un mardi.
+    async function createWeeklySeries() {
+      const id = await createDetailedTask({
+        title: 'Piscine',
+        description: '',
+        icon: null,
+        color: null,
+        energyCost: 1,
+        essential: false,
+        durationMinutes: 30,
+        date: '2026-09-22',
+        startTime: '18:00',
+        status: 'planned',
+        recurrence: { frequency: 'weekly', interval: 1, weekdays: [2], end_type: 'never', end_date: null, end_count: null },
+      })
+      setTaskId(id)
+    }
+
+    async function switchToDaily() {
+      if (!taskId) return
+      await setTaskRecurrence(taskId, {
+        frequency: 'daily',
+        interval: 1,
+        weekdays: null,
+        end_type: 'never',
+        end_date: null,
+        end_count: null,
+      })
+    }
+
+    async function inspect() {
+      const anchorDay = (await getPlannedTasksForDate('2026-09-22')).filter((t) => t.title === 'Piscine')
+      const nextDay = (await getPlannedTasksForDate('2026-09-23')).filter((t) => t.title === 'Piscine')
+      setCounts(`${anchorDay.length}/${nextDay.length}`)
+    }
+
+    return (
+      <>
+        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={createWeeklySeries}>créer série hebdo</button>
+        <button onClick={switchToDaily}>passer en quotidien</button>
+        <button onClick={inspect}>inspecter</button>
+        <div data-testid="task-id">{taskId ?? ''}</div>
+        <div data-testid="counts">{counts}</div>
+      </>
+    )
+  }
+
+  it('modifie la règle d\'une série existante : l\'occurrence éditée garde sa date, les occurrences futures sont régénérées', async () => {
+    render(
+      <AppProvider>
+        <ChangeRecurrenceRulePanel />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByTestId('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'init' }))
+    await userEvent.click(screen.getByRole('button', { name: 'créer série hebdo' }))
+    await waitFor(() => expect(screen.getByTestId('task-id').textContent).not.toBe(''))
+    await userEvent.click(screen.getByRole('button', { name: 'passer en quotidien' }))
+    await userEvent.click(screen.getByRole('button', { name: 'inspecter' }))
+    await waitFor(() => expect(screen.getByTestId('counts').textContent).toBe('1/1'))
   })
 })
 

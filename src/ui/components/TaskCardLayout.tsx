@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { TaskIcon } from '@/ui/components/TaskIcon'
 import { pastelBackground } from '@/ui/styles/ambiance'
+import { TASK_ICONS } from '@/domain/rules/taskAppearance'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 
 interface TaskCardLayoutProps {
   icon: string | null
@@ -79,6 +81,41 @@ const toggleBtnStyle: React.CSSProperties = {
   color: 'var(--color-text)',
   fontFamily: 'var(--font-body)',
   width: '100%',
+}
+
+const fieldValueRowStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 'var(--spacing-xs)',
+}
+
+const colorDotStyle: React.CSSProperties = {
+  width: '14px',
+  height: '14px',
+  borderRadius: '50%',
+  flexShrink: 0,
+}
+
+export function IconFieldValue({ icon }: { icon: string | null }) {
+  if (!icon) return 'Aucune'
+  const label = TASK_ICONS.find((i) => i.id === icon)?.label ?? icon
+  return (
+    <span style={fieldValueRowStyle}>
+      <TaskIcon icon={icon} size={18} />
+      {label}
+    </span>
+  )
+}
+
+export function ColorFieldValue({ color, categories }: { color: string | null; categories: TaskCategory[] }) {
+  if (!color) return 'Aucune couleur'
+  const category = categories.find((c) => c.color === color)
+  return (
+    <span style={fieldValueRowStyle}>
+      <span aria-hidden style={{ ...colorDotStyle, backgroundColor: color }} />
+      {category?.name ?? color}
+    </span>
+  )
 }
 
 export function TaskFieldCard({ label, value, color, expanded, onToggle, span, children }: TaskFieldCardProps) {

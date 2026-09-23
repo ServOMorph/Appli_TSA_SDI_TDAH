@@ -79,6 +79,7 @@ describe('E122FeedbackCapture', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
     expect(mocks.flattenImage).toHaveBeenCalledWith(file, [])
     expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({ screen_code: 'E10', comment: 'Le bouton ne répond pas', sync_status: 'pending' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('feedback-list')
+    expect(ctx.replace).toHaveBeenCalledWith('feedback-list')
+    expect(ctx.goTo).not.toHaveBeenCalledWith('feedback-list')
   })
 })

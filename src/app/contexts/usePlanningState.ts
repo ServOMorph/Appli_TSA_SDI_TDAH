@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { db, newId, taskRepo, todayDate } from '@/app/repositories'
+import { db, newId, taskRepo, taskRecurrenceRepo, todayDate } from '@/app/repositories'
 import { persistSeriesBatch } from '@/data/services/seriesPersistence'
 import {
   createTask as createTaskRule,
@@ -46,6 +46,7 @@ export interface DetailedTaskInput {
   startTime: string | null
   status: TaskStatus
   recurrence: RecurrenceRuleInput | null
+  subTaskTitles?: string[]
 }
 
 export type TaskEditScope = 'occurrence' | 'series'
@@ -63,6 +64,12 @@ export interface TaskFieldEdit {
 }
 
 const RECURRENCE_MATERIALIZATION_DAYS = 90
+
+function materializeSubTasks(parents: Task[], subTaskTitles: string[], now: string): Task[] {
+  return parents.flatMap((parent) =>
+    subTaskTitles.map((subTitle, i) => createTaskRule(newId(), subTitle, 'inbox', false, now, parent.id, i)),
+  )
+}
 
 /**
  * Tâches planifiées et opérations de placement sur le planning.
@@ -126,13 +133,10 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     task = { ...task, description: input.description, icon: input.icon, color: input.color }
     task = setEnergyCostRule(task, input.energyCost, now)
 
-    if (input.date && input.startTime) {
-      const end = addMinutesToTime(input.startTime, input.durationMinutes ?? 0)
-      task = scheduleTaskRule(task, input.date, input.startTime, end, now)
-    }
-
     const occurrences: Task[] = []
     let recurrence: TaskRecurrence | undefined
+    let rootDate = input.date
+
     if (input.recurrence && input.date && isValidRecurrence(input.recurrence)) {
       const recurrenceId = newId()
       recurrence = {
@@ -153,9 +157,13 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
         input.date,
         input.date,
         recurrenceMaterializationEndDate(input.date, RECURRENCE_MATERIALIZATION_DAYS),
-      ).filter((d) => d !== input.date)
+      )
+      // La date de création peut ne pas correspondre au motif choisi (ex. tâche créée un lundi
+      // pour une récurrence mardi/vendredi) : la première occurrence réelle de la série sert de
+      // date racine, pas nécessairement la date de création.
+      rootDate = dates[0] ?? input.date
 
-      for (const date of dates) {
+      for (const date of dates.slice(1)) {
         let occurrence = createTaskRule(newId(), trimmed, input.status, input.essential, now)
         occurrence = { ...occurrence, description: input.description, icon: input.icon, color: input.color }
         occurrence = setEnergyCostRule(occurrence, input.energyCost, now)
@@ -168,9 +176,16 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
       }
     }
 
+    if (rootDate && input.startTime) {
+      const end = addMinutesToTime(input.startTime, input.durationMinutes ?? 0)
+      task = scheduleTaskRule(task, rootDate, input.startTime, end, now)
+    }
+
+    const subTasks = materializeSubTasks([task, ...occurrences], input.subTaskTitles ?? [], now)
+
     await persistSeriesBatch(db, {
       recurrenceToCreate: recurrence,
-      tasksToCreate: [task, ...occurrences],
+      tasksToCreate: [task, ...occurrences, ...subTasks],
       sourceIdToDelete: sourceTaskId,
     })
     await reloadTasks()
@@ -181,6 +196,80 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
   /** Charge une tâche directement depuis le dépôt, sans dépendre des listes déjà en mémoire. */
   async function getTaskById(id: string): Promise<Task | undefined> {
     return taskRepo.getById(id)
+  }
+
+  async function getTaskRecurrence(recurrenceId: string): Promise<TaskRecurrence | undefined> {
+    return taskRecurrenceRepo.getById(recurrenceId)
+  }
+
+  /**
+   * Ajoute une récurrence à une tâche qui n'en a pas, ou modifie la règle d'une série
+   * existante. La tâche affichée garde sa propre date et son propre horaire : seules les
+   * occurrences futures (à partir de cette date, hors occurrences détachées) sont
+   * régénérées selon la nouvelle règle. Nécessite une tâche déjà planifiée (une date sert
+   * d'ancrage au motif) ; sans date, ne fait rien.
+   */
+  async function setTaskRecurrence(taskId: string, rule: RecurrenceRuleInput): Promise<void> {
+    const task = await taskRepo.getById(taskId)
+    if (!task || !task.scheduled_date || !isValidRecurrence(rule)) return
+    const anchorDate = task.scheduled_date
+    const now = new Date().toISOString()
+
+    const existingRecurrence = task.recurrence_id ? await taskRecurrenceRepo.getById(task.recurrence_id) : undefined
+    const recurrenceId = task.recurrence_id ?? newId()
+    const recurrence: TaskRecurrence = {
+      id: recurrenceId,
+      frequency: rule.frequency,
+      interval: rule.interval,
+      weekdays: rule.weekdays,
+      end_type: rule.end_type,
+      end_date: rule.end_date,
+      end_count: rule.end_count,
+      created_at: existingRecurrence?.created_at ?? now,
+      updated_at: now,
+    }
+
+    let targetsToDelete: string[] = []
+    if (task.recurrence_id) {
+      const series = await taskRepo.getByRecurrenceId(task.recurrence_id)
+      targetsToDelete = series
+        .filter((t) => t.id !== taskId && !t.recurrence_exception && (t.scheduled_date ?? '') >= anchorDate)
+        .map((t) => t.id)
+    }
+
+    const dates = generateOccurrenceDates(
+      recurrence,
+      anchorDate,
+      anchorDate,
+      recurrenceMaterializationEndDate(anchorDate, RECURRENCE_MATERIALIZATION_DAYS),
+    )
+    const futureDates = dates.filter((date) => date !== anchorDate)
+
+    const occurrences: Task[] = futureDates.map((date) => {
+      let occurrence = createTaskRule(newId(), task.title, task.status, task.essential, now)
+      occurrence = { ...occurrence, description: task.description, icon: task.icon, color: task.color }
+      occurrence = setEnergyCostRule(occurrence, task.energy_cost, now)
+      if (task.scheduled_start) {
+        const end = addMinutesToTime(task.scheduled_start, task.duration_minutes ?? 0)
+        occurrence = scheduleTaskRule(occurrence, date, task.scheduled_start, end, now)
+      }
+      return { ...occurrence, recurrence_id: recurrenceId, is_recurrence_root: false }
+    })
+
+    const subTaskTitles = (await taskRepo.getChildren(taskId)).map((st) => st.title)
+    const newSubTasks = materializeSubTasks(occurrences, subTaskTitles, now)
+
+    await persistSeriesBatch(db, {
+      recurrenceToCreate: task.recurrence_id ? undefined : recurrence,
+      recurrenceToUpdate: task.recurrence_id ? recurrence : undefined,
+      tasksToCreate: [...occurrences, ...newSubTasks],
+      tasksToUpdate: task.recurrence_id
+        ? []
+        : [{ ...task, recurrence_id: recurrenceId, is_recurrence_root: true, updated_at: now }],
+      taskIdsToDelete: targetsToDelete,
+    })
+    await reloadTasks()
+    await load()
   }
 
   async function duplicateTaskById(id: string): Promise<string | undefined> {
@@ -288,6 +377,8 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     planTaskToday,
     createDetailedTask,
     getTaskById,
+    getTaskRecurrence,
+    setTaskRecurrence,
     duplicateTaskById,
     updateTaskFields,
     deleteTaskScoped,

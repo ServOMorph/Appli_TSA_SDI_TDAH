@@ -307,5 +307,11 @@ describe('E10Dashboard', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Centre récupération' }))
       expect(ctx.goTo).toHaveBeenCalledWith('overload-recovery')
     })
+
+    it('garde le bloc Outils visible en mode surcharge (#245fa5d3)', async () => {
+      const ctx = makeAppContext({ overloadMode: true })
+      await renderDashboard(ctx)
+      expect(screen.getByRole('region', { name: 'Outils' })).toBeDefined()
+    })
   })
 })

@@ -6,6 +6,32 @@ en tête, précédées de `---`. Contenu strictement inchangé au déplacement.
 
 ---
 
+## Dernière session (2026-09-22 — retrait du workflow Google Doc, commande /traiter_retours créée)
+
+## Décisions prises
+- Sur demande explicite (« on n'utilise plus le Google Doc de commentaire »), scope clarifié par question à l'utilisateur : retrait complet du workflow Google Doc « Modifications » de `/deploy` et `/traiter_export_marie`, suppression de `/analyser_googledoc`.
+- Sur demande explicite, commande `/traiter_retours` créée pour organiser le traitement des retours testeurs (analyse, clarification, roadmap groupée par phases, correctifs testés, dépôt de réponse par phase, synthèse finale).
+
+## Livrables produits ou modifiés
+- `.claude/commands/traiter_retours.md` : créé.
+- `.claude/commands/deploy.md`, `.claude/commands/traiter_export_marie.md` : étapes liées au Google Doc retirées, renumérotation corrigée (y compris un bug de numérotation préexistant dans `traiter_export_marie.md`).
+- `.claude/commands/analyser_googledoc.md`, `.claude/revue_googledoc.md` : supprimés (commande obsolète et sa procédure partagée, devenue orpheline).
+- `.claude/CLAUDE.md`, `AGENTS.md`, `GEMINI.md` : référence à `/analyser_googledoc` retirée (mirroirs resynchronisés).
+- `_contexte/marie_modifications_suivi.md` → `Archives/marie_modifications_suivi.md` : registre archivé (demande explicite).
+- `_contexte/signals.md`, `DISCORD/_contexte/signals.md` : références mises à jour vers le nouveau chemin d'archive (DISCORD modifié sur autorisation explicite de l'utilisateur).
+
+## Hypothèses validées / invalidées
+- VALIDE : plus aucune commande active ne référence le Google Doc après nettoyage (vérifié par grep sur `.claude/` et les trois mirroirs).
+- EN ATTENTE : les 7 retours testeur en attente (device `103c9b92`) n'ont pas encore été traités par la nouvelle commande.
+
+## Prochaine étape exacte
+Exécuter `/traiter_retours` sur les 7 retours testeur non répondus (device `103c9b92`, 19-20/09). Puis `/deploy` : plusieurs correctifs déjà committés (sync, Nouveautés, Valider, échec d'envoi, montage concurrent, e2e) attendent toujours la mise en production.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
 ## Dernière session (2026-09-05 — deploy.md/gateway attachment/hooks de zone)
 
 ## Décisions prises

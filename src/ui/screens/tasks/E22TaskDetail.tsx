@@ -5,14 +5,17 @@ import { Card } from '@/ui/components/Card'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import { IconPicker } from '@/ui/components/IconPicker'
 import { ColorPicker } from '@/ui/components/ColorPicker'
-import { TaskCardLayout, TaskFieldCard } from '@/ui/components/TaskCardLayout'
+import { TaskCardLayout, TaskFieldCard, IconFieldValue, ColorFieldValue } from '@/ui/components/TaskCardLayout'
+import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
 import type { Task } from '@/domain/entities/task'
+import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
 import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
+import { describeRecurrence } from '@/domain/rules/taskRecurrenceRules'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
 import { pastelBackground } from '@/ui/styles/ambiance'
 import type { Screen } from '@/app/AppContext'
-import type { TaskEditScope, TaskFieldEdit } from '@/app/contexts/usePlanningState'
+import type { TaskEditScope, TaskFieldEdit, RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
 import {
   DndContext,
   PointerSensor,
@@ -319,7 +322,16 @@ function backScreenForTask(task: Task): Screen {
   return 'inbox'
 }
 
-type FieldKey = 'icon' | 'color' | 'date' | 'time' | 'energy' | 'description'
+type FieldKey = 'icon' | 'color' | 'date' | 'time' | 'energy' | 'description' | 'recurrence'
+
+const DEFAULT_RECURRENCE: RecurrenceRuleInput = {
+  frequency: 'weekly',
+  interval: 1,
+  weekdays: null,
+  end_type: 'never',
+  end_date: null,
+  end_count: null,
+}
 
 export function E22TaskDetail() {
   const {
@@ -341,6 +353,8 @@ export function E22TaskDetail() {
     deleteTaskScoped,
     updateTaskFields,
     taskCategories,
+    getTaskRecurrence,
+    setTaskRecurrence,
   } = useApp()
 
   const [subTasks, setSubTasks] = useState<Task[]>([])
@@ -356,6 +370,9 @@ export function E22TaskDetail() {
   const saveTokenRef = useRef(0)
   const [draftStart, setDraftStart] = useState('')
   const [draftDuration, setDraftDuration] = useState<number | null>(null)
+  const [recurrenceRule, setRecurrenceRule] = useState<TaskRecurrence | null>(null)
+  const [draftRecurring, setDraftRecurring] = useState(false)
+  const [draftRecurrenceRule, setDraftRecurrenceRule] = useState<RecurrenceRuleInput>(DEFAULT_RECURRENCE)
 
   const taskFromLists = inboxTasks.find((t) => t.id === selectedTaskId)
   const task = taskFromLists ?? fetchedTask ?? undefined
@@ -374,6 +391,15 @@ export function E22TaskDetail() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTaskId, taskFromLists])
+
+  useEffect(() => {
+    if (task?.recurrence_id) {
+      getTaskRecurrence(task.recurrence_id).then((r) => setRecurrenceRule(r ?? null))
+    } else {
+      setRecurrenceRule(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task?.recurrence_id])
 
   function requiresScopeChoice(): boolean {
     return !!task?.recurrence_id
@@ -429,6 +455,21 @@ export function E22TaskDetail() {
         setDraftStart(task.scheduled_start ?? '')
         setDraftDuration(task.duration_minutes)
       }
+      if (field === 'recurrence') {
+        setDraftRecurring(!!task.recurrence_id)
+        setDraftRecurrenceRule(
+          recurrenceRule
+            ? {
+                frequency: recurrenceRule.frequency,
+                interval: recurrenceRule.interval,
+                weekdays: recurrenceRule.weekdays,
+                end_type: recurrenceRule.end_type,
+                end_date: recurrenceRule.end_date,
+                end_count: recurrenceRule.end_count,
+              }
+            : DEFAULT_RECURRENCE,
+        )
+      }
       return field
     })
   }
@@ -448,6 +489,15 @@ export function E22TaskDetail() {
 
   async function saveTime() {
     await saveField({ startTime: draftStart || null, durationMinutes: draftDuration }, 'time')
+  }
+
+  async function saveRecurrence() {
+    if (!selectedTaskId) return
+    await setTaskRecurrence(selectedTaskId, draftRecurrenceRule)
+    await refreshFetchedTask()
+    const refreshed = await getTaskById(selectedTaskId)
+    setRecurrenceRule(refreshed?.recurrence_id ? ((await getTaskRecurrence(refreshed.recurrence_id)) ?? null) : null)
+    setExpandedField(null)
   }
 
   async function handleDuplicate() {
@@ -580,7 +630,7 @@ export function E22TaskDetail() {
       >
         <TaskFieldCard
           label="Icône"
-          value={task.icon ?? 'Aucune'}
+          value={<IconFieldValue icon={task.icon} />}
           color={task.color}
           expanded={expandedField === 'icon'}
           onToggle={() => toggleField('icon')}
@@ -590,7 +640,7 @@ export function E22TaskDetail() {
 
         <TaskFieldCard
           label="Couleur"
-          value={task.color ?? 'Aucune couleur'}
+          value={<ColorFieldValue color={task.color} categories={taskCategories} />}
           color={task.color}
           expanded={expandedField === 'color'}
           onToggle={() => toggleField('color')}
@@ -632,6 +682,46 @@ export function E22TaskDetail() {
           <Button fullWidth onClick={saveTime}>
             Enregistrer
           </Button>
+        </TaskFieldCard>
+
+        <TaskFieldCard
+          label="Récurrence"
+          value={!task.recurrence_id ? 'Aucune' : recurrenceRule ? describeRecurrence(recurrenceRule) : 'Récurrente'}
+          color={task.color}
+          expanded={expandedField === 'recurrence'}
+          onToggle={() => toggleField('recurrence')}
+        >
+          {!task.scheduled_date ? (
+            <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+              Planifiez d'abord une date pour activer la récurrence.
+            </p>
+          ) : task.recurrence_id ? (
+            <>
+              <RecurrenceEditor value={draftRecurrenceRule} onChange={setDraftRecurrenceRule} />
+              <Button fullWidth onClick={saveRecurrence}>
+                Enregistrer
+              </Button>
+            </>
+          ) : (
+            <>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={draftRecurring}
+                  onChange={(e) => setDraftRecurring(e.target.checked)}
+                />
+                Tâche récurrente
+              </label>
+              {draftRecurring && (
+                <>
+                  <RecurrenceEditor value={draftRecurrenceRule} onChange={setDraftRecurrenceRule} />
+                  <Button fullWidth onClick={saveRecurrence}>
+                    Enregistrer
+                  </Button>
+                </>
+              )}
+            </>
+          )}
         </TaskFieldCard>
 
         <TaskFieldCard

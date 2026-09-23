@@ -12,4 +12,6 @@ export interface Settings {
   mon_compte_color?: string
   /** Code testeur saisi en Paramètres > Profil. Identifiant humain d'un testeur additionnel, sérialisé tel quel dans le snapshot de synchronisation pour rattacher ses retours sans recoupement manuel de l'UUID d'appareil. */
   tester_code?: string
+  /** Afficher « Mon énergie maintenant » (E31) à chaque connexion (lancement et retour au premier plan), même si déjà renseignée aujourd'hui. */
+  energy_checkin_always?: boolean
 }

@@ -29,6 +29,16 @@ describe('persistSeriesBatch — chemin nominal', () => {
     ])
   })
 
+  it('réécrit une règle de récurrence existante', async () => {
+    await db.taskRecurrences.add(makeTaskRecurrence({ id: 'rec-1', frequency: 'weekly', weekdays: [1] }))
+
+    await persistSeriesBatch(db, {
+      recurrenceToUpdate: makeTaskRecurrence({ id: 'rec-1', frequency: 'weekly', weekdays: [2, 5] }),
+    })
+
+    expect((await db.taskRecurrences.get('rec-1'))?.weekdays).toEqual([2, 5])
+  })
+
   it('réécrit les occurrences ciblées', async () => {
     await db.tasks.bulkAdd([
       makeTask({ id: 'a', energy_cost: 3 }),

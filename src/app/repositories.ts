@@ -12,6 +12,7 @@ import { BudgetCategoryRepository } from '@/data/repositories/budgetCategoryRepo
 import { BudgetEntryRepository } from '@/data/repositories/budgetEntryRepository'
 import { BudgetAccountRepository } from '@/data/repositories/budgetAccountRepository'
 import { BudgetDepositRepository } from '@/data/repositories/budgetDepositRepository'
+import { BudgetDepositCategoryRepository } from '@/data/repositories/budgetDepositCategoryRepository'
 import { BudgetIncomeEntryRepository } from '@/data/repositories/budgetIncomeEntryRepository'
 import { TaskRecurrenceRepository } from '@/data/repositories/taskRecurrenceRepository'
 import { TaskExceptionRepository } from '@/data/repositories/taskExceptionRepository'
@@ -36,6 +37,7 @@ export const budgetCategoryRepo = new BudgetCategoryRepository(db)
 export const budgetEntryRepo = new BudgetEntryRepository(db)
 export const budgetAccountRepo = new BudgetAccountRepository(db)
 export const budgetDepositRepo = new BudgetDepositRepository(db)
+export const budgetDepositCategoryRepo = new BudgetDepositCategoryRepository(db)
 export const budgetIncomeEntryRepo = new BudgetIncomeEntryRepository(db)
 export const folderRepo = new FolderRepository(db)
 export const toolRepo = new ToolRepository(db)

@@ -447,4 +447,86 @@ describe('E22TaskDetail', () => {
     })
 
   })
+
+  describe('icône et couleur : affichage résolu (#47db30e8, #7e1383fe)', () => {
+    it('affiche le libellé français de l’icône plutôt que son identifiant technique', async () => {
+      const task = makeTask({ icon: 'meal' })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      expect(screen.getByText('Repas')).toBeDefined()
+      expect(screen.queryByText('meal')).toBeNull()
+    })
+
+    it('affiche le nom de la catégorie associée à la couleur plutôt que le code hexadécimal', async () => {
+      const category: TaskCategory = { id: 'cat-1', name: 'Repas', color: '#ee719e', position: 0, created_at: '2026-09-05T00:00:00Z' }
+      const task = makeTask({ color: '#ee719e' })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task], taskCategories: [category] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      expect(screen.getByText('Repas')).toBeDefined()
+      expect(screen.queryByText('#ee719e')).toBeNull()
+    })
+  })
+
+  describe('durée (#909b8a67)', () => {
+    it('affiche la durée enregistrée dans le champ Horaire', async () => {
+      const task = makeTask({ scheduled_start: '09:00', duration_minutes: 45 })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      expect(screen.getByText('09:00 (45 min)')).toBeDefined()
+    })
+  })
+
+  describe('récurrence (#2c3af15b)', () => {
+    it('tâche non planifiée : indique qu’une date est nécessaire avant d’activer la récurrence', async () => {
+      const task = makeTask({ scheduled_date: null, recurrence_id: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Récurrence' }))
+      expect(screen.getByText('Planifiez d\'abord une date pour activer la récurrence.')).toBeDefined()
+    })
+
+    it('tâche planifiée sans récurrence : cocher "Tâche récurrente" affiche l’éditeur, Enregistrer appelle setTaskRecurrence', async () => {
+      const task = makeTask({ scheduled_date: '2026-09-22', recurrence_id: null })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Récurrence' }))
+      expect(screen.queryByRole('group', { name: 'Règle de récurrence' })).toBeNull()
+      await userEvent.click(screen.getByLabelText('Tâche récurrente'))
+      expect(screen.getByRole('group', { name: 'Règle de récurrence' })).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+      expect(ctx.setTaskRecurrence).toHaveBeenCalledWith(
+        'task-1',
+        expect.objectContaining({ frequency: 'weekly', interval: 1 }),
+      )
+    })
+
+    it('tâche déjà récurrente : affiche le résumé de la règle et propose directement l’éditeur', async () => {
+      const task = makeTask({ scheduled_date: '2026-09-22', recurrence_id: 'rec-1' })
+      const ctx = makeAppContext({
+        selectedTaskId: 'task-1',
+        inboxTasks: [task],
+        getTaskRecurrence: vi.fn().mockResolvedValue({
+          id: 'rec-1',
+          frequency: 'weekly',
+          interval: 1,
+          weekdays: [2, 5],
+          end_type: 'never',
+          end_date: null,
+          end_count: null,
+          created_at: '2026-09-01T00:00:00Z',
+          updated_at: '2026-09-01T00:00:00Z',
+        }),
+      })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await waitFor(() => expect(screen.getByText('Tous les 1 semaine (M, V)')).toBeDefined())
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier Récurrence' }))
+      expect(screen.queryByLabelText('Tâche récurrente')).toBeNull()
+      expect(screen.getByRole('group', { name: 'Règle de récurrence' })).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+      expect(ctx.setTaskRecurrence).toHaveBeenCalledWith(
+        'task-1',
+        expect.objectContaining({ frequency: 'weekly', weekdays: [2, 5] }),
+      )
+    })
+  })
 })

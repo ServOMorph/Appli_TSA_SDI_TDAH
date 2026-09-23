@@ -30,7 +30,7 @@ function imageFromClipboard(data: DataTransfer | null): Blob | null {
 }
 
 export function E122FeedbackCapture() {
-  const { back, goTo, route, originScreen } = useApp()
+  const { back, goTo, replace, route, originScreen } = useApp()
   const inputRef = useRef<HTMLInputElement>(null)
   const [image, setImage] = useState<Blob | null>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -119,7 +119,7 @@ export function E122FeedbackCapture() {
         resolution_last_attempt_at: null,
       })
       void syncFeedbackNow()
-      goTo('feedback-list')
+      replace('feedback-list')
     } catch {
       setError('Le retour n’a pas pu être enregistré sur cet appareil.')
     } finally {

@@ -86,6 +86,12 @@ export function toggleTaskCompletion(task: Task, now: string): Task {
   return isCompleted(task) ? uncompleteTask(task, now) : completeTask(task, now)
 }
 
+function minutesBetween(start: string, end: string): number {
+  const [sh, sm] = start.split(':').map(Number)
+  const [eh, em] = end.split(':').map(Number)
+  return eh * 60 + em - (sh * 60 + sm)
+}
+
 export function scheduleTask(task: Task, date: string, start: string, end: string, now: string): Task {
   return {
     ...task,
@@ -93,6 +99,7 @@ export function scheduleTask(task: Task, date: string, start: string, end: strin
     scheduled_date: date,
     scheduled_start: start,
     scheduled_end: end,
+    duration_minutes: minutesBetween(start, end),
     postponed: false,
     updated_at: now,
   }
@@ -143,6 +150,11 @@ export function getRemainingPlannedCost(tasks: Task[]): number {
   return tasks
     .filter((t) => t.status === 'planned')
     .reduce((sum, t) => sum + (t.energy_cost ?? 0), 0)
+}
+
+/** Somme de l'énergie planifiée d'un jour, tâches terminées incluses. */
+export function getTotalPlannedEnergy(tasks: Pick<Task, 'energy_cost'>[]): number {
+  return tasks.reduce((sum, t) => sum + (t.energy_cost ?? 0), 0)
 }
 
 export const SLOTS_PER_DAY = 48

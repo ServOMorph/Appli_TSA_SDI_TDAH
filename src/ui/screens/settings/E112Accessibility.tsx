@@ -86,6 +86,7 @@ export function E112Accessibility() {
   const darkMode = settings?.dark_mode ?? false
   const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
   const monCompteColor = settings?.mon_compte_color ?? null
+  const energyCheckinAlways = settings?.energy_checkin_always ?? false
 
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false)
   const [newCategoryName, setNewCategoryName] = useState('')
@@ -173,6 +174,21 @@ export function E112Accessibility() {
             checked={darkMode}
             onChange={(e) => updateSettings({ dark_mode: e.target.checked })}
             aria-label="Mode sombre"
+            style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+          />
+        </label>
+      </Card>
+
+      <Card>
+        <label
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+        >
+          <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>Afficher mon énergie à chaque connexion</span>
+          <input
+            type="checkbox"
+            checked={energyCheckinAlways}
+            onChange={(e) => updateSettings({ energy_checkin_always: e.target.checked })}
+            aria-label="Afficher mon énergie à chaque connexion"
             style={{ width: '20px', height: '20px', cursor: 'pointer' }}
           />
         </label>

@@ -151,7 +151,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           if (s) setSettings(s)
           const entry = await energyRepo.getByDate(todayDate())
           await loadAll()
-          setStack([{ name: entry ? 'dashboard' : 'energy-checkin' }])
+          setStack([{ name: entry && !s?.energy_checkin_always ? 'dashboard' : 'energy-checkin' }])
           void syncNow()
         }
       } catch (error) {
@@ -169,11 +169,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     function onVisibilityChange() {
-      if (document.visibilityState === 'visible') void syncNow()
+      if (document.visibilityState !== 'visible') return
+      void syncNow()
+      if (session.currentUser && session.settings?.energy_checkin_always && route.name !== 'energy-checkin') {
+        replace('energy-checkin')
+      }
     }
     document.addEventListener('visibilitychange', onVisibilityChange)
     return () => document.removeEventListener('visibilitychange', onVisibilityChange)
-  }, [])
+  }, [session.currentUser, session.settings, route.name, replace])
 
   async function hasSignificantData(): Promise<boolean> {
     const [taskCount, listItemCount, budgetEntryCount, energyEntryCount] = await Promise.all([

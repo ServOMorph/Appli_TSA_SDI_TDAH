@@ -120,54 +120,52 @@ export function E10Dashboard() {
         <PlanningBoard />
       </div>
 
-      {!overloadMode && (
-        <section aria-label="Outils">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-            <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Outils</h2>
-            <Button
-              onClick={() => setShowCreateTool(true)}
-              aria-label="Ajouter un outil"
-              style={{ padding: '4px 10px', fontSize: '1rem', lineHeight: 1 }}
-            >
-              +
-            </Button>
-          </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 'var(--spacing-sm)',
-              marginTop: 'var(--spacing-md)',
-            }}
+      <section aria-label="Outils">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+          <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Outils</h2>
+          <Button
+            onClick={() => setShowCreateTool(true)}
+            aria-label="Ajouter un outil"
+            style={{ padding: '4px 10px', fontSize: '1rem', lineHeight: 1 }}
           >
-            <Card style={settings?.mon_compte_color ? outlineOnlyStyle(settings.mon_compte_color) : undefined}>
-              <button style={widgetBtnStyle} onClick={() => goTo('budget-account')}>
-                Mon compte
+            +
+          </Button>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 'var(--spacing-sm)',
+            marginTop: 'var(--spacing-md)',
+          }}
+        >
+          <Card style={settings?.mon_compte_color ? outlineOnlyStyle(settings.mon_compte_color) : undefined}>
+            <button style={widgetBtnStyle} onClick={() => goTo('budget-account')}>
+              Mon compte
+            </button>
+          </Card>
+          {rootFolders.map((folder) => (
+            <Card key={folder.id}>
+              <button style={widgetBtnStyle} onClick={() => goTo({ name: 'folder-detail', folderId: folder.id })}>
+                📁 {folder.name}
               </button>
             </Card>
-            {rootFolders.map((folder) => (
-              <Card key={folder.id}>
-                <button style={widgetBtnStyle} onClick={() => goTo({ name: 'folder-detail', folderId: folder.id })}>
-                  📁 {folder.name}
+          ))}
+          {rootTools.map((tool) => {
+            const list = tool.list_id ? lists.find((l) => l.id === tool.list_id) : undefined
+            return (
+              <Card
+                key={tool.id}
+                style={tool.color ? outlineOnlyStyle(tool.color) : undefined}
+              >
+                <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
+                  {toolLabel(tool, list?.name)}
                 </button>
               </Card>
-            ))}
-            {rootTools.map((tool) => {
-              const list = tool.list_id ? lists.find((l) => l.id === tool.list_id) : undefined
-              return (
-                <Card
-                  key={tool.id}
-                  style={tool.color ? outlineOnlyStyle(tool.color) : undefined}
-                >
-                  <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
-                    {toolLabel(tool, list?.name)}
-                  </button>
-                </Card>
-              )
-            })}
-          </div>
-        </section>
-      )}
+            )
+          })}
+        </div>
+      </section>
 
       {showCreateTool && (
         <ToolCreateModal

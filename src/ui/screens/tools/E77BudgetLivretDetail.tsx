@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
-import { getAccountBalance } from '@/domain/rules/budgetRules'
+import { getAccountBalance, getDepositCategoryBalance } from '@/domain/rules/budgetRules'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetDepositCategory } from '@/domain/entities/budgetDepositCategory'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { dangerLinkStyle, formatEuro, inputStyle, modalBox, modalOverlay, neutralLinkStyle, pageStyle } from '@/ui/styles/budget'
@@ -15,10 +16,11 @@ interface MovementFormState {
   amount: string
   label: string
   date: string
+  categoryId: string
 }
 
 function emptyForm(): MovementFormState {
-  return { kind: 'deposit', amount: '', label: '', date: todayDate() }
+  return { kind: 'deposit', amount: '', label: '', date: todayDate(), categoryId: '' }
 }
 
 function formFromDeposit(deposit: BudgetDeposit): MovementFormState {
@@ -27,11 +29,24 @@ function formFromDeposit(deposit: BudgetDeposit): MovementFormState {
     amount: String(Math.abs(deposit.amount)),
     label: deposit.label ?? '',
     date: deposit.date,
+    categoryId: deposit.category_id ?? '',
   }
 }
 
 export function E77BudgetLivretDetail() {
-  const { route, back, budgetAccounts, budgetDeposits, createBudgetDeposit, updateBudgetDeposit, deleteBudgetDeposit } = useApp()
+  const {
+    route,
+    back,
+    budgetAccounts,
+    budgetDeposits,
+    budgetDepositCategories,
+    createBudgetDeposit,
+    updateBudgetDeposit,
+    deleteBudgetDeposit,
+    createBudgetDepositCategory,
+    renameBudgetDepositCategory,
+    deleteBudgetDepositCategory,
+  } = useApp()
   const accountId = route.name === 'budget-livret-detail' ? (route.accountId ?? null) : null
   const account = budgetAccounts.find((item) => item.id === accountId) ?? null
 
@@ -39,6 +54,11 @@ export function E77BudgetLivretDetail() {
   const [addForm, setAddForm] = useState<MovementFormState>(emptyForm())
   const [editingDeposit, setEditingDeposit] = useState<BudgetDeposit | null>(null)
   const [editForm, setEditForm] = useState<MovementFormState>(emptyForm())
+  const [showCategoryForm, setShowCategoryForm] = useState(false)
+  const [categoryName, setCategoryName] = useState('')
+  const [renamingCategory, setRenamingCategory] = useState<BudgetDepositCategory | null>(null)
+  const [categoryRenameValue, setCategoryRenameValue] = useState('')
+  const [deletingCategory, setDeletingCategory] = useState<BudgetDepositCategory | null>(null)
 
   if (!account) {
     return (
@@ -55,9 +75,11 @@ export function E77BudgetLivretDetail() {
   }
 
   const balance = getAccountBalance(budgetDeposits, account.id)
+  const categories = budgetDepositCategories.filter((item) => item.account_id === account.id)
   const deposits = budgetDeposits
     .filter((deposit) => deposit.account_id === account.id)
     .sort((a, b) => b.date.localeCompare(a.date))
+  const uncategorizedDeposits = deposits.filter((deposit) => !deposit.category_id)
 
   function parsedAmount(form: MovementFormState): number {
     return Number(form.amount.replace(',', '.'))
@@ -77,7 +99,7 @@ export function E77BudgetLivretDetail() {
     if (!account || !canSubmit(addForm)) return
     const amount = parsedAmount(addForm)
     const signedAmount = addForm.kind === 'withdrawal' ? -amount : amount
-    await createBudgetDeposit(account.id, signedAmount, addForm.label, addForm.date)
+    await createBudgetDeposit(account.id, signedAmount, addForm.label, addForm.date, addForm.categoryId || undefined)
     setShowAddForm(false)
   }
 
@@ -85,8 +107,65 @@ export function E77BudgetLivretDetail() {
     if (!editingDeposit || !canSubmit(editForm, editingDeposit.id)) return
     const amount = parsedAmount(editForm)
     const signedAmount = editForm.kind === 'withdrawal' ? -amount : amount
-    await updateBudgetDeposit(editingDeposit.id, signedAmount, editForm.label, editForm.date)
+    await updateBudgetDeposit(editingDeposit.id, signedAmount, editForm.label, editForm.date, editForm.categoryId || undefined)
     setEditingDeposit(null)
+  }
+
+  async function handleCreateCategory() {
+    if (!account || !categoryName.trim()) return
+    await createBudgetDepositCategory(account.id, categoryName)
+    setCategoryName('')
+    setShowCategoryForm(false)
+  }
+
+  async function handleRenameCategory() {
+    if (!renamingCategory || !categoryRenameValue.trim()) return
+    await renameBudgetDepositCategory(renamingCategory.id, categoryRenameValue)
+    setRenamingCategory(null)
+  }
+
+  async function handleDeleteCategory(category: BudgetDepositCategory) {
+    const result = await deleteBudgetDepositCategory(category.id)
+    if (result === 'needs_confirmation') setDeletingCategory(category)
+  }
+
+  async function confirmDeleteCategory() {
+    if (!deletingCategory) return
+    await deleteBudgetDepositCategory(deletingCategory.id, true)
+    setDeletingCategory(null)
+  }
+
+  function renderMovementList(items: BudgetDeposit[]) {
+    return (
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+        {items.map((deposit) => {
+          const isWithdrawal = deposit.amount < 0
+          const movementLabel = isWithdrawal ? 'Retrait' : 'Dépôt'
+          return (
+            <li key={deposit.id} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-sm)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-sm)' }}>
+              <span style={{ flex: '1 1 180px', fontSize: '0.9375rem' }}>
+                {formatFrenchDate(deposit.date)} · {movementLabel} : {formatEuro(Math.abs(deposit.amount))}
+                {deposit.label ? ` · ${deposit.label}` : ''}
+              </span>
+              <button
+                aria-label={`Modifier le mouvement du ${formatFrenchDate(deposit.date)}`}
+                onClick={() => { setEditForm(formFromDeposit(deposit)); setEditingDeposit(deposit) }}
+                style={neutralLinkStyle}
+              >
+                Modifier
+              </button>
+              <button
+                aria-label={`Supprimer le mouvement du ${formatFrenchDate(deposit.date)}`}
+                onClick={() => deleteBudgetDeposit(deposit.id)}
+                style={dangerLinkStyle}
+              >
+                Supprimer
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    )
   }
 
   return (
@@ -103,39 +182,56 @@ export function E77BudgetLivretDetail() {
         <p style={{ margin: '4px 0', fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-success)' }}>{formatEuro(balance)}</p>
       </Card>
 
+      <section aria-label="Catégories">
+        <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Catégories</h2>
+        {categories.length === 0 ? (
+          <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)' }}>Aucune catégorie configurée.</p>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 var(--spacing-sm)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+            {categories.map((category) => (
+              <li key={category.id} style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: 'var(--spacing-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--spacing-sm)' }}>
+                  <span>{category.name}</span>
+                  <span style={{ fontWeight: 600 }}>{formatEuro(getDepositCategoryBalance(deposits, category.id))}</span>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-sm)', marginTop: '4px' }}>
+                  <button aria-label={`Renommer ${category.name}`} onClick={() => { setRenamingCategory(category); setCategoryRenameValue(category.name) }} style={neutralLinkStyle}>Renommer</button>
+                  <button aria-label={`Supprimer ${category.name}`} onClick={() => handleDeleteCategory(category)} style={{ ...dangerLinkStyle, marginLeft: 'auto' }}>Supprimer</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Button variant="secondary" fullWidth onClick={() => { setCategoryName(''); setShowCategoryForm(true) }}>Ajouter une catégorie</Button>
+      </section>
+
       <section aria-label="Mouvements">
         <h2 style={{ fontSize: '1rem', margin: '0 0 var(--spacing-sm)' }}>Mouvements</h2>
         {deposits.length === 0 ? (
           <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Aucun mouvement enregistré.</p>
+        ) : categories.length === 0 ? (
+          renderMovementList(deposits)
         ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-            {deposits.map((deposit) => {
-              const isWithdrawal = deposit.amount < 0
-              const movementLabel = isWithdrawal ? 'Retrait' : 'Dépôt'
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+            {categories.map((category) => {
+              const items = deposits.filter((deposit) => deposit.category_id === category.id)
+              if (items.length === 0) return null
               return (
-                <li key={deposit.id} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-sm)', borderTop: '1px solid var(--color-border)', paddingTop: 'var(--spacing-sm)' }}>
-                  <span style={{ flex: '1 1 180px', fontSize: '0.9375rem' }}>
-                    {formatFrenchDate(deposit.date)} · {movementLabel} : {formatEuro(Math.abs(deposit.amount))}
-                    {deposit.label ? ` · ${deposit.label}` : ''}
-                  </span>
-                  <button
-                    aria-label={`Modifier le mouvement du ${formatFrenchDate(deposit.date)}`}
-                    onClick={() => { setEditForm(formFromDeposit(deposit)); setEditingDeposit(deposit) }}
-                    style={neutralLinkStyle}
-                  >
-                    Modifier
-                  </button>
-                  <button
-                    aria-label={`Supprimer le mouvement du ${formatFrenchDate(deposit.date)}`}
-                    onClick={() => deleteBudgetDeposit(deposit.id)}
-                    style={dangerLinkStyle}
-                  >
-                    Supprimer
-                  </button>
-                </li>
+                <div key={category.id}>
+                  <h3 style={{ fontSize: '0.875rem', margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)' }}>
+                    {category.name} · {formatEuro(getDepositCategoryBalance(deposits, category.id))}
+                  </h3>
+                  {renderMovementList(items)}
+                </div>
               )
             })}
-          </ul>
+            {uncategorizedDeposits.length > 0 && (
+              <div>
+                <h3 style={{ fontSize: '0.875rem', margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)' }}>Hors catégorie</h3>
+                {renderMovementList(uncategorizedDeposits)}
+              </div>
+            )}
+          </div>
         )}
       </section>
 
@@ -161,6 +257,17 @@ export function E77BudgetLivretDetail() {
             <input id="livret-add-label" value={addForm.label} onChange={(event) => setAddForm({ ...addForm, label: event.target.value })} style={inputStyle} />
             <label htmlFor="livret-add-date">Date</label>
             <input id="livret-add-date" type="date" value={addForm.date} onChange={(event) => setAddForm({ ...addForm, date: event.target.value })} style={inputStyle} />
+            {categories.length > 0 && (
+              <>
+                <label htmlFor="livret-add-category">Catégorie</label>
+                <select id="livret-add-category" value={addForm.categoryId} onChange={(event) => setAddForm({ ...addForm, categoryId: event.target.value })} style={inputStyle}>
+                  <option value="">Hors catégorie</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                  ))}
+                </select>
+              </>
+            )}
             <Button fullWidth onClick={handleAddSubmit} disabled={!canSubmit(addForm)}>Enregistrer</Button>
             <Button variant="secondary" fullWidth onClick={() => setShowAddForm(false)}>Annuler</Button>
           </div>
@@ -185,8 +292,53 @@ export function E77BudgetLivretDetail() {
             <input id="livret-edit-label" value={editForm.label} onChange={(event) => setEditForm({ ...editForm, label: event.target.value })} style={inputStyle} />
             <label htmlFor="livret-edit-date">Date</label>
             <input id="livret-edit-date" type="date" value={editForm.date} onChange={(event) => setEditForm({ ...editForm, date: event.target.value })} style={inputStyle} />
+            {categories.length > 0 && (
+              <>
+                <label htmlFor="livret-edit-category">Catégorie</label>
+                <select id="livret-edit-category" value={editForm.categoryId} onChange={(event) => setEditForm({ ...editForm, categoryId: event.target.value })} style={inputStyle}>
+                  <option value="">Hors catégorie</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>{category.name}</option>
+                  ))}
+                </select>
+              </>
+            )}
             <Button fullWidth onClick={handleEditSubmit} disabled={!canSubmit(editForm, editingDeposit.id)}>Enregistrer</Button>
             <Button variant="secondary" fullWidth onClick={() => setEditingDeposit(null)}>Annuler</Button>
+          </div>
+        </div>
+      )}
+
+      {showCategoryForm && (
+        <div role="dialog" aria-modal="true" aria-label="Ajouter une catégorie" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Ajouter une catégorie</h2>
+            <label htmlFor="livret-category-name">Nom</label>
+            <input id="livret-category-name" autoFocus value={categoryName} onChange={(event) => setCategoryName(event.target.value)} style={inputStyle} />
+            <Button fullWidth onClick={handleCreateCategory} disabled={!categoryName.trim()}>Créer</Button>
+            <Button variant="secondary" fullWidth onClick={() => setShowCategoryForm(false)}>Annuler</Button>
+          </div>
+        </div>
+      )}
+
+      {renamingCategory && (
+        <div role="dialog" aria-modal="true" aria-label="Renommer la catégorie" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Renommer la catégorie</h2>
+            <input aria-label="Nouveau nom de la catégorie" autoFocus value={categoryRenameValue} onChange={(event) => setCategoryRenameValue(event.target.value)} style={inputStyle} />
+            <Button fullWidth onClick={handleRenameCategory} disabled={!categoryRenameValue.trim()}>Enregistrer</Button>
+            <Button variant="secondary" fullWidth onClick={() => setRenamingCategory(null)}>Annuler</Button>
+          </div>
+        </div>
+      )}
+
+      {deletingCategory && (
+        <div role="dialog" aria-modal="true" aria-label="Supprimer la catégorie" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Supprimer cette catégorie ?</h2>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Ses mouvements resteront dans le livret, hors catégorie.</p>
+            <Button fullWidth onClick={confirmDeleteCategory} style={{ backgroundColor: 'var(--color-error)', borderColor: 'var(--color-error)' }}>Supprimer</Button>
+            <Button variant="secondary" fullWidth onClick={() => setDeletingCategory(null)}>Annuler</Button>
           </div>
         </div>
       )}

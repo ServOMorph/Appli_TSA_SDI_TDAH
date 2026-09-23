@@ -56,6 +56,13 @@ describe('E123FeedbackList', () => {
     expect(goTo).toHaveBeenCalledWith('settings-privacy')
   })
 
+  it('place le bouton Nouveau retour au-dessus de la liste des retours (#9a8f67a9)', async () => {
+    renderWithApp(<E123FeedbackList />, makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' } }))
+    const card = (await screen.findByText('E10')).closest('[role="button"]') as HTMLElement
+    const newFeedbackButton = screen.getByRole('button', { name: 'Nouveau retour' })
+    expect(newFeedbackButton.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('navigue vers le détail au clic sur un retour', async () => {
     const goTo = vi.fn()
     renderWithApp(<E123FeedbackList />, makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' }, goTo }))

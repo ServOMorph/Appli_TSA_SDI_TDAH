@@ -5,7 +5,7 @@ import { IconPicker } from '@/ui/components/IconPicker'
 import { ColorPicker } from '@/ui/components/ColorPicker'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
-import { TaskCardLayout, TaskFieldCard } from '@/ui/components/TaskCardLayout'
+import { TaskCardLayout, TaskFieldCard, IconFieldValue, ColorFieldValue } from '@/ui/components/TaskCardLayout'
 import { todayDate } from '@/app/repositories'
 import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
@@ -130,7 +130,6 @@ const removeBtnStyle: React.CSSProperties = {
 export function E21CreateTaskV2() {
   const {
     goTo,
-    addSubTask,
     createDetailedTask,
     back,
     originScreen,
@@ -188,10 +187,8 @@ export function E21CreateTaskV2() {
       startTime: isPlanned && startTime ? startTime : null,
       status,
       recurrence: isPlanned && recurring ? recurrence : null,
+      subTaskTitles: subTasks,
     })
-    for (const subTaskTitle of subTasks) {
-      await addSubTask(taskId, subTaskTitle)
-    }
     return taskId
   }
 
@@ -231,7 +228,7 @@ export function E21CreateTaskV2() {
         >
           <TaskFieldCard
             label="Icône"
-            value={icon ?? 'Aucune'}
+            value={<IconFieldValue icon={icon} />}
             color={color}
             expanded={expandedField === 'icon'}
             onToggle={() => toggleField('icon')}
@@ -247,7 +244,7 @@ export function E21CreateTaskV2() {
 
           <TaskFieldCard
             label="Couleur"
-            value={color ?? 'Aucune couleur'}
+            value={<ColorFieldValue color={color} categories={taskCategories} />}
             color={color}
             expanded={expandedField === 'color'}
             onToggle={() => toggleField('color')}
@@ -407,7 +404,7 @@ export function E21CreateTaskV2() {
         <Button fullWidth type="submit" disabled={!canSubmit}>
           Valider
         </Button>
-        <Button variant="secondary" fullWidth type="button" onClick={() => goTo('inbox')}>
+        <Button variant="secondary" fullWidth type="button" onClick={returnToOrigin}>
           Annuler
         </Button>
       </form>

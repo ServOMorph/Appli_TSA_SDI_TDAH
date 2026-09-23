@@ -16,6 +16,23 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 23 septembre 2026, les 19 retours signalés par Marie dans l'application ont été traités par lots
+via la nouvelle commande `/traiter_retours` : 16 sont corrigés, avec une réponse déposée dans le fil
+de discussion de chacun (les sous-tâches d'une tâche répétée apparaissent maintenant sur tous les
+jours concernés, l'icône et la couleur d'une tâche s'affichent correctement sur sa fiche, sa durée
+est enregistrée dès la création, sa récurrence peut être modifiée directement sur la fiche, le
+bouton « Annuler » revient au bon écran, le bouton « Nouveau retour » est remonté, les outils
+restent visibles en mode surcharge, une tâche se coche automatiquement quand toutes ses sous-tâches
+le sont, un nouveau repère affiche l'énergie totale planifiée du jour, le bandeau des jours reste
+centré, un nouveau réglage permet d'afficher l'énergie à chaque connexion, le planning de la semaine
+affiche les noms et couleurs en plus grand, et les livrets permettent désormais de créer des
+catégories avec leur propre sous-total). Un retour concerne un badge d'hébergement qui n'est pas un
+défaut de l'application (vérification manuelle du compte à faire). Le dernier, une demande détaillée
+de nouvel outil « Routine », a été mis de côté dans sa propre feuille de route
+(`roadmap_routine_2026-09-23.md`, six étapes, aucune commencée), le sujet étant trop large pour être
+traité avec les autres retours. Reste à faire, hors code : mise en ligne de ce lot de corrections et
+vérification par Marie.
+
 Le 22 septembre 2026 (suite de session), le circuit de traitement des commentaires de Marie sur
 Google Doc, devenu obsolète depuis le passage aux retours signalés dans l'application, a été
 retiré : plus aucune commande ne le référence. Une nouvelle commande dédiée au traitement des

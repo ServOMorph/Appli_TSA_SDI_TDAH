@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  describeRecurrence,
   generateOccurrenceDates,
   isValidRecurrence,
   nextOccurrenceAfter,
@@ -149,6 +150,23 @@ describe('taskRecurrenceRules', () => {
     it('rejette une fin par nombre sans nombre positif', () => {
       expect(isValidRecurrence(makeTaskRecurrence({ end_type: 'count', end_count: null }))).toBe(false)
       expect(isValidRecurrence(makeTaskRecurrence({ end_type: 'count', end_count: 0 }))).toBe(false)
+    })
+  })
+
+  describe('describeRecurrence', () => {
+    it('décrit une fréquence hebdomadaire avec ses jours', () => {
+      const recurrence = makeTaskRecurrence({ frequency: 'weekly', interval: 1, weekdays: [5, 2] })
+      expect(describeRecurrence(recurrence)).toBe('Tous les 1 semaine (M, V)')
+    })
+
+    it('accorde le pluriel à partir de 2', () => {
+      const recurrence = makeTaskRecurrence({ frequency: 'daily', interval: 3, weekdays: null })
+      expect(describeRecurrence(recurrence)).toBe('Tous les 3 jours')
+    })
+
+    it('garde "mois" invariable', () => {
+      const recurrence = makeTaskRecurrence({ frequency: 'monthly', interval: 2, weekdays: null })
+      expect(describeRecurrence(recurrence)).toBe('Tous les 2 mois')
     })
   })
 })

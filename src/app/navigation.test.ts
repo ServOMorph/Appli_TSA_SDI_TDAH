@@ -154,4 +154,17 @@ describe('parcours de navigation complets', () => {
     }
     expect(stack).toHaveLength(2)
   })
+
+  it('après envoi d’un retour testeur, Retour ne rebondit pas sur le formulaire (#1f202a5e)', () => {
+    const onFeedbackList = push(dashboard, 'feedback-list')
+    const onNewFeedback = push(onFeedbackList, 'feedback')
+
+    const buggyAfterSend = push(onNewFeedback, 'feedback-list')
+    expect(currentRoute(pop(buggyAfterSend))).toEqual({ name: 'feedback' })
+
+    const fixedAfterSend = replace(onNewFeedback, 'feedback-list')
+    expect(currentRoute(fixedAfterSend)).toEqual({ name: 'feedback-list' })
+    expect(currentRoute(pop(fixedAfterSend))).toEqual({ name: 'feedback-list' })
+    expect(currentRoute(pop(pop(fixedAfterSend)))).toEqual({ name: 'dashboard' })
+  })
 })

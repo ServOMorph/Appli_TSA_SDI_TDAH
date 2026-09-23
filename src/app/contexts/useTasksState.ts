@@ -7,6 +7,7 @@ import {
   renameTask as renameTaskRule,
   toggleTaskCompletion as toggleTaskCompletionRule,
   completeTask as completeTaskRule,
+  isCompleted,
 } from '@/domain/rules/taskRules'
 import { createListItem as createListItemRule, createListCategory as createListCategoryRule } from '@/domain/rules/listRules'
 import type { Task } from '@/domain/entities/task'
@@ -96,7 +97,20 @@ export function useTasksState() {
   }
 
   async function toggleSubTask(subTask: Task) {
-    await taskRepo.update(toggleTaskCompletionRule(subTask, new Date().toISOString()))
+    const now = new Date().toISOString()
+    const updated = toggleTaskCompletionRule(subTask, now)
+    await taskRepo.update(updated)
+
+    if (isCompleted(updated) && subTask.parent_id) {
+      const siblings = await taskRepo.getChildren(subTask.parent_id)
+      if (siblings.length > 0 && siblings.every(isCompleted)) {
+        const parent = await taskRepo.getById(subTask.parent_id)
+        if (parent && !isCompleted(parent)) {
+          await taskRepo.update(completeTaskRule(parent, now))
+        }
+      }
+    }
+
     await load()
   }
 

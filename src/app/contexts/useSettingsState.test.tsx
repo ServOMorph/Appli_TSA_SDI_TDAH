@@ -69,7 +69,7 @@ function SettingsPanel() {
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, tasks: {} })}>
         Importer tableau invalide
       </button>
-      <button onClick={() => runImport({ version: '3.7', user: { id: 'u1', profile_type: 'student' } })}>
+      <button onClick={() => runImport({ version: '3.8', user: { id: 'u1', profile_type: 'student' } })}>
         Importer version future
       </button>
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, tasks: [{ id: 'task-1', parent_id: 'inconnue' }] })}>
@@ -204,7 +204,7 @@ describe('useSettingsState — export/import', () => {
     })
 
     const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
-    expect(payload.version).toBe('3.6')
+    expect(payload.version).toBe('3.7')
     expect(payload.manual_test_results).toBeUndefined()
     expect(payload.budget_income_entries).toEqual([
       { id: 'income-1', amount: 1500, label: 'Salaire', date: '2026-08-24', created_at: '2026-08-24T09:00:00.000Z' },

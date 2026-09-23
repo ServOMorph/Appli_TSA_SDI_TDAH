@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { Task } from '@/domain/entities/task'
-import { TaskIcon } from '@/ui/components/TaskIcon'
 import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
-import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
+import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle, pastelBackground } from '@/ui/styles/ambiance'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, weekStrip } from '@/domain/rules/planningSlotRules'
 
 const SWIPE_THRESHOLD_PX = 50
@@ -11,11 +10,10 @@ const SWIPE_THRESHOLD_PX = 50
 const pageStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  padding: 'var(--spacing-xl)',
-  gap: 'var(--spacing-md)',
-  maxWidth: '480px',
-  margin: '0 auto',
-  minHeight: '100svh',
+  padding: 'var(--spacing-md)',
+  gap: 'var(--spacing-sm)',
+  height: '100svh',
+  boxSizing: 'border-box',
   paddingBottom: 'var(--bottomnav-h)',
 }
 
@@ -123,30 +121,34 @@ const dayTasksStyle: React.CSSProperties = {
   overflowY: 'auto',
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
-  gap: '4px',
-  padding: '4px 0',
+  alignItems: 'stretch',
+  gap: '2px',
+  padding: '3px 1px',
 }
 
-const taskIconBtnStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '30px',
-  height: '30px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1px solid var(--color-border)',
-  background: 'var(--color-surface)',
-  color: 'var(--color-text)',
-  cursor: 'pointer',
-  flexShrink: 0,
-  padding: 0,
-  fontSize: '0.8125rem',
-  fontWeight: 700,
-}
-
-function taskFallbackLabel(title: string): string {
-  return title.trim().charAt(0).toUpperCase() || '•'
+function taskChipStyle(color: string | null): React.CSSProperties {
+  const hasColor = !!color
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    width: '100%',
+    minHeight: '28px',
+    borderRadius: 'var(--radius-sm)',
+    border: hasColor ? 'none' : '1px solid var(--color-border)',
+    background: hasColor ? pastelBackground(color) : 'var(--color-surface)',
+    color: 'var(--color-text)',
+    cursor: 'pointer',
+    flexShrink: 0,
+    padding: '3px 2px',
+    fontSize: '0.5625rem',
+    fontWeight: 600,
+    fontFamily: 'var(--font-body)',
+    lineHeight: 1.2,
+    whiteSpace: 'normal',
+    overflowWrap: 'break-word',
+  }
 }
 
 export function E12WeekPlanning() {
@@ -274,11 +276,10 @@ export function E12WeekPlanning() {
                     {dayTasks.map((task) => (
                       <button
                         key={task.id}
-                        style={taskIconBtnStyle}
+                        style={taskChipStyle(task.color)}
                         onClick={() => openTask(task.id)}
-                        aria-label={task.title}
                       >
-                        {task.icon ? <TaskIcon icon={task.icon} size={18} /> : taskFallbackLabel(task.title)}
+                        {task.title}
                       </button>
                     ))}
                   </div>

@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
-import { TaskCardLayout, TaskFieldCard } from './TaskCardLayout'
+import { TaskCardLayout, TaskFieldCard, IconFieldValue, ColorFieldValue } from './TaskCardLayout'
+import type { TaskCategory } from '@/domain/entities/taskCategory'
 
 describe('TaskCardLayout', () => {
   it('affiche l’icône et le titre dans le bandeau, les champs dans une grille', () => {
@@ -53,5 +54,39 @@ describe('TaskFieldCard', () => {
     render(<TaskFieldCard label="Couleur" value="Aucune couleur" color={null} expanded={false} onToggle={onToggle} />)
     await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
     expect(onToggle).toHaveBeenCalled()
+  })
+})
+
+describe('IconFieldValue', () => {
+  it('sans icône : affiche "Aucune"', () => {
+    render(<IconFieldValue icon={null} />)
+    expect(screen.getByText('Aucune')).toBeDefined()
+  })
+
+  it('résout l’identifiant en libellé français lisible', () => {
+    render(<IconFieldValue icon="meal" />)
+    expect(screen.getByText('Repas')).toBeDefined()
+    expect(screen.queryByText('meal')).toBeNull()
+  })
+})
+
+describe('ColorFieldValue', () => {
+  it('sans couleur : affiche "Aucune couleur"', () => {
+    render(<ColorFieldValue color={null} categories={[]} />)
+    expect(screen.getByText('Aucune couleur')).toBeDefined()
+  })
+
+  it('résout la couleur en nom de catégorie', () => {
+    const categories: TaskCategory[] = [
+      { id: 'cat-1', name: 'Repas', color: '#ee719e', position: 0, created_at: '2026-09-05T00:00:00Z' },
+    ]
+    render(<ColorFieldValue color="#ee719e" categories={categories} />)
+    expect(screen.getByText('Repas')).toBeDefined()
+    expect(screen.queryByText('#ee719e')).toBeNull()
+  })
+
+  it('couleur sans catégorie associée : affiche le code brut en repli', () => {
+    render(<ColorFieldValue color="#ee719e" categories={[]} />)
+    expect(screen.getByText('#ee719e')).toBeDefined()
   })
 })

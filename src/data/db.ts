@@ -13,6 +13,7 @@ import type { BudgetCategory } from '@/domain/entities/budgetCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetAccount } from '@/domain/entities/budgetAccount'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
+import type { BudgetDepositCategory } from '@/domain/entities/budgetDepositCategory'
 import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
@@ -45,6 +46,7 @@ export class AppDatabase extends Dexie {
   budgetEntries!: Table<BudgetEntry>
   budgetAccounts!: Table<BudgetAccount>
   budgetDeposits!: Table<BudgetDeposit>
+  budgetDepositCategories!: Table<BudgetDepositCategory>
   budgetIncomeEntries!: Table<BudgetIncomeEntry>
   taskRecurrences!: Table<TaskRecurrence>
   taskExceptions!: Table<TaskException>
@@ -461,6 +463,10 @@ export class AppDatabase extends Dexie {
     // Les resultats historiques locaux ne sont pas repris ailleurs ; le catalogue lui-meme etait
     // deja vide depuis le 2026-09-13 (sauvegarde : Archives/manualTestsCatalog_backup_2026-09-13.md).
     this.version(24).stores({ manualTestResults: null })
+    this.version(25).stores({
+      budgetDepositCategories: 'id, account_id, position',
+      budgetDeposits: 'id, account_id, category_id, date',
+    })
   }
 }
 

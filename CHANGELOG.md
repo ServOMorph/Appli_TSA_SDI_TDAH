@@ -1,3 +1,46 @@
+## v6.1 — 2026-09-23
+
+### Ajouté
+- **Livrets : sous-catégories avec sous-total propre.** Un livret peut désormais contenir des
+  catégories (création, renommage, suppression) ; chaque catégorie totalise ses propres mouvements
+  et contribue au total du livret. Un mouvement peut rester hors catégorie, compté seulement dans le
+  total. Supprimer une catégorie qui a des mouvements demande confirmation et détache ses mouvements
+  (jamais de suppression d'historique financier). Sous-catégories incluses dans l'export/import et la
+  synchronisation automatique (schéma de sauvegarde 3.6 → 3.7).
+- **Réglage « Afficher mon énergie à chaque connexion »** (Paramètres > Accessibilité, désactivé par
+  défaut) : l'écran « Mon énergie maintenant » s'affiche à chaque lancement et retour au premier plan
+  de l'application quand il est activé.
+- **Roadmap `roadmap_routine_2026-09-23.md`** créée pour un nouvel outil « Routine » (retour testeur
+  `#229113cc`), 6 phases planifiées, non démarrées.
+
+### Corrigé
+- Sous-tâches ajoutées à la création d'une tâche répétée : désormais dupliquées sur toutes les
+  occurrences matérialisées, plus seulement sur la première.
+- Tâche récurrente sur des jours précis de la semaine : la première occurrence ne se planifie plus
+  un jour hors motif.
+- Fiche de tâche (E21/E22) : icône et couleur rendues correctement au lieu d'un texte brut ; durée
+  désormais enregistrée dès la création ; récurrence modifiable directement sur la fiche.
+- Bouton « Annuler » (création de tâche) : suit désormais l'origine réelle de navigation, comme
+  « Retour ».
+- Après l'envoi d'un retour testeur, l'écran « Mes retours » ne s'empile plus en double dans la
+  navigation.
+- Bouton « Nouveau retour » remonté en haut de l'écran « Mes retours ».
+- Bloc Outils masqué à tort en mode surcharge (E10) : n'est plus masqué.
+- Alignement de la colonne des sous-étapes du planning quand l'énergie n'est pas affichée.
+- Tâche parente cochée automatiquement quand toutes ses sous-tâches sont cochées.
+- Bandeau des jours (E10) : le clic sur un jour recentre désormais le bandeau, au lieu de déplacer
+  seulement la sélection.
+
+### Modifié
+- Planning de la semaine (E12) : nom complet des tâches (au lieu d'un pictogramme), couleur de la
+  tâche reprise sur la case, cadre occupant toute la page.
+- Nouveau repère affichant l'énergie totale planifiée du jour affiché, sur l'accueil.
+
+### Constaté
+- **Durée d'une tâche tronquée silencieusement au-delà de minuit** (ex. 23:00 + 120 min enregistre
+  59 min), trouvé par la revue de code de ce `/close`. Non corrigé : la réponse correcte (avertir,
+  empêcher la saisie, ou répartir) est un choix produit. Suivi `[P1]` `signals.md`.
+
 ## v6.0 — 2026-09-22
 
 ### Supprimé

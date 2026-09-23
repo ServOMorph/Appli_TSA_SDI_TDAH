@@ -92,6 +92,26 @@ export function nextOccurrenceAfter(recurrence: TaskRecurrence, anchorDate: stri
   return generateOccurrenceDates(recurrence, anchorDate, from, to)[0] ?? null
 }
 
+const FREQUENCY_UNIT_LABEL: Record<TaskRecurrence['frequency'], { singular: string; plural: string }> = {
+  daily: { singular: 'jour', plural: 'jours' },
+  weekly: { singular: 'semaine', plural: 'semaines' },
+  monthly: { singular: 'mois', plural: 'mois' },
+  yearly: { singular: 'année', plural: 'années' },
+}
+
+const WEEKDAY_SHORT_LABELS = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+
+/** Résumé lisible d'une règle de récurrence, pour affichage (ex. "Tous les 2 semaines (L, V)"). */
+export function describeRecurrence(recurrence: Pick<TaskRecurrence, 'frequency' | 'interval' | 'weekdays'>): string {
+  const unit = FREQUENCY_UNIT_LABEL[recurrence.frequency]
+  const base = `Tous les ${recurrence.interval} ${recurrence.interval > 1 ? unit.plural : unit.singular}`
+  if (recurrence.frequency === 'weekly' && recurrence.weekdays && recurrence.weekdays.length > 0) {
+    const days = [...recurrence.weekdays].sort((a, b) => a - b).map((d) => WEEKDAY_SHORT_LABELS[d]).join(', ')
+    return `${base} (${days})`
+  }
+  return base
+}
+
 export function isValidRecurrence(
   recurrence: Pick<TaskRecurrence, 'frequency' | 'interval' | 'weekdays' | 'end_type' | 'end_date' | 'end_count'>,
 ): boolean {

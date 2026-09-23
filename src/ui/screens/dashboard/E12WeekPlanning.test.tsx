@@ -21,7 +21,7 @@ describe('E12WeekPlanning', () => {
     vi.useRealTimers()
   })
 
-  it('affiche les 7 jours de la semaine avec leurs tâches en icônes (#22)', async () => {
+  it('affiche les 7 jours de la semaine avec le nom des tâches (#9d73bbdc)', async () => {
     const getPlannedTasksForDate = vi.fn(async (d: string) =>
       d === '2026-07-01' ? [makeTask({ id: 't1', title: 'Médecin', icon: 'health', status: 'planned' })] : [],
     )
@@ -40,6 +40,28 @@ describe('E12WeekPlanning', () => {
       expect(screen.getByLabelText(`Tâches du ${d}`)).toBeInTheDocument()
     }
     expect(await screen.findByRole('button', { name: 'Médecin' })).toBeInTheDocument()
+  })
+
+  it('reprend la couleur de la tâche pour teinter sa case (#9d73bbdc)', async () => {
+    const getPlannedTasksForDate = vi.fn(async (d: string) =>
+      d === '2026-07-01'
+        ? [makeTask({ id: 't1', title: 'Médecin', color: '#ee719e', status: 'planned' })]
+        : [],
+    )
+    renderWeek(makeAppContext({ route: WEEK_ROUTE, getPlannedTasksForDate }))
+
+    const chip = await screen.findByRole('button', { name: 'Médecin' })
+    expect(chip.style.background).toContain('#ee719e')
+  })
+
+  it('affiche une case neutre pour une tâche sans couleur (#9d73bbdc)', async () => {
+    const getPlannedTasksForDate = vi.fn(async (d: string) =>
+      d === '2026-07-01' ? [makeTask({ id: 't1', title: 'Médecin', color: null, status: 'planned' })] : [],
+    )
+    renderWeek(makeAppContext({ route: WEEK_ROUTE, getPlannedTasksForDate }))
+
+    const chip = await screen.findByRole('button', { name: 'Médecin' })
+    expect(chip.style.border).toContain('var(--color-border)')
   })
 
   it('encadre la grille de la semaine en contour coloré, sans fond (33 reprise Doc)', async () => {
@@ -97,7 +119,7 @@ describe('E12WeekPlanning', () => {
     expect(screen.queryByRole('button', { name: "Aujourd'hui" })).toBeNull()
   })
 
-  it('ouvre la fiche d’une tâche au clic sur son icône (#22)', async () => {
+  it('ouvre la fiche d’une tâche au clic sur son nom (#22)', async () => {
     const selectTask = vi.fn()
     const goTo = vi.fn()
     const getPlannedTasksForDate = vi.fn(async (d: string) =>

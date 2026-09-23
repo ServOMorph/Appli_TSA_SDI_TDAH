@@ -10,6 +10,8 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 export interface SeriesBatch {
   /** Règle de récurrence à créer (création de série). */
   recurrenceToCreate?: TaskRecurrence
+  /** Règle de récurrence existante à réécrire (modification du motif d'une série). */
+  recurrenceToUpdate?: TaskRecurrence
   /** Tâches à insérer : racine puis occurrences futures. */
   tasksToCreate?: Task[]
   /** Tâches à réécrire (édition de série sur les occurrences ciblées). */
@@ -39,6 +41,7 @@ async function resolveWithChildren(db: AppDatabase, ids: string[]): Promise<stri
 export async function persistSeriesBatch(db: AppDatabase, batch: SeriesBatch): Promise<void> {
   const {
     recurrenceToCreate,
+    recurrenceToUpdate,
     tasksToCreate = [],
     tasksToUpdate = [],
     taskIdsToDelete = [],
@@ -47,6 +50,7 @@ export async function persistSeriesBatch(db: AppDatabase, batch: SeriesBatch): P
 
   await db.transaction('rw', db.tasks, db.taskRecurrences, async () => {
     if (recurrenceToCreate) await db.taskRecurrences.add(recurrenceToCreate)
+    if (recurrenceToUpdate) await db.taskRecurrences.put(recurrenceToUpdate)
     if (tasksToCreate.length) await db.tasks.bulkAdd(tasksToCreate)
     for (const task of tasksToUpdate) await db.tasks.put(task)
 

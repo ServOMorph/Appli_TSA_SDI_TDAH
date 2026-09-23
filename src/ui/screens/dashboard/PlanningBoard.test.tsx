@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor, fireEvent } from '@testing-library/react'
+import { screen, waitFor, fireEvent, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PlanningBoard } from './PlanningBoard'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
@@ -163,6 +163,36 @@ describe('PlanningBoard', () => {
     expect(edge.style.transform).toBe('scale(1)')
   })
 
+  it('recentre le bandeau sur le jour cliqué au lieu de déplacer la case sélectionnée (#6f90c375)', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByLabelText('2026-07-01'))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
+
+    expect(screen.getByLabelText('2026-07-01')).toHaveAttribute('aria-current', 'date')
+    expect(screen.getByLabelText('2026-07-03')).not.toHaveAttribute('aria-hidden')
+    expect(screen.getByLabelText('2026-06-29')).not.toHaveAttribute('aria-hidden')
+  })
+
+  it('garde la case sélectionnée à la même position du bandeau quel que soit le jour cliqué (#6f90c375)', async () => {
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    const strip = screen.getByLabelText('Bandeau des jours de la semaine')
+    const indexBefore = within(strip)
+      .getAllByRole('button')
+      .findIndex((b) => b.getAttribute('aria-current') === 'date')
+
+    await userEvent.click(screen.getByLabelText('2026-07-01'))
+    await waitFor(() => expect(screen.getByLabelText('2026-07-01')).toHaveAttribute('aria-current', 'date'))
+
+    const indexAfter = within(strip)
+      .getAllByRole('button')
+      .findIndex((b) => b.getAttribute('aria-current') === 'date')
+    expect(indexAfter).toBe(indexBefore)
+  })
+
   it('ouvre le planning de la semaine depuis le logo à gauche du mois (#22)', async () => {
     const goTo = vi.fn()
     renderExpanded(makeAppContext({ goTo, getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
@@ -195,6 +225,36 @@ describe('PlanningBoard', () => {
     await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
     expect(screen.getByText('09:00')).toBeInTheDocument()
     expect(screen.getByLabelText('7 énergie')).toBeInTheDocument()
+  })
+
+  it('réserve la place de la colonne énergie même sans coût affiché, pour garder le compteur de sous-étapes aligné (#37f9f912)', async () => {
+    const withEnergy = makeTaskV2({ id: 't1', title: 'Avec énergie', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '09:30', energy_cost: 3 })
+    const withoutEnergy = makeTaskV2({ id: 't2', title: 'Sans énergie', scheduled_date: '2026-06-30', scheduled_start: '10:00', scheduled_end: '10:30', energy_cost: null })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([withEnergy, withoutEnergy]) }))
+    const titleWith = await screen.findByText('Avec énergie')
+    const titleWithout = await screen.findByText('Sans énergie')
+    const headerWith = titleWith.parentElement?.parentElement as HTMLElement
+    const headerWithout = titleWithout.parentElement?.parentElement as HTMLElement
+    expect(headerWithout.children.length).toBe(headerWith.children.length)
+  })
+
+  it('affiche l’énergie totale planifiée du jour, tâches terminées incluses (#8573bf55)', async () => {
+    const active = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '09:30', energy_cost: 3 })
+    const done = makeTaskV2({ id: 't2', scheduled_date: '2026-06-30', scheduled_start: '10:00', scheduled_end: '10:30', energy_cost: 5, status: 'completed' })
+    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([active, done]) }))
+    expect(await screen.findByLabelText('8 énergie planifiée ce jour')).toBeInTheDocument()
+  })
+
+  it('met à jour l’énergie totale planifiée quand le jour affiché change (#8573bf55)', async () => {
+    const getPlannedTasksForDate = vi.fn()
+      .mockResolvedValueOnce([makeTaskV2({ scheduled_date: '2026-06-30', energy_cost: 3 })])
+      .mockResolvedValueOnce([makeTaskV2({ scheduled_date: '2026-07-01', energy_cost: 9 })])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await screen.findByLabelText('3 énergie planifiée ce jour')
+
+    await userEvent.click(screen.getByLabelText('2026-07-01'))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
+    expect(await screen.findByLabelText('9 énergie planifiée ce jour')).toBeInTheDocument()
   })
 
   it('affiche l’heure de début en haut et l’heure de fin en bas de la case (#25)', async () => {

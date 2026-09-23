@@ -83,6 +83,7 @@ export function E123FeedbackList() {
           }}
         />
       )}
+      <Button fullWidth onClick={() => goTo('feedback')}>Nouveau retour</Button>
       {!consentGranted && hasUnsent && (
         <Card>
           <p style={{ margin: 0 }}>Le partage des données est désactivé : vos retours ne peuvent pas être envoyés. Activez-le pour qu’ils partent automatiquement.</p>
@@ -117,7 +118,6 @@ export function E123FeedbackList() {
           )}
         </Card>
       ))}
-      <Button fullWidth onClick={() => goTo('feedback')}>Nouveau retour</Button>
     </main>
   )
 }

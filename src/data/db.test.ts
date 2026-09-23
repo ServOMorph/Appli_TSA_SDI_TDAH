@@ -23,6 +23,7 @@ describe('AppDatabase', () => {
     expect(db.budgetEntries).toBeDefined()
     expect(db.budgetAccounts).toBeDefined()
     expect(db.budgetDeposits).toBeDefined()
+    expect(db.budgetDepositCategories).toBeDefined()
     expect(db.taskRecurrences).toBeDefined()
     expect(db.taskExceptions).toBeDefined()
     expect(db.folders).toBeDefined()
@@ -31,7 +32,7 @@ describe('AppDatabase', () => {
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(24)
+    expect(db.verno).toBe(25)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -211,7 +212,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -295,7 +296,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -334,7 +335,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
 
     const migratedItem = await upgraded.listItems.get('existing-item')
     expect(migratedItem).toMatchObject({ checked: false })
@@ -387,7 +388,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
     expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
 
@@ -433,7 +434,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.budgetCategories.get('income-1')).toBeUndefined()
     expect(await upgraded.budgetCategories.get('expense-1')).toBeDefined()
 
@@ -482,7 +483,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.listItems.get('item-1')).toMatchObject({ description: '' })
     expect(upgraded.listItemSubTasks).toBeDefined()
 
@@ -527,7 +528,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.tools.get('tool-1')).toMatchObject({ color: null })
 
     await upgraded.delete()
@@ -596,7 +597,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.tasks.get('task-today')).toMatchObject({
       status: 'inbox',
       scheduled_date: null,
@@ -638,7 +639,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.users.get('user-1')).toMatchObject({ id: 'user-1' })
     expect(await upgraded.feedbackReports.toArray()).toEqual([])
 
@@ -689,7 +690,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.feedbackReports.get('report-1')).toMatchObject({
       sync_status: 'sent',
       resolution_status: 'open',
@@ -772,7 +773,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.feedbackReports.get('report-open')).toMatchObject({
       resolution_sync_status: 'sent',
       resolution_last_attempt_at: null,
@@ -819,7 +820,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.feedbackMessages.get('from-user')).toMatchObject({ read_at: '2026-09-04T11:00:00.000Z' })
     expect(await upgraded.feedbackMessages.get('from-agent')).toMatchObject({ read_at: null })
 
@@ -871,7 +872,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(await upgraded.feedbackReports.get('written-by-old-client')).toMatchObject({
       resolution_status: 'open',
       validated_at: null,
@@ -908,8 +909,43 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(24)
+    expect(upgraded.verno).toBe(25)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('manualTestResults')
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 24 database by adding livret deposit categories without altering existing deposits', async () => {
+    const name = `migration-v25-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(24).stores({
+      budgetAccounts: 'id',
+      budgetDeposits: 'id, account_id, date',
+      feedbackReports: 'id, created_at, sync_status',
+    })
+    await legacy.open()
+    await legacy.table('budgetAccounts').add({
+      id: 'account-1',
+      name: 'Livret A',
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+    })
+    await legacy.table('budgetDeposits').add({
+      id: 'deposit-existant',
+      account_id: 'account-1',
+      amount: 50,
+      date: '2026-07-21',
+      created_at: '2026-07-21T00:00:00Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(25)
+    expect(upgraded.budgetDepositCategories).toBeDefined()
+    expect(await upgraded.budgetDepositCategories.toArray()).toEqual([])
+    expect(await upgraded.budgetDeposits.get('deposit-existant')).toMatchObject({ amount: 50, account_id: 'account-1' })
 
     await upgraded.delete()
   })

@@ -14,6 +14,7 @@ import {
   getSubTasks,
   getSubTaskCounts,
   getRemainingPlannedCost,
+  getTotalPlannedEnergy,
   sortByPosition,
   nextPosition,
   taskSlotRange,
@@ -232,6 +233,11 @@ describe('taskRules', () => {
       const task = mockTask({ status: 'planned', postponed: true })
       expect(scheduleTask(task, '2026-06-30', '10:00', '11:00', now).postponed).toBe(false)
     })
+
+    it('enregistre la durée déduite du créneau', () => {
+      const scheduled = scheduleTask(mockTask({ status: 'inbox' }), '2026-06-30', '10:00', '11:30', now)
+      expect(scheduled.duration_minutes).toBe(90)
+    })
   })
 
   describe('reportTask', () => {
@@ -310,6 +316,24 @@ describe('taskRules', () => {
 
     it('retourne 0 pour une liste vide', () => {
       expect(getRemainingPlannedCost([])).toBe(0)
+    })
+  })
+
+  describe('getTotalPlannedEnergy (#8573bf55)', () => {
+    it('somme le coût des tâches terminées et non terminées', () => {
+      const tasks = [
+        mockTask({ status: 'planned', energy_cost: 3 }),
+        mockTask({ status: 'completed', energy_cost: 5 }),
+      ]
+      expect(getTotalPlannedEnergy(tasks)).toBe(8)
+    })
+
+    it('traite un coût absent comme 0', () => {
+      expect(getTotalPlannedEnergy([mockTask({ energy_cost: null }), mockTask({ energy_cost: 4 })])).toBe(4)
+    })
+
+    it('retourne 0 pour une liste vide', () => {
+      expect(getTotalPlannedEnergy([])).toBe(0)
     })
   })
 

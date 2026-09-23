@@ -36,11 +36,11 @@ describe('E21CreateTaskV2', () => {
     expect(ctx.createDetailedTask).not.toHaveBeenCalled()
   })
 
-  it('Annuler navigue vers inbox', async () => {
+  it('Annuler suit l’origine, comme Retour (#a89bf7a0)', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
-    expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+    expect(ctx.back).toHaveBeenCalledWith('inbox')
   })
 
   it('Retour navigue vers inbox sans écran d’origine', async () => {
@@ -189,14 +189,33 @@ describe('E21CreateTaskV2', () => {
     expect(screen.queryByText('Étape 1')).toBeNull()
   })
 
-  it('transmet les sous-tâches créées à addSubTask après la création de la tâche', async () => {
+  it('transmet les sous-tâches créées à createDetailedTask', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche avec sous-tâches')
     await userEvent.type(screen.getByLabelText('Nouvelle sous-tâche'), 'Étape 1')
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
-    expect(ctx.addSubTask).toHaveBeenCalledWith('task-1', 'Étape 1')
+    expect(ctx.createDetailedTask).toHaveBeenCalledWith(
+      expect.objectContaining({ subTaskTitles: ['Étape 1'] }),
+    )
+  })
+
+  it('affiche le libellé français de l\'icône choisie plutôt que son identifiant technique (#47db30e8)', async () => {
+    renderWithApp(<E21CreateTaskV2 />)
+    await userEvent.click(screen.getByRole('button', { name: 'Modifier Icône' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Repas' }))
+    expect(screen.getByText('Repas')).toBeDefined()
+    expect(screen.queryByText('meal')).toBeNull()
+  })
+
+  it('affiche le nom de la catégorie associée à la couleur plutôt que le code hexadécimal (#7e1383fe)', async () => {
+    const category: TaskCategory = { id: 'cat-1', name: 'Repas', color: '#ee719e', position: 0, created_at: '2026-09-05T00:00:00Z' }
+    renderWithApp(<E21CreateTaskV2 />, makeAppContext({ taskCategories: [category] }))
+    await userEvent.click(screen.getByRole('button', { name: 'Modifier Couleur' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Repas' }))
+    expect(screen.getByText('Repas')).toBeDefined()
+    expect(screen.queryByText('#ee719e')).toBeNull()
   })
 
   it('transmet le coût en énergie choisi à createDetailedTask', async () => {

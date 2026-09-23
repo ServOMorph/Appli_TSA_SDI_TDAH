@@ -5,6 +5,7 @@ import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import {
   getAccountBalance,
+  getDepositCategoryBalance,
   getGaugeLevel,
   getGaugeRatio,
   getMonComptePrevisions,
@@ -177,6 +178,25 @@ describe('budgetRules', () => {
         deposit({ id: 'other', account_id: 'livret-jeune', amount: 30 }),
       ]
       expect(getAccountBalance(deposits, 'livret-a')).toBe(150)
+    })
+
+    it('somme les mouvements d’une sous-catégorie de livret, en ignorant les autres (#a1317d93)', () => {
+      const deposits = [
+        deposit({ id: 'd1', category_id: 'vacances', amount: 100 }),
+        deposit({ id: 'd2', category_id: 'vacances', amount: 40 }),
+        deposit({ id: 'd3', category_id: 'projets', amount: 25 }),
+        deposit({ id: 'd4', amount: 10 }),
+      ]
+      expect(getDepositCategoryBalance(deposits, 'vacances')).toBe(140)
+    })
+
+    it('le total du livret reste la somme de tous les mouvements, catégorisés ou non (#a1317d93)', () => {
+      const deposits = [
+        deposit({ id: 'd1', category_id: 'vacances', amount: 100 }),
+        deposit({ id: 'd2', category_id: 'projets', amount: 25 }),
+        deposit({ id: 'd3', amount: 10 }),
+      ]
+      expect(getAccountBalance(deposits, 'livret-a')).toBe(135)
     })
   })
 

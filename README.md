@@ -16,6 +16,16 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 24 septembre 2026, la feuille de route de l'outil « Routine » (ouverte le 23 septembre) est
+achevée et validée : une routine se crée avec ses étapes ordonnées, se planifie sur les jours de la
+semaine avec un horaire propre à chacun, apparaît dans le planning et se coche automatiquement une
+fois toutes ses étapes faites, et s'ouvre dans un écran plein écran dédié pour cocher ses étapes au
+jour le jour, avec des sous-tâches dépliables. Les étapes d'un seul jour peuvent aussi être
+modifiées sans toucher aux autres jours planifiés. Le réordonnancement des étapes, d'abord prévu
+avec des boutons monter/descendre, se fait finalement par glisser-déposer, sur demande explicite
+après un premier essai. Validée en conditions réelles sur téléphone, via un accès temporaire au
+serveur de test depuis le réseau local. Reste à faire, hors code : mise en ligne.
+
 Le 23 septembre 2026, les 19 retours signalés par Marie dans l'application ont été traités par lots
 via la nouvelle commande `/traiter_retours` : 16 sont corrigés, avec une réponse déposée dans le fil
 de discussion de chacun (les sous-tâches d'une tâche répétée apparaissent maintenant sur tous les

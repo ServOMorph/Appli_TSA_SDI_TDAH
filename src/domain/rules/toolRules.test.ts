@@ -10,6 +10,7 @@ describe('createTool', () => {
       type: 'liste',
       folder_id: null,
       list_id: 'list-1',
+      routine_id: null,
       position: 0,
       color: null,
       created_at: now,
@@ -28,5 +29,12 @@ describe('createTool', () => {
     const now = '2026-08-18T10:00:00.000Z'
     const tool = createTool('tool-3', 'liste', null, 'list-1', 0, now, '#ff8800')
     expect(tool.color).toBe('#ff8800')
+  })
+
+  it('accepte un routine_id optionnel (ex. routine)', () => {
+    const now = '2026-09-23T10:00:00.000Z'
+    const tool = createTool('tool-4', 'routine', 'folder-1', null, 0, now, null, 'routine-1')
+    expect(tool.routine_id).toBe('routine-1')
+    expect(tool.list_id).toBeNull()
   })
 })

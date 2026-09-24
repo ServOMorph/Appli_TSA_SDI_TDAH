@@ -2,6 +2,7 @@ import type { Task } from '@/domain/entities/task'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { PlannedSubTask } from '@/app/contexts/usePlanningState'
+import type { PlannedRoutineOccurrence } from '@/app/contexts/useRoutineState'
 
 const FIXED_DATE = '2026-06-24T00:00:00Z'
 
@@ -70,6 +71,20 @@ export function makePlannedSubTask(overrides: Partial<PlannedSubTask> = {}): Pla
   return {
     ...makeSubTask({ id: 'sub-1', parent_id: 'parent-1', title: 'Ranger le bureau' }),
     parentTitle: 'Rangement',
+    ...overrides,
+  }
+}
+
+export function makePlannedRoutineOccurrence(
+  overrides: Partial<PlannedRoutineOccurrence> = {},
+): PlannedRoutineOccurrence {
+  return {
+    scheduleId: 'schedule-1',
+    routineId: 'routine-1',
+    routineName: 'Routine du matin',
+    color: null,
+    time: '08:00',
+    completed: false,
     ...overrides,
   }
 }

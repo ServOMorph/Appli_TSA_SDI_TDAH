@@ -106,6 +106,26 @@ seulement dans le total du livret.
 
 Le bouton « Nouveau retour » est remonté en haut de l'écran.
 
+## Nouvel outil « Routine »
+
+Un nouvel outil « Routine » est disponible depuis l'accueil (bouton « Ajouter un outil »). Vous
+pouvez créer une routine (par exemple « Routine du matin »), lui donner un nom, une couleur, puis
+lui ajouter des étapes dans l'ordre que vous voulez (avec une durée optionnelle pour chacune).
+
+Vous planifiez ensuite la routine sur les jours de la semaine de votre choix, chacun avec son
+propre horaire (un pavé numérique permet de saisir l'heure). Les jours planifiés apparaissent alors
+dans votre planning, avec le nom de la routine et son horaire.
+
+En touchant la routine dans le planning, un écran plein écran s'ouvre avec la liste de ses étapes
+pour ce jour-là : cochez-les une par une. Une étape peut aussi être dépliée pour lui ajouter des
+sous-tâches, comme pour une tâche classique. Une fois toutes les étapes cochées, la routine
+apparaît comme terminée dans le planning.
+
+Vous pouvez aussi modifier les étapes d'un seul jour en particulier, sans toucher aux autres jours :
+depuis cet écran plein écran, le bouton « Modifier ce jour » permet de changer, ajouter, supprimer
+ou réordonner (par glisser-déposer) les étapes propres à ce jour-là uniquement. Un bouton « Revenir
+à la version commune » annule ce changement et remet les étapes habituelles.
+
 ## Adresse de l'application changée
 
 L'adresse a changé : `https://appli-marie.netlify.app/`. Mettez à jour le raccourci sur votre écran d'accueil avec cette nouvelle adresse ; l'ancienne ne fonctionnera plus.

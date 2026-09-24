@@ -3,7 +3,7 @@ import { screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { E12WeekPlanning } from './E12WeekPlanning'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
-import { makeTask } from '@/test/factories'
+import { makeTask, makePlannedRoutineOccurrence } from '@/test/factories'
 import type { Route } from '@/app/AppContext'
 
 // 2026-06-30 est un mardi ; sa semaine va du lundi 2026-06-29 au dimanche 2026-07-05.
@@ -149,5 +149,35 @@ describe('E12WeekPlanning', () => {
     renderWeek(makeAppContext({ route: WEEK_ROUTE, back, getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await userEvent.click(await screen.findByRole('button', { name: 'Retour' }))
     expect(back).toHaveBeenCalledWith('dashboard')
+  })
+
+  it('affiche une routine planifiée sur son jour', async () => {
+    const getPlannedRoutinesForDate = vi.fn(async (d: string) =>
+      d === '2026-07-01' ? [makePlannedRoutineOccurrence({ routineName: 'Routine du matin' })] : [],
+    )
+    renderWeek(makeAppContext({
+      route: WEEK_ROUTE,
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate,
+    }))
+    expect(await screen.findByRole('button', { name: 'routine « Routine du matin »' })).toBeInTheDocument()
+  })
+
+  it('ouvre la fiche d’une routine au clic sur sa case', async () => {
+    const selectRoutine = vi.fn()
+    const goTo = vi.fn()
+    const getPlannedRoutinesForDate = vi.fn(async (d: string) =>
+      d === '2026-06-30' ? [makePlannedRoutineOccurrence({ routineId: 'routine-9', routineName: 'Routine du matin' })] : [],
+    )
+    renderWeek(makeAppContext({
+      route: WEEK_ROUTE,
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate,
+      selectRoutine,
+      goTo,
+    }))
+    await userEvent.click(await screen.findByRole('button', { name: 'routine « Routine du matin »' }))
+    expect(selectRoutine).toHaveBeenCalledWith('routine-9')
+    expect(goTo).toHaveBeenCalledWith({ name: 'routine-steps', date: '2026-06-30' })
   })
 })

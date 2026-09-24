@@ -5,13 +5,14 @@ export interface Tool {
   type: ToolType
   folder_id: string | null
   list_id: string | null
+  routine_id: string | null
   position: number
   color?: string | null
   created_at: string
   updated_at: string
 }
 
-export const IMPLEMENTED_TOOL_TYPES: ToolType[] = ['liste', 'tableau_comptage']
+export const IMPLEMENTED_TOOL_TYPES: ToolType[] = ['liste', 'tableau_comptage', 'routine']
 
 export const TOOL_TYPE_LABELS: Record<ToolType, string> = {
   liste: 'Liste',

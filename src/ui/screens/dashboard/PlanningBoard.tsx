@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { Task } from '@/domain/entities/task'
-import type { PlannedSubTask } from '@/app/AppContext'
+import type { PlannedSubTask, PlannedRoutineOccurrence } from '@/app/AppContext'
 import { BatteryCost } from '@/ui/components/BatteryCost'
 import { BatteryIcon } from '@/ui/components/BatteryIcon'
 import { TaskIcon } from '@/ui/components/TaskIcon'
+import { RoutineIcon } from '@/ui/components/RoutineIcon'
 import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import { isCompleted, getTotalPlannedEnergy } from '@/domain/rules/taskRules'
@@ -33,9 +34,22 @@ function stripShiftTransform(shiftNumerator: number, dragPx: number): string {
 type PlanBlock =
   | { kind: 'task'; item: Task }
   | { kind: 'subtask'; item: PlannedSubTask }
+  | { kind: 'routine'; item: PlannedRoutineOccurrence }
+
+function blockId(block: PlanBlock): string {
+  return block.kind === 'routine' ? block.item.scheduleId : block.item.id
+}
+
+function blockStart(block: PlanBlock): string | null {
+  return block.kind === 'routine' ? block.item.time : block.item.scheduled_start
+}
+
+function blockEnd(block: PlanBlock): string | null {
+  return block.kind === 'routine' ? null : block.item.scheduled_end
+}
 
 function blockCompleted(block: PlanBlock): boolean {
-  return isCompleted(block.item)
+  return block.kind === 'routine' ? block.item.completed : isCompleted(block.item)
 }
 
 function blockEssential(block: PlanBlock): boolean {
@@ -43,17 +57,19 @@ function blockEssential(block: PlanBlock): boolean {
 }
 
 function blockPostponed(block: PlanBlock): boolean {
-  return !!block.item.postponed
+  return block.kind !== 'routine' && !!block.item.postponed
 }
 
 function blockDisplayTitle(block: PlanBlock): string {
-  return block.kind === 'subtask' ? `${block.item.parentTitle} - ${block.item.title}` : block.item.title
+  if (block.kind === 'subtask') return `${block.item.parentTitle} - ${block.item.title}`
+  if (block.kind === 'routine') return `routine « ${block.item.routineName} »`
+  return block.item.title
 }
 
 function sortBlocks(blocks: PlanBlock[]): PlanBlock[] {
   return [...blocks].sort((a, b) => {
-    const as = a.item.scheduled_start
-    const bs = b.item.scheduled_start
+    const as = blockStart(a)
+    const bs = blockStart(b)
     if (as === bs) return 0
     if (!as) return -1
     if (!bs) return 1
@@ -234,7 +250,8 @@ const todayBtnStyle: React.CSSProperties = {
 }
 
 function rowTintStyle(block: PlanBlock, ambianceColor: string): React.CSSProperties {
-  return plannedTaskTintStyle(blockCompleted(block), block.kind === 'task' ? block.item.color : ambianceColor)
+  const color = block.kind === 'task' || block.kind === 'routine' ? block.item.color : ambianceColor
+  return plannedTaskTintStyle(blockCompleted(block), color)
 }
 
 const timeColStyle: React.CSSProperties = {
@@ -354,6 +371,7 @@ export function PlanningBoard() {
   const {
     getPlannedTasksForDate,
     getPlannedSubTasksForDate,
+    getPlannedRoutinesForDate,
     completeTaskById,
     reportTaskById,
     toggleSubTask,
@@ -362,6 +380,7 @@ export function PlanningBoard() {
     overloadMode,
     settings,
     selectTask,
+    selectRoutine,
     goTo,
     route,
     replace,
@@ -374,6 +393,7 @@ export function PlanningBoard() {
   )
   const [scheduledTasks, setScheduledTasks] = useState<Task[]>([])
   const [scheduledSubTasks, setScheduledSubTasks] = useState<PlannedSubTask[]>([])
+  const [scheduledRoutines, setScheduledRoutines] = useState<PlannedRoutineOccurrence[]>([])
   const [subTasksByTask, setSubTasksByTask] = useState<Record<string, Task[]>>({})
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
@@ -406,9 +426,14 @@ export function PlanningBoard() {
 
   async function reload() {
     const date = displayDateRef.current
-    const [tasks, subs] = await Promise.all([getPlannedTasksForDate(date), getPlannedSubTasksForDate(date)])
+    const [tasks, subs, routines] = await Promise.all([
+      getPlannedTasksForDate(date),
+      getPlannedSubTasksForDate(date),
+      getPlannedRoutinesForDate(date),
+    ])
     setScheduledTasks(tasks)
     setScheduledSubTasks(subs)
+    setScheduledRoutines(routines)
     const children = await Promise.all(tasks.map((t) => getSubTasks(t.id)))
     const map: Record<string, Task[]> = {}
     tasks.forEach((t, i) => {
@@ -433,7 +458,7 @@ export function PlanningBoard() {
 
   async function handleComplete(block: PlanBlock) {
     if (block.kind === 'task') await completeTaskById(block.item.id)
-    else await toggleSubTask(block.item)
+    else if (block.kind === 'subtask') await toggleSubTask(block.item)
     await reload()
   }
 
@@ -445,12 +470,18 @@ export function PlanningBoard() {
   }
 
   async function handleReport(block: PlanBlock) {
+    if (block.kind === 'routine') return
     const target = addDays(displayDateRef.current, 1)
     const start = block.item.scheduled_start ?? '09:00'
     const end = block.item.scheduled_end ?? start
     if (block.kind === 'task') await reportTaskById(block.item.id, target, start, end)
     else await reportSubTask(block.item.id, target, start, end)
     await reload()
+  }
+
+  function openRoutineSteps(routineId: string) {
+    selectRoutine(routineId)
+    goTo({ name: 'routine-steps', date: displayDateRef.current })
   }
 
   function openDetail(taskId: string) {
@@ -501,8 +532,11 @@ export function PlanningBoard() {
   const blocks: PlanBlock[] = sortBlocks([
     ...scheduledTasks.map((t): PlanBlock => ({ kind: 'task', item: t })),
     ...scheduledSubTasks.map((s): PlanBlock => ({ kind: 'subtask', item: s })),
+    ...scheduledRoutines.map((r): PlanBlock => ({ kind: 'routine', item: r })),
   ])
-  const totalEnergy = getTotalPlannedEnergy(blocks.map((b) => b.item))
+  const totalEnergy = getTotalPlannedEnergy(
+    blocks.filter((b): b is Extract<PlanBlock, { kind: 'task' | 'subtask' }> => b.kind !== 'routine').map((b) => b.item),
+  )
 
   const displayDateObj = new Date(displayDate + 'T12:00:00')
 
@@ -603,42 +637,44 @@ export function PlanningBoard() {
 
         {blocks.map((block) => {
           const completed = blockCompleted(block)
-          const canPostpone = isToday && overloadMode && !blockEssential(block) && !completed
+          const canPostpone = block.kind !== 'routine' && isToday && overloadMode && !blockEssential(block) && !completed
           const subs = block.kind === 'task' ? (subTasksByTask[block.item.id] ?? []) : []
           const hasSubs = subs.length > 0
           const done = subs.filter(isCompleted).length
-          const expanded = expandedIds.has(block.item.id)
+          const id = blockId(block)
+          const expanded = expandedIds.has(id)
           const tint = rowTintStyle(block, ambianceColor)
+          const start = blockStart(block)
+          const end = blockEnd(block)
+          const openBlock = () =>
+            block.kind === 'routine' ? openRoutineSteps(block.item.routineId) : openDetail(block.item.id)
 
           return (
-            <div key={`${block.kind}-${block.item.id}`} style={rowContainerStyle(tint)}>
+            <div key={`${block.kind}-${id}`} style={rowContainerStyle(tint)}>
               <span style={timeColStyle}>
-                <span>{block.item.scheduled_start ?? 'Sans horaire'}</span>
-                {block.item.scheduled_start &&
-                  block.item.scheduled_end &&
-                  block.item.scheduled_end !== block.item.scheduled_start && (
-                    <span style={endTimeStyle}>{block.item.scheduled_end}</span>
-                  )}
+                <span>{start ?? 'Sans horaire'}</span>
+                {start && end && end !== start && <span style={endTimeStyle}>{end}</span>}
               </span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   role="button"
                   tabIndex={0}
                   style={{
-                    ...rowStyle(block.item.duration_minutes),
+                    ...rowStyle(block.kind === 'routine' ? null : block.item.duration_minutes),
                     color: tint.color,
                     textDecoration: tint.textDecoration,
                   }}
-                  onClick={() => openDetail(block.item.id)}
+                  onClick={openBlock}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault()
-                      openDetail(block.item.id)
+                      openBlock()
                     }
                   }}
                 >
                   <div style={rowHeaderStyle}>
                     {block.kind === 'task' && block.item.icon && <TaskIcon icon={block.item.icon} size={18} />}
+                    {block.kind === 'routine' && <RoutineIcon size={18} />}
                     <span style={titleColStyle}>
                       <span style={titleTextStyle}>{blockDisplayTitle(block)}</span>
                       {blockPostponed(block) && <span style={REPORTED_BADGE_STYLE}>Reporté</span>}
@@ -651,23 +687,35 @@ export function PlanningBoard() {
                         style={expandBtnStyle}
                         onClick={(event) => {
                           event.stopPropagation()
-                          toggleExpand(block.item.id)
+                          toggleExpand(id)
                         }}
                       >
                         {done}/{subs.length} {expanded ? '▾' : '▸'}
                       </span>
                     )}
                     <span style={energyColStyle}>
-                      {block.item.energy_cost != null && <BatteryCost cost={block.item.energy_cost} />}
+                      {block.kind !== 'routine' && block.item.energy_cost != null && (
+                        <BatteryCost cost={block.item.energy_cost} />
+                      )}
                     </span>
-                    <input
-                      type="checkbox"
-                      checked={completed}
-                      onClick={(event) => event.stopPropagation()}
-                      onChange={() => handleComplete(block)}
-                      aria-label={`Terminer ${blockDisplayTitle(block)}`}
-                      style={taskCheckboxStyle}
-                    />
+                    {block.kind === 'routine' ? (
+                      <input
+                        type="checkbox"
+                        checked={completed}
+                        disabled
+                        aria-label={`${blockDisplayTitle(block)}, ${completed ? 'terminée' : 'non terminée'}`}
+                        style={taskCheckboxStyle}
+                      />
+                    ) : (
+                      <input
+                        type="checkbox"
+                        checked={completed}
+                        onClick={(event) => event.stopPropagation()}
+                        onChange={() => handleComplete(block)}
+                        aria-label={`Terminer ${blockDisplayTitle(block)}`}
+                        style={taskCheckboxStyle}
+                      />
+                    )}
                     {canPostpone && (
                       <button
                         onClick={(event) => {
@@ -693,7 +741,7 @@ export function PlanningBoard() {
                           <input
                             type="checkbox"
                             checked={isCompleted(st)}
-                            onChange={() => handleToggleSubTaskRow(block.item.id, st)}
+                            onChange={() => handleToggleSubTaskRow(id, st)}
                             aria-label={`Terminer ${st.title}`}
                             style={taskCheckboxStyle}
                           />

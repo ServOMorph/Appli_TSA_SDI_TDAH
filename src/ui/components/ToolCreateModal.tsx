@@ -60,11 +60,12 @@ interface ToolCreateModalProps {
   folderId: string | null
   onClose: () => void
   onListCreated: (listId: string) => void
+  onRoutineCreated: (routineId: string) => void
 }
 
-export function ToolCreateModal({ folderId, onClose, onListCreated }: ToolCreateModalProps) {
-  const { createToolList, createListCategory } = useApp()
-  const [mode, setMode] = useState<'choice' | 'new-list'>('choice')
+export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCreated }: ToolCreateModalProps) {
+  const { createToolList, createListCategory, createToolRoutine } = useApp()
+  const [mode, setMode] = useState<'choice' | 'new-list' | 'new-routine'>('choice')
   const [name, setName] = useState('')
   const [categories, setCategories] = useState<string[]>([])
   const [categoryInput, setCategoryInput] = useState('')
@@ -93,6 +94,15 @@ export function ToolCreateModal({ folderId, onClose, onListCreated }: ToolCreate
     onListCreated(listId)
   }
 
+  async function handleCreateRoutine() {
+    const trimmed = name.trim()
+    if (!trimmed) return
+    setSubmitting(true)
+    const routineId = await createToolRoutine(trimmed, folderId)
+    setSubmitting(false)
+    onRoutineCreated(routineId)
+  }
+
   return (
     <div style={overlayStyle} role="dialog" aria-label="Ajouter un outil">
       <div style={boxStyle}>
@@ -101,6 +111,9 @@ export function ToolCreateModal({ folderId, onClose, onListCreated }: ToolCreate
             <h2 style={{ margin: 0, fontSize: '1.1rem' }}>Ajouter</h2>
             <Button fullWidth onClick={() => setMode('new-list')}>
               Nouvelle liste
+            </Button>
+            <Button fullWidth onClick={() => setMode('new-routine')}>
+              Nouvelle routine
             </Button>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
               {toolTypeOrder
@@ -167,6 +180,30 @@ export function ToolCreateModal({ folderId, onClose, onListCreated }: ToolCreate
 
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
               <Button fullWidth disabled={!name.trim() || categories.length === 0 || submitting} onClick={handleCreateList}>
+                Créer
+              </Button>
+              <Button fullWidth variant="secondary" onClick={onClose}>
+                Annuler
+              </Button>
+            </div>
+          </>
+        )}
+
+        {mode === 'new-routine' && (
+          <>
+            <label htmlFor="new-tool-routine-name" style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+              Nom de la routine
+            </label>
+            <input
+              id="new-tool-routine-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+              style={inputStyle}
+            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <Button fullWidth disabled={!name.trim() || submitting} onClick={handleCreateRoutine}>
                 Créer
               </Button>
               <Button fullWidth variant="secondary" onClick={onClose}>

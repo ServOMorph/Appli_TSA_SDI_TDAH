@@ -69,7 +69,7 @@ function SettingsPanel() {
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, tasks: {} })}>
         Importer tableau invalide
       </button>
-      <button onClick={() => runImport({ version: '3.8', user: { id: 'u1', profile_type: 'student' } })}>
+      <button onClick={() => runImport({ version: '3.9', user: { id: 'u1', profile_type: 'student' } })}>
         Importer version future
       </button>
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, tasks: [{ id: 'task-1', parent_id: 'inconnue' }] })}>
@@ -77,6 +77,21 @@ function SettingsPanel() {
       </button>
       <button onClick={() => runImport({ user: { id: 'u-import', profile_type: 'student' }, tasks: [{ id: 'task-import' }] })}>
         Importer avec tâche
+      </button>
+      <button
+        onClick={() =>
+          runImport({
+            user: { id: 'u-routine', profile_type: 'student' },
+            routines: [{ id: 'routine-1', name: 'Routine du matin', color: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
+            routine_steps: [{ id: 'step-1', routine_id: 'routine-1', title: 'Se brosser les dents', position: 0, duration_minutes: 5, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
+            tools: [{ id: 'tool-routine-1', type: 'routine', folder_id: null, list_id: null, routine_id: 'routine-1', position: 0, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
+          })
+        }
+      >
+        Importer avec routine
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, routine_steps: [{ id: 'step-orphelin', routine_id: 'inconnue' }] })}>
+        Importer étape de routine orpheline
       </button>
     </>
   )
@@ -93,6 +108,8 @@ function readBlob(blob: Blob): Promise<string> {
 
 afterEach(async () => {
   await db.budgetIncomeEntries.clear()
+  await db.routines.clear()
+  await db.routineSteps.clear()
   syncNowMock.mockClear()
 })
 
@@ -142,6 +159,7 @@ describe('useSettingsState — export/import', () => {
       ['Importer tableau invalide', 'tasks doit être une liste'],
       ['Importer référence orpheline', 'référence tâche parente orpheline'],
       ['Importer version future', 'version d’export plus récente'],
+      ['Importer étape de routine orpheline', 'référence routine orpheline'],
     ] as const
 
     for (const [button, error] of cases) {
@@ -204,7 +222,7 @@ describe('useSettingsState — export/import', () => {
     })
 
     const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
-    expect(payload.version).toBe('3.7')
+    expect(payload.version).toBe('3.8')
     expect(payload.manual_test_results).toBeUndefined()
     expect(payload.budget_income_entries).toEqual([
       { id: 'income-1', amount: 1500, label: 'Salaire', date: '2026-08-24', created_at: '2026-08-24T09:00:00.000Z' },
@@ -212,6 +230,49 @@ describe('useSettingsState — export/import', () => {
 
     clickSpy.mockRestore()
     vi.unstubAllGlobals()
+  })
+
+  it('exporte les routines et leurs étapes', async () => {
+    const createObjectURL = vi.fn().mockReturnValue('blob:test')
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL: vi.fn() })
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    await db.routines.add({ id: 'routine-export', name: 'Routine du soir', color: '#ff8800', created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineSteps.add({ id: 'step-export', routine_id: 'routine-export', title: 'Pyjama', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Exporter' }))
+    })
+
+    const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
+    expect(payload.routines).toEqual([
+      { id: 'routine-export', name: 'Routine du soir', color: '#ff8800', created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' },
+    ])
+    expect(payload.routine_steps).toEqual([
+      { id: 'step-export', routine_id: 'routine-export', title: 'Pyjama', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' },
+    ])
+
+    clickSpy.mockRestore()
+    vi.unstubAllGlobals()
+  })
+
+  it('importe une routine, ses étapes et l’outil qui la référence', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer avec routine' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(await db.routines.toArray()).toEqual([
+      { id: 'routine-1', name: 'Routine du matin', color: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' },
+    ])
+    const steps = await db.routineSteps.toArray()
+    expect(steps).toHaveLength(1)
+    expect(steps[0]).toMatchObject({ id: 'step-1', routine_id: 'routine-1', title: 'Se brosser les dents' })
+    expect(steps[0].weekday).toBeNull()
+    const tools = await toolRepo.getAll()
+    expect(tools.some((t) => t.type === 'routine' && t.routine_id === 'routine-1')).toBe(true)
   })
 
   it('recrée l’entrée Outil Budget manquante à l’import', async () => {

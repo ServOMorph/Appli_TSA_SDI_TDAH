@@ -30,6 +30,8 @@ const ROUTES: Route[] = [
   { name: 'list-item-detail' },
   { name: 'tools' },
   { name: 'folder-detail' },
+  { name: 'routine-detail' },
+  { name: 'routine-steps' },
   { name: 'budget' },
   { name: 'budget-account' },
   { name: 'budget-previsions' },

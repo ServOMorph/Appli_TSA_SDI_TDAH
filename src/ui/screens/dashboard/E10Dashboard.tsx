@@ -36,7 +36,9 @@ export function E10Dashboard() {
     folders,
     tools,
     lists,
+    routines,
     selectList,
+    selectRoutine,
     settings,
   } = useApp()
   const [showCreateTool, setShowCreateTool] = useState(false)
@@ -64,6 +66,9 @@ export function E10Dashboard() {
     } else if (tool.type === 'liste' && tool.list_id) {
       selectList(tool.list_id)
       goTo('list-detail')
+    } else if (tool.type === 'routine' && tool.routine_id) {
+      selectRoutine(tool.routine_id)
+      goTo('routine-detail')
     }
   }
 
@@ -71,6 +76,12 @@ export function E10Dashboard() {
     setShowCreateTool(false)
     selectList(listId)
     goTo('list-detail')
+  }
+
+  function handleToolRoutineCreated(routineId: string) {
+    setShowCreateTool(false)
+    selectRoutine(routineId)
+    goTo('routine-detail')
   }
 
   return (
@@ -153,13 +164,15 @@ export function E10Dashboard() {
           ))}
           {rootTools.map((tool) => {
             const list = tool.list_id ? lists.find((l) => l.id === tool.list_id) : undefined
+            const routine = tool.routine_id ? routines.find((r) => r.id === tool.routine_id) : undefined
+            const accentColor = tool.type === 'routine' ? routine?.color : tool.color
             return (
               <Card
                 key={tool.id}
-                style={tool.color ? outlineOnlyStyle(tool.color) : undefined}
+                style={accentColor ? outlineOnlyStyle(accentColor) : undefined}
               >
                 <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
-                  {toolLabel(tool, list?.name)}
+                  {toolLabel(tool, list?.name, routine?.name)}
                 </button>
               </Card>
             )
@@ -172,6 +185,7 @@ export function E10Dashboard() {
           folderId={null}
           onClose={() => setShowCreateTool(false)}
           onListCreated={handleToolListCreated}
+          onRoutineCreated={handleToolRoutineCreated}
         />
       )}
 

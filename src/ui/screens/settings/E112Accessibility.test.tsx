@@ -16,7 +16,7 @@ const defaultSettings: Settings = {
 }
 
 const defaultTool: Tool = {
-  id: 'tool-1', type: 'liste', folder_id: null, list_id: 'list-1', position: 0,
+  id: 'tool-1', type: 'liste', folder_id: null, list_id: 'list-1', routine_id: null, position: 0,
   created_at: '2026-08-25T00:00:00.000Z', updated_at: '2026-08-25T00:00:00.000Z',
 }
 

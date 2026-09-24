@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { Task } from '@/domain/entities/task'
+import type { PlannedRoutineOccurrence } from '@/app/AppContext'
 import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
+import { RoutineIcon } from '@/ui/components/RoutineIcon'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle, pastelBackground } from '@/ui/styles/ambiance'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, weekStrip } from '@/domain/rules/planningSlotRules'
 
@@ -152,13 +154,14 @@ function taskChipStyle(color: string | null): React.CSSProperties {
 }
 
 export function E12WeekPlanning() {
-  const { getPlannedTasksForDate, selectTask, goTo, back, route, settings } = useApp()
+  const { getPlannedTasksForDate, getPlannedRoutinesForDate, selectTask, selectRoutine, goTo, back, route, settings } = useApp()
   const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
 
   const [anchorDate, setAnchorDate] = useState(() =>
     route.name === 'planning' && route.date ? route.date : todayStr(),
   )
   const [tasksByDate, setTasksByDate] = useState<Record<string, Task[]>>({})
+  const [routinesByDate, setRoutinesByDate] = useState<Record<string, PlannedRoutineOccurrence[]>>({})
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
 
   const touchStartX = useRef<number | null>(null)
@@ -173,13 +176,19 @@ export function E12WeekPlanning() {
     let cancelled = false
     async function load() {
       const days = weekStrip(anchorDate)
-      const lists = await Promise.all(days.map((d) => getPlannedTasksForDate(d)))
+      const [taskLists, routineLists] = await Promise.all([
+        Promise.all(days.map((d) => getPlannedTasksForDate(d))),
+        Promise.all(days.map((d) => getPlannedRoutinesForDate(d))),
+      ])
       if (cancelled) return
-      const map: Record<string, Task[]> = {}
+      const taskMap: Record<string, Task[]> = {}
+      const routineMap: Record<string, PlannedRoutineOccurrence[]> = {}
       days.forEach((d, i) => {
-        map[d] = lists[i]
+        taskMap[d] = taskLists[i]
+        routineMap[d] = routineLists[i]
       })
-      setTasksByDate(map)
+      setTasksByDate(taskMap)
+      setRoutinesByDate(routineMap)
     }
     load()
     return () => {
@@ -217,6 +226,11 @@ export function E12WeekPlanning() {
   function openTask(taskId: string) {
     selectTask(taskId)
     goTo('task-detail')
+  }
+
+  function openRoutine(routineId: string, date: string) {
+    selectRoutine(routineId)
+    goTo({ name: 'routine-steps', date })
   }
 
   return (
@@ -266,6 +280,7 @@ export function E12WeekPlanning() {
               const badge = formatDayBadge(d)
               const isToday = d === today
               const dayTasks = tasksByDate[d] ?? []
+              const dayRoutines = routinesByDate[d] ?? []
               return (
                 <div key={d} style={dayColumnStyle(i)}>
                   <div style={dayHeaderStyle(isToday)}>
@@ -280,6 +295,16 @@ export function E12WeekPlanning() {
                         onClick={() => openTask(task.id)}
                       >
                         {task.title}
+                      </button>
+                    ))}
+                    {dayRoutines.map((routine) => (
+                      <button
+                        key={routine.scheduleId}
+                        style={taskChipStyle(routine.color)}
+                        onClick={() => openRoutine(routine.routineId, d)}
+                      >
+                        <RoutineIcon size={12} />
+                        {`routine « ${routine.routineName} »`}
                       </button>
                     ))}
                   </div>

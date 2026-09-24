@@ -16,7 +16,7 @@ const pageStyle: React.CSSProperties = {
 }
 
 export function E72FolderDetail() {
-  const { route, goTo, back, folders, tools, selectList } = useApp()
+  const { route, goTo, back, folders, tools, selectList, selectRoutine } = useApp()
   const folderId = route.name === 'folder-detail' ? (route.folderId ?? null) : null
   const folder = folders.find((f) => f.id === folderId) ?? null
   const [showCreate, setShowCreate] = useState(false)
@@ -30,6 +30,9 @@ export function E72FolderDetail() {
     } else if (tool.type === 'liste' && tool.list_id) {
       selectList(tool.list_id)
       goTo('list-detail')
+    } else if (tool.type === 'routine' && tool.routine_id) {
+      selectRoutine(tool.routine_id)
+      goTo('routine-detail')
     }
   }
 
@@ -37,6 +40,12 @@ export function E72FolderDetail() {
     setShowCreate(false)
     selectList(listId)
     goTo('list-detail')
+  }
+
+  function handleRoutineCreated(routineId: string) {
+    setShowCreate(false)
+    selectRoutine(routineId)
+    goTo('routine-detail')
   }
 
   return (
@@ -70,6 +79,7 @@ export function E72FolderDetail() {
           folderId={folderId}
           onClose={() => setShowCreate(false)}
           onListCreated={handleListCreated}
+          onRoutineCreated={handleRoutineCreated}
         />
       )}
     </main>

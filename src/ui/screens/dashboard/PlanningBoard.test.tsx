@@ -4,11 +4,15 @@ import userEvent from '@testing-library/user-event'
 import { PlanningBoard } from './PlanningBoard'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
 import type { Task } from '@/domain/entities/task'
-import type { PlannedSubTask } from '@/app/AppContext'
-import { makeTask as baseTask, makePlannedSubTask } from '@/test/factories'
+import type { PlannedSubTask, PlannedRoutineOccurrence } from '@/app/AppContext'
+import { makeTask as baseTask, makePlannedSubTask, makePlannedRoutineOccurrence } from '@/test/factories'
 
 function makeSubTaskV2(overrides: Partial<PlannedSubTask> = {}): PlannedSubTask {
   return makePlannedSubTask(overrides)
+}
+
+function makeRoutineOccurrence(overrides: Partial<PlannedRoutineOccurrence> = {}): PlannedRoutineOccurrence {
+  return makePlannedRoutineOccurrence(overrides)
 }
 
 function makeTaskV2(overrides: Partial<Task> = {}): Task {
@@ -603,5 +607,62 @@ describe('PlanningBoard', () => {
     const row = tinted.querySelector('[role="button"]') as HTMLElement
     expect(row.style.color).not.toBe('rgb(255, 255, 255)')
     expect(row.style.textDecoration).toBe('line-through')
+  })
+
+  it('affiche une routine planifiée avec son titre et son horaire', async () => {
+    const routine = makeRoutineOccurrence({ routineName: 'Routine du matin', time: '07:15' })
+    renderExpanded(makeAppContext({
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate: vi.fn().mockResolvedValue([routine]),
+    }))
+    expect(await screen.findByText('routine « Routine du matin »')).toBeInTheDocument()
+    expect(screen.getByText('07:15')).toBeInTheDocument()
+  })
+
+  it('affiche une case à cocher non interactive sur une routine, reflétant son état de complétion', async () => {
+    const routine = makeRoutineOccurrence({ routineName: 'Routine du matin', completed: true })
+    renderExpanded(makeAppContext({
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate: vi.fn().mockResolvedValue([routine]),
+    }))
+    const checkbox = await screen.findByLabelText('routine « Routine du matin », terminée')
+    expect(checkbox).toBeChecked()
+    expect(checkbox).toBeDisabled()
+  })
+
+  it('affiche une case à cocher non cochée sur une routine non terminée', async () => {
+    const routine = makeRoutineOccurrence({ routineName: 'Routine du matin', completed: false })
+    renderExpanded(makeAppContext({
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate: vi.fn().mockResolvedValue([routine]),
+    }))
+    const checkbox = await screen.findByLabelText('routine « Routine du matin », non terminée')
+    expect(checkbox).not.toBeChecked()
+  })
+
+  it('cliquer une routine sélectionne la routine et ouvre sa fiche, pas le détail de tâche', async () => {
+    const selectRoutine = vi.fn()
+    const goTo = vi.fn()
+    const routine = makeRoutineOccurrence({ routineId: 'routine-9', routineName: 'Routine du matin' })
+    renderExpanded(makeAppContext({
+      selectRoutine,
+      goTo,
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate: vi.fn().mockResolvedValue([routine]),
+    }))
+    await userEvent.click(await screen.findByText('routine « Routine du matin »'))
+    expect(selectRoutine).toHaveBeenCalledWith('routine-9')
+    expect(goTo).toHaveBeenCalledWith({ name: 'routine-steps', date: '2026-06-30' })
+  })
+
+  it("n'affiche pas de bouton Reporter sur une routine, même en surcharge", async () => {
+    const routine = makeRoutineOccurrence({ routineName: 'Routine du matin' })
+    renderExpanded(makeAppContext({
+      overloadMode: true,
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate: vi.fn().mockResolvedValue([routine]),
+    }))
+    await screen.findByText('routine « Routine du matin »')
+    expect(screen.queryByLabelText(/Reporter routine/)).toBeNull()
   })
 })

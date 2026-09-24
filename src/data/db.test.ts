@@ -29,10 +29,14 @@ describe('AppDatabase', () => {
     expect(db.folders).toBeDefined()
     expect(db.tools).toBeDefined()
     expect(db.taskCategories).toBeDefined()
+    expect(db.routines).toBeDefined()
+    expect(db.routineSteps).toBeDefined()
+    expect(db.routineSchedules).toBeDefined()
+    expect(db.routineStepCompletions).toBeDefined()
   })
 
   it('has correct version', () => {
-    expect(db.verno).toBe(25)
+    expect(db.verno).toBe(28)
   })
 
   it('upgrades a version 4 database without losing existing data', async () => {
@@ -212,7 +216,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('subTasks')
     expect(upgraded.tables.map((t) => t.name)).not.toContain('tasksV2')
 
@@ -296,7 +300,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.tasks.get('legacy-task')).toMatchObject({
       title: 'Tâche existante',
       description: '',
@@ -335,7 +339,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
 
     const migratedItem = await upgraded.listItems.get('existing-item')
     expect(migratedItem).toMatchObject({ checked: false })
@@ -388,7 +392,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     const categories = await upgraded.listCategories.where('list_id').equals('list-1').toArray()
     expect(categories.map((c) => c.name).sort()).toEqual(['Général', 'Habits été'])
 
@@ -434,7 +438,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.budgetCategories.get('income-1')).toBeUndefined()
     expect(await upgraded.budgetCategories.get('expense-1')).toBeDefined()
 
@@ -483,7 +487,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.listItems.get('item-1')).toMatchObject({ description: '' })
     expect(upgraded.listItemSubTasks).toBeDefined()
 
@@ -528,7 +532,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.tools.get('tool-1')).toMatchObject({ color: null })
 
     await upgraded.delete()
@@ -597,7 +601,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.tasks.get('task-today')).toMatchObject({
       status: 'inbox',
       scheduled_date: null,
@@ -639,7 +643,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.users.get('user-1')).toMatchObject({ id: 'user-1' })
     expect(await upgraded.feedbackReports.toArray()).toEqual([])
 
@@ -690,7 +694,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.feedbackReports.get('report-1')).toMatchObject({
       sync_status: 'sent',
       resolution_status: 'open',
@@ -773,7 +777,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.feedbackReports.get('report-open')).toMatchObject({
       resolution_sync_status: 'sent',
       resolution_last_attempt_at: null,
@@ -820,7 +824,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.feedbackMessages.get('from-user')).toMatchObject({ read_at: '2026-09-04T11:00:00.000Z' })
     expect(await upgraded.feedbackMessages.get('from-agent')).toMatchObject({ read_at: null })
 
@@ -872,7 +876,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(await upgraded.feedbackReports.get('written-by-old-client')).toMatchObject({
       resolution_status: 'open',
       validated_at: null,
@@ -909,7 +913,7 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(upgraded.tables.map((t) => t.name)).not.toContain('manualTestResults')
 
     await upgraded.delete()
@@ -942,10 +946,116 @@ describe('AppDatabase', () => {
     const upgraded = new AppDatabase(name)
     await upgraded.open()
 
-    expect(upgraded.verno).toBe(25)
+    expect(upgraded.verno).toBe(28)
     expect(upgraded.budgetDepositCategories).toBeDefined()
     expect(await upgraded.budgetDepositCategories.toArray()).toEqual([])
     expect(await upgraded.budgetDeposits.get('deposit-existant')).toMatchObject({ amount: 50, account_id: 'account-1' })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 25 database by adding routine tables and a routine_id default on existing tools', async () => {
+    const name = `migration-v26-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(25).stores({
+      lists: 'id',
+      tools: 'id, type, folder_id, position',
+    })
+    await legacy.open()
+    await legacy.table('lists').add({
+      id: 'list-1',
+      name: 'Courses',
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+    })
+    await legacy.table('tools').add({
+      id: 'tool-existant',
+      type: 'liste',
+      folder_id: null,
+      list_id: 'list-1',
+      position: 0,
+      created_at: '2026-07-21T00:00:00Z',
+      updated_at: '2026-07-21T00:00:00Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(28)
+    expect(upgraded.routines).toBeDefined()
+    expect(upgraded.routineSteps).toBeDefined()
+    expect(upgraded.routineSchedules).toBeDefined()
+    expect(await upgraded.routines.toArray()).toEqual([])
+    expect(await upgraded.tools.get('tool-existant')).toMatchObject({ list_id: 'list-1', routine_id: null })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 26 database by adding the routine step completion table', async () => {
+    const name = `migration-v27-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(26).stores({
+      routines: 'id',
+      routineSteps: 'id, routine_id, position',
+      routineSchedules: 'id, routine_id, weekday',
+    })
+    await legacy.open()
+    await legacy.table('routines').add({
+      id: 'routine-1',
+      name: 'Routine du matin',
+      color: null,
+      created_at: '2026-09-23T00:00:00Z',
+      updated_at: '2026-09-23T00:00:00Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(28)
+    expect(upgraded.routineStepCompletions).toBeDefined()
+    expect(await upgraded.routineStepCompletions.toArray()).toEqual([])
+    expect(await upgraded.routines.get('routine-1')).toMatchObject({ name: 'Routine du matin' })
+
+    await upgraded.delete()
+  })
+
+  it('upgrades a version 27 database by defaulting weekday and steps_overridden on existing rows', async () => {
+    const name = `migration-v28-db-${++testCount}`
+    const legacy = new Dexie(name)
+    legacy.version(27).stores({
+      routines: 'id',
+      routineSteps: 'id, routine_id, position',
+      routineSchedules: 'id, routine_id, weekday',
+      routineStepCompletions: 'id, routine_step_id, routine_id, date',
+    })
+    await legacy.open()
+    await legacy.table('routineSteps').add({
+      id: 'step-1',
+      routine_id: 'routine-1',
+      title: 'Se brosser les dents',
+      position: 0,
+      duration_minutes: 5,
+      created_at: '2026-09-23T00:00:00Z',
+      updated_at: '2026-09-23T00:00:00Z',
+    })
+    await legacy.table('routineSchedules').add({
+      id: 'schedule-1',
+      routine_id: 'routine-1',
+      weekday: 3,
+      time: '07:15',
+      created_at: '2026-09-23T00:00:00Z',
+      updated_at: '2026-09-23T00:00:00Z',
+    })
+    legacy.close()
+
+    const upgraded = new AppDatabase(name)
+    await upgraded.open()
+
+    expect(upgraded.verno).toBe(28)
+    expect(await upgraded.routineSteps.get('step-1')).toMatchObject({ weekday: null })
+    expect(await upgraded.routineSchedules.get('schedule-1')).toMatchObject({ steps_overridden: false })
 
     await upgraded.delete()
   })

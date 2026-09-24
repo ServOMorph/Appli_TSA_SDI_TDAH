@@ -6,6 +6,31 @@ en tête, précédées de `---`. Contenu strictement inchangé au déplacement.
 
 ---
 
+## Dernière session (2026-09-23 — 19 retours testeurs traités via /traiter_retours, roadmap Routine créée)
+
+## Décisions prises
+- Sur exécution de `/traiter_retours` (commande créée la session précédente), les 19 retours en attente ont été traités par 8 phases groupées : 16 corrigés avec réponse déposée dans le fil E124, 1 hors code (badge Netlify, vérification manuelle), 1 sorti sur demande explicite en roadmap dédiée.
+- Sur demande explicite (« créer la roadmap puis close, on la lancera prochaine session »), `roadmap_routine_2026-09-23.md` créée pour l'outil « Routine » (#229113cc), 6 phases `[TODO]`, aucune démarrée.
+
+## Livrables produits ou modifiés
+- `roadmap_retours_2026-09-22.md` : 8 phases `[FAIT]` (tâches récurrentes, fiche tâche E22, navigation, dashboard E10, bandeau des jours, jauge d'énergie E31, planning semaine E12, livrets E77 + sous-catégories).
+- `roadmap_routine_2026-09-23.md` : créée.
+- 44 fichiers `src/` (entités, règles, repositories, state hooks, écrans concernés par les 8 phases).
+- `COMMUNICATION/Marie/a_transmettre.md`, `src/domain/data/whatsNew.ts` : changements visibles complétés.
+
+## Hypothèses validées / invalidées
+- VALIDE : les 16 correctifs vérifiés (tests + Playwright en conditions réelles), suite 940/940, `tsc -b`/lint clean.
+- INVALIDE : la durée d'une tâche planifiée tard le soir n'est pas fiable au-delà de la limite 23:59 (trouvé par la revue de code de ce `/close`, tracé `[P1]` signals.md, non corrigé — décision produit nécessaire).
+- EN ATTENTE : déploiement et vérification par Marie de l'ensemble du lot.
+
+## Prochaine étape exacte
+`/deploy` pour mettre en production le lot de 16 correctifs. Démarrer `roadmap_routine_2026-09-23.md` Phase 1 à une session dédiée.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
 ## Dernière session (2026-09-22 — retrait du workflow Google Doc, commande /traiter_retours créée)
 
 ## Décisions prises

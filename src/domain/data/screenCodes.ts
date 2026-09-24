@@ -33,6 +33,8 @@ export const SCREEN_CODES: Record<Route['name'], ScreenCode> = {
   'list-item-detail': { code: 'E62', label: 'Élément de liste' },
   tools: { code: 'E70', label: 'Outils' },
   'folder-detail': { code: 'E72', label: 'Dossier' },
+  'routine-detail': { code: 'E79', label: 'Routine' },
+  'routine-steps': { code: 'E80', label: 'Étapes de la routine' },
   budget: { code: 'E71', label: 'Budget' },
   'budget-category-detail': { code: 'E73', label: 'Catégorie de budget' },
   'budget-settings': { code: 'E74', label: 'Paramètres du budget' },

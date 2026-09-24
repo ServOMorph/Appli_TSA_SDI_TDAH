@@ -18,6 +18,10 @@ import { TaskRecurrenceRepository } from '@/data/repositories/taskRecurrenceRepo
 import { TaskExceptionRepository } from '@/data/repositories/taskExceptionRepository'
 import { FolderRepository } from '@/data/repositories/folderRepository'
 import { ToolRepository } from '@/data/repositories/toolRepository'
+import { RoutineRepository } from '@/data/repositories/routineRepository'
+import { RoutineStepRepository } from '@/data/repositories/routineStepRepository'
+import { RoutineScheduleRepository } from '@/data/repositories/routineScheduleRepository'
+import { RoutineStepCompletionRepository } from '@/data/repositories/routineStepCompletionRepository'
 import { FeedbackReportRepository } from '@/data/repositories/feedbackReportRepository'
 import { FeedbackMessageRepository } from '@/data/repositories/feedbackMessageRepository'
 
@@ -41,6 +45,10 @@ export const budgetDepositCategoryRepo = new BudgetDepositCategoryRepository(db)
 export const budgetIncomeEntryRepo = new BudgetIncomeEntryRepository(db)
 export const folderRepo = new FolderRepository(db)
 export const toolRepo = new ToolRepository(db)
+export const routineRepo = new RoutineRepository(db)
+export const routineStepRepo = new RoutineStepRepository(db)
+export const routineScheduleRepo = new RoutineScheduleRepository(db)
+export const routineStepCompletionRepo = new RoutineStepCompletionRepository(db)
 export const feedbackReportRepo = new FeedbackReportRepository(db)
 export const feedbackMessageRepo = new FeedbackMessageRepository(db)
 

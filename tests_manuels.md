@@ -26,32 +26,7 @@ récent. Une fois le correctif déployé et un cycle de synchronisation passé :
 prochain `python scripts/backup_testeur_snapshots.py` range bien le snapshot de `103c9b92` dans
 `marie/` et non plus dans `_sans_code/`. Retirer cette section une fois vérifié.
 
-## Vérifier le garde-fou export ajouté à /deploy (étape 4ter)
 
-Ajouté le 2026-09-13 suite à l'incident de perte de données de Marie (import raté sans export
-préalable). Nouvelle étape 0.1 : alerte urgente à Marie dès le tout début de `/deploy` pour
-exporter ses données avant qu'une nouvelle version soit en ligne. Nouvelle étape 4ter : avant le
-build, confirmation explicite demandée à l'utilisateur que Marie a exporté — sinon arrêt.
 
-**Étape 0.1 observée en conditions réelles le 2026-09-16** : message envoyé en mode urgent
-(id gateway `20260916T125042_899231`, Discord `1549764473798008873`) et journalisé dans
-`historique_conversation_marie.md` (commit `cb2339c`). Reste à observer : que l'étape 4ter bloque
-effectivement la suite du même `/deploy` tant que la confirmation n'est pas donnée. Retirer cette
-section une fois observé.
 
-## Vérifier le tunnel cloudflared sur téléphone réel
 
-Ajouté le 2026-09-16 (`vite.config.ts`, `allowedHosts: ['.serenia-tech.fr']`) pour afficher le site
-de développement local directement sur téléphone sans passer par Netlify. Jamais testé en
-conditions réelles depuis un appareil mobile. Retirer cette section une fois le tunnel confirmé
-fonctionnel depuis un téléphone.
-
-## Sauvegarde Drive en attente
-
-Manifeste rafraîchi le 2026-09-23 (319 fichiers). L'upload vers Drive n'est pas exécutable en
-auto-mode (classifieur). À lancer manuellement, dans un terminal normal, depuis la racine du
-projet :
-```
-python claude-vibecoding-kit/backup_project.py . --upload
-```
-Retirer cette section une fois l'upload confirmé effectué.

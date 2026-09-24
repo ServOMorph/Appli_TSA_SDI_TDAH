@@ -19,6 +19,10 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
+import type { Routine } from '@/domain/entities/routine'
+import type { RoutineStep } from '@/domain/entities/routineStep'
+import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
+import type { RoutineStepCompletion } from '@/domain/entities/routineStepCompletion'
 import type { FeedbackReport } from '@/domain/entities/feedbackReport'
 import type { FeedbackMessage } from '@/domain/entities/feedbackMessage'
 
@@ -52,6 +56,10 @@ export class AppDatabase extends Dexie {
   taskExceptions!: Table<TaskException>
   folders!: Table<Folder>
   tools!: Table<Tool>
+  routines!: Table<Routine>
+  routineSteps!: Table<RoutineStep>
+  routineSchedules!: Table<RoutineSchedule>
+  routineStepCompletions!: Table<RoutineStepCompletion>
   feedbackReports!: Table<FeedbackReport>
   feedbackMessages!: Table<FeedbackMessage>
 
@@ -467,6 +475,39 @@ export class AppDatabase extends Dexie {
       budgetDepositCategories: 'id, account_id, position',
       budgetDeposits: 'id, account_id, category_id, date',
     })
+    this.version(26)
+      .stores({
+        routines: 'id',
+        routineSteps: 'id, routine_id, position',
+        routineSchedules: 'id, routine_id, weekday',
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table('tools')
+          .toCollection()
+          .modify((tool) => {
+            tool.routine_id = null
+          })
+      })
+    this.version(27).stores({
+      routineStepCompletions: 'id, routine_step_id, routine_id, date',
+    })
+    this.version(28)
+      .stores({})
+      .upgrade(async (tx) => {
+        await tx
+          .table('routineSteps')
+          .toCollection()
+          .modify((step) => {
+            step.weekday = null
+          })
+        await tx
+          .table('routineSchedules')
+          .toCollection()
+          .modify((schedule) => {
+            schedule.steps_overridden = false
+          })
+      })
   }
 }
 

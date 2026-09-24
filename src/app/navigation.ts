@@ -26,6 +26,8 @@ export type Route =
   | { name: 'list-item-detail'; itemId?: string }
   | { name: 'tools' }
   | { name: 'folder-detail'; folderId?: string }
+  | { name: 'routine-detail' }
+  | { name: 'routine-steps'; date?: string }
   | { name: 'budget' }
   | { name: 'budget-account' }
   | { name: 'budget-previsions' }

@@ -9,6 +9,7 @@ function makeTool(overrides: Partial<Tool> = {}): Tool {
     type: 'liste',
     folder_id: null,
     list_id: 'list-1',
+    routine_id: null,
     position: 0,
     created_at: '2026-08-06T00:00:00Z',
     updated_at: '2026-08-06T00:00:00Z',

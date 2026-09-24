@@ -1,3 +1,16 @@
+## v6.2 — 2026-09-24
+
+### Ajouté
+- **Nouvel outil « Routine ».** Création d'une routine (nom, couleur) avec ses étapes ordonnées
+  (titre, durée optionnelle). Planification sur un ou plusieurs jours de la semaine, chacun avec
+  son propre horaire saisi au pavé numérique. Une routine planifiée apparaît dans le planning du
+  jour et de la semaine, avec une coche automatique quand toutes ses étapes sont faites. Un écran
+  plein écran dédié permet de cocher les étapes du jour et de les décomposer en sous-tâches
+  pliables. Les étapes d'un jour donné peuvent être modifiées indépendamment des autres jours
+  planifiés (détachement), avec un retour possible à la version commune. Réordonnancement des
+  étapes par glisser-déposer (outil et écran plein écran). `roadmap_routine_2026-09-23.md`,
+  6 phases, archivée.
+
 ## v6.1 — 2026-09-23
 
 ### Ajouté

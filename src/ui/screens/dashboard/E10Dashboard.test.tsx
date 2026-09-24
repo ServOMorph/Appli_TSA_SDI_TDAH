@@ -217,7 +217,7 @@ describe('E10Dashboard', () => {
     it('affiche un outil liste racine avec le nom de la liste et navigue vers list-detail au clic', async () => {
       const ctx = makeAppContext({
         lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
-        tools: [{ id: 't1', type: 'liste', folder_id: null, list_id: 'l1', position: 0, created_at: '', updated_at: '' }],
+        tools: [{ id: 't1', type: 'liste', folder_id: null, list_id: 'l1', routine_id: null, position: 0, created_at: '', updated_at: '' }],
       })
       renderWithApp(<E10Dashboard />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Courses' }))
@@ -236,7 +236,7 @@ describe('E10Dashboard', () => {
       const ctx = makeAppContext({
         lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
         tools: [
-          { id: 't1', type: 'liste', folder_id: null, list_id: 'l1', position: 0, color: '#ff8800', created_at: '', updated_at: '' },
+          { id: 't1', type: 'liste', folder_id: null, list_id: 'l1', routine_id: null, position: 0, color: '#ff8800', created_at: '', updated_at: '' },
         ],
       })
       renderWithApp(<E10Dashboard />, ctx)
@@ -249,7 +249,7 @@ describe('E10Dashboard', () => {
       const ctx = makeAppContext({
         lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
         tools: [
-          { id: 't1', type: 'liste', folder_id: null, list_id: 'l1', position: 0, created_at: '', updated_at: '' },
+          { id: 't1', type: 'liste', folder_id: null, list_id: 'l1', routine_id: null, position: 0, created_at: '', updated_at: '' },
         ],
       })
       renderWithApp(<E10Dashboard />, ctx)

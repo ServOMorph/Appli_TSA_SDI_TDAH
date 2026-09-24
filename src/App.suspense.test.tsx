@@ -29,6 +29,8 @@ const CASES: { screen: Screen; route?: Route }[] = [
   { screen: 'list-item-detail', route: { name: 'list-item-detail', itemId: 'item-1' } },
   { screen: 'tools' },
   { screen: 'folder-detail', route: { name: 'folder-detail', folderId: 'folder-1' } },
+  { screen: 'routine-detail' },
+  { screen: 'routine-steps' },
   { screen: 'budget' },
   { screen: 'budget-account' },
   { screen: 'budget-previsions' },

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { addDays, formatPlanningDate, formatDayBadge, dateStrip, weekStrip } from '@/domain/rules/planningSlotRules'
+import { addDays, formatPlanningDate, formatDayBadge, dateStrip, weekStrip, weekdayOf } from '@/domain/rules/planningSlotRules'
 
 describe('addDays', () => {
   it('décale la date du nombre de jours demandé', () => {
@@ -67,5 +67,13 @@ describe('weekStrip', () => {
     expect(weekStrip('2026-08-02')).toEqual(monday)
     expect(monday[0]).toBe('2026-07-27')
     expect(monday[6]).toBe('2026-08-02')
+  })
+})
+
+describe('weekdayOf', () => {
+  it('rend le jour de semaine JS, 0 = dimanche à 6 = samedi', () => {
+    expect(weekdayOf('2026-07-27')).toBe(1) // lundi
+    expect(weekdayOf('2026-08-02')).toBe(0) // dimanche
+    expect(weekdayOf('2026-07-30')).toBe(4) // jeudi
   })
 })

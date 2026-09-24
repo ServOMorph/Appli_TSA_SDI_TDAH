@@ -1,12 +1,22 @@
 import { useState } from 'react'
-import { folderRepo, listItemRepo, listRepo, newId, toolRepo } from '@/app/repositories'
+import {
+  folderRepo,
+  listItemRepo,
+  listRepo,
+  newId,
+  routineRepo,
+  routineScheduleRepo,
+  routineStepRepo,
+  toolRepo,
+} from '@/app/repositories'
 import { createFolder as createFolderRule } from '@/domain/rules/folderRules'
 import { createList as createListRule } from '@/domain/rules/listRules'
+import { createRoutine as createRoutineRule } from '@/domain/rules/routineRules'
 import { createTool as createToolRule } from '@/domain/rules/toolRules'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
 
-export function useToolsState(reloadLists: () => Promise<void>) {
+export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: () => Promise<void>) {
   const [tools, setTools] = useState<Tool[]>([])
   const [folders, setFolders] = useState<Folder[]>([])
 
@@ -41,6 +51,19 @@ export function useToolsState(reloadLists: () => Promise<void>) {
     return list.id
   }
 
+  async function createToolRoutine(name: string, folderId: string | null): Promise<string> {
+    const now = new Date().toISOString()
+    const routine = createRoutineRule(newId(), name.trim(), now)
+    await routineRepo.create(routine)
+
+    const siblings = tools.filter((t) => t.folder_id === folderId)
+    const tool = createToolRule(newId(), 'routine', folderId, null, siblings.length, now, null, routine.id)
+    await toolRepo.create(tool)
+    setTools((prev) => [...prev, tool])
+    await reloadRoutines()
+    return routine.id
+  }
+
   async function deleteTool(id: string) {
     const tool = tools.find((t) => t.id === id)
     if (!tool) return
@@ -49,9 +72,17 @@ export function useToolsState(reloadLists: () => Promise<void>) {
       await Promise.all(items.map((item) => listItemRepo.delete(item.id)))
       await listRepo.delete(tool.list_id)
     }
+    if (tool.type === 'routine' && tool.routine_id) {
+      const steps = await routineStepRepo.getByRoutineId(tool.routine_id)
+      await Promise.all(steps.map((step) => routineStepRepo.delete(step.id)))
+      const schedules = await routineScheduleRepo.getByRoutineId(tool.routine_id)
+      await Promise.all(schedules.map((schedule) => routineScheduleRepo.delete(schedule.id)))
+      await routineRepo.delete(tool.routine_id)
+    }
     await toolRepo.delete(id)
     setTools((prev) => prev.filter((t) => t.id !== id))
     if (tool.type === 'liste') await reloadLists()
+    if (tool.type === 'routine') await reloadRoutines()
   }
 
   async function updateToolColor(id: string, color: string | null) {
@@ -76,6 +107,7 @@ export function useToolsState(reloadLists: () => Promise<void>) {
     folders,
     createFolder,
     createToolList,
+    createToolRoutine,
     deleteTool,
     updateToolColor,
     deleteFolder,

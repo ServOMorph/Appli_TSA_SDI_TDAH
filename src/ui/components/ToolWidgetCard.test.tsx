@@ -10,6 +10,7 @@ function makeTool(overrides: Partial<Tool> = {}): Tool {
     type: 'liste',
     folder_id: null,
     list_id: 'list-1',
+    routine_id: null,
     position: 0,
     created_at: '2026-08-18T00:00:00.000Z',
     updated_at: '2026-08-18T00:00:00.000Z',
@@ -31,5 +32,16 @@ describe('ToolCard', () => {
     const card = screen.getByRole('button', { name: 'Courses' }).parentElement as HTMLElement
     expect(card.style.border).toBe('2px solid rgb(255, 136, 0)')
     expect(card.style.backgroundColor).toBe('var(--color-surface)')
+  })
+
+  it('affiche le nom de la routine référencée, avec le contour de sa couleur propre', () => {
+    const ctx = makeAppContext({
+      routines: [{ id: 'routine-1', name: 'Routine du matin', color: '#22aa55', created_at: '', updated_at: '' }],
+    })
+    const tool = makeTool({ type: 'routine', list_id: null, routine_id: 'routine-1', color: null })
+    renderWithApp(<ToolCard tool={tool} onOpen={() => {}} />, ctx)
+    expect(screen.getByRole('button', { name: 'Routine du matin' })).toBeDefined()
+    const card = screen.getByRole('button', { name: 'Routine du matin' }).parentElement as HTMLElement
+    expect(card.style.border).toBe('2px solid rgb(34, 170, 85)')
   })
 })

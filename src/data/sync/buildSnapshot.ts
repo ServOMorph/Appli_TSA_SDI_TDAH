@@ -1,10 +1,10 @@
 import { db, userRepo, settingsRepo } from '@/app/repositories'
 
-export const SNAPSHOT_SCHEMA_VERSION = '3.7'
+export const SNAPSHOT_SCHEMA_VERSION = '3.8'
 
 /**
  * Payload complet des donnees applicatives, partage par l'export manuel (useSettingsState)
- * et la synchronisation automatique (syncClient) : une seule source pour les 19 tables
+ * et la synchronisation automatique (syncClient) : une seule source pour les 22 tables
  * Dexie a serialiser evite qu'une table ajoutee soit oubliee dans l'un des deux flux.
  */
 export async function buildSnapshotPayload() {
@@ -30,6 +30,9 @@ export async function buildSnapshotPayload() {
     budgetDeposits,
     budgetDepositCategories,
     budgetIncomeEntries,
+    routines,
+    routineSteps,
+    routineSchedules,
   ] = await Promise.all([
     db.tasks.toArray(),
     db.taskRecurrences.toArray(),
@@ -49,6 +52,9 @@ export async function buildSnapshotPayload() {
     db.budgetDeposits.toArray(),
     db.budgetDepositCategories.toArray(),
     db.budgetIncomeEntries.toArray(),
+    db.routines.toArray(),
+    db.routineSteps.toArray(),
+    db.routineSchedules.toArray(),
   ])
 
   return {
@@ -72,5 +78,8 @@ export async function buildSnapshotPayload() {
     budget_deposits: budgetDeposits,
     budget_deposit_categories: budgetDepositCategories,
     budget_income_entries: budgetIncomeEntries,
+    routines,
+    routine_steps: routineSteps,
+    routine_schedules: routineSchedules,
   }
 }

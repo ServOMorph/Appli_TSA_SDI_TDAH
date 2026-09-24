@@ -14,6 +14,7 @@ import { db, energyRepo, settingsRepo, todayDate, userRepo } from '@/app/reposit
 import { useBudgetState } from '@/app/contexts/useBudgetState'
 import { useEnergyState } from '@/app/contexts/useEnergyState'
 import { useListsState } from '@/app/contexts/useListsState'
+import { useRoutineState } from '@/app/contexts/useRoutineState'
 import { useTaskCategoriesState } from '@/app/contexts/useTaskCategoriesState'
 import { useToolsState } from '@/app/contexts/useToolsState'
 import { useSettingsState, type ImportResult } from '@/app/contexts/useSettingsState'
@@ -27,6 +28,7 @@ import { startFeedbackSync } from '@/data/sync/feedbackClient'
 
 export type { Screen, Route } from '@/app/navigation'
 export type { PlannedSubTask } from '@/app/contexts/usePlanningState'
+export type { PlannedRoutineOccurrence } from '@/app/contexts/useRoutineState'
 
 type NavigationValue = {
   screen: Screen
@@ -56,6 +58,7 @@ type AppContextValue = NavigationValue &
   Omit<ReturnType<typeof usePlanningState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useEnergyState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useListsState>, 'load' | 'reset'> &
+  Omit<ReturnType<typeof useRoutineState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useTaskCategoriesState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useToolsState>, 'load' | 'reset'> &
   Omit<ReturnType<typeof useBudgetState>, 'load' | 'reset'> &
@@ -88,8 +91,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const planning = usePlanningState(tasks.load)
   const energy = useEnergyState()
   const lists = useListsState()
+  const routines = useRoutineState()
   const taskCategories = useTaskCategoriesState()
-  const tools = useToolsState(lists.load)
+  const tools = useToolsState(lists.load, routines.load)
   const budget = useBudgetState()
   const session = useSettingsState()
 
@@ -97,6 +101,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const { load: loadPlanning, reset: resetPlanning, ...planningValue } = planning
   const { load: loadEnergy, reset: resetEnergy, ...energyValue } = energy
   const { load: loadLists, reset: resetLists, ...listsValue } = lists
+  const { load: loadRoutines, reset: resetRoutines, ...routinesValue } = routines
   const { load: loadTaskCategories, reset: resetTaskCategories, ...taskCategoriesValue } = taskCategories
   const { load: loadTools, reset: resetTools, ...toolsValue } = tools
   const { load: loadBudget, reset: resetBudget, ...budgetValue } = budget
@@ -124,6 +129,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       loadPlanning(),
       loadEnergy(),
       loadLists(),
+      loadRoutines(),
       loadTaskCategories(),
       loadTools(),
       loadBudget(),
@@ -180,13 +186,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [session.currentUser, session.settings, route.name, replace])
 
   async function hasSignificantData(): Promise<boolean> {
-    const [taskCount, listItemCount, budgetEntryCount, energyEntryCount] = await Promise.all([
+    const [taskCount, listItemCount, budgetEntryCount, energyEntryCount, routineStepCount] = await Promise.all([
       db.tasks.count(),
       db.listItems.count(),
       db.budgetEntries.count(),
       db.energyEntries.count(),
+      db.routineSteps.count(),
     ])
-    return taskCount > 0 || listItemCount > 0 || budgetEntryCount > 0 || energyEntryCount > 0
+    return taskCount > 0 || listItemCount > 0 || budgetEntryCount > 0 || energyEntryCount > 0 || routineStepCount > 0
   }
 
   async function wipeAllData() {
@@ -195,6 +202,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     resetPlanning()
     resetEnergy()
     resetLists()
+    resetRoutines()
     resetTaskCategories()
     resetTools()
     resetBudget()
@@ -239,6 +247,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...planningValue,
         ...energyValue,
         ...listsValue,
+        ...routinesValue,
         ...taskCategoriesValue,
         ...toolsValue,
         ...budgetValue,

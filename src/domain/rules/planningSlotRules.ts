@@ -57,3 +57,8 @@ export function weekStrip(date: string): string[] {
   const monday = addDays(date, -mondayOffset)
   return Array.from({ length: 7 }, (_, i) => addDays(monday, i))
 }
+
+/** Jour de semaine de `date` (0 = dimanche … 6 = samedi), même convention que `RoutineSchedule.weekday`. */
+export function weekdayOf(date: string): number {
+  return new Date(date + 'T12:00:00').getDay()
+}

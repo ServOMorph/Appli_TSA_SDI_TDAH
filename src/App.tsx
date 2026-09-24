@@ -78,6 +78,12 @@ const E70Tools = lazy(() => import('@/ui/screens/tools/E70Tools').then((m) => ({
 const E72FolderDetail = lazy(() =>
   import('@/ui/screens/tools/E72FolderDetail').then((m) => ({ default: m.E72FolderDetail })),
 )
+const E79RoutineDetail = lazy(() =>
+  import('@/ui/screens/tools/E79RoutineDetail').then((m) => ({ default: m.E79RoutineDetail })),
+)
+const E80RoutineSteps = lazy(() =>
+  import('@/ui/screens/tools/E80RoutineSteps').then((m) => ({ default: m.E80RoutineSteps })),
+)
 const E71Budget = lazy(() => import('@/ui/screens/tools/E71Budget').then((m) => ({ default: m.E71Budget })))
 const E73CategoryDetail = lazy(() =>
   import('@/ui/screens/tools/E73CategoryDetail').then((m) => ({ default: m.E73CategoryDetail })),
@@ -210,6 +216,10 @@ export function AppScreens() {
         return <E70Tools />
       case 'folder-detail':
         return <E72FolderDetail />
+      case 'routine-detail':
+        return <E79RoutineDetail />
+      case 'routine-steps':
+        return <E80RoutineSteps />
       case 'budget':
         return <E71Budget />
       case 'budget-account':

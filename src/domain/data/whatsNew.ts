@@ -15,6 +15,7 @@ export const WHATS_NEW: string[] = [
   'Nouveau réglage dans Paramètres > Accessibilité pour afficher votre énergie à chaque connexion.',
   'Le planning de la semaine affiche maintenant le nom des tâches et leur couleur, en plus grand.',
   'Les livrets permettent maintenant de créer des catégories, chacune avec son propre sous-total.',
+  'Nouvel outil « Routine » : créez une routine avec ses étapes, planifiez-la sur les jours de votre choix avec un horaire propre à chacun, et cochez ses étapes chaque jour depuis un écran dédié.',
 ]
 
 export const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

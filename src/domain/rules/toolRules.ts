@@ -8,6 +8,7 @@ export function createTool(
   position: number,
   now: string,
   color: string | null = null,
+  routineId: string | null = null,
 ): Tool {
-  return { id, type, folder_id: folderId, list_id: listId, position, color, created_at: now, updated_at: now }
+  return { id, type, folder_id: folderId, list_id: listId, routine_id: routineId, position, color, created_at: now, updated_at: now }
 }

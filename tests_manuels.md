@@ -26,6 +26,16 @@ récent. Une fois le correctif déployé et un cycle de synchronisation passé :
 prochain `python scripts/backup_testeur_snapshots.py` range bien le snapshot de `103c9b92` dans
 `marie/` et non plus dans `_sans_code/`. Retirer cette section une fois vérifié.
 
+## Sauvegarde Drive en attente
+
+Manifeste rafraîchi (`claude-vibecoding-kit/backup_project.py . --refresh-list`) le 2026-09-24,
+485 fichiers. Upload jamais lancé en auto-mode (refusé par le classifieur). À lancer manuellement,
+dans un terminal normal, depuis la racine du projet :
+```
+python claude-vibecoding-kit/backup_project.py . --upload
+```
+Retirer cette section une fois l'upload confirmé effectué.
+
 
 
 

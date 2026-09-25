@@ -28,7 +28,7 @@ prochain `python scripts/backup_testeur_snapshots.py` range bien le snapshot de 
 
 ## Sauvegarde Drive en attente
 
-Manifeste rafraîchi (`claude-vibecoding-kit/backup_project.py . --refresh-list`) le 2026-09-24,
+Manifeste rafraîchi (`claude-vibecoding-kit/backup_project.py . --refresh-list`) le 2026-09-25,
 485 fichiers. Upload jamais lancé en auto-mode (refusé par le classifieur). À lancer manuellement,
 dans un terminal normal, depuis la racine du projet :
 ```

@@ -82,6 +82,6 @@
   {
     "report_id": "6b0cfaab-5770-49bc-9d55-161ed0ded1c4",
     "screen_code": "E10",
-    "body": "Corrigé. L'affichage ne déborde plus sur le bord droit avec une tâche récurrente."
+    "body": "Corrigé. L'affichage ne déborde plus sur le bord droit, y compris en changeant de jour avec une tâche récurrente."
   }
 ]

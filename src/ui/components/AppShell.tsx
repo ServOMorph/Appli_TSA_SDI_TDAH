@@ -12,6 +12,8 @@ export function AppShell({ overloadMode, children }: AppShellProps) {
         padding: 'var(--spacing-xl)',
         paddingBottom: 'var(--bottomnav-h)',
         gap: 'var(--spacing-lg)',
+        width: '100%',
+        minWidth: 0,
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',

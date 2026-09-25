@@ -16,6 +16,8 @@ export function E01Welcome() {
         padding: 'clamp(16px, 4svh, 32px)',
         gap: 'var(--spacing-md)',
         textAlign: 'center',
+        width: '100%',
+        minWidth: 0,
         maxWidth: '480px',
         margin: '0 auto',
       }}

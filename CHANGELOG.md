@@ -1,3 +1,15 @@
+## v6.3 — 2026-09-25
+
+### Corrigé
+- **Complétions de routine absentes de l'export, de l'import, du vidage complet des données et de
+  la suppression d'une routine ou d'un jour détaché** (outil « Routine » livré en v6.2, pas encore
+  déployé). Une coche d'étape de routine ne survivait à aucun de ces chemins et pouvait rester
+  orpheline en base.
+- **Cocher une étape puis modifier les étapes de ce jour effaçait la coche.** La complétion du jour
+  en cours est désormais reportée sur les étapes propres à ce jour au lieu d'être perdue.
+- Garde contre un double-appui rapide sur « Modifier ce jour », qui pouvait dupliquer les étapes
+  communes.
+
 ## v6.2 — 2026-09-24
 
 ### Ajouté

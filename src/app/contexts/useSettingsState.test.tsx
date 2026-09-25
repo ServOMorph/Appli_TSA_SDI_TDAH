@@ -84,6 +84,7 @@ function SettingsPanel() {
             user: { id: 'u-routine', profile_type: 'student' },
             routines: [{ id: 'routine-1', name: 'Routine du matin', color: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
             routine_steps: [{ id: 'step-1', routine_id: 'routine-1', title: 'Se brosser les dents', position: 0, duration_minutes: 5, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
+            routine_step_completions: [{ id: 'completion-1', routine_step_id: 'step-1', routine_id: 'routine-1', date: '2026-09-23', created_at: '2026-09-23T00:00:00.000Z' }],
             tools: [{ id: 'tool-routine-1', type: 'routine', folder_id: null, list_id: null, routine_id: 'routine-1', position: 0, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
           })
         }
@@ -92,6 +93,9 @@ function SettingsPanel() {
       </button>
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, routine_steps: [{ id: 'step-orphelin', routine_id: 'inconnue' }] })}>
         Importer étape de routine orpheline
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, routine_step_completions: [{ id: 'completion-orpheline', routine_step_id: 'inconnue', routine_id: 'inconnue', date: '2026-09-23' }] })}>
+        Importer complétion de routine orpheline
       </button>
     </>
   )
@@ -110,6 +114,7 @@ afterEach(async () => {
   await db.budgetIncomeEntries.clear()
   await db.routines.clear()
   await db.routineSteps.clear()
+  await db.routineStepCompletions.clear()
   syncNowMock.mockClear()
 })
 
@@ -160,6 +165,7 @@ describe('useSettingsState — export/import', () => {
       ['Importer référence orpheline', 'référence tâche parente orpheline'],
       ['Importer version future', 'version d’export plus récente'],
       ['Importer étape de routine orpheline', 'référence routine orpheline'],
+      ['Importer complétion de routine orpheline', 'référence routine orpheline'],
     ] as const
 
     for (const [button, error] of cases) {
@@ -242,6 +248,7 @@ describe('useSettingsState — export/import', () => {
     await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
     await db.routines.add({ id: 'routine-export', name: 'Routine du soir', color: '#ff8800', created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
     await db.routineSteps.add({ id: 'step-export', routine_id: 'routine-export', title: 'Pyjama', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineStepCompletions.add({ id: 'completion-export', routine_step_id: 'step-export', routine_id: 'routine-export', date: '2026-09-23', created_at: '2026-09-23T00:00:00.000Z' })
     await act(async () => {
       await userEvent.click(screen.getByRole('button', { name: 'Exporter' }))
     })
@@ -252,6 +259,9 @@ describe('useSettingsState — export/import', () => {
     ])
     expect(payload.routine_steps).toEqual([
       { id: 'step-export', routine_id: 'routine-export', title: 'Pyjama', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' },
+    ])
+    expect(payload.routine_step_completions).toEqual([
+      { id: 'completion-export', routine_step_id: 'step-export', routine_id: 'routine-export', date: '2026-09-23', created_at: '2026-09-23T00:00:00.000Z' },
     ])
 
     clickSpy.mockRestore()
@@ -273,6 +283,10 @@ describe('useSettingsState — export/import', () => {
     expect(steps[0].weekday).toBeNull()
     const tools = await toolRepo.getAll()
     expect(tools.some((t) => t.type === 'routine' && t.routine_id === 'routine-1')).toBe(true)
+    const completions = await db.routineStepCompletions.toArray()
+    expect(completions).toEqual([
+      { id: 'completion-1', routine_step_id: 'step-1', routine_id: 'routine-1', date: '2026-09-23', created_at: '2026-09-23T00:00:00.000Z' },
+    ])
   })
 
   it('recrée l’entrée Outil Budget manquante à l’import', async () => {

@@ -6,6 +6,38 @@ en tête, précédées de `---`. Contenu strictement inchangé au déplacement.
 
 ---
 
+## Dernière session (2026-09-24 — Phase 6 Routine, glisser-déposer E79/E80, roadmap close et validée par l'utilisateur)
+
+## Décisions prises
+- Phase 6 de `roadmap_routine_2026-09-23.md` (modification d'une routine : tous les jours vs un seul jour) implémentée sur le modèle du jour de semaine récurrent (`RoutineSchedule.weekday`), pas sur une occurrence datée comme `persistSeriesBatch` (tâches récurrentes) : détacher un jour porte sur « tous les mercredis », pas une date isolée — cohérent avec le reste du modèle Routine.
+- Sur demande explicite, le réordonnancement des étapes passe du bouton ▲/▼ au glisser-déposer (bibliothèque `@dnd-kit`, déjà utilisée par `E22TaskDetail.tsx`) : d'abord dans E80 (mode « Modifier ce jour »), puis étendu à E79 (gestion globale) sur signalement que les flèches y persistaient et que le geste n'y fonctionnait pas.
+- Roadmap `roadmap_routine_2026-09-23.md` (6 phases) entièrement réalisée, archivée (`Archives/`) et validée par l'utilisateur après test manuel sur téléphone (serveur Vite exposé sur le réseau local, port 5174).
+
+## Livrables produits ou modifiés
+- Entités/schéma : `RoutineStep.weekday`, `RoutineSchedule.steps_overridden` (migration Dexie v28), repository `routineStepRepository.reorder()`.
+- `useRoutineState.ts` : `getRoutineStepsForDate`, `detachRoutineDay`, `reattachRoutineDay`, `reorderRoutineSteps` ; `moveRoutineStep` retiré (plus aucun appelant).
+- `E80RoutineSteps.tsx` : mode « Modifier ce jour » (détachement automatique au premier clic, retour à la version commune), liste d'étapes en glisser-déposer avec poignée `⠿`.
+- `E79RoutineDetail.tsx` : même bascule glisser-déposer, flèches ▲/▼ retirées.
+- `useSettingsState.ts` (import JSON) : valeurs par défaut pour les exports antérieurs à cette phase (`weekday`/`steps_overridden` absents).
+- `tests_manuels.md` : section de validation manuelle de la routine ajoutée puis retirée après validation explicite de l'utilisateur.
+- `COMMUNICATION/Marie/a_transmettre.md`, `src/domain/data/whatsNew.ts` : nouvel outil Routine ajouté en langage simple.
+- `DOCUMENTATION/_contexte/signals.md` : action de triage ajoutée (documenter l'outil Routine), écriture différée à confirmation de l'utilisateur.
+- Suite complète 1019/1019 (+79 tests depuis le dernier `/close`), `tsc -b` + `eslint` clean.
+
+## Hypothèses validées / invalidées
+- VALIDE : glisser-déposer testé avec une vraie souris (E79 et E80), persistance vérifiée après rechargement.
+- VALIDE : détachement/réattachement d'un jour, étapes communes non affectées (vérifié via E79), sous-tâches et coche du planning non régressées.
+- INVALIDE : le clic « Test Routine » signalé comme bug (E80 attendu, E79 obtenu) — clarifié avec l'utilisateur : carte Outils → E79 par conception, pas une régression.
+- EN ATTENTE : documenter l'outil Routine dans `DOCUMENTATION/` (proposition faite, confirmation utilisateur nécessaire — cf. Questions ouvertes) ; `/deploy` du lot complet (Routine + le lot de 16 correctifs de la session du 23/09, toujours pas déployé) ; revue de code `medium` de l'étape 9 rejouée sur les 9 angles restés incomplets (limite de session API, cf. Questions ouvertes).
+
+## Prochaine étape exacte
+`/deploy` pour mettre en production le lot de 16 correctifs (23/09) et l'outil Routine (Phases 1-6). Documenter l'outil Routine dans `DOCUMENTATION/` si l'utilisateur confirme.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
 ## Dernière session (2026-09-23 — 19 retours testeurs traités via /traiter_retours, roadmap Routine créée)
 
 ## Décisions prises

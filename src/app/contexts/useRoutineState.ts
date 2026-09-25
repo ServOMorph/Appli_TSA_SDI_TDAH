@@ -79,6 +79,7 @@ export function useRoutineState() {
   }
 
   async function deleteRoutineStep(id: string) {
+    await routineStepCompletionRepo.deleteByStepIds([id])
     await routineStepRepo.delete(id)
   }
 
@@ -159,12 +160,14 @@ export function useRoutineState() {
       routineStepRepo.getByRoutineId(routineId).then((steps) => steps.filter((s) => s.weekday === null)),
       routineStepCompletionRepo.getByRoutineAndDate(routineId, date),
     ])
-    const completedCommonIds = new Set(completions.map((c) => c.routine_step_id))
+    const completionByStepId = new Map(completions.map((c) => [c.routine_step_id, c]))
     const now = new Date().toISOString()
     for (const step of commonSteps) {
       const clonedId = newId()
       await routineStepRepo.create({ ...step, id: clonedId, weekday, created_at: now, updated_at: now })
-      if (completedCommonIds.has(step.id)) {
+      const original = completionByStepId.get(step.id)
+      if (original) {
+        await routineStepCompletionRepo.delete(original.id)
         await routineStepCompletionRepo.create({
           id: newId(),
           routine_step_id: clonedId,

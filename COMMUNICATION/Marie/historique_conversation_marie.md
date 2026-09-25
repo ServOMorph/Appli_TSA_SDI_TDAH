@@ -1096,6 +1096,14 @@ _Suite :_ renvoi du message précédent — l'utilisateur avait supprimé le mes
 (Playwright, dev + production) confirmant qu'il fonctionne. Redéposé en **mode urgent** sur
 demande explicite. Id gateway `20260917T184308_811343`, Discord `1550215558102786149`.
 
+### 2026-09-23 [17h40 UTC]
+
+**Marie ->** C'est fait
+
+_Suite :_ confirmation tardive (7 jours) de l'export demandé le 2026-09-16 avant mise à jour (id
+`20260916T125042_899231`) — le déploiement v5.138/v5.139 avait déjà eu lieu le 2026-09-17 sans
+cette confirmation. Reçue en gateway (id `20260923T174040_821392`), acquittée à ce `/start`.
+
 ### 2026-09-23
 
 **Dév ->**

@@ -79,3 +79,7 @@ scratchpad/
 
 # Artefacts du serveur MCP Playwright (captures/console de session, jamais commités)
 .playwright-mcp/
+
+# Captures téléchargées par scripts/read_feedback_reports.py (données personnelles testeur,
+# jamais commitées ; dossier par défaut du script, pas seulement un artefact de session)
+feedback-reports/

@@ -219,6 +219,7 @@ export function E61ListDetail() {
         gap: 'var(--spacing-lg)',
         maxWidth: '480px',
         width: '100%',
+        minWidth: 0,
         margin: '0 auto',
         minHeight: '100svh',
         paddingBottom: 'var(--bottomnav-h)',

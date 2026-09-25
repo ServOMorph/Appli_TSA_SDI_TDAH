@@ -48,6 +48,7 @@ export function E111Profile() {
         padding: 'var(--spacing-xl)',
         gap: 'var(--spacing-lg)',
         width: '100%',
+        minWidth: 0,
         maxWidth: '480px',
         margin: '0 auto',
         minHeight: '100svh',

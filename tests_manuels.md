@@ -39,15 +39,19 @@ pas encore tourné dans un vrai `/deploy`. Au prochain `/deploy` : vérifier que
 déposées avec les bons accents (le dépôt en ligne de commande est sensible à l'encodage — vérifier
 en relisant le contenu, pas seulement l'affichage terminal). Retirer cette section une fois vérifié.
 
-## Sauvegarde Drive en attente
+## Vérifier sur le téléphone réel l'affichage du mois sur une seule ligne (E10)
 
-Manifeste rafraîchi (`claude-vibecoding-kit/backup_project.py . --refresh-list`) le 2026-09-25,
-485 fichiers. Upload jamais lancé en auto-mode (refusé par le classifieur). À lancer manuellement,
-dans un terminal normal, depuis la racine du projet :
-```
-python claude-vibecoding-kit/backup_project.py . --upload
-```
-Retirer cette section une fois l'upload confirmé effectué.
+Signalé le 2026-09-25 : le libellé mois/année du dashboard (E10) passait sur 2 lignes pour certains
+mois (« Septembre 2026 », « Novembre 2026 ») mais pas d'autres (« Octobre 2026 »), sur un téléphone
+réel — non reproductible dans Chromium, reproduit ensuite via WebKit émulé (iPhone SE 320px, Pixel 9
+360px) avec le bouton « Aujourd'hui » affiché. Correctif : police du bouton mois
+(`monthButtonStyle`, `PlanningBoard.tsx`) réduite à `0.75rem` + `whiteSpace: nowrap`. Vérifié sur les
+12 mois aux largeurs 320/360/390px en WebKit émulé, jamais sur l'appareil physique d'origine. Faire
+défiler les 12 mois sur le téléphone réel : chacun doit tenir sur une seule ligne, sans retour à la
+ligne ni débordement à droite. Retirer cette section une fois vérifié.
+
+
+
 
 
 

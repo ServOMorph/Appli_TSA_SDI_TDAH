@@ -126,6 +126,12 @@ depuis cet écran plein écran, le bouton « Modifier ce jour » permet de chang
 ou réordonner (par glisser-déposer) les étapes propres à ce jour-là uniquement. Un bouton « Revenir
 à la version commune » annule ce changement et remet les étapes habituelles.
 
+## Accueil : affichage corrigé
+
+L'affichage ne déborde plus sur le bord droit de l'écran, y compris en changeant de jour avec une
+tâche récurrente. Le mois affiché en haut de l'accueil tient maintenant sur une seule ligne, quel
+que soit le mois.
+
 ## Adresse de l'application changée
 
 L'adresse a changé : `https://appli-marie.netlify.app/`. Mettez à jour le raccourci sur votre écran d'accueil avec cette nouvelle adresse ; l'ancienne ne fonctionnera plus.

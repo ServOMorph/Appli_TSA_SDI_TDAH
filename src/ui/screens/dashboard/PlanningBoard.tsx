@@ -164,11 +164,12 @@ const monthButtonStyle: React.CSSProperties = {
   border: 'none',
   cursor: 'pointer',
   color: 'var(--color-text)',
-  fontSize: '0.875rem',
+  fontSize: '0.75rem',
   fontWeight: 700,
   fontFamily: 'var(--font-body)',
   padding: '10px 4px',
   minHeight: '44px',
+  whiteSpace: 'nowrap',
 }
 
 const ROW_MIN_HEIGHT = 44
@@ -415,10 +416,8 @@ export function PlanningBoard() {
   // Ne jamais appeler replace() (setState d'AppProvider) depuis l'updater de setDisplayDate :
   // React peut executer cet updater pendant le rendu de PlanningBoard, ce qui declenchait
   // l'avertissement "Cannot update a component (AppProvider) while rendering a different
-  // component (PlanningBoard)". displayDateRef tient lieu de valeur precedente, en dehors du
-  // rendu, puisque updateDisplayDate n'est jamais appelee que depuis des gestionnaires d'evenement.
-  function updateDisplayDate(updater: string | ((d: string) => string)) {
-    const next = typeof updater === 'function' ? updater(displayDateRef.current) : updater
+  // component (PlanningBoard)".
+  function updateDisplayDate(next: string) {
     setDisplayDate(next)
     replace({ name: 'dashboard', date: next })
   }

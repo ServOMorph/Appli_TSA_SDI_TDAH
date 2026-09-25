@@ -16,6 +16,8 @@ export const WHATS_NEW: string[] = [
   'Le planning de la semaine affiche maintenant le nom des tâches et leur couleur, en plus grand.',
   'Les livrets permettent maintenant de créer des catégories, chacune avec son propre sous-total.',
   'Nouvel outil « Routine » : créez une routine avec ses étapes, planifiez-la sur les jours de votre choix avec un horaire propre à chacun, et cochez ses étapes chaque jour depuis un écran dédié.',
+  'Corrigé : l\'affichage ne déborde plus sur le bord droit de l\'écran, y compris en changeant de jour.',
+  'Sur l\'accueil, le mois affiché tient maintenant sur une seule ligne, quel que soit le mois.',
 ]
 
 export const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

@@ -6,6 +6,32 @@ en tête, précédées de `---`. Contenu strictement inchangé au déplacement.
 
 ---
 
+## Session du 2026-09-25 — dépôt différé des réponses aux retours testeur jusqu'au déploiement
+
+## Décisions prises
+- Les réponses aux retours testeur ne sont plus déposées immédiatement sur Supabase pendant `/traiter_retours` : mises en attente, publiées seulement une fois le correctif réellement déployé (nouvelle règle `CLAUDE.md` § Réponses aux retours testeurs).
+
+## Livrables produits ou modifiés
+- Nettoyage production : 16 réponses prématurées du lot `roadmap_retours_2026-09-22.md` (+ 1 doublon trouvé sur `34ba6474`) retirées de Supabase, déplacées vers `_contexte/reponses_retours_en_attente_deploiement.json`. Retour `2c3af15b` (Marie avait déjà réagi à la réponse prématurée) laissé intact, message explicatif ajouté.
+- `scripts/_supabase.py` : ajout de `delete_row()`.
+- Nouveaux scripts `scripts/queue_pending_feedback_reply.py` (mise en attente) et `scripts/republish_pending_feedback_replies.py` (republication).
+- `scripts/reply_feedback_report.py` : le listing des retours à traiter exclut désormais ceux déjà en attente ; `screen_code` ajouté à `find_report`.
+- `.claude/commands/deploy.md` : nouvelle étape après le smoke test (étape 8) qui republie les réponses en attente.
+- `.claude/commands/traiter_retours.md` (étape 5) : appelle `queue_pending_feedback_reply.py` au lieu d'un dépôt direct.
+- `CLAUDE.md` + miroirs `AGENTS.md`/`GEMINI.md` : règle documentée.
+
+## Hypothèses validées / invalidées
+- VALIDE : le listing (`reply_feedback_report.py` sans argument) exclut bien les 16 retours mis en attente ; la mise en attente rejette proprement un `report_id` inexistant sans corrompre le fichier.
+- EN ATTENTE : vérifier au prochain `/deploy` que l'étape 8 republie effectivement les 16 réponses et vide le fichier.
+
+## Prochaine étape exacte
+`/deploy` — mettra en production le lot Routine + 16 correctifs (23/09) et republiera automatiquement les 16 réponses en attente.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
 ## Dernière session (2026-09-24 — Phase 6 Routine, glisser-déposer E79/E80, roadmap close et validée par l'utilisateur)
 
 ## Décisions prises

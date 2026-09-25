@@ -16,6 +16,14 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 25 septembre 2026 (nouvelle suite de session), un défaut de débordement de l'écran d'accueil,
+corrigé une première fois puis réapparu au changement de jour, a été redébuggé jusqu'à sa vraie
+cause : un conteneur de page qui pouvait s'élargir au-delà de l'écran selon le texte affiché, sur
+certains navigateurs mobiles. Corrigé à sa source et étendu par précaution aux autres écrans
+partageant la même construction, pas seulement celui où le défaut s'était vu. Un deuxième défaut
+signalé dans la foulée (le mois affiché en haut de l'accueil passait sur deux lignes pour certains
+mois) est également corrigé.
+
 Le 25 septembre 2026 (suite de session), un défaut de séquencement a été corrigé dans la façon de
 répondre aux retours signalés par Marie : la réponse à un correctif partait aussitôt visible dans
 son application, même avant que la nouvelle version ne soit réellement mise en ligne — ce qui

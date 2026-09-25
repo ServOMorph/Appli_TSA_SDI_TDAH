@@ -1,3 +1,20 @@
+## v6.5 — 2026-09-25
+
+### Corrigé
+- **Débordement horizontal de l'écran d'accueil, réapparu après un premier correctif partiel.**
+  Root cause réelle trouvée (conteneur de page sans largeur explicite, dimensionné au contenu sous
+  WebKit) et corrigée à la source (`AppShell.tsx`) plutôt qu'au symptôme, puis étendue par
+  précaution à 23 autres conteneurs de page partageant la même construction, dont 7 qui restaient
+  exposés à un correctif antérieur incomplet (`E110Settings.tsx`, `E111Profile.tsx`,
+  `E112Accessibility.tsx`, `E116Privacy.tsx`, `E117Export.tsx`, `E21CreateTaskV2.tsx`,
+  `E61ListDetail.tsx`).
+- **Libellé mois/année de l'accueil sur 2 lignes pour certains mois** (« Septembre 2026 »,
+  « Novembre 2026 »), pas d'autres (« Octobre 2026 »), selon la largeur d'écran. Police réduite et
+  passage forcé sur une seule ligne.
+- **Avertissement React « setState pendant le rendu d'un autre composant »** au changement de jour
+  sur l'accueil (`PlanningBoard.tsx`) : les deux mises à jour d'état concernées sont désormais
+  découplées.
+
 ## v6.4 — 2026-09-25
 
 ### Corrigé

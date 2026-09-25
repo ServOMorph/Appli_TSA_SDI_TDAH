@@ -113,7 +113,9 @@ export function useRoutineState() {
     const schedule = await routineScheduleRepo.getById(id)
     if (schedule?.steps_overridden) {
       const daySteps = (await routineStepRepo.getByRoutineId(schedule.routine_id)).filter((s) => s.weekday === schedule.weekday)
-      await routineStepRepo.deleteMany(daySteps.map((s) => s.id))
+      const dayStepIds = daySteps.map((s) => s.id)
+      await routineStepCompletionRepo.deleteByStepIds(dayStepIds)
+      await routineStepRepo.deleteMany(dayStepIds)
     }
     await routineScheduleRepo.delete(id)
   }
@@ -149,14 +151,28 @@ export function useRoutineState() {
     [resolveEffectiveSteps],
   )
 
-  async function detachRoutineDay(routineId: string, weekday: number) {
+  async function detachRoutineDay(routineId: string, weekday: number, date: string) {
     const schedules = await routineScheduleRepo.getByRoutineId(routineId)
     const schedule = schedules.find((s) => s.weekday === weekday)
     if (!schedule || schedule.steps_overridden) return
-    const commonSteps = (await routineStepRepo.getByRoutineId(routineId)).filter((s) => s.weekday === null)
+    const [commonSteps, completions] = await Promise.all([
+      routineStepRepo.getByRoutineId(routineId).then((steps) => steps.filter((s) => s.weekday === null)),
+      routineStepCompletionRepo.getByRoutineAndDate(routineId, date),
+    ])
+    const completedCommonIds = new Set(completions.map((c) => c.routine_step_id))
     const now = new Date().toISOString()
     for (const step of commonSteps) {
-      await routineStepRepo.create({ ...step, id: newId(), weekday, created_at: now, updated_at: now })
+      const clonedId = newId()
+      await routineStepRepo.create({ ...step, id: clonedId, weekday, created_at: now, updated_at: now })
+      if (completedCommonIds.has(step.id)) {
+        await routineStepCompletionRepo.create({
+          id: newId(),
+          routine_step_id: clonedId,
+          routine_id: routineId,
+          date,
+          created_at: now,
+        })
+      }
     }
     await routineScheduleRepo.update({ ...schedule, steps_overridden: true, updated_at: now })
   }
@@ -166,7 +182,9 @@ export function useRoutineState() {
     const schedule = schedules.find((s) => s.weekday === weekday)
     if (!schedule || !schedule.steps_overridden) return
     const daySteps = (await routineStepRepo.getByRoutineId(routineId)).filter((s) => s.weekday === weekday)
-    await routineStepRepo.deleteMany(daySteps.map((s) => s.id))
+    const dayStepIds = daySteps.map((s) => s.id)
+    await routineStepCompletionRepo.deleteByStepIds(dayStepIds)
+    await routineStepRepo.deleteMany(dayStepIds)
     await routineScheduleRepo.update({ ...schedule, steps_overridden: false, updated_at: new Date().toISOString() })
   }
 

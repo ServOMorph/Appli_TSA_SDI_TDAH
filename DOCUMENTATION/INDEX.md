@@ -13,7 +13,7 @@ nécessaires au sujet traité.
 - [Produit et domaines fonctionnels](10_concepts/produit_et_domaines.md) — objectif, utilisateurs et domaines visibles.
 - [Tâches et planification](10_concepts/taches_et_planification.md) — cycle de vie, décomposition et récurrence.
 - [Énergie et surcharge](10_concepts/energie_et_surcharge.md) — relevé quotidien et seuil de surcharge.
-- [Outils, listes et budget](10_concepts/outils_listes_et_budget.md) — organisation, listes et calculs budgétaires.
+- [Outils, listes et budget](10_concepts/outils_listes_et_budget.md) — organisation, listes, routines et calculs budgétaires.
 - [Retours et partage des données](10_concepts/retours_et_partage.md) — captures, échanges, résolution et consentement.
 
 ## Guides
@@ -36,5 +36,5 @@ nécessaires au sujet traité.
 
 - [Onboarding, accueil et navigation](40_specs/onboarding_accueil_navigation.md) — entrée, profil, consentement et accès aux parcours.
 - [Tâches, planning et énergie](40_specs/taches_planning_energie.md) — réception, planification, récurrence et surcharge.
-- [Outils, listes et budget](40_specs/outils_listes_budget.md) — organisation, listes, prévisions et livrets.
+- [Outils, listes et budget](40_specs/outils_listes_budget.md) — organisation, listes, routines, prévisions et livrets.
 - [Paramètres, données et retours](40_specs/parametres_donnees_retours.md) — réglages, export/import et cycle de retour.

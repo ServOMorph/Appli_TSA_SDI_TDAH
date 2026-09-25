@@ -14,7 +14,20 @@ export class RoutineStepCompletionRepository {
     return all.filter((c) => c.date === date)
   }
 
+  async getByRoutineId(routineId: string): Promise<RoutineStepCompletion[]> {
+    return this.db.routineStepCompletions.where('routine_id').equals(routineId).toArray()
+  }
+
   async delete(id: string): Promise<void> {
     await this.db.routineStepCompletions.delete(id)
+  }
+
+  async deleteByRoutineId(routineId: string): Promise<void> {
+    await this.db.routineStepCompletions.where('routine_id').equals(routineId).delete()
+  }
+
+  async deleteByStepIds(stepIds: string[]): Promise<void> {
+    if (!stepIds.length) return
+    await this.db.routineStepCompletions.where('routine_step_id').anyOf(stepIds).delete()
   }
 }

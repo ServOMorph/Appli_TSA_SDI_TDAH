@@ -43,4 +43,35 @@ describe('RoutineStepCompletionRepository', () => {
     const result = await repo.getByRoutineAndDate('routine-1', '2026-09-28')
     expect(result.map((c) => c.id).sort()).toEqual(['c1', 'c2'])
   })
+
+  it('retrieves all completions for a routine regardless of date', async () => {
+    await repo.create(completion({ id: 'c1', date: '2026-09-28' }))
+    await repo.create(completion({ id: 'c2', date: '2026-09-29' }))
+    await repo.create(completion({ id: 'c3', routine_id: 'routine-2', date: '2026-09-28' }))
+
+    const result = await repo.getByRoutineId('routine-1')
+    expect(result.map((c) => c.id).sort()).toEqual(['c1', 'c2'])
+  })
+
+  it('deletes all completions of a routine', async () => {
+    await repo.create(completion({ id: 'c1' }))
+    await repo.create(completion({ id: 'c2', date: '2026-09-29' }))
+    await repo.create(completion({ id: 'c3', routine_id: 'routine-2' }))
+
+    await repo.deleteByRoutineId('routine-1')
+
+    expect(await repo.getByRoutineId('routine-1')).toEqual([])
+    expect(await repo.getByRoutineId('routine-2')).toHaveLength(1)
+  })
+
+  it('deletes completions matching a set of step ids', async () => {
+    await repo.create(completion({ id: 'c1', routine_step_id: 'step-1' }))
+    await repo.create(completion({ id: 'c2', routine_step_id: 'step-2' }))
+    await repo.create(completion({ id: 'c3', routine_step_id: 'step-3' }))
+
+    await repo.deleteByStepIds(['step-1', 'step-3'])
+
+    const remaining = await repo.getByRoutineId('routine-1')
+    expect(remaining.map((c) => c.id)).toEqual(['c2'])
+  })
 })

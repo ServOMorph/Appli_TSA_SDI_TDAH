@@ -208,7 +208,7 @@ describe('E80RoutineSteps', () => {
       }),
     )
     await userEvent.click(await screen.findByLabelText('Modifier les étapes de ce jour'))
-    expect(detachRoutineDay).toHaveBeenCalledWith('routine-1', 3)
+    expect(detachRoutineDay).toHaveBeenCalledWith('routine-1', 3, '2026-09-23')
 
     await userEvent.click(await screen.findByRole('button', { name: 'Ajouter une étape' }))
     await userEvent.type(screen.getByLabelText('Titre'), 'Pyjama')

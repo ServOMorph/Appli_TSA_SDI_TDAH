@@ -256,6 +256,7 @@ export function E80RoutineSteps() {
   const [editingStep, setEditingStep] = useState<RoutineStep | null>(null)
   const [editStepTitle, setEditStepTitle] = useState('')
   const [editStepDuration, setEditStepDuration] = useState('')
+  const [detaching, setDetaching] = useState(false)
 
   const daySchedule = schedules.find((s) => s.weekday === weekday) ?? null
 
@@ -324,10 +325,15 @@ export function E80RoutineSteps() {
   }
 
   async function handleEnterEditMode() {
-    if (!selectedRoutineId) return
+    if (!selectedRoutineId || detaching) return
     if (!overridden) {
-      await detachRoutineDay(selectedRoutineId, weekday)
-      await reload()
+      setDetaching(true)
+      try {
+        await detachRoutineDay(selectedRoutineId, weekday, date)
+        await reload()
+      } finally {
+        setDetaching(false)
+      }
     }
     setEditingDay(true)
   }
@@ -418,7 +424,7 @@ export function E80RoutineSteps() {
           <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>{formatFullDate(date)}</p>
         </div>
         {daySchedule && !editingDay && (
-          <button aria-label="Modifier les étapes de ce jour" onClick={handleEnterEditMode} style={neutralLinkStyle}>
+          <button aria-label="Modifier les étapes de ce jour" onClick={handleEnterEditMode} disabled={detaching} style={neutralLinkStyle}>
             Modifier ce jour
           </button>
         )}

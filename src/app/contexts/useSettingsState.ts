@@ -26,6 +26,7 @@ import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
 import type { Routine } from '@/domain/entities/routine'
 import type { RoutineStep } from '@/domain/entities/routineStep'
 import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
+import type { RoutineStepCompletion } from '@/domain/entities/routineStepCompletion'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
 
@@ -34,7 +35,7 @@ const IMPORT_TABLES = [
   db.lists, db.listItems, db.listItemSubTasks, db.listCategories, db.folders,
   db.tools, db.energyEntries, db.settings, db.budgetCategories, db.budgetEntries,
   db.budgetAccounts, db.budgetDeposits, db.budgetDepositCategories, db.budgetIncomeEntries,
-  db.routines, db.routineSteps, db.routineSchedules,
+  db.routines, db.routineSteps, db.routineSchedules, db.routineStepCompletions,
 ] as const
 
 function readImportArray(data: Record<string, unknown>, key: string): unknown[] {
@@ -74,7 +75,7 @@ function assertSupportedVersion(version: unknown) {
   const major = parts[0]
   const minor = parts[1]
   const patch = parts[2] ?? 0
-  const [currentMajor, currentMinor, currentPatch] = [3, 8, 0]
+  const [currentMajor, currentMinor, currentPatch] = [3, 9, 0]
   if (major > currentMajor || (major === currentMajor && (minor > currentMinor || (minor === currentMinor && patch > currentPatch)))) {
     throw new Error('Fichier incompatible : version d’export plus récente.')
   }
@@ -188,6 +189,7 @@ export function useSettingsState() {
       db.routines.clear(),
       db.routineSteps.clear(),
       db.routineSchedules.clear(),
+      db.routineStepCompletions.clear(),
     ])
   }
 
@@ -226,7 +228,7 @@ export function useSettingsState() {
     let lists: List[], rawListItems: (ListItem & { section?: string | null })[], listItemSubTasks: ListItemSubTask[], listCategories: ListCategory[]
     let folders: Folder[], tools: Tool[], energyEntries: EnergyEntry[], categories: BudgetCategory[], entries: BudgetEntry[]
     let accounts: BudgetAccount[], deposits: BudgetDeposit[], depositCategories: BudgetDepositCategory[], incomeEntries: BudgetIncomeEntry[]
-    let routines: Routine[], routineSteps: RoutineStep[], routineSchedules: RoutineSchedule[]
+    let routines: Routine[], routineSteps: RoutineStep[], routineSchedules: RoutineSchedule[], routineStepCompletions: RoutineStepCompletion[]
     try {
       tasks = readImportArray(data, 'tasks') as Task[]
       taskRecurrences = readImportArray(data, 'task_recurrences') as TaskRecurrence[]
@@ -248,7 +250,8 @@ export function useSettingsState() {
       routines = readImportArray(data, 'routines') as Routine[]
       routineSteps = readImportArray(data, 'routine_steps') as RoutineStep[]
       routineSchedules = readImportArray(data, 'routine_schedules') as RoutineSchedule[]
-      for (const [name, items] of Object.entries({ tasks, taskRecurrences, taskExceptions, taskCategories, lists, rawListItems, listItemSubTasks, listCategories, folders, tools, energyEntries, categories, entries, accounts, deposits, depositCategories, incomeEntries, routines, routineSteps, routineSchedules })) {
+      routineStepCompletions = readImportArray(data, 'routine_step_completions') as RoutineStepCompletion[]
+      for (const [name, items] of Object.entries({ tasks, taskRecurrences, taskExceptions, taskCategories, lists, rawListItems, listItemSubTasks, listCategories, folders, tools, energyEntries, categories, entries, accounts, deposits, depositCategories, incomeEntries, routines, routineSteps, routineSchedules, routineStepCompletions })) {
         assertUniqueIds(name, items as { id: string }[])
       }
       const taskIds = new Set(tasks.map((item) => item.id))
@@ -260,6 +263,7 @@ export function useSettingsState() {
       const categoryIds = new Set(categories.map((item) => item.id))
       const depositCategoryIds = new Set(depositCategories.map((item) => item.id))
       const routineIds = new Set(routines.map((item) => item.id))
+      const routineStepIds = new Set(routineSteps.map((item) => item.id))
       assertReferences('tâche parente', tasks, 'parent_id', taskIds)
       assertReferences('récurrence de tâche', tasks, 'recurrence_id', recurrenceIds)
       assertReferences('récurrence', taskExceptions, 'recurrence_id', recurrenceIds)
@@ -274,6 +278,8 @@ export function useSettingsState() {
       assertReferences('catégorie budget', entries, 'category_id', categoryIds)
       assertReferences('routine', routineSteps, 'routine_id', routineIds)
       assertReferences('routine', routineSchedules, 'routine_id', routineIds)
+      assertReferences('routine', routineStepCompletions, 'routine_id', routineIds)
+      assertReferences('étape de routine', routineStepCompletions, 'routine_step_id', routineStepIds)
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Fichier invalide.' }
     }
@@ -375,6 +381,7 @@ export function useSettingsState() {
         if (routines.length) await db.routines.bulkAdd(routines)
         if (repairedRoutineSteps.length) await db.routineSteps.bulkAdd(repairedRoutineSteps)
         if (repairedRoutineSchedules.length) await db.routineSchedules.bulkAdd(repairedRoutineSchedules)
+        if (routineStepCompletions.length) await db.routineStepCompletions.bulkAdd(routineStepCompletions)
       })
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Échec de l\'import.' }

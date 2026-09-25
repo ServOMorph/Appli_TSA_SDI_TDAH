@@ -93,6 +93,7 @@ function dateStripBoxStyle(ambianceColor: string): React.CSSProperties {
     borderRadius: 'var(--radius-md)',
     padding: '4px 2px',
     overflow: 'hidden',
+    touchAction: 'pan-y',
   }
 }
 

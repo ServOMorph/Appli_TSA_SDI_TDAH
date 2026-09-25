@@ -84,7 +84,7 @@ html.reduce-motion, html.reduce-motion * {
 html,
 body {
   margin: 0;
-  overflow-x: clip;
+  overflow-x: hidden;
   background: var(--color-background);
 }
 

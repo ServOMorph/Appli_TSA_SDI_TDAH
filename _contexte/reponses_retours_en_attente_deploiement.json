@@ -78,5 +78,10 @@
     "report_id": "a1317d93-6d8b-4c64-8c49-d84bc7103cdd",
     "screen_code": "E77",
     "body": "Le livret permet maintenant de créer des sous-catégories, chacune avec son propre sous-total. Un mouvement peut aussi rester hors catégorie, il compte alors seulement dans le total du livret."
+  },
+  {
+    "report_id": "6b0cfaab-5770-49bc-9d55-161ed0ded1c4",
+    "screen_code": "E10",
+    "body": "Corrigé. L'affichage ne déborde plus sur le bord droit avec une tâche récurrente."
   }
 ]

@@ -1,0 +1,82 @@
+[
+  {
+    "report_id": "34ba6474-2574-4c97-b198-d5ac5343f28f",
+    "screen_code": "E10",
+    "body": "Les sous-tâches ajoutées à la création d'une tâche répétée apparaissent maintenant sur tous les jours où elle revient."
+  },
+  {
+    "report_id": "4e3042e1-6fe3-47f5-8a6e-359c38a19f82",
+    "screen_code": "E21",
+    "body": "La récurrence respecte maintenant les jours choisis. La tâche ne se planifie plus le jour de la création si ce jour n'en fait pas partie."
+  },
+  {
+    "report_id": "47db30e8-9533-4630-a311-415955729f8e",
+    "screen_code": "E21",
+    "body": "L'icône choisie s'affiche maintenant directement, avec son nom, au lieu du code technique."
+  },
+  {
+    "report_id": "7e1383fe-f90a-4df4-9b34-f25941ec0b9f",
+    "screen_code": "E21",
+    "body": "La couleur affiche maintenant le nom de la catégorie et sa pastille, plutôt que le code hexadécimal."
+  },
+  {
+    "report_id": "909b8a67-d853-464e-a770-d0333424a25d",
+    "screen_code": "E22",
+    "body": "La durée choisie à la création d'une tâche est maintenant bien enregistrée et s'affiche correctement."
+  },
+  {
+    "report_id": "a89bf7a0-d6f7-4e0b-9a81-46e097038856",
+    "screen_code": "E21",
+    "body": "Annuler retourne maintenant à l'écran d'où vous êtes arrivée, comme le bouton Retour."
+  },
+  {
+    "report_id": "1f202a5e-176a-42fb-b03e-9c510908235f",
+    "screen_code": "E123",
+    "body": "Après l'envoi d'un retour, le bouton Retour ne repasse plus par la page Nouveau retour."
+  },
+  {
+    "report_id": "9a8f67a9-5c26-49a0-a274-323d2792d027",
+    "screen_code": "E123",
+    "body": "Le bouton Nouveau retour est maintenant en haut de la page, juste sous le titre."
+  },
+  {
+    "report_id": "245fa5d3-082b-4ca0-9e05-7d19d4aeaa0c",
+    "screen_code": "E10",
+    "body": "Les outils restent maintenant accessibles même en mode surcharge."
+  },
+  {
+    "report_id": "37f9f912-e86d-4e08-9a59-5d76e323d43a",
+    "screen_code": "E10",
+    "body": "Le nombre de sous-tâches est maintenant à la même place, avec ou sans énergie affichée."
+  },
+  {
+    "report_id": "cd7529b6-d0fe-45bd-bc8b-b7f52a82744b",
+    "screen_code": "E10",
+    "body": "La tâche se coche maintenant automatiquement quand toutes ses sous-tâches sont cochées."
+  },
+  {
+    "report_id": "8573bf55-a5ab-4675-a158-7bfae7c290c7",
+    "screen_code": "E10",
+    "body": "Un logo affiche maintenant l'énergie totale planifiée du jour affiché, tâches faites et non faites comprises. Il se met à jour dès que vous changez de jour."
+  },
+  {
+    "report_id": "6f90c375-3483-4d4c-8a11-2cd77e555602",
+    "screen_code": "E10",
+    "body": "Corrigé. La case du milieu reste maintenant fixe. Les jours défilent à l'intérieur du bandeau, que ce soit en glissant ou en cliquant sur un jour."
+  },
+  {
+    "report_id": "ed6ab7df-b512-4921-8a0a-3393bb059018",
+    "screen_code": "E31",
+    "body": "Nouveau réglage dans Paramètres > Accessibilité pour afficher l'écran énergie à chaque connexion. Une fois activé, il s'affiche au lancement et à chaque retour sur l'application. Le mode surcharge se déclenche déjà même pour une seule tâche coûteuse, sans compter les tâches déjà faites."
+  },
+  {
+    "report_id": "9d73bbdc-9d36-450e-a3c9-8a86696696b8",
+    "screen_code": "E12",
+    "body": "Le planning de la semaine affiche maintenant le nom de chaque tâche avec sa couleur, au lieu du petit logo. Le cadre du planning est agrandi pour occuper tout l'espace disponible de la page."
+  },
+  {
+    "report_id": "a1317d93-6d8b-4c64-8c49-d84bc7103cdd",
+    "screen_code": "E77",
+    "body": "Le livret permet maintenant de créer des sous-catégories, chacune avec son propre sous-total. Un mouvement peut aussi rester hors catégorie, il compte alors seulement dans le total du livret."
+  }
+]

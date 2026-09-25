@@ -1,7 +1,7 @@
 ---
 description: Analyse les retours testeurs en attente, planifie et traite leurs correctifs, répond au fil de discussion
 argument-hint: [device_id]
-allowed-tools: Bash(python scripts/reply_feedback_report.py:*), Bash(python scripts/read_feedback_reports.py:*), Bash(npx tsc -b:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(npm run test:e2e:*), Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(ls:*), Bash(test -f:*)
+allowed-tools: Bash(python scripts/reply_feedback_report.py:*), Bash(python scripts/queue_pending_feedback_reply.py:*), Bash(python scripts/read_feedback_reports.py:*), Bash(npx tsc -b:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(npm run test:e2e:*), Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(ls:*), Bash(test -f:*)
 ---
 
 # /traiter_retours [device_id]
@@ -71,13 +71,17 @@ livraison).
    - Gates avant de considérer la phase terminée : `npx vitest run`, `npx tsc -b`, `npm run lint` ;
      ajouter `npm run test:e2e` si le parcours touché est couvert par la suite e2e.
    - Documenter le résultat dans la phase (§ Réalisé), comme `Archives/roadmap_demandes_marie_2026-09-10.md`.
-   - Une fois le correctif vérifié, déposer la réponse pour chaque retour couvert par la phase :
+   - Une fois le correctif vérifié, mettre en attente la réponse pour chaque retour couvert par la
+     phase — jamais de dépôt direct, le code corrigé n'est pas encore déployé à ce stade :
      ```
-     python scripts/reply_feedback_report.py --report-id <id> --body <texte>
+     python scripts/queue_pending_feedback_reply.py --report-id <id> --body <texte>
      ```
      Règle de rédaction (CLAUDE.md § Réponses aux retours testeurs) : synthétique, sans jargon, sans
      nom de fichier ni de commit, une idée par phrase. Ne jamais appeler `close_feedback_report` :
-     le retour reste ouvert tant que le testeur ne l'a pas validé lui-même dans E124.
+     le retour reste ouvert tant que le testeur ne l'a pas validé lui-même dans E124. La réponse
+     n'est visible pour le testeur qu'au prochain `/deploy` (juste après son smoke test, une fois le
+     correctif réellement en production) — `scripts/reply_feedback_report.py` (étape 1) n'y compte
+     déjà plus ce retour comme en attente de réponse.
    - Checkpoint : demander à l'utilisateur de faire `/compact` avant la phase suivante, attendre sa
      réponse écrite.
 

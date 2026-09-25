@@ -114,6 +114,28 @@ def insert_row(url: str, service_key: str, table: str, row: dict) -> dict:
         raise SupabaseError(f"Supabase n'a pas repondu en {HTTP_TIMEOUT_SECONDS} s") from e
 
 
+def delete_row(url: str, service_key: str, table: str, row_id: str) -> None:
+    request = urllib.request.Request(
+        f"{url.rstrip('/')}/rest/v1/{quote(table, safe='_')}?id=eq.{quote(row_id, safe='-')}",
+        method="DELETE",
+        headers={
+            "apikey": service_key,
+            "Authorization": f"Bearer {service_key}",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT_SECONDS):
+            return
+    except urllib.error.HTTPError as e:
+        raise SupabaseError(
+            f"suppression Supabase echouee ({e.code}) : {e.read().decode('utf-8')}"
+        ) from e
+    except urllib.error.URLError as e:
+        raise SupabaseError(f"Supabase injoignable ({e.reason})") from e
+    except TimeoutError as e:
+        raise SupabaseError(f"Supabase n'a pas repondu en {HTTP_TIMEOUT_SECONDS} s") from e
+
+
 def download_storage_object(url: str, service_key: str, bucket: str, path: str) -> bytes:
     request = urllib.request.Request(
         f"{url.rstrip('/')}/storage/v1/object/{quote(bucket, safe='')}/{quote(path, safe='/')}",

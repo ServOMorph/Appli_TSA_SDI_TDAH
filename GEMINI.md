@@ -121,6 +121,20 @@ clôt jamais un retour à la place du testeur. Décision du 2026-09-14 : aucune 
 appel explicite du script en session quand un retour est traité — pas de rattachement à `/close`
 ni `/deploy`.
 
+**Ajout du 2026-09-25 — réponse à un retour dont le correctif n'est pas encore déployé.**
+`reply_feedback_report.py --report-id --body` dépose la réponse immédiatement et de façon visible
+pour le testeur (sync Supabase), indépendamment de tout déploiement réel du correctif — l'appeler
+pendant une session de correction (`/traiter_retours`) expose donc « corrigé » avant que le code
+ne soit en ligne. `/traiter_retours.md` (étape 5) appelle désormais
+`scripts/queue_pending_feedback_reply.py --report-id --body` à la place : la réponse est ajoutée à
+`_contexte/reponses_retours_en_attente_deploiement.json` au lieu d'être déposée sur Supabase, et
+`reply_feedback_report.py` (étape 1, liste des retours à traiter) exclut déjà les retours ainsi mis
+en attente pour ne pas les re-proposer. `/deploy` republie ce fichier via
+`scripts/republish_pending_feedback_replies.py` juste après le smoke test post-déploiement (étape
+8), une fois le code confirmé réellement en production. `reply_feedback_report.py --report-id
+--body` reste utilisé directement uniquement hors `/traiter_retours`, pour répondre à un retour
+dont le correctif est déjà en production (rien à différer).
+
 ### Section Délégation Ollama : helper dans `scripts/`
 L'helper Ollama de ce projet est `scripts/ollama_call.py` (pas à la racine comme le template kit),
 aligné avec les références de `AGENTS.md` et `GEMINI.md`. `/update` ne recopie donc pas

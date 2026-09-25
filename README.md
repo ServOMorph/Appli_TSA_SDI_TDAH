@@ -16,6 +16,13 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 25 septembre 2026 (suite de session), un défaut de séquencement a été corrigé dans la façon de
+répondre aux retours signalés par Marie : la réponse à un correctif partait aussitôt visible dans
+son application, même avant que la nouvelle version ne soit réellement mise en ligne — ce qui
+l'avait déjà conduite à juger « pas encore corrigé » une réponse pourtant exacte, simplement en
+avance sur la mise en ligne. Les réponses attendent désormais la mise en ligne effective du
+correctif avant d'apparaître dans son fil de discussion.
+
 Le 25 septembre 2026, une relecture approfondie du code de l'outil « Routine » (pas encore mis en
 ligne) a trouvé deux vrais défauts, corrigés avant tout déploiement : les coches d'étapes de routine
 n'étaient pas incluses dans l'export, l'import ni la suppression d'une routine, et cocher une étape

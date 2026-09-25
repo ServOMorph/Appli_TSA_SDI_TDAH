@@ -8,7 +8,7 @@
 
 ## Questions ouvertes
 - [P1] **Correctif `is_empty_snapshot_payload()` (`supabase/schema.sql` v5.138) à appliquer manuellement sur Supabase.** `/deploy` ne l'exécute pas automatiquement (aucun script du projet n'applique `schema.sql`/`feedback.sql`) : tant que ce n'est pas fait dans le SQL Editor du projet, le garde-fou serveur en production reste incomplet (risque d'écrasement silencieux d'un appareil dont les seules données réelles sont des entrées d'énergie). — fait quand : la fonction corrigée est appliquée sur la base Supabase de production et vérifiée (`select prosrc from pg_proc where proname = 'is_empty_snapshot_payload'` ou nouveau test manuel) — réf : `supabase/schema.sql`, `CHANGELOG.md` v5.138
-- [P1] **Lot de correctifs `roadmap_retours_2026-09-22.md` (8 phases, 16 retours testeur corrigés et répondus via `/traiter_retours`) committé mais pas encore déployé.** — fait quand : `/deploy` met ce lot en production — réf : `roadmap_retours_2026-09-22.md`, `CHANGELOG.md` v6.1
+- [P1] **Lot de correctifs `roadmap_retours_2026-09-22.md` (8 phases, 16 retours testeur corrigés) committé mais pas encore déployé — réponses agent mises en attente (`_contexte/reponses_retours_en_attente_deploiement.json`) plutôt que déposées directement, depuis le nettoyage du 2026-09-25 (cf. Dernière session).** — fait quand : `/deploy` met ce lot en production et republie automatiquement les réponses en attente (étape 8) — réf : `roadmap_retours_2026-09-22.md`, `_contexte/reponses_retours_en_attente_deploiement.json`, `CHANGELOG.md` v6.1
 - [P1] **Durée d'une tâche tronquée silencieusement si elle dépasse minuit, trouvé par la revue de code du `/close` 2026-09-23 (non corrigé, décision produit nécessaire).** `scheduleTask` (`taskRules.ts:95-106`) dérive désormais `duration_minutes` de l'écart réel entre l'heure de début et de fin (correctif `909b8a67`, Phase 2), mais `addMinutesToTime` (`taskRules.ts:116-122`) clampe l'heure de fin à `23:59` sans jamais réduire la durée affichée pendant la saisie. Exemple : une tâche planifiée à 23:00 avec 120 min demandées affiche « 23:00 (120 min) » sur l'écran de création (`E21CreateTaskV2.tsx:286`, aucun garde-fou sur `DurationRoller`) mais est enregistrée avec `duration_minutes: 59`. Même chemin pour une occurrence de série régénérée (`usePlanningState.ts:171-181,253-254`) et pour la modification d'horaire sur la fiche (`E22TaskDetail.tsx:563`). Pas corrigé ici : la bonne réponse (avertir, empêcher la saisie, ou répartir) est un choix produit, pas un bug mécanique évident. — fait quand : décision actée avec l'utilisateur et implémentée — réf : `src/domain/rules/taskRules.ts:95-122`, `src/app/contexts/usePlanningState.ts:171-181`
 - [P3] **Dette signalée par la synthèse `/traiter_retours` du 2026-09-23 (non corrigée) : la liste « Mes livrets » (E74) pourrait afficher le nombre de sous-catégories par livret.** — fait quand : traité ou jugé non nécessaire — réf : `src/ui/screens/tools/E74BudgetSettings.tsx`
 - [P1] **Code testeur de Marie toujours absent côté serveur — code corrigé (`72481be`, `updateSettings()` déclenche désormais `syncNow()`) mais non encore déployé.** Reconfirmé par le hook de pré-synthèse de ce `/close` (2026-09-22) : snapshot de l'appareil `103c9b92` toujours classé `donnees_testeurs/_sans_code/`. Attendu tant que la production (toujours v5.139) n'a pas reçu ce correctif — pas une régression nouvelle. — fait quand : après déploiement, un `backup_testeur_snapshots.py` range le snapshot de `103c9b92` dans `marie/` — réf : `src/app/contexts/useSettingsState.ts`, `tests_manuels.md` § Vérifier le classement du snapshot de Marie (référence `192f2411` à mettre à jour vers `103c9b92`)
@@ -39,27 +39,26 @@
 - [P3] **Étapes dupliquées si double-appui sur « Ajouter » avant la fin de l'écriture précédente, trouvé par la même revue (non corrigé, effet mineur — position dupliquée, se corrige au premier glisser-déposer).** `addRoutineStep` calcule la position à partir d'une lecture fraîche mais le bouton n'a pas de garde anti-double-soumission. — fait quand : garde ajoutée ou risque jugé négligeable — réf : `src/app/contexts/useRoutineState.ts:64`
 - [P2] **`PlanningBoard.tsx` (E10) : clic sur le bandeau des jours déclenche une erreur console React (« Cannot update a component (`AppProvider`) while rendering a different component (`PlanningBoard`) »), trouvé en vérifiant manuellement la roadmap Routine (non lié aux routines — reproductible sur un jour sans rien de planifié).** Cause : `updateDisplayDate`/`jumpTo` (`PlanningBoard.tsx:414-425`) appellent `replace(...)` (setState d'`AppProvider`) depuis l'intérieur de la fonction de mise à jour passée à `setDisplayDate`, exécutée pendant le rendu de `PlanningBoard` — anti-pattern React préexistant, non introduit par la roadmap Routine (fichier non touché par elle). N'empêche pas l'app de fonctionner (avertissement, pas un crash). — fait quand : `replace(...)` déplacé hors de l'updater (ex. `useEffect` sur le changement de `displayDate`, ou appel direct après le `setDisplayDate`) et le clic sur un jour ne produit plus cette erreur — réf : `src/ui/screens/dashboard/PlanningBoard.tsx:414-425`
 
-## Dernière session (2026-09-25 — documentation Routine, revue de code relancée et findings corrigés)
+## Dernière session (2026-09-25 — dépôt différé des réponses aux retours testeur jusqu'au déploiement)
 
 ## Décisions prises
-- Sur confirmation explicite, outil Routine documenté dans `DOCUMENTATION/` (10_concepts et 40_specs « Outils, listes et budget », `INDEX.md`) ; action de triage résolue.
-- Revue de code `medium` relancée (la limite de session API du `/close` précédent avait expiré) : deux passes distinctes (diff `d8c421b..HEAD` puis `3a766ce..HEAD`) ont cette fois trouvé des bugs de correction confirmés, corrigés immédiatement plutôt que tracés.
+- Les réponses aux retours testeur ne sont plus déposées immédiatement sur Supabase pendant `/traiter_retours` : mises en attente, publiées seulement une fois le correctif réellement déployé (nouvelle règle `CLAUDE.md` § Réponses aux retours testeurs).
 
 ## Livrables produits ou modifiés
-- `routineStepCompletions` câblé dans l'export (`buildSnapshot.ts`, schéma 3.8 → 3.9), l'import et le vidage complet (`useSettingsState.ts`), et la suppression en cascade d'une routine (`useToolsState.ts`) — ces quatre chemins l'ignoraient jusqu'ici, risque réel de perte silencieuse des coches à l'export/import.
-- `detachRoutineDay` (`useRoutineState.ts`) : la complétion du jour en cours est déplacée (pas seulement copiée) vers l'étape clonée — corrige la coche qui réapparaissait après un cycle détacher → décocher → revenir à la version commune.
-- `deleteRoutineStep` supprime désormais aussi les complétions de l'étape supprimée (chemin oublié par le premier correctif de complétions).
-- Garde anti-double-appui sur « Modifier ce jour » (E80RoutineSteps.tsx) — un double-clic avant la fin de l'écriture précédente pouvait dupliquer toutes les étapes communes.
-- `RoutineStepCompletionRepository.getByRoutineId` retiré (code mort, aucun appelant hors de son propre test).
-- Nouveau fichier `src/app/contexts/useRoutineState.test.tsx` (Dexie réel, pas de mock) couvrant les deux correctifs de complétions — angle mort signalé par la revue elle-même.
-- Suite complète 1023/1023, `tsc -b` + `eslint` clean. Commits `5c817c8` (documentation + premier correctif) et le commit de ce `/close` (second correctif).
+- Nettoyage production : 16 réponses prématurées du lot `roadmap_retours_2026-09-22.md` (+ 1 doublon trouvé sur `34ba6474`) retirées de Supabase, déplacées vers `_contexte/reponses_retours_en_attente_deploiement.json`. Retour `2c3af15b` (Marie avait déjà réagi à la réponse prématurée) laissé intact, message explicatif ajouté.
+- `scripts/_supabase.py` : ajout de `delete_row()`.
+- Nouveaux scripts `scripts/queue_pending_feedback_reply.py` (mise en attente) et `scripts/republish_pending_feedback_replies.py` (republication).
+- `scripts/reply_feedback_report.py` : le listing des retours à traiter exclut désormais ceux déjà en attente ; `screen_code` ajouté à `find_report`.
+- `.claude/commands/deploy.md` : nouvelle étape après le smoke test (étape 8) qui republie les réponses en attente.
+- `.claude/commands/traiter_retours.md` (étape 5) : appelle `queue_pending_feedback_reply.py` au lieu d'un dépôt direct.
+- `CLAUDE.md` + miroirs `AGENTS.md`/`GEMINI.md` : règle documentée.
 
 ## Hypothèses validées / invalidées
-- VALIDE : le scénario exact décrit par la revue (cocher une étape commune, détacher le jour, décocher, revenir à la version commune) vérifié en navigateur — la case ne réapparaît plus cochée après retour à la version commune.
-- EN ATTENTE : `/deploy` du lot complet (Routine + 16 correctifs du 23/09), toujours pas déployé.
+- VALIDE : le listing (`reply_feedback_report.py` sans argument) exclut bien les 16 retours mis en attente ; la mise en attente rejette proprement un `report_id` inexistant sans corrompre le fichier.
+- EN ATTENTE : vérifier au prochain `/deploy` que l'étape 8 republie effectivement les 16 réponses et vide le fichier.
 
 ## Prochaine étape exacte
-`/deploy` pour mettre en production le lot de 16 correctifs (23/09) et l'outil Routine complet.
+`/deploy` — mettra en production le lot Routine + 16 correctifs (23/09) et republiera automatiquement les 16 réponses en attente.
 
 ## Question bloquante pour la session suivante
 Aucune.

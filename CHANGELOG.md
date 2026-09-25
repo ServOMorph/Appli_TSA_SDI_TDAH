@@ -1,3 +1,12 @@
+## v6.4 — 2026-09-25
+
+### Corrigé
+- **Réponse à un retour testeur visible avant que son correctif ne soit réellement déployé.** Un
+  correctif corrigé mais pas encore mis en ligne pouvait déjà porter une réponse « corrigé »
+  visible côté testeur, l'exposant à un « pas encore corrigé » à tort. Les réponses attendent
+  désormais la mise en ligne effective du correctif (`_contexte/reponses_retours_en_attente_deploiement.json`,
+  republiées automatiquement par `/deploy` après son smoke test).
+
 ## v6.3 — 2026-09-25
 
 ### Corrigé

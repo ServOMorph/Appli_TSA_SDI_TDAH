@@ -8,6 +8,10 @@ La cle service_role n'est jamais affichee ni ecrite par ce script.
 Regle de redaction (voir .claude/CLAUDE.md, section Specificites projet) : reponse synthetique,
 sans jargon, sans nom de fichier ni de commit, une idee par phrase. Ce script ne clot jamais un
 retour a la place du testeur : deposer une reponse n'appelle pas close_feedback_report.
+
+Un retour dont le correctif n'est pas encore deploye ne doit pas passer par ce script directement
+(cf. queue_pending_feedback_reply.py) : la reponse resterait visible pour le testeur avant que le
+code ne soit reellement en production.
 """
 
 import argparse
@@ -15,9 +19,19 @@ import json
 import sys
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from urllib.parse import quote
 
 from _supabase import SupabaseError, fetch_rows, insert_row, read_credentials
+
+QUEUE_FILE = Path(__file__).resolve().parent.parent / "_contexte" / "reponses_retours_en_attente_deploiement.json"
+
+
+def queued_report_ids() -> set[str]:
+    if not QUEUE_FILE.exists():
+        return set()
+    entries = json.loads(QUEUE_FILE.read_text(encoding="utf-8"))
+    return {e["report_id"] for e in entries}
 
 
 def build_open_reports_query() -> str:
@@ -43,11 +57,12 @@ def list_reports_needing_reply(url: str, service_key: str) -> list[dict]:
     last_author: dict[str, str] = {}
     for message in messages:
         last_author[message["report_id"]] = message["author"]
-    return [r for r in reports if last_author.get(r["id"]) != "agent"]
+    pending = queued_report_ids()
+    return [r for r in reports if last_author.get(r["id"]) != "agent" and r["id"] not in pending]
 
 
 def find_report(url: str, service_key: str, report_id: str) -> dict:
-    query = f"select=id,device_id,resolved_at&id=eq.{quote(report_id, safe='-')}"
+    query = f"select=id,device_id,screen_code,resolved_at&id=eq.{quote(report_id, safe='-')}"
     rows = fetch_rows(url, service_key, "feedback_reports", query)
     if not rows:
         raise SupabaseError(f"retour introuvable : {report_id}")

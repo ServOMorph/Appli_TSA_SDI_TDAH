@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -199,6 +199,18 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    puis `curl -sf -o /dev/null -w '%{http_code}' <url>`. Un code différent de 200 est signalé dans le rapport
    final mais n'invalide pas le déploiement déjà effectué (Netlify l'a déjà confirmé) — c'est une vérification
    indépendante supplémentaire, pas une nouvelle porte bloquante.
+
+   Republier les réponses aux retours testeur laissées en attente de cette livraison :
+   ```
+   python scripts/republish_pending_feedback_replies.py
+   ```
+   `_contexte/reponses_retours_en_attente_deploiement.json` contient les réponses dont le
+   correctif n'était pas encore réellement en production au moment où elles ont été rédigées —
+   déposées ici, maintenant que le smoke test ci-dessus confirme le code en ligne, plutôt qu'au
+   moment de la correction, pour que le testeur ne lise jamais « corrigé » sur une version qui ne
+   l'embarque pas encore. Fichier absent ou vide : rien à faire. Échec partiel : les entrées non
+   publiées restent dans le fichier (nouvelle tentative au prochain `/deploy`), à signaler dans le
+   rapport final sans bloquer la suite.
 
    Mettre à jour `_contexte/dernier_deploiement.md` (le créer s'il n'existe pas) avec la version, la date et
    l'URL de production déployées, pour que cette information reste à jour indépendamment de `/close`. Y

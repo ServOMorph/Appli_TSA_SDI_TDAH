@@ -412,12 +412,15 @@ export function PlanningBoard() {
     displayDateRef.current = displayDate
   }, [displayDate])
 
+  // Ne jamais appeler replace() (setState d'AppProvider) depuis l'updater de setDisplayDate :
+  // React peut executer cet updater pendant le rendu de PlanningBoard, ce qui declenchait
+  // l'avertissement "Cannot update a component (AppProvider) while rendering a different
+  // component (PlanningBoard)". displayDateRef tient lieu de valeur precedente, en dehors du
+  // rendu, puisque updateDisplayDate n'est jamais appelee que depuis des gestionnaires d'evenement.
   function updateDisplayDate(updater: string | ((d: string) => string)) {
-    setDisplayDate((prev) => {
-      const next = typeof updater === 'function' ? updater(prev) : updater
-      replace({ name: 'dashboard', date: next })
-      return next
-    })
+    const next = typeof updater === 'function' ? updater(displayDateRef.current) : updater
+    setDisplayDate(next)
+    replace({ name: 'dashboard', date: next })
   }
 
   function jumpTo(date: string) {

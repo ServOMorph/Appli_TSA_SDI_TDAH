@@ -253,20 +253,24 @@ Version <X.Y> en ligne.
 
 <lien de l'appli sur sa propre ligne>
 
-Détail des changements et questions : commentaires_marie_<X.Y>.docx
+Détail des changements : bouton « Nouveautés » dans l'application.
 
 💻🤖
 ```
 
-La ligne « Détail des changements et questions : » n'est présente que s'il y a un commentaire utile
-pour cette livraison ; sinon elle est omise. Elle porte le nom de fichier versionné, jamais une URL.
+La ligne « Détail des changements : » n'est présente que s'il y a du nouveau contenu dans
+`WHATS_NEW` pour cette livraison ; sinon elle est omise.
 
 **Modifié le 2026-09-15 (roadmap_retours_conversationnels.md, Phase 6)** : la bulle « `<N>` tests à
 faire, correspondant aux modifications » a été retirée du gabarit — le catalogue de tests in-app qui
 l'alimentait (`manualTestsCatalog.ts`, écran « Tests à faire ») a été retiré (voir section
 « Validation des retours par Marie » ci-dessous). Le message de livraison ne renvoie donc plus vers
-une liste de tests à faire. **Aucune livraison réelle n'a encore utilisé ce gabarit modifié** :
-relire ce paragraphe avant le prochain `/deploy` et ajuster si le rendu ne convient pas.
+une liste de tests à faire.
+
+**Modifié le 2026-09-26 (roadmap_deploy_md.md, Phase 4)** : le renvoi vers le commentaire détaillé en
+`.docx` déposé sur Drive a été retiré du gabarit — ce mécanisme (ancienne étape 11 de `/deploy`,
+conversion `pandoc`/dépôt `rclone`) n'existe plus. Le détail des changements passe désormais
+uniquement par le bouton « Nouveautés » in-app (`WHATS_NEW`).
 
 ### Historique de conversation avec Marie : sauvegarde systématique et immédiate
 Tout message échangé avec Marie — canal Discord via la gateway, bridge ROBERTO en secours — est
@@ -290,8 +294,9 @@ curatée des questions / réponses / décisions produit :
   `_Suite :_` nomme explicitement le message auquel elle répond, repéré dans le fichier et non
   supposé.
 - Committer cette mise à jour (ne pas la laisser en résidu non commité). Le fichier est une mémoire
-  durable, distincte de `a_transmettre.md` (commentaires de livraison en attente uniquement) et des
-  `livraisons/vX.Y.md` (historique figé des livraisons).
+  durable, distincte de `livraisons/vX.Y.md` (archive figée des livraisons passées, plus alimentée
+  depuis le retrait du mécanisme de commentaire de livraison le 2026-09-26 — roadmap_deploy_md.md
+  Phase 4).
 
 ### Validation des retours par Marie : via le fil de discussion (remplace le catalogue de tests)
 **Décision du 2026-09-15 (roadmap_retours_conversationnels.md, Phase 6)** : le catalogue de tests
@@ -304,9 +309,9 @@ Marie relit la réponse dans le fil de discussion (écran E124) et valide elle-m
 jamais l'agent à sa place. Il n'existe donc plus de liste de tests à faire proactive : la
 validation porte sur les problèmes effectivement remontés, pas sur un parcours prédéfini. Ne jamais
 recréer de liste de tests à refaire ailleurs :
-- `COMMUNICATION/Marie/a_transmettre.md` et les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md`
-  ne contiennent que des **commentaires de livraison** (ce qui change, décisions attendues, écarts
-  assumés) — aucune liste de tests, aucune étape de test.
+- Les fichiers `COMMUNICATION/Marie/livraisons/vX.Y.md` (archive figée, plus alimentée depuis le
+  retrait du 2026-09-26 — roadmap_deploy_md.md Phase 4) ne contenaient que des **commentaires de
+  livraison** (ce qui change, décisions attendues, écarts assumés) — jamais de liste de tests.
 Cette règle prime sur toute étape de `/deploy` ou `/close` qui mentionnerait encore l'écran « Tests
 à faire » ou une rubrique « Tests à refaire » dans les documents de communication — ces mentions
 sont désormais obsolètes et doivent être corrigées, pas suivies.

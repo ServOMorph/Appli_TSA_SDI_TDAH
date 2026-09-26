@@ -208,17 +208,12 @@ générique.
     Spécificités projet, « Validation des retours par Marie » (roadmap_retours_conversationnels.md,
     Phase 6 — le catalogue de tests in-app est retiré). Ne rien ajouter à `tests_manuels.md` si
     aucun contrôle développeur n'a été décidé — ne pas en inventer.
-  - Vérifier `COMMUNICATION/Marie/a_transmettre.md` : chaque changement visible pour Marie,
-    décision attendue, écart assumé ou retour d'export encore pertinent de la session doit y
-    figurer, en langage simple. Ce fichier ne contient jamais de liste de tests (cf. `CLAUDE.md` §
-    Spécificités projet, « Validation des retours par Marie »). Ne pas déplacer
-    les documents de `COMMUNICATION/Marie/livraisons/` (historique figé des messages publiés).
   - Sur `main` uniquement, si la session a introduit un changement visible pour Marie (nouvelle
     fonctionnalité, écran, comportement modifié — pas un correctif interne ni un refacto), ajouter
     une entrée en langage clair et sans jargon technique au tableau `WHATS_NEW` de
-    `src/ui/screens/onboarding/E01Welcome.tsx`. Ajout uniquement : ne jamais réécrire ni supprimer
-    les entrées existantes (le tableau accumule les changements depuis le dernier déploiement, la
-    modale Nouveautés de l'écran d'accueil s'appuyant dessus pour la version publiée par
+    `src/domain/data/whatsNew.ts`. Ajout uniquement : ne jamais réécrire ni supprimer
+    les entrées existantes (le tableau accumule les changements depuis le dernier déploiement, le
+    bouton « Nouveautés » de l'écran « Mes retours » s'appuyant dessus pour la version publiée par
     `/deploy`).
   - Sur `main` uniquement et si la zone résolue est la racine du projet : vérifier que
     `tests_manuels.md` est cohérent avant de le committer à l'étape 13 — ne jamais recréer ni

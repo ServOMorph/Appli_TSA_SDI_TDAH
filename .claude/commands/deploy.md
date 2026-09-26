@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(pandoc:*), Bash(rclone:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -10,12 +10,12 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 ## Procédure
 
 0. Traiter les données synchronisées de Marie avant toute chose.
-   Depuis la bascule du 2026-09-01 (`roadmap_sync_marie.md` Phase 5), les données de Marie
-   arrivent par synchronisation automatique (Supabase) : plus aucun export ni envoi manuel à
+   Depuis la bascule du 2026-09-01 (`Archives/roadmap_sync_marie.md` Phase 5), les données de
+   Marie arrivent par synchronisation automatique (Supabase) : plus aucun export ni envoi manuel à
    réclamer. `/start` archive déjà le dernier snapshot daté de chaque testeur dans
    `donnees_testeurs/<tester_code>/` (`scripts/backup_testeur_snapshots.py`) — cette étape ne
    porte que sur celui de Marie (`donnees_testeurs/marie/`), seule testeuse dont les retours
-   conditionnent le déploiement (roadmap_integration_onboard.md § Phase 6). `/traiter_export_marie`
+   conditionnent le déploiement (`Archives/roadmap_integration_onboard.md` § Phase 6). `/traiter_export_marie`
    ne subsiste que comme repli manuel (voir son en-tête) et ne fait pas partie de ce flux.
    1. Alerter Marie en urgence, avant toute autre analyse : lui demander d'exporter ses données
       maintenant (Paramètres > Export et import > Exporter en JSON), avant qu'une nouvelle version
@@ -72,7 +72,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 
 1. Exécuter intégralement `/close` (sans argument — zone implicite : dossier courant) avant de
    poursuivre. Le code à déployer doit être clôturé et commité, pas laissé en session ouverte.
-   Si `/close` signale des résidus non commités à son étape 12, les traiter comme un échec de
+   Si `/close` signale des résidus non commités à son étape 15, les traiter comme un échec de
    l'étape 3.1 ci-dessous plutôt que de continuer.
 
 2. Déterminer la version.
@@ -86,30 +86,19 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
 
    1. **Arbre de travail propre** : `git status --short`. Si la sortie n'est pas vide, s'arrêter — le code
       déployé doit être traçable dans un commit.
-   2. **`.env` présent avec les clés attendues, valeurs non vides** : `test -f .env`, puis
-      `grep -qE '^NETLIFY_AUTH_TOKEN=.+' .env` et `grep -qE '^NETLIFY_SITE_ID=.+' .env` (le `.+` exige une
-      valeur après le `=`, pas seulement la clé). Si absent ou incomplet : dire à l'utilisateur de le
-      créer/compléter depuis `.env.example` et s'arrêter. Ne jamais lire ni afficher le contenu de `.env`.
+   2. **`.env` présent** : `test -f .env`. Si absent : dire à l'utilisateur de le créer depuis
+      `.env.example` et s'arrêter. Ne jamais lire ni afficher le contenu de `.env`. Le contrôle des
+      clés Netlify (`NETLIFY_AUTH_TOKEN`/`NETLIFY_SITE_ID`) est déplacé à l'étape 7, conditionné au
+      choix du mode de déploiement.
    3. **Cohérence CHANGELOG.md / version cible** : `grep -q "^## <version> " CHANGELOG.md`. Si aucune entrée
       ne correspond à la version déterminée à l'étape 2, s'arrêter — ajouter une entrée CHANGELOG décrivant
       les changements à déployer avant de relancer `/deploy`.
    4. **Tests unitaires verts** : `npx vitest run`.
    5. **Compilation TypeScript clean** : `npx tsc -b`.
    6. **Lint clean** : `npm run lint`.
-   7. **Communication prête** : vérifier l'existence de `COMMUNICATION/Marie/a_transmettre.md` et de
-      `.claude/rclone.conf`, puis vérifier que `pandoc` et `rclone` sont disponibles. Vérifier enfin l'accès
-      en lecture au dossier Drive cible, sans afficher son contenu :
-      ```
-      test -f COMMUNICATION/Marie/a_transmettre.md && test -f .claude/rclone.conf
-      pandoc --version
-      rclone version
-      rclone lsd tsa_gdrive:Projets/Appli --config .claude/rclone.conf > /dev/null
-      ```
-      Si l'un de ces contrôles échoue, s'arrêter avant le build : la livraison ne peut pas être communiquée
-      correctement à Marie.
-   8. **Branche de production** : `git branch --show-current` doit retourner `main`. Sinon, s'arrêter : un
+   7. **Branche de production** : `git branch --show-current` doit retourner `main`. Sinon, s'arrêter : un
       déploiement de production depuis une autre branche n'est pas autorisé.
-   9. **Aucune roadmap avec une phase en cours** : lister les `roadmap_*.md` à la racine du projet
+   8. **Aucune roadmap avec une phase en cours** : lister les `roadmap_*.md` à la racine du projet
       (`ls roadmap_*.md`). Pour chacune, relever les statuts de phase (`[EN COURS]`, `[TODO]`,
       `[TODO — BLOQUÉ]`, `[FAIT]`). Si une phase est `[EN COURS]`, s'arrêter — du travail est en
       cours et ne doit pas être déployé : demander à l'utilisateur de terminer la phase (ou de la
@@ -134,7 +123,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       n'existe plus, ce gate est désormais sans objet. La validation par Marie passe par ses retours
       (cf. `CLAUDE.md` § Spécificités projet, « Validation des retours par Marie »).
    5. **Roadmap active incomplète (déploiement partiel)** : pour chaque `roadmap_*.md` à la racine ayant
-      encore des phases `[TODO]` ou `[TODO — BLOQUÉ]` (la vérification bloquante 3.9 a déjà écarté le cas
+      encore des phases `[TODO]` ou `[TODO — BLOQUÉ]` (la vérification bloquante 3.8 a déjà écarté le cas
       `[EN COURS]`), lister les phases restantes et signaler que le déploiement livrera une roadmap
       partiellement réalisée. Demander une confirmation explicite avant de poursuivre. Ne pas modifier la
       roadmap automatiquement.
@@ -189,13 +178,27 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    Un code de sortie 1 est bloquant : s'arrêter, rapporter le dépassement précis (chunk concerné,
    écart au seuil) et attendre une instruction explicite avant de déployer.
 
-7. Déployer en prod sur Netlify, en chargeant `.env` dans l'environnement de la seule commande (jamais affiché,
-   jamais passé en argument visible) :
-   ```
-   set -a; source .env; set +a; npx netlify deploy --prod --dir=dist/<version>
-   ```
+7. Choisir le mode de déploiement de cette livraison. Deux comptes Netlify existent pour contourner
+   les limitations du plan gratuit : demander explicitement à l'utilisateur, à chaque `/deploy`,
+   entre automatique et manuel — ne jamais supposer le mode d'une exécution précédente.
+   - **Automatique** : Netlify CLI avec les credentials du compte ciblé, chargés depuis `.env`
+     (jamais affichés, jamais passés en argument visible). Vérifier d'abord :
+     `grep -qE '^NETLIFY_AUTH_TOKEN=.+' .env` et `grep -qE '^NETLIFY_SITE_ID=.+' .env`. Si l'une des
+     deux clés est absente ou vide : signaler que ce mode n'est pas disponible tel que `.env` est
+     configuré actuellement, proposer de le compléter ou de choisir le mode manuel, et ne pas
+     poursuivre sans nouvelle décision de l'utilisateur. Sinon :
+     ```
+     set -a; source .env; set +a; npx netlify deploy --prod --dir=dist/<version>
+     ```
+     Retenir l'URL de production renvoyée par la commande.
+   - **Manuel** : signaler que `dist/<version>` est prêt à être uploadé. Attendre la confirmation
+     explicite de l'utilisateur que l'upload est terminé, ainsi que l'URL de production effective.
+     Ne jamais deviner cette URL ni poursuivre sans confirmation explicite.
 
-8. Vérification de fumée post-déploiement : lire l'URL de production annoncée par la commande précédente,
+   L'URL retenue (automatique ou confirmée manuellement) alimente la vérification de fumée de
+   l'étape 8 et le rapport final de l'étape 12.
+
+8. Vérification de fumée post-déploiement : utiliser l'URL de production retenue à l'étape 7,
    puis `curl -sf -o /dev/null -w '%{http_code}' <url>`. Un code différent de 200 est signalé dans le rapport
    final mais n'invalide pas le déploiement déjà effectué (Netlify l'a déjà confirmé) — c'est une vérification
    indépendante supplémentaire, pas une nouvelle porte bloquante.
@@ -217,10 +220,10 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    consigner aussi le SHA déployé sous un champ `Commit :` (`git rev-parse HEAD`) : il sert de base à la
    revue de code cumulée (étape 4bis) du déploiement suivant.
 
-   Vider intégralement le tableau `WHATS_NEW` de `src/ui/screens/onboarding/E01Welcome.tsx` (`[]`) : son
-   contenu vient d'être publié dans cette version et la modale Nouveautés de l'écran d'accueil ne doit pas
-   le réafficher aux versions suivantes. Committer ce vidage séparément après le déploiement (le build
-   `dist/<version>` a déjà embarqué le contenu avant le vidage).
+   Vider intégralement le tableau `WHATS_NEW` de `src/domain/data/whatsNew.ts` (`[]`) : son
+   contenu vient d'être publié dans cette version et la fonctionnalité Nouveautés (accessible depuis
+   `E123FeedbackList.tsx`) ne doit pas le réafficher aux versions suivantes. Committer ce vidage
+   séparément après le déploiement (le build `dist/<version>` a déjà embarqué le contenu avant le vidage).
 
 8bis. Archivage des roadmaps terminées par cette livraison. Pour chaque `roadmap_*.md` à la racine dont
    toutes les phases sont `[FAIT]` après ce déploiement : le signaler à l'utilisateur et lui proposer de
@@ -230,14 +233,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    L'archivage confirmé est inclus dans le commit de l'étape 8 (vidage `WHATS_NEW`) ou dans un commit
    dédié.
 
-9. Préparer les éléments du rapport final : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify,
-   résultat de la vérification de fumée et résultat du contrôle de budget bundle (étape 6). Le rapport est
-   envoyé après les étapes de communication ci-dessous.
+9. Préparer les éléments du rapport final : version déployée, dossier `dist/` utilisé, URL de production
+   retenue à l'étape 7, résultat de la vérification de fumée et résultat du contrôle de budget bundle
+   (étape 6). Le rapport est envoyé après les étapes de communication ci-dessous.
 
 10. Constituer l'inventaire de communication de la livraison. Avant toute rédaction pour Marie, lire et croiser :
     - les changements de la version cible dans `CHANGELOG.md` et `WHATS_NEW` ;
     - les roadmaps terminées ou modifiées par cette livraison, y compris leurs écarts assumés et décisions non tranchées ;
-    - `COMMUNICATION/Marie/a_transmettre.md` ;
     - les retours ouverts de Marie nécessitant une réponse (`python scripts/reply_feedback_report.py`)
       et les actions encore ouvertes dans la partie active de `_contexte/signals.md`.
 
@@ -249,39 +251,19 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     par le fil de discussion de ses retours (cf. `CLAUDE.md` § Spécificités projet, « Validation des retours
     par Marie »), pas par un document de livraison.
 
-11. Figer puis publier systématiquement le commentaire de livraison dans le dossier Drive partagé.
-    - Prendre `COMMUNICATION/Marie/a_transmettre.md`. S'il n'existe pas, créer avant le déploiement un fichier
-      avec l'inventaire de l'étape 10, en langage simple.
-    - Copier son contenu dans `COMMUNICATION/Marie/livraisons/<version>.md`, précédé de la version et de la date.
-      Ce fichier est l'historique immuable de ce qui a été préparé pour Marie à cette livraison.
-    - La disponibilité de `pandoc`, `rclone`, de la configuration et du dossier Drive a déjà été validée à l'étape 3.7.
-    - Convertir le commentaire en `.docx` et le déposer sous un nom versionné dans le dossier `Projets/Appli`,
-      auquel le compte Google de Marie (`rayonnetoi@gmail.com`) a accès en lecture :
-      ```
-      pandoc COMMUNICATION/Marie/livraisons/<version>.md -o COMMUNICATION/Marie/commentaires/commentaires_marie_<version>.docx
-      rclone copyto COMMUNICATION/Marie/commentaires/commentaires_marie_<version>.docx "tsa_gdrive:Projets/Appli/commentaires_marie_<version>.docx" --config .claude/rclone.conf
-      ```
-    - Ne jamais appeler `rclone link` ni produire de lien de partage public : le dossier `Projets/Appli` et son
-      contenu sont en accès restreint (comptes nommés), un lien public rouvrirait chaque docx à « tout
-      utilisateur disposant du lien ». Marie ouvre le document depuis le dossier Drive partagé, par son nom
-      versionné `commentaires_marie_<version>.docx`.
-    - Si le dépôt du docx échoue, ne pas prétendre que Marie peut consulter le document ; signaler précisément
-      l'échec et attendre une instruction.
-
-12. Composer le message de livraison pour Marie à partir de l'inventaire (cf. `CLAUDE.md` § Messages
+11. Composer le message de livraison pour Marie à partir de l'inventaire (cf. `CLAUDE.md` § Messages
     pour Marie). Il doit toujours contenir :
     - une annonce brève de la version disponible ;
     - les changements effectivement livrés ;
     - les choix ou questions encore attendus, ainsi que les écarts assumés s'ils la concernent ;
-    - le lien de production, sur sa propre ligne : `https://appli-audhd.netlify.app/` ;
-    - le renvoi vers le commentaire détaillé, sur sa propre ligne, introduit par « Détail des changements et
-      questions : », sous la forme du nom du document dans le dossier Drive partagé
-      (`commentaires_marie_<version>.docx`) — jamais une URL publique.
+    - le lien de production, sur sa propre ligne : l'URL de production retenue à l'étape 7 ;
+    - la mention que le détail des changements est visible dans l'application via le bouton
+      « Nouveautés » — jamais de renvoi vers un document externe.
 
     Écrire le corps au fond définitif, **sans** l'encadrement `💻🤖` ni le tag (l'agent DISCORD les pose).
 
-12bis. Validation du message de livraison — gate bloquant côté humain, avant tout dépôt en gateway.
-    Afficher à l'utilisateur le corps intégral composé à l'étape 12 et attendre sa confirmation explicite.
+11bis. Validation du message de livraison — gate bloquant côté humain, avant tout dépôt en gateway.
+    Afficher à l'utilisateur le corps intégral composé à l'étape 11 et attendre sa confirmation explicite.
     - Confirmé : déposer le message tel quel dans la gateway Discord :
       ```
       python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie --kind delivery --file <corps.txt>
@@ -292,13 +274,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - Demande de modification du fond : réécrire le corps en conséquence et le représenter à l'utilisateur
       avant tout dépôt. Ne jamais déposer un corps non validé.
 
-12ter. Vérifier que le message est effectivement sorti de l'outbox. Le dépôt en gateway (étape 12bis) ne
+11ter. Vérifier que le message est effectivement sorti de l'outbox. Le dépôt en gateway (étape 11bis) ne
     garantit pas l'envoi : le gardien Discord peut `bounce`, ou `bot.py` peut échouer à drainer. Depuis le
     réveil synthétique de la gateway (`_wake_gardien`), la demande est en général jugée en quelques secondes
     à quelques minutes plutôt que d'attendre jusqu'à 1h — recontrôler à ce rythme, sans `sleep` bloquant.
     - `python DISCORD/discord_com/gateway.py list` : si l'id n'apparaît plus, vérifier sa présence dans
       `DISCORD/discord_com/gateway/outbox/sent/<id>.json` (champ `sent_at` renseigné) → envoi confirmé,
-      consigner l'id dans le rapport final (étape 13).
+      consigner l'id dans le rapport final (étape 12).
     - Si un fichier `kind: "bounce"` référant cet id apparaît dans `gateway/inbox/orchestrateur/`
       (`gateway.py poll --agent orchestrateur`) : lire le motif, corriger le corps du message en conséquence
       (gabarit CLAUDE.md), re-`enqueue`, `ack` le bounce, consigner la correction dans
@@ -314,9 +296,9 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - Ne jamais appeler `drain` manuellement (cf. CLAUDE.md § Communication Discord) : seul `bot.py` draine
       les demandes `approved`.
 
-13. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL renvoyée par Netlify, résultat de la
-    vérification de fumée, résultat du contrôle de budget bundle, nom du document Drive déposé, inventaire
+12. Rapporter à l'utilisateur : version déployée, dossier `dist/` utilisé, URL de production retenue à l'étape 7, résultat de la
+    vérification de fumée, résultat du contrôle de budget bundle, inventaire
     synthétique, corps du message de livraison déposé dans la gateway (avec son id de demande) et résultat de sa
-    vérification d'envoi (étape 12ter) — confirmé sorti, corrigé après bounce, ou en attente signalée à
+    vérification d'envoi (étape 11ter) — confirmé sorti, corrigé après bounce, ou en attente signalée à
     l'utilisateur. Ne jamais relancer le déploiement automatiquement en cas d'échec — signaler l'erreur et
     attendre une confirmation explicite.

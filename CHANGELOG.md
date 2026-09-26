@@ -13,6 +13,9 @@
   passe par l'écran de consentement.
 
 ### Corrigé
+- **Durée d'une tâche planifiée plafonnée avant minuit** : les durées qui feraient dépasser 23:59 sont grisées
+  dans le sélecteur et la durée est ajustée automatiquement quand l'heure de début change. Supprime l'écart entre
+  la durée affichée à la saisie et celle enregistrée.
 - **Garde-fou serveur anti-écrasement (`is_empty_snapshot_payload`) aligné sur le client** : il
   compte aussi les étapes de routine. Appliqué sur Supabase.
 - **Un import dont le fichier indique un partage refusé retire le consentement local** au lieu de le

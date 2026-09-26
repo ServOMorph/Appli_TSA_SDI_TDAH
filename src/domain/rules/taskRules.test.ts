@@ -18,6 +18,8 @@ import {
   sortByPosition,
   nextPosition,
   taskSlotRange,
+  maxDurationBeforeMidnight,
+  clampDurationToDay,
   taskOccupiesSlot,
 } from './taskRules'
 import type { Task } from '@/domain/entities/task'
@@ -358,6 +360,30 @@ describe('taskRules', () => {
 
     it('retourne la position max + 1', () => {
       expect(nextPosition([{ position: 5 }, { position: 3 }, { position: 2 }])).toBe(6)
+    })
+  })
+
+  describe('maxDurationBeforeMidnight', () => {
+    it('retourne les minutes restantes jusqu à 23:59', () => {
+      expect(maxDurationBeforeMidnight('23:00')).toBe(59)
+      expect(maxDurationBeforeMidnight('09:00')).toBe(899)
+      expect(maxDurationBeforeMidnight('23:59')).toBe(0)
+    })
+  })
+
+  describe('clampDurationToDay', () => {
+    it('plafonne une durée qui dépasserait minuit', () => {
+      expect(clampDurationToDay('23:00', 120)).toBe(59)
+    })
+    it('laisse inchangée une durée qui tient dans la journée', () => {
+      expect(clampDurationToDay('09:00', 120)).toBe(120)
+    })
+    it('laisse la durée telle quelle sans heure de début', () => {
+      expect(clampDurationToDay('', 120)).toBe(120)
+      expect(clampDurationToDay('09:00', null)).toBeNull()
+    })
+    it('retourne null quand aucune minute ne reste', () => {
+      expect(clampDurationToDay('23:59', 30)).toBeNull()
     })
   })
 })

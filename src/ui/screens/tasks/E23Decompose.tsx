@@ -4,7 +4,7 @@ import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
-import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
+import { isCompleted, addMinutesToTime, maxDurationBeforeMidnight } from '@/domain/rules/taskRules'
 import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import {
   DndContext,
@@ -200,6 +200,7 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onSchedule }: Sortab
             />
             <DurationRoller
               minutes={subTask.duration_minutes}
+              maxMinutes={maxDurationBeforeMidnight(subTask.scheduled_start ?? '09:00')}
               onChange={(durationMinutes) =>
                 onSchedule(
                   subTask,

@@ -9,6 +9,7 @@ import { TaskCardLayout, TaskFieldCard, IconFieldValue, ColorFieldValue } from '
 import { todayDate } from '@/app/repositories'
 import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
+import { maxDurationBeforeMidnight, clampDurationToDay } from '@/domain/rules/taskRules'
 import type { Screen } from '@/app/AppContext'
 import type { RecurrenceRuleInput } from '@/app/contexts/usePlanningState'
 import type { TaskStatus } from '@/domain/entities/task'
@@ -297,7 +298,10 @@ export function E21CreateTaskV2() {
                 type="time"
                 aria-label="Heure de début"
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={(e) => {
+                  setStartTime(e.target.value)
+                  setDurationMinutes((d) => clampDurationToDay(e.target.value, d))
+                }}
                 style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
               />
               {!startTime && (
@@ -306,7 +310,11 @@ export function E21CreateTaskV2() {
                 </p>
               )}
               <span style={labelStyle}>Durée</span>
-              <DurationRoller minutes={durationMinutes} onChange={setDurationMinutes} />
+              <DurationRoller
+                minutes={durationMinutes}
+                onChange={setDurationMinutes}
+                maxMinutes={startTime ? maxDurationBeforeMidnight(startTime) : undefined}
+              />
               {!hasDuration && (
                 <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
                   La durée est obligatoire pour planifier la tâche.

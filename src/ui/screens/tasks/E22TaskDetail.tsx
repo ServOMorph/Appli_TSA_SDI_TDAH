@@ -9,7 +9,12 @@ import { TaskCardLayout, TaskFieldCard, IconFieldValue, ColorFieldValue } from '
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
 import type { Task } from '@/domain/entities/task'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
-import { isCompleted, addMinutesToTime } from '@/domain/rules/taskRules'
+import {
+  isCompleted,
+  addMinutesToTime,
+  maxDurationBeforeMidnight,
+  clampDurationToDay,
+} from '@/domain/rules/taskRules'
 import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import { describeRecurrence } from '@/domain/rules/taskRecurrenceRules'
 import { ENERGY_MIN, ENERGY_MAX } from '@/domain/rules/energyRules'
@@ -303,6 +308,7 @@ function SortableSubTaskItem({ subTask, onDelete, onToggle, onSchedule, onRename
             />
             <DurationRoller
               minutes={subTask.duration_minutes}
+              maxMinutes={maxDurationBeforeMidnight(subTask.scheduled_start ?? '09:00')}
               onChange={(durationMinutes) =>
                 onSchedule(
                   subTask,
@@ -677,10 +683,17 @@ export function E22TaskDetail() {
             type="time"
             aria-label="Heure"
             value={draftStart}
-            onChange={(e) => setDraftStart(e.target.value)}
+            onChange={(e) => {
+              setDraftStart(e.target.value)
+              setDraftDuration((d) => clampDurationToDay(e.target.value, d))
+            }}
             style={inputStyle}
           />
-          <DurationRoller minutes={draftDuration} onChange={setDraftDuration} />
+          <DurationRoller
+            minutes={draftDuration}
+            onChange={setDraftDuration}
+            maxMinutes={draftStart ? maxDurationBeforeMidnight(draftStart) : undefined}
+          />
           <Button fullWidth onClick={saveTime}>
             Enregistrer
           </Button>

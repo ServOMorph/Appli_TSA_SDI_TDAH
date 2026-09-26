@@ -31,4 +31,25 @@ describe('DurationRoller', () => {
     await userEvent.selectOptions(screen.getByLabelText('Minutes'), '0')
     expect(onChange).toHaveBeenCalledWith(null)
   })
+
+  it('désactive les valeurs qui dépasseraient maxMinutes', () => {
+    render(<DurationRoller minutes={30} onChange={vi.fn()} maxMinutes={59} />)
+    const hours = screen.getByLabelText('Heures') as HTMLSelectElement
+    expect((hours.querySelector('option[value="0"]') as HTMLOptionElement).disabled).toBe(false)
+    expect((hours.querySelector('option[value="1"]') as HTMLOptionElement).disabled).toBe(true)
+    const days = screen.getByLabelText('Jours') as HTMLSelectElement
+    expect((days.querySelector('option[value="1"]') as HTMLOptionElement).disabled).toBe(true)
+  })
+
+  it('plafonne le total transmis à maxMinutes', async () => {
+    const onChange = vi.fn()
+    render(<DurationRoller minutes={50} onChange={onChange} maxMinutes={100} />)
+    await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
+    expect(onChange).toHaveBeenCalledWith(100)
+  })
+
+  it('signale la limite atteinte', () => {
+    render(<DurationRoller minutes={59} onChange={vi.fn()} maxMinutes={59} />)
+    expect(screen.getByText('Durée limitée pour finir avant minuit.')).toBeTruthy()
+  })
 })

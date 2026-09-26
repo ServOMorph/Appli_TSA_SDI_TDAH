@@ -19,6 +19,7 @@ export const WHATS_NEW: string[] = [
   'Corrigé : l\'affichage ne déborde plus sur le bord droit de l\'écran, y compris en changeant de jour.',
   'Sur l\'accueil, le mois affiché tient maintenant sur une seule ligne, quel que soit le mois.',
   'Nouveau bouton « Retrouver mes données » sur l\'écran de bienvenue : importez votre sauvegarde sans refaire la configuration. Une sauvegarde faite depuis cette version garde aussi votre choix de partage.',
+  'La durée d\'une tâche planifiée ne peut plus dépasser minuit : les durées trop longues sont grisées et un message l\'indique.',
 ]
 
 export const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

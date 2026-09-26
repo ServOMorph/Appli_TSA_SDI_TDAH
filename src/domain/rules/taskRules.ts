@@ -121,6 +121,19 @@ export function addMinutesToTime(time: string, minutes: number): string {
   return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`
 }
 
+/** Durée maximale (minutes) d'une tâche commençant à `start` pour finir au plus tard à 23:59. */
+export function maxDurationBeforeMidnight(start: string): number {
+  const [h, m] = start.split(':').map(Number)
+  return Math.max(0, 23 * 60 + 59 - (h * 60 + m))
+}
+
+/** Ramène une durée sous le plafond de fin de journée ; null si le résultat est nul. */
+export function clampDurationToDay(start: string, minutes: number | null): number | null {
+  if (minutes == null || !start) return minutes
+  const clamped = Math.min(minutes, maxDurationBeforeMidnight(start))
+  return clamped > 0 ? clamped : null
+}
+
 export function renameTask(task: Task, title: string, now: string): Task {
   return {
     ...task,

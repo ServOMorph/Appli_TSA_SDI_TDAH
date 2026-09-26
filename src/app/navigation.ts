@@ -1,7 +1,7 @@
 export type Route =
   | { name: 'welcome' }
   | { name: 'init-error' }
-  | { name: 'consent' }
+  | { name: 'consent'; next?: 'dashboard' | 'energy-checkin' }
   | { name: 'tester-code' }
   | { name: 'profile' }
   | { name: 'energy' }

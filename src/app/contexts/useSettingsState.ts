@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/repositories'
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
+import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
+import { grantSyncConsent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { createList } from '@/domain/rules/listRules'
 import { createTool } from '@/domain/rules/toolRules'
@@ -155,7 +157,14 @@ export function useSettingsState() {
     if (!currentUser) return
     const snapshot = await buildSnapshotPayload()
     if (!snapshot) return
-    const payload = { export_date: new Date().toISOString(), ...snapshot }
+    const { deviceId, deviceSecret } = getDeviceIdentity()
+    const payload = {
+      export_date: new Date().toISOString(),
+      device_id: deviceId,
+      device_secret: deviceSecret,
+      sync_consent_granted: isSyncConsentGranted(),
+      ...snapshot,
+    }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -386,6 +395,11 @@ export function useSettingsState() {
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Échec de l\'import.' }
     }
+
+    if (typeof data.device_id === 'string' && data.device_id && typeof data.device_secret === 'string' && data.device_secret) {
+      setDeviceIdentity(data.device_id, data.device_secret)
+    }
+    if (data.sync_consent_granted === true) grantSyncConsent()
 
     setCurrentUser(user)
     setSettings(settingsData)

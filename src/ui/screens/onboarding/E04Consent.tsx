@@ -4,15 +4,16 @@ import { Card } from '@/ui/components/Card'
 import { grantSyncConsent } from '@/data/sync/syncConsent'
 
 export function E04Consent() {
-  const { goTo } = useApp()
+  const { goTo, route } = useApp()
+  const next = route.name === 'consent' && route.next ? route.next : 'tester-code'
 
   function accept() {
     grantSyncConsent()
-    goTo('tester-code')
+    goTo(next)
   }
 
   function decline() {
-    goTo('tester-code')
+    goTo(next)
   }
 
   return (

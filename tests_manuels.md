@@ -46,6 +46,18 @@ pas encore tourné dans un vrai `/deploy`. Au prochain `/deploy` : vérifier que
 déposées avec les bons accents (le dépôt en ligne de commande est sensible à l'encodage — vérifier
 en relisant le contenu, pas seulement l'affichage terminal). Retirer cette section une fois vérifié.
 
+## Vérifier sur iPhone réel l'import depuis l'écran de bienvenue (2026-09-26)
+
+Bouton « Retrouver mes données » ajouté à E01 (import JSON avant l'accueil) ; l'export inclut
+désormais `device_id`/`device_secret`/`sync_consent_granted`, restaurés à l'import ; sans
+consentement dans le fichier, l'import passe par E04 puis reprend vers l'accueil/énergie. Aucun
+test automatisé n'exerce le sélecteur de fichiers de Safari iOS. Après déploiement, sur un
+navigateur neuf (ou navigation privée) côté iPhone : (1) exporter depuis la version déployée ;
+(2) ouvrir l'adresse vierge, « Retrouver mes données », choisir le fichier dans « Fichiers » ;
+(3) vérifier arrivée sur Accueil/énergie sans repasser par l'accueil, données présentes ;
+(4) Paramètres > Vie privée : partage actif ; (5) le snapshot Supabase se met à jour sur le même
+`device_id` qu'avant. Retirer cette section une fois vérifié.
+
 
 
 

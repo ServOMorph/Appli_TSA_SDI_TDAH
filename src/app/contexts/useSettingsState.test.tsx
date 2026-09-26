@@ -7,6 +7,8 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useState } from 'react'
 import { db, listItemRepo, settingsRepo, toolRepo } from '@/app/repositories'
+import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
+import { grantSyncConsent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { useSettingsState } from './useSettingsState'
 
@@ -97,6 +99,21 @@ function SettingsPanel() {
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, routine_step_completions: [{ id: 'completion-orpheline', routine_step_id: 'inconnue', routine_id: 'inconnue', date: '2026-09-23' }] })}>
         Importer complétion de routine orpheline
       </button>
+      <button
+        onClick={() =>
+          runImport({
+            user: { id: 'u-identite', profile_type: 'student' },
+            device_id: 'device-exporte',
+            device_secret: 'secret-exporte',
+            sync_consent_granted: true,
+          })
+        }
+      >
+        Importer avec identité d’appareil
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u-sans-identite', profile_type: 'student' } })}>
+        Importer sans identité d’appareil
+      </button>
     </>
   )
 }
@@ -116,6 +133,7 @@ afterEach(async () => {
   await db.routineSteps.clear()
   await db.routineStepCompletions.clear()
   syncNowMock.mockClear()
+  localStorage.clear()
 })
 
 describe('useSettingsState — createUser', () => {
@@ -331,5 +349,49 @@ describe('useSettingsState — export/import', () => {
       expect(items[0].description).toBe('')
       expect(await db.listItemSubTasks.toArray()).toEqual([])
     })
+  })
+
+  it('exporte l’identité d’appareil et le consentement au partage courants', async () => {
+    const createObjectURL = vi.fn().mockReturnValue('blob:test')
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL: vi.fn() })
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+
+    grantSyncConsent()
+    const { deviceId, deviceSecret } = getDeviceIdentity()
+
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Exporter' }))
+    })
+
+    const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
+    expect(payload.device_id).toBe(deviceId)
+    expect(payload.device_secret).toBe(deviceSecret)
+    expect(payload.sync_consent_granted).toBe(true)
+
+    clickSpy.mockRestore()
+    vi.unstubAllGlobals()
+  })
+
+  it('restaure l’identité d’appareil et le consentement importés', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer avec identité d’appareil' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(getDeviceIdentity()).toEqual({ deviceId: 'device-exporte', deviceSecret: 'secret-exporte' })
+    expect(isSyncConsentGranted()).toBe(true)
+  })
+
+  it('conserve l’identité d’appareil actuelle quand l’export ne la contient pas', async () => {
+    setDeviceIdentity('device-actuel', 'secret-actuel')
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer sans identité d’appareil' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(getDeviceIdentity()).toEqual({ deviceId: 'device-actuel', deviceSecret: 'secret-actuel' })
   })
 })

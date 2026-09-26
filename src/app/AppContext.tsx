@@ -23,7 +23,7 @@ import { usePlanningState } from '@/app/contexts/usePlanningState'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { syncNow } from '@/data/sync/syncClient'
-import { backfillSyncConsentFromHistory } from '@/data/sync/syncConsent'
+import { backfillSyncConsentFromHistory, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { startFeedbackSync } from '@/data/sync/feedbackClient'
 
 export type { Screen, Route } from '@/app/navigation'
@@ -219,7 +219,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (result.ok) {
       await loadAll()
       const entry = await energyRepo.getByDate(todayDate())
-      setStack([{ name: entry ? 'dashboard' : 'energy-checkin' }])
+      const next = entry ? 'dashboard' : 'energy-checkin'
+      setStack([isSyncConsentGranted() ? { name: next } : { name: 'consent', next }])
     }
     return result
   }

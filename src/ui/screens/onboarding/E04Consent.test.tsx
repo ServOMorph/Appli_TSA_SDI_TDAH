@@ -32,4 +32,12 @@ describe('E04Consent', () => {
     expect(isSyncConsentGranted()).toBe(false)
     expect(ctx.goTo).toHaveBeenCalledWith('tester-code')
   })
+
+  it('après un import, reprend vers l’écran prévu au lieu du code testeur', async () => {
+    const ctx = makeAppContext({ route: { name: 'consent', next: 'dashboard' }, screen: 'consent' })
+    renderWithApp(<E04Consent />, ctx)
+    await userEvent.click(screen.getByRole('button', { name: 'J’accepte le partage' }))
+    expect(isSyncConsentGranted()).toBe(true)
+    expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+  })
 })

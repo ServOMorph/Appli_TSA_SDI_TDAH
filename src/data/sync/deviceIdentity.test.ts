@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { getDeviceIdentity } from './deviceIdentity'
+import { getDeviceIdentity, setDeviceIdentity } from './deviceIdentity'
 
 beforeEach(() => {
   localStorage.clear()
@@ -27,5 +27,13 @@ describe('getDeviceIdentity', () => {
     }
     expect(stored.deviceId).toBe(first.deviceId)
     expect(stored.deviceSecret).toBe(first.deviceSecret)
+  })
+})
+
+describe('setDeviceIdentity', () => {
+  it('remplace l’identité existante et la rend persistante', () => {
+    getDeviceIdentity()
+    setDeviceIdentity('device-importe', 'secret-importe')
+    expect(getDeviceIdentity()).toEqual({ deviceId: 'device-importe', deviceSecret: 'secret-importe' })
   })
 })

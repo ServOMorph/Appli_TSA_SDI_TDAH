@@ -22,3 +22,13 @@ export function getDeviceIdentity(): { deviceId: string; deviceSecret: string } 
 
   return { deviceId, deviceSecret }
 }
+
+/**
+ * Restaure une identite d'appareil issue d'un export (E117Export) : la synchronisation et
+ * le fil de retours continuent alors sous la meme identite cote serveur apres une reinstallation
+ * ou un changement d'adresse, plutot que de repartir en nouvel appareil.
+ */
+export function setDeviceIdentity(deviceId: string, deviceSecret: string): void {
+  localStorage.setItem(DEVICE_ID_KEY, deviceId)
+  localStorage.setItem(DEVICE_SECRET_KEY, deviceSecret)
+}

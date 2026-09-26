@@ -48,6 +48,7 @@ as $$
      and coalesce(jsonb_array_length(p_payload -> 'list_items'), 0) = 0
      and coalesce(jsonb_array_length(p_payload -> 'budget_entries'), 0) = 0
      and coalesce(jsonb_array_length(p_payload -> 'energy_entries'), 0) = 0
+     and coalesce(jsonb_array_length(p_payload -> 'routine_steps'), 0) = 0
 $$;
 
 -- Garde anti-ecrasement (roadmap_fiabilite_sync.md Phase 1, 2026-09-13) : un payload vide ne

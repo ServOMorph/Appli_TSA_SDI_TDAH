@@ -4,6 +4,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useState } from 'react'
 import { AppProvider, useApp } from './AppContext'
 import { db, userRepo } from '@/app/repositories'
+import { grantSyncConsent, revokeSyncConsent } from '@/data/sync/syncConsent'
 
 /**
  * Les tâches créées par un test (y compris les tests qui s'appuient sur `inboxTasks[0]`
@@ -699,7 +700,19 @@ describe('AppProvider — settings et données', () => {
     await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('welcome'))
   })
 
+  it('importData sans consentement au partage passe par l’écran de consentement', async () => {
+    revokeSyncConsent()
+    render(<AppProvider><DataPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'importer valide' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('consent'))
+  })
+
   it('importData remplace les données et bascule vers energy-checkin', async () => {
+    grantSyncConsent()
     render(<AppProvider><DataPanel /></AppProvider>)
     await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
     await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
@@ -710,6 +723,7 @@ describe('AppProvider — settings et données', () => {
       expect(screen.getByTestId('user-id').textContent).toBe('imported-user')
       expect(screen.getByTestId('screen').textContent).toBe('energy-checkin')
     })
+    revokeSyncConsent()
   })
 
   it('importData rejette un fichier sans profil utilisateur sans toucher aux données actuelles', async () => {

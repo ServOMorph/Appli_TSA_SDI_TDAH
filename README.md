@@ -16,6 +16,14 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 26 septembre 2026 (nouvelle suite), la durée d'une tâche planifiée ne peut plus dépasser minuit
+sans que l'écran de saisie en tienne compte : les durées trop longues sont grisées et la durée
+choisie s'ajuste automatiquement si l'heure de début change. Un défaut trouvé par une relecture du
+code a par ailleurs été corrigé avant toute mise en ligne : un import indiquant un partage refusé
+retirait bien le consentement dans l'instant, mais celui-ci pouvait être rétabli tout seul au
+lancement suivant de l'application. La mise en ligne du lot en préparation a été volontairement
+reportée à la demande de l'utilisateur.
+
 Le 26 septembre 2026 (suite), la récupération des données après un changement d'adresse de
 l'application a été fiabilisée. Une sauvegarde exportée conserve maintenant l'identité de
 l'appareil et le choix de partage. Elle peut aussi être importée dès l'écran de bienvenue, sans

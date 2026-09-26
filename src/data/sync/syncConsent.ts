@@ -14,6 +14,9 @@ export function grantSyncConsent(): void {
 
 export function revokeSyncConsent(): void {
   localStorage.removeItem(CONSENT_KEY)
+  // Sans ce retrait, backfillSyncConsentFromHistory() re-accorderait le consentement au
+  // prochain lancement (LAST_SUCCESS_KEY encore present), annulant ce retrait explicite.
+  localStorage.removeItem(LAST_SUCCESS_KEY)
 }
 
 /**

@@ -1,3 +1,11 @@
+## v6.8 — 2026-09-26
+
+### Corrigé
+- **Un import indiquant un partage refusé restait annulé seulement en apparence** : le retrait du
+  consentement local ne supprimait pas la trace de dernière synchronisation réussie, si bien que le
+  consentement était re-accordé silencieusement au lancement suivant sur un appareil ayant déjà
+  synchronisé (trouvé par la revue de code).
+
 ## v6.7 — 2026-09-26
 
 ### Ajouté

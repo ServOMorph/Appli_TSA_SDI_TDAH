@@ -44,5 +44,13 @@ describe('syncConsent', () => {
       backfillSyncConsentFromHistory()
       expect(isSyncConsentGranted()).toBe(false)
     })
+
+    it('revoke retire aussi l’historique de succès, empêchant un re-octroi ultérieur', () => {
+      localStorage.setItem('sync_last_success_at', new Date().toISOString())
+      grantSyncConsent()
+      revokeSyncConsent()
+      backfillSyncConsentFromHistory()
+      expect(isSyncConsentGranted()).toBe(false)
+    })
   })
 })

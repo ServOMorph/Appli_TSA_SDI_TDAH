@@ -42,28 +42,26 @@
 - [P3] **`AppShell.test.tsx` ne peut pas détecter le débordement WebKit qu'il documente en commentaire** (trouvé par la revue de code du `/close` du 2026-09-25) : jsdom ne calcule pas de layout réel, le test ne vérifie que les valeurs littérales du style inline — une régression future qui recrée le débordement par un autre biais (ex. un enfant `whiteSpace: nowrap`) passerait ce test sans être détectée. — fait quand : un test avec mesure de layout réelle (Playwright/WebKit) couvre ce cas, ou risque jugé acceptable — réf : `src/ui/components/AppShell.test.tsx`
 - [P3] **`E12WeekPlanning.tsx` reproduit le défaut de libellé mois/année sur 2 lignes corrigé sur E10 (`PlanningBoard.tsx`) le 2026-09-25** — même `monthButtonStyle` (police `0.875rem`, pas de `whiteSpace: nowrap`), signalé à l'utilisateur mais non corrigé (hors périmètre de la demande, qui portait sur E10/Phase 5). — fait quand : Marie ou l'utilisateur confirme le même problème sur « Planning de la semaine » et il est corrigé, ou jugé non prioritaire — réf : `src/ui/screens/dashboard/E12WeekPlanning.tsx:39-52`
 
-## Dernière session (2026-09-25 — bugs dashboard corrigés définitivement, débordement horizontal généralisé à 7 écrans oubliés)
+## Dernière session (2026-09-26 — message Marie en attente traité, zone Discord mise en pause, libellé mois E10 validé sur téléphone réel)
 
 ## Décisions prises
-- Bug de débordement horizontal E10 (réapparu au changement de jour après un premier correctif partiel) redébuggé « de façon définitive » sur demande explicite : root cause réelle trouvée dans `AppShell.tsx` (largeur dépendante du contenu sous WebKit), corrigée à la source et étendue proactivement à 16 écrans partageant le même défaut latent — pas seulement celui qui avait un bug visible.
-- Le libellé mois/année du dashboard (E10) qui passait sur 2 lignes pour certains mois est corrigé par réduction de police (`0.75rem`) + `whiteSpace: nowrap`, plutôt qu'en cherchant à libérer de l'espace disponible.
-- La revue de code de ce `/close` a trouvé que le correctif de débordement précédent (session antérieure à ce `/close`, commit `b4701ba`) était incomplet : 7 écrans supplémentaires avaient `width:100%` sans `minWidth:0` et restaient exposés au même bug — corrigés immédiatement plutôt que tracés, pour rester cohérent avec l'objectif « définitif » de la demande initiale.
-- `updateDisplayDate` (`PlanningBoard.tsx`) simplifiée : la revue de code a identifié un risque latent de valeur périmée (ref non resynchronisée) sur une branche jamais utilisée (aucun appelant ne passe de fonction) — branche morte retirée plutôt que tracée.
+- Message Discord de Marie du 2026-09-23 (confirmation d'export tardif du 2026-09-16), resté non traité dans l'inbox jusqu'à ce `/start`, ajouté à l'historique de conversation.
+- Sur demande explicite de l'utilisateur, zone `discord` mise en pause : `bot.py` arrêté, gardien de sortie hors service. Protocole temporaire tant que la pause dure : confirmation explicite de l'utilisateur avant tout envoi Discord, puis dépôt direct via `gateway.py enqueue --urgent` (bypass du gardien).
+- Correctif du libellé mois/année E10 (`monthButtonStyle`, session du 2026-09-25 — police réduite + `nowrap`), jusque-là vérifié en WebKit émulé seulement, confirmé par l'utilisateur sur son téléphone physique d'origine, sur les 12 mois.
+- Sur déclaration explicite de l'utilisateur, les 3 tests manuels restants (sauvegarde Drive, classement snapshot Marie, republication réponses en attente) seront évalués après le prochain `/deploy`, pas avant — aucune action à entreprendre maintenant sur ces 3 tests.
 
 ## Livrables produits ou modifiés
-- `src/ui/screens/dashboard/PlanningBoard.tsx` : fix React « setState pendant le rendu d'un autre composant » (`updateDisplayDate`/`replace` découplés, commit `1e7c062`) ; police du libellé mois/année réduite + `nowrap` ; signature `updateDisplayDate` simplifiée (non commité à l'écriture de cette synthèse).
-- `E110Settings.tsx`, `E111Profile.tsx`, `E112Accessibility.tsx`, `E116Privacy.tsx`, `E117Export.tsx`, `E21CreateTaskV2.tsx`, `E61ListDetail.tsx` : `minWidth: 0` ajouté (défaut oublié par le correctif de débordement de la session précédente).
-- `tests_manuels.md` : Phases 1/3 de `roadmap_retours_2026-09-22.md` retirées (validées par le développeur) ; Phases 2/4-8 retirées manuellement par l'utilisateur (laissées à la validation de Marie via les retours) ; nouvelle entrée de vérification sur téléphone physique du libellé mois (WebKit émulé seulement à ce stade).
-- `roadmap_retours_2026-09-22.md` : 8 phases confirmées `[FAIT]`, proposé à l'archivage à ce `/close`.
-- Nouveaux findings `[P3]` tracés ci-dessus (duplication `pageStyle`/`AppShell`, couverture faible d'`AppShell.test.tsx`, même bug de libellé mois sur `E12WeekPlanning.tsx`).
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : message de Marie du 2026-09-23 ajouté (commit `3bad951`).
+- `_contexte/signals.md` : entrée « Contexte chaud » sur la pause Discord ajoutée (commit `b26055e`).
+- `tests_manuels.md` : section « Vérifier sur le téléphone réel l'affichage du mois sur une seule ligne (E10) » retirée après validation (commit `00178f6`).
+- Aucun fichier `src/` touché cette session.
 
 ## Hypothèses validées / invalidées
-- VALIDE : le bug de débordement horizontal était bien un défaut de largeur de conteneur (flex-item sans `minWidth:0`) sous WebKit, pas un problème isolé au bandeau des jours — confirmé par une réapparition sur un autre jour puis par une revue de code trouvant 7 écrans supplémentaires exposés au même défaut.
-- VALIDE : le bug de libellé mois sur 2 lignes est un défaut de largeur disponible ordinaire (pas un bug WebKit exotique) — reproduit en WebKit émulé (iPhone SE 320px, Pixel 9 360px), corrigé par réduction de police, vérifié sur les 12 mois à 3 largeurs.
-- EN ATTENTE : confirmation sur le téléphone physique d'origine de l'utilisateur pour le correctif du libellé mois (vérifié en WebKit émulé seulement) — cf. `tests_manuels.md`.
+- VALIDE : le correctif du libellé mois/année E10 fonctionne aussi sur l'appareil physique d'origine, pas seulement en émulation WebKit.
+- EN ATTENTE : sauvegarde Drive (upload manuel hors session), classement du snapshot de Marie après déploiement du correctif de sync, republication des 16 réponses en attente au prochain `/deploy` — les 3 évalués après ce déploiement, sur décision explicite de l'utilisateur.
 
 ## Prochaine étape exacte
-`/deploy` du lot cumulé (16 correctifs retours 2026-09-22 + outil Routine + ces correctifs de layout/React), puis republication automatique des 16 réponses en attente (étape 8 de `/deploy`).
+`/deploy` du lot cumulé (16 correctifs retours 2026-09-22 + outil Routine + correctifs de layout/React du 2026-09-25), puis évaluation des 3 tests manuels restants une fois la production mise à jour.
 
 ## Question bloquante pour la session suivante
 Aucune.

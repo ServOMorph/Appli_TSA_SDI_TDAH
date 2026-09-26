@@ -16,6 +16,10 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 26 septembre 2026, le correctif du libellé mois/année de l'accueil (24 septembre) qui n'avait
+été vérifié que sur un simulateur de téléphone a été confirmé sur un vrai téléphone : les douze
+mois s'affichent bien sur une seule ligne.
+
 Le 25 septembre 2026 (nouvelle suite de session), un défaut de débordement de l'écran d'accueil,
 corrigé une première fois puis réapparu au changement de jour, a été redébuggé jusqu'à sa vraie
 cause : un conteneur de page qui pouvait s'élargir au-delà de l'écran selon le texte affiché, sur

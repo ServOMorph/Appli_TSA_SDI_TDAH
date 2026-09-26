@@ -1,3 +1,15 @@
+## v6.6 — 2026-09-26
+
+### Modifié
+- **Zone `discord` mise en pause** (bot arrêté, sur demande explicite) : tout envoi Discord repasse
+  temporairement par confirmation explicite avant envoi direct, jusqu'à réintégration.
+- **Correctif du libellé mois/année de l'accueil (v6.5), jusque-là vérifié en simulateur
+  seulement**, confirmé sur un téléphone physique réel, sur les 12 mois.
+
+### Constaté
+- **Message Discord de Marie du 23 septembre** (confirmation d'un export tardif), resté non traité
+  dans la file d'attente, retrouvé et archivé dans l'historique de conversation.
+
 ## v6.5 — 2026-09-25
 
 ### Corrigé

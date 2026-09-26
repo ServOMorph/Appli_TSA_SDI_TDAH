@@ -16,6 +16,12 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 26 septembre 2026 (suite), la récupération des données après un changement d'adresse de
+l'application a été fiabilisée. Une sauvegarde exportée conserve maintenant l'identité de
+l'appareil et le choix de partage. Elle peut aussi être importée dès l'écran de bienvenue, sans
+refaire la configuration. Les mises en ligne sont désormais limitées à dix par mois sur le compte
+d'hébergement principal. Rien de tout cela n'est encore en ligne.
+
 Le 26 septembre 2026, le correctif du libellé mois/année de l'accueil (24 septembre) qui n'avait
 été vérifié que sur un simulateur de téléphone a été confirmé sur un vrai téléphone : les douze
 mois s'affichent bien sur une seule ligne.

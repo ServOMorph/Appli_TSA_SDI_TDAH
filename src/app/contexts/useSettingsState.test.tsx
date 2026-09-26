@@ -114,6 +114,9 @@ function SettingsPanel() {
       <button onClick={() => runImport({ user: { id: 'u-sans-identite', profile_type: 'student' } })}>
         Importer sans identité d’appareil
       </button>
+      <button onClick={() => runImport({ user: { id: 'u-refus', profile_type: 'student' }, sync_consent_granted: false })}>
+        Importer avec partage refusé
+      </button>
     </>
   )
 }
@@ -393,5 +396,15 @@ describe('useSettingsState — export/import', () => {
     })
     await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
     expect(getDeviceIdentity()).toEqual({ deviceId: 'device-actuel', deviceSecret: 'secret-actuel' })
+  })
+
+  it('retire le consentement local quand l’export indique un partage refusé', async () => {
+    grantSyncConsent()
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer avec partage refusé' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(isSyncConsentGranted()).toBe(false)
   })
 })

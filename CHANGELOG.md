@@ -1,3 +1,23 @@
+## v6.7 — 2026-09-26
+
+### Ajouté
+- **Plafond de 10 déploiements de production par mois sur le compte Netlify principal**
+  (`scripts/count_netlify_deploys.py`, `/deploy` étape 7). Au plafond, `/deploy` propose le second
+  compte. Un changement d'adresse est détecté et Marie est guidée sur Discord pour migrer ses données.
+- **Bouton « Retrouver mes données » sur l'écran de bienvenue** : import d'une sauvegarde sans
+  refaire la configuration.
+
+### Modifié
+- **L'export contient l'identité d'appareil et le choix de partage, restaurés à l'import** : même
+  ligne Supabase après un changement d'adresse. Sans choix de partage dans le fichier, l'import
+  passe par l'écran de consentement.
+
+### Corrigé
+- **Garde-fou serveur anti-écrasement (`is_empty_snapshot_payload`) aligné sur le client** : il
+  compte aussi les étapes de routine. Appliqué sur Supabase.
+- **Un import dont le fichier indique un partage refusé retire le consentement local** au lieu de le
+  conserver (trouvé par la revue de code).
+
 ## v6.6 — 2026-09-26
 
 ### Modifié

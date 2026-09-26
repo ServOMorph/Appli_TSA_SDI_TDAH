@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/repositories'
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
-import { grantSyncConsent, isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { grantSyncConsent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { createList } from '@/domain/rules/listRules'
 import { createTool } from '@/domain/rules/toolRules'
@@ -400,6 +400,7 @@ export function useSettingsState() {
       setDeviceIdentity(data.device_id, data.device_secret)
     }
     if (data.sync_consent_granted === true) grantSyncConsent()
+    if (data.sync_consent_granted === false) revokeSyncConsent()
 
     setCurrentUser(user)
     setSettings(settingsData)

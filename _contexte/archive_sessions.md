@@ -1574,3 +1574,29 @@ Aucune.
 
 ## Question bloquante pour la session suivante
 Aucune.
+
+---
+
+## Dernière session (2026-09-26 — message Marie en attente traité, zone Discord mise en pause, libellé mois E10 validé sur téléphone réel)
+
+## Décisions prises
+- Message Discord de Marie du 2026-09-23 (confirmation d'export tardif du 2026-09-16), resté non traité dans l'inbox jusqu'à ce `/start`, ajouté à l'historique de conversation.
+- Sur demande explicite de l'utilisateur, zone `discord` mise en pause : `bot.py` arrêté, gardien de sortie hors service. Protocole temporaire tant que la pause dure : confirmation explicite de l'utilisateur avant tout envoi Discord, puis dépôt direct via `gateway.py enqueue --urgent` (bypass du gardien).
+- Correctif du libellé mois/année E10 (`monthButtonStyle`, session du 2026-09-25 — police réduite + `nowrap`), jusque-là vérifié en WebKit émulé seulement, confirmé par l'utilisateur sur son téléphone physique d'origine, sur les 12 mois.
+- Sur déclaration explicite de l'utilisateur, les 3 tests manuels restants (sauvegarde Drive, classement snapshot Marie, republication réponses en attente) seront évalués après le prochain `/deploy`, pas avant — aucune action à entreprendre maintenant sur ces 3 tests.
+
+## Livrables produits ou modifiés
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : message de Marie du 2026-09-23 ajouté (commit `3bad951`).
+- `_contexte/signals.md` : entrée « Contexte chaud » sur la pause Discord ajoutée (commit `b26055e`).
+- `tests_manuels.md` : section « Vérifier sur le téléphone réel l'affichage du mois sur une seule ligne (E10) » retirée après validation (commit `00178f6`).
+- Aucun fichier `src/` touché cette session.
+
+## Hypothèses validées / invalidées
+- VALIDE : le correctif du libellé mois/année E10 fonctionne aussi sur l'appareil physique d'origine, pas seulement en émulation WebKit.
+- EN ATTENTE : sauvegarde Drive (upload manuel hors session), classement du snapshot de Marie après déploiement du correctif de sync, republication des 16 réponses en attente au prochain `/deploy` — les 3 évalués après ce déploiement, sur décision explicite de l'utilisateur.
+
+## Prochaine étape exacte
+`/deploy` du lot cumulé (16 correctifs retours 2026-09-22 + outil Routine + correctifs de layout/React du 2026-09-25), puis évaluation des 3 tests manuels restants une fois la production mise à jour.
+
+## Question bloquante pour la session suivante
+Aucune.

@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python scripts/count_netlify_deploys.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -88,8 +88,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       déployé doit être traçable dans un commit.
    2. **`.env` présent** : `test -f .env`. Si absent : dire à l'utilisateur de le créer depuis
       `.env.example` et s'arrêter. Ne jamais lire ni afficher le contenu de `.env`. Le contrôle des
-      clés Netlify (`NETLIFY_AUTH_TOKEN`/`NETLIFY_SITE_ID`) est déplacé à l'étape 7, conditionné au
-      choix du mode de déploiement.
+      clés Netlify (`NETLIFY_AUTH_TOKEN`/`NETLIFY_SITE_ID`) est fait à l'étape 7.1.
    3. **Cohérence CHANGELOG.md / version cible** : `grep -q "^## <version> " CHANGELOG.md`. Si aucune entrée
       ne correspond à la version déterminée à l'étape 2, s'arrêter — ajouter une entrée CHANGELOG décrivant
       les changements à déployer avant de relancer `/deploy`.
@@ -178,25 +177,42 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    Un code de sortie 1 est bloquant : s'arrêter, rapporter le dépassement précis (chunk concerné,
    écart au seuil) et attendre une instruction explicite avant de déployer.
 
-7. Choisir le mode de déploiement de cette livraison. Deux comptes Netlify existent pour contourner
-   les limitations du plan gratuit : demander explicitement à l'utilisateur, à chaque `/deploy`,
-   entre automatique et manuel — ne jamais supposer le mode d'une exécution précédente.
-   - **Automatique** : Netlify CLI avec les credentials du compte ciblé, chargés depuis `.env`
-     (jamais affichés, jamais passés en argument visible). Vérifier d'abord :
-     `grep -qE '^NETLIFY_AUTH_TOKEN=.+' .env` et `grep -qE '^NETLIFY_SITE_ID=.+' .env`. Si l'une des
-     deux clés est absente ou vide : signaler que ce mode n'est pas disponible tel que `.env` est
-     configuré actuellement, proposer de le compléter ou de choisir le mode manuel, et ne pas
-     poursuivre sans nouvelle décision de l'utilisateur. Sinon :
-     ```
-     set -a; source .env; set +a; npx netlify deploy --prod --dir=dist/<version>
-     ```
-     Retenir l'URL de production renvoyée par la commande.
-   - **Manuel** : signaler que `dist/<version>` est prêt à être uploadé. Attendre la confirmation
-     explicite de l'utilisateur que l'upload est terminé, ainsi que l'URL de production effective.
-     Ne jamais deviner cette URL ni poursuivre sans confirmation explicite.
+7. Déployer. Par défaut, sans poser de question : déploiement automatique sur le compte Netlify
+   principal, dont les credentials sont dans `.env` (jamais affichés, jamais passés en argument
+   visible). Le second compte n'est proposé qu'en repli, dans les cas ci-dessous.
+   1. Vérifier les clés : `grep -qE '^NETLIFY_AUTH_TOKEN=.+' .env` et
+      `grep -qE '^NETLIFY_SITE_ID=.+' .env`. Si l'une est absente ou vide : signaler, proposer de
+      compléter `.env` ou de déployer manuellement sur le second compte (7.3), et attendre une
+      décision explicite.
+   2. Contrôler le plafond mensuel de déploiements de production du compte principal (10 par
+      période de facturation Netlify, pour préserver les crédits du plan gratuit) :
+      ```
+      set -a; source .env; set +a; python scripts/count_netlify_deploys.py --max 10
+      ```
+      - Code 0 : annoncer le compte (`N/10`) puis déployer :
+        ```
+        set -a; source .env; set +a; npx netlify deploy --prod --dir=dist/<version>
+        ```
+        Retenir l'URL de production renvoyée par la commande.
+      - Code 1 (plafond atteint) : ne pas déployer sur le compte principal. Rapporter le compte et
+        la date de fin de période, puis proposer le déploiement manuel sur le second compte (7.3)
+        en signalant que son adresse diffère : les données locales de Marie sont liées à l'adresse,
+        elle devra importer son export sur la nouvelle et mettre à jour son raccourci. Attendre une
+        décision explicite (second compte, ou report du déploiement).
+      - Code 2 ou erreur réseau : signaler et attendre une décision explicite.
+   3. **Manuel sur le second compte** (uniquement sur décision explicite de l'utilisateur à l'une
+      des propositions ci-dessus) : signaler que `dist/<version>` est prêt à être uploadé. Attendre
+      la confirmation explicite que l'upload est terminé, ainsi que l'URL de production effective.
+      Ne jamais deviner cette URL ni poursuivre sans confirmation explicite.
 
    L'URL retenue (automatique ou confirmée manuellement) alimente la vérification de fumée de
    l'étape 8 et le rapport final de l'étape 12.
+
+   Comparer l'URL retenue au champ `URL de production` de `_contexte/dernier_deploiement.md`,
+   **avant** sa mise à jour à l'étape 8. Si elles diffèrent : **changement d'adresse** — le signaler
+   à l'utilisateur et le retenir pour l'étape 11 (guidage de Marie). Les données locales de Marie
+   (IndexedDB, `localStorage`) sont liées à l'adresse : sur la nouvelle, l'application est vide
+   tant qu'elle n'a pas importé son export.
 
 8. Vérification de fumée post-déploiement : utiliser l'URL de production retenue à l'étape 7,
    puis `curl -sf -o /dev/null -w '%{http_code}' <url>`. Un code différent de 200 est signalé dans le rapport
@@ -260,6 +276,22 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - la mention que le détail des changements est visible dans l'application via le bouton
       « Nouveautés » — jamais de renvoi vers un document externe.
 
+    En cas de changement d'adresse (étape 7), ajouter un guidage pas à pas, une action par ligne :
+    ```
+    Nouvelle adresse de l'appli (l'ancienne n'est plus mise à jour) :
+    <nouvelle URL>
+
+    Pour retrouver tes données :
+    1. Sur l'ancienne adresse, si pas déjà fait : Paramètres > Export et import > Exporter en JSON.
+    2. Ouvre la nouvelle adresse. L'appli démarre vide : passe l'accueil rapidement.
+    3. Paramètres > Export et import > Importer un fichier JSON. Choisis ton fichier. Confirme.
+    4. Supprime l'ancien raccourci de ton écran d'accueil.
+    5. Sur la nouvelle adresse : Partager > Sur l'écran d'accueil.
+
+    Réponds « fait » une fois terminé, ou dis-moi où tu bloques.
+    ```
+    Ce message est alors déposé avec `--expect-reply` (étape 11bis) pour suivre sa réponse.
+
     Écrire le corps au fond définitif, **sans** l'encadrement `💻🤖` ni le tag (l'agent DISCORD les pose).
 
 11bis. Validation du message de livraison — gate bloquant côté humain, avant tout dépôt en gateway.
@@ -268,6 +300,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       ```
       python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie --kind delivery --file <corps.txt>
       ```
+      Ajouter `--expect-reply` en cas de changement d'adresse (étape 7).
       Ne jamais appeler `DISCORD/discord_com/message_marie.py`, l'API Discord ou `claude_bridge` en direct.
       L'agent DISCORD ajuste ensuite ton, format et moment d'envoi sans changer le fond ; relever l'id de
       demande renvoyé.

@@ -14,7 +14,7 @@ demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
 ## Sauvegarde Drive en attente (2026-09-27)
 
-Manifeste rafraîchi (`python claude-vibecoding-kit/backup_project.py . --refresh-list`, 505
+Manifeste rafraîchi (`python claude-vibecoding-kit/backup_project.py . --refresh-list`, 506
 fichiers), upload non lancé (classifieur auto-mode refuse `rclone copy`). À lancer manuellement,
 hors session : `python claude-vibecoding-kit/backup_project.py . --upload`. Retirer cette section
 une fois l'upload effectué.

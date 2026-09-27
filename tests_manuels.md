@@ -46,6 +46,14 @@ pas encore tourné dans un vrai `/deploy`. Au prochain `/deploy` : vérifier que
 déposées avec les bons accents (le dépôt en ligne de commande est sensible à l'encodage — vérifier
 en relisant le contenu, pas seulement l'affichage terminal). Retirer cette section une fois vérifié.
 
+## Vérifier les en-têtes de sécurité après le prochain déploiement (2026-09-26)
+
+`public/_headers` (CSP, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`), validé en
+local sur un build servi avec ces en-têtes (onboarding complet jusqu'à E10, aucune violation).
+Non vérifié : Safari iOS, sync Supabase réelle, collage d'image dans E122. Après déploiement :
+`curl -sI <url>` montre les en-têtes ; sur iPhone, sync et envoi d'un retour avec capture
+fonctionnent. Retirer cette section une fois vérifié.
+
 ## Vérifier sur iPhone réel l'import depuis l'écran de bienvenue (2026-09-26)
 
 Bouton « Retrouver mes données » ajouté à E01 (import JSON avant l'accueil) ; l'export inclut

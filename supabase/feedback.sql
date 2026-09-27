@@ -20,6 +20,10 @@ create index if not exists feedback_reports_device_id_idx on feedback_reports (d
 alter table feedback_reports enable row level security;
 revoke all on feedback_reports from anon;
 
+-- Horodatage serveur (created_at est fourni par le client, donc falsifiable) : base des
+-- plafonds par appareil.
+alter table feedback_reports add column if not exists received_at timestamptz not null default now();
+
 create or replace function submit_feedback(
   p_id uuid,
   p_device_id uuid,
@@ -48,6 +52,22 @@ begin
   end if;
 
   if p_storage_path <> format('%s/%s.jpg', p_device_id, p_id) then
+    return false;
+  end if;
+
+  -- Plafonds anti-abus (audit securite 2026-09-26) : textes bornes, 50 retours par appareil
+  -- et par 24 h au plus.
+  if char_length(p_screen_code) > 100
+     or char_length(p_comment) > 10000
+     or octet_length(coalesce(p_strokes, '[]'::jsonb)::text) > 2097152
+     or char_length(coalesce(p_app_version, '')) > 50
+     or p_image_bytes > 8388608 then
+    return false;
+  end if;
+
+  if (select count(*) from feedback_reports
+      where device_id = p_device_id
+        and received_at > now() - interval '24 hours') >= 50 then
     return false;
   end if;
 
@@ -82,6 +102,8 @@ create index if not exists feedback_messages_report_id_idx on feedback_messages 
 alter table feedback_messages enable row level security;
 revoke all on feedback_messages from anon;
 
+alter table feedback_messages add column if not exists received_at timestamptz not null default now();
+
 -- Le client ne pousse jamais que des messages de testeur : les reponses d'agent sont deposees
 -- directement en base par le script developpeur (service_role, Phase 5), jamais via cette RPC.
 create or replace function submit_feedback_message(
@@ -99,7 +121,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if p_author <> 'user' then
+  if p_author <> 'user' or char_length(p_body) > 4000 then
     return false;
   end if;
 
@@ -118,6 +140,12 @@ begin
     where id = p_report_id
       and device_id = p_device_id
   ) then
+    return false;
+  end if;
+
+  if (select count(*) from feedback_messages
+      where device_id = p_device_id
+        and received_at > now() - interval '24 hours') >= 200 then
     return false;
   end if;
 
@@ -218,12 +246,58 @@ on conflict (id) do update
       file_size_limit = excluded.file_size_limit,
       allowed_mime_types = excluded.allowed_mime_types;
 
-create policy "anon_can_upload_feedback_images"
-on storage.objects
-for insert
-to anon
-with check (
-  bucket_id = 'feedback'
-  and array_length(storage.foldername(name), 1) = 1
-  and name like '%.jpg'
-);
+-- Depot d'image (audit securite 2026-09-26) : auparavant, anon pouvait deposer n'importe quel
+-- <x>/<y>.jpg sans limite. Desormais : chemin <device_id>/<report_id>.jpg en UUID, appareil
+-- deja enregistre (sync_device_snapshot), 50 images par appareil et par 24 h. Security definer
+-- car anon n'a acces ni a device_snapshots ni a la lecture de storage.objects.
+create or replace function feedback_upload_allowed(p_name text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_folder text := split_part(p_name, '/', 1);
+begin
+  if p_name !~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jpg$' then
+    return false;
+  end if;
+
+  if not exists (select 1 from device_snapshots where device_id = v_folder::uuid) then
+    return false;
+  end if;
+
+  return (
+    select count(*) from storage.objects
+    where bucket_id = 'feedback'
+      and name like v_folder || '/%'
+      and created_at > now() - interval '24 hours'
+  ) < 50;
+end;
+$$;
+
+revoke all on function feedback_upload_allowed(text) from public;
+grant execute on function feedback_upload_allowed(text) to anon;
+
+-- ALTER (pas DROP+CREATE) : le SQL Editor Supabase marque tout DROP comme destructif, meme
+-- ici ou rien n'est perdu (on ne fait que resserrer la regle d'acces).
+do $$
+begin
+  if exists (
+    select 1 from pg_policies
+    where schemaname = 'storage' and tablename = 'objects'
+      and policyname = 'anon_can_upload_feedback_images'
+  ) then
+    alter policy "anon_can_upload_feedback_images" on storage.objects
+      with check (bucket_id = 'feedback' and public.feedback_upload_allowed(name));
+  else
+    create policy "anon_can_upload_feedback_images"
+    on storage.objects
+    for insert
+    to anon
+    with check (
+      bucket_id = 'feedback'
+      and public.feedback_upload_allowed(name)
+    );
+  end if;
+end $$;

@@ -71,6 +71,22 @@ as $$
 declare
   v_rows int;
 begin
+  -- Plafonds anti-abus (audit securite 2026-09-26) : la cle anon est publique (bundle JS),
+  -- n'importe qui peut appeler cette fonction. Payload borne a 5 Mo, textes bornes, et au
+  -- plus 20 nouveaux appareils par heure (les appareils deja connus ne sont pas concernes).
+  if octet_length(p_payload::text) > 5242880
+     or char_length(p_device_secret) not between 20 and 100
+     or char_length(p_schema_version) > 20
+     or char_length(coalesce(p_app_version, '')) > 50 then
+    return false;
+  end if;
+
+  if not exists (select 1 from device_snapshots where device_id = p_device_id)
+     and (select count(*) from device_snapshots
+          where created_at > now() - interval '1 hour') >= 20 then
+    return false;
+  end if;
+
   insert into device_snapshots (device_id, device_secret, payload, schema_version, app_version, synced_at)
   values (p_device_id, p_device_secret, p_payload, p_schema_version, p_app_version, now())
   on conflict (device_id) do update

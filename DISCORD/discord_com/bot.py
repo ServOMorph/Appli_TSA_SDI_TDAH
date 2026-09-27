@@ -21,7 +21,7 @@ if not CONFIG.get("enabled", True):
 
 TOKEN = os.environ["DISCORD_BOT_TOKEN"]
 CHANNEL_ID = int(CONFIG["channel_id"])
-ADMINS = set(CONFIG.get("admins", []))
+ADMINS = {int(x) for x in CONFIG.get("admins", []) if str(x).isdigit()}
 QUEUE = DIR / "queue.json"
 COMMANDS = DIR / "commands.json"
 LOGS_DIR = DIR / "logs"
@@ -349,9 +349,12 @@ async def on_message(message):
     # réflexe en répondant), ou message de Marie (jamais d'usage légitime du mode commande) :
     # ce n'est pas une commande /discord_loop, c'est du trafic de canal. Il part vers la
     # gateway, qui le route dans l'inbox de l'agent concerné, pièces jointes incluses.
+    # Le mode commande donne à Claude Bash/Write sur le poste : réservé aux `admins`, un
+    # non-admin qui mentionne le bot est traité comme du trafic, jamais exécuté.
     if (client.user not in message.mentions
             or gateway.has_pending_reply(message.author.id)
-            or message.author.id == gateway.MARIE_USER_ID):
+            or message.author.id == gateway.MARIE_USER_ID
+            or message.author.id not in ADMINS):
         try:
             pieces = [{"filename": a.filename, "url": a.url, "content_type": a.content_type}
                       for a in message.attachments]

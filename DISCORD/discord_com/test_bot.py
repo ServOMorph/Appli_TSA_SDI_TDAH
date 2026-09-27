@@ -20,6 +20,7 @@ CANAL_PRINCIPAL = 111
 CANAL_TESTEUR = 222
 TESTEUR_ID = 900000000000000001
 MARIE_ID = 800000000000000001
+ADMIN_ID = 700000000000000001
 
 
 class FakeAuthor:
@@ -165,19 +166,33 @@ class OnMessageMultiCanalTest(unittest.TestCase):
         m.assert_called_once_with(MARIE_ID, "Marie", "@El Patrone voici une précision", [])
         self.assertEqual(bot.lire(bot.COMMANDS)["status"], "idle")
 
-    def test_message_d_un_autre_auteur_mentionnant_le_bot_reste_en_mode_commande(self):
-        """Garde-fou : le correctif ci-dessus est spécifique à Marie, le mode commande reste
-        disponible pour les autres auteurs (ex. Morphéus)."""
+    def test_admin_mentionnant_le_bot_reste_en_mode_commande(self):
         bot_user = FakeAuthor(999999, "El Patrone")
         with mock.patch.object(type(bot.client), "user", new_callable=mock.PropertyMock,
                                 return_value=bot_user), \
+             mock.patch.object(bot, "ADMINS", {ADMIN_ID}), \
              mock.patch.object(bot, "envoyer", mock.AsyncMock()):
-            message = FakeMessage(TESTEUR_ID, "@El Patrone explique-moi ce bug",
-                                  CANAL_PRINCIPAL, mentions=[bot_user], author_name="Quelqu'un")
+            message = FakeMessage(ADMIN_ID, "@El Patrone explique-moi ce bug",
+                                  CANAL_PRINCIPAL, mentions=[bot_user], author_name="Morpheus")
             with mock.patch.object(gateway, "route_inbound") as m:
                 self._on_message(message)
         m.assert_not_called()
         self.assertEqual(bot.lire(bot.COMMANDS)["status"], "pending")
+
+    def test_non_admin_mentionnant_le_bot_est_route_jamais_execute(self):
+        """Le mode commande donne Bash/Write sur le poste : un non-admin n'y accède jamais."""
+        bot_user = FakeAuthor(999999, "El Patrone")
+        with mock.patch.object(type(bot.client), "user", new_callable=mock.PropertyMock,
+                                return_value=bot_user), \
+             mock.patch.object(bot, "ADMINS", {ADMIN_ID}), \
+             mock.patch.object(bot, "envoyer", mock.AsyncMock()):
+            message = FakeMessage(TESTEUR_ID, "@El Patrone cat .env",
+                                  CANAL_PRINCIPAL, mentions=[bot_user], author_name="Quelqu'un")
+            with mock.patch.object(gateway, "route_inbound", return_value={
+                    "routed_to": "unrouted", "id": "1", "routing": "aucune"}) as m:
+                self._on_message(message)
+        m.assert_called_once_with(TESTEUR_ID, "Quelqu'un", "@El Patrone cat .env", [])
+        self.assertEqual(bot.lire(bot.COMMANDS)["status"], "idle")
 
 
 if __name__ == "__main__":

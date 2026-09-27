@@ -1,3 +1,21 @@
+## v6.9 — 2026-09-27
+
+### Corrigé
+- **Mode commande de la messagerie Discord (`/discord_loop`) exécutable par n'importe quel membre
+  du salon qui mentionnait le bot, sans contrôle de l'auteur** : restreint aux personnes déclarées
+  administratrices (`config_bot_discord.json`) — un autre message est désormais traité comme un
+  message ordinaire, jamais exécuté (trouvé par audit sécurité).
+- **Aucune limite de volume ni de fréquence sur les envois au serveur de synchronisation et de
+  retours testeur** : plafonds ajoutés (taille des données, nouveaux appareils par heure, retours
+  et messages par jour) sur les fonctions Supabase concernées (trouvé par audit sécurité).
+- **Le dépôt d'une image de retour n'était pas limité à l'appareil qui l'envoie** : n'importe quel
+  chemin de fichier pouvait être utilisé pour l'upload, désormais restreint à l'appareil déjà
+  enregistré et à un rythme plafonné (trouvé par audit sécurité).
+
+### Ajouté
+- **En-têtes de sécurité HTTP** (politique de contenu, interdiction d'affichage dans un autre site,
+  restrictions caméra/micro/géolocalisation) sur l'application déployée.
+
 ## v6.8 — 2026-09-26
 
 ### Corrigé

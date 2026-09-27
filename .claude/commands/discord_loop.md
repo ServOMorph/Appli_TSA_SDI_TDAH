@@ -133,7 +133,9 @@ directement par `done` (3d) puis reboucler en 3a-bis (le jugement de l'outbox qu
 justement traiter la demande qui a causé ce réveil) avant de relancer `wait 3600`. Ignorer aussi
 3d-bis pour ce seul événement (pas un `TIMEOUT`, pas une rafale de `queue[]`).
 
-Arrivent ici les messages qui @-mentionnent le bot, **sauf** une réponse à une question en
+Arrivent ici les messages qui @-mentionnent le bot **et dont l'auteur figure dans `admins`**
+(`config_bot_discord.json` ; un non-admin est routé en trafic par `bot.py`, jamais exécuté —
+`DISCORD/discord_com/ACCES.md`), **sauf** une réponse à une question en
 attente (`state.pending_replies`) : même @-mentionné par réflexe, `bot.py` la route
 mécaniquement vers `gateway/inbox/<agent>/` (pièces jointes incluses) au lieu de la mettre en
 commande — `gateway.has_pending_reply(author_id)`, vérifié avant la branche commande. Plus

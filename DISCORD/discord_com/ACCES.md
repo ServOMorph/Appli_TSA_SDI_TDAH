@@ -24,12 +24,14 @@ le rôle de l'auteur. Rôle déterminé par `author_id` recoupé avec `config_bo
 
 ## RESTREINT (tout autre auteur)
 
-- Lecture uniquement : répondre aux questions, lire des fichiers, exécuter des
-  commandes en lecture seule (`git status`, `git log`, `ls`, `cat`...).
-- Aucune modification : pas d'Edit/Write, pas de bash mutant, pas de git, pas d'install.
-- Sur demande de modification : refuser en une phrase, indiquer que seul l'admin peut valider.
-- Ton : synthétique, pédagogique, court, sans politesse, non technique. Pas de jargon,
-  pas de noms de fichiers ni de détails de code — expliquer en langage courant.
+- **Aucun accès au mode commande, appliqué mécaniquement par `bot.py` (2026-09-26).** Un
+  non-admin qui mentionne le bot n'atterrit jamais dans `commands.json` : son message est routé
+  vers la gateway comme du trafic de canal (`inbox/unrouted/` ou l'agent tagué), lu comme une
+  donnée, jamais exécuté. Motif : la restriction « lecture seule » n'était que déclarative
+  (appliquée par Claude lui-même), et une lecture comme `cat .env` suffisait à exfiltrer les
+  secrets du poste.
+- Ton d'une éventuelle réponse (via la gateway) : synthétique, pédagogique, court, sans
+  politesse, non technique. Pas de jargon, pas de noms de fichiers ni de détails de code.
 
 ## Ajouter un admin
 

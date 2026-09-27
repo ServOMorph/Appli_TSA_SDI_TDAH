@@ -8,6 +8,13 @@
     correspondant et est remplacé par un renvoi dans CLAUDE.md
   - réf: CLAUDE.md § Spécificités projet, décision utilisateur du 2026-09-16 (migration progressive,
     pas immédiate)
+- [P2|ouvert|source=orchestrateur] Documenter le contrôle d'accès au mode commande de la gateway
+  Discord : depuis le 2026-09-27 (audit sécurité), seuls les `author_id` déclarés dans `admins`
+  (`config_bot_discord.json`) peuvent faire exécuter une commande par la session `/discord_loop` —
+  un non-admin qui mentionne le bot est routé comme trafic ordinaire, jamais exécuté.
+  - fait quand: décision documentaire prise (guide mis à jour ou jugé suffisant tel quel)
+  - réf: 20_guides/gateway_discord.md, 30_decisions/gouvernance_gateway_discord.md,
+    DISCORD/discord_com/ACCES.md, commit de ce /close
 - [P2|ouvert|source=orchestrateur] Mettre à jour la documentation export/import. L'export porte
   désormais `device_id`/`device_secret`/`sync_consent_granted`, restaurés à l'import ; l'import est
   possible dès l'écran de bienvenue (E01) et passe par E04 si le consentement manque ; le fil « Mes

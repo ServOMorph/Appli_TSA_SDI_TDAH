@@ -1,3 +1,9 @@
+## v6.10 — 2026-09-27
+
+### Constaté
+- Alerte d'export envoyée à Marie avant la mise en production du lot en attente (audit sécurité
+  inclus) : sa dernière sauvegarde a été vérifiée, aucune perte ni incohérence détectée.
+
 ## v6.9 — 2026-09-27
 
 ### Corrigé

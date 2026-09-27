@@ -6,6 +6,31 @@ en tête, précédées de `---`. Contenu strictement inchangé au déplacement.
 
 ---
 
+## Session du 2026-09-27 — audit sécurité complet, 4 correctifs appliqués et vérifiés
+
+## Décisions prises
+- Audit sécurité complet mené sur demande explicite (SQL Supabase, bot Discord, client de sync, en-têtes HTTP, dépendances, historique git) : rapport de 9 constats livré avant tout correctif.
+- Sur accord explicite (« go »), 4 constats corrigés : mode commande Discord restreint aux admins, plafonds anti-abus SQL, policy de dépôt d'image resserrée, en-têtes de sécurité HTTP.
+
+## Livrables produits ou modifiés
+- `DISCORD/discord_com/bot.py`, `test_bot.py`, `ACCES.md`, `.claude/commands/discord_loop.md` : liste blanche `admins` appliquée mécaniquement au mode commande (10/10 tests).
+- `supabase/schema.sql`, `supabase/feedback.sql` : plafonds anti-abus (payload/textes/quotas horaires-journaliers sur `received_at` serveur) + policy `storage.objects` resserrée (`ALTER POLICY`, pas `DROP`) — appliqués en production Supabase, vérifiés en conditions réelles.
+- `public/_headers` : CSP + `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy`, vérifié en local (build + Playwright jusqu'à E10, 0 violation) — pas encore vérifié en production.
+- `tests_manuels.md` : section SQL retirée (3 points validés) ; sections en-têtes + import iPhone conservées, liées au prochain déploiement.
+
+## Hypothèses validées / invalidées
+- VALIDE : les 3 plafonds SQL fonctionnent en conditions réelles — appareil existant (`ac4a10b6...`) resynchronisé, retour avec capture accepté et retrouvé via `read_feedback_reports.py` (« Test 5 », 104 376 octets), dépôt anon sur chemin libre refusé (`curl` direct, `HTTP 400`/`403 row-level security policy`).
+- VALIDE : la CSP ne bloque aucun flux applicatif normal (onboarding complet E01→E10, sync Supabase autorisée, appel tiers bloqué comme attendu).
+- EN ATTENTE : en-têtes en production et import iPhone — le mécanisme `_headers` n'est actif qu'au build Netlify, inopérant en dev.
+
+## Prochaine étape exacte
+Prochain `/deploy` (v6.9 ou bumpée) : vérifier en production les en-têtes (`curl -sI`) et l'import iPhone (E01), migration Marie option A. Puis, au choix, traiter les 5 points de l'audit laissés ouverts (Questions ouvertes ci-dessus : injection de prompt, `device_secret` en clair côté serveur, données de santé/RGPD, dépendances dev, horodatages client).
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
 ## Session du 2026-09-25 — dépôt différé des réponses aux retours testeur jusqu'au déploiement
 
 ## Décisions prises

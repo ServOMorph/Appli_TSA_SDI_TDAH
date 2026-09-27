@@ -6,7 +6,7 @@
 - **Décision du 2026-09-26 (option A) : le prochain `/deploy` part en manuel sur le second compte (`appli-marie`, étape 7.3), pas sur le compte principal par défaut.** But : que Marie exporte depuis une version dont l'export contient son identité d'appareil et son consentement, avant de migrer vers `appli-audhd`. Message de livraison : lui demander un nouvel export depuis cette version (son ancien fichier ne contient pas l'identité). Migration vers `appli-audhd` au `/deploy` suivant seulement, après ce nouvel export et après traitement de ses retours ouverts (le fil « Mes retours » est local à l'adresse, il ne suit pas la migration). Retirer cette entrée une fois la migration faite.
 - **Isolation des données multi-testeurs : par `device_id` (localStorage, propre à chaque origine), pas par `tester_code`.** Changer de domaine Netlify crée un nouveau `device_id`, sauf si le testeur importe un export fait depuis une version postérieure à `84472d8` (l'export porte `device_id`/`device_secret`/`sync_consent_granted`, restaurés à l'import). Le fil « Mes retours » (tables Dexie `feedbackReports`/`feedbackMessages`) ne suit jamais la migration.
 - Phase 5 — modèle « un canal Discord par testeur ». Câblage local fait (`config_bot_discord.json`, gitignore). Premier testeur Satine pas encore sur le serveur ; Morphéus doit s'ajouter avant elle pour valider le dispositif (`tester_code = "morpheus"`, saisie encore à faire).
-- e2e : suite complète rejouée et réparée le 2026-09-22 — **59/59**. Cause racine des échecs (T02-T07, T58) : écran E05TesterCode (ajouté le 2026-09-16) non géré par les helpers d'onboarding e2e, désynchronisés depuis le 2026-09-10 — corrigé. T59 corrigé séparément (cause distincte, cf. Dernière session).
+- **`/deploy` v6.9 lancé le 2026-09-27 (étape 0 exécutée) : alerte d'export envoyée à Marie en mode urgent** (gateway id `20260927T055656_106687`, Discord `1553646608107970601`, `--expect-reply`), snapshot de son appareil (`103c9b92`, capture du 2026-09-25) analysé sans perte ni incohérence structurelle. Confirmation explicite de son export attendue avant le gate étape 4ter — ne jamais lancer le build sans elle. Retirer cette entrée une fois le déploiement conclu (cf. `_contexte/dernier_deploiement.md`).
 
 ## Questions ouvertes
 - [P2] **Injection de prompt possible via des contenus non fiables lus par des sessions Claude ayant Bash/Write actifs, trouvé par l'audit sécurité du 2026-09-27 — non corrigé.** Sources : commentaires/messages de retours testeurs (`/traiter_retours`), messages Discord routés dans les inbox (`/discord_loop`). Ces textes peuvent contenir des instructions déguisées, lues sans distinction du reste du contexte par une session qui peut ensuite écrire des fichiers, committer ou lancer des commandes. Le correctif du 2026-09-27 (liste blanche `admins` sur le mode commande Discord) réduit qui peut déposer ces textes mais ne filtre pas leur contenu une fois routés. — fait quand : ces contenus sont lus dans un contexte sans outils mutants, ou une validation humaine explicite est imposée avant toute action qu'ils déclenchent — réf : `.claude/commands/traiter_retours.md`, `.claude/commands/discord_loop.md`, `DISCORD/discord_com/bot.py`
@@ -48,25 +48,20 @@
 - [P3] **`AppShell.test.tsx` ne peut pas détecter le débordement WebKit qu'il documente en commentaire** (trouvé par la revue de code du `/close` du 2026-09-25) : jsdom ne calcule pas de layout réel, le test ne vérifie que les valeurs littérales du style inline — une régression future qui recrée le débordement par un autre biais (ex. un enfant `whiteSpace: nowrap`) passerait ce test sans être détectée. — fait quand : un test avec mesure de layout réelle (Playwright/WebKit) couvre ce cas, ou risque jugé acceptable — réf : `src/ui/components/AppShell.test.tsx`
 - [P3] **`E12WeekPlanning.tsx` reproduit le défaut de libellé mois/année sur 2 lignes corrigé sur E10 (`PlanningBoard.tsx`) le 2026-09-25** — même `monthButtonStyle` (police `0.875rem`, pas de `whiteSpace: nowrap`), signalé à l'utilisateur mais non corrigé (hors périmètre de la demande, qui portait sur E10/Phase 5). — fait quand : Marie ou l'utilisateur confirme le même problème sur « Planning de la semaine » et il est corrigé, ou jugé non prioritaire — réf : `src/ui/screens/dashboard/E12WeekPlanning.tsx:39-52`
 
-## Dernière session (2026-09-27 — audit sécurité complet, 4 correctifs appliqués et vérifiés)
+## Dernière session (2026-09-27 — /deploy v6.9 : alerte export Marie, aucune perte détectée)
 
 ## Décisions prises
-- Audit sécurité complet mené sur demande explicite (SQL Supabase, bot Discord, client de sync, en-têtes HTTP, dépendances, historique git) : rapport de 9 constats livré avant tout correctif.
-- Sur accord explicite (« go »), 4 constats corrigés : mode commande Discord restreint aux admins, plafonds anti-abus SQL, policy de dépôt d'image resserrée, en-têtes de sécurité HTTP.
+- `/deploy` lancé (cible déterminée au CHANGELOG) : étape 0 exécutée avant toute chose — alerte d'export envoyée à Marie, snapshot analysé, aucune perte détectée. `/close` exécuté en son étape 1 pour clôturer proprement avant le build.
 
 ## Livrables produits ou modifiés
-- `DISCORD/discord_com/bot.py`, `test_bot.py`, `ACCES.md`, `.claude/commands/discord_loop.md` : liste blanche `admins` appliquée mécaniquement au mode commande (10/10 tests).
-- `supabase/schema.sql`, `supabase/feedback.sql` : plafonds anti-abus (payload/textes/quotas horaires-journaliers sur `received_at` serveur) + policy `storage.objects` resserrée (`ALTER POLICY`, pas `DROP`) — appliqués en production Supabase, vérifiés en conditions réelles.
-- `public/_headers` : CSP + `X-Frame-Options`/`Referrer-Policy`/`Permissions-Policy`, vérifié en local (build + Playwright jusqu'à E10, 0 violation) — pas encore vérifié en production.
-- `tests_manuels.md` : section SQL retirée (3 points validés) ; sections en-têtes + import iPhone conservées, liées au prochain déploiement.
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : alerte export consignée (commit `5a5fad2`).
 
 ## Hypothèses validées / invalidées
-- VALIDE : les 3 plafonds SQL fonctionnent en conditions réelles — appareil existant (`ac4a10b6...`) resynchronisé, retour avec capture accepté et retrouvé via `read_feedback_reports.py` (« Test 5 », 104 376 octets), dépôt anon sur chemin libre refusé (`curl` direct, `HTTP 400`/`403 row-level security policy`).
-- VALIDE : la CSP ne bloque aucun flux applicatif normal (onboarding complet E01→E10, sync Supabase autorisée, appel tiers bloqué comme attendu).
-- EN ATTENTE : en-têtes en production et import iPhone — le mécanisme `_headers` n'est actif qu'au build Netlify, inopérant en dev.
+- VALIDE : snapshot de Marie (`103c9b92`, capture du 2026-09-25) stable entre ses deux dernières captures du même jour — aucune perte, aucune incohérence structurelle.
+- EN ATTENTE : confirmation d'export de Marie (gate étape 4ter de `/deploy`, avant le build).
 
 ## Prochaine étape exacte
-Prochain `/deploy` (v6.9 ou bumpée) : vérifier en production les en-têtes (`curl -sI`) et l'import iPhone (E01), migration Marie option A. Puis, au choix, traiter les 5 points de l'audit laissés ouverts (Questions ouvertes ci-dessus : injection de prompt, `device_secret` en clair côté serveur, données de santé/RGPD, dépendances dev, horodatages client).
+Poursuivre `/deploy` : vérifications bloquantes (étape 3), avertissements (étape 4), revue de code cumulée (4bis), confirmation export Marie (4ter), build et déploiement.
 
 ## Question bloquante pour la session suivante
 Aucune.

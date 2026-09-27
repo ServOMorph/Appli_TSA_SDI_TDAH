@@ -1124,3 +1124,21 @@ jour par jour. Question déposée en gateway en **mode forcé** sur demande expl
 l'utilisateur (id `20260923T172745_810418`, approuvée manuellement puis `bot.py` relancé pour la
 drainer — revue normale du gardien de sortie sautée). Réponse reçue et transmise par l'utilisateur,
 confirmée dans `gateway/inbox/orchestrateur/` (id `20260923T175246_310881`, acquittée).
+
+### 2026-09-27
+
+**Dév ->**
+Nouvelle version bientôt en ligne.
+
+Exporte tes données maintenant : Paramètres > Export et import > Exporter en JSON.
+
+Garde ce fichier de côté avant la mise à jour.
+
+Confirme-moi une fois fait.
+
+_Suite :_ alerte `/deploy` étape 0.1 avant le lot v6.9. Zone `discord` en pause depuis le
+2026-09-26 (`bot.py` arrêté, gardien de sortie hors service) : envoi soumis à confirmation
+explicite de l'utilisateur avant dépôt (au lieu de la relecture normale du gardien), puis déposé
+en **mode urgent** (approve + drain immédiats, indépendant de `bot.py`). Id gateway
+`20260927T055656_106687`, Discord `1553646608107970601`, `--expect-reply`. Confirmation
+recontrôlée à l'étape 4ter avant le build.

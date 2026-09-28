@@ -6,6 +6,26 @@ en tête, précédées de `---`. Contenu strictement inchangé au déplacement.
 
 ---
 
+## Session du 2026-09-27 — /deploy v6.9 : alerte export Marie, aucune perte détectée
+
+## Décisions prises
+- `/deploy` lancé (cible déterminée au CHANGELOG) : étape 0 exécutée avant toute chose — alerte d'export envoyée à Marie, snapshot analysé, aucune perte détectée. `/close` exécuté en son étape 1 pour clôturer proprement avant le build.
+
+## Livrables produits ou modifiés
+- `COMMUNICATION/Marie/historique_conversation_marie.md` : alerte export consignée (commit `5a5fad2`).
+
+## Hypothèses validées / invalidées
+- VALIDE : snapshot de Marie (`103c9b92`, capture du 2026-09-25) stable entre ses deux dernières captures du même jour — aucune perte, aucune incohérence structurelle.
+- EN ATTENTE : confirmation d'export de Marie (gate étape 4ter de `/deploy`, avant le build).
+
+## Prochaine étape exacte
+Poursuivre `/deploy` : vérifications bloquantes (étape 3), avertissements (étape 4), revue de code cumulée (4bis), confirmation export Marie (4ter), build et déploiement.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
 ## Session du 2026-09-27 — audit sécurité complet, 4 correctifs appliqués et vérifiés
 
 ## Décisions prises

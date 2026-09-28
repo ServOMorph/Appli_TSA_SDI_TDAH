@@ -37,7 +37,7 @@ export function E111Profile() {
     ? (profileLabels[currentUser.profile_type] ?? currentUser.profile_type)
     : 'Non défini'
 
-  const testerCode = settings?.tester_code ?? ''
+  const testerCode = (settings?.tester_code ?? '').trim()
   const [testerCodeInput, setTesterCodeInput] = useState(testerCode)
 
   return (

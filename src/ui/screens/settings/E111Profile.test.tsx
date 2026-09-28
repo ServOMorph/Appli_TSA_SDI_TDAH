@@ -68,6 +68,12 @@ describe('E111Profile', () => {
     expect(screen.getByRole('button', { name: 'Enregistrer' })).toBeDisabled()
   })
 
+  it('désactive Enregistrer même si le code stocké contient des espaces superflus', () => {
+    renderE111({ settings: { ...baseSettings, tester_code: ' alpha-01 ' } })
+    expect(screen.getByLabelText('Code testeur')).toHaveValue('alpha-01')
+    expect(screen.getByRole('button', { name: 'Enregistrer' })).toBeDisabled()
+  })
+
   it('enregistre le nouveau code testeur saisi', () => {
     const updateSettings = vi.fn().mockResolvedValue(undefined)
     renderE111({ settings: baseSettings, updateSettings })

@@ -1,9 +1,3 @@
-## v6.10 — 2026-09-27
-
-### Constaté
-- Alerte d'export envoyée à Marie avant la mise en production du lot en attente (audit sécurité
-  inclus) : sa dernière sauvegarde a été vérifiée, aucune perte ni incohérence détectée.
-
 ## v6.9 — 2026-09-27
 
 ### Corrigé
@@ -17,6 +11,9 @@
 - **Le dépôt d'une image de retour n'était pas limité à l'appareil qui l'envoie** : n'importe quel
   chemin de fichier pouvait être utilisé pour l'upload, désormais restreint à l'appareil déjà
   enregistré et à un rythme plafonné (trouvé par audit sécurité).
+- **Champ Code testeur (Paramètres > Profil) : le bouton Enregistrer pouvait rester actif à tort**
+  si le code déjà enregistré comportait des espaces superflus, sans qu'aucune modification n'ait
+  été faite (trouvé par la revue de code de la livraison).
 
 ### Ajouté
 - **En-têtes de sécurité HTTP** (politique de contenu, interdiction d'affichage dans un autre site,

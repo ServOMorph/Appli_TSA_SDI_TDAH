@@ -2,7 +2,7 @@
 
 Mis à jour automatiquement par `/deploy` (étape 7). Ne pas éditer manuellement.
 
-- Version : v5.139
-- Date : 2026-09-17
-- URL de production : https://appli-marie.netlify.app
-- Commit : aa49bcce1410ef6dfe6c2dc77f0d9172e139e4b5
+- Version : v6.9
+- Date : 2026-09-28
+- URL de production : https://appli-audhd.netlify.app
+- Commit : a3af94b5a7ee484106126456f357d830164ddd12

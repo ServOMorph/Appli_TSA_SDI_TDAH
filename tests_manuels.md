@@ -12,7 +12,7 @@ annoté « (hors délégation, à provoquer manuellement) » à l'intérieur d'u
 reste un test dev classique, jamais validé passivement. Ajouter un futur test `[discord-auto]` ne
 demande d'éditer que ce fichier — jamais `discord_loop.md`.
 
-## Sauvegarde Drive en attente (2026-09-27)
+## Sauvegarde Drive en attente (2026-09-28)
 
 Manifeste rafraîchi (`python claude-vibecoding-kit/backup_project.py . --refresh-list`, 506
 fichiers), upload non lancé (classifieur auto-mode refuse `rclone copy`). À lancer manuellement,

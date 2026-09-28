@@ -1,3 +1,9 @@
+## v6.10 — 2026-09-28
+
+### Modifié
+- **Mise en production du lot v6.9 sur une nouvelle adresse d'hébergement**, avec guidage de
+  récupération des données envoyé à la testeuse principale.
+
 ## v6.9 — 2026-09-27
 
 ### Corrigé

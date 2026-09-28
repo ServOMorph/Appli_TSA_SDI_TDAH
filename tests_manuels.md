@@ -33,26 +33,14 @@ récent. Une fois le correctif déployé et un cycle de synchronisation passé :
 prochain `python scripts/backup_testeur_snapshots.py` range bien le snapshot de `103c9b92` dans
 `marie/` et non plus dans `_sans_code/`. Retirer cette section une fois vérifié.
 
-## Vérifier la republication des réponses en attente au prochain /deploy
-
-Depuis le 2026-09-25, les réponses aux retours testeur d'un correctif pas encore déployé sont mises
-en attente dans `_contexte/reponses_retours_en_attente_deploiement.json`
-(`scripts/queue_pending_feedback_reply.py`) au lieu d'être déposées immédiatement sur Supabase.
-`/deploy` (étape 8, juste après le smoke test) doit les republier automatiquement via
-`scripts/republish_pending_feedback_replies.py`. Le fichier contient actuellement 16 entrées (lot
-`roadmap_retours_2026-09-22.md`), jamais encore republiées en conditions réelles — ce mécanisme n'a
-pas encore tourné dans un vrai `/deploy`. Au prochain `/deploy` : vérifier que le fichier se vide
-(ou ne contient plus que d'éventuels échecs) et qu'un aperçu Supabase confirme les réponses
-déposées avec les bons accents (le dépôt en ligne de commande est sensible à l'encodage — vérifier
-en relisant le contenu, pas seulement l'affichage terminal). Retirer cette section une fois vérifié.
-
 ## Vérifier les en-têtes de sécurité après le prochain déploiement (2026-09-26)
 
 `public/_headers` (CSP, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`), validé en
 local sur un build servi avec ces en-têtes (onboarding complet jusqu'à E10, aucune violation).
-Non vérifié : Safari iOS, sync Supabase réelle, collage d'image dans E122. Après déploiement :
-`curl -sI <url>` montre les en-têtes ; sur iPhone, sync et envoi d'un retour avec capture
-fonctionnent. Retirer cette section une fois vérifié.
+`curl -sI https://appli-audhd.netlify.app` confirmé après le déploiement v6.9 (2026-09-28) : les
+4 en-têtes sont présents en production. Reste non vérifié : Safari iOS, sync Supabase réelle,
+collage d'image dans E122 (sur iPhone, sync et envoi d'un retour avec capture fonctionnent).
+Retirer cette section une fois vérifié.
 
 ## Vérifier sur iPhone réel l'import depuis l'écran de bienvenue (2026-09-26)
 

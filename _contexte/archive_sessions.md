@@ -6,6 +6,29 @@ en tête, précédées de `---`. Contenu strictement inchangé au déplacement.
 
 ---
 
+## Session du 2026-09-28 — correctif E111Profile suite revue 4bis, CHANGELOG v6.10 erroné retiré
+
+## Décisions prises
+- Revue de code `high` de l'étape 4bis de `/deploy` : correctif appliqué à `E111Profile.tsx` (code testeur trimmé à la lecture, le bouton Enregistrer ne reste plus actif à tort). Le point sur `tester_code: undefined` explicite vérifié non problématique (nécessaire au fonctionnement par fusion de `updateSettings`, champ non indexé Dexie) — aucun changement.
+- Revue de code `medium` de clôture : entrée `CHANGELOG.md` `v6.10` (créée par erreur au `/close` précédent) retirée avant tout déploiement — voir Questions ouvertes. Correctif ci-dessus intégré dans le bloc `v6.9` (toujours non déployé) plutôt que de créer une nouvelle version.
+
+## Livrables produits ou modifiés
+- `src/ui/screens/settings/E111Profile.tsx` : `testerCode` trimmé à la lecture.
+- `src/ui/screens/settings/E111Profile.test.tsx` : nouveau test (code stocké avec espaces superflus).
+- `CHANGELOG.md` : entrée `v6.10` retirée, correctif documenté dans `v6.9`.
+
+## Hypothèses validées / invalidées
+- VALIDE : 1045/1045 tests, `tsc -b` et lint clean après correctif.
+- INVALIDE : bump systématique de version à chaque `/close` sans condition — risque concret confirmé (cf. Questions ouvertes).
+
+## Prochaine étape exacte
+Reprendre `/deploy` à l'étape 4bis (revue acquittée), cible `v6.9` confirmée stable, puis étape 4ter (confirmation export Marie) et build.
+
+## Question bloquante pour la session suivante
+Aucune.
+
+---
+
 ## Session du 2026-09-27 — /deploy v6.9 : alerte export Marie, aucune perte détectée
 
 ## Décisions prises

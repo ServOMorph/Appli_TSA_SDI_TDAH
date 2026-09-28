@@ -16,6 +16,12 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 28 septembre 2026, la version en attente est mise en ligne à une nouvelle adresse
+(appli-audhd.netlify.app) : sécurité renforcée (messagerie Discord, serveur de synchronisation,
+en-têtes de protection), corrections de retours testeurs, nouvel outil « Routine », améliorations
+d'affichage et plafond de durée avant minuit. La testeuse principale est guidée pour récupérer ses
+données sur la nouvelle adresse.
+
 Le 28 septembre 2026, un défaut mineur trouvé par une relecture de code avant la mise en ligne a
 été corrigé : dans Paramètres > Profil, le bouton Enregistrer du code testeur pouvait apparaître
 actif à tort si le code déjà enregistré contenait des espaces superflus, sans qu'aucune

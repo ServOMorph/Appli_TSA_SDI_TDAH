@@ -1142,3 +1142,36 @@ explicite de l'utilisateur avant dépôt (au lieu de la relecture normale du gar
 en **mode urgent** (approve + drain immédiats, indépendant de `bot.py`). Id gateway
 `20260927T055656_106687`, Discord `1553646608107970601`, `--expect-reply`. Confirmation
 recontrôlée à l'étape 4ter avant le build.
+
+### 2026-09-28
+
+**Dév ->**
+Version 6.9 en ligne.
+
+Nouvelle adresse de l'appli (l'ancienne ne sera plus mise à jour) :
+https://appli-audhd.netlify.app
+
+Pour retrouver tes données :
+1. Sur l'ancienne adresse, si pas déjà fait : Paramètres > Export et import > Exporter en JSON.
+2. Ouvre la nouvelle adresse. L'appli démarre vide : passe l'accueil rapidement.
+3. Paramètres > Export et import > Importer un fichier JSON. Choisis ton fichier. Confirme.
+4. Supprime l'ancien raccourci de ton écran d'accueil.
+5. Sur la nouvelle adresse : Partager > Sur l'écran d'accueil.
+
+Ta routine est maintenant disponible dans l'outil Routine. Tu peux créer une routine avec ses étapes, la planifier sur les jours de ton choix avec un horaire propre à chacun, et cocher ses étapes chaque jour depuis un écran dédié. Un jour précis peut être modifié séparément des autres.
+
+Une fois importée, retape ton code testeur dans Paramètres > Profil : marie.
+
+Détail des autres changements : bouton « Nouveautés » dans l'application.
+
+Réponds « fait » une fois terminé, ou dis-moi où tu bloques.
+
+_Suite :_ message de livraison de `/deploy` (v6.9, lot cumulé depuis v5.139 : audit sécurité,
+16 correctifs `roadmap_retours_2026-09-22.md`, outil Routine, layout/React, récupération des
+données, plafond de durée avant minuit). Déploiement automatique sur le compte principal
+(`appli-audhd`) sur demande explicite de l'utilisateur, qui annule la décision « option A » du
+2026-09-26 (déploiement manuel prévu sur `appli-marie`) — d'où le changement d'adresse. Réponse au
+retour Routine (`229113cc`) reprise directement dans ce message : son fil « Mes retours » est local
+à l'ancienne adresse et ne migre pas, cette réponse y resterait invisible après l'import. Déposé en
+**mode urgent** sur confirmation explicite de l'utilisateur (zone `discord` toujours en pause). Id
+gateway `20260928T160438_504017`, Discord `1554161944322121870`, `--expect-reply`.

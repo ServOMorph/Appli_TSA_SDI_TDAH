@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/repositories'
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
+import { setFeedbackMessagesCursor } from '@/data/sync/feedbackMessagesCursor'
 import { grantSyncConsent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { createList } from '@/domain/rules/listRules'
@@ -39,6 +40,18 @@ const IMPORT_TABLES = [
   db.budgetAccounts, db.budgetDeposits, db.budgetDepositCategories, db.budgetIncomeEntries,
   db.routines, db.routineSteps, db.routineSchedules, db.routineStepCompletions,
 ] as const
+
+// Un retour envoyé est lié côté serveur à l'appareil émetteur : sous une autre identité, ses commentaires et sa validation seraient refusés sans fin.
+async function detachFeedbackFromPreviousIdentity() {
+  const boundIds = (await db.feedbackReports.filter((report) => report.sync_status === 'sent').toArray()).map((report) => report.id)
+  await db.feedbackMessages.where('report_id').anyOf(boundIds).delete()
+  await db.feedbackReports.bulkDelete(boundIds)
+  await db.feedbackReports.toCollection().modify({ image_path: null, sync_status: 'pending', last_attempt_at: null })
+  // Le curseur de lecture (feedbackMessagesCursor.ts) n'est pas scopé par device_id : sous l'ancienne
+  // identité, il pourrait être plus récent que des réponses d'agent déjà reçues par la nouvelle,
+  // qui ne seraient alors jamais retéléchargées.
+  setFeedbackMessagesCursor(new Date(0).toISOString())
+}
 
 function readImportArray(data: Record<string, unknown>, key: string): unknown[] {
   const value = data[key]
@@ -365,8 +378,15 @@ export function useSettingsState() {
       steps_overridden: schedule.steps_overridden ?? false,
     }))
 
+    const importedIdentity =
+      typeof data.device_id === 'string' && data.device_id && typeof data.device_secret === 'string' && data.device_secret
+        ? { deviceId: data.device_id, deviceSecret: data.device_secret }
+        : null
+    const identityChanges = importedIdentity !== null && importedIdentity.deviceId !== getDeviceIdentity().deviceId
+    const transactionTables = identityChanges ? [...IMPORT_TABLES, db.feedbackReports, db.feedbackMessages] : IMPORT_TABLES
+
     try {
-      await db.transaction('rw', IMPORT_TABLES, async () => {
+      await db.transaction('rw', transactionTables, async () => {
         await Promise.all(IMPORT_TABLES.map((table) => table.clear()))
         await db.users.add(user)
         if (tasks.length) await db.tasks.bulkAdd(tasks)
@@ -391,14 +411,13 @@ export function useSettingsState() {
         if (repairedRoutineSteps.length) await db.routineSteps.bulkAdd(repairedRoutineSteps)
         if (repairedRoutineSchedules.length) await db.routineSchedules.bulkAdd(repairedRoutineSchedules)
         if (routineStepCompletions.length) await db.routineStepCompletions.bulkAdd(routineStepCompletions)
+        if (identityChanges) await detachFeedbackFromPreviousIdentity()
       })
     } catch (error) {
       return { ok: false, error: error instanceof Error ? error.message : 'Échec de l\'import.' }
     }
 
-    if (typeof data.device_id === 'string' && data.device_id && typeof data.device_secret === 'string' && data.device_secret) {
-      setDeviceIdentity(data.device_id, data.device_secret)
-    }
+    if (importedIdentity) setDeviceIdentity(importedIdentity.deviceId, importedIdentity.deviceSecret)
     if (data.sync_consent_granted === true) grantSyncConsent()
     if (data.sync_consent_granted === false) revokeSyncConsent()
 

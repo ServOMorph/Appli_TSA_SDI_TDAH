@@ -91,6 +91,9 @@ export function E110Settings() {
 
       <SyncStatusCard />
 
+      <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem', textAlign: 'center' }}>
+        Version {__APP_DEV_VERSION__}
+      </p>
     </main>
   )
 }

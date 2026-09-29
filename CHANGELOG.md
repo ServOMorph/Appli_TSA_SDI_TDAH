@@ -4,6 +4,19 @@
 - **Mise en production du lot v6.9 sur une nouvelle adresse d'hébergement**, avec guidage de
   récupération des données envoyé à la testeuse principale.
 
+### Ajouté
+- **Numéro de version affiché en bas de l'écran Paramètres.**
+
+### Corrigé
+- **Un changement d'adresse pouvait laisser d'anciens retours définitivement bloqués en « Échec
+  d'envoi »**, sans jamais réussir à recevoir un commentaire ni une validation : un import qui
+  restaure une autre identité d'appareil détache désormais localement les retours liés à
+  l'identité précédente (trouvé sur l'incident réel de la testeuse principale, `103c9b92` →
+  `192f2411`).
+- **Le curseur de lecture des réponses de l'équipe n'était pas réinitialisé au changement
+  d'identité d'appareil** (trouvé par la revue de code de ce `/close`) : une réponse déjà déposée
+  avant ce curseur aurait pu ne jamais être retéléchargée après un import.
+
 ## v6.9 — 2026-09-27
 
 ### Corrigé

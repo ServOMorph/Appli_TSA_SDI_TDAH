@@ -21,17 +21,14 @@ une fois l'upload effectué.
 
 ## Vérifier le classement du snapshot de Marie après saisie de son code testeur
 
-Depuis la Phase 6 `roadmap_integration_onboard.md`, tant que le `tester_code` (`marie`) n'est pas
-enregistré côté serveur, ses snapshots Supabase tombent dans `donnees_testeurs/_sans_code/` au lieu
-de `donnees_testeurs/marie/`. L'appareil concerné est désormais identifié : `103c9b92…` (identité
-confirmée le 2026-09-21, remplace la référence à `192f2411`). Cause du blocage actuel connue et
-corrigée en code (`updateSettings()` déclenche `syncNow()`, commit `72481be`) mais pas encore
-déployée — reconfirmé au hook `/close` du 2026-09-22 :
-`snapshot-supabase-103c9b92-20260922-1145z.json` toujours archivé en `_sans_code/`. Risque concret :
-`/deploy` étape 0.2-0.3 lirait `donnees_testeurs/marie/`, qui ne contient pas le snapshot le plus
-récent. Une fois le correctif déployé et un cycle de synchronisation passé : vérifier que le
-prochain `python scripts/backup_testeur_snapshots.py` range bien le snapshot de `103c9b92` dans
-`marie/` et non plus dans `_sans_code/`. Retirer cette section une fois vérifié.
+**Correctif du 2026-09-29 : l'appareil concerné n'est plus `103c9b92…`.** Diagnostic de session :
+sur l'adresse actuelle (`appli-audhd`), Marie est en réalité l'appareil `192f2411-9e09-495c-97ec-6df563f01732`
+(actif, v6.9) — `103c9b92…` est un appareil devenu orphelin, lié à l'ancienne adresse (v5.139),
+tracké par `roadmap_correctifs_retours_2026-09-29.md`. Reconfirmé au hook `/close` du 2026-09-29 :
+`snapshot-supabase-192f2411-20260929-0904z.json` toujours archivé en `_sans_code/` — son
+`tester_code` reste à saisir. Une fois saisi et un cycle de synchronisation passé : vérifier que le
+prochain `python scripts/backup_testeur_snapshots.py` range le snapshot de `192f2411` dans `marie/`.
+Retirer cette section une fois vérifié.
 
 ## Vérifier les en-têtes de sécurité après le prochain déploiement (2026-09-26)
 

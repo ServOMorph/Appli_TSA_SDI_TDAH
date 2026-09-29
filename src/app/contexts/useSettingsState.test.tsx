@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useState } from 'react'
 import { db, listItemRepo, settingsRepo, toolRepo } from '@/app/repositories'
 import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
+import { getFeedbackMessagesCursor, setFeedbackMessagesCursor } from '@/data/sync/feedbackMessagesCursor'
 import { grantSyncConsent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { useSettingsState } from './useSettingsState'
@@ -396,6 +397,79 @@ describe('useSettingsState — export/import', () => {
     })
     await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
     expect(getDeviceIdentity()).toEqual({ deviceId: 'device-actuel', deviceSecret: 'secret-actuel' })
+  })
+
+  describe('retours locaux quand l’identité d’appareil importée diffère', () => {
+    const baseReport = {
+      screen_code: 'E10', comment: 'Retour', image_blob: new Blob(['image']), image_bytes: 5, strokes: [],
+      app_version: 'v6.9', created_at: '2026-09-20T10:00:00.000Z', last_attempt_at: '2026-09-20T10:00:05.000Z',
+      resolution_status: 'open' as const, validated_at: null, resolution_sync_status: 'sent' as const, resolution_last_attempt_at: null,
+    }
+
+    async function seedFeedback() {
+      await db.feedbackReports.clear()
+      await db.feedbackMessages.clear()
+      await db.feedbackReports.bulkAdd([
+        { ...baseReport, id: 'report-envoye', image_path: 'device-actuel/report-envoye.jpg', sync_status: 'sent' },
+        { ...baseReport, id: 'report-en-echec', image_path: 'device-actuel/report-en-echec.jpg', sync_status: 'failed' },
+      ])
+      await db.feedbackMessages.add({
+        id: 'message-1', report_id: 'report-envoye', author: 'user', body: 'Commentaire', created_at: '2026-09-21T10:00:00.000Z',
+        sync_status: 'failed', last_attempt_at: '2026-09-21T10:00:05.000Z', read_at: '2026-09-21T10:00:00.000Z',
+      })
+    }
+
+    it('retire les retours liés à l’ancienne identité et remet les autres en attente d’envoi', async () => {
+      setDeviceIdentity('device-actuel', 'secret-actuel')
+      await seedFeedback()
+      render(<SettingsPanel />)
+      await act(async () => {
+        await userEvent.click(screen.getByRole('button', { name: 'Importer avec identité d’appareil' }))
+      })
+      await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+
+      expect(await db.feedbackMessages.toArray()).toEqual([])
+      const reports = await db.feedbackReports.toArray()
+      expect(reports.map((report) => report.id)).toEqual(['report-en-echec'])
+      expect(reports[0]).toMatchObject({ image_path: null, sync_status: 'pending', last_attempt_at: null })
+    })
+
+    it('réinitialise le curseur de lecture des messages d’agent quand l’identité change', async () => {
+      setDeviceIdentity('device-actuel', 'secret-actuel')
+      setFeedbackMessagesCursor('2026-09-27T00:00:00.000Z')
+      await seedFeedback()
+      render(<SettingsPanel />)
+      await act(async () => {
+        await userEvent.click(screen.getByRole('button', { name: 'Importer avec identité d’appareil' }))
+      })
+      await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+      expect(getFeedbackMessagesCursor()).toBe(new Date(0).toISOString())
+    })
+
+    it('conserve le curseur de lecture des messages d’agent quand l’identité importée est la même', async () => {
+      setDeviceIdentity('device-exporte', 'secret-exporte')
+      setFeedbackMessagesCursor('2026-09-27T00:00:00.000Z')
+      await seedFeedback()
+      render(<SettingsPanel />)
+      await act(async () => {
+        await userEvent.click(screen.getByRole('button', { name: 'Importer avec identité d’appareil' }))
+      })
+      await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+      expect(getFeedbackMessagesCursor()).toBe('2026-09-27T00:00:00.000Z')
+    })
+
+    it('conserve les retours quand l’identité importée est déjà celle de l’appareil', async () => {
+      setDeviceIdentity('device-exporte', 'secret-exporte')
+      await seedFeedback()
+      render(<SettingsPanel />)
+      await act(async () => {
+        await userEvent.click(screen.getByRole('button', { name: 'Importer avec identité d’appareil' }))
+      })
+      await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+
+      expect((await db.feedbackReports.toArray()).map((report) => report.id).sort()).toEqual(['report-en-echec', 'report-envoye'])
+      expect(await db.feedbackMessages.count()).toBe(1)
+    })
   })
 
   it('retire le consentement local quand l’export indique un partage refusé', async () => {

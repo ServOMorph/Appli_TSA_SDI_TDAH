@@ -1175,3 +1175,20 @@ retour Routine (`229113cc`) reprise directement dans ce message : son fil « Mes
 à l'ancienne adresse et ne migre pas, cette réponse y resterait invisible après l'import. Déposé en
 **mode urgent** sur confirmation explicite de l'utilisateur (zone `discord` toujours en pause). Id
 gateway `20260928T160438_504017`, Discord `1554161944322121870`, `--expect-reply`.
+
+### 2026-09-29
+
+**Marie ->**
+[00h38] comment je fais si il y’a une réponse à un test qui est écrit « échec d’envoi » pour
+relancer l’envoi ? Est-ce qu’il faut que je fasse une manipulation ou juste attendre ?
+[00h51] j’ai fait tous les tests
+
+_Suite :_ collée par l’utilisateur (pas encore de réponse dév envoyée). Répond au message de
+livraison v6.9 du 2026-09-28 (« Réponds « fait » une fois terminé, ou dis-moi où tu bloques »),
+mais formulation ambiguë — à clarifier avant de répondre : confirme-t-elle la migration terminée,
+ou parle-t-elle seulement de son fil « Mes retours » ? Question technique (00h38) identifiée
+côté code : un message du fil en « Échec d’envoi » (`E124FeedbackDetail.tsx`) n’a pas de bouton
+dédié mais se retente automatiquement à chaque ouverture de l’écran (`syncFeedbackNow()` au
+montage, throttle 60 s) ; un retour lui-même en échec (`E123FeedbackList.tsx`) a un bouton
+« Relancer » sous la carte. Réponse à rédiger et déposer en session (zone `discord` en pause,
+confirmation explicite requise avant `enqueue --urgent`).

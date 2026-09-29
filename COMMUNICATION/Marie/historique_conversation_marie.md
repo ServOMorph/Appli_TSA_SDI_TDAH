@@ -1192,3 +1192,23 @@ dédié mais se retente automatiquement à chaque ouverture de l’écran (`sync
 montage, throttle 60 s) ; un retour lui-même en échec (`E123FeedbackList.tsx`) a un bouton
 « Relancer » sous la carte. Réponse à rédiger et déposer en session (zone `discord` en pause,
 confirmation explicite requise avant `enqueue --urgent`).
+
+**Dév ->**
+C'est réglé.
+
+Rouvre le retour concerné (ou l'appli), ton commentaire part tout seul.
+
+Si un retour entier reste bloqué, il y a un bouton « Relancer » dessous.
+
+Dis-moi si « Échec d'envoi » revient.
+
+_Suite :_ répond à la question technique de Marie (00h38) ci-dessus. Cause réelle trouvée en
+session (diagnostic complet, hors périmètre du message) : ses 19 anciens retours et 20 messages
+appartenaient à un appareil orphelin (`103c9b92…`, ancienne adresse) distinct de son appareil actif
+(`192f2411…`) — les RPC Supabase refusaient tout commentaire/validation d'un appareil non
+propriétaire du retour, d'où le blocage permanent sans erreur explicite. Réattribution Supabase
+effectuée et vérifiée en base (Phase 1 de `roadmap_correctifs_retours_2026-09-29.md`). Son second
+message (00h51, « j'ai fait tous les tests ») volontairement laissé sans réponse ici, sur décision
+explicite de l'utilisateur (formulation ambiguë, à traiter séparément si besoin). Déposé en **mode
+urgent** sur confirmation explicite de l'utilisateur (zone `discord` toujours en pause). Id gateway
+`20260929T110346_336757`, Discord `1554448618134573130`, `--expect-reply`.

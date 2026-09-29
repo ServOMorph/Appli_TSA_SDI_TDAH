@@ -20,6 +20,10 @@ create index if not exists feedback_reports_device_id_idx on feedback_reports (d
 alter table feedback_reports enable row level security;
 revoke all on feedback_reports from anon;
 
+-- Ecritures administratives (PATCH REST via service_role, scripts/_supabase.py patch_rows) hors
+-- des RPC security definer existantes : reattribution de device_id (roadmap_correctifs_retours_2026-09-29.md).
+grant update on feedback_reports to service_role;
+
 -- Horodatage serveur (created_at est fourni par le client, donc falsifiable) : base des
 -- plafonds par appareil.
 alter table feedback_reports add column if not exists received_at timestamptz not null default now();
@@ -101,6 +105,10 @@ create index if not exists feedback_messages_report_id_idx on feedback_messages 
 
 alter table feedback_messages enable row level security;
 revoke all on feedback_messages from anon;
+
+-- Ecritures administratives (PATCH REST via service_role, scripts/_supabase.py patch_rows) hors
+-- des RPC security definer existantes : reattribution de device_id (roadmap_correctifs_retours_2026-09-29.md).
+grant update on feedback_messages to service_role;
 
 alter table feedback_messages add column if not exists received_at timestamptz not null default now();
 

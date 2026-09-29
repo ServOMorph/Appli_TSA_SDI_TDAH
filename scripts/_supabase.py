@@ -114,6 +114,31 @@ def insert_row(url: str, service_key: str, table: str, row: dict) -> dict:
         raise SupabaseError(f"Supabase n'a pas repondu en {HTTP_TIMEOUT_SECONDS} s") from e
 
 
+def patch_rows(url: str, service_key: str, table: str, query: str, data: dict) -> list[dict]:
+    request = urllib.request.Request(
+        f"{url.rstrip('/')}/rest/v1/{quote(table, safe='_')}?{query}",
+        data=json.dumps(data).encode("utf-8"),
+        method="PATCH",
+        headers={
+            "apikey": service_key,
+            "Authorization": f"Bearer {service_key}",
+            "Content-Type": "application/json",
+            "Prefer": "return=representation",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        raise SupabaseError(
+            f"mise a jour Supabase echouee ({e.code}) : {e.read().decode('utf-8')}"
+        ) from e
+    except urllib.error.URLError as e:
+        raise SupabaseError(f"Supabase injoignable ({e.reason})") from e
+    except TimeoutError as e:
+        raise SupabaseError(f"Supabase n'a pas repondu en {HTTP_TIMEOUT_SECONDS} s") from e
+
+
 def delete_row(url: str, service_key: str, table: str, row_id: str) -> None:
     request = urllib.request.Request(
         f"{url.rstrip('/')}/rest/v1/{quote(table, safe='_')}?id=eq.{quote(row_id, safe='-')}",

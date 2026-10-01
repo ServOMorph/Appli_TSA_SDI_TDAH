@@ -1230,3 +1230,23 @@ bloqué côté client. Cause non encore isolée (le retry automatique au montage
 reprendre ce message maintenant que le retour lui appartient). Le message du dév mentionnait un
 bouton « Relancer » applicable à l'écran liste (E123), absent de l'écran détail (E124) qu'elle
 utilise ici — imprécision à corriger dans une prochaine réponse. Réponse pas encore rédigée.
+
+**Dév ->**
+Ouvre « Mes retours » depuis l'icône en haut à droite de l'Accueil (pas le fil, la liste).
+
+Trouve le retour sur le mouvement des jours.
+
+Dis-moi s'il est marqué « Échec d'envoi » et s'il y a un bouton « Relancer » dessous.
+
+Si oui, appuie dessus.
+
+_Suite :_ répond au message de Marie ci-dessus. Vérifié en base : le retour `6f90c375…` est bien
+réattribué à son appareil actif, mais son message du 29/09 00h37 n'a jamais atteint le serveur.
+Anomalie relevée en session (non résolue) : une entrée de son fil est datée du 07/09/2026, avec un
+texte identique à celui du retour dont la date serveur est le 19/09/2026 — hypothèse d'un doublon
+local jamais confirmé côté serveur, dans ce cas le client ne pousse jamais un message tant que son
+retour parent n'est pas lui-même envoyé. Ce message lui demande de vérifier depuis la liste (E123,
+qui a un bouton « Relancer » contrairement au fil E124 qu'elle utilisait) plutôt que d'agir à
+l'aveugle côté serveur. Déposé en **mode urgent** sur confirmation explicite de l'utilisateur (zone
+`discord` toujours en pause). Id gateway `20261001T160317_142760`, Discord `1555248754314059960`,
+`--expect-reply`.

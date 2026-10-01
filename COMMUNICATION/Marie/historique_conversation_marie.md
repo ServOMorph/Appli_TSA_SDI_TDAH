@@ -1212,3 +1212,21 @@ message (00h51, « j'ai fait tous les tests ») volontairement laissé sans rép
 explicite de l'utilisateur (formulation ambiguë, à traiter séparément si besoin). Déposé en **mode
 urgent** sur confirmation explicite de l'utilisateur (zone `discord` toujours en pause). Id gateway
 `20260929T110346_336757`, Discord `1554448618134573130`, `--expect-reply`.
+
+### 2026-10-01
+
+**Marie ->**
+toujours pas envoyer et je n'ai pas le bouton relancer sur un ancien retour comme celui là avec ce
+screen shot
+
+[Capture jointe : écran E124 du retour « mouvement des jours » (screen_code E10), son message du
+29/09/2026 00h37 affiché en « Échec d'envoi », aucun bouton « Relancer » visible sur cet écran.]
+
+_Suite :_ répond au message du dév du 2026-09-29 (id gateway `20260929T110346_336757`) lui
+demandant de rouvrir le retour concerné. Vérifié côté serveur : le retour `6f90c375…` est bien
+réattribué à son appareil actif (`192f2411…`, Phase 1 de `roadmap_correctifs_retours_2026-09-29.md`
+effectuée le 2026-09-29), mais son message du 29/09 00h37 n'est jamais arrivé en base — resté
+bloqué côté client. Cause non encore isolée (le retry automatique au montage de l'écran devrait
+reprendre ce message maintenant que le retour lui appartient). Le message du dév mentionnait un
+bouton « Relancer » applicable à l'écran liste (E123), absent de l'écran détail (E124) qu'elle
+utilise ici — imprécision à corriger dans une prochaine réponse. Réponse pas encore rédigée.

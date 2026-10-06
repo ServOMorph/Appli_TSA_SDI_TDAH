@@ -309,3 +309,153 @@ begin
     );
   end if;
 end $$;
+
+-- Variantes a motif de refus (roadmap_correctifs_retours_2026-09-29.md, Phase 4). Les RPC
+-- booleennes ci-dessus restent en place pour les clients non mis a jour ; ces variantes
+-- renvoient 'ok' ou un motif : 'device_unknown', 'rate_limited' (transitoires, le client
+-- retente) ; 'report_not_found', 'report_not_owned', 'invalid' (definitifs, le client cesse).
+-- Nouveaux noms : create or replace ne peut pas changer le type de retour, et un drop est
+-- marque destructif par le SQL Editor.
+create or replace function submit_feedback_v2(
+  p_id uuid,
+  p_device_id uuid,
+  p_device_secret text,
+  p_screen_code text,
+  p_comment text,
+  p_storage_path text,
+  p_image_bytes integer,
+  p_strokes jsonb,
+  p_app_version text,
+  p_created_at timestamptz
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1 from device_snapshots
+    where device_id = p_device_id and device_secret = p_device_secret
+  ) then
+    return 'device_unknown';
+  end if;
+
+  if p_storage_path <> format('%s/%s.jpg', p_device_id, p_id)
+     or char_length(p_screen_code) > 100
+     or char_length(p_comment) > 10000
+     or octet_length(coalesce(p_strokes, '[]'::jsonb)::text) > 2097152
+     or char_length(coalesce(p_app_version, '')) > 50
+     or p_image_bytes > 8388608 then
+    return 'invalid';
+  end if;
+
+  if (select count(*) from feedback_reports
+      where device_id = p_device_id
+        and received_at > now() - interval '24 hours') >= 50 then
+    return 'rate_limited';
+  end if;
+
+  insert into feedback_reports (
+    id, device_id, screen_code, comment, storage_path, image_bytes, strokes, app_version, created_at
+  ) values (
+    p_id, p_device_id, p_screen_code, p_comment, p_storage_path, p_image_bytes,
+    coalesce(p_strokes, '[]'::jsonb), p_app_version, p_created_at
+  ) on conflict (id) do nothing;
+
+  return 'ok';
+end;
+$$;
+
+revoke all on function submit_feedback_v2(uuid, uuid, text, text, text, text, integer, jsonb, text, timestamptz) from public;
+grant execute on function submit_feedback_v2(uuid, uuid, text, text, text, text, integer, jsonb, text, timestamptz) to anon;
+
+create or replace function submit_feedback_message_v2(
+  p_id uuid,
+  p_device_id uuid,
+  p_device_secret text,
+  p_report_id uuid,
+  p_author text,
+  p_body text,
+  p_created_at timestamptz
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_owner uuid;
+begin
+  if not exists (
+    select 1 from device_snapshots
+    where device_id = p_device_id and device_secret = p_device_secret
+  ) then
+    return 'device_unknown';
+  end if;
+
+  if p_author <> 'user' or char_length(p_body) > 4000 then
+    return 'invalid';
+  end if;
+
+  select device_id into v_owner from feedback_reports where id = p_report_id;
+  if not found then
+    return 'report_not_found';
+  end if;
+  if v_owner <> p_device_id then
+    return 'report_not_owned';
+  end if;
+
+  if (select count(*) from feedback_messages
+      where device_id = p_device_id
+        and received_at > now() - interval '24 hours') >= 200 then
+    return 'rate_limited';
+  end if;
+
+  insert into feedback_messages (id, report_id, device_id, author, body, created_at)
+  values (p_id, p_report_id, p_device_id, p_author, p_body, p_created_at)
+  on conflict (id) do nothing;
+
+  return 'ok';
+end;
+$$;
+
+revoke all on function submit_feedback_message_v2(uuid, uuid, text, uuid, text, text, timestamptz) from public;
+grant execute on function submit_feedback_message_v2(uuid, uuid, text, uuid, text, text, timestamptz) to anon;
+
+create or replace function close_feedback_report_v2(
+  p_device_id uuid,
+  p_device_secret text,
+  p_report_id uuid,
+  p_resolved_at timestamptz
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_owner uuid;
+begin
+  if not exists (
+    select 1 from device_snapshots
+    where device_id = p_device_id and device_secret = p_device_secret
+  ) then
+    return 'device_unknown';
+  end if;
+
+  select device_id into v_owner from feedback_reports where id = p_report_id;
+  if not found then
+    return 'report_not_found';
+  end if;
+  if v_owner <> p_device_id then
+    return 'report_not_owned';
+  end if;
+
+  update feedback_reports set resolved_at = p_resolved_at where id = p_report_id;
+  return 'ok';
+end;
+$$;
+
+revoke all on function close_feedback_report_v2(uuid, text, uuid, timestamptz) from public;
+grant execute on function close_feedback_report_v2(uuid, text, uuid, timestamptz) to anon;

@@ -10,7 +10,7 @@ import { Card } from '@/ui/components/Card'
 import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 import { pageStyle } from '@/ui/styles/budget'
 
-const STATUS_LABELS = { pending: 'En attente d’envoi', sent: 'Envoyé', failed: 'Échec d’envoi' } as const
+const STATUS_LABELS = { pending: 'En attente d’envoi', sent: 'Envoyé', failed: 'Échec d’envoi', rejected: 'Refusé par le serveur' } as const
 
 export function E123FeedbackList() {
   const { back, goTo } = useApp()
@@ -18,7 +18,7 @@ export function E123FeedbackList() {
   const [unreadReportIds, setUnreadReportIds] = useState<string[]>([])
   const [showWhatsNew, setShowWhatsNew] = useState(false)
   const consentGranted = isSyncConsentGranted()
-  const hasUnsent = reports.some((report) => report.sync_status !== 'sent')
+  const hasUnsent = reports.some((report) => report.sync_status === 'pending' || report.sync_status === 'failed')
 
   async function load(isActive: () => boolean = () => true) {
     const [openReports, unread] = await Promise.all([

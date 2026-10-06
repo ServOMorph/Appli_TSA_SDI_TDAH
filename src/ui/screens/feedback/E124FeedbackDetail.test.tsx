@@ -39,12 +39,13 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn().mockResolvedValue(undefined),
   markReportRead: vi.fn().mockResolvedValue(undefined),
   syncFeedbackNow: vi.fn().mockResolvedValue(false),
+  markMessagePending: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock('@/app/repositories', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/app/repositories')>()),
   feedbackReportRepo: { getById: mocks.getById, validate: mocks.validate },
-  feedbackMessageRepo: { getByReport: mocks.getByReport, create: mocks.create, markReportRead: mocks.markReportRead },
+  feedbackMessageRepo: { getByReport: mocks.getByReport, create: mocks.create, markReportRead: mocks.markReportRead, markPending: mocks.markMessagePending },
   newId: () => 'message-2',
 }))
 vi.mock('@/data/sync/feedbackClient', () => ({ syncFeedbackNow: mocks.syncFeedbackNow }))
@@ -59,11 +60,28 @@ describe('E124FeedbackDetail', () => {
     mocks.create.mockClear()
     mocks.markReportRead.mockClear()
     mocks.syncFeedbackNow.mockClear()
+    mocks.markMessagePending.mockClear()
     Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:detail') })
     Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() })
   })
 
   afterEach(() => localStorage.clear())
+
+  it('propose Relancer sous un message en échec et le remet en attente', async () => {
+    mocks.getByReport.mockResolvedValue([{ ...AGENT_MESSAGE, id: 'message-9', author: 'user' as const, sync_status: 'failed' as const }])
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    const { default: userEvent } = await import('@testing-library/user-event')
+    await userEvent.click(await screen.findByRole('button', { name: 'Relancer' }))
+    expect(mocks.markMessagePending).toHaveBeenCalledWith('message-9')
+    expect(mocks.syncFeedbackNow).toHaveBeenCalledWith({ force: true })
+  })
+
+  it('explique un message refusé par le serveur, sans bouton Relancer', async () => {
+    mocks.getByReport.mockResolvedValue([{ ...AGENT_MESSAGE, id: 'message-9', author: 'user' as const, sync_status: 'rejected' as const }])
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    expect(await screen.findByText(/Refusé par le serveur/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Relancer' })).toBeNull()
+  })
 
   it('affiche le fil avec le commentaire initial et la réponse de l’agent', async () => {
     renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))

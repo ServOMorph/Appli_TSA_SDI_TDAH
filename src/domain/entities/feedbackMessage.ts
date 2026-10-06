@@ -1,5 +1,5 @@
 export type FeedbackMessageAuthor = 'user' | 'agent'
-export type FeedbackMessageSyncStatus = 'pending' | 'sent' | 'failed'
+export type FeedbackMessageSyncStatus = 'pending' | 'sent' | 'failed' | 'rejected'
 
 export interface FeedbackMessage {
   id: string

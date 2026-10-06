@@ -25,21 +25,54 @@ function mayRetry(lastAttemptAt: string | null, force: boolean): boolean {
   return !Number.isFinite(lastAttempt) || Date.now() - lastAttempt >= THROTTLE_MS
 }
 
-async function sendReport(report: FeedbackReport, deviceId: string, deviceSecret: string): Promise<boolean> {
+type Outcome = 'sent' | 'failed' | 'rejected'
+
+interface Settlers {
+  sent: (attemptedAt: string) => Promise<void>
+  failed: (attemptedAt: string) => Promise<void>
+  rejected: (attemptedAt: string) => Promise<void>
+}
+
+const DEFINITIVE_REASONS = new Set(['report_not_found', 'report_not_owned', 'invalid'])
+
+/**
+ * Les RPC `*_v2` renvoient 'ok' ou un motif. Un motif definitif (retour d'un autre appareil,
+ * donnees invalides) ne se corrigera pas en reessayant : 'rejected'. Toute autre issue (reseau,
+ * appareil pas encore enregistre, plafond horaire) reste 'failed' et sera retentee.
+ */
+async function callFeedbackRpc(name: string, params: Record<string, unknown>): Promise<Outcome> {
+  const { data, error } = await callRpc<string>(name, params)
+  if (error || typeof data !== 'string') return 'failed'
+  if (data === 'ok') return 'sent'
+  return DEFINITIVE_REASONS.has(data) ? 'rejected' : 'failed'
+}
+
+async function settle(attempt: () => Promise<Outcome>, on: Settlers): Promise<boolean> {
   const attemptedAt = new Date().toISOString()
+  let outcome: Outcome = 'failed'
   try {
+    outcome = await attempt()
+  } catch {
+    outcome = 'failed'
+  }
+  try {
+    await on[outcome](attemptedAt)
+  } catch {
+    return false
+  }
+  return outcome === 'sent'
+}
+
+function sendReport(report: FeedbackReport, deviceId: string, deviceSecret: string): Promise<boolean> {
+  return settle(async () => {
     let storagePath = report.image_path
     if (!storagePath) {
       const upload = await uploadFeedbackImage(deviceId, report.id, report.image_blob)
-      if (upload.error || !upload.data) {
-        await feedbackReportRepo.markFailed(report.id, attemptedAt)
-        return false
-      }
+      if (upload.error || !upload.data) return 'failed'
       storagePath = upload.data.path
       await feedbackReportRepo.markImageUploaded(report.id, storagePath)
     }
-
-    const { data, error } = await callRpc<boolean>('submit_feedback', {
+    return callFeedbackRpc('submit_feedback_v2', {
       p_id: report.id,
       p_device_id: deviceId,
       p_device_secret: deviceSecret,
@@ -51,64 +84,40 @@ async function sendReport(report: FeedbackReport, deviceId: string, deviceSecret
       p_app_version: report.app_version,
       p_created_at: report.created_at,
     })
-    if (error || !data) {
-      await feedbackReportRepo.markFailed(report.id, attemptedAt)
-      return false
-    }
-
-    await feedbackReportRepo.markSent(report.id, attemptedAt)
-    return true
-  } catch {
-    await feedbackReportRepo.markFailed(report.id, attemptedAt)
-    return false
-  }
+  }, {
+    sent: (at) => feedbackReportRepo.markSent(report.id, at),
+    failed: (at) => feedbackReportRepo.markFailed(report.id, at),
+    rejected: (at) => feedbackReportRepo.markRejected(report.id, at),
+  })
 }
 
-async function sendMessage(message: FeedbackMessage, deviceId: string, deviceSecret: string): Promise<boolean> {
-  const attemptedAt = new Date().toISOString()
-  try {
-    const { data, error } = await callRpc<boolean>('submit_feedback_message', {
-      p_id: message.id,
-      p_device_id: deviceId,
-      p_device_secret: deviceSecret,
-      p_report_id: message.report_id,
-      p_author: message.author,
-      p_body: message.body,
-      p_created_at: message.created_at,
-    })
-    if (error || !data) {
-      await feedbackMessageRepo.markFailed(message.id, attemptedAt)
-      return false
-    }
-
-    await feedbackMessageRepo.markSent(message.id, attemptedAt)
-    return true
-  } catch {
-    await feedbackMessageRepo.markFailed(message.id, attemptedAt)
-    return false
-  }
+function sendMessage(message: FeedbackMessage, deviceId: string, deviceSecret: string): Promise<boolean> {
+  return settle(() => callFeedbackRpc('submit_feedback_message_v2', {
+    p_id: message.id,
+    p_device_id: deviceId,
+    p_device_secret: deviceSecret,
+    p_report_id: message.report_id,
+    p_author: message.author,
+    p_body: message.body,
+    p_created_at: message.created_at,
+  }), {
+    sent: (at) => feedbackMessageRepo.markSent(message.id, at),
+    failed: (at) => feedbackMessageRepo.markFailed(message.id, at),
+    rejected: (at) => feedbackMessageRepo.markRejected(message.id, at),
+  })
 }
 
-async function closeReport(report: FeedbackReport, deviceId: string, deviceSecret: string): Promise<boolean> {
-  const attemptedAt = new Date().toISOString()
-  try {
-    const { data, error } = await callRpc<boolean>('close_feedback_report', {
-      p_device_id: deviceId,
-      p_device_secret: deviceSecret,
-      p_report_id: report.id,
-      p_resolved_at: report.validated_at ?? attemptedAt,
-    })
-    if (error || !data) {
-      await feedbackReportRepo.markResolutionFailed(report.id, attemptedAt)
-      return false
-    }
-
-    await feedbackReportRepo.markResolutionSent(report.id, attemptedAt)
-    return true
-  } catch {
-    await feedbackReportRepo.markResolutionFailed(report.id, attemptedAt)
-    return false
-  }
+function closeReport(report: FeedbackReport, deviceId: string, deviceSecret: string): Promise<boolean> {
+  return settle(() => callFeedbackRpc('close_feedback_report_v2', {
+    p_device_id: deviceId,
+    p_device_secret: deviceSecret,
+    p_report_id: report.id,
+    p_resolved_at: report.validated_at ?? new Date().toISOString(),
+  }), {
+    sent: (at) => feedbackReportRepo.markResolutionSent(report.id, at),
+    failed: (at) => feedbackReportRepo.markResolutionFailed(report.id, at),
+    rejected: (at) => feedbackReportRepo.markResolutionRejected(report.id, at),
+  })
 }
 
 /**

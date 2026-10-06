@@ -9,7 +9,7 @@ import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { inputStyle, modalBox, modalOverlay, pageStyle } from '@/ui/styles/budget'
 
-const STATUS_LABELS = { pending: 'En attente d’envoi', sent: 'Envoyé', failed: 'Échec d’envoi' } as const
+const STATUS_LABELS = { pending: 'En attente d’envoi', sent: 'Envoyé', failed: 'Échec d’envoi', rejected: 'Refusé par le serveur' } as const
 
 interface ThreadEntry {
   id: string
@@ -101,6 +101,14 @@ export function E124FeedbackDetail() {
     }
   }
 
+  async function retryEntry(entryId: string) {
+    if (!report) return
+    if (entryId === report.id) await feedbackReportRepo.markPending(entryId)
+    else await feedbackMessageRepo.markPending(entryId)
+    await syncFeedbackNow({ force: true })
+    await load()
+  }
+
   async function validate() {
     if (!report) return
     setError('')
@@ -153,7 +161,15 @@ export function E124FeedbackDetail() {
             <p style={{ margin: 'var(--spacing-sm) 0 0' }}>{entry.body}</p>
             <span style={{ color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>{formatDateTime(entry.created_at)}</span>
             {entry.sync_status === 'failed' && (
-              <span style={{ display: 'block', color: 'var(--color-error)', fontSize: '0.8125rem', marginTop: 'var(--spacing-xs)' }}>Échec d’envoi</span>
+              <>
+                <span style={{ display: 'block', color: 'var(--color-error)', fontSize: '0.8125rem', marginTop: 'var(--spacing-xs)' }}>Échec d’envoi</span>
+                <Button variant="secondary" onClick={() => retryEntry(entry.id)} style={{ marginTop: 'var(--spacing-xs)' }}>Relancer</Button>
+              </>
+            )}
+            {entry.sync_status === 'rejected' && (
+              <span style={{ display: 'block', color: 'var(--color-error)', fontSize: '0.8125rem', marginTop: 'var(--spacing-xs)' }}>
+                Refusé par le serveur : ce message ne peut pas être envoyé depuis cet appareil.
+              </span>
             )}
           </Card>
         ))}

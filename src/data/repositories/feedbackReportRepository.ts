@@ -40,6 +40,10 @@ export class FeedbackReportRepository {
     await this.db.feedbackReports.update(id, { sync_status: 'failed', last_attempt_at: attemptedAt })
   }
 
+  async markRejected(id: string, attemptedAt: string): Promise<void> {
+    await this.db.feedbackReports.update(id, { sync_status: 'rejected', last_attempt_at: attemptedAt })
+  }
+
   async markPending(id: string): Promise<void> {
     await this.db.feedbackReports.update(id, { sync_status: 'pending' })
   }
@@ -63,7 +67,8 @@ export class FeedbackReportRepository {
       .filter((report) =>
         report.resolution_status === 'validated' &&
         report.sync_status === 'sent' &&
-        report.resolution_sync_status !== 'sent',
+        report.resolution_sync_status !== 'sent' &&
+        report.resolution_sync_status !== 'rejected',
       )
       .sortBy('created_at')
   }
@@ -74,5 +79,9 @@ export class FeedbackReportRepository {
 
   async markResolutionFailed(id: string, attemptedAt: string): Promise<void> {
     await this.db.feedbackReports.update(id, { resolution_sync_status: 'failed', resolution_last_attempt_at: attemptedAt })
+  }
+
+  async markResolutionRejected(id: string, attemptedAt: string): Promise<void> {
+    await this.db.feedbackReports.update(id, { resolution_sync_status: 'rejected', resolution_last_attempt_at: attemptedAt })
   }
 }

@@ -1,6 +1,6 @@
-export type FeedbackSyncStatus = 'pending' | 'sent' | 'failed'
+export type FeedbackSyncStatus = 'pending' | 'sent' | 'failed' | 'rejected'
 export type FeedbackResolutionStatus = 'open' | 'validated'
-export type FeedbackResolutionSyncStatus = 'pending' | 'sent' | 'failed'
+export type FeedbackResolutionSyncStatus = 'pending' | 'sent' | 'failed' | 'rejected'
 
 export interface FeedbackPoint {
   x: number

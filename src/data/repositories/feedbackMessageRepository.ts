@@ -28,6 +28,14 @@ export class FeedbackMessageRepository {
     await this.db.feedbackMessages.update(id, { sync_status: 'failed', last_attempt_at: attemptedAt })
   }
 
+  async markRejected(id: string, attemptedAt: string): Promise<void> {
+    await this.db.feedbackMessages.update(id, { sync_status: 'rejected', last_attempt_at: attemptedAt })
+  }
+
+  async markPending(id: string): Promise<void> {
+    await this.db.feedbackMessages.update(id, { sync_status: 'pending' })
+  }
+
   /**
    * Insertion idempotente des messages recus du serveur (cle primaire = identifiant serveur).
    * Un message deja present est laisse tel quel : le serveur renvoie le dernier message a chaque

@@ -11,11 +11,14 @@ const reportRepo = vi.hoisted(() => ({
   markFailed: vi.fn(),
   markResolutionSent: vi.fn(),
   markResolutionFailed: vi.fn(),
+  markRejected: vi.fn(),
+  markResolutionRejected: vi.fn(),
 }))
 const messageRepo = vi.hoisted(() => ({
   getToSync: vi.fn(),
   markSent: vi.fn(),
   markFailed: vi.fn(),
+  markRejected: vi.fn(),
   saveReceived: vi.fn(),
 }))
 
@@ -96,11 +99,14 @@ beforeEach(() => {
   messageRepo.getToSync.mockResolvedValue([])
   messageRepo.markSent.mockResolvedValue(undefined)
   messageRepo.markFailed.mockResolvedValue(undefined)
+  messageRepo.markRejected.mockResolvedValue(undefined)
+  reportRepo.markRejected.mockResolvedValue(undefined)
+  reportRepo.markResolutionRejected.mockResolvedValue(undefined)
   messageRepo.saveReceived.mockResolvedValue(undefined)
   uploadMock.mockResolvedValue({ data: { path: 'device-1/report-1.jpg' }, error: null })
   getFeedbackMessagesCursorMock.mockReturnValue('2026-09-01T00:00:00.000Z')
   callRpcMock.mockImplementation(async (name: string) =>
-    name === 'fetch_feedback_messages' ? { data: [], error: null } : { data: true, error: null },
+    name === 'fetch_feedback_messages' ? { data: [], error: null } : { data: 'ok', error: null },
   )
 })
 
@@ -113,7 +119,7 @@ describe('syncFeedbackNow', () => {
 
     expect(uploadMock).toHaveBeenCalledWith('device-1', item.id, item.image_blob)
     expect(reportRepo.markImageUploaded).toHaveBeenCalledWith(item.id, 'device-1/report-1.jpg')
-    expect(callRpcMock).toHaveBeenCalledWith('submit_feedback', expect.objectContaining({
+    expect(callRpcMock).toHaveBeenCalledWith('submit_feedback_v2', expect.objectContaining({
       p_id: item.id,
       p_device_id: 'device-1',
       p_storage_path: 'device-1/report-1.jpg',
@@ -160,7 +166,7 @@ describe('syncFeedbackNow', () => {
     await expect(syncFeedbackNow({ force: true })).resolves.toBe(true)
 
     expect(uploadMock).not.toHaveBeenCalled()
-    expect(callRpcMock.mock.calls.filter(([name]) => name === 'submit_feedback')).toHaveLength(1)
+    expect(callRpcMock.mock.calls.filter(([name]) => name === 'submit_feedback_v2')).toHaveLength(1)
     expect(reportRepo.markSent).toHaveBeenCalledWith(item.id, expect.any(String))
   })
 
@@ -177,7 +183,7 @@ describe('syncFeedbackNow', () => {
 
     await Promise.all([first, second])
     expect(uploadMock).toHaveBeenCalledTimes(1)
-    expect(callRpcMock.mock.calls.filter(([name]) => name === 'submit_feedback')).toHaveLength(1)
+    expect(callRpcMock.mock.calls.filter(([name]) => name === 'submit_feedback_v2')).toHaveLength(1)
   })
 
   it('un appel force pendant un cycle non force en cours enchaîne un second cycle plutôt que de s’y fondre', async () => {
@@ -233,7 +239,7 @@ describe('syncFeedbackNow', () => {
 
     await expect(syncFeedbackNow()).resolves.toBe(true)
 
-    expect(callRpcMock).toHaveBeenCalledWith('submit_feedback_message', expect.objectContaining({
+    expect(callRpcMock).toHaveBeenCalledWith('submit_feedback_message_v2', expect.objectContaining({
       p_id: item.id,
       p_report_id: item.report_id,
       p_body: item.body,
@@ -248,7 +254,7 @@ describe('syncFeedbackNow', () => {
 
     await expect(syncFeedbackNow()).resolves.toBe(false)
 
-    expect(callRpcMock).not.toHaveBeenCalledWith('submit_feedback_message', expect.anything())
+    expect(callRpcMock).not.toHaveBeenCalledWith('submit_feedback_message_v2', expect.anything())
     expect(messageRepo.markFailed).not.toHaveBeenCalled()
   })
 
@@ -256,11 +262,55 @@ describe('syncFeedbackNow', () => {
     const item = message()
     messageRepo.getToSync.mockResolvedValue([item])
     reportRepo.getById.mockResolvedValue(report({ sync_status: 'sent' }))
-    callRpcMock.mockResolvedValue({ data: false, error: null })
+    callRpcMock.mockResolvedValue({ data: 'rate_limited', error: null })
 
     await expect(syncFeedbackNow()).resolves.toBe(false)
 
     expect(messageRepo.markFailed).toHaveBeenCalledWith(item.id, expect.any(String))
+    expect(messageRepo.markRejected).not.toHaveBeenCalled()
+  })
+
+  it('marque un message refusé définitivement quand le retour appartient à un autre appareil', async () => {
+    const item = message()
+    messageRepo.getToSync.mockResolvedValue([item])
+    reportRepo.getById.mockResolvedValue(report({ sync_status: 'sent' }))
+    callRpcMock.mockResolvedValue({ data: 'report_not_owned', error: null })
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+
+    expect(messageRepo.markRejected).toHaveBeenCalledWith(item.id, expect.any(String))
+    expect(messageRepo.markFailed).not.toHaveBeenCalled()
+  })
+
+  it('traite un appareil pas encore enregistré comme transitoire pour un retour', async () => {
+    const item = report()
+    reportRepo.getToSync.mockResolvedValue([item])
+    callRpcMock.mockResolvedValue({ data: 'device_unknown', error: null })
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+
+    expect(reportRepo.markFailed).toHaveBeenCalledWith(item.id, expect.any(String))
+    expect(reportRepo.markRejected).not.toHaveBeenCalled()
+  })
+
+  it('marque un retour refusé définitivement quand les données sont invalides', async () => {
+    const item = report()
+    reportRepo.getToSync.mockResolvedValue([item])
+    callRpcMock.mockResolvedValue({ data: 'invalid', error: null })
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+
+    expect(reportRepo.markRejected).toHaveBeenCalledWith(item.id, expect.any(String))
+  })
+
+  it('marque une clôture refusée définitivement si le retour est introuvable', async () => {
+    const closed = report({ resolution_status: 'validated', resolution_sync_status: 'pending' })
+    reportRepo.getToCloseSync.mockResolvedValue([closed])
+    callRpcMock.mockResolvedValue({ data: 'report_not_found', error: null })
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+
+    expect(reportRepo.markResolutionRejected).toHaveBeenCalledWith(closed.id, expect.any(String))
   })
 
   it('pousse la clôture d’un retour validé et déjà envoyé', async () => {
@@ -269,7 +319,7 @@ describe('syncFeedbackNow', () => {
 
     await expect(syncFeedbackNow()).resolves.toBe(true)
 
-    expect(callRpcMock).toHaveBeenCalledWith('close_feedback_report', expect.objectContaining({
+    expect(callRpcMock).toHaveBeenCalledWith('close_feedback_report_v2', expect.objectContaining({
       p_report_id: closed.id,
       p_resolved_at: closed.validated_at,
     }))
@@ -290,7 +340,7 @@ describe('syncFeedbackNow', () => {
     callRpcMock.mockImplementation(async (name: string) =>
       name === 'fetch_feedback_messages'
         ? { data: [{ id: 'agent-1', report_id: 'report-1', body: 'Le correctif est en ligne', created_at: '2026-09-14T13:00:00.000Z' }], error: null }
-        : { data: true, error: null },
+        : { data: 'ok', error: null },
     )
 
     await expect(syncFeedbackNow()).resolves.toBe(true)
@@ -313,7 +363,7 @@ describe('syncFeedbackNow', () => {
 
   it('n’enregistre rien et n’avance pas le curseur quand le serveur ne renvoie aucun message (isolation par appareil)', async () => {
     callRpcMock.mockImplementation(async (name: string) =>
-      name === 'fetch_feedback_messages' ? { data: [], error: null } : { data: true, error: null },
+      name === 'fetch_feedback_messages' ? { data: [], error: null } : { data: 'ok', error: null },
     )
 
     await expect(syncFeedbackNow()).resolves.toBe(false)
@@ -324,7 +374,7 @@ describe('syncFeedbackNow', () => {
 
   it('n’avance pas le curseur en cas d’échec réseau de la lecture', async () => {
     callRpcMock.mockImplementation(async (name: string) =>
-      name === 'fetch_feedback_messages' ? { data: null, error: new Error('offline') } : { data: true, error: null },
+      name === 'fetch_feedback_messages' ? { data: null, error: new Error('offline') } : { data: 'ok', error: null },
     )
 
     await expect(syncFeedbackNow()).resolves.toBe(false)

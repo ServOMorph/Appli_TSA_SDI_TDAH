@@ -1262,3 +1262,15 @@ dans `E123FeedbackList.tsx:116`, « Relancer » n'apparaît que si le retour lui
 (avec partage activé). Son absence indique que le retour est local `sent` : l'échec porte sur le
 message (commentaire du 29/09), seulement visible dans E124, sans bouton. Ne confirme pas
 l'hypothèse du doublon local. Réponse non rédigée.
+
+**Dév ->**
+Une nouvelle version arrive bientôt.
+
+Avant, exporte tes données : Paramètres > Export et import > Exporter en JSON.
+
+Réponds « fait » une fois terminé.
+
+_Suite :_ alerte d'export de `/deploy` étape 0.1 (v6.10), avant mise en ligne. Ne répond pas encore
+à son message du 2026-10-06 (« Échec d'envoi » sans « Relancer ») : la réponse viendra avec la
+livraison du correctif. Déposé en **mode urgent** sur confirmation explicite de l'utilisateur. Id
+gateway `20261006T123345_560583`, Discord `1557007970141872199`, `--expect-reply`.

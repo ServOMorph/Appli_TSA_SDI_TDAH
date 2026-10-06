@@ -1250,3 +1250,15 @@ qui a un bouton « Relancer » contrairement au fil E124 qu'elle utilisait) plut
 l'aveugle côté serveur. Déposé en **mode urgent** sur confirmation explicite de l'utilisateur (zone
 `discord` toujours en pause). Id gateway `20261001T160317_142760`, Discord `1555248754314059960`,
 `--expect-reply`.
+
+### 2026-10-06
+
+**Marie ->**
+Il est marqué « échec d'envoi » et il n'y a pas de bouton « relancer » dessous
+
+_Suite :_ répond au message du dév du 2026-10-01 (id gateway `20261001T160317_142760`) lui demandant
+de vérifier le retour « mouvement des jours » depuis la liste « Mes retours ». Point de lecture :
+dans `E123FeedbackList.tsx:116`, « Relancer » n'apparaît que si le retour lui-même est `failed`
+(avec partage activé). Son absence indique que le retour est local `sent` : l'échec porte sur le
+message (commentaire du 29/09), seulement visible dans E124, sans bouton. Ne confirme pas
+l'hypothèse du doublon local. Réponse non rédigée.

@@ -13,6 +13,7 @@ const reportRepo = vi.hoisted(() => ({
   markResolutionFailed: vi.fn(),
   markRejected: vi.fn(),
   markResolutionRejected: vi.fn(),
+  requeue: vi.fn(),
 }))
 const messageRepo = vi.hoisted(() => ({
   getToSync: vi.fn(),
@@ -102,6 +103,7 @@ beforeEach(() => {
   messageRepo.markRejected.mockResolvedValue(undefined)
   reportRepo.markRejected.mockResolvedValue(undefined)
   reportRepo.markResolutionRejected.mockResolvedValue(undefined)
+  reportRepo.requeue.mockResolvedValue(undefined)
   messageRepo.saveReceived.mockResolvedValue(undefined)
   uploadMock.mockResolvedValue({ data: { path: 'device-1/report-1.jpg' }, error: null })
   getFeedbackMessagesCursorMock.mockReturnValue('2026-09-01T00:00:00.000Z')
@@ -280,6 +282,29 @@ describe('syncFeedbackNow', () => {
 
     expect(messageRepo.markRejected).toHaveBeenCalledWith(item.id, expect.any(String))
     expect(messageRepo.markFailed).not.toHaveBeenCalled()
+  })
+
+  it('remet en file un retour inconnu du serveur au lieu de bloquer son message', async () => {
+    const item = message()
+    messageRepo.getToSync.mockResolvedValue([item])
+    reportRepo.getById.mockResolvedValue(report({ sync_status: 'sent', image_path: 'device-1/report-1.jpg' }))
+    callRpcMock.mockResolvedValue({ data: 'report_not_found', error: null })
+
+    await expect(syncFeedbackNow()).resolves.toBe(false)
+
+    expect(reportRepo.requeue).toHaveBeenCalledWith('report-1', 'device-1/report-1.jpg')
+    expect(messageRepo.markFailed).toHaveBeenCalledWith(item.id, expect.any(String))
+    expect(messageRepo.markRejected).not.toHaveBeenCalled()
+  })
+
+  it('oublie l’image déposée sous un autre appareil en remettant le retour en file', async () => {
+    messageRepo.getToSync.mockResolvedValue([message()])
+    reportRepo.getById.mockResolvedValue(report({ sync_status: 'sent', image_path: 'ancien-appareil/report-1.jpg' }))
+    callRpcMock.mockResolvedValue({ data: 'report_not_found', error: null })
+
+    await syncFeedbackNow()
+
+    expect(reportRepo.requeue).toHaveBeenCalledWith('report-1', null)
   })
 
   it('traite un appareil pas encore enregistré comme transitoire pour un retour', async () => {

@@ -48,6 +48,10 @@ export class FeedbackReportRepository {
     await this.db.feedbackReports.update(id, { sync_status: 'pending' })
   }
 
+  async requeue(id: string, imagePath: string | null): Promise<void> {
+    await this.db.feedbackReports.update(id, { sync_status: 'pending', image_path: imagePath })
+  }
+
   async getOpen(): Promise<FeedbackReport[]> {
     return this.db.feedbackReports
       .filter((report) => report.resolution_status === 'open')

@@ -40,11 +40,14 @@ const DEFINITIVE_REASONS = new Set(['report_not_found', 'report_not_owned', 'inv
  * donnees invalides) ne se corrigera pas en reessayant : 'rejected'. Toute autre issue (reseau,
  * appareil pas encore enregistre, plafond horaire) reste 'failed' et sera retentee.
  */
-async function callFeedbackRpc(name: string, params: Record<string, unknown>): Promise<Outcome> {
+async function callFeedbackRpc(name: string, params: Record<string, unknown>): Promise<string | null> {
   const { data, error } = await callRpc<string>(name, params)
-  if (error || typeof data !== 'string') return 'failed'
-  if (data === 'ok') return 'sent'
-  return DEFINITIVE_REASONS.has(data) ? 'rejected' : 'failed'
+  return error || typeof data !== 'string' ? null : data
+}
+
+function outcomeOf(reason: string | null): Outcome {
+  if (reason === 'ok') return 'sent'
+  return reason !== null && DEFINITIVE_REASONS.has(reason) ? 'rejected' : 'failed'
 }
 
 async function settle(attempt: () => Promise<Outcome>, on: Settlers): Promise<boolean> {
@@ -72,7 +75,7 @@ function sendReport(report: FeedbackReport, deviceId: string, deviceSecret: stri
       storagePath = upload.data.path
       await feedbackReportRepo.markImageUploaded(report.id, storagePath)
     }
-    return callFeedbackRpc('submit_feedback_v2', {
+    return outcomeOf(await callFeedbackRpc('submit_feedback_v2', {
       p_id: report.id,
       p_device_id: deviceId,
       p_device_secret: deviceSecret,
@@ -83,7 +86,7 @@ function sendReport(report: FeedbackReport, deviceId: string, deviceSecret: stri
       p_strokes: report.strokes,
       p_app_version: report.app_version,
       p_created_at: report.created_at,
-    })
+    }))
   }, {
     sent: (at) => feedbackReportRepo.markSent(report.id, at),
     failed: (at) => feedbackReportRepo.markFailed(report.id, at),
@@ -91,16 +94,29 @@ function sendReport(report: FeedbackReport, deviceId: string, deviceSecret: stri
   })
 }
 
-function sendMessage(message: FeedbackMessage, deviceId: string, deviceSecret: string): Promise<boolean> {
-  return settle(() => callFeedbackRpc('submit_feedback_message_v2', {
-    p_id: message.id,
-    p_device_id: deviceId,
-    p_device_secret: deviceSecret,
-    p_report_id: message.report_id,
-    p_author: message.author,
-    p_body: message.body,
-    p_created_at: message.created_at,
-  }), {
+/**
+ * Un retour marque envoye localement mais inconnu du serveur (identifiant divergent apres un
+ * import ou une migration) bloquerait ses messages pour toujours : on le remet en file pour qu'il
+ * soit renvoye sous l'appareil courant, et le message reste 'failed' pour partir au cycle suivant.
+ * L'image n'est reutilisee que si elle a ete deposee sous l'appareil courant, sinon le serveur
+ * refuserait le chemin.
+ */
+function sendMessage(message: FeedbackMessage, report: FeedbackReport, deviceId: string, deviceSecret: string): Promise<boolean> {
+  return settle(async () => {
+    const reason = await callFeedbackRpc('submit_feedback_message_v2', {
+      p_id: message.id,
+      p_device_id: deviceId,
+      p_device_secret: deviceSecret,
+      p_report_id: message.report_id,
+      p_author: message.author,
+      p_body: message.body,
+      p_created_at: message.created_at,
+    })
+    if (reason !== 'report_not_found') return outcomeOf(reason)
+    const ownPath = `${deviceId}/${report.id}.jpg`
+    await feedbackReportRepo.requeue(report.id, report.image_path === ownPath ? ownPath : null)
+    return 'failed'
+  }, {
     sent: (at) => feedbackMessageRepo.markSent(message.id, at),
     failed: (at) => feedbackMessageRepo.markFailed(message.id, at),
     rejected: (at) => feedbackMessageRepo.markRejected(message.id, at),
@@ -108,12 +124,12 @@ function sendMessage(message: FeedbackMessage, deviceId: string, deviceSecret: s
 }
 
 function closeReport(report: FeedbackReport, deviceId: string, deviceSecret: string): Promise<boolean> {
-  return settle(() => callFeedbackRpc('close_feedback_report_v2', {
+  return settle(async () => outcomeOf(await callFeedbackRpc('close_feedback_report_v2', {
     p_device_id: deviceId,
     p_device_secret: deviceSecret,
     p_report_id: report.id,
     p_resolved_at: report.validated_at ?? new Date().toISOString(),
-  }), {
+  })), {
     sent: (at) => feedbackReportRepo.markResolutionSent(report.id, at),
     failed: (at) => feedbackReportRepo.markResolutionFailed(report.id, at),
     rejected: (at) => feedbackReportRepo.markResolutionRejected(report.id, at),
@@ -127,16 +143,16 @@ function closeReport(report: FeedbackReport, deviceId: string, deviceSecret: str
  */
 async function syncMessages(deviceId: string, deviceSecret: string, force: boolean): Promise<boolean> {
   const candidates = await feedbackMessageRepo.getToSync()
-  const pending: FeedbackMessage[] = []
+  const pending: Array<[FeedbackMessage, FeedbackReport]> = []
   for (const message of candidates) {
     if (!mayRetry(message.last_attempt_at, force)) continue
     const report = await feedbackReportRepo.getById(message.report_id)
     if (report?.sync_status !== 'sent') continue
-    pending.push(message)
+    pending.push([message, report])
   }
   if (pending.length === 0) return false
 
-  const results = await Promise.all(pending.map((message) => sendMessage(message, deviceId, deviceSecret)))
+  const results = await Promise.all(pending.map(([message, report]) => sendMessage(message, report, deviceId, deviceSecret)))
   return results.some(Boolean)
 }
 

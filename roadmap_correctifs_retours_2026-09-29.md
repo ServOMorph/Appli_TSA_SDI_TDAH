@@ -50,8 +50,26 @@ traiter les défauts structurels découverts pendant le diagnostic.
 - Limite assumée : l'ancienne adresse (`appli-marie`, v5.139, identité `103c9b92`) ne pourra plus
   commenter ces fils. Sans impact, Marie a migré.
 
+### Avancement (2026-09-29 → 2026-10-06)
+
+- **Réattribution faite et vérifiée en base** (2026-09-29, sur autorisation explicite) : 19 retours et
+  20 messages passés de `103c9b92` à `192f2411` ; 0 ligne restante sous l'ancien appareil, 24 retours
+  et 20 messages sous le nouveau. Liste des identifiants : `_contexte/reattribution_marie_2026-09-29.json`.
+  Nécessitait `grant update … to service_role` (SQL Editor) et un `patch_rows` dans `scripts/_supabase.py`.
+- **Message à Marie envoyé** (Discord, 2026-09-29) puis, après sa réponse du 2026-10-01 (« toujours pas
+  envoyé »), demande de vérification depuis « Mes retours » (2026-10-01).
+- **Constat du 2026-10-01** : son commentaire du 29/09 00h37 sur le retour « mouvement des jours »
+  (`6f90c375…`, bien réattribué) n'existe pas en base : bloqué côté client. L'écran de détail E124 n'a
+  aucun bouton « Relancer » (il n'existe que sur la liste E123). Anomalie non expliquée : une entrée de
+  son fil est datée du 07/09 alors que le retour date du 19/09 côté serveur (hypothèse non vérifiée :
+  doublon local jamais confirmé, que `syncMessages` ne pousse jamais tant que son retour parent n'est
+  pas `sent`).
+- **État au 2026-10-06** : aucun message ni validation de Marie en base sous `192f2411` depuis la
+  réattribution (requête de contrôle) ; aucune réponse de sa part connue (zone `discord` en pause).
+
 **Gate de sortie** : au moins un commentaire ou une validation de Marie sur un ancien fil arrive en
 base sous `192f2411`, ou Marie confirme que l'envoi fonctionne ; `tests_manuels.md` à jour.
+**Non atteint au 2026-10-06.**
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -121,7 +139,10 @@ seul bloquerait à tort les retours d'un appareil neuf envoyés avant sa premiè
   `sendMessage` et `closeReport` (`feedbackClient.ts`, déjà signalé `[P3]` dans `signals.md`)
   avant d'y ajouter la gestion des motifs, pour ne pas la tripler.
 - **Client** : motifs transitoires → `failed` et relance ; motifs définitifs → nouveau statut
-  `rejected`, sans relance, message explicite dans E124 (messages) et E123 (retours).
+  `rejected`, sans relance, message explicite dans E124 (messages) et E123 (retours). Constat du
+  2026-10-01 à traiter ici : E124 n'a aucun bouton « Relancer » sur un message en échec (retry
+  automatique au montage seulement), et un message dont le retour parent local n'est pas `sent`
+  reste muet (`feedbackClient.ts:125`).
 - Tests : unitaires `feedbackClient` et affichage E124/E123 ; appel réel par motif sur un appareil
   de test, données supprimées ensuite.
 

@@ -3,6 +3,11 @@
 ### Modifié
 - **Mise en production du lot v6.9 sur une nouvelle adresse d'hébergement**, avec guidage de
   récupération des données envoyé à la testeuse principale.
+- **Anciens retours de la testeuse principale rattachés à son appareil actif en base** (19 retours,
+  20 messages) : ses commentaires et validations sur ces fils ne sont plus refusés par le serveur.
+  Opération de données (trace dans `_contexte/reattribution_marie_2026-09-29.json`), accompagnée
+  d'une fonction d'écriture administrative (`scripts/_supabase.py`) et des droits de mise à jour
+  correspondants (`supabase/feedback.sql`).
 
 ### Ajouté
 - **Numéro de version affiché en bas de l'écran Paramètres.**

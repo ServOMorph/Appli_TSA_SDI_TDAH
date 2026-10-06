@@ -24,8 +24,8 @@ une fois l'upload effectué.
 **Correctif du 2026-09-29 : l'appareil concerné n'est plus `103c9b92…`.** Diagnostic de session :
 sur l'adresse actuelle (`appli-audhd`), Marie est en réalité l'appareil `192f2411-9e09-495c-97ec-6df563f01732`
 (actif, v6.9) — `103c9b92…` est un appareil devenu orphelin, lié à l'ancienne adresse (v5.139),
-tracké par `roadmap_correctifs_retours_2026-09-29.md`. Reconfirmé au hook `/close` du 2026-09-29 :
-`snapshot-supabase-192f2411-20260929-0904z.json` toujours archivé en `_sans_code/` — son
+tracké par `roadmap_correctifs_retours_2026-09-29.md`. Reconfirmé au hook `/close` du 2026-10-06 :
+`snapshot-supabase-192f2411-20261005-2251z.json` toujours archivé en `_sans_code/` — son
 `tester_code` reste à saisir. Une fois saisi et un cycle de synchronisation passé : vérifier que le
 prochain `python scripts/backup_testeur_snapshots.py` range le snapshot de `192f2411` dans `marie/`.
 Retirer cette section une fois vérifié.

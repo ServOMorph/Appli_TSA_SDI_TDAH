@@ -16,6 +16,11 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 29 septembre 2026, les 19 anciens retours de la testeuse principale ont été rattachés en base à
+son appareil actif. Un de ses commentaires reste pourtant bloqué sur son téléphone et n'est jamais
+arrivé sur le serveur ; elle a été invitée (1er octobre) à vérifier l'état de ce retour depuis la
+liste « Mes retours ». Sa réponse est attendue.
+
 Le 29 septembre 2026, un défaut a été identifié : après un changement d'adresse, la testeuse
 principale ne pouvait plus ni commenter ni valider ses anciens retours, sans qu'aucun message
 n'explique pourquoi — ses retours étaient restés rattachés à son ancien appareil. Une feuille de

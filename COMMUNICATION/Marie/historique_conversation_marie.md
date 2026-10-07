@@ -1282,3 +1282,21 @@ Export de données fait.
 
 _Suite :_ répond à l'alerte d'export du dév du 2026-10-06 (id gateway `20261006T123345_560583`).
 Vaut confirmation de l'étape 4ter de `/deploy` v6.10. Aucune réponse Discord attendue sur ce point.
+
+**Dév ->**
+Version 6.10 en ligne.
+
+https://appli-audhd.netlify.app
+
+Nouveau : le numéro de version s'affiche en bas des Paramètres. Dans le fil d'un retour, un message qui n'est pas parti a maintenant un bouton « Relancer », ou une explication si le serveur le refuse. Un commentaire bloqué est renvoyé automatiquement quand c'est possible.
+
+Ton message du 6/10 : le bouton manquait bien dans le fil. Il est ajouté.
+
+À faire :
+1. Ouvre le fil « mouvement des jours », attends quelques secondes. Dis-moi ce qui est écrit sous ton commentaire du 29/09 : « Envoyé », « Échec d'envoi » ou « Refusé par le serveur ». Si « Relancer » apparaît, appuie dessus.
+2. Paramètres > Profil : tape « marie » et enregistre.
+3. Des catégories de ton budget ont disparu ces derniers jours : c'était voulu ? Réponds oui ou non.
+
+Détail des changements : bouton « Nouveautés » dans l'application.
+
+_Suite :_ message de livraison v6.10 (brouillon rédigé le 2026-10-07, **non encore envoyé** à la rédaction de cette entrée, en attente de validation de l'utilisateur). Répond à son message du 2026-10-06 (« Échec d'envoi » sans « Relancer ») et redemande le code testeur (`marie`). La question budget vient de l'analyse `/deploy` du snapshot (5 catégories et 37 écritures absentes entre le 29/09 et le 05/10, réorganisation volontaire probable).

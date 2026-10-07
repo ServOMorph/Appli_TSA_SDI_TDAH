@@ -1274,3 +1274,11 @@ _Suite :_ alerte d'export de `/deploy` étape 0.1 (v6.10), avant mise en ligne. 
 à son message du 2026-10-06 (« Échec d'envoi » sans « Relancer ») : la réponse viendra avec la
 livraison du correctif. Déposé en **mode urgent** sur confirmation explicite de l'utilisateur. Id
 gateway `20261006T123345_560583`, Discord `1557007970141872199`, `--expect-reply`.
+
+### 2026-10-07
+
+**Marie -> (oral, transmis par l'utilisateur, présent avec elle)**
+Export de données fait.
+
+_Suite :_ répond à l'alerte d'export du dév du 2026-10-06 (id gateway `20261006T123345_560583`).
+Vaut confirmation de l'étape 4ter de `/deploy` v6.10. Aucune réponse Discord attendue sur ce point.

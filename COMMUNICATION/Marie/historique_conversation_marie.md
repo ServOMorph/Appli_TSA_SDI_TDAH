@@ -1299,4 +1299,4 @@ Ton message du 6/10 : le bouton manquait bien dans le fil. Il est ajouté.
 
 Détail des changements : bouton « Nouveautés » dans l'application.
 
-_Suite :_ message de livraison v6.10 (brouillon rédigé le 2026-10-07, **non encore envoyé** à la rédaction de cette entrée, en attente de validation de l'utilisateur). Répond à son message du 2026-10-06 (« Échec d'envoi » sans « Relancer ») et redemande le code testeur (`marie`). La question budget vient de l'analyse `/deploy` du snapshot (5 catégories et 37 écritures absentes entre le 29/09 et le 05/10, réorganisation volontaire probable).
+_Suite :_ message de livraison v6.10 (envoyé le 2026-10-07 en **mode urgent** sur confirmation explicite de l'utilisateur, avec `--expect-reply` ; id gateway `20261007T091015_573598`, Discord `1557319138953797744`). Répond à son message du 2026-10-06 (« Échec d'envoi » sans « Relancer ») et redemande le code testeur (`marie`). La question budget vient de l'analyse `/deploy` du snapshot (5 catégories et 37 écritures absentes entre le 29/09 et le 05/10, réorganisation volontaire probable).

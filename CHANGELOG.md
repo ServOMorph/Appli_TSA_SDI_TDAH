@@ -1,8 +1,6 @@
-## v6.10 — 2026-09-28
+## v6.10 — 2026-10-07
 
 ### Modifié
-- **Mise en production du lot v6.9 sur une nouvelle adresse d'hébergement**, avec guidage de
-  récupération des données envoyé à la testeuse principale.
 - **Anciens retours de la testeuse principale rattachés à son appareil actif en base** (19 retours,
   20 messages) : ses commentaires et validations sur ces fils ne sont plus refusés par le serveur.
   Opération de données (trace dans `_contexte/reattribution_marie_2026-09-29.json`), accompagnée
@@ -11,8 +9,17 @@
 
 ### Ajouté
 - **Numéro de version affiché en bas de l'écran Paramètres.**
+- **Motifs de refus du serveur pour les retours, commentaires et validations** (fonctions `*_v2`,
+  `supabase/feedback.sql`) : un refus définitif (retour d'un autre appareil, données invalides)
+  passe en statut « Refusé par le serveur » au lieu de rester en « Échec d'envoi » sans fin ; les
+  refus transitoires restent relancés.
+- **Bouton « Relancer » sous un commentaire ou un retour en échec dans le fil de discussion.**
 
 ### Corrigé
+- **Un commentaire dont le retour est inconnu du serveur n'est plus refusé définitivement** : le
+  retour est remis en file d'envoi sous l'appareil courant (image réutilisée seulement si elle y a
+  été déposée), puis le commentaire part au cycle suivant. Le retour peut exister en double côté
+  serveur.
 - **Un changement d'adresse pouvait laisser d'anciens retours définitivement bloqués en « Échec
   d'envoi »**, sans jamais réussir à recevoir un commentaire ni une validation : un import qui
   restaure une autre identité d'appareil détache désormais localement les retours liés à

@@ -30,7 +30,7 @@ traiter les défauts structurels découverts pendant le diagnostic.
 
 ---
 
-## Phase 1 — Débloquer le fil de retours de Marie (données, sans code) [EN COURS]
+## Phase 1 — Débloquer le fil de retours de Marie (données, sans code) [TODO — BLOQUÉ]
 
 - **Réattribution Supabase** : `device_id` de `feedback_reports` et `feedback_messages` passé de
   `103c9b92…` à `192f2411…` (19 retours, 20 messages). Écriture en production, refusée par le mode
@@ -69,7 +69,7 @@ traiter les défauts structurels découverts pendant le diagnostic.
 
 **Gate de sortie** : au moins un commentaire ou une validation de Marie sur un ancien fil arrive en
 base sous `192f2411`, ou Marie confirme que l'envoi fonctionne ; `tests_manuels.md` à jour.
-**Non atteint au 2026-10-06.**
+**Non atteint au 2026-10-07.** Bloquée jusqu'au déploiement de la v6.10 : les correctifs `078ddef` et `1a3fa8e` ciblent la cause supposée (retour local inconnu du serveur). Réponse de Marie du 2026-10-06 : « Échec d'envoi » sans « Relancer » dans le fil.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -121,7 +121,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Refus serveur explicites au lieu d'« Échec d'envoi » sans fin [TODO]
+## Phase 4 — Refus serveur explicites au lieu d'« Échec d'envoi » sans fin [FAIT]
 
 Problème : les RPC renvoient `false` pour toutes les causes de refus. Le client ne distingue pas
 un refus définitif (retour d'un autre appareil) d'un refus transitoire (appareil neuf pas encore
@@ -146,7 +146,9 @@ seul bloquerait à tort les retours d'un appareil neuf envoyés avant sa premiè
 - Tests : unitaires `feedbackClient` et affichage E124/E123 ; appel réel par motif sur un appareil
   de test, données supprimées ensuite.
 
-**Gate de sortie** : tests verts, SQL appliqué et vérifié par un appel réel pour chaque motif.
+**Réalisé (2026-10-06/07)** : RPC v2 à motifs, statut `rejected`, bouton Relancer dans E124 (`078ddef`) ; un `report_not_found` sur un message remet son retour parent en file (`1a3fa8e`). Suite 1058/1058. Non livré en production avant la v6.10. Résiduel tracé `[P2]` : messages muets d'un retour `rejected`.
+
+**Gate de sortie** : tests verts, SQL appliqué et vérifié par un appel réel pour chaque motif. **Atteint.**
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

@@ -16,6 +16,13 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
+Le 7 octobre 2026, la mise en ligne de la version 6.10 est en cours. Un commentaire de la
+testeuse principale reste bloqué sur son téléphone et n'est jamais arrivé sur le serveur ; la cause
+la plus probable est un retour dont l'identifiant local est inconnu du serveur. Cette version le
+remet alors en file d'envoi (le retour peut exister en double côté serveur), et affiche dans le fil
+de discussion soit un bouton « Relancer », soit « Refusé par le serveur » quand le refus est
+définitif. La testeuse a confirmé avoir exporté ses données avant la mise à jour.
+
 Le 29 septembre 2026, les 19 anciens retours de la testeuse principale ont été rattachés en base à
 son appareil actif. Un de ses commentaires reste pourtant bloqué sur son téléphone et n'est jamais
 arrivé sur le serveur ; elle a été invitée (1er octobre) à vérifier l'état de ce retour depuis la

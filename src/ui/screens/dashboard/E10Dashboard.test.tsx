@@ -171,9 +171,25 @@ describe('E10Dashboard', () => {
         const { unmount } = renderWithApp(<E10Dashboard />, ctx)
         const board = await screen.findByRole('region', { name: 'Planning du jour' })
         const container = board.parentElement as HTMLElement
+        await userEvent.click(screen.getByRole('button', { name: 'Déplier les outils' }))
         expect(container.style.height).toBe(`${PLANNING_HEIGHT_PX}px`)
         unmount()
       }
+    })
+
+    it('replie les outils par défaut, les déplie au clic et agrandit le planning quand ils sont repliés', async () => {
+      renderWithApp(<E10Dashboard />, makeAppContext())
+      const board = await screen.findByRole('region', { name: 'Planning du jour' })
+      const container = board.parentElement as HTMLElement
+      expect(screen.queryByRole('button', { name: 'Mon compte' })).toBeNull()
+      expect(container.style.height).not.toBe(`${PLANNING_HEIGHT_PX}px`)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Déplier les outils' }))
+      expect(screen.getByRole('button', { name: 'Mon compte' })).toBeInTheDocument()
+      expect(container.style.height).toBe(`${PLANNING_HEIGHT_PX}px`)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Replier les outils' }))
+      expect(screen.queryByRole('button', { name: 'Mon compte' })).toBeNull()
     })
 
     it('fait défiler la liste des tâches à l’intérieur du planning (#20)', async () => {
@@ -206,6 +222,10 @@ describe('E10Dashboard', () => {
   })
 
   describe('zone widgets (E24)', () => {
+    async function deplierOutils() {
+      await userEvent.click(screen.getByRole('button', { name: 'Déplier les outils' }))
+    }
+
     it('le "+" ouvre le sélecteur de création d\'outil', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
@@ -220,6 +240,7 @@ describe('E10Dashboard', () => {
         tools: [{ id: 't1', type: 'liste', folder_id: null, list_id: 'l1', routine_id: null, position: 0, created_at: '', updated_at: '' }],
       })
       renderWithApp(<E10Dashboard />, ctx)
+      await deplierOutils()
       await userEvent.click(screen.getByRole('button', { name: 'Courses' }))
       expect(ctx.selectList).toHaveBeenCalledWith('l1')
       expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
@@ -228,6 +249,7 @@ describe('E10Dashboard', () => {
     it('le widget « Mon compte » navigue vers l’écran budget-account', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
+      await deplierOutils()
       await userEvent.click(screen.getByRole('button', { name: 'Mon compte' }))
       expect(ctx.goTo).toHaveBeenCalledWith('budget-account')
     })
@@ -240,6 +262,7 @@ describe('E10Dashboard', () => {
         ],
       })
       renderWithApp(<E10Dashboard />, ctx)
+      await deplierOutils()
       const card = (await screen.findByRole('button', { name: 'Courses' })).closest('div') as HTMLElement
       expect(card.style.border).toBe('2px solid rgb(255, 136, 0)')
       expect(card.style.backgroundColor).toBe('var(--color-surface)')
@@ -253,6 +276,7 @@ describe('E10Dashboard', () => {
         ],
       })
       renderWithApp(<E10Dashboard />, ctx)
+      await deplierOutils()
       const card = (await screen.findByRole('button', { name: 'Courses' })).closest('div') as HTMLElement
       expect(card.style.border).not.toBe('2px solid rgb(255, 136, 0)')
     })
@@ -262,6 +286,7 @@ describe('E10Dashboard', () => {
         settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, mon_compte_color: '#22aa55' },
       })
       renderWithApp(<E10Dashboard />, ctx)
+      await deplierOutils()
       const card = (await screen.findByRole('button', { name: 'Mon compte' })).closest('div') as HTMLElement
       expect(card.style.border).toBe('2px solid rgb(34, 170, 85)')
       expect(card.style.backgroundColor).toBe('var(--color-surface)')
@@ -270,6 +295,7 @@ describe('E10Dashboard', () => {
     it('ne pose aucun contour sur la carte « Mon compte » sans couleur configurée (#36)', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
+      await deplierOutils()
       const card = (await screen.findByRole('button', { name: 'Mon compte' })).closest('div') as HTMLElement
       expect(card.style.border).not.toBe('2px solid rgb(34, 170, 85)')
     })

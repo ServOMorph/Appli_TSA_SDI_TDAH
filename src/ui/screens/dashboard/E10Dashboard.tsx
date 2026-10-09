@@ -42,6 +42,7 @@ export function E10Dashboard() {
     settings,
   } = useApp()
   const [showCreateTool, setShowCreateTool] = useState(false)
+  const [toolsOpen, setToolsOpen] = useState(false)
   const [hasUnreadFeedback, setHasUnreadFeedback] = useState(false)
 
   const rootFolders = folders
@@ -124,7 +125,7 @@ export function E10Dashboard() {
           display: 'flex',
           flexDirection: 'column',
           minHeight: 0,
-          height: `${PLANNING_HEIGHT_PX}px`,
+          height: toolsOpen ? `${PLANNING_HEIGHT_PX}px` : `max(${PLANNING_HEIGHT_PX}px, calc(100svh - 200px))`,
           overflow: 'hidden',
         }}
       >
@@ -141,8 +142,17 @@ export function E10Dashboard() {
           >
             +
           </Button>
+          <Button
+            variant="secondary"
+            onClick={() => setToolsOpen((open) => !open)}
+            aria-expanded={toolsOpen}
+            aria-label={toolsOpen ? 'Replier les outils' : 'Déplier les outils'}
+            style={{ padding: '4px 10px', fontSize: '1rem', lineHeight: 1, marginLeft: 'auto' }}
+          >
+            {toolsOpen ? '▲' : '▼'}
+          </Button>
         </div>
-        <div
+        {toolsOpen && <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
@@ -177,7 +187,7 @@ export function E10Dashboard() {
               </Card>
             )
           })}
-        </div>
+        </div>}
       </section>
 
       {showCreateTool && (

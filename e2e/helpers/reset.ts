@@ -16,9 +16,10 @@ export async function resetApp(page: Page, url = '/') {
   await page.waitForSelector('h1')
 }
 
-export async function completeFastOnboarding(page: Page) {
+export async function completeFastOnboarding(page: Page, testerCode?: string) {
   await page.getByRole('button', { name: 'Entrer' }).click()
   await page.getByRole('button', { name: 'Continuer sans partager' }).click()
+  if (testerCode) await page.getByRole('textbox', { name: 'Code testeur' }).fill(testerCode)
   await page.getByRole('button', { name: 'Continuer' }).click()
   await page.getByRole('button', { name: 'Étudiant' }).click()
   await page.getByRole('button', { name: '5' }).click()

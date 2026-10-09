@@ -4,7 +4,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E10Dashboard, PLANNING_HEIGHT_PX } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
-import { makeTask as baseTask } from '@/test/factories'
+import { makeTask as baseTask, makeSettings } from '@/test/factories'
+
+const adminSettings = makeSettings({ tester_code: 'marie' })
 
 const mocks = vi.hoisted(() => ({
   getUnreadReportIds: vi.fn().mockResolvedValue([]),
@@ -111,7 +113,7 @@ describe('E10Dashboard', () => {
 
     it('navigue vers Mes retours et affiche une pastille si une réponse n’est pas lue', async () => {
       mocks.getUnreadReportIds.mockResolvedValue(['report-1'])
-      const ctx = makeAppContext()
+      const ctx = makeAppContext({ settings: adminSettings })
       renderWithApp(<E10Dashboard />, ctx)
       expect(await screen.findByLabelText('Nouvelle réponse disponible')).toBeDefined()
       await userEvent.click(screen.getByRole('button', { name: 'Mes retours, nouvelle réponse disponible' }))
@@ -119,7 +121,7 @@ describe('E10Dashboard', () => {
     })
 
     it('n’affiche pas de pastille sans réponse non lue', async () => {
-      const ctx = makeAppContext()
+      const ctx = makeAppContext({ settings: adminSettings })
       renderWithApp(<E10Dashboard />, ctx)
       await screen.findByRole('button', { name: 'Mes retours' })
       await vi.waitFor(() => expect(mocks.syncFeedbackNow).toHaveBeenCalled())
@@ -131,9 +133,16 @@ describe('E10Dashboard', () => {
       // demarree en meme temps que ce tableau de bord pouvait recevoir une reponse d'agent apres
       // le premier controle local, sans jamais le declencher a nouveau.
       mocks.getUnreadReportIds.mockResolvedValueOnce([]).mockResolvedValueOnce(['report-1'])
-      renderWithApp(<E10Dashboard />)
+      renderWithApp(<E10Dashboard />, makeAppContext({ settings: adminSettings }))
       expect(screen.queryByLabelText('Nouvelle réponse disponible')).toBeNull()
       expect(await screen.findByLabelText('Nouvelle réponse disponible')).toBeDefined()
+    })
+
+    it.each([undefined, 'raphtest', 'satine'])('masque Mes retours et ne synchronise pas les retours pour un testeur non admin (code %s)', async (code) => {
+      await renderDashboard(makeAppContext({ settings: makeSettings({ tester_code: code }) }))
+      expect(screen.queryByRole('button', { name: /Mes retours/ })).toBeNull()
+      expect(mocks.syncFeedbackNow).not.toHaveBeenCalled()
+      expect(mocks.getUnreadReportIds).not.toHaveBeenCalled()
     })
 
     it('n\'affiche pas d\'icône Planning dans la TopBar', async () => {

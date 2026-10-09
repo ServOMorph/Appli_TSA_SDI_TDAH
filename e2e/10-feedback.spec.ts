@@ -4,7 +4,7 @@ import { completeFastOnboarding, resetApp } from './helpers/reset'
 test.beforeEach(async ({ page }) => {
   await page.route('**/*supabase.co/**', (route) => route.abort())
   await resetApp(page)
-  await completeFastOnboarding(page)
+  await completeFastOnboarding(page, 'dev')
 })
 
 test('T58 — créer un retour avec une capture conserve le retour local sans backend réel', async ({ page }) => {

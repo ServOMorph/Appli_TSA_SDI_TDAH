@@ -9,6 +9,7 @@ import { LazyScreenBoundary } from '@/ui/components/LazyScreenBoundary'
 import { ScreenCodeBadge } from '@/ui/components/ScreenCodeBadge'
 import { FeedbackFab } from '@/ui/components/FeedbackFab'
 import type { Screen } from '@/app/AppContext'
+import { hasFeedbackAccess } from '@/domain/rules/testerRoles'
 
 // `E10Dashboard` reste en import statique : c'est l'écran d'atterrissage de Marie. Tous les
 // autres sont chargés en différé (roadmap_bundle_2026-08-31.md, Phase 2) — un seul écran est
@@ -141,8 +142,15 @@ function preloadNavScreens() {
   importE110Settings()
 }
 
+const FEEDBACK_SCREENS: Screen[] = ['feedback', 'feedback-list', 'feedback-detail']
+
 export function AppScreens() {
-  const { screen, loading, overloadMode, inboxTasks, goTo } = useApp()
+  const { screen, loading, overloadMode, inboxTasks, goTo, replace, settings } = useApp()
+  const feedbackBlocked = !loading && FEEDBACK_SCREENS.includes(screen) && !hasFeedbackAccess(settings)
+
+  useEffect(() => {
+    if (feedbackBlocked) replace('dashboard')
+  }, [feedbackBlocked, replace])
 
   useEffect(() => {
     const idle = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(cb, 1))
@@ -161,6 +169,7 @@ export function AppScreens() {
   }
 
   function renderScreen() {
+    if (feedbackBlocked) return null
     switch (screen) {
       case 'welcome':
         return <E01Welcome />

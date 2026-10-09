@@ -3,6 +3,7 @@ import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
 import type { PlannedSubTask } from '@/app/contexts/usePlanningState'
 import type { PlannedRoutineOccurrence } from '@/app/contexts/useRoutineState'
+import type { Settings } from '@/domain/entities/settings'
 
 const FIXED_DATE = '2026-06-24T00:00:00Z'
 
@@ -85,6 +86,17 @@ export function makePlannedRoutineOccurrence(
     color: null,
     time: '08:00',
     completed: false,
+    ...overrides,
+  }
+}
+
+export function makeSettings(overrides: Partial<Settings> = {}): Settings {
+  return {
+    id: 'settings-1',
+    user_id: 'user-1',
+    dark_mode: false,
+    font_size: 'medium',
+    reduced_motion: false,
     ...overrides,
   }
 }

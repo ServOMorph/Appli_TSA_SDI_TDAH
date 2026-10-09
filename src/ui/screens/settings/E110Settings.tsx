@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
+import { WHATS_NEW, hasUnseenWhatsNew, markWhatsNewSeen } from '@/domain/data/whatsNew'
 import { Card } from '@/ui/components/Card'
 import { SyncStatusCard } from '@/ui/components/SyncStatusCard'
+import { WhatsNewModal } from '@/ui/components/WhatsNewModal'
 import type { Screen } from '@/app/AppContext'
 
 const backBtnStyle: React.CSSProperties = {
@@ -28,6 +31,8 @@ const entries: SettingsEntry[] = [
 
 export function E110Settings() {
   const { goTo } = useApp()
+  const [showWhatsNew, setShowWhatsNew] = useState(false)
+  const unseenWhatsNew = hasUnseenWhatsNew()
 
   return (
     <main
@@ -88,6 +93,36 @@ export function E110Settings() {
           ))}
         </ul>
       </nav>
+
+      <button
+        onClick={() => setShowWhatsNew(true)}
+        aria-label={unseenWhatsNew ? 'Nouveautés, non lu' : 'Nouveautés'}
+        style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+      >
+        <Card>
+          <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+            Nouveautés
+            {unseenWhatsNew && (
+              <span
+                aria-hidden
+                style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--color-error)', display: 'inline-block' }}
+              />
+            )}
+          </p>
+          <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+            Ce qui a changé dans la dernière version
+          </p>
+        </Card>
+      </button>
+      {showWhatsNew && (
+        <WhatsNewModal
+          updates={WHATS_NEW}
+          onClose={() => {
+            markWhatsNewSeen()
+            setShowWhatsNew(false)
+          }}
+        />
+      )}
 
       <SyncStatusCard />
 

@@ -10,7 +10,7 @@ interface TopBarProps {
   overloadActive: boolean
   plannedCost: number
   onResourcesClick: () => void
-  onFeedbackClick: () => void
+  onFeedbackClick?: () => void
   hasUnreadFeedback: boolean
   onOverloadClick: () => void
   ambianceColor: string
@@ -134,7 +134,7 @@ export function TopBar({
                   <path d="M10 9H8" />
                 </svg>
               </button>
-              <button
+              {onFeedbackClick && <button
                 onClick={onFeedbackClick}
                 aria-label={hasUnreadFeedback ? 'Mes retours, nouvelle réponse disponible' : 'Mes retours'}
                 title="Mes retours"
@@ -157,7 +157,7 @@ export function TopBar({
                     style={{ position: 'absolute', top: 2, right: 2, width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--color-error)', border: '1px solid var(--color-surface)' }}
                   />
                 )}
-              </button>
+              </button>}
             </>
           )}
         </div>

@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
+import { makeSettings } from '@/test/factories'
 import { AppScreens, activeTabFor, NO_NAV_SCREENS } from './App'
 
 describe('activeTabFor', () => {
@@ -67,5 +68,19 @@ describe('AppScreens — navigation persistante (N1)', () => {
     renderWithApp(<AppScreens />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter une tâche' }))
     expect(ctx.goTo).toHaveBeenCalledWith('task-create-v2')
+  })
+})
+
+describe('AppScreens — accès aux retours selon le rôle testeur', () => {
+  it.each(['feedback', 'feedback-list', 'feedback-detail'] as const)('renvoie un testeur non admin de %s vers l’Accueil', (screenName) => {
+    const ctx = makeAppContext({ screen: screenName, route: { name: screenName }, settings: makeSettings({ tester_code: 'satine' }) })
+    renderWithApp(<AppScreens />, ctx)
+    expect(ctx.replace).toHaveBeenCalledWith('dashboard')
+  })
+
+  it('laisse un admin sur l’écran de retour', () => {
+    const ctx = makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' }, settings: makeSettings({ tester_code: 'marie' }) })
+    renderWithApp(<AppScreens />, ctx)
+    expect(ctx.replace).not.toHaveBeenCalled()
   })
 })

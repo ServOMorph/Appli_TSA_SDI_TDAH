@@ -11,6 +11,7 @@ import { toolLabel } from '@/ui/components/ToolWidgetCard'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
 import { feedbackMessageRepo } from '@/app/repositories'
 import { syncFeedbackNow } from '@/data/sync/feedbackClient'
+import { hasFeedbackAccess } from '@/domain/rules/testerRoles'
 
 export const PLANNING_HEIGHT_PX = 325
 
@@ -44,11 +45,13 @@ export function E10Dashboard() {
   const [showCreateTool, setShowCreateTool] = useState(false)
   const [toolsOpen, setToolsOpen] = useState(false)
   const [hasUnreadFeedback, setHasUnreadFeedback] = useState(false)
+  const feedbackAccess = hasFeedbackAccess(settings)
 
   const rootFolders = folders
   const rootTools = tools.filter((t) => t.folder_id === null)
 
   useEffect(() => {
+    if (!feedbackAccess) return
     function checkUnread() {
       void feedbackMessageRepo.getUnreadReportIds().then((ids) => setHasUnreadFeedback(ids.length > 0))
     }
@@ -57,7 +60,7 @@ export function E10Dashboard() {
     // montage de ce tableau de bord : sans ce second appel, une reponse d'agent recue juste apres
     // le premier controle local restait invisible tant que l'ecran n'etait pas remonte.
     void syncFeedbackNow().then(checkUnread)
-  }, [])
+  }, [feedbackAccess])
 
   function openTool(toolId: string) {
     const tool = rootTools.find((t) => t.id === toolId)
@@ -95,7 +98,7 @@ export function E10Dashboard() {
         overloadActive={overloadMode}
         plannedCost={getRemainingPlannedCost(todayPlannedTasks)}
         onResourcesClick={() => goTo('resources')}
-        onFeedbackClick={() => goTo('feedback-list')}
+        onFeedbackClick={feedbackAccess ? () => goTo('feedback-list') : undefined}
         hasUnreadFeedback={hasUnreadFeedback}
         onOverloadClick={() => goTo('overload-recovery')}
         ambianceColor={settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR}

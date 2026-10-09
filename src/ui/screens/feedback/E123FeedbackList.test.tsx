@@ -9,8 +9,6 @@ const mocks = vi.hoisted(() => ({
   ]),
   markPending: vi.fn().mockResolvedValue(undefined),
   getUnreadReportIds: vi.fn().mockResolvedValue([]),
-  hasUnseenWhatsNew: vi.fn().mockReturnValue(false),
-  markWhatsNewSeen: vi.fn(),
 }))
 
 vi.mock('@/app/repositories', async (importOriginal) => ({
@@ -19,11 +17,6 @@ vi.mock('@/app/repositories', async (importOriginal) => ({
   feedbackMessageRepo: { getUnreadReportIds: mocks.getUnreadReportIds },
 }))
 vi.mock('@/data/sync/feedbackClient', () => ({ syncFeedbackNow: vi.fn().mockResolvedValue(false) }))
-vi.mock('@/domain/data/whatsNew', () => ({
-  WHATS_NEW: ['Nouvelle fonctionnalité de test'],
-  hasUnseenWhatsNew: mocks.hasUnseenWhatsNew,
-  markWhatsNewSeen: mocks.markWhatsNewSeen,
-}))
 
 import { E123FeedbackList } from '@/ui/screens/feedback/E123FeedbackList'
 
@@ -32,8 +25,6 @@ describe('E123FeedbackList', () => {
     localStorage.clear()
     mocks.markPending.mockClear()
     mocks.getUnreadReportIds.mockClear()
-    mocks.hasUnseenWhatsNew.mockReturnValue(false)
-    mocks.markWhatsNewSeen.mockClear()
   })
   afterEach(() => localStorage.clear())
 
@@ -75,23 +66,5 @@ describe('E123FeedbackList', () => {
     mocks.getUnreadReportIds.mockResolvedValue(['failed-1'])
     renderWithApp(<E123FeedbackList />, makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' } }))
     expect(await screen.findByLabelText('Nouvelle réponse')).toBeInTheDocument()
-  })
-
-  it('n’affiche pas de pastille sur le bouton Nouveautés quand la version courante a déjà été vue', async () => {
-    renderWithApp(<E123FeedbackList />, makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' } }))
-    expect(await screen.findByRole('button', { name: 'Nouveautés' })).toBeDefined()
-  })
-
-  it('affiche une pastille sur le bouton Nouveautés tant que la version courante n’a pas été vue, et l’ouverture de la modale la marque vue', async () => {
-    mocks.hasUnseenWhatsNew.mockReturnValue(true)
-    const { default: userEvent } = await import('@testing-library/user-event')
-    renderWithApp(<E123FeedbackList />, makeAppContext({ screen: 'feedback-list', route: { name: 'feedback-list' } }))
-    const button = await screen.findByRole('button', { name: 'Nouveautés, non lu' })
-    await userEvent.click(button)
-    expect(screen.getByRole('dialog', { name: 'Nouveautés' })).toBeInTheDocument()
-    expect(screen.getByText('Nouvelle fonctionnalité de test')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
-    expect(mocks.markWhatsNewSeen).toHaveBeenCalled()
-    expect(screen.queryByRole('dialog', { name: 'Nouveautés' })).toBeNull()
   })
 })

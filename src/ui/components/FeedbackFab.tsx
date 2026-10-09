@@ -1,7 +1,9 @@
 import { useApp } from '@/app/AppContext'
+import { hasFeedbackAccess } from '@/domain/rules/testerRoles'
 
 export function FeedbackFab() {
-  const { screen, goTo } = useApp()
+  const { screen, goTo, settings } = useApp()
+  if (!hasFeedbackAccess(settings)) return null
   if (screen === 'feedback' || screen === 'feedback-list' || screen === 'feedback-detail') return null
 
   return (

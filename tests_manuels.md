@@ -54,3 +54,7 @@ navigateur neuf (ou navigation privée) côté iPhone : (1) exporter depuis la v
 ## Mesurer la hauteur du planning de l'Accueil, outils repliés (2026-10-09)
 
 En code, la hauteur est `max(325px, calc(100svh - 200px))` ; les 200 px sont une estimation (barre du haut, titre « Outils », marges), jamais mesurée. À contrôler sur un vrai téléphone (iPhone SE et grand écran) : pas de défilement de page ni de vide excessif sous le planning. Contrôler aussi qu'une routine sans horaire apparaît bien en fin de journée dans le planning de la semaine (E12). Retirer cette section une fois vérifié.
+
+## Vérifier les rôles admin/testeur et Nouveautés dans Paramètres (2026-10-09)
+
+Après déploiement : sur un appareil avec le code `dev` (ou `marie`), le bouton `+` et l'icône « Mes retours » sont visibles et un retour part normalement. Sur un appareil avec le code `raphtest` (ou sans code), ni le bouton `+` ni l'icône ne s'affichent. Changer le code dans Paramètres > Profil fait apparaître ou disparaître les retours sans relancer l'appli. « Nouveautés » s'ouvre depuis Paramètres, avec sa pastille tant que la version n'a pas été vue. Retirer cette section une fois vérifié.

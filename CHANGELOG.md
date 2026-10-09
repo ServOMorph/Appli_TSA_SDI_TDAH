@@ -1,6 +1,10 @@
 ## v6.11 — 2026-10-09
 
+### Ajouté
+- **Deux catégories de testeurs** (`src/domain/rules/testerRoles.ts`) : `admin` (codes `marie`, `dev`) garde le signalement de retours (bouton `+`, « Mes retours », écrans E122-E124) ; `testeur` (tout autre code ou absence de code) ne le voit plus et est renvoyé vers l'Accueil s'il atteint un écran de retour. Simple masquage côté client, sans contrôle d'accès.
+
 ### Modifié
+- **« Nouveautés » déplacé de « Mes retours » vers Paramètres**, accessible à tous les testeurs.
 - **Planning de la semaine : les routines sont placées à leur horaire**, triées avec les tâches du jour ; une routine sans horaire défini passe en fin de journée (auparavant toutes les routines suivaient les tâches).
 - **Accueil : les outils sont repliés par défaut**, avec un bouton ▲ / ▼ à côté de « Outils » ; replié, le planning du jour occupe la place libérée (hauteur `max(325 px, 100svh - 200 px)`, estimation non mesurée sur téléphone).
 

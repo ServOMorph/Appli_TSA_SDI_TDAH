@@ -12,13 +12,13 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 - Planification quotidienne et suivi d'énergie, avec un mode de récupération en cas de surcharge.
 - Listes, dossiers et outil Budget, organisés pour réduire les frictions de l'usage quotidien.
 - Export et import local des données ; le stockage applicatif repose sur IndexedDB.
-- Signalement d'un retour depuis n'importe quel écran (capture annotée + commentaire), suivi dans un fil de discussion avec l'équipe jusqu'à validation par le testeur lui-même.
+- Signalement d'un retour (testeurs administrateurs) depuis n'importe quel écran (capture annotée + commentaire), suivi dans un fil de discussion avec l'équipe jusqu'à validation par le testeur lui-même.
 
 ## État actuel
 
 Le 9 octobre 2026, la version 6.10 (en ligne depuis le 7 octobre) est confirmée efficace : le commentaire de la testeuse principale, bloqué sur son téléphone depuis le 29 septembre, est arrivé sur le serveur (la cause était un retour dont l'identifiant local était inconnu du serveur, désormais remis en file d'envoi ; il peut exister en double côté serveur). Le fil de discussion affiche un bouton « Relancer » ou « Refusé par le serveur » selon le cas. Elle a saisi son code testeur et confirmé que la réduction de son budget était voulue.
 
-Le 9 octobre 2026, deux changements sont prêts pour la version 6.11, non encore en ligne : dans le planning de la semaine, les routines sont placées à leur horaire avec les tâches (sans horaire défini, elles restent en fin de journée) ; sur l'Accueil, les outils sont repliés par défaut et un bouton les déplie, ce qui laisse plus de place au planning du jour.
+Le 9 octobre 2026, deux changements sont prêts pour la version 6.11, non encore en ligne : dans le planning de la semaine, les routines sont placées à leur horaire avec les tâches (sans horaire défini, elles restent en fin de journée) ; sur l'Accueil, les outils sont repliés par défaut et un bouton les déplie, ce qui laisse plus de place au planning du jour. S'y ajoutent deux catégories de testeurs : les administrateurs (codes `marie` et `dev`) gardent le signalement de retours, les autres testeurs ne le voient plus. « Nouveautés » est déplacé dans Paramètres. Ces catégories reposent sur un code saisi librement : la sécurité de connexion sera revue avant l'arrivée du testeur suivant.
 
 Le 29 septembre 2026, un défaut a été identifié : après un changement d'adresse, la testeuse
 principale ne pouvait plus ni commenter ni valider ses anciens retours, sans qu'aucun message

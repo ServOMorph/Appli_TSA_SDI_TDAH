@@ -1668,3 +1668,28 @@ Aucune.
 
 ## Question bloquante pour la session suivante
 Aucune.
+
+---
+
+## Dernière session (2026-10-09 — v6.10 confirmée en production, routines E12 et outils de l’Accueil)
+
+## Décisions prises
+- Réponse de Marie consignée (« 1. Envoyer 2. Fait 3. Oui ») : commentaire bloqué arrivé en base, code testeur saisi, baisse du budget voulue.
+- E12 : routines triées par heure avec les tâches, sans heure en fin de journée (`8467d7b`), note dans `WHATS_NEW`.
+- E10 : outils repliés par défaut, bouton ▲/▼, planning agrandi quand ils sont repliés (`6dfbb1a`, `4b7f9a5`), note dans `WHATS_NEW`.
+
+## Livrables produits ou modifiés
+- `src/ui/screens/dashboard/E12WeekPlanning.tsx`, `E10Dashboard.tsx` et leurs tests, `src/domain/data/whatsNew.ts` : commités, non déployés.
+- `CHANGELOG.md` (v6.11), `README.md`, `contexte.md`, `signals.md`, `roadmap_correctifs_retours_2026-09-29.md` (Phase 1 `[FAIT]`) : mis à jour à ce `/close`.
+
+## Hypothèses validées / invalidées
+- VALIDE : cause du commentaire bloqué (retours locaux inconnus du serveur), levée par `1a3fa8e` en v6.10.
+- VALIDE : la baisse du budget de Marie était voulue.
+- EN ATTENTE : classement du snapshot de `192f2411` dans `donnees_testeurs/marie/` (lecture refusée par le mode auto).
+- EN ATTENTE : hauteur du planning outils repliés sur un vrai téléphone ; heure des routines de Marie (une routine sans heure reste en fin de journée).
+
+## Prochaine étape exacte
+`/deploy` de la v6.11, puis `/traiter_retours` sur les retours ouverts de Marie (Phase 3).
+
+## Question bloquante pour la session suivante
+Aucune

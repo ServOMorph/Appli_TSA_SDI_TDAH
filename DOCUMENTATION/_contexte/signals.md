@@ -22,6 +22,13 @@
   - fait quand: décision documentaire prise (docs mis à jour ou jugés inchangés)
   - réf: 20_guides/stockage_sauvegarde_restauration.md, 40_specs/parametres_donnees_retours.md,
     commit 84472d8, CHANGELOG.md v6.7
+- [P2|ouvert|source=orchestrateur] Documenter les catégories de testeurs (2026-10-09) : `admin`
+  (codes `marie`, `dev`) garde le signalement de retours, `testeur` (tout autre code ou sans code)
+  ne le voit plus ; « Nouveautés » est dans Paramètres. Simple masquage sur un code saisi
+  librement, sécurité de connexion à revoir avant le testeur suivant Satine.
+  - fait quand: décision documentaire prise (docs mis à jour ou jugés inchangés)
+  - réf: src/domain/rules/testerRoles.ts, 40_specs/parametres_donnees_retours.md, commit 2b3c020,
+    CHANGELOG.md v6.11
 
 ## Dernière session (2026-09-16)
 <!-- Écrasé intégralement par /close. Synthèse < 25 lignes. -->

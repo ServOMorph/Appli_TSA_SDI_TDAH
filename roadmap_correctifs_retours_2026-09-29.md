@@ -30,7 +30,7 @@ traiter les défauts structurels découverts pendant le diagnostic.
 
 ---
 
-## Phase 1 — Débloquer le fil de retours de Marie (données, sans code) [TODO — BLOQUÉ]
+## Phase 1 — Débloquer le fil de retours de Marie (données, sans code) [FAIT]
 
 - **Réattribution Supabase** : `device_id` de `feedback_reports` et `feedback_messages` passé de
   `103c9b92…` à `192f2411…` (19 retours, 20 messages). Écriture en production, refusée par le mode
@@ -69,7 +69,7 @@ traiter les défauts structurels découverts pendant le diagnostic.
 
 **Gate de sortie** : au moins un commentaire ou une validation de Marie sur un ancien fil arrive en
 base sous `192f2411`, ou Marie confirme que l'envoi fonctionne ; `tests_manuels.md` à jour.
-**Non atteint au 2026-10-07.** Bloquée jusqu'au déploiement de la v6.10 : les correctifs `078ddef` et `1a3fa8e` ciblent la cause supposée (retour local inconnu du serveur). Réponse de Marie du 2026-10-06 : « Échec d'envoi » sans « Relancer » dans le fil.
+**Atteint le 2026-10-09.** v6.10 déployée le 2026-10-07. La remise en file (`1a3fa8e`) a poussé deux retours locaux de Marie (datés 07/09 et 10/09, écran E10) vers 09h49 UTC, puis leurs deux commentaires (`789f1803`, `b9e345dc`) sont arrivés en base à 10h19 UTC, dont celui du 29/09 00h37 (Paris). Marie confirme « Envoyé » (réponse du 2026-10-09). Cause confirmée : retours locaux inconnus du serveur. Effet de bord : ces deux retours existent maintenant côté serveur, possiblement en doublon de `6f90c375`.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
@@ -92,6 +92,8 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - **`/deploy`** (compteur Netlify : 1/10 sur la période en cours au 2026-09-28).
 - Tests : `tsc -b`, suite complète, e2e via `/deploy`.
 
+**État au 2026-10-09** : v6.10 déployée le 2026-10-07 (`https://appli-audhd.netlify.app`). Restent non faits : l'amendement de `close.md` étape 9, la lecture de « Version v6.10 » par Marie dans Paramètres (non confirmée), et le préfixe `v` de `E124FeedbackDetail.tsx:147` (`v{report.app_version}`, non vérifié si la valeur contient déjà le `v`).
+
 **Gate de sortie** : v6.10 en production, Marie lit « Version v6.10 » dans Paramètres, `close.md`
 amendé et vérifié sur un `/close` sans changement de `src/` (aucune nouvelle version créée).
 
@@ -105,8 +107,10 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - Lancer `/traiter_retours` sur les retours de `192f2411` reçus le 2026-09-28 au soir :
   E77 (catégories et « livret jeune »), E10 (dossiers et rangement des outils), E21 (case
   « dépense » liée à « Mon compte »), E124 (« commentaire qui ne s'envoie pas », `b1e179f4`).
-- `b1e179f4` : réponse directe via `scripts/reply_feedback_report.py` dès la Phase 1 validée — le
-  correctif est une opération de données, déjà effectif, rien à différer.
+- `b1e179f4` : réponse directe via `scripts/reply_feedback_report.py` (Phase 1 validée le 2026-10-09)
+  — le correctif est une opération de données, déjà effectif, rien à différer.
+- Nouveaux commentaires arrivés en base le 2026-10-07 (retours E10 datés 07/09 et 10/09) : « Ça ne va
+  pas. Reprends toute la str… » et celui sur le « cadre orange » — à traiter.
 - « Test version » (`5b8d7ed1`, E123) : réponse courte, à valider par Marie elle-même.
 - Répondre aux commentaires de Marie sur « mode surcharge » et « mouvement des jours » une fois
   arrivés en base (Phase 1).

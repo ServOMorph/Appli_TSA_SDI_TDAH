@@ -50,3 +50,7 @@ navigateur neuf (ou navigation privée) côté iPhone : (1) exporter depuis la v
 (3) vérifier arrivée sur Accueil/énergie sans repasser par l'accueil, données présentes ;
 (4) Paramètres > Vie privée : partage actif ; (5) le snapshot Supabase se met à jour sur le même
 `device_id` qu'avant. Retirer cette section une fois vérifié.
+
+## Mesurer la hauteur du planning de l'Accueil, outils repliés (2026-10-09)
+
+En code, la hauteur est `max(325px, calc(100svh - 200px))` ; les 200 px sont une estimation (barre du haut, titre « Outils », marges), jamais mesurée. À contrôler sur un vrai téléphone (iPhone SE et grand écran) : pas de défilement de page ni de vide excessif sous le planning. Contrôler aussi qu'une routine sans horaire apparaît bien en fin de journée dans le planning de la semaine (E12). Retirer cette section une fois vérifié.

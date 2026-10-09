@@ -16,17 +16,9 @@ Assistant AuDHD est une application web progressive (PWA) conçue pour aider les
 
 ## État actuel
 
-Le 7 octobre 2026, la mise en ligne de la version 6.10 est en cours. Un commentaire de la
-testeuse principale reste bloqué sur son téléphone et n'est jamais arrivé sur le serveur ; la cause
-la plus probable est un retour dont l'identifiant local est inconnu du serveur. Cette version le
-remet alors en file d'envoi (le retour peut exister en double côté serveur), et affiche dans le fil
-de discussion soit un bouton « Relancer », soit « Refusé par le serveur » quand le refus est
-définitif. La testeuse a confirmé avoir exporté ses données avant la mise à jour.
+Le 9 octobre 2026, la version 6.10 (en ligne depuis le 7 octobre) est confirmée efficace : le commentaire de la testeuse principale, bloqué sur son téléphone depuis le 29 septembre, est arrivé sur le serveur (la cause était un retour dont l'identifiant local était inconnu du serveur, désormais remis en file d'envoi ; il peut exister en double côté serveur). Le fil de discussion affiche un bouton « Relancer » ou « Refusé par le serveur » selon le cas. Elle a saisi son code testeur et confirmé que la réduction de son budget était voulue.
 
-Le 29 septembre 2026, les 19 anciens retours de la testeuse principale ont été rattachés en base à
-son appareil actif. Un de ses commentaires reste pourtant bloqué sur son téléphone et n'est jamais
-arrivé sur le serveur ; elle a été invitée (1er octobre) à vérifier l'état de ce retour depuis la
-liste « Mes retours ». Sa réponse est attendue.
+Le 9 octobre 2026, deux changements sont prêts pour la version 6.11, non encore en ligne : dans le planning de la semaine, les routines sont placées à leur horaire avec les tâches (sans horaire défini, elles restent en fin de journée) ; sur l'Accueil, les outils sont repliés par défaut et un bouton les déplie, ce qui laisse plus de place au planning du jour.
 
 Le 29 septembre 2026, un défaut a été identifié : après un changement d'adresse, la testeuse
 principale ne pouvait plus ni commenter ni valider ses anciens retours, sans qu'aucun message

@@ -1,3 +1,9 @@
+## v6.11 — 2026-10-09
+
+### Modifié
+- **Planning de la semaine : les routines sont placées à leur horaire**, triées avec les tâches du jour ; une routine sans horaire défini passe en fin de journée (auparavant toutes les routines suivaient les tâches).
+- **Accueil : les outils sont repliés par défaut**, avec un bouton ▲ / ▼ à côté de « Outils » ; replié, le planning du jour occupe la place libérée (hauteur `max(325 px, 100svh - 200 px)`, estimation non mesurée sur téléphone).
+
 ## v6.10 — 2026-10-07
 
 ### Modifié

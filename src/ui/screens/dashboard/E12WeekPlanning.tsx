@@ -153,6 +153,23 @@ function taskChipStyle(color: string | null): React.CSSProperties {
   }
 }
 
+type DayItem =
+  | { kind: 'task'; item: Task; start: string | null }
+  | { kind: 'routine'; item: PlannedRoutineOccurrence; start: string | null }
+
+function mergeDayItems(tasks: Task[], routines: PlannedRoutineOccurrence[]): DayItem[] {
+  const items: DayItem[] = [
+    ...tasks.map((item): DayItem => ({ kind: 'task', item, start: item.scheduled_start })),
+    ...routines.map((item): DayItem => ({ kind: 'routine', item, start: item.time || null })),
+  ]
+  return items.sort((a, b) => {
+    if (a.start === b.start) return 0
+    if (!a.start) return 1
+    if (!b.start) return -1
+    return a.start.localeCompare(b.start)
+  })
+}
+
 export function E12WeekPlanning() {
   const { getPlannedTasksForDate, getPlannedRoutinesForDate, selectTask, selectRoutine, goTo, back, route, settings } = useApp()
   const ambianceColor = settings?.ambiance_color ?? DEFAULT_AMBIANCE_COLOR
@@ -279,8 +296,7 @@ export function E12WeekPlanning() {
             {week.map((d, i) => {
               const badge = formatDayBadge(d)
               const isToday = d === today
-              const dayTasks = tasksByDate[d] ?? []
-              const dayRoutines = routinesByDate[d] ?? []
+              const dayItems = mergeDayItems(tasksByDate[d] ?? [], routinesByDate[d] ?? [])
               return (
                 <div key={d} style={dayColumnStyle(i)}>
                   <div style={dayHeaderStyle(isToday)}>
@@ -288,25 +304,26 @@ export function E12WeekPlanning() {
                     <span style={dayNumberStyle(isToday)}>{badge.day}</span>
                   </div>
                   <div style={dayTasksStyle} aria-label={`Tâches du ${d}`}>
-                    {dayTasks.map((task) => (
-                      <button
-                        key={task.id}
-                        style={taskChipStyle(task.color)}
-                        onClick={() => openTask(task.id)}
-                      >
-                        {task.title}
-                      </button>
-                    ))}
-                    {dayRoutines.map((routine) => (
-                      <button
-                        key={routine.scheduleId}
-                        style={taskChipStyle(routine.color)}
-                        onClick={() => openRoutine(routine.routineId, d)}
-                      >
-                        <RoutineIcon size={12} />
-                        {`routine « ${routine.routineName} »`}
-                      </button>
-                    ))}
+                    {dayItems.map((entry) =>
+                      entry.kind === 'task' ? (
+                        <button
+                          key={entry.item.id}
+                          style={taskChipStyle(entry.item.color)}
+                          onClick={() => openTask(entry.item.id)}
+                        >
+                          {entry.item.title}
+                        </button>
+                      ) : (
+                        <button
+                          key={entry.item.scheduleId}
+                          style={taskChipStyle(entry.item.color)}
+                          onClick={() => openRoutine(entry.item.routineId, d)}
+                        >
+                          <RoutineIcon size={12} />
+                          {`routine « ${entry.item.routineName} »`}
+                        </button>
+                      ),
+                    )}
                   </div>
                 </div>
               )

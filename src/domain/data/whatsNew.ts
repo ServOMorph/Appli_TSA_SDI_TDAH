@@ -1,4 +1,6 @@
-export const WHATS_NEW: string[] = []
+export const WHATS_NEW: string[] = [
+  'Dans le planning de la semaine, les routines sont maintenant placées à leur horaire. Si une routine apparaît en fin de journée, c’est qu’aucune heure n’est définie pour elle.',
+]
 
 export const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'
 export const WHATS_NEW_SEEN_STORAGE_KEY = 'whats_new_seen_version'

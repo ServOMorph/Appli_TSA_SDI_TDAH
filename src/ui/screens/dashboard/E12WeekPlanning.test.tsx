@@ -163,6 +163,21 @@ describe('E12WeekPlanning', () => {
     expect(await screen.findByRole('button', { name: 'routine « Routine du matin »' })).toBeInTheDocument()
   })
 
+  it('place une routine du matin avant une tâche de l’après-midi du même jour', async () => {
+    renderWeek(makeAppContext({
+      route: WEEK_ROUTE,
+      getPlannedTasksForDate: vi.fn(async (d: string) =>
+        d === '2026-07-01' ? [makeTask({ id: 't1', title: 'Tâche du soir', scheduled_start: '18:00' })] : [],
+      ),
+      getPlannedRoutinesForDate: vi.fn(async (d: string) =>
+        d === '2026-07-01' ? [makePlannedRoutineOccurrence({ routineName: 'Routine du matin', time: '07:30' })] : [],
+      ),
+    }))
+    const routine = await screen.findByRole('button', { name: 'routine « Routine du matin »' })
+    const task = await screen.findByRole('button', { name: 'Tâche du soir' })
+    expect(routine.compareDocumentPosition(task) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('ouvre la fiche d’une routine au clic sur sa case', async () => {
     const selectRoutine = vi.fn()
     const goTo = vi.fn()

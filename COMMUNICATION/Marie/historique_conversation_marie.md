@@ -1300,3 +1300,18 @@ Ton message du 6/10 : le bouton manquait bien dans le fil. Il est ajouté.
 Détail des changements : bouton « Nouveautés » dans l'application.
 
 _Suite :_ message de livraison v6.10 (envoyé le 2026-10-07 en **mode urgent** sur confirmation explicite de l'utilisateur, avec `--expect-reply` ; id gateway `20261007T091015_573598`, Discord `1557319138953797744`). Répond à son message du 2026-10-06 (« Échec d'envoi » sans « Relancer ») et redemande le code testeur (`marie`). La question budget vient de l'analyse `/deploy` du snapshot (5 catégories et 37 écritures absentes entre le 29/09 et le 05/10, réorganisation volontaire probable).
+
+**Marie -> (transmis par l'utilisateur, 2026-10-09)**
+1. Envoyer
+2. Fait
+3. Oui
+
+_Suite :_ répond au message de livraison v6.10 du dév du 2026-10-07 (id gateway `20261007T091015_573598`).
+1 : son commentaire est « Envoyé » ; relu en base, il est arrivé (voir ci-dessous). 2 : code testeur
+`marie` saisi. 3 : la disparition de catégories de son budget était voulue. L'utilisateur indique
+qu'elle a ouvert l'appli et que ses données ont été bien intégrées. Relevé serveur du 2026-10-09 : le
+07/10 vers 09h49 UTC, deux retours locaux jusque-là inconnus du serveur (E10, datés du 07/09 et du
+10/09) sont arrivés, puis leurs deux commentaires (28/09 22h37 et 22h47 UTC, soit 00h37 et 00h47 le
+29/09 à Paris) à 10h19 UTC. Le blocage venait bien d'un retour local inconnu du serveur : la remise en
+file de la v6.10 l'a levé. Pas de réponse rédigée.
+

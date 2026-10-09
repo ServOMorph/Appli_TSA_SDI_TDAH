@@ -50,11 +50,3 @@ navigateur neuf (ou navigation privée) côté iPhone : (1) exporter depuis la v
 (3) vérifier arrivée sur Accueil/énergie sans repasser par l'accueil, données présentes ;
 (4) Paramètres > Vie privée : partage actif ; (5) le snapshot Supabase se met à jour sur le même
 `device_id` qu'avant. Retirer cette section une fois vérifié.
-
-## Vérifier l'arrivée du commentaire de Marie après la v6.10
-
-Commentaire du 29/09 00h37 sur « mouvement des jours » (`6f90c375…`), absent de la base au 2026-10-06.
-Après déploiement et ouverture du fil par Marie : relire la base sous `192f2411` (`feedback_messages`,
-`author = user`) et chercher un second retour « mouvement des jours » (doublon attendu si le retour
-local était inconnu du serveur). Sinon, relever le libellé exact affiché dans son fil
-(« Échec d'envoi » + Relancer, ou « Refusé par le serveur »). Retirer cette section une fois tranché.

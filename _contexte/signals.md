@@ -59,23 +59,19 @@
 - [P3] **Revue `medium` du 2026-10-10 (non corrigés)** : (a) `DurationRoller.pressDigit` repart du dernier chiffre quand la valeur dépasse le maximum de l'unité et les touches ne sont pas désactivées avec `maxMinutes` (valeur silencieusement écrêtée) ; (b) `moveTool` et `deleteFolder` (`useToolsState.ts`) ne retassent pas les positions du dossier source (trou, collision possible au prochain ajout) ; (c) `ToolActionsMenu` appelle `deleteTool`/`moveTool` sans `await` ni gestion d'erreur et ferme le dialogue aussitôt ; (d) `duplicateTaskById` ne copie les sous-tâches que sur un niveau, en insertions séquentielles sans transaction ; (e) `needs_reply` (`reply_feedback_report.py`) ignore une relance si l'entrée de file n'a pas de `queued_at` (entrées antérieures au changement) ; (f) `handleChangeTime` (E80) sans gestion d'erreur. Écartés : doublon d'horaire par `setRoutineDaySchedule` (c'est un upsert, lu) et suppression de la carte de surcharge (demandée par le retour `1c42ba1b`). — fait quand : traités ou jugés acceptables — réf : `src/ui/components/DurationRoller.tsx`, `src/app/contexts/useToolsState.ts`, `src/ui/components/ToolActionsMenu.tsx`, `src/app/contexts/usePlanningState.ts`, `scripts/reply_feedback_report.py`
 - [P2] **Fichiers `JEUX/` modifiés ou supprimés hors de cette session, non commités** (`JeuxLauncher.tsx`, `catalogue.ts`, `planning_energie/`, `tri_calme/` supprimés, contextes de la zone) : à relire et commiter par la zone `jeux`, non inclus au commit de ce `/close`. — fait quand : commités ou écartés — réf : `git status`, `JEUX/_contexte/statut.md`
 
-## Dernière session (2026-10-10 — traitement des retours de Marie, phases 1-4)
+## Dernière session (2026-10-10 — reprise `/start`, analyse A/B de la phase 5)
 
 ## Décisions prises
-- Réponses aux retours : relecture humaine obligatoire avant dépôt ou mise en file ; 7 réponses en file, aucune déposée.
-- Phases 1-4 de `roadmap_retours_2026-10-10.md` réalisées et validées ; phases 5 et 6 bloquées par Marie.
-- Mot de passe admin, T58/T58b et déploiement v6.11 reportés à la discussion avec Marie.
+- Aucune décision actée. Recommandation faite pour la phase 5 de `roadmap_correctifs_retours_2026-09-29.md` : option A (redescente Supabase), en attente de confirmation de l'utilisateur.
 
 ## Livrables produits ou modifiés
-- `src/` (navigation des jours, surcharge, dupliquer, heure/durée par chiffres, routine, dossiers d'outils, E124), e2e adaptés, scripts de retours, `close.md` (étape 9) : commités, non déployés. 1104 tests, `tsc` et `eslint` propres, e2e 58/59.
-- `CHANGELOG.md` v6.11 complété, `WHATS_NEW` : 6 entrées ajoutées, roadmap phases 1-4 `[FAIT]`.
+- Aucun fichier de code ou de roadmap modifié ; `src/` inchangé depuis `ad9e40b` (v6.10) hors travail déjà commité. Pas de revue de code ni de bump `CHANGELOG.md`.
 
 ## Hypothèses validées / invalidées
-- VALIDE : revue `medium` : 2 correctifs appliqués ; doublon d'horaire de routine invalidé (upsert).
-- EN ATTENTE : T58 (empreintes vides) ; contrôle mobile ; sauvegardes.
+- EN ATTENTE : choix A/B ; empreintes admin (`ADMIN_CREDENTIAL_HASHES` vide) ; T58 ; contrôles manuels de `tests_manuels.md` ; seconde relecture des 7 réponses en file.
 
 ## Prochaine étape exacte
-Voir Marie (`a_voir_avec_marie.md`) : empreintes admin, puis réparer T58, puis `/deploy` v6.11 avec seconde relecture des 7 réponses.
+Voir Marie (`a_voir_avec_marie.md`) : empreintes admin, puis réparer T58, puis `/deploy` v6.11 avec seconde relecture des 7 réponses. Phase 5 : si A confirmé, RPC dans `supabase/feedback.sql` (à appliquer par l'utilisateur) et client de redescente.
 
 ## Question bloquante pour la session suivante
-Choix A (redescente Supabase) ou B (retours inclus dans l'export) pour la phase 5 de la roadmap du 29/09 ?
+Confirmes-tu l'option A (redescente Supabase) pour la phase 5, plutôt que B (retours inclus dans l'export) ?

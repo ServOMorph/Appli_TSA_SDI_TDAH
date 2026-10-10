@@ -12,9 +12,9 @@ Concevoir et développer des jeux pour personnes TSA, SDI et TDAH, destinés à 
 - Vérifications locales : `npx vitest run --config JEUX/vitest.config.ts`, `npx tsc -p JEUX/tsconfig.json`, `npx eslint JEUX --max-warnings 0`.
 
 ## État actuel (réécrit intégralement à chaque /close)
-Banc de test opérationnel avec deux jeux fonctionnels : Tri calme (trop simple) et Planning d'énergie (pas assez ludique), tous deux rejetés par l'utilisateur après essai.
-Public cible précisé : jeunes adultes autonomes, parfois à haut potentiel.
-Les critères de « ludique » restent à recueillir avant toute nouvelle proposition. Aucun jeu n'est branché sur l'application.
+Banc de test conservé, sans jeu inscrit au catalogue. Les implémentations de Tri calme (trop simple), Planning d'énergie (pas assez ludique) et Fruits en cascade (trop proche de Fruit Merge) ont été retirées après retour utilisateur. Leurs boucles, résultats et leçons sont archivés dans `JEUX/donnees/analyse_prototypes_rejetes.md`.
+Trois concepts distincts sont proposés dans `JEUX/propositions_jeux.md`, en attente du choix utilisateur avant tout nouveau développement. Sa fille aime Zombie Tsunami, Tetris et les jeux de fusion de fruits ; les mécaniques précises appréciées restent à préciser.
+Public cible précisé : jeunes adultes autonomes, parfois à haut potentiel. Aucun jeu n'est branché à l'application.
 
 ## Décisions structurantes (append only — 10 entrées max, 5 lignes max/entrée, archiver au-delà)
 - 2026-10-10 : Initialisation du protocole vibecoding.
@@ -22,3 +22,4 @@ Les critères de « ludique » restent à recueillir avant toute nouvelle propos
 - 2026-10-10 : Public cible = jeunes adultes autonomes, parfois haut potentiel. La proposition initiale (jeux simples, issue de données enfants TSA) est abandonnée.
 - 2026-10-10 : Banc de test = harnais séparé qui importe `src/` en lecture seule (section « Jeux » injectée sur l'accueil), base de données isolée de `npm run dev`.
 - 2026-10-10 : Tri calme et Planning d'énergie jugés insuffisants par l'utilisateur après essai (trop simple / pas assez ludique). Le sens de « ludique » reste à préciser.
+- 2026-10-10 : Les trois prototypes ont été retirés à la demande de l'utilisateur ; analyse gardée dans `JEUX/donnees/analyse_prototypes_rejetes.md`. Trois nouveaux concepts attendent son choix.

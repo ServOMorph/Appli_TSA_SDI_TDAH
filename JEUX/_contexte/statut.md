@@ -4,19 +4,19 @@
 Concevoir des jeux pour personnes TSA / SDI / TDAH (public précisé : jeunes adultes autonomes), testés hors application via `run_jeux.py`.
 
 ## Avancement
-Collecte interne et web faite (`JEUX/donnees/synthese_recherche.md`). Banc de test opérationnel. Deux jeux développés puis rejetés par l'utilisateur : Tri calme (trop simple), Planning d'énergie (pas assez ludique).
+Collecte initiale et banc de test conservés. Les implémentations des trois prototypes (Tri calme, Planning d'énergie, Fruits en cascade) sont retirées à la demande de l'utilisateur ; leur analyse est conservée dans `JEUX/donnees/analyse_prototypes_rejetes.md`. Trois nouvelles pistes figurent dans `JEUX/propositions_jeux.md`, en attente de choix. Aucun jeu n'est actuellement inscrit au catalogue ni branché dans l'application.
 
 ## Blocages
-Critères de « ludique » non définis ; tension possible avec le principe du design system « ni ludique à tout prix, ni addictif ».
+Le concept à prototyper n'est pas choisi. Les jeux préférés de sa fille sont connus (Zombie Tsunami, Tetris, jeux de fusion), mais les mécaniques précises qu'elle apprécie restent à clarifier.
 
 ## Prochain pas
-Recueillir les critères de l'utilisateur (jeux et mécaniques appréciés), reconstruire la proposition, la faire valider.
+Choisir une des trois pistes et préciser les éléments de ces jeux qui lui plaisent avant le prochain prototype.
 
 ## Commit proposé
 Commit de session fait par `/close` : `close(jeux): session 2026-10-10 — ...`
 
 ## Fichiers modifiés
-`run_jeux.py`, `JEUX/` (harness, tri_calme, planning_energie, donnees, propositions_jeux.md, _contexte, vitest.config.ts, tsconfig.json).
+`JEUX/` (harness, donnees, propositions_jeux.md, analyse des prototypes, _contexte, vitest.config.ts, tsconfig.json). `run_jeux.py` est conservé.
 
 ## Tests et migrations
-29 tests Vitest passent (logique des deux jeux), types et lint sans erreur. Aucune migration. Tactile, mode sombre et difficulté réelle non testés.
+Les 35 tests des trois prototypes passaient avant leur retrait. Il ne reste aucun test de jeu dans JEUX. TypeScript et ESLint passent après le retrait. Aucune migration applicative.

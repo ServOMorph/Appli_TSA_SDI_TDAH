@@ -106,25 +106,27 @@ export function JeuxLauncher() {
     <>
       {host &&
         createPortal(
-          <div style={{ marginTop: 'var(--spacing-lg)' }}>
-            <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Jeux</h2>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 'var(--spacing-sm)',
-                marginTop: 'var(--spacing-md)',
-              }}
-            >
-              {CATALOGUE.map((game) => (
-                <Card key={game.id}>
-                  <button style={tileButtonStyle} onClick={() => setOpenId(game.id)}>
-                    {game.label}
-                  </button>
-                </Card>
-              ))}
+          CATALOGUE.length > 0 ? (
+            <div style={{ marginTop: 'var(--spacing-lg)' }}>
+              <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Jeux</h2>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 'var(--spacing-sm)',
+                  marginTop: 'var(--spacing-md)',
+                }}
+              >
+                {CATALOGUE.map((game) => (
+                  <Card key={game.id}>
+                    <button style={tileButtonStyle} onClick={() => setOpenId(game.id)}>
+                      {game.label}
+                    </button>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>,
+          ) : null,
           host,
         )}
       {openGame && <GameOverlay game={openGame} onClose={() => setOpenId(null)} />}

@@ -4,6 +4,7 @@ import type { TaskException } from '@/domain/entities/taskException'
 import type { PlannedSubTask } from '@/app/contexts/usePlanningState'
 import type { PlannedRoutineOccurrence } from '@/app/contexts/useRoutineState'
 import type { Settings } from '@/domain/entities/settings'
+import { ADMIN_CREDENTIAL_HASHES } from '@/domain/rules/adminCredentials'
 
 const FIXED_DATE = '2026-06-24T00:00:00Z'
 
@@ -88,6 +89,11 @@ export function makePlannedRoutineOccurrence(
     completed: false,
     ...overrides,
   }
+}
+
+export function makeAdminSettings(identity = 'marie', overrides: Partial<Settings> = {}): Settings {
+  ADMIN_CREDENTIAL_HASHES[identity] = 'test-admin-key'
+  return makeSettings({ tester_code: identity, admin_key: 'test-admin-key', ...overrides })
 }
 
 export function makeSettings(overrides: Partial<Settings> = {}): Settings {

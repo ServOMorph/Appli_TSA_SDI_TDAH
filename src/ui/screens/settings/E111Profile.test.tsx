@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { E111Profile } from './E111Profile'
 import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
@@ -80,5 +80,25 @@ describe('E111Profile', () => {
     fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'marie' } })
     fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
     expect(updateSettings).toHaveBeenCalledWith({ tester_code: 'marie' })
+  })
+
+  it('affiche le champ mot de passe uniquement pour une identité admin', () => {
+    renderE111({ settings: baseSettings })
+    expect(screen.queryByLabelText('Mot de passe administrateur')).toBeNull()
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'dev' } })
+    expect(screen.getByLabelText('Mot de passe administrateur')).toHaveAttribute('type', 'password')
+  })
+
+  it('enregistre la clé dérivée du mot de passe, jamais le mot de passe', async () => {
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE111({ settings: baseSettings, updateSettings })
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'marie' } })
+    fireEvent.change(screen.getByLabelText('Mot de passe administrateur'), { target: { value: 'secret-long' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    await waitFor(() => expect(updateSettings).toHaveBeenCalled())
+    const patch = updateSettings.mock.calls[0][0]
+    expect(patch.tester_code).toBe('marie')
+    expect(patch.admin_key).toMatch(/^[0-9a-f]{64}$/)
+    expect(JSON.stringify(patch)).not.toContain('secret-long')
   })
 })

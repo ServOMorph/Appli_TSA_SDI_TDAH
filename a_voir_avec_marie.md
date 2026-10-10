@@ -19,6 +19,7 @@ Liste de points à trancher ou à lui faire tester. Source : `_contexte/signals.
   - Était-elle sur une adresse neuve ou sur celle qu'elle utilisait déjà ?
   - Son ancien contenu (tâches, routines) est-il apparu dès l'arrivée sur l'Accueil, ou après une action de sa part ?
   - A-t-elle utilisé « Export et import » dans les paramètres ?
+- **Mot de passe administrateur (nouveau dans la v6.11).** Elle doit choisir un mot de passe long, à saisir une fois dans Paramètres > Profil avec le code `marie`. À faire avec elle sur place : dev lance `python scripts/hash_admin_code.py marie` (saisie masquée) et colle l'empreinte dans `adminCredentials.ts`. Choisir le mot de passe de dev dans la foulée (`dev`). Ne pas déployer la v6.11 avant que les deux empreintes soient en place. Elle doit le noter dans un gestionnaire de mots de passe.
 - **Latence « Chargement… » entre écrans** (signalée le 2026-09-04) : persiste-t-elle ?
 - **Planning de la semaine** : le saut au relâchement d'une tâche glissée existe-t-il aussi dans cette vue ?
 - **Navigation « Planning de la semaine »** : est-elle lisible ? (décision produit 4 en attente)

@@ -4,9 +4,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E10Dashboard, PLANNING_HEIGHT_PX } from './E10Dashboard'
 import type { Task } from '@/domain/entities/task'
-import { makeTask as baseTask, makeSettings } from '@/test/factories'
+import { makeTask as baseTask, makeSettings, makeAdminSettings } from '@/test/factories'
 
-const adminSettings = makeSettings({ tester_code: 'marie' })
+const adminSettings = makeAdminSettings('marie')
 
 const mocks = vi.hoisted(() => ({
   getUnreadReportIds: vi.fn().mockResolvedValue([]),

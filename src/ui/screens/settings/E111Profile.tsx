@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
+import { deriveAdminKey, isAdminIdentity } from '@/domain/rules/adminCredentials'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -40,6 +41,9 @@ export function E111Profile() {
 
   const testerCode = (settings?.tester_code ?? '').trim()
   const [testerCodeInput, setTesterCodeInput] = useState(testerCode)
+  const [adminSecret, setAdminSecret] = useState('')
+  const showAdminField = isAdminIdentity(testerCodeInput)
+  const dirty = testerCodeInput.trim() !== testerCode || (showAdminField && adminSecret !== '')
 
   return (
     <main
@@ -88,16 +92,33 @@ export function E111Profile() {
             style={inputStyle}
           />
           <Button
-            onClick={() => {
+            onClick={async () => {
               const trimmed = testerCodeInput.trim()
-              updateSettings({ tester_code: trimmed || undefined })
+              if (isAdminIdentity(trimmed) && adminSecret) {
+                const adminKey = await deriveAdminKey(trimmed, adminSecret)
+                await updateSettings({ tester_code: trimmed, admin_key: adminKey })
+              } else {
+                await updateSettings({ tester_code: trimmed || undefined, admin_key: undefined })
+              }
               setTesterCodeInput(trimmed)
+              setAdminSecret('')
             }}
-            disabled={testerCodeInput.trim() === testerCode}
+            disabled={!dirty}
           >
             Enregistrer
           </Button>
         </div>
+        {showAdminField && (
+          <input
+            type="password"
+            aria-label="Mot de passe administrateur"
+            value={adminSecret}
+            onChange={(e) => setAdminSecret(e.target.value)}
+            placeholder="Mot de passe administrateur"
+            autoComplete="off"
+            style={{ ...inputStyle, flex: 'none', width: '100%', marginTop: 'var(--spacing-sm)', boxSizing: 'border-box' }}
+          />
+        )}
       </Card>
 
       <Card>

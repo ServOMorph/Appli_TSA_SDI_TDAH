@@ -48,6 +48,7 @@ export interface DetailedTaskInput {
   status: TaskStatus
   recurrence: RecurrenceRuleInput | null
   subTaskTitles?: string[]
+  expensePlanned?: boolean
 }
 
 export type TaskEditScope = 'occurrence' | 'series'
@@ -59,6 +60,7 @@ export interface TaskFieldEdit {
   color?: string | null
   energyCost?: number | null
   essential?: boolean
+  expensePlanned?: boolean
   date?: string
   startTime?: string | null
   durationMinutes?: number | null
@@ -131,7 +133,8 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     const trimmed = input.title.trim()
     const now = new Date().toISOString()
     let task = createTaskRule(newId(), trimmed, input.status, input.essential, now)
-    task = { ...task, description: input.description, icon: input.icon, color: input.color }
+    const expense_planned = input.expensePlanned ? true : undefined
+    task = { ...task, description: input.description, icon: input.icon, color: input.color, expense_planned }
     task = setEnergyCostRule(task, input.energyCost, now)
 
     const occurrences: Task[] = []
@@ -166,7 +169,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
 
       for (const date of dates.slice(1)) {
         let occurrence = createTaskRule(newId(), trimmed, input.status, input.essential, now)
-        occurrence = { ...occurrence, description: input.description, icon: input.icon, color: input.color }
+        occurrence = { ...occurrence, description: input.description, icon: input.icon, color: input.color, expense_planned }
         occurrence = setEnergyCostRule(occurrence, input.energyCost, now)
         if (input.startTime) {
           const end = addMinutesToTime(input.startTime, input.durationMinutes ?? 0)
@@ -248,7 +251,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
 
     const occurrences: Task[] = futureDates.map((date) => {
       let occurrence = createTaskRule(newId(), task.title, task.status, task.essential, now)
-      occurrence = { ...occurrence, description: task.description, icon: task.icon, color: task.color }
+      occurrence = { ...occurrence, description: task.description, icon: task.icon, color: task.color, expense_planned: task.expense_planned }
       occurrence = setEnergyCostRule(occurrence, task.energy_cost, now)
       if (task.scheduled_start) {
         const end = addMinutesToTime(task.scheduled_start, task.duration_minutes ?? 0)
@@ -328,6 +331,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     if (edit.icon !== undefined) next.icon = edit.icon
     if (edit.color !== undefined) next.color = edit.color
     if (edit.essential !== undefined) next.essential = edit.essential
+    if (edit.expensePlanned !== undefined) next.expense_planned = edit.expensePlanned ? true : undefined
     if (edit.energyCost !== undefined) next = setEnergyCostRule(next, edit.energyCost, now)
     if (includeDate && edit.date !== undefined) next.scheduled_date = edit.date
 

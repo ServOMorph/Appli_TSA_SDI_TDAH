@@ -16,6 +16,7 @@ import {
   getMontantTotal,
   getTotalDeposits,
   getTotalIncomeEntries,
+  getUncategorizedBalance,
   isDateInPeriod,
 } from './budgetRules'
 
@@ -188,6 +189,16 @@ describe('budgetRules', () => {
         deposit({ id: 'd4', amount: 10 }),
       ]
       expect(getDepositCategoryBalance(deposits, 'vacances')).toBe(140)
+    })
+
+    it('somme les mouvements non classés d’un livret, sans les autres livrets ni les catégories', () => {
+      const deposits = [
+        deposit({ id: 'd1', amount: 100 }),
+        deposit({ id: 'd2', amount: -30 }),
+        deposit({ id: 'd3', category_id: 'vacances', amount: 40 }),
+        deposit({ id: 'd4', account_id: 'livret-jeune', amount: 60 }),
+      ]
+      expect(getUncategorizedBalance(deposits, 'livret-a')).toBe(70)
     })
 
     it('le total du livret reste la somme de tous les mouvements, catégorisés ou non (#a1317d93)', () => {

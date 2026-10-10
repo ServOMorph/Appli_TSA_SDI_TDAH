@@ -23,6 +23,8 @@ export interface Task {
   is_recurrence_root: boolean
   /** true si cette occurrence a été détachée de la série (édition "cette occurrence"). */
   recurrence_exception: boolean
+  /** true si la tâche propose d'enregistrer une dépense « Mon compte » à son achèvement. */
+  expense_planned?: boolean
   created_at: string
   updated_at: string
   completed_at: string | null

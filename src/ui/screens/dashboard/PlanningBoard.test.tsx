@@ -352,6 +352,62 @@ describe('PlanningBoard', () => {
     expect(goTo).not.toHaveBeenCalled()
   })
 
+  it('une tâche avec dépense ouvre une fenêtre au cochage et enregistre la dépense au nom de la tâche', async () => {
+    const completeTaskById = vi.fn().mockResolvedValue(undefined)
+    const createBudgetEntry = vi.fn().mockResolvedValue(undefined)
+    const updateTaskFields = vi.fn().mockResolvedValue(undefined)
+    const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', expense_planned: true })
+    const budgetCategories = [
+      { id: 'c1', name: 'Courses', period: 'week' as const, amount: 50, position: 0, created_at: '2026-06-01T00:00:00.000Z', updated_at: '2026-06-01T00:00:00.000Z' },
+    ]
+    renderExpanded(makeAppContext({
+      completeTaskById,
+      createBudgetEntry,
+      updateTaskFields,
+      budgetCategories,
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+    }))
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Terminer Médecin' }))
+    expect(completeTaskById).not.toHaveBeenCalled()
+    await userEvent.type(screen.getByLabelText('Montant'), '12,50')
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+    await waitFor(() => expect(completeTaskById).toHaveBeenCalledWith('t1'))
+    expect(createBudgetEntry).toHaveBeenCalledWith('c1', 12.5, 'Médecin', expect.any(String))
+    expect(updateTaskFields).toHaveBeenCalledWith('t1', { expensePlanned: false })
+  })
+
+  it('« Terminer sans dépense » termine la tâche sans enregistrer de dépense', async () => {
+    const completeTaskById = vi.fn().mockResolvedValue(undefined)
+    const createBudgetEntry = vi.fn().mockResolvedValue(undefined)
+    const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', expense_planned: true })
+    renderExpanded(makeAppContext({
+      completeTaskById,
+      createBudgetEntry,
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([task]),
+    }))
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Terminer Médecin' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Terminer sans dépense' }))
+
+    await waitFor(() => expect(completeTaskById).toHaveBeenCalledWith('t1'))
+    expect(createBudgetEntry).not.toHaveBeenCalled()
+  })
+
+  it('décocher une tâche avec dépense ne rouvre pas la fenêtre et ne supprime aucune dépense', async () => {
+    const completeTaskById = vi.fn().mockResolvedValue(undefined)
+    const task = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', status: 'completed', expense_planned: true })
+    renderExpanded(makeAppContext({ completeTaskById, getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))
+    await waitFor(() => expect(screen.getByText('Médecin')).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Terminer Médecin' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(completeTaskById).toHaveBeenCalledWith('t1')
+  })
+
   it('affiche une case cochée sur une tâche déjà terminée', async () => {
     const task = makeTaskV2({ scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', status: 'completed' })
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([task]) }))

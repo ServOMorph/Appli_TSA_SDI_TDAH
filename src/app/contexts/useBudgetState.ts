@@ -244,6 +244,47 @@ export function useBudgetState() {
     setBudgetDeposits((previous) => previous.map((item) => (item.id === id ? updated : item)))
   }
 
+  /**
+   * Virement interne d'un livret : retire `amount` d'une catégorie (ou du non classé si
+   * `fromCategoryId` est absent) et l'ajoute à une autre. Le solde du livret ne change pas.
+   */
+  async function transferBudgetDeposit(
+    accountId: string,
+    amount: number,
+    fromCategoryId: string | undefined,
+    toCategoryId: string | undefined,
+    label?: string,
+    date = todayDate(),
+  ) {
+    if (!Number.isFinite(amount) || amount <= 0) return
+    if ((fromCategoryId || undefined) === (toCategoryId || undefined)) return
+    const accountName = budgetAccounts.find((item) => item.id === accountId)?.name ?? 'Livret'
+    const bucketName = (categoryId: string | undefined) =>
+      categoryId ? (budgetDepositCategories.find((item) => item.id === categoryId)?.name ?? 'Catégorie') : accountName
+    const trimmedLabel = label?.trim()
+    const createdAt = new Date().toISOString()
+    const outgoing: BudgetDeposit = {
+      id: newId(),
+      account_id: accountId,
+      category_id: fromCategoryId || undefined,
+      amount: -amount,
+      label: trimmedLabel || `Virement vers ${bucketName(toCategoryId || undefined)}`,
+      date,
+      created_at: createdAt,
+    }
+    const incoming: BudgetDeposit = {
+      id: newId(),
+      account_id: accountId,
+      category_id: toCategoryId || undefined,
+      amount,
+      label: trimmedLabel || `Virement depuis ${bucketName(fromCategoryId || undefined)}`,
+      date,
+      created_at: createdAt,
+    }
+    await Promise.all([budgetDepositRepo.create(outgoing), budgetDepositRepo.create(incoming)])
+    setBudgetDeposits(await budgetDepositRepo.getAll())
+  }
+
   async function deleteBudgetDeposit(id: string) {
     await budgetDepositRepo.delete(id)
     setBudgetDeposits(await budgetDepositRepo.getAll())
@@ -300,6 +341,7 @@ export function useBudgetState() {
     deleteBudgetEntry,
     createBudgetDeposit,
     updateBudgetDeposit,
+    transferBudgetDeposit,
     deleteBudgetDeposit,
     createBudgetDepositCategory,
     renameBudgetDepositCategory,

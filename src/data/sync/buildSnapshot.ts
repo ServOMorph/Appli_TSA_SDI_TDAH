@@ -2,6 +2,11 @@ import { db, userRepo, settingsRepo } from '@/app/repositories'
 
 export const SNAPSHOT_SCHEMA_VERSION = '3.9'
 
+function withoutAdminKey<T extends { admin_key?: string }>(settings: T): Omit<T, 'admin_key'> {
+  const { admin_key: _adminKey, ...rest } = settings
+  return rest
+}
+
 /**
  * Payload complet des donnees applicatives, partage par l'export manuel (useSettingsState)
  * et la synchronisation automatique (syncClient) : une seule source pour les 23 tables
@@ -73,7 +78,7 @@ export async function buildSnapshotPayload() {
     folders,
     tools,
     energy_entries: energyEntries,
-    settings: settingsData,
+    settings: settingsData ? withoutAdminKey(settingsData) : settingsData,
     budget_categories: budgetCategories,
     budget_entries: budgetEntries,
     budget_accounts: budgetAccounts,

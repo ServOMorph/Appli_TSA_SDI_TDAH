@@ -144,6 +144,7 @@ export function E21CreateTaskV2() {
   const [color, setColor] = useState<string | null>(null)
   const [energyCost, setEnergyCost] = useState<number | null>(null)
   const [essential, setEssential] = useState(false)
+  const [expensePlanned, setExpensePlanned] = useState(false)
   const [subTasks, setSubTasks] = useState<string[]>([])
   const [subTaskInput, setSubTaskInput] = useState('')
   const [date, setDate] = useState(todayDate())
@@ -191,6 +192,7 @@ export function E21CreateTaskV2() {
       status,
       recurrence: isPlanned && recurring ? recurrence : null,
       subTaskTitles: subTasks,
+      expensePlanned,
     })
     return taskId
   }
@@ -394,6 +396,11 @@ export function E21CreateTaskV2() {
         <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
           <input type="checkbox" checked={essential} onChange={(e) => setEssential(e.target.checked)} />
           Obligatoire
+        </label>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
+          <input type="checkbox" checked={expensePlanned} onChange={(e) => setExpensePlanned(e.target.checked)} />
+          Dépense
         </label>
 
         {isPlanned && (

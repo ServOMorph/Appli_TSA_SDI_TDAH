@@ -35,6 +35,16 @@ describe('buildSnapshotPayload', () => {
     expect(snapshot?.settings?.tester_code).toBe('alpha-01')
   })
 
+  it('exclut la clé administrateur du snapshot', async () => {
+    await userRepo.create(user)
+    await settingsRepo.create({ ...settings, tester_code: 'dev', admin_key: 'abc123' })
+
+    const snapshot = await buildSnapshotPayload()
+
+    expect(snapshot?.settings?.tester_code).toBe('dev')
+    expect(snapshot?.settings).not.toHaveProperty('admin_key')
+  })
+
   it('n’ajoute pas de champ code testeur quand il n’est pas renseigné', async () => {
     await userRepo.create(user)
     await settingsRepo.create(settings)

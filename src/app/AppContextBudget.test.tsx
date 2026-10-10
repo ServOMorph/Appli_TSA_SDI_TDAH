@@ -22,6 +22,7 @@ function BudgetPanel() {
     createBudgetEntry,
     deleteBudgetEntry,
     createBudgetDeposit,
+    transferBudgetDeposit,
     deleteBudgetDeposit,
     createBudgetDepositCategory,
     renameBudgetDepositCategory,
@@ -39,6 +40,8 @@ function BudgetPanel() {
       <div data-testid="entry-count">{budgetEntries.length}</div>
       <div data-testid="deposit-count">{budgetDeposits.length}</div>
       <div data-testid="deposit-category">{depositCategory?.name ?? 'none'}</div>
+      <div data-testid="deposit-sum">{budgetDeposits.reduce((total, d) => total + d.amount, 0)}</div>
+      <div data-testid="categorized-sum">{budgetDeposits.filter((d) => d.category_id).reduce((total, d) => total + d.amount, 0)}</div>
       <div data-testid="uncategorized-deposit-count">{budgetDeposits.filter((d) => !d.category_id).length}</div>
       <button onClick={() => deleteAllData()}>effacer</button>
       <button onClick={() => createBudgetCategory('Courses', 'week', 60)}>créer catégorie</button>
@@ -57,6 +60,9 @@ function BudgetPanel() {
       <button onClick={() => depositCategory && renameBudgetDepositCategory(depositCategory.id, 'Projets')}>renommer sous-catégorie</button>
       <button onClick={() => account && depositCategory && createBudgetDeposit(account.id, 30, 'Acompte', undefined, depositCategory.id)}>
         créer dépôt catégorisé
+      </button>
+      <button onClick={() => account && depositCategory && transferBudgetDeposit(account.id, 20, undefined, depositCategory.id)}>
+        virer vers la sous-catégorie
       </button>
       <button onClick={() => depositCategory && deleteBudgetDepositCategory(depositCategory.id, true)}>supprimer sous-catégorie</button>
     </>
@@ -137,5 +143,23 @@ describe('AppProvider — Budget', () => {
     await userEvent.click(screen.getByRole('button', { name: 'supprimer livret' }))
     await waitFor(() => expect(screen.getByTestId('account').textContent).toBe('none'))
     await waitFor(() => expect(screen.getByTestId('deposit-category').textContent).toBe('none'))
+  })
+
+  it('un virement interne déplace l’argent vers la catégorie sans changer le solde du livret', async () => {
+    render(<AppProvider><BudgetPanel /></AppProvider>)
+    await waitFor(() => expect(screen.getByTestId('ready').textContent).toBe('true'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'effacer' }))
+    })
+    await userEvent.click(screen.getByRole('button', { name: 'créer livret' }))
+    await waitFor(() => expect(screen.getByTestId('account').textContent).toBe('Livret A'))
+    await userEvent.click(screen.getByRole('button', { name: 'créer sous-catégorie' }))
+    await waitFor(() => expect(screen.getByTestId('deposit-category').textContent).toBe('Vacances'))
+    await userEvent.click(screen.getByRole('button', { name: 'créer dépôt' }))
+    await waitFor(() => expect(screen.getByTestId('deposit-count').textContent).toBe('1'))
+    await userEvent.click(screen.getByRole('button', { name: 'virer vers la sous-catégorie' }))
+    await waitFor(() => expect(screen.getByTestId('deposit-count').textContent).toBe('3'))
+    expect(screen.getByTestId('deposit-sum').textContent).toBe('50')
+    expect(screen.getByTestId('categorized-sum').textContent).toBe('20')
   })
 })

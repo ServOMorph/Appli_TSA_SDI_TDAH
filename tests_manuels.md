@@ -9,5 +9,8 @@ Lancer dans un terminal normal, depuis la racine : `python claude-vibecoding-kit
 ## Rendu mobile des correctifs du 2026-10-10 (ajouté le 2026-10-10)
 Sur un téléphone, `npm run dev -- --host` : sur l'Accueil, déplier les outils et vérifier que le bouton « ⋯ » des petites cartes ne recouvre pas le nom ; ouvrir une nouvelle tâche et vérifier que les pavés de chiffres de l'heure et de la durée tiennent dans l'écran ; vérifier les flèches précédent/suivant et « Aujourd'hui » du planning.
 
-## T58 en échec (e2e, retours réservés aux admins)
-`e2e/10-feedback.spec.ts` attend le bouton « Signaler un retour », désormais réservé aux administrateurs (mot de passe admin). Décider comment fournir une identité admin aux tests sans y écrire le mot de passe, ou adapter le test.
+## Livret : provenance d'un dépôt (ajouté le 2026-10-10)
+Dans Budget > un livret : déposer une somme en choisissant « Provenance » (montant total ou une autre catégorie), vérifier que le solde de la provenance baisse du même montant, puis déplier les mouvements du livret et contrôler leur affichage sur téléphone.
+
+## Dépense liée à une tâche (ajouté le 2026-10-10)
+Créer une tâche avec la case « Dépense » cochée et la planifier ; la cocher dans le planning : la fenêtre « Dépense » s'ouvre. Enregistrer un montant et une catégorie, puis vérifier la dépense dans Budget. Refaire avec « Terminer sans dépense ». Contrôler l'affichage de la fenêtre sur téléphone.

@@ -780,6 +780,17 @@ export function E22TaskDetail() {
           </label>
         </div>
 
+        <div style={essentialCardStyle(task.color)}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={task.expense_planned === true}
+              onChange={(e) => saveField({ expensePlanned: e.target.checked })}
+            />
+            Dépense
+          </label>
+        </div>
+
         <TaskFieldCard
           label="Description"
           value={task.description || 'Aucune description'}

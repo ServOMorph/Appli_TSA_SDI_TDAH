@@ -141,3 +141,10 @@ export function getDepositCategoryBalance(deposits: BudgetDeposit[], categoryId:
     .filter((deposit) => deposit.category_id === categoryId)
     .reduce((total, deposit) => total + deposit.amount, 0)
 }
+
+/** Somme des mouvements d'un livret qui ne sont rattachés à aucune sous-catégorie. */
+export function getUncategorizedBalance(deposits: BudgetDeposit[], accountId: string): number {
+  return deposits
+    .filter((deposit) => deposit.account_id === accountId && !deposit.category_id)
+    .reduce((total, deposit) => total + deposit.amount, 0)
+}

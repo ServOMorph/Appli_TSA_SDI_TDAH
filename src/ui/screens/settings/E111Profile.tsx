@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
-import { deriveAdminKey, isAdminIdentity } from '@/domain/rules/adminCredentials'
+import {
+  ADMIN_CREDENTIAL_HASHES,
+  deriveAdminKey,
+  isAdminIdentity,
+  normalizeIdentity,
+} from '@/domain/rules/adminCredentials'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -42,6 +47,7 @@ export function E111Profile() {
   const testerCode = (settings?.tester_code ?? '').trim()
   const [testerCodeInput, setTesterCodeInput] = useState(testerCode)
   const [adminSecret, setAdminSecret] = useState('')
+  const [adminError, setAdminError] = useState<string | null>(null)
   const showAdminField = isAdminIdentity(testerCodeInput)
   const dirty = testerCodeInput.trim() !== testerCode || (showAdminField && adminSecret !== '')
 
@@ -94,9 +100,22 @@ export function E111Profile() {
           <Button
             onClick={async () => {
               const trimmed = testerCodeInput.trim()
+              setAdminError(null)
               if (isAdminIdentity(trimmed) && adminSecret) {
-                const adminKey = await deriveAdminKey(trimmed, adminSecret)
+                let adminKey: string
+                try {
+                  adminKey = await deriveAdminKey(trimmed, adminSecret)
+                } catch {
+                  setAdminError('Vérification impossible sur cet appareil (connexion non sécurisée).')
+                  return
+                }
+                if (adminKey !== ADMIN_CREDENTIAL_HASHES[normalizeIdentity(trimmed)]) {
+                  setAdminError('Mot de passe incorrect.')
+                  return
+                }
                 await updateSettings({ tester_code: trimmed, admin_key: adminKey })
+              } else if (isAdminIdentity(trimmed) && normalizeIdentity(trimmed) === normalizeIdentity(testerCode)) {
+                await updateSettings({ tester_code: trimmed })
               } else {
                 await updateSettings({ tester_code: trimmed || undefined, admin_key: undefined })
               }
@@ -118,6 +137,11 @@ export function E111Profile() {
             autoComplete="off"
             style={{ ...inputStyle, flex: 'none', width: '100%', marginTop: 'var(--spacing-sm)', boxSizing: 'border-box' }}
           />
+        )}
+        {adminError && (
+          <p role="alert" style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-error)', fontSize: '0.875rem' }}>
+            {adminError}
+          </p>
         )}
       </Card>
 

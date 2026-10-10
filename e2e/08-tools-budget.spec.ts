@@ -37,7 +37,7 @@ test('T52 — configurer le Budget, saisir une dépense, la consulter en fiche e
   await movementDialog.getByLabel('Montant').fill('50')
   await movementDialog.getByRole('button', { name: 'Enregistrer' }).click()
   await expect(page.getByText(/Solde/)).toBeVisible()
-  await expect(page.getByText('50,00 €', { exact: true })).toBeVisible()
+  await expect(page.getByText('50,00 €', { exact: true }).first()).toBeVisible()
 
   await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Configurer le budget' })).toBeVisible()

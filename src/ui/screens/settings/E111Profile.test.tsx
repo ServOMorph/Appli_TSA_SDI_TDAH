@@ -4,6 +4,17 @@ import { E111Profile } from './E111Profile'
 import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
 import type { Settings } from '@/domain/entities/settings'
+import { ADMIN_CREDENTIAL_HASHES, deriveAdminKey } from '@/domain/rules/adminCredentials'
+
+vi.mock('@/domain/rules/adminCredentials', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/domain/rules/adminCredentials')>()
+  return {
+    ...actual,
+    deriveAdminKey: vi.fn(async (identity: string) => actual.ADMIN_CREDENTIAL_HASHES[actual.normalizeIdentity(identity)]),
+  }
+})
+
+const deriveMock = vi.mocked(deriveAdminKey)
 
 const baseSettings: Settings = {
   id: 'settings-1',
@@ -98,7 +109,49 @@ describe('E111Profile', () => {
     await waitFor(() => expect(updateSettings).toHaveBeenCalled())
     const patch = updateSettings.mock.calls[0][0]
     expect(patch.tester_code).toBe('marie')
-    expect(patch.admin_key).toMatch(/^[0-9a-f]{64}$/)
+    expect(patch.admin_key).toBe(ADMIN_CREDENTIAL_HASHES.marie)
     expect(JSON.stringify(patch)).not.toContain('secret-long')
+  })
+
+  it('refuse un mot de passe qui ne correspond pas à l’empreinte', async () => {
+    deriveMock.mockResolvedValueOnce('0'.repeat(64))
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE111({ settings: baseSettings, updateSettings })
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'marie' } })
+    fireEvent.change(screen.getByLabelText('Mot de passe administrateur'), { target: { value: 'faux' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Mot de passe incorrect.')
+    expect(updateSettings).not.toHaveBeenCalled()
+  })
+
+  it('signale une dérivation impossible sans rien enregistrer', async () => {
+    deriveMock.mockRejectedValueOnce(new Error('crypto.subtle indisponible'))
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE111({ settings: baseSettings, updateSettings })
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'dev' } })
+    fireEvent.change(screen.getByLabelText('Mot de passe administrateur'), { target: { value: 'x' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Vérification impossible')
+    expect(updateSettings).not.toHaveBeenCalled()
+  })
+
+  it('conserve la clé admin quand on resauvegarde la même identité sans mot de passe', async () => {
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE111({ settings: { ...baseSettings, tester_code: 'marie', admin_key: 'k' }, updateSettings })
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: ' marie ' } })
+    fireEvent.change(screen.getByLabelText('Mot de passe administrateur'), { target: { value: '' } })
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'Marie' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    await waitFor(() => expect(updateSettings).toHaveBeenCalled())
+    expect(updateSettings.mock.calls[0][0]).not.toHaveProperty('admin_key')
+  })
+
+  it('efface la clé admin quand l’identité change sans mot de passe', async () => {
+    const updateSettings = vi.fn().mockResolvedValue(undefined)
+    renderE111({ settings: { ...baseSettings, tester_code: 'marie', admin_key: 'k' }, updateSettings })
+    fireEvent.change(screen.getByLabelText('Code testeur'), { target: { value: 'alpha-01' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+    await waitFor(() => expect(updateSettings).toHaveBeenCalled())
+    expect(updateSettings.mock.calls[0][0]).toEqual({ tester_code: 'alpha-01', admin_key: undefined })
   })
 })

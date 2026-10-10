@@ -56,12 +56,13 @@ describe('E77BudgetLivretDetail', () => {
     expect(ctx.back).toHaveBeenCalledWith('budget-livrets')
   })
 
-  it('affiche le solde et les mouvements du livret', () => {
+  it('affiche le solde et les mouvements du livret', async () => {
     renderWithApp(<E77BudgetLivretDetail />, renderScreen({
       budgetAccounts: [makeAccount()],
       budgetDeposits: [makeDeposit(), makeDeposit({ id: 'deposit-2', amount: -20, date: '2026-01-05', label: 'Retrait courses' })],
     }))
-    expect(screen.getByText(/30,00/)).toBeDefined()
+    await userEvent.click(screen.getByRole('button', { name: 'Afficher les mouvements de Livret A' }))
+    expect(screen.getAllByText(/30,00/).length).toBeGreaterThan(0)
     expect(screen.getByText(/05\/01\/2026.*Retrait.*20,00.*Retrait courses/)).toBeDefined()
   })
 
@@ -98,6 +99,7 @@ describe('E77BudgetLivretDetail', () => {
       budgetDeposits: [makeDeposit({ amount: 50, label: 'Dépôt initial' })],
       updateBudgetDeposit,
     }))
+    await userEvent.click(screen.getByRole('button', { name: 'Afficher les mouvements de Livret A' }))
     await userEvent.click(screen.getByRole('button', { name: /Modifier le mouvement/ }))
     const dialog = screen.getByRole('dialog', { name: 'Modifier le mouvement' })
     await userEvent.clear(within(dialog).getByLabelText('Montant'))
@@ -113,11 +115,12 @@ describe('E77BudgetLivretDetail', () => {
       budgetDeposits: [makeDeposit()],
       deleteBudgetDeposit,
     }))
+    await userEvent.click(screen.getByRole('button', { name: 'Afficher les mouvements de Livret A' }))
     await userEvent.click(screen.getByRole('button', { name: /Supprimer le mouvement/ }))
     expect(deleteBudgetDeposit).toHaveBeenCalledWith('deposit-1')
   })
 
-  it('affiche la somme roulante de chaque sous-catégorie, groupée dans les mouvements (#a1317d93)', () => {
+  it('affiche le non classé sous le nom du livret et le solde de chaque catégorie, sans les mouvements', () => {
     renderWithApp(<E77BudgetLivretDetail />, renderScreen({
       budgetAccounts: [makeAccount()],
       budgetDepositCategories: [makeCategory()],
@@ -129,12 +132,28 @@ describe('E77BudgetLivretDetail', () => {
     const categories = within(screen.getByRole('region', { name: 'Catégories' }))
     expect(categories.getByText('Vacances')).toBeDefined()
     expect(categories.getByText(/30,00/)).toBeDefined()
+    expect(categories.getByText('Livret A')).toBeDefined()
+    expect(categories.getByText(/20,00/)).toBeDefined()
+    expect(screen.queryByText(/Acompte/)).toBeNull()
+    expect(screen.queryByText(/Non classé/)).toBeNull()
+  })
 
-    const movements = within(screen.getByRole('region', { name: 'Mouvements' }))
-    expect(movements.getByRole('heading', { name: /Vacances.*30,00/ })).toBeDefined()
-    expect(movements.getByRole('heading', { name: 'Hors catégorie' })).toBeDefined()
-    expect(movements.getByText(/Acompte/)).toBeDefined()
-    expect(movements.getByText(/Non classé/)).toBeDefined()
+  it('affiche les mouvements d’une catégorie seulement au clic', async () => {
+    renderWithApp(<E77BudgetLivretDetail />, renderScreen({
+      budgetAccounts: [makeAccount()],
+      budgetDepositCategories: [makeCategory()],
+      budgetDeposits: [
+        makeDeposit({ id: 'deposit-cat', amount: 30, category_id: 'category-1', label: 'Acompte' }),
+        makeDeposit({ id: 'deposit-hors', amount: 20, label: 'Non classé', date: '2026-01-05' }),
+      ],
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Afficher les mouvements de Vacances' }))
+    expect(screen.getByText(/Acompte/)).toBeDefined()
+    expect(screen.queryByText(/Non classé/)).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Masquer les mouvements de Vacances' }))
+    expect(screen.queryByText(/Acompte/)).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Afficher les mouvements de Livret A' }))
+    expect(screen.getByText(/Non classé/)).toBeDefined()
   })
 
   it('crée une sous-catégorie de livret', async () => {
@@ -205,6 +224,64 @@ describe('E77BudgetLivretDetail', () => {
     await userEvent.selectOptions(within(dialog).getByLabelText('Catégorie'), 'category-1')
     await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
     expect(createBudgetDeposit).toHaveBeenCalledWith('account-1', 25, '', todayDate(), 'category-1')
+  })
+
+  it('un dépôt depuis le Montant total crée un mouvement simple', async () => {
+    const createBudgetDeposit = vi.fn().mockResolvedValue(undefined)
+    const transferBudgetDeposit = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E77BudgetLivretDetail />, renderScreen({
+      budgetAccounts: [makeAccount()],
+      budgetDepositCategories: [makeCategory()],
+      createBudgetDeposit,
+      transferBudgetDeposit,
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
+    expect((within(dialog).getByLabelText('Provenance') as HTMLSelectElement).value).toBe('total')
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '25')
+    await userEvent.selectOptions(within(dialog).getByLabelText('Catégorie'), 'category-1')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
+    expect(createBudgetDeposit).toHaveBeenCalledWith('account-1', 25, '', todayDate(), 'category-1')
+    expect(transferBudgetDeposit).not.toHaveBeenCalled()
+  })
+
+  it('un dépôt depuis le non classé du livret crée un virement vers la catégorie', async () => {
+    const createBudgetDeposit = vi.fn().mockResolvedValue(undefined)
+    const transferBudgetDeposit = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E77BudgetLivretDetail />, renderScreen({
+      budgetAccounts: [makeAccount()],
+      budgetDepositCategories: [makeCategory()],
+      budgetDeposits: [makeDeposit({ amount: 50 })],
+      createBudgetDeposit,
+      transferBudgetDeposit,
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '25')
+    await userEvent.selectOptions(within(dialog).getByLabelText('Catégorie'), 'category-1')
+    await userEvent.selectOptions(within(dialog).getByLabelText('Provenance'), 'uncategorized')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
+    expect(transferBudgetDeposit).toHaveBeenCalledWith('account-1', 25, undefined, 'category-1', '', todayDate())
+    expect(createBudgetDeposit).not.toHaveBeenCalled()
+  })
+
+  it('bloque un virement dont la provenance est la catégorie elle-même ou dépasse son solde', async () => {
+    renderWithApp(<E77BudgetLivretDetail />, renderScreen({
+      budgetAccounts: [makeAccount()],
+      budgetDepositCategories: [makeCategory()],
+      budgetDeposits: [makeDeposit({ amount: 50 })],
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un mouvement' }))
+    const dialog = screen.getByRole('dialog', { name: 'Ajouter un mouvement' })
+    const save = within(dialog).getByRole('button', { name: 'Enregistrer' })
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '80')
+    await userEvent.selectOptions(within(dialog).getByLabelText('Catégorie'), 'category-1')
+    await userEvent.selectOptions(within(dialog).getByLabelText('Provenance'), 'uncategorized')
+    expect(save.hasAttribute('disabled')).toBe(true)
+    expect(within(dialog).getByText(/dépasse ce qui est disponible/)).toBeDefined()
+    await userEvent.selectOptions(within(dialog).getByLabelText('Provenance'), 'category-1')
+    expect(save.hasAttribute('disabled')).toBe(true)
+    expect(within(dialog).getByText(/doivent être différentes/)).toBeDefined()
   })
 
   it('affiche un message si le livret n’existe plus', () => {

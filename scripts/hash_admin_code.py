@@ -1,11 +1,10 @@
 """Calcule l'empreinte d'un mot de passe administrateur pour src/domain/rules/adminCredentials.ts.
 
 Usage : python scripts/hash_admin_code.py <identite>
-Le mot de passe est saisi sans écho et n'est jamais écrit ni affiché. Coller la ligne produite
-dans ADMIN_CREDENTIAL_HASHES.
+Le mot de passe est saisi avec écho (visible à l'écran) et n'est jamais écrit dans un fichier.
+Coller la ligne produite dans ADMIN_CREDENTIAL_HASHES.
 """
 
-import getpass
 import hashlib
 import sys
 
@@ -22,8 +21,8 @@ def main() -> int:
         print("Usage : python scripts/hash_admin_code.py <identite>")
         return 1
     identity = sys.argv[1]
-    secret = getpass.getpass(f"Mot de passe pour « {identity} » : ")
-    if getpass.getpass("Confirmer : ") != secret or not secret:
+    secret = input(f"Mot de passe pour « {identity} » : ")
+    if input("Confirmer : ") != secret or not secret:
         print("ERREUR : saisies différentes ou vides.")
         return 1
     print(f"  {identity.strip().lower()}: '{derive(identity, secret)}',")

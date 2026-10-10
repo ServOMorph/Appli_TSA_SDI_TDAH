@@ -7,6 +7,7 @@ import { BatteryIcon } from '@/ui/components/BatteryIcon'
 import { TaskIcon } from '@/ui/components/TaskIcon'
 import { RoutineIcon } from '@/ui/components/RoutineIcon'
 import { MonthYearPickerModal } from '@/ui/components/MonthYearPickerModal'
+import { TaskExpenseModal } from '@/ui/components/TaskExpenseModal'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle, plannedTaskTintStyle } from '@/ui/styles/ambiance'
 import { isCompleted, getTotalPlannedEnergy } from '@/domain/rules/taskRules'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@/domain/rules/planningSlotRules'
@@ -388,6 +389,9 @@ export function PlanningBoard() {
     getPlannedSubTasksForDate,
     getPlannedRoutinesForDate,
     completeTaskById,
+    updateTaskFields,
+    budgetCategories,
+    createBudgetEntry,
     reportTaskById,
     toggleSubTask,
     reportSubTask,
@@ -411,6 +415,7 @@ export function PlanningBoard() {
   const [scheduledRoutines, setScheduledRoutines] = useState<PlannedRoutineOccurrence[]>([])
   const [subTasksByTask, setSubTasksByTask] = useState<Record<string, Task[]>>({})
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [expenseTask, setExpenseTask] = useState<Task | null>(null)
 
   const displayDateRef = useRef(displayDate)
   const touchStartX = useRef<number | null>(null)
@@ -473,8 +478,25 @@ export function PlanningBoard() {
   }
 
   async function handleComplete(block: PlanBlock) {
-    if (block.kind === 'task') await completeTaskById(block.item.id)
-    else if (block.kind === 'subtask') await toggleSubTask(block.item)
+    if (block.kind === 'task') {
+      if (block.item.expense_planned && !isCompleted(block.item)) {
+        setExpenseTask(block.item)
+        return
+      }
+      await completeTaskById(block.item.id)
+    } else if (block.kind === 'subtask') await toggleSubTask(block.item)
+    await reload()
+  }
+
+  async function finishExpenseTask(categoryId: string | null, amount: number) {
+    const task = expenseTask
+    if (!task) return
+    setExpenseTask(null)
+    await completeTaskById(task.id)
+    if (categoryId) {
+      await createBudgetEntry(categoryId, amount, task.title, displayDateRef.current)
+      await updateTaskFields(task.id, { expensePlanned: false })
+    }
     await reload()
   }
 
@@ -793,6 +815,14 @@ export function PlanningBoard() {
         })}
       </div>
     </section>
+    {expenseTask && (
+      <TaskExpenseModal
+        taskTitle={expenseTask.title}
+        categories={budgetCategories}
+        onSubmit={(categoryId, amount) => finishExpenseTask(categoryId, amount)}
+        onSkip={() => finishExpenseTask(null, 0)}
+      />
+    )}
     {monthPickerOpen && (
       <MonthYearPickerModal
         year={displayDateObj.getFullYear()}

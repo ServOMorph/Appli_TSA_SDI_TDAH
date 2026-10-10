@@ -389,7 +389,7 @@ export function PlanningBoard() {
     getPlannedSubTasksForDate,
     getPlannedRoutinesForDate,
     completeTaskById,
-    updateTaskFields,
+    clearTaskExpensePlanned,
     budgetCategories,
     createBudgetEntry,
     reportTaskById,
@@ -416,6 +416,7 @@ export function PlanningBoard() {
   const [subTasksByTask, setSubTasksByTask] = useState<Record<string, Task[]>>({})
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [expenseTask, setExpenseTask] = useState<Task | null>(null)
+  const expenseSubmittingRef = useRef(false)
 
   const displayDateRef = useRef(displayDate)
   const touchStartX = useRef<number | null>(null)
@@ -490,12 +491,17 @@ export function PlanningBoard() {
 
   async function finishExpenseTask(categoryId: string | null, amount: number) {
     const task = expenseTask
-    if (!task) return
-    setExpenseTask(null)
-    await completeTaskById(task.id)
-    if (categoryId) {
-      await createBudgetEntry(categoryId, amount, task.title, displayDateRef.current)
-      await updateTaskFields(task.id, { expensePlanned: false })
+    if (!task || expenseSubmittingRef.current) return
+    expenseSubmittingRef.current = true
+    try {
+      if (categoryId) {
+        await createBudgetEntry(categoryId, amount, task.title, displayDateRef.current)
+        await clearTaskExpensePlanned(task.id)
+      }
+      await completeTaskById(task.id)
+      setExpenseTask(null)
+    } finally {
+      expenseSubmittingRef.current = false
     }
     await reload()
   }

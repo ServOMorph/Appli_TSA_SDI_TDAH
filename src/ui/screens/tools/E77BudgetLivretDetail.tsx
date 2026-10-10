@@ -113,10 +113,14 @@ export function E77BudgetLivretDetail() {
     if (!Number.isFinite(amount) || amount <= 0) return false
     if (transferProblem(form)) return false
     if (form.kind !== 'withdrawal') return true
-    const currentBalance = deposits
-      .filter((deposit) => deposit.id !== excludeDepositId)
+    const remaining = deposits.filter((deposit) => deposit.id !== excludeDepositId)
+    const currentBalance = remaining.reduce((total, deposit) => total + deposit.amount, 0)
+    if (amount > currentBalance) return false
+    const bucket = form.categoryId || UNCATEGORIZED
+    const bucketBalanceValue = remaining
+      .filter((deposit) => (deposit.category_id || UNCATEGORIZED) === bucket)
       .reduce((total, deposit) => total + deposit.amount, 0)
-    return amount <= currentBalance
+    return amount <= bucketBalanceValue
   }
 
   async function handleAddSubmit() {
@@ -176,13 +180,15 @@ export function E77BudgetLivretDetail() {
                 {formatFrenchDate(deposit.date)} · {movementLabel} : {formatEuro(Math.abs(deposit.amount))}
                 {deposit.label ? ` · ${deposit.label}` : ''}
               </span>
-              <button
-                aria-label={`Modifier le mouvement du ${formatFrenchDate(deposit.date)}`}
-                onClick={() => { setEditForm(formFromDeposit(deposit)); setEditingDeposit(deposit) }}
-                style={neutralLinkStyle}
-              >
-                Modifier
-              </button>
+              {!deposit.transfer_id && (
+                <button
+                  aria-label={`Modifier le mouvement du ${formatFrenchDate(deposit.date)}`}
+                  onClick={() => { setEditForm(formFromDeposit(deposit)); setEditingDeposit(deposit) }}
+                  style={neutralLinkStyle}
+                >
+                  Modifier
+                </button>
+              )}
               <button
                 aria-label={`Supprimer le mouvement du ${formatFrenchDate(deposit.date)}`}
                 onClick={() => deleteBudgetDeposit(deposit.id)}

@@ -232,7 +232,7 @@ export function useBudgetState() {
   async function updateBudgetDeposit(id: string, amount: number, label?: string, date?: string, categoryId?: string) {
     if (!Number.isFinite(amount) || amount === 0) return
     const deposit = budgetDeposits.find((item) => item.id === id)
-    if (!deposit) return
+    if (!deposit || deposit.transfer_id) return
     const updated: BudgetDeposit = {
       ...deposit,
       amount,
@@ -263,6 +263,7 @@ export function useBudgetState() {
       categoryId ? (budgetDepositCategories.find((item) => item.id === categoryId)?.name ?? 'Catégorie') : accountName
     const trimmedLabel = label?.trim()
     const createdAt = new Date().toISOString()
+    const transferId = newId()
     const outgoing: BudgetDeposit = {
       id: newId(),
       account_id: accountId,
@@ -270,6 +271,7 @@ export function useBudgetState() {
       amount: -amount,
       label: trimmedLabel || `Virement vers ${bucketName(toCategoryId || undefined)}`,
       date,
+      transfer_id: transferId,
       created_at: createdAt,
     }
     const incoming: BudgetDeposit = {
@@ -279,14 +281,19 @@ export function useBudgetState() {
       amount,
       label: trimmedLabel || `Virement depuis ${bucketName(fromCategoryId || undefined)}`,
       date,
+      transfer_id: transferId,
       created_at: createdAt,
     }
-    await Promise.all([budgetDepositRepo.create(outgoing), budgetDepositRepo.create(incoming)])
+    await budgetDepositRepo.createMany([outgoing, incoming])
     setBudgetDeposits(await budgetDepositRepo.getAll())
   }
 
   async function deleteBudgetDeposit(id: string) {
-    await budgetDepositRepo.delete(id)
+    const deposit = budgetDeposits.find((item) => item.id === id)
+    const ids = deposit?.transfer_id
+      ? budgetDeposits.filter((item) => item.transfer_id === deposit.transfer_id).map((item) => item.id)
+      : [id]
+    await budgetDepositRepo.deleteMany(ids)
     setBudgetDeposits(await budgetDepositRepo.getAll())
   }
 

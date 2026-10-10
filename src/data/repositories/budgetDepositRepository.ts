@@ -11,6 +11,18 @@ export class BudgetDepositRepository {
     return this.db.budgetDeposits.add(deposit)
   }
 
+  async createMany(deposits: BudgetDeposit[]): Promise<void> {
+    await this.db.transaction('rw', this.db.budgetDeposits, async () => {
+      await this.db.budgetDeposits.bulkAdd(deposits)
+    })
+  }
+
+  async deleteMany(ids: string[]): Promise<void> {
+    await this.db.transaction('rw', this.db.budgetDeposits, async () => {
+      await this.db.budgetDeposits.bulkDelete(ids)
+    })
+  }
+
   async getById(id: string): Promise<BudgetDeposit | undefined> {
     return this.db.budgetDeposits.get(id)
   }

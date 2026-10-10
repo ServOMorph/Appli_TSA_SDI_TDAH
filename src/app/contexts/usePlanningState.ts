@@ -380,6 +380,18 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
   }
 
   /**
+   * Retire le drapeau « dépense prévue » d'une tâche sans la marquer comme exception de sa série :
+   * le drapeau a été consommé par l'enregistrement de la dépense, l'occurrence reste liée à la série.
+   */
+  async function clearTaskExpensePlanned(id: string): Promise<void> {
+    const task = await taskRepo.getById(id)
+    if (!task || !task.expense_planned) return
+    await taskRepo.update({ ...task, expense_planned: undefined, updated_at: new Date().toISOString() })
+    await reloadTasks()
+    await load()
+  }
+
+  /**
    * Supprime une tâche. `'occurrence'` ne retire que cette occurrence, `'series'` retire
    * cette occurrence et toutes les occurrences futures non détachées de la série.
    */
@@ -412,6 +424,7 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     setTaskRecurrence,
     duplicateTaskById,
     updateTaskFields,
+    clearTaskExpensePlanned,
     deleteTaskScoped,
     load,
     reset,

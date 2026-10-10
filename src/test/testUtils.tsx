@@ -45,6 +45,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     setTaskRecurrence: vi.fn().mockResolvedValue(undefined),
     duplicateTaskById: vi.fn().mockResolvedValue('task-copy-1'),
     updateTaskFields: vi.fn().mockResolvedValue(undefined),
+    clearTaskExpensePlanned: vi.fn().mockResolvedValue(undefined),
     deleteTaskScoped: vi.fn().mockResolvedValue(undefined),
     completeTaskById: vi.fn().mockResolvedValue(undefined),
     reportTaskById: vi.fn().mockResolvedValue(undefined),

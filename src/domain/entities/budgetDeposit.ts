@@ -5,5 +5,6 @@ export interface BudgetDeposit {
   amount: number
   label?: string
   date: string
+  transfer_id?: string
   created_at: string
 }

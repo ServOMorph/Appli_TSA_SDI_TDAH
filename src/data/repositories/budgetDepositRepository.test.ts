@@ -61,4 +61,17 @@ describe('BudgetDepositRepository', () => {
       ),
     ).toEqual(['inside-earlier', 'inside-later'])
   })
+  it("ne crée aucun mouvement d'un virement si l'un des deux échoue", async () => {
+    await repo.create(deposit({ id: 'existing' }))
+    await expect(
+      repo.createMany([deposit({ id: 'new-leg', transfer_id: 't1' }), deposit({ id: 'existing', transfer_id: 't1' })]),
+    ).rejects.toThrow()
+    expect((await repo.getAll()).map((item) => item.id)).toEqual(['existing'])
+  })
+
+  it('supprime plusieurs mouvements en une transaction', async () => {
+    await repo.createMany([deposit({ id: 'a', transfer_id: 't1' }), deposit({ id: 'b', amount: -50, transfer_id: 't1' })])
+    await repo.deleteMany(['a', 'b'])
+    expect(await repo.getAll()).toEqual([])
+  })
 })

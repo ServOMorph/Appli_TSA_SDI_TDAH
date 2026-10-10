@@ -16,6 +16,8 @@
 - **Accueil : les outils sont repliés par défaut**, avec un bouton ▲ / ▼ à côté de « Outils » ; replié, le planning du jour occupe la place libérée (hauteur `max(325 px, 100svh - 200 px)`, estimation non mesurée sur téléphone).
 
 ### Corrigé
+- **Dépense liée à une tâche** : une tâche récurrente terminée avec dépense reste liée à sa série, la dépense est créée avant la complétion et un double appui sur « Enregistrer » n'en crée qu'une (`PlanningBoard.tsx`, `usePlanningState.ts`).
+- **Livret : un virement entre catégories est enregistré en une seule opération (`transfer_id`)**, ses deux mouvements se suppriment ensemble et ne sont plus modifiables séparément ; un retrait est refusé si le solde de sa catégorie est insuffisant (`useBudgetState.ts`, `budgetDepositRepository.ts`, `E77BudgetLivretDetail.tsx`).
 - **Code testeur saisi à l'onboarding désormais visible dans Paramètres > Profil** dès la création du compte (les réglages n'étaient pas chargés en mémoire, le champ restait vide).
 - **Bouton « Enregistrer » du code testeur contenu dans sa carte** sur petit écran.
 - **Fil de discussion E124** : version affichée proprement dans l'en-tête du retour (`E124FeedbackDetail.tsx`).

@@ -289,9 +289,11 @@ export function useBudgetState() {
   }
 
   async function deleteBudgetDeposit(id: string) {
-    const deposit = budgetDeposits.find((item) => item.id === id)
+    const deposit = await budgetDepositRepo.getById(id)
     const ids = deposit?.transfer_id
-      ? budgetDeposits.filter((item) => item.transfer_id === deposit.transfer_id).map((item) => item.id)
+      ? (await budgetDepositRepo.getByAccountId(deposit.account_id))
+          .filter((item) => item.transfer_id === deposit.transfer_id)
+          .map((item) => item.id)
       : [id]
     await budgetDepositRepo.deleteMany(ids)
     setBudgetDeposits(await budgetDepositRepo.getAll())

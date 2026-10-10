@@ -64,6 +64,9 @@ test('T59 — export JSON puis réimport après perte totale des données restau
   await page.getByRole('dialog', { name: "Confirmer l'import" }).getByRole('button', { name: 'Remplacer' }).click()
   await expect(page.getByRole('dialog', { name: "Confirmer l'import" })).not.toBeVisible()
 
+  // Partage non accepté : le consentement est redemandé après l'import
+  await page.getByRole('button', { name: 'Continuer sans partager' }).click()
+
   // Données restaurées à l'identique
   await page.getByRole('navigation').getByRole('button', { name: 'Boîte de réception' }).click()
   await expect(page.getByText(marker)).toBeVisible()

@@ -1,8 +1,14 @@
 import type { Routine } from '@/domain/entities/routine'
 import type { RoutineStep } from '@/domain/entities/routineStep'
 
-export function createRoutine(id: string, name: string, now: string, color: string | null = null): Routine {
-  return { id, name, color, created_at: now, updated_at: now }
+export function createRoutine(
+  id: string,
+  name: string,
+  now: string,
+  color: string | null = null,
+  durationMinutes: number | null = null,
+): Routine {
+  return { id, name, color, duration_minutes: durationMinutes, created_at: now, updated_at: now }
 }
 
 export function createRoutineStep(

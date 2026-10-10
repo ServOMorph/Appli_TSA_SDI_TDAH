@@ -12,24 +12,80 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _supabase import SupabaseError  # noqa: E402
 from reply_feedback_report import (  # noqa: E402
+    ReportResolvedError,
     build_open_reports_query,
     build_report_messages_query,
+    build_tester_devices_query,
     deposit_reply,
     find_report,
     list_reports_needing_reply,
+    read_thread,
 )
 
 
 class ReplyFeedbackReportTests(unittest.TestCase):
+    def setUp(self):
+        queue_patch = patch("reply_feedback_report.read_queue", return_value=[])
+        self.read_queue = queue_patch.start()
+        self.addCleanup(queue_patch.stop)
+
     def test_requete_retours_ouverts_filtre_et_trie(self):
         query = build_open_reports_query()
         self.assertIn("resolved_at=is.null", query)
         self.assertIn("order=created_at.asc", query)
+        self.assertNotIn("device_id=", query)
+
+    def test_requete_retours_ouverts_filtre_les_appareils(self):
+        query = build_open_reports_query(["appareil-1", "appareil 2"])
+        self.assertIn("device_id=in.(appareil-1,appareil%202)", query)
 
     def test_requete_messages_encode_les_identifiants(self):
         query = build_report_messages_query(["retour 1", "retour-2"])
-        self.assertIn("select=report_id,author,created_at", query)
+        self.assertIn("select=report_id,author,body,created_at", query)
         self.assertIn("report_id=in.(retour%201,retour-2)", query)
+
+    def test_requete_appareils_d_un_testeur(self):
+        query = build_tester_devices_query(" Marie ")
+        self.assertIn("select=device_id", query)
+        self.assertIn("payload->settings->>tester_code=ilike.Marie", query)
+
+    def test_liste_expose_le_dernier_message(self):
+        reports = [{"id": "retour-1"}]
+        messages = [{"report_id": "retour-1", "author": "user", "body": "Toujours present.", "created_at": "2026-10-07T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
+            result = list_reports_needing_reply("https://example.test", "key")
+        self.assertEqual(result[0]["last_message"]["body"], "Toujours present.")
+        self.assertNotIn("reponse_en_attente", result[0])
+
+    def test_reponse_en_attente_exclut_le_retour_sans_relance(self):
+        self.read_queue.return_value = [{"report_id": "retour-1", "queued_at": "2026-10-08T10:00:00+00:00"}]
+        reports = [{"id": "retour-1"}]
+        messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-07T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
+            self.assertEqual(list_reports_needing_reply("https://example.test", "key"), [])
+
+    def test_relance_posterieure_a_la_mise_en_attente_est_remontee(self):
+        self.read_queue.return_value = [{"report_id": "retour-1", "queued_at": "2026-10-08T10:00:00+00:00"}]
+        reports = [{"id": "retour-1"}]
+        messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-09T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
+            result = list_reports_needing_reply("https://example.test", "key")
+        self.assertEqual([r["id"] for r in result], ["retour-1"])
+        self.assertTrue(result[0]["reponse_en_attente"])
+
+    def test_entree_en_attente_sans_horodatage_reste_exclue(self):
+        self.read_queue.return_value = [{"report_id": "retour-1"}]
+        reports = [{"id": "retour-1"}]
+        messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-09T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
+            self.assertEqual(list_reports_needing_reply("https://example.test", "key"), [])
+
+    def test_fil_complet_retourne_le_retour_et_ses_messages(self):
+        report = {"id": "retour-1", "resolved_at": None}
+        messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-09T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[[report], messages]):
+            thread = read_thread("https://example.test", "key", "retour-1")
+        self.assertEqual(thread, {"report": report, "messages": messages})
 
     def test_liste_exclut_les_retours_dont_le_dernier_message_est_de_lagent(self):
         reports = [{"id": "retour-1"}, {"id": "retour-2"}, {"id": "retour-3"}]
@@ -71,7 +127,7 @@ class ReplyFeedbackReportTests(unittest.TestCase):
             return_value={"id": "retour-1", "device_id": "appareil-1", "resolved_at": "2026-09-14T10:00:00Z"},
         ):
             with patch("reply_feedback_report.insert_row") as insert:
-                with self.assertRaises(SupabaseError):
+                with self.assertRaises(ReportResolvedError):
                     deposit_reply("https://example.test", "key", "retour-1", "Le correctif est en ligne.")
             insert.assert_not_called()
 

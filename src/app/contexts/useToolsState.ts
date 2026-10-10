@@ -52,9 +52,9 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
     return list.id
   }
 
-  async function createToolRoutine(name: string, folderId: string | null): Promise<string> {
+  async function createToolRoutine(name: string, folderId: string | null, durationMinutes: number | null = null): Promise<string> {
     const now = new Date().toISOString()
-    const routine = createRoutineRule(newId(), name.trim(), now)
+    const routine = createRoutineRule(newId(), name.trim(), now, null, durationMinutes)
     await routineRepo.create(routine)
 
     const siblings = tools.filter((t) => t.folder_id === folderId)
@@ -95,10 +95,28 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
     setTools((prev) => prev.map((t) => (t.id === id ? updated : t)))
   }
 
+  async function moveTool(id: string, folderId: string | null) {
+    const tool = tools.find((t) => t.id === id)
+    if (!tool || tool.folder_id === folderId) return
+    const siblings = tools.filter((t) => t.folder_id === folderId)
+    const updated = { ...tool, folder_id: folderId, position: siblings.length, updated_at: new Date().toISOString() }
+    await toolRepo.update(updated)
+    setTools((prev) => prev.map((t) => (t.id === id ? updated : t)))
+  }
+
   async function deleteFolder(id: string) {
     const contained = tools.filter((t) => t.folder_id === id)
+    const rootSiblings = tools.filter((t) => t.folder_id === null).length
+    let kept = 0
     for (const tool of contained) {
-      await deleteTool(tool.id)
+      if (tool.type === 'tableau_comptage') {
+        const updated = { ...tool, folder_id: null, position: rootSiblings + kept, updated_at: new Date().toISOString() }
+        kept += 1
+        await toolRepo.update(updated)
+        setTools((prev) => prev.map((t) => (t.id === tool.id ? updated : t)))
+      } else {
+        await deleteTool(tool.id)
+      }
     }
     await folderRepo.delete(id)
     setFolders((prev) => prev.filter((f) => f.id !== id))
@@ -112,6 +130,7 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
     createToolRoutine,
     deleteTool,
     updateToolColor,
+    moveTool,
     deleteFolder,
     load,
     reset,

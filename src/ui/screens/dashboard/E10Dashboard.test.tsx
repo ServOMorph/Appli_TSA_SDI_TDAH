@@ -311,10 +311,11 @@ describe('E10Dashboard', () => {
   })
 
   describe('mode surcharge (D10B)', () => {
-    it('affiche le bandeau Mode surcharge actif sans changer de page', async () => {
+    it('n’affiche plus de carte Mode surcharge, seulement le bouton Centre récupération', async () => {
       const ctx = makeAppContext({ overloadMode: true })
       await renderDashboard(ctx)
-      expect(screen.getByText('Mode surcharge actif', { selector: 'p' })).toBeDefined()
+      expect(screen.queryByText('Mode surcharge actif', { selector: 'p' })).toBeNull()
+      expect(screen.getByRole('button', { name: 'Centre récupération' })).toBeDefined()
       expect(screen.getByRole('heading', { name: 'AuDHD' })).toBeDefined()
     })
 

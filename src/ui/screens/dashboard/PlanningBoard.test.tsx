@@ -213,6 +213,20 @@ describe('PlanningBoard', () => {
     expect(screen.queryByRole('button', { name: /semaine suivante/i })).toBeNull()
   })
 
+  it('les flèches changent le jour affiché et Aujourd’hui revient au jour courant', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
+
+    await userEvent.click(screen.getByRole('button', { name: 'Jour suivant' }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
+    await userEvent.click(screen.getByRole('button', { name: 'Jour précédent' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Jour précédent' }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
+    await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenLastCalledWith('2026-06-30'))
+  })
+
   it('choisir un mois via le sélecteur mois/année charge ce mois', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
@@ -617,6 +631,15 @@ describe('PlanningBoard', () => {
     }))
     expect(await screen.findByText('routine « Routine du matin »')).toBeInTheDocument()
     expect(screen.getByText('07:15')).toBeInTheDocument()
+  })
+
+  it("affiche l'heure de fin d'une routine ayant une durée totale", async () => {
+    const routine = makeRoutineOccurrence({ time: '07:15', durationMinutes: 45, endTime: '08:00' })
+    renderExpanded(makeAppContext({
+      getPlannedTasksForDate: vi.fn().mockResolvedValue([]),
+      getPlannedRoutinesForDate: vi.fn().mockResolvedValue([routine]),
+    }))
+    expect(await screen.findByText('08:00')).toBeInTheDocument()
   })
 
   it('affiche une case à cocher non interactive sur une routine, reflétant son état de complétion', async () => {

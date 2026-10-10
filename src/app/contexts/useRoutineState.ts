@@ -12,6 +12,7 @@ import {
   resolveRoutineStepsForWeekday,
 } from '@/domain/rules/routineRules'
 import { weekdayOf } from '@/domain/rules/planningSlotRules'
+import { addMinutesToTime } from '@/domain/rules/taskRules'
 import type { Routine } from '@/domain/entities/routine'
 import type { RoutineStep } from '@/domain/entities/routineStep'
 import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
@@ -22,6 +23,8 @@ export interface PlannedRoutineOccurrence {
   routineName: string
   color: string | null
   time: string
+  durationMinutes: number | null
+  endTime: string | null
   completed: boolean
 }
 
@@ -52,6 +55,14 @@ export function useRoutineState() {
     const routine = routines.find((r) => r.id === id)
     if (!routine) return
     const updated = { ...routine, color, updated_at: new Date().toISOString() }
+    await routineRepo.update(updated)
+    setRoutines((prev) => prev.map((r) => (r.id === id ? updated : r)))
+  }
+
+  async function updateRoutineDuration(id: string, durationMinutes: number | null) {
+    const routine = routines.find((r) => r.id === id)
+    if (!routine) return
+    const updated = { ...routine, duration_minutes: durationMinutes, updated_at: new Date().toISOString() }
     await routineRepo.update(updated)
     setRoutines((prev) => prev.map((r) => (r.id === id ? updated : r)))
   }
@@ -218,12 +229,15 @@ export function useRoutineState() {
       schedules.map(async (schedule): Promise<PlannedRoutineOccurrence | null> => {
         const routine = await routineRepo.getById(schedule.routine_id)
         if (!routine) return null
+        const durationMinutes = routine.duration_minutes ?? null
         return {
           scheduleId: schedule.id,
           routineId: schedule.routine_id,
           routineName: routine.name,
           color: routine.color,
           time: schedule.time,
+          durationMinutes,
+          endTime: durationMinutes ? addMinutesToTime(schedule.time, durationMinutes) : null,
           completed: await getRoutineCompletionForDate(schedule.routine_id, date),
         }
       }),
@@ -237,6 +251,7 @@ export function useRoutineState() {
     selectRoutine: setSelectedRoutineId,
     renameRoutine,
     updateRoutineColor,
+    updateRoutineDuration,
     getRoutineSteps,
     addRoutineStep,
     updateRoutineStep,

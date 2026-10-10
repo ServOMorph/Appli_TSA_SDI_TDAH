@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { completeFastOnboarding, resetApp } from './helpers/reset'
+import { openTools } from './helpers/pickers'
 
 test.beforeEach(async ({ page }) => {
   await resetApp(page)
@@ -7,10 +8,13 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('T54 — la To Do et le Budget sont présents d’office à l’installation, sans donnée préremplie dedans', async ({ page }) => {
-  await expect(page.getByRole('button', { name: 'To Do' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Budget' })).toBeVisible()
+  await openTools(page)
+  await expect(page.getByRole('button', { name: 'To Do', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Budget', exact: true })).toBeVisible()
 
-  await page.getByRole('button', { name: 'To Do' }).click()
+  await openTools(page)
+
+  await page.getByRole('button', { name: 'To Do', exact: true }).click()
   await expect(page.getByText("Cette liste n'a pas encore de catégorie.")).toBeVisible()
 })
 
@@ -42,7 +46,8 @@ test('T55 — créer une liste avec catégorie, ajouter des éléments, cocher t
 })
 
 test('T56 — le réveil d’un item de liste planifie une tâche ponctuelle', async ({ page }) => {
-  await page.getByRole('button', { name: 'To Do' }).click()
+  await openTools(page)
+  await page.getByRole('button', { name: 'To Do', exact: true }).click()
   await page.getByRole('button', { name: 'Ajouter une catégorie' }).click()
   await page.getByLabel('Nom de la catégorie').fill('Santé')
   await page.getByRole('button', { name: 'Ajouter', exact: true }).click()
@@ -61,7 +66,8 @@ test('T56 — le réveil d’un item de liste planifie une tâche ponctuelle', a
 })
 
 test('T57 — le widget Comptes de l’accueil ouvre le suivi des sous-catégories, sans régression du Budget', async ({ page }) => {
-  await page.getByRole('button', { name: 'Budget' }).click()
+  await openTools(page)
+  await page.getByRole('button', { name: 'Budget', exact: true }).click()
   await page.getByRole('button', { name: 'Configurer le budget' }).click()
   const incomeDialog = page.getByRole('dialog', { name: 'Ajouter un revenu' })
   await incomeDialog.getByLabel('Montant').fill('1500')
@@ -82,6 +88,7 @@ test('T57 — le widget Comptes de l’accueil ouvre le suivi des sous-catégori
   await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 
+  await openTools(page)
   await page.getByRole('button', { name: 'Mon compte', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible()
   await page.getByRole('button', { name: 'Ouvrir Courses' }).click()
@@ -96,6 +103,8 @@ test('T57 — le widget Comptes de l’accueil ouvre le suivi des sous-catégori
   await page.getByRole('button', { name: 'Retour', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()
 
-  await page.getByRole('button', { name: 'Budget' }).click()
+  await openTools(page)
+
+  await page.getByRole('button', { name: 'Budget', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Ouvrir Prévisions' })).toBeVisible()
 })

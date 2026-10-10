@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { resetApp } from './helpers/reset'
+import { pickHours, pickStartTime } from './helpers/pickers'
 
 test.beforeEach(async ({ page }) => {
   await resetApp(page)
@@ -57,8 +58,8 @@ test('T06 — Ajouter une tâche depuis Dashboard vide → visible sur Dashboard
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche onboarding test')
   await page.getByRole('button', { name: 'Modifier Horaire' }).click()
-  await page.getByLabel('Heure de début').fill('09:00')
-  await page.getByLabel('Heures', { exact: true }).selectOption('1')
+  await pickStartTime(page, '09:00')
+  await pickHours(page, '1')
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.getByRole('button', { name: 'Accueil' }).click()
   await expect(page.getByRole('heading', { name: 'AuDHD' })).toBeVisible()

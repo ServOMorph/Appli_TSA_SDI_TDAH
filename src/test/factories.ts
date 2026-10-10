@@ -86,6 +86,8 @@ export function makePlannedRoutineOccurrence(
     routineName: 'Routine du matin',
     color: null,
     time: '08:00',
+    durationMinutes: null,
+    endTime: null,
     completed: false,
     ...overrides,
   }

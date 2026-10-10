@@ -8,6 +8,7 @@ import {
   setEnergyCost as setEnergyCostRule,
   reportTask as reportTaskRule,
   addMinutesToTime,
+  clampDurationToDay,
 } from '@/domain/rules/taskRules'
 import {
   generateOccurrenceDates,
@@ -272,14 +273,16 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     await load()
   }
 
-  async function duplicateTaskById(id: string): Promise<string | undefined> {
+  async function duplicateTaskById(
+    id: string,
+    schedule?: { date: string; startTime: string },
+  ): Promise<string | undefined> {
     const task = await taskRepo.getById(id)
     if (!task) return undefined
     const now = new Date().toISOString()
     const copy: Task = {
       ...task,
       id: newId(),
-      title: `${task.title} (copie)`,
       status: task.status === 'completed' ? 'inbox' : task.status,
       recurrence_id: null,
       is_recurrence_root: false,
@@ -288,7 +291,31 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
       updated_at: now,
       completed_at: null,
     }
+    if (schedule) {
+      copy.status = 'planned'
+      copy.scheduled_date = schedule.date
+      copy.scheduled_start = schedule.startTime
+      copy.duration_minutes = clampDurationToDay(schedule.startTime, task.duration_minutes)
+      copy.scheduled_end = addMinutesToTime(schedule.startTime, copy.duration_minutes ?? 0)
+    }
     await taskRepo.create(copy)
+    for (const child of await taskRepo.getChildren(id)) {
+      await taskRepo.create({
+        ...child,
+        id: newId(),
+        parent_id: copy.id,
+        status: child.status === 'completed' ? 'inbox' : child.status,
+        scheduled_date: null,
+        scheduled_start: null,
+        scheduled_end: null,
+        recurrence_id: null,
+        is_recurrence_root: false,
+        recurrence_exception: false,
+        created_at: now,
+        updated_at: now,
+        completed_at: null,
+      })
+    }
     await reloadTasks()
     await load()
     return copy.id

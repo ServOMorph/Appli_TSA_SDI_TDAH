@@ -5,6 +5,18 @@ import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import { E21CreateTaskV2 } from './E21CreateTaskV2'
 import type { TaskCategory } from '@/domain/entities/taskCategory'
 
+async function enterStartTime(digits: string) {
+  await userEvent.click(screen.getByRole('button', { name: 'Heure de début' }))
+  for (const digit of digits) {
+    await userEvent.click(screen.getByRole('button', { name: digit }))
+  }
+}
+
+async function enterHours(digit: string) {
+  await userEvent.click(screen.getByRole('button', { name: 'Heures' }))
+  await userEvent.click(screen.getByRole('button', { name: digit }))
+}
+
 describe('E21CreateTaskV2', () => {
   it('affiche le champ titre', () => {
     renderWithApp(<E21CreateTaskV2 />)
@@ -97,7 +109,7 @@ describe('E21CreateTaskV2', () => {
     const ctx = makeAppContext({ originScreen: 'planning' })
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Modifier Horaire' }))
-    await userEvent.type(screen.getByLabelText('Heure de début'), '10:30')
+    await enterStartTime('1030')
     expect(screen.getByRole('button', { name: 'Modifier Horaire' })).toHaveAttribute('aria-expanded', 'true')
     await userEvent.click(screen.getByRole('button', { name: 'Fermer' }))
     expect(screen.getByRole('button', { name: 'Modifier Horaire' })).toHaveAttribute('aria-expanded', 'false')
@@ -132,12 +144,12 @@ describe('E21CreateTaskV2', () => {
     expect(btn.disabled).toBe(true)
     await userEvent.click(screen.getByRole('button', { name: 'Modifier Horaire' }))
     expect(screen.getByText("L'heure de début est requise pour planifier la tâche.")).toBeDefined()
-    await userEvent.type(screen.getByLabelText('Heure de début'), '10:30')
+    await enterStartTime('1030')
     expect(screen.queryByText("L'heure de début est requise pour planifier la tâche.")).toBeNull()
     // Durée encore vide : validation toujours bloquée (#25).
     expect(btn.disabled).toBe(true)
     expect(screen.getByText('La durée est obligatoire pour planifier la tâche.')).toBeDefined()
-    await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
+    await enterHours('1')
     expect(btn.disabled).toBe(false)
     expect(screen.queryByText('La durée est obligatoire pour planifier la tâche.')).toBeNull()
     await userEvent.click(btn)
@@ -161,9 +173,7 @@ describe('E21CreateTaskV2', () => {
     expect(dateInput.style.maxWidth).toBe('100%')
     expect(dateInput.style.minWidth).toBe('0')
     await userEvent.click(screen.getByRole('button', { name: 'Modifier Horaire' }))
-    const timeInput = screen.getByLabelText('Heure de début') as HTMLInputElement
-    expect(timeInput.style.maxWidth).toBe('100%')
-    expect(timeInput.style.minWidth).toBe('0')
+    expect(screen.getByRole('button', { name: 'Heure de début' })).toBeDefined()
   })
 
   it("depuis Accueil (originScreen 'dashboard') : planifie directement la tâche", async () => {
@@ -171,8 +181,8 @@ describe('E21CreateTaskV2', () => {
     renderWithApp(<E21CreateTaskV2 />, ctx)
     await userEvent.type(screen.getByLabelText('Titre de la tâche'), 'Tâche depuis accueil')
     await userEvent.click(screen.getByRole('button', { name: 'Modifier Horaire' }))
-    await userEvent.type(screen.getByLabelText('Heure de début'), '08:00')
-    await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
+    await enterStartTime('0800')
+    await enterHours('1')
     await userEvent.click(screen.getByRole('button', { name: 'Valider' }))
     expect(ctx.createDetailedTask).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'Tâche depuis accueil', status: 'planned', startTime: '08:00', durationMinutes: 60 }),

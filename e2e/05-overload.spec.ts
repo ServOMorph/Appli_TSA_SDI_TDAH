@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { resetApp, completeFastOnboarding } from './helpers/reset'
+import { pickHours, pickStartTime } from './helpers/pickers'
 
 test.beforeEach(async ({ page }) => {
   await resetApp(page)
@@ -14,8 +15,8 @@ async function planOverloadingTask(page: Page, title: string) {
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill(title)
   await page.getByRole('button', { name: 'Modifier Horaire' }).click()
-  await page.getByLabel('Heure de début').fill('08:00')
-  await page.getByLabel('Heures', { exact: true }).selectOption('1')
+  await pickStartTime(page, '08:00')
+  await pickHours(page, '1')
   await page.getByRole('button', { name: 'Fermer' }).click()
   await page.getByRole('button', { name: 'Modifier Coût en énergie' }).click()
   await page.getByRole('group', { name: 'Coût en énergie' }).getByRole('button', { name: '12', exact: true }).click()

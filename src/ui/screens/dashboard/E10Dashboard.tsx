@@ -8,6 +8,7 @@ import { AppShell } from '@/ui/components/AppShell'
 import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
+import { FolderActionsMenu, ToolActionsMenu, cardWithMenuStyle } from '@/ui/components/ToolActionsMenu'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
 import { feedbackMessageRepo } from '@/app/repositories'
 import { syncFeedbackNow } from '@/data/sync/feedbackClient'
@@ -105,22 +106,9 @@ export function E10Dashboard() {
       />
 
       {overloadMode && (
-        <Card style={{ borderColor: 'var(--color-warning)' }}>
-          <p style={{ fontWeight: 600, margin: 0, color: 'var(--color-warning)' }}>
-            Mode surcharge actif
-          </p>
-          <p style={{ margin: '6px 0 0', color: 'var(--color-text-muted)' }}>
-            Prenez le temps qu'il vous faut.
-          </p>
-          <Button
-            variant="secondary"
-            fullWidth
-            onClick={() => goTo('overload-recovery')}
-            style={{ marginTop: 'var(--spacing-sm)' }}
-          >
-            Centre récupération
-          </Button>
-        </Card>
+        <Button variant="secondary" fullWidth onClick={() => goTo('overload-recovery')}>
+          Centre récupération
+        </Button>
       )}
 
       <div
@@ -169,24 +157,27 @@ export function E10Dashboard() {
             </button>
           </Card>
           {rootFolders.map((folder) => (
-            <Card key={folder.id}>
+            <Card key={folder.id} style={cardWithMenuStyle}>
               <button style={widgetBtnStyle} onClick={() => goTo({ name: 'folder-detail', folderId: folder.id })}>
                 📁 {folder.name}
               </button>
+              <FolderActionsMenu folder={folder} />
             </Card>
           ))}
           {rootTools.map((tool) => {
             const list = tool.list_id ? lists.find((l) => l.id === tool.list_id) : undefined
             const routine = tool.routine_id ? routines.find((r) => r.id === tool.routine_id) : undefined
             const accentColor = tool.type === 'routine' ? routine?.color : tool.color
+            const label = toolLabel(tool, list?.name, routine?.name)
             return (
               <Card
                 key={tool.id}
-                style={accentColor ? outlineOnlyStyle(accentColor) : undefined}
+                style={{ ...cardWithMenuStyle, ...(accentColor ? outlineOnlyStyle(accentColor) : {}) }}
               >
                 <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
-                  {toolLabel(tool, list?.name, routine?.name)}
+                  {label}
                 </button>
+                <ToolActionsMenu tool={tool} label={label} />
               </Card>
             )
           })}
@@ -199,6 +190,10 @@ export function E10Dashboard() {
           onClose={() => setShowCreateTool(false)}
           onListCreated={handleToolListCreated}
           onRoutineCreated={handleToolRoutineCreated}
+          onFolderCreated={() => {
+            setShowCreateTool(false)
+            setToolsOpen(true)
+          }}
         />
       )}
 

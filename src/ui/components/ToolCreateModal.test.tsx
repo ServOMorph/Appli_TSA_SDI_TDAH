@@ -11,6 +11,26 @@ describe('ToolCreateModal', () => {
     expect(screen.getByRole('button', { name: 'Nouvelle routine' })).toBeDefined()
   })
 
+  it('crée un dossier depuis le choix initial à la racine', async () => {
+    const onFolderCreated = vi.fn()
+    const createFolder = vi.fn().mockResolvedValue('folder-9')
+    const user = userEvent.setup()
+    renderWithApp(
+      <ToolCreateModal folderId={null} onClose={vi.fn()} onListCreated={vi.fn()} onRoutineCreated={vi.fn()} onFolderCreated={onFolderCreated} />,
+      makeAppContext({ createFolder }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Nouveau dossier' }))
+    await user.type(screen.getByLabelText('Nom du dossier'), '  Maison ')
+    await user.click(screen.getByRole('button', { name: 'Créer' }))
+    expect(createFolder).toHaveBeenCalledWith('Maison')
+    expect(onFolderCreated).toHaveBeenCalledWith('folder-9')
+  })
+
+  it('ne propose pas de dossier à l\'intérieur d\'un dossier', () => {
+    renderWithApp(<ToolCreateModal folderId="folder-1" onClose={vi.fn()} onListCreated={vi.fn()} onRoutineCreated={vi.fn()} onFolderCreated={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: 'Nouveau dossier' })).toBeNull()
+  })
+
   it('le bouton Créer reste désactivé tant qu\'aucune catégorie n\'est ajoutée', async () => {
     const user = userEvent.setup()
     renderWithApp(<ToolCreateModal folderId={null} onClose={vi.fn()} onListCreated={vi.fn()} onRoutineCreated={vi.fn()} />)
@@ -71,7 +91,26 @@ describe('ToolCreateModal', () => {
     await user.type(screen.getByLabelText('Nom de la routine'), 'Routine du matin')
     await user.click(screen.getByRole('button', { name: 'Créer' }))
 
-    expect(createToolRoutine).toHaveBeenCalledWith('Routine du matin', null)
+    expect(createToolRoutine).toHaveBeenCalledWith('Routine du matin', null, null)
     expect(onRoutineCreated).toHaveBeenCalledWith('routine-1')
+  })
+
+  it('crée la routine avec sa durée totale', async () => {
+    const createToolRoutine = vi.fn().mockResolvedValue('routine-1')
+    const ctx = makeAppContext({ createToolRoutine })
+    const user = userEvent.setup()
+    renderWithApp(
+      <ToolCreateModal folderId={null} onClose={vi.fn()} onListCreated={vi.fn()} onRoutineCreated={vi.fn()} />,
+      ctx,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Nouvelle routine' }))
+    await user.type(screen.getByLabelText('Nom de la routine'), 'Routine du matin')
+    await user.click(screen.getByRole('button', { name: 'Minutes' }))
+    await user.click(screen.getByRole('button', { name: '4' }))
+    await user.click(screen.getByRole('button', { name: '5' }))
+    await user.click(screen.getByRole('button', { name: 'Créer' }))
+
+    expect(createToolRoutine).toHaveBeenCalledWith('Routine du matin', null, 45)
   })
 })

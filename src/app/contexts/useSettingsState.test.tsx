@@ -270,7 +270,7 @@ describe('useSettingsState — export/import', () => {
     render(<SettingsPanel />)
     await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
     await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
-    await db.routines.add({ id: 'routine-export', name: 'Routine du soir', color: '#ff8800', created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routines.add({ id: 'routine-export', name: 'Routine du soir', color: '#ff8800', duration_minutes: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
     await db.routineSteps.add({ id: 'step-export', routine_id: 'routine-export', title: 'Pyjama', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
     await db.routineStepCompletions.add({ id: 'completion-export', routine_step_id: 'step-export', routine_id: 'routine-export', date: '2026-09-23', created_at: '2026-09-23T00:00:00.000Z' })
     await act(async () => {
@@ -279,7 +279,7 @@ describe('useSettingsState — export/import', () => {
 
     const payload = JSON.parse(await readBlob(createObjectURL.mock.calls[0][0] as Blob))
     expect(payload.routines).toEqual([
-      { id: 'routine-export', name: 'Routine du soir', color: '#ff8800', created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' },
+      { id: 'routine-export', name: 'Routine du soir', color: '#ff8800', duration_minutes: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' },
     ])
     expect(payload.routine_steps).toEqual([
       { id: 'step-export', routine_id: 'routine-export', title: 'Pyjama', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' },

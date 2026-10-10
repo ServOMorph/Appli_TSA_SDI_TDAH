@@ -18,13 +18,16 @@ from _supabase import (
 )
 
 
-def build_query(device_id: str | None) -> str:
+def build_query(device_id: str | None, report_ids: list[str] | None = None) -> str:
     query = (
         "select=id,device_id,screen_code,comment,storage_path,image_bytes,strokes,"
         "app_version,created_at&order=created_at.desc"
     )
     if device_id:
         query += f"&device_id=eq.{quote(device_id, safe='-')}"
+    if report_ids:
+        ids = ",".join(quote(report_id, safe="-") for report_id in report_ids)
+        query += f"&id=in.({ids})"
     return query
 
 
@@ -52,6 +55,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--device-id", help="Limiter aux retours d'un appareil")
     parser.add_argument(
+        "--report-id",
+        action="append",
+        dest="report_ids",
+        help="Limiter a ce retour (option repetable)",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=Path("feedback-reports"),
@@ -65,7 +74,7 @@ def main() -> int:
     args = parse_args()
     try:
         url, service_key = read_credentials()
-        reports = fetch_rows(url, service_key, "feedback_reports", build_query(args.device_id))
+        reports = fetch_rows(url, service_key, "feedback_reports", build_query(args.device_id, args.report_ids))
         if not reports:
             print("Aucun retour trouve.")
             return 0

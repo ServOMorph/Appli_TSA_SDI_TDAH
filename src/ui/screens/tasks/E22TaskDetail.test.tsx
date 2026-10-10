@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
@@ -350,8 +350,12 @@ describe('E22TaskDetail', () => {
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Modifier Horaire' }))
-      fireEvent.change(screen.getByLabelText('Heure'), { target: { value: '09:00' } })
-      await userEvent.selectOptions(screen.getByLabelText('Heures'), '1')
+      await userEvent.click(screen.getByRole('button', { name: 'Heure' }))
+      for (const digit of ['0', '9', '0', '0']) {
+        await userEvent.click(screen.getByRole('button', { name: digit }))
+      }
+      await userEvent.click(screen.getByRole('button', { name: 'Heures' }))
+      await userEvent.click(screen.getByRole('button', { name: '1' }))
       await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
       await waitFor(() => {
         expect(ctx.updateTaskFields).toHaveBeenCalledWith('task-1', { startTime: '09:00', durationMinutes: 60 }, 'occurrence')
@@ -416,13 +420,33 @@ describe('E22TaskDetail', () => {
   })
 
   describe('Dupliquer (M4)', () => {
-    it('appelle duplicateTaskById et navigue vers l\'écran d\'origine', async () => {
+    it("demande la date et l'heure puis appelle duplicateTaskById", async () => {
       const task = makeTask({ status: 'inbox' })
       const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
       renderWithApp(<E22TaskDetail />, ctx)
       await userEvent.click(screen.getByRole('button', { name: 'Dupliquer' }))
-      expect(ctx.duplicateTaskById).toHaveBeenCalledWith('task-1')
-      expect(ctx.goTo).toHaveBeenCalledWith('inbox')
+      const dialog = screen.getByRole('dialog', { name: 'Dupliquer la tâche' })
+      const create = within(dialog).getByRole('button', { name: 'Créer la copie' }) as HTMLButtonElement
+      expect(create.disabled).toBe(true)
+      fireEvent.change(within(dialog).getByLabelText('Date de la copie'), { target: { value: '2026-11-03' } })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Heure de début de la copie' }))
+      for (const digit of ['1', '4', '3', '0']) {
+        await userEvent.click(within(dialog).getByRole('button', { name: digit }))
+      }
+      expect(create.disabled).toBe(false)
+      await userEvent.click(create)
+      expect(ctx.duplicateTaskById).toHaveBeenCalledWith('task-1', { date: '2026-11-03', startTime: '14:30' })
+      expect(ctx.goTo).toHaveBeenCalledWith('dashboard')
+    })
+
+    it("n'appelle pas duplicateTaskById quand on annule", async () => {
+      const task = makeTask({ status: 'inbox' })
+      const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+      renderWithApp(<E22TaskDetail />, ctx)
+      await userEvent.click(screen.getByRole('button', { name: 'Dupliquer' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+      expect(ctx.duplicateTaskById).not.toHaveBeenCalled()
+      expect(screen.queryByRole('dialog', { name: 'Dupliquer la tâche' })).toBeNull()
     })
   })
 

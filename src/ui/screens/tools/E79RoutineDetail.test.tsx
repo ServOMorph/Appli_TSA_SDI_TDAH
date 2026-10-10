@@ -13,6 +13,7 @@ function makeRoutine(overrides: Partial<Routine> = {}): Routine {
     id: 'routine-1',
     name: 'Routine du matin',
     color: null,
+    duration_minutes: null,
     created_at: '2026-09-23T00:00:00.000Z',
     updated_at: '2026-09-23T00:00:00.000Z',
     ...overrides,
@@ -116,6 +117,19 @@ describe('E79RoutineDetail', () => {
     const input = screen.getByLabelText('Choisir une couleur') as HTMLInputElement
     fireEvent.change(input, { target: { value: '#ff8800' } })
     expect(updateRoutineColor).toHaveBeenCalledWith('routine-1', '#ff8800')
+  })
+
+  it('affiche la durée totale de la routine et la modifie', async () => {
+    const updateRoutineDuration = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(
+      <E79RoutineDetail />,
+      renderScreen({ routines: [makeRoutine({ duration_minutes: 90 })], updateRoutineDuration }),
+    )
+    expect(screen.getByRole('button', { name: 'Heures' }).textContent).toBe('1')
+    expect(screen.getByRole('button', { name: 'Minutes' }).textContent).toBe('30')
+    await userEvent.click(screen.getByRole('button', { name: 'Minutes' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Effacer' }))
+    expect(updateRoutineDuration).toHaveBeenCalledWith('routine-1', 60)
   })
 
   it('ajoute une étape avec un titre et une durée', async () => {

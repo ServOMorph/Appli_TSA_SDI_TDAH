@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { resetApp, completeFastOnboarding } from './helpers/reset'
+import { pickHours, pickStartTime } from './helpers/pickers'
 
 test.beforeEach(async ({ page }) => {
   await resetApp(page)
@@ -10,8 +11,8 @@ test('T46 — planifier une tâche à la création, puis modifier son horaire de
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('McDo')
   await page.getByRole('button', { name: 'Modifier Horaire' }).click()
-  await page.getByLabel('Heure de début').fill('10:00')
-  await page.getByLabel('Heures', { exact: true }).selectOption('1')
+  await pickStartTime(page, '10:00')
+  await pickHours(page, '1')
   await page.getByRole('button', { name: 'Fermer' }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
 
@@ -21,7 +22,7 @@ test('T46 — planifier une tâche à la création, puis modifier son horaire de
   await page.getByText('McDo').click()
   await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
   await page.getByRole('button', { name: 'Modifier Horaire' }).click()
-  await page.getByLabel('Heure', { exact: true }).fill('12:00')
+  await pickStartTime(page, '12:00', 'Heure')
   await page.getByRole('button', { name: 'Enregistrer' }).click()
 
   await expect(page.getByRole('heading', { name: 'McDo' })).toBeVisible()
@@ -37,8 +38,8 @@ test('T48 — cliquer une tâche planifiée ouvre sa fiche, renommer et supprime
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('RDV dentiste')
   await page.getByRole('button', { name: 'Modifier Horaire' }).click()
-  await page.getByLabel('Heure de début').fill('15:00')
-  await page.getByLabel('Heures', { exact: true }).selectOption('1')
+  await pickStartTime(page, '15:00')
+  await pickHours(page, '1')
   await page.getByRole('button', { name: 'Valider' }).click()
 
   await page.getByText('RDV dentiste').click()
@@ -58,8 +59,8 @@ test('T49 — Reporter une tâche en surcharge la bascule sur le lendemain (E8)'
   await page.getByRole('button', { name: 'Ajouter une tâche' }).click()
   await page.getByLabel('Titre de la tâche').fill('Tâche lourde')
   await page.getByRole('button', { name: 'Modifier Horaire' }).click()
-  await page.getByLabel('Heure de début').fill('08:00')
-  await page.getByLabel('Heures', { exact: true }).selectOption('1')
+  await pickStartTime(page, '08:00')
+  await pickHours(page, '1')
   await page.getByRole('button', { name: 'Fermer' }).click()
   await page.getByRole('button', { name: 'Modifier Coût en énergie' }).click()
   await page.getByRole('group', { name: 'Coût en énergie' }).getByRole('button', { name: '12', exact: true }).click()

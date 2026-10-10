@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { RoutineTimeKeypad } from '@/ui/components/RoutineTimeKeypad'
 import type { RoutineStep } from '@/domain/entities/routineStep'
 import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
 import type { Task } from '@/domain/entities/task'
@@ -229,6 +230,7 @@ export function E80RoutineSteps() {
     reorderRoutineSteps,
     detachRoutineDay,
     reattachRoutineDay,
+    setRoutineDaySchedule,
     getSubTasks,
     addSubTask,
     deleteSubTask,
@@ -257,6 +259,7 @@ export function E80RoutineSteps() {
   const [editStepTitle, setEditStepTitle] = useState('')
   const [editStepDuration, setEditStepDuration] = useState('')
   const [detaching, setDetaching] = useState(false)
+  const [changingTime, setChangingTime] = useState(false)
 
   const daySchedule = schedules.find((s) => s.weekday === weekday) ?? null
 
@@ -345,6 +348,13 @@ export function E80RoutineSteps() {
     setEditingDay(false)
   }
 
+  async function handleChangeTime(time: string) {
+    if (!selectedRoutineId) return
+    await setRoutineDaySchedule(selectedRoutineId, weekday, time)
+    await reload()
+    setChangingTime(false)
+  }
+
   async function handleAddStep() {
     if (!selectedRoutineId || !newStepTitle.trim()) return
     await addRoutineStep(selectedRoutineId, newStepTitle, parsedDuration(newStepDuration), weekday)
@@ -423,6 +433,11 @@ export function E80RoutineSteps() {
           <h1 style={{ margin: 0, fontSize: '1.25rem' }}>{routine.name}</h1>
           <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>{formatFullDate(date)}</p>
         </div>
+        {daySchedule && (
+          <button aria-label="Changer l'heure de ce jour" onClick={() => setChangingTime(true)} style={neutralLinkStyle}>
+            {daySchedule.time}
+          </button>
+        )}
         {daySchedule && !editingDay && (
           <button aria-label="Modifier les étapes de ce jour" onClick={handleEnterEditMode} disabled={detaching} style={neutralLinkStyle}>
             Modifier ce jour
@@ -570,6 +585,19 @@ export function E80RoutineSteps() {
             )
           })}
         </ul>
+      )}
+
+      {changingTime && daySchedule && (
+        <div role="dialog" aria-modal="true" aria-label="Changer l'heure" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Changer l'heure</h2>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Horaire actuel : {daySchedule.time}</p>
+            <RoutineTimeKeypad onComplete={handleChangeTime} />
+            <Button variant="secondary" fullWidth onClick={() => setChangingTime(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
       )}
 
       {showAddStepForm && (

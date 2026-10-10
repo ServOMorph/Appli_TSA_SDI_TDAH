@@ -89,6 +89,18 @@ describe('E124FeedbackDetail', () => {
     expect(screen.getByText(AGENT_MESSAGE.body)).toBeInTheDocument()
   })
 
+  it('affiche la version sans doubler le préfixe v', async () => {
+    mocks.getById.mockResolvedValue({ ...REPORT, app_version: 'v6.9' })
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    expect(await screen.findByText(/· v6\.9 ·/)).toBeInTheDocument()
+    expect(screen.queryByText(/vv6\.9/)).toBeNull()
+  })
+
+  it('ajoute le préfixe v à une ancienne version qui n’en a pas', async () => {
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    expect(await screen.findByText(/· v5\.84 ·/)).toBeInTheDocument()
+  })
+
   it('marque le message de l’agent comme lu à l’ouverture', async () => {
     renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
     await screen.findByText('Le bouton est masqué')

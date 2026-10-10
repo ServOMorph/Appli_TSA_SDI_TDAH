@@ -23,6 +23,10 @@ function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })
 }
 
+function formatVersion(version: string): string {
+  return version.startsWith('v') ? version : `v${version}`
+}
+
 export function E124FeedbackDetail() {
   const { route, back } = useApp()
   const reportId = route.name === 'feedback-detail' ? (route.reportId ?? null) : null
@@ -144,7 +148,7 @@ export function E124FeedbackDetail() {
       <div>
         <h1 style={{ margin: 0 }}>{report.screen_code}</h1>
         <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>
-          {formatDateTime(report.created_at)} · v{report.app_version} · {STATUS_LABELS[report.sync_status]}
+          {formatDateTime(report.created_at)} · {formatVersion(report.app_version)} · {STATUS_LABELS[report.sync_status]}
         </p>
       </div>
       {imageUrl && (

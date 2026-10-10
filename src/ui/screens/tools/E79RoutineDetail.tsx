@@ -3,6 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { ColorPicker } from '@/ui/components/ColorPicker'
+import { DurationRoller } from '@/ui/components/DurationRoller'
 import { RoutineWeekdayPicker } from '@/ui/components/RoutineWeekdayPicker'
 import { RoutineTimeKeypad } from '@/ui/components/RoutineTimeKeypad'
 import type { RoutineStep } from '@/domain/entities/routineStep'
@@ -102,6 +103,7 @@ export function E79RoutineDetail() {
     selectedRoutineId,
     renameRoutine,
     updateRoutineColor,
+    updateRoutineDuration,
     getRoutineSteps,
     addRoutineStep,
     updateRoutineStep,
@@ -272,6 +274,8 @@ export function E79RoutineDetail() {
             Renommer
           </button>
           <ColorPicker value={routine.color} onChange={(color) => updateRoutineColor(routine.id, color)} />
+          <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Durée totale</span>
+          <DurationRoller minutes={routine.duration_minutes ?? null} onChange={(minutes) => updateRoutineDuration(routine.id, minutes)} />
         </div>
       </Card>
 

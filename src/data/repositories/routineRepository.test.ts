@@ -11,6 +11,7 @@ describe('RoutineRepository', () => {
     id: 'routine-1',
     name: 'Routine du matin',
     color: null,
+    duration_minutes: null,
     created_at: '2026-09-23T00:00:00Z',
     updated_at: '2026-09-23T00:00:00Z',
     ...overrides,

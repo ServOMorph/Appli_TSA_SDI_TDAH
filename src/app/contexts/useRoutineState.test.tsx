@@ -6,7 +6,7 @@ import { db } from '@/app/repositories'
 import { useRoutineState } from './useRoutineState'
 
 function RoutinePanel() {
-  const { detachRoutineDay, deleteRoutineStep } = useRoutineState()
+  const { detachRoutineDay, deleteRoutineStep, getPlannedRoutinesForDate } = useRoutineState()
   const [result, setResult] = useState('')
 
   return (
@@ -19,6 +19,14 @@ function RoutinePanel() {
         }}
       >
         Détacher
+      </button>
+      <button
+        onClick={async () => {
+          const planned = await getPlannedRoutinesForDate('2026-09-23')
+          setResult(planned.map((p) => `${p.time}>${p.endTime}`).join(','))
+        }}
+      >
+        Planifiées
       </button>
       <button
         onClick={async () => {
@@ -41,7 +49,7 @@ afterEach(async () => {
 
 describe('useRoutineState', () => {
   it('detachRoutineDay reporte la complétion du jour vers l’étape clonée et supprime l’originale', async () => {
-    await db.routines.add({ id: 'routine-1', name: 'Routine du matin', color: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routines.add({ id: 'routine-1', name: 'Routine du matin', color: null, duration_minutes: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
     await db.routineSteps.add({ id: 'step-1', routine_id: 'routine-1', title: 'Se brosser les dents', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
     await db.routineSchedules.add({ id: 'schedule-1', routine_id: 'routine-1', weekday: 3, time: '07:15', steps_overridden: false, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
     await db.routineStepCompletions.add({ id: 'completion-1', routine_step_id: 'step-1', routine_id: 'routine-1', date: '2026-09-23', created_at: '2026-09-23T00:00:00.000Z' })
@@ -75,5 +83,14 @@ describe('useRoutineState', () => {
 
     expect(await db.routineSteps.toArray()).toEqual([])
     expect(await db.routineStepCompletions.toArray()).toEqual([])
+  })
+
+  it('getPlannedRoutinesForDate calcule l’heure de fin depuis la durée totale', async () => {
+    await db.routines.add({ id: 'routine-1', name: 'Routine du matin', color: null, duration_minutes: 45, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineSchedules.add({ id: 'schedule-1', routine_id: 'routine-1', weekday: 3, time: '07:15', steps_overridden: false, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+
+    render(<RoutinePanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Planifiées' }))
+    await waitFor(() => expect(screen.getByTestId('result')).toHaveTextContent('07:15>08:00'))
   })
 })

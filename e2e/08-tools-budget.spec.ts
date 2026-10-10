@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { completeFastOnboarding, resetApp } from './helpers/reset'
+import { openTools } from './helpers/pickers'
 
 test.beforeEach(async ({ page }) => {
   await resetApp(page)
@@ -7,7 +8,8 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('T52 — configurer le Budget, saisir une dépense, la consulter en fiche et la corriger', async ({ page }) => {
-  await page.getByRole('button', { name: 'Budget' }).click()
+  await openTools(page)
+  await page.getByRole('button', { name: 'Budget', exact: true }).click()
   await page.getByRole('button', { name: 'Configurer le budget' }).click()
   const incomeDialog = page.getByRole('dialog', { name: 'Ajouter un revenu' })
   await incomeDialog.getByLabel('Montant').fill('1500')
@@ -62,7 +64,8 @@ test('T52 — configurer le Budget, saisir une dépense, la consulter en fiche e
 })
 
 test('T53 — suppression en cascade d’un livret et d’une catégorie, sans donnée orpheline comptée', async ({ page }) => {
-  await page.getByRole('button', { name: 'Budget' }).click()
+  await openTools(page)
+  await page.getByRole('button', { name: 'Budget', exact: true }).click()
   await page.getByRole('button', { name: 'Configurer le budget' }).click()
   const incomeDialog = page.getByRole('dialog', { name: 'Ajouter un revenu' })
   await incomeDialog.getByLabel('Montant').fill('1500')

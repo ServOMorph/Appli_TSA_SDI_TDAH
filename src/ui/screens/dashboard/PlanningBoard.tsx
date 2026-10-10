@@ -45,7 +45,7 @@ function blockStart(block: PlanBlock): string | null {
 }
 
 function blockEnd(block: PlanBlock): string | null {
-  return block.kind === 'routine' ? null : block.item.scheduled_end
+  return block.kind === 'routine' ? block.item.endTime : block.item.scheduled_end
 }
 
 function blockCompleted(block: PlanBlock): boolean {
@@ -248,6 +248,19 @@ const todayBtnStyle: React.CSSProperties = {
   color: 'var(--color-text-muted)',
   fontSize: '0.75rem',
   fontFamily: 'var(--font-body)',
+  flexShrink: 0,
+}
+
+const dayArrowBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-sm)',
+  cursor: 'pointer',
+  color: 'var(--color-text)',
+  fontSize: '1.25rem',
+  lineHeight: 1,
+  minWidth: '44px',
+  minHeight: '44px',
   flexShrink: 0,
 }
 
@@ -580,6 +593,22 @@ export function PlanningBoard() {
             <BatteryIcon size={16} />
             {totalEnergy}
           </span>
+          <button
+            type="button"
+            style={dayArrowBtnStyle}
+            aria-label="Jour précédent"
+            onClick={() => jumpTo(addDays(displayDate, -1))}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            style={dayArrowBtnStyle}
+            aria-label="Jour suivant"
+            onClick={() => jumpTo(addDays(displayDate, 1))}
+          >
+            ›
+          </button>
           {!isToday && (
             <button style={todayBtnStyle} onClick={() => jumpTo(todayStr())}>
               Aujourd'hui
@@ -663,7 +692,7 @@ export function PlanningBoard() {
                   role="button"
                   tabIndex={0}
                   style={{
-                    ...rowStyle(block.kind === 'routine' ? null : block.item.duration_minutes),
+                    ...rowStyle(block.kind === 'routine' ? block.item.durationMinutes : block.item.duration_minutes),
                     color: tint.color,
                     textDecoration: tint.textDecoration,
                   }}

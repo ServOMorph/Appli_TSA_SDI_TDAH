@@ -20,9 +20,15 @@ describe('createRoutine', () => {
       id: 'routine-1',
       name: 'Routine du matin',
       color: null,
+      duration_minutes: null,
       created_at: now,
       updated_at: now,
     })
+  })
+
+  it('accepte une durée totale optionnelle', () => {
+    const routine = createRoutine('routine-3', 'Routine', '2026-09-23T10:00:00.000Z', null, 45)
+    expect(routine.duration_minutes).toBe(45)
   })
 
   it('accepte une couleur optionnelle', () => {

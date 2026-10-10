@@ -70,7 +70,7 @@ describe('E70Tools', () => {
   it('affiche un dossier et navigue vers folder-detail au clic', async () => {
     const ctx = makeAppContext({ folders: [makeFolder({ id: 'f1', name: 'Maison' })] })
     renderWithApp(<E70Tools />, ctx)
-    await userEvent.click(screen.getByRole('button', { name: /Maison/ }))
+    await userEvent.click(screen.getByRole('button', { name: /^📁 Maison$/ }))
     expect(ctx.goTo).toHaveBeenCalledWith({ name: 'folder-detail', folderId: 'f1' })
   })
 

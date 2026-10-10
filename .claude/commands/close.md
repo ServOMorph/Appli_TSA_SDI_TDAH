@@ -247,6 +247,16 @@ générique.
 
 - Étape 8 (README) et étape 9 (`CHANGELOG.md`) : n'exécuter que sur la branche `main`.
 
+- Étape 9 (remplace la création systématique d'une entrée) — **une version par déploiement, pas
+  par session** :
+  1. Si `src/` n'a pas changé depuis le dernier déploiement (`git diff --quiet <Commit de
+     _contexte/dernier_deploiement.md> -- src/` et aucune modification non commitée sous `src/`) :
+     ne créer aucune entrée dans `CHANGELOG.md`.
+  2. Sinon, si la version en tête de `CHANGELOG.md` est supérieure à la `Version` de
+     `_contexte/dernier_deploiement.md` (pas encore déployée) : compléter ce bloc existant (date mise
+     à jour, livrables ajoutés sous les rubriques existantes) au lieu d'en créer un nouveau.
+  3. Sinon seulement : créer la nouvelle entrée selon le corps générique de l'étape 9.
+
 - Étape 13 (commit) : `git add <contexte>/` au lieu de `<dossier>/_contexte/` ; n'ajouter
   `CHANGELOG.md` et `README.md` que sur `main`. Sur une branche `agent/<alias>`, ne pousser
   (étape 14) que si la branche dispose déjà d'un suivi distant et si le parent l'a explicitement

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { DurationRoller } from '@/ui/components/DurationRoller'
 import { IMPLEMENTED_TOOL_TYPES, TOOL_TYPE_LABELS, type ToolType } from '@/domain/entities/tool'
 
 const overlayStyle: React.CSSProperties = {
@@ -21,6 +22,8 @@ const boxStyle: React.CSSProperties = {
   padding: 'var(--spacing-xl)',
   maxWidth: '360px',
   width: '90%',
+  maxHeight: '90svh',
+  overflowY: 'auto',
   display: 'flex',
   flexDirection: 'column',
   gap: 'var(--spacing-md)',
@@ -61,15 +64,17 @@ interface ToolCreateModalProps {
   onClose: () => void
   onListCreated: (listId: string) => void
   onRoutineCreated: (routineId: string) => void
+  onFolderCreated?: (folderId: string) => void
 }
 
-export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCreated }: ToolCreateModalProps) {
-  const { createToolList, createListCategory, createToolRoutine } = useApp()
-  const [mode, setMode] = useState<'choice' | 'new-list' | 'new-routine'>('choice')
+export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCreated, onFolderCreated }: ToolCreateModalProps) {
+  const { createToolList, createListCategory, createToolRoutine, createFolder } = useApp()
+  const [mode, setMode] = useState<'choice' | 'new-list' | 'new-routine' | 'new-folder'>('choice')
   const [name, setName] = useState('')
   const [categories, setCategories] = useState<string[]>([])
   const [categoryInput, setCategoryInput] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [routineDuration, setRoutineDuration] = useState<number | null>(null)
 
   function addCategoryEntry() {
     const trimmed = categoryInput.trim()
@@ -98,9 +103,18 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
     const trimmed = name.trim()
     if (!trimmed) return
     setSubmitting(true)
-    const routineId = await createToolRoutine(trimmed, folderId)
+    const routineId = await createToolRoutine(trimmed, folderId, routineDuration)
     setSubmitting(false)
     onRoutineCreated(routineId)
+  }
+
+  async function handleCreateFolder() {
+    const trimmed = name.trim()
+    if (!trimmed || !onFolderCreated) return
+    setSubmitting(true)
+    const newFolderId = await createFolder(trimmed)
+    setSubmitting(false)
+    onFolderCreated(newFolderId)
   }
 
   return (
@@ -115,6 +129,11 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
             <Button fullWidth onClick={() => setMode('new-routine')}>
               Nouvelle routine
             </Button>
+            {onFolderCreated && folderId === null && (
+              <Button fullWidth onClick={() => setMode('new-folder')}>
+                Nouveau dossier
+              </Button>
+            )}
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
               {toolTypeOrder
                 .filter((type) => !IMPLEMENTED_TOOL_TYPES.includes(type))
@@ -202,8 +221,34 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
               autoFocus
               style={inputStyle}
             />
+            <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Durée totale (optionnel)</span>
+            <DurationRoller minutes={routineDuration} onChange={setRoutineDuration} />
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
               <Button fullWidth disabled={!name.trim() || submitting} onClick={handleCreateRoutine}>
+                Créer
+              </Button>
+              <Button fullWidth variant="secondary" onClick={onClose}>
+                Annuler
+              </Button>
+            </div>
+          </>
+        )}
+
+        {mode === 'new-folder' && (
+          <>
+            <label htmlFor="new-tool-folder-name" style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+              Nom du dossier
+            </label>
+            <input
+              id="new-tool-folder-name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+              style={inputStyle}
+            />
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <Button fullWidth disabled={!name.trim() || submitting} onClick={handleCreateFolder}>
                 Créer
               </Button>
               <Button fullWidth variant="secondary" onClick={onClose}>

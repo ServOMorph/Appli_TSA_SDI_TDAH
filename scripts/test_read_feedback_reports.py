@@ -24,6 +24,10 @@ class ReadFeedbackReportsTests(unittest.TestCase):
     def test_requete_filtre_l_appareil_encode(self):
         self.assertIn("device_id=eq.appareil%20test", build_query("appareil test"))
 
+    def test_requete_filtre_les_retours_demandes(self):
+        query = build_query(None, ["retour-1", "retour 2"])
+        self.assertIn("id=in.(retour-1,retour%202)", query)
+
     def test_nom_image_derive_de_l_identifiant(self):
         self.assertEqual(image_filename({"id": "retour-1"}), "retour-1.jpg")
 

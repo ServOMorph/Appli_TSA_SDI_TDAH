@@ -3,6 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { DurationRoller } from '@/ui/components/DurationRoller'
+import { TaskTimeField } from '@/ui/components/TaskTimeField'
 import { IconPicker } from '@/ui/components/IconPicker'
 import { ColorPicker } from '@/ui/components/ColorPicker'
 import { TaskCardLayout, TaskFieldCard, IconFieldValue, ColorFieldValue } from '@/ui/components/TaskCardLayout'
@@ -367,6 +368,9 @@ export function E22TaskDetail() {
 
   const [subTasks, setSubTasks] = useState<Task[]>([])
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showDuplicate, setShowDuplicate] = useState(false)
+  const [duplicateDate, setDuplicateDate] = useState('')
+  const [duplicateStart, setDuplicateStart] = useState('')
   const [renamingSubTask, setRenamingSubTask] = useState<Task | null>(null)
   const [renameSubTaskTitle, setRenameSubTaskTitle] = useState('')
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
@@ -508,11 +512,18 @@ export function E22TaskDetail() {
     setExpandedField(null)
   }
 
+  function openDuplicate() {
+    setDuplicateDate(task?.scheduled_date ?? todayStr())
+    setDuplicateStart(task?.scheduled_start ?? '')
+    setShowDuplicate(true)
+  }
+
   async function handleDuplicate() {
-    if (!selectedTaskId) return
-    await duplicateTaskById(selectedTaskId)
+    if (!selectedTaskId || !duplicateDate || !duplicateStart) return
+    await duplicateTaskById(selectedTaskId, { date: duplicateDate, startTime: duplicateStart })
+    setShowDuplicate(false)
     selectTask(null)
-    goTo(task ? backScreenForTask(task) : 'inbox')
+    goTo('dashboard')
   }
 
   const sensors = useSensors(
@@ -679,15 +690,13 @@ export function E22TaskDetail() {
           expanded={expandedField === 'time'}
           onToggle={() => toggleField('time')}
         >
-          <input
-            type="time"
-            aria-label="Heure"
+          <TaskTimeField
+            label="Heure"
             value={draftStart}
-            onChange={(e) => {
-              setDraftStart(e.target.value)
-              setDraftDuration((d) => clampDurationToDay(e.target.value, d))
+            onChange={(time) => {
+              setDraftStart(time)
+              setDraftDuration((d) => clampDurationToDay(time, d))
             }}
-            style={inputStyle}
           />
           <DurationRoller
             minutes={draftDuration}
@@ -822,7 +831,7 @@ export function E22TaskDetail() {
         <Button fullWidth onClick={() => goTo('task-decompose')}>
           Décomposer
         </Button>
-        <Button fullWidth onClick={handleDuplicate}>
+        <Button fullWidth onClick={openDuplicate}>
           Dupliquer
         </Button>
         <Button variant="secondary" fullWidth onClick={() => setShowDeleteConfirm(true)}>
@@ -866,6 +875,33 @@ export function E22TaskDetail() {
               Toutes les occurrences
             </Button>
             <Button variant="secondary" fullWidth onClick={() => setPendingFieldEdit(null)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {showDuplicate && (
+        <div role="dialog" aria-modal="true" aria-label="Dupliquer la tâche" style={modalOverlay}>
+          <div style={{ ...modalBox, maxHeight: '90svh', overflowY: 'auto' }}>
+            <h2 style={{ margin: 0 }}>Dupliquer la tâche</h2>
+            <label htmlFor="duplicate-date" style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+              Date
+            </label>
+            <input
+              id="duplicate-date"
+              type="date"
+              aria-label="Date de la copie"
+              value={duplicateDate}
+              onChange={(e) => setDuplicateDate(e.target.value)}
+              style={inputStyle}
+            />
+            <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>Heure de début</span>
+            <TaskTimeField label="Heure de début de la copie" value={duplicateStart} onChange={setDuplicateStart} />
+            <Button fullWidth onClick={handleDuplicate} disabled={!duplicateDate || !duplicateStart}>
+              Créer la copie
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setShowDuplicate(false)}>
               Annuler
             </Button>
           </div>

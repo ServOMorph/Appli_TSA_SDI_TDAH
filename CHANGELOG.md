@@ -1,6 +1,11 @@
-## v6.11 — 2026-10-09
+## v6.11 — 2026-10-10
 
 ### Ajouté
+- **Accueil : navigation des jours par flèches précédent/suivant, bouton « Aujourd'hui » et calendrier** (`PlanningBoard.tsx`) ; en mode surcharge, la carte orange est retirée au profit du seul bouton « centre de récupération », outils accessibles (`E10Dashboard.tsx`, retours `818b5891`, `1c42ba1b`).
+- **Tâches : « Dupliquer » demande date et heure de début**, conserve le titre (plus de « (copie) ») et copie les sous-tâches ; heure de début par pavé de chiffres (`TaskTimeField.tsx`) et durée par chiffres cliquables minutes/heures/jours (`DurationRoller.tsx`) (retours `0cacea0f`, `b9e58eab`).
+- **Routines : durée totale, heure de fin dans le planning, heure modifiable pour un seul jour** (`E79RoutineDetail.tsx`, `E80RoutineSteps.tsx`, `routine.ts`) (retours `b19506a7`, `1734c523`).
+- **Outils : création d'un dossier depuis « + », menu « ⋯ » sur les cartes (déplacer, supprimer avec confirmation)** (`ToolActionsMenu.tsx`, `useToolsState.ts`) (retour `9ac356a8`).
+- **Scripts de retours** : mise en file horodatée des réponses (`queue_pending_feedback_reply.py`), un retour relancé après mise en file redevient à traiter (`reply_feedback_report.py`).
 - **Deux catégories de testeurs** (`src/domain/rules/testerRoles.ts`) : `admin` (codes `marie`, `dev`) garde le signalement de retours (bouton `+`, « Mes retours », écrans E122-E124) ; `testeur` (tout autre code ou absence de code) ne le voit plus et est renvoyé vers l'Accueil s'il atteint un écran de retour. Le rôle `admin` exige en plus un mot de passe administrateur (saisi dans Paramètres > Profil, clé dérivée comparée à une empreinte embarquée) : contrôle côté appareil uniquement, sans vérification serveur.
 
 ### Modifié
@@ -11,6 +16,8 @@
 ### Corrigé
 - **Code testeur saisi à l'onboarding désormais visible dans Paramètres > Profil** dès la création du compte (les réglages n'étaient pas chargés en mémoire, le champ restait vide).
 - **Bouton « Enregistrer » du code testeur contenu dans sa carte** sur petit écran.
+- **Fil de discussion E124** : version affichée proprement dans l'en-tête du retour (`E124FeedbackDetail.tsx`).
+- **Tests e2e** : helpers de saisie d'heure et de durée (`e2e/helpers/pickers.ts`), specs 01/05/07/08/09/11 adaptées ; T58 reste en échec connu (retours réservés aux admins, empreintes vides).
 
 ## v6.10 — 2026-10-07
 

@@ -819,6 +819,41 @@ describe('AppProvider — outils et dossiers (V5-3)', () => {
     await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'supprimer première liste' })) })
     await waitFor(() => expect(Number(screen.getByTestId('tool-count').textContent)).toBe(toolCountBefore - 1))
   })
+
+  it('moveTool range un outil dans un dossier ; supprimer le dossier efface la liste mais garde le Budget à la racine', async () => {
+    function MovePanel() {
+      const { createUser, goTo, screen: s, tools, folders, createFolder, moveTool, deleteFolder } = useApp()
+      const folder = folders[0]
+      const inFolder = folder ? tools.filter((t) => t.folder_id === folder.id) : []
+      const budget = tools.find((t) => t.type === 'tableau_comptage')
+      return (
+        <>
+          <div data-testid="screen">{s}</div>
+          <div data-testid="in-folder">{inFolder.length}</div>
+          <div data-testid="tool-count">{tools.length}</div>
+          <div data-testid="budget-folder">{budget ? String(budget.folder_id) : 'absent'}</div>
+          <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
+          <button onClick={() => createFolder('Maison')}>créer dossier</button>
+          <button onClick={() => { if (folder) for (const t of tools) void moveTool(t.id, folder.id) }}>tout ranger</button>
+          <button onClick={() => folder && deleteFolder(folder.id)}>supprimer dossier</button>
+        </>
+      )
+    }
+    render(<AppProvider><MovePanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await waitFor(() => expect(screen.getByTestId('budget-folder').textContent).toBe('null'))
+    const toolCount = Number(screen.getByTestId('tool-count').textContent)
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer dossier' })) })
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'tout ranger' })) })
+    await waitFor(() => expect(Number(screen.getByTestId('in-folder').textContent)).toBe(toolCount))
+    expect(screen.getByTestId('budget-folder').textContent).not.toBe('null')
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'supprimer dossier' })) })
+    await waitFor(() => expect(Number(screen.getByTestId('tool-count').textContent)).toBe(1))
+    expect(screen.getByTestId('budget-folder').textContent).toBe('null')
+  })
 })
 
 describe('AppProvider — catégories de tâche (#35)', () => {

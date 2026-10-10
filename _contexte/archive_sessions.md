@@ -1693,3 +1693,26 @@ Aucune.
 
 ## Question bloquante pour la session suivante
 Aucune
+
+---
+# Session du 2026-10-10 — mot de passe administrateur, sauvegarde chiffrée rclone crypt)
+
+## Décisions prises
+- Sécurité de connexion niveau « A » retenu (contrôle côté appareil) : rôle admin = identité `marie`/`dev` + mot de passe dont la clé dérivée (PBKDF2) est comparée à une empreinte embarquée ; identité (nom de dossier de sauvegarde) séparée du secret. Niveau « B » (vérification serveur) écarté pour l'instant.
+- Mots de passe de Marie et de dev à choisir avec Marie lors de leur rencontre ; rien n'est stocké dans `.env` (empreinte publique, mot de passe dans un gestionnaire).
+- Sauvegarde Drive : le backup en clair est inchangé ; les fichiers sensibles passent par `rclone crypt` (script séparé), pas par un zip protégé.
+
+## Livrables produits ou modifiés
+- `src/domain/rules/adminCredentials.ts`, `testerRoles.ts`, `E111Profile.tsx`, `settings.ts` (+ tests), `scripts/hash_admin_code.py` : commités (`06cf5b5`), non déployés ; 1081 tests, `tsc` et `eslint` propres.
+- `scripts/backup_sensitive.py` : commité (`22f8d1f`), testé à blanc sur remote local, pas encore sur le Drive.
+- `a_voir_avec_marie.md` : point mot de passe administrateur ajouté.
+
+## Hypothèses validées / invalidées
+- VALIDE : empreinte identique entre le script Python et l'appli ; `--upload` + `--check` chiffrés OK sur remote jetable (108 fichiers).
+- EN ATTENTE : empreintes réelles absentes (personne n'est admin tant qu'elles ne sont pas collées) ; remote Drive chiffré non créé.
+
+## Prochaine étape exacte
+Voir Marie : choisir les mots de passe `marie` et `dev`, coller les empreintes, corriger les défauts a)-c) du P1, puis `/deploy` v6.11. Lancer `python scripts/backup_sensitive.py --setup` puis `--upload` et `--check`.
+
+## Question bloquante pour la session suivante
+Aucune

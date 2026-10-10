@@ -20,10 +20,12 @@ Liste de points à trancher ou à lui faire tester. Source : `_contexte/signals.
   - Son ancien contenu (tâches, routines) est-il apparu dès l'arrivée sur l'Accueil, ou après une action de sa part ?
   - A-t-elle utilisé « Export et import » dans les paramètres ?
 - **Mot de passe administrateur (nouveau dans la v6.11).** Elle doit choisir un mot de passe long, à saisir une fois dans Paramètres > Profil avec le code `marie`. À faire avec elle sur place : dev lance `python scripts/hash_admin_code.py marie` (saisie masquée) et colle l'empreinte dans `adminCredentials.ts`. Choisir le mot de passe de dev dans la foulée (`dev`). Ne pas déployer la v6.11 avant que les deux empreintes soient en place. Elle doit le noter dans un gestionnaire de mots de passe.
+  - Une fois les empreintes en place (`ADMIN_CREDENTIAL_HASHES` est vide aujourd'hui, donc personne n'est admin) : réparer le test e2e T58 (`e2e/10-feedback.spec.ts`) en écrivant dans les réglages locaux `tester_code: 'dev'` et `admin_key: ADMIN_CREDENTIAL_HASHES.dev`, sans mot de passe dans les tests. Ajouter un test T58b : un profil non admin ne voit pas « Signaler un retour ». Retirer ensuite la section « T58 en échec » de `tests_manuels.md`.
 - **Latence « Chargement… » entre écrans** (signalée le 2026-09-04) : persiste-t-elle ?
 - **Planning de la semaine** : le saut au relâchement d'une tâche glissée existe-t-il aussi dans cette vue ?
 - **Navigation « Planning de la semaine »** : est-elle lisible ? (décision produit 4 en attente)
-- **Badge « Powered by Netlify »** : le voit-elle encore après fermeture complète de l'appli ?
+- **Livret, retour `17f8fcae` (E77)** : quand elle fait un dépôt et choisit « d'où vient l'argent », veut-elle déplacer de l'argent déjà sur le livret d'une catégorie à une autre (ex. de « livret jeune » vers « Vacances ») ? Ou choisir dans quelle catégorie va l'argent qui arrive ? Bloque la Phase 5 de `roadmap_retours_2026-10-10.md`.
+- **Dépense liée à une tâche, retour `c2143fff` (E21)** : si elle décoche la tâche après avoir saisi la dépense, faut-il supprimer la dépense automatiquement, ou la garder ? Bloque la Phase 6 de `roadmap_retours_2026-10-10.md`.
 
 ## À lui annoncer
 

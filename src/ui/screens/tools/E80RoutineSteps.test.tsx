@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
@@ -13,6 +13,7 @@ function makeRoutine(overrides: Partial<Routine> = {}): Routine {
     id: 'routine-1',
     name: 'Routine du matin',
     color: null,
+    duration_minutes: null,
     created_at: '2026-09-23T00:00:00.000Z',
     updated_at: '2026-09-23T00:00:00.000Z',
     ...overrides,
@@ -187,6 +188,41 @@ describe('E80RoutineSteps', () => {
     )
     await screen.findByRole('heading', { name: 'Routine du matin' })
     expect(screen.queryByLabelText('Modifier les étapes de ce jour')).not.toBeInTheDocument()
+  })
+
+  it("change l'heure de la routine pour ce jour de semaine uniquement", async () => {
+    const setRoutineDaySchedule = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    renderScreen(
+      makeAppContext({
+        route: ROUTE,
+        routines: [makeRoutine()],
+        selectedRoutineId: 'routine-1',
+        getRoutineStepsForDate: vi.fn().mockResolvedValue(stepsResult([makeStep()])),
+        getRoutineSchedules: vi.fn().mockResolvedValue([makeSchedule()]),
+        setRoutineDaySchedule,
+      }),
+    )
+    await user.click(await screen.findByRole('button', { name: "Changer l'heure de ce jour" }))
+    const dialog = screen.getByRole('dialog', { name: "Changer l'heure" })
+    for (const digit of ['0', '9', '3', '0']) {
+      await user.click(within(dialog).getByRole('button', { name: digit }))
+    }
+    expect(setRoutineDaySchedule).toHaveBeenCalledWith('routine-1', 3, '09:30')
+  })
+
+  it("n'affiche pas le changement d'heure si la routine n'est pas planifiée ce jour-là", async () => {
+    renderScreen(
+      makeAppContext({
+        route: ROUTE,
+        routines: [makeRoutine()],
+        selectedRoutineId: 'routine-1',
+        getRoutineStepsForDate: vi.fn().mockResolvedValue(stepsResult([makeStep()])),
+        getRoutineSchedules: vi.fn().mockResolvedValue([]),
+      }),
+    )
+    await screen.findByRole('heading', { name: 'Routine du matin' })
+    expect(screen.queryByRole('button', { name: "Changer l'heure de ce jour" })).not.toBeInTheDocument()
   })
 
   it('détache le jour au premier clic sur « Modifier ce jour » puis permet d’ajouter une étape propre à ce jour', async () => {

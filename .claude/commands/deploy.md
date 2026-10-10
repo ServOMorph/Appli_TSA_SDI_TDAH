@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python scripts/count_netlify_deploys.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python scripts/queue_pending_feedback_reply.py:*), Bash(python scripts/count_netlify_deploys.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -219,7 +219,15 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    final mais n'invalide pas le déploiement déjà effectué (Netlify l'a déjà confirmé) — c'est une vérification
    indépendante supplémentaire, pas une nouvelle porte bloquante.
 
-   Republier les réponses aux retours testeur laissées en attente de cette livraison :
+   Republier les réponses aux retours testeur laissées en attente de cette livraison. D'abord les
+   afficher :
+   ```
+   python scripts/queue_pending_feedback_reply.py --list
+   ```
+   File non vide : présenter à l'utilisateur le texte exact de chaque réponse et attendre son accord
+   écrit avant de republier — c'est le dernier contrôle avant que le testeur ne lise la réponse. Une
+   réponse devenue obsolète (correctif retiré de la livraison, texte à reprendre) se retire avec
+   `--remove --report-id <id>` ou se corrige avec `--replace --report-id <id> --body <texte>`. Puis :
    ```
    python scripts/republish_pending_feedback_replies.py
    ```
@@ -229,7 +237,8 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    moment de la correction, pour que le testeur ne lise jamais « corrigé » sur une version qui ne
    l'embarque pas encore. Fichier absent ou vide : rien à faire. Échec partiel : les entrées non
    publiées restent dans le fichier (nouvelle tentative au prochain `/deploy`), à signaler dans le
-   rapport final sans bloquer la suite.
+   rapport final sans bloquer la suite. Une réponse dont le retour a été validé par le testeur
+   entre-temps est retirée de la file par le script (avertissement), sans échec.
 
    Mettre à jour `_contexte/dernier_deploiement.md` (le créer s'il n'existe pas) avec la version, la date et
    l'URL de production déployées, pour que cette information reste à jour indépendamment de `/close`. Y

@@ -36,7 +36,7 @@ describe('ToolCard', () => {
 
   it('affiche le nom de la routine référencée, avec le contour de sa couleur propre', () => {
     const ctx = makeAppContext({
-      routines: [{ id: 'routine-1', name: 'Routine du matin', color: '#22aa55', created_at: '', updated_at: '' }],
+      routines: [{ id: 'routine-1', name: 'Routine du matin', color: '#22aa55', duration_minutes: null, created_at: '', updated_at: '' }],
     })
     const tool = makeTool({ type: 'routine', list_id: null, routine_id: 'routine-1', color: null })
     renderWithApp(<ToolCard tool={tool} onOpen={() => {}} />, ctx)

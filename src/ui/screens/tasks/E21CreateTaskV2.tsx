@@ -4,6 +4,7 @@ import { Button } from '@/ui/components/Button'
 import { IconPicker } from '@/ui/components/IconPicker'
 import { ColorPicker } from '@/ui/components/ColorPicker'
 import { DurationRoller } from '@/ui/components/DurationRoller'
+import { TaskTimeField } from '@/ui/components/TaskTimeField'
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
 import { TaskCardLayout, TaskFieldCard, IconFieldValue, ColorFieldValue } from '@/ui/components/TaskCardLayout'
 import { todayDate } from '@/app/repositories'
@@ -290,19 +291,14 @@ export function E21CreateTaskV2() {
               expanded={expandedField === 'time'}
               onToggle={() => toggleField('time')}
             >
-              <label htmlFor="task-start-time" style={labelStyle}>
-                Heure de début
-              </label>
-              <input
-                id="task-start-time"
-                type="time"
-                aria-label="Heure de début"
+              <span style={labelStyle}>Heure de début</span>
+              <TaskTimeField
+                label="Heure de début"
                 value={startTime}
-                onChange={(e) => {
-                  setStartTime(e.target.value)
-                  setDurationMinutes((d) => clampDurationToDay(e.target.value, d))
+                onChange={(time) => {
+                  setStartTime(time)
+                  setDurationMinutes((d) => clampDurationToDay(time, d))
                 }}
-                style={{ ...inputStyle, minWidth: 0, maxWidth: '100%', WebkitAppearance: 'none', appearance: 'none' }}
               />
               {!startTime && (
                 <p style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>

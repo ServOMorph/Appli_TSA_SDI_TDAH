@@ -1315,3 +1315,17 @@ qu'elle a ouvert l'appli et que ses données ont été bien intégrées. Relevé
 29/09 à Paris) à 10h19 UTC. Le blocage venait bien d'un retour local inconnu du serveur : la remise en
 file de la v6.10 l'a levé. Pas de réponse rédigée.
 
+
+### 2026-10-10 (rencontre en personne, réponses relayées par l'utilisateur)
+**Dév ->** questions de `a_voir_avec_marie.md`, posées oralement.
+**Marie ->**
+- Import à l'ouverture : elle n'a pas cliqué sur « Retrouver mes données », ses données étaient directement présentes dans l'appli. Elle avait fait un export avant, à la demande du dév sur Discord. Adresse (neuve ou habituelle) : non précisée.
+- Latence « Chargement… » entre écrans : ne persiste pas.
+- Planning de la semaine : plus de saut au relâchement d'une tâche glissée ; navigation lisible.
+- Livret (retour `17f8fcae`, E77) : l'argent ajouté à une catégorie d'un livret doit être pris sur le « montant total » (confirmé : solde du livret non encore réparti en catégories).
+- Dépense liée à une tâche (retour `c2143fff`, E21) : si la tâche est décochée, la dépense est gardée.
+- Collage d'image dans « Signaler un retour » (production) : fonctionne.
+- Barre d'annotation sur iPhone : ne la gêne plus.
+- Import depuis l'écran de bienvenue sur iPhone : non testé (ses données étaient déjà chargées).
+- Annonces faites : « Nouveautés » dans Paramètres à partir de la v6.11 ; code testeur à ne pas ressaisir.
+_Suite :_ réponses à `a_voir_avec_marie.md`. Débloque les phases 5 (Livret) et 6 (Dépense) de `roadmap_retours_2026-10-10.md`. Mots de passe admin choisis pour `marie` et `dev`, empreintes posées dans `adminCredentials.ts` (saisie du mot de passe dans Paramètres > Profil non confirmée).

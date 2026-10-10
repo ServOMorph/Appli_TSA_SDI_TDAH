@@ -14,12 +14,11 @@ Points restants après l'échange du 2026-10-10. Supprimer un point une fois tra
 ## À trancher
 
 - **Import des données sans clic (cause inconnue).** Ses données sont apparues directement dans l'appli, sans « Retrouver mes données ». Elle avait exporté avant. Adresse neuve ou habituelle : non précisé. Aucun mécanisme d'import automatique trouvé dans le code.
-- **Mot de passe administrateur.** Empreintes `marie` et `dev` posées dans `adminCredentials.ts` (non commitées). Reste : saisie du mot de passe dans Paramètres > Profil sur chaque appareil admin ; défauts a)-c) de `signals.md` ; réparer le test e2e T58 (`e2e/10-feedback.spec.ts`) avec `tester_code: 'dev'` et `admin_key: ADMIN_CREDENTIAL_HASHES.dev`, sans mot de passe dans les tests ; ajouter T58b (un profil non admin ne voit pas « Signaler un retour ») ; retirer la section « T58 en échec » de `tests_manuels.md`.
+- **Mot de passe administrateur.** Empreintes `marie` et `dev` posées et commitées, vérification à l'enregistrement et T58 réparés. Reste : saisie du mot de passe dans Paramètres > Profil sur chaque appareil admin après le déploiement (et après toute restauration depuis un export).
 
-## Décisions reçues, à implémenter (`roadmap_retours_2026-10-10.md`)
+## À trancher avec Marie (livret)
 
-- **Phase 5, Livret `17f8fcae` (E77)** : un dépôt propose le choix de la provenance : « Montant total » (argent neuf, le solde du livret augmente) ou argent déjà dans le livret (virement entre catégories). L'argent non classé d'un livret porte le nom du livret (« livret jeune »). À trancher : les autres livrets sont-ils aussi des provenances ?
-- **Phase 6, Dépense `c2143fff` (E21)** : décocher la tâche garde la dépense.
+- Les autres livrets sont-ils aussi des provenances possibles d'un dépôt ?
 
 ## À annoncer dans le message de livraison de la v6.11
 

@@ -7,6 +7,8 @@
 - **Outils : création d'un dossier depuis « + », menu « ⋯ » sur les cartes (déplacer, supprimer avec confirmation)** (`ToolActionsMenu.tsx`, `useToolsState.ts`) (retour `9ac356a8`).
 - **Scripts de retours** : mise en file horodatée des réponses (`queue_pending_feedback_reply.py`), un retour relancé après mise en file redevient à traiter (`reply_feedback_report.py`).
 - **Deux catégories de testeurs** (`src/domain/rules/testerRoles.ts`) : `admin` (codes `marie`, `dev`) garde le signalement de retours (bouton `+`, « Mes retours », écrans E122-E124) ; `testeur` (tout autre code ou absence de code) ne le voit plus et est renvoyé vers l'Accueil s'il atteint un écran de retour. Le rôle `admin` exige en plus un mot de passe administrateur (saisi dans Paramètres > Profil, clé dérivée comparée à une empreinte embarquée) : contrôle côté appareil uniquement, sans vérification serveur.
+- **Livret : mouvements repliés par catégorie, ligne « hors catégorie » portant le nom du livret, provenance d'un dépôt (montant total ou virement depuis une autre catégorie)** (`E77BudgetLivretDetail.tsx`, `budgetRules.ts`, `useBudgetState.ts`) (retour `17f8fcae`).
+- **Tâche avec dépense prévue : case « Dépense » en création et modification, fenêtre montant et catégorie au cochage dans le planning, dépense enregistrée avec le nom de la tâche** (`TaskExpenseModal.tsx`, `PlanningBoard.tsx`, `task.ts`) (retour `c2143fff`).
 
 ### Modifié
 - **« Nouveautés » déplacé de « Mes retours » vers Paramètres**, accessible à tous les testeurs.
@@ -17,7 +19,8 @@
 - **Code testeur saisi à l'onboarding désormais visible dans Paramètres > Profil** dès la création du compte (les réglages n'étaient pas chargés en mémoire, le champ restait vide).
 - **Bouton « Enregistrer » du code testeur contenu dans sa carte** sur petit écran.
 - **Fil de discussion E124** : version affichée proprement dans l'en-tête du retour (`E124FeedbackDetail.tsx`).
-- **Tests e2e** : helpers de saisie d'heure et de durée (`e2e/helpers/pickers.ts`), specs 01/05/07/08/09/11 adaptées ; T58 reste en échec connu (retours réservés aux admins, empreintes vides).
+- **Mot de passe administrateur vérifié à l'enregistrement** (`E111Profile.tsx`) : refus si la clé dérivée diffère de l'empreinte, message si la dérivation est impossible, clé conservée en re-sauvegardant la même identité ; `admin_key` exclue du snapshot de synchronisation et de l'export (`buildSnapshot.ts`).
+- **Tests e2e** : helpers de saisie d'heure et de durée (`e2e/helpers/pickers.ts`), specs 01/05/07/08/09/11 adaptées ; T58 réparé (clé admin injectée dans IndexedDB) et T58b ajouté (bouton absent sans clé admin).
 
 ## v6.10 — 2026-10-07
 

@@ -8,6 +8,8 @@ export const WHATS_NEW: string[] = [
   'L’heure de début et la durée d’une tâche se choisissent avec des chiffres à toucher, comme pour les routines.',
   'Une routine a maintenant une durée totale, et son heure de fin apparaît dans le planning. L’heure d’une routine peut aussi être changée pour un seul jour.',
   'Le bouton « + » des outils permet de créer un outil ou un dossier. Le menu « ⋯ » des cartes permet de déplacer ou de supprimer un outil ou un dossier.',
+  'Dans un livret, les mouvements sont repliés et s’affichent en ouvrant une catégorie. L’argent qui n’est dans aucune catégorie apparaît dans une ligne à part, et un dépôt permet de choisir d’où vient l’argent.',
+  'Une tâche peut avoir la case « Dépense ». En la cochant dans le planning, une fenêtre demande le montant et la catégorie de « Mon compte ».',
 ]
 
 export const WHATS_NEW_VERSION = import.meta.env.VITE_APP_VERSION ?? 'dev'

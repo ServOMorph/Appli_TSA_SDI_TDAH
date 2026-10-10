@@ -14,8 +14,8 @@ Déclenchée par `/traiter_retours` (Phase 3 de `roadmap_correctifs_retours_2026
 | `b19506a7` | E79/E10 | Pas de durée totale de routine ni d'heure de fin dans le planning | Phase 3 |
 | `1734c523` | E80 | Pas de changement d'heure pour la routine d'un seul jour | Phase 3 |
 | `9ac356a8` | E10 | Pas de choix outil/dossier sur « + », pas de menu « ⋯ » (déplacer, supprimer) sur les cartes | Phase 4 |
-| `17f8fcae` | E77 | Catégories, « livret jeune » (non classé), mouvements par catégorie, source d'un dépôt ambiguë | Phase 5 — bloquée, question à Marie |
-| `c2143fff` | E21 | Case « dépense » liée à « Mon compte » ; comportement au décochage non défini | Phase 6 — bloquée, question à Marie |
+| `17f8fcae` | E77 | Catégories, « livret jeune » (non classé), mouvements par catégorie, source d'un dépôt ambiguë | Phase 5 — faite, réponse en file |
+| `c2143fff` | E21 | Case « dépense » liée à « Mon compte » ; comportement au décochage non défini | Phase 6 — faite, réponse en file |
 | `58787b8f` | E10 | Badge Netlify : désactivé côté site, version en cache sur le téléphone | Vérifié avec Marie le 2026-10-10 : badge absent. Marqué validé côté serveur (`resolved_at`) sur demande explicite de l'utilisateur, aucune réponse déposée |
 | `389e3f8a` | E10 | « Test 5 », appareil de test | Réponse directe déposée le 2026-10-10 |
 
@@ -66,18 +66,18 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 5 — Livret : catégories et « livret jeune » [TODO — bloquée]
+## Phase 5 — Livret : catégories et « livret jeune » [FAIT]
 
-- Bloquée tant que Marie n'a pas précisé « choisir de quel endroit je prends l'argent » lors d'un dépôt (déplacement entre catégories, ou catégorie de destination d'un dépôt entrant).
+- Décision de Marie (2026-10-10) : un dépôt propose la provenance (montant total ou autre catégorie) ; l'argent non classé porte le nom du livret.
 - `17f8fcae` : catégories visibles sur E77, catégorie « livret jeune » pour l'argent non classé, mouvements visibles seulement en ouvrant une catégorie.
 - Fichiers pressentis : `E77BudgetLivretDetail.tsx`, `budgetRules.ts`, `useBudgetState.ts`.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
-## Phase 6 — Dépense liée à une tâche [TODO — bloquée]
+## Phase 6 — Dépense liée à une tâche [FAIT]
 
-- Bloquée tant que Marie n'a pas dit si décocher la tâche supprime ou conserve la dépense.
+- Décision de Marie (2026-10-10) : décocher la tâche garde la dépense.
 - `c2143fff` : case « dépense » dans E21 ; en cochant la tâche, fenêtre : montant, catégorie de « Mon compte » ; dépense enregistrée avec le nom de la tâche comme motif.
 - Fichiers pressentis : entité tâche (migration Dexie), `E21CreateTaskV2.tsx`, `E22TaskDetail.tsx`, `useTasksState.ts`, `useBudgetState.ts`, `PlanningBoard.tsx`.
 

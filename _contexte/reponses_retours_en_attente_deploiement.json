@@ -40,5 +40,17 @@
     "screen_code": "E10",
     "body": "Sur l'Accueil, le bouton « + » propose maintenant aussi de créer un dossier. Chaque outil et chaque dossier a un bouton « ⋯ » en haut à droite. Il permet de déplacer l'outil dans un dossier, ou de le ressortir vers l'Accueil. Il permet aussi de supprimer, avec une confirmation avant d'effacer. Supprimer un dossier efface aussi les outils qu'il contient, sauf le Budget qui revient sur l'Accueil. Dis-moi si cela te convient.",
     "queued_at": "2026-10-10T10:53:09.607764+00:00"
+  },
+  {
+    "report_id": "17f8fcae-fcb9-408c-bf43-0797490ef696",
+    "screen_code": "E77",
+    "body": "Les mouvements du livret sont maintenant repliés. Ils s'affichent seulement quand tu ouvres une catégorie. L'argent qui n'est dans aucune catégorie apparaît dans une ligne à part. Quand tu fais un dépôt, tu choisis d'où vient l'argent : montant total ou une autre catégorie. Dis-moi si cela te convient.",
+    "queued_at": "2026-10-10T18:32:41.778437+00:00"
+  },
+  {
+    "report_id": "c2143fff-2698-4707-92e4-11ab48a0ac46",
+    "screen_code": "E21",
+    "body": "Tu peux cocher « Dépense » en créant ou en modifiant une tâche. Quand tu la coches dans le planning, une fenêtre te demande le montant et la catégorie de « Mon compte ». La dépense est ajoutée avec le nom de la tâche comme motif. Tu peux aussi terminer la tâche sans dépense. Dis-moi si cela te convient.",
+    "queued_at": "2026-10-10T18:32:42.063514+00:00"
   }
 ]

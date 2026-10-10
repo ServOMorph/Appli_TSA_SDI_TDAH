@@ -16,7 +16,7 @@ Créer une application neuroinclusive (web PWA + mobile) pour personnes AuDHD (T
 ## État actuel (réécrit intégralement à chaque /close)
 
 **v6.10 en production** (`https://appli-audhd.netlify.app`, 2026-10-07). **v6.11 prête, non déployée (2026-10-09)** : rôles testeurs `admin` (`marie`, `dev` : retours visibles) / `testeur` (autres codes ou sans code : retours masqués), « Nouveautés » dans Paramètres, routines triées à leur horaire dans E12, outils de l'Accueil repliés par défaut.
-Prochain essai : rôles sur téléphone via le tunnel Cloudflare (port 5000, occupé par un `server.py` à libérer). Sécurité de connexion à revoir avant le testeur suivant Satine.
+Rôles validés sur téléphone (2026-10-10). Prochain pas : voir Marie (`a_voir_avec_marie.md`), puis `/deploy` v6.11. Sécurité de connexion à revoir avant le testeur suivant Satine.
 `roadmap_correctifs_retours_2026-09-29.md` : Phases 1 et 4 `[FAIT]`, Phases 2, 3 et 5 `[TODO]`. Zone `discord` en pause (`bot.py` arrêté) : tout envoi passe par confirmation explicite + `enqueue --urgent`.
 `roadmap_experience_accueil_testeurs.md` : Phase 1 `[FAIT]`, Phase 2 `[TODO]`.
 

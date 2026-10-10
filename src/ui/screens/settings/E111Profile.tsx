@@ -15,6 +15,7 @@ const backBtnStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   flex: 1,
+  minWidth: 0,
   padding: '10px 12px',
   borderRadius: 'var(--radius-md)',
   border: '1px solid var(--color-border)',
@@ -74,7 +75,7 @@ export function E111Profile() {
         <p style={{ margin: '0 0 var(--spacing-xs)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
           Code testeur
         </p>
-        <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)', minWidth: 0 }}>
           <input
             type="text"
             aria-label="Code testeur"

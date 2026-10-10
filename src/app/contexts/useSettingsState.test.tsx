@@ -16,7 +16,7 @@ import { useSettingsState } from './useSettingsState'
 const syncNowMock = vi.mocked(syncNow)
 
 function SettingsPanel() {
-  const { createUser, exportData, importData, updateSettings, currentUser } = useSettingsState()
+  const { createUser, exportData, importData, updateSettings, currentUser, settings } = useSettingsState()
   const [lastImport, setLastImport] = useState('')
   async function runImport(data: unknown) {
     const result = await importData(data)
@@ -25,6 +25,7 @@ function SettingsPanel() {
   return (
     <>
       <div data-testid="user">{currentUser?.id ?? 'aucun'}</div>
+      <div data-testid="settings-tester-code">{settings?.tester_code ?? 'aucun'}</div>
       <button onClick={() => createUser('student')}>Créer l’utilisateur</button>
       <button onClick={() => createUser('student', ' RaphTest ')}>Créer l’utilisateur avec code testeur</button>
       <button onClick={() => updateSettings({ tester_code: 'marie' })}>Modifier les réglages</button>
@@ -148,6 +149,7 @@ describe('useSettingsState — createUser', () => {
     const userId = screen.getByTestId('user').textContent as string
     const settings = await settingsRepo.getByUserId(userId)
     expect(settings?.tester_code).toBe('RaphTest')
+    expect(screen.getByTestId('settings-tester-code')).toHaveTextContent('RaphTest')
   })
 
   it('ne fixe pas de code testeur quand aucun n’est fourni', async () => {

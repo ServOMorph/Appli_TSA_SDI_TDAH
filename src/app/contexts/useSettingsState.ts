@@ -138,6 +138,7 @@ export function useSettingsState() {
     await settingsRepo.create(defaultSettings)
     await seedDefaultToolsIfMissing()
     setCurrentUser(user)
+    setSettings(defaultSettings)
   }
 
   /**

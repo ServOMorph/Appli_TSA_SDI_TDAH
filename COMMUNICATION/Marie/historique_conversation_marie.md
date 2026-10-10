@@ -1345,3 +1345,11 @@ _Suite :_ remplace sa réponse précédente du même jour sur le Livret (`17f8fc
 3. Oui pour « livret jeune » ; on peut avoir d'autres livrets, et dans ce cas le nom choisi sera celui de ce livret-là.
 
 _Suite :_ répond aux questions de clarification Livret ci-dessus (`17f8fcae`). Un dépôt propose un choix de provenance : « Montant total » (A) ou de l'argent déjà dans le livret (B). L'argent d'un livret qui n'est dans aucune catégorie porte le nom de ce livret (« livret jeune » pour son livret actuel). Reste non tranché : les autres livrets sont-ils aussi des provenances possibles d'un dépôt ?
+
+### 2026-10-10 (alerte export avant /deploy v6.11)
+**Dév ->**
+Une nouvelle version sera bientôt disponible.
+Avant, exporte tes données.
+Paramètres > Export et import > Exporter en JSON.
+Réponds « fait » une fois l'export terminé.
+_Suite :_ alerte de l'étape 0.1 de `/deploy` (envoi urgent, demande `20261010T190104_502276`). Réponse de Marie attendue ; sa confirmation est recontrôlée par l'utilisateur à l'étape 4ter.

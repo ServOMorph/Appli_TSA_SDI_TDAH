@@ -1353,3 +1353,22 @@ Avant, exporte tes données.
 Paramètres > Export et import > Exporter en JSON.
 Réponds « fait » une fois l'export terminé.
 _Suite :_ alerte de l'étape 0.1 de `/deploy` (envoi urgent, demande `20261010T190104_502276`). Réponse de Marie attendue ; sa confirmation est recontrôlée par l'utilisateur à l'étape 4ter.
+
+### 2026-10-10 (livraison v6.11 — message validé, dépôt en attente)
+**Dév ->**
+Version 6.11 en ligne.
+
+https://appli-audhd.netlify.app
+
+Détail des changements : bouton « Nouveautés » dans Paramètres.
+
+Saisis ton mot de passe administrateur dans Paramètres > Profil.
+Sans lui, « Signaler un retour » reste masqué.
+
+Livré : jours précédent et suivant sur l'Accueil, « Dupliquer » une tâche, heure et durée par chiffres, durée des routines, dossiers d'outils, provenance d'un dépôt dans un livret, dépense liée à une tâche.
+La fenêtre de dépense s'ouvre seulement depuis le planning.
+
+Teste le collage d'image : copie une image, puis « Signaler un retour » > « Coller une image ».
+
+Question : les autres livrets sont-ils aussi des provenances possibles d'un dépôt ?
+_Suite :_ message de l'étape 11 de `/deploy`, validé par l'utilisateur ; dépôt gateway refusé par le classifieur auto-mode, donc non envoyé à ce stade. Réponse attendue sur la question des livrets.

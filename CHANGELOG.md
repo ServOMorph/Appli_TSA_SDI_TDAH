@@ -1,7 +1,7 @@
 ## v6.11 — 2026-10-09
 
 ### Ajouté
-- **Deux catégories de testeurs** (`src/domain/rules/testerRoles.ts`) : `admin` (codes `marie`, `dev`) garde le signalement de retours (bouton `+`, « Mes retours », écrans E122-E124) ; `testeur` (tout autre code ou absence de code) ne le voit plus et est renvoyé vers l'Accueil s'il atteint un écran de retour. Simple masquage côté client, sans contrôle d'accès.
+- **Deux catégories de testeurs** (`src/domain/rules/testerRoles.ts`) : `admin` (codes `marie`, `dev`) garde le signalement de retours (bouton `+`, « Mes retours », écrans E122-E124) ; `testeur` (tout autre code ou absence de code) ne le voit plus et est renvoyé vers l'Accueil s'il atteint un écran de retour. Le rôle `admin` exige en plus un mot de passe administrateur (saisi dans Paramètres > Profil, clé dérivée comparée à une empreinte embarquée) : contrôle côté appareil uniquement, sans vérification serveur.
 
 ### Modifié
 - **« Nouveautés » déplacé de « Mes retours » vers Paramètres**, accessible à tous les testeurs.

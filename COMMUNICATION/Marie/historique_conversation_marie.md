@@ -1322,10 +1322,26 @@ file de la v6.10 l'a levé. Pas de réponse rédigée.
 - Import à l'ouverture : elle n'a pas cliqué sur « Retrouver mes données », ses données étaient directement présentes dans l'appli. Elle avait fait un export avant, à la demande du dév sur Discord. Adresse (neuve ou habituelle) : non précisée.
 - Latence « Chargement… » entre écrans : ne persiste pas.
 - Planning de la semaine : plus de saut au relâchement d'une tâche glissée ; navigation lisible.
-- Livret (retour `17f8fcae`, E77) : l'argent ajouté à une catégorie d'un livret doit être pris sur le « montant total » (confirmé : solde du livret non encore réparti en catégories).
+- Livret (retour `17f8fcae`, E77) : réponse « l'argent ajouté dans une catégorie d'un livret doit être pris de "montant total" ». Interprétation du dév (solde non réparti du livret) erronée, voir l'entrée suivante.
 - Dépense liée à une tâche (retour `c2143fff`, E21) : si la tâche est décochée, la dépense est gardée.
 - Collage d'image dans « Signaler un retour » (production) : fonctionne.
 - Barre d'annotation sur iPhone : ne la gêne plus.
 - Import depuis l'écran de bienvenue sur iPhone : non testé (ses données étaient déjà chargées).
 - Annonces faites : « Nouveautés » dans Paramètres à partir de la v6.11 ; code testeur à ne pas ressaisir.
 _Suite :_ réponses à `a_voir_avec_marie.md`. Débloque les phases 5 (Livret) et 6 (Dépense) de `roadmap_retours_2026-10-10.md`. Mots de passe admin choisis pour `marie` et `dev`, empreintes posées dans `adminCredentials.ts` (saisie du mot de passe dans Paramètres > Profil non confirmée).
+
+### 2026-10-10 (questions de clarification sur le Livret, à poser en personne)
+**Dév ->**
+1. Quand tu fais un dépôt dans une catégorie d'un livret, l'argent vient d'où ?
+   - A : de ton « Montant total » du Budget (le livret augmente, le Montant total baisse).
+   - B : de l'argent déjà dans le livret, « livret jeune » ou une autre catégorie (le total du livret ne change pas, l'argent passe d'une catégorie à l'autre).
+2. Tu veux pouvoir choisir entre A et B à chaque dépôt, ou toujours A ?
+3. « Livret jeune » : c'est bien le nom que tu veux pour l'argent du livret qui n'est dans aucune catégorie ?
+_Suite :_ remplace sa réponse précédente du même jour sur le Livret (`17f8fcae`), obtenue à partir d'une reformulation erronée de « montant total » par le dév (le Montant total du code est le montant global du Budget, pas le solde non réparti du livret). Réponse de Marie attendue.
+
+**Marie -> (transmis par l'utilisateur, 2026-10-10)**
+1. Dans le dépôt, on doit pouvoir choisir d'où on prélève l'argent (A ou B).
+2. On vient d'y répondre.
+3. Oui pour « livret jeune » ; on peut avoir d'autres livrets, et dans ce cas le nom choisi sera celui de ce livret-là.
+
+_Suite :_ répond aux questions de clarification Livret ci-dessus (`17f8fcae`). Un dépôt propose un choix de provenance : « Montant total » (A) ou de l'argent déjà dans le livret (B). L'argent d'un livret qui n'est dans aucune catégorie porte le nom de ce livret (« livret jeune » pour son livret actuel). Reste non tranché : les autres livrets sont-ils aussi des provenances possibles d'un dépôt ?

@@ -18,7 +18,7 @@ Points restants après l'échange du 2026-10-10. Supprimer un point une fois tra
 
 ## Décisions reçues, à implémenter (`roadmap_retours_2026-10-10.md`)
 
-- **Phase 5, Livret `17f8fcae` (E77)** : un ajout à une catégorie d'un livret se prélève sur le solde non réparti du livret (« montant total »).
+- **Phase 5, Livret `17f8fcae` (E77)** : un dépôt propose le choix de la provenance : « Montant total » (argent neuf, le solde du livret augmente) ou argent déjà dans le livret (virement entre catégories). L'argent non classé d'un livret porte le nom du livret (« livret jeune »). À trancher : les autres livrets sont-ils aussi des provenances ?
 - **Phase 6, Dépense `c2143fff` (E21)** : décocher la tâche garde la dépense.
 
 ## À annoncer dans le message de livraison de la v6.11

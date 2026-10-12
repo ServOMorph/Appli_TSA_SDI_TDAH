@@ -111,18 +111,6 @@ export function E10Dashboard() {
         </Button>
       )}
 
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 0,
-          height: toolsOpen ? `${PLANNING_HEIGHT_PX}px` : `max(${PLANNING_HEIGHT_PX}px, calc(100svh - 200px))`,
-          overflow: 'hidden',
-        }}
-      >
-        <PlanningBoard />
-      </div>
-
       <section aria-label="Outils">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
           <h2 style={{ fontSize: '1.1rem', margin: 0 }}>Outils</h2>
@@ -183,6 +171,18 @@ export function E10Dashboard() {
           })}
         </div>}
       </section>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 0,
+          height: toolsOpen ? `${PLANNING_HEIGHT_PX}px` : `max(${PLANNING_HEIGHT_PX}px, calc(100svh - 200px))`,
+          overflow: 'hidden',
+        }}
+      >
+        <PlanningBoard />
+      </div>
 
       {showCreateTool && (
         <ToolCreateModal

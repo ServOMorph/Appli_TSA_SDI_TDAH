@@ -1,3 +1,15 @@
+## v6.12 — 2026-10-12
+
+### Ajouté
+- **Onboarding : catégories (TSA, TDAH, SDI, avec DI, HPI, neurotypique, je ne sais pas) et âge** remplacent adolescent / étudiant / adulte ; bouton « ? » de définition par catégorie ; modifiables dans Paramètres > Profil ; synchronisés (`profileRules.ts`, `NeuroCategoryPicker.tsx`, `E02Profile.tsx`, `E111Profile.tsx`).
+- **Écran de rattrapage du profil et renouvellement du consentement** (version de consentement) pour les utilisateurs existants ; le code testeur et le mot de passe admin sont demandés en premier (`startRoute.ts`, `syncConsent.ts`, `E04Consent.tsx`, `E05TesterCode.tsx`).
+
+### Modifié
+- **Accueil : bandeau des jours à défilement natif** (jour toujours centré, cadre autour du jour, fenêtre de 43 jours recentrée, axe horizontal verrouillé, flèches retirées) (`PlanningBoard.tsx`) ; section « Outils » placée au-dessus du planning (`E10Dashboard.tsx`).
+
+### Corrigé
+- `E02Profile.tsx` : le bouton « Continuer » ne reste plus bloqué si l'enregistrement du profil échoue.
+
 ## v6.11 — 2026-10-10
 
 ### Ajouté

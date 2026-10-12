@@ -1,4 +1,4 @@
-# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-10-10 — v6.11 en production, message de livraison envoyé à Marie, réponse attendue)
+# Signals — Appli_TSA_SDI_TDAH (MAJ 2026-10-12 — v6.11 en production ; v6.12 en préparation, non déployée)
 
 ## Contexte chaud
 - **Zone `discord` mise en pause sur demande explicite (2026-09-26) : `bot.py` arrêté, aucune boucle `discord_loop` active.** Le gardien de sortie (relecture ton/format/regroupement de l'agent DISCORD) est hors service pour tout envoi Discord jusqu'à réintégration explicite de l'utilisateur. En attendant : tout message à envoyer (initiative de l'agent ou demande de l'utilisateur) exige sa confirmation explicite avant l'envoi, puis passe directement par `gateway.py enqueue --urgent` (bypass gardien, indépendant de `bot.py`). L'inbox `discord`/`unrouted` n'est plus drainée automatiquement — les réponses entrantes (Marie, testeurs) ne seront plus routées avant relance. Réactivation : `/discord_relance` sur autorisation explicite de l'utilisateur — retirer alors cette entrée. **Correctif du 2026-09-27 (audit sécurité) à connaître pour la relance : le mode commande (Bash/Write sur le poste) n'est plus accessible qu'aux `author_id` déclarés dans `admins` (`config_bot_discord.json`, un seul aujourd'hui : Morphéus) — un non-admin qui mentionne le bot est routé comme trafic ordinaire, jamais exécuté (`DISCORD/discord_com/ACCES.md`).**
@@ -60,25 +60,26 @@
 - [P2] **`TaskTimeField` (E21/E22) ne permet plus d'effacer une heure déjà saisie** (revue `medium` du 2026-10-10, non corrigé) : l'ancien `<input type="time">` le permettait ; le pavé n'a pas de bouton « Effacer ». Dans E22, impossible de repasser une tâche « sans heure ». — fait quand : bouton d'effacement ajouté ou comportement jugé acceptable — réf : `src/ui/components/TaskTimeField.tsx`, `src/ui/screens/tasks/E22TaskDetail.tsx`
 - [P3] **Revue `medium` du 2026-10-10 (non corrigés)** : (a) `DurationRoller.pressDigit` repart du dernier chiffre quand la valeur dépasse le maximum de l'unité et les touches ne sont pas désactivées avec `maxMinutes` (valeur silencieusement écrêtée) ; (b) `moveTool` et `deleteFolder` (`useToolsState.ts`) ne retassent pas les positions du dossier source (trou, collision possible au prochain ajout) ; (c) `ToolActionsMenu` appelle `deleteTool`/`moveTool` sans `await` ni gestion d'erreur et ferme le dialogue aussitôt ; (d) `duplicateTaskById` ne copie les sous-tâches que sur un niveau, en insertions séquentielles sans transaction ; (e) `needs_reply` (`reply_feedback_report.py`) ignore une relance si l'entrée de file n'a pas de `queued_at` (entrées antérieures au changement) ; (f) `handleChangeTime` (E80) sans gestion d'erreur. Écartés : doublon d'horaire par `setRoutineDaySchedule` (c'est un upsert, lu) et suppression de la carte de surcharge (demandée par le retour `1c42ba1b`). — fait quand : traités ou jugés acceptables — réf : `src/ui/components/DurationRoller.tsx`, `src/app/contexts/useToolsState.ts`, `src/ui/components/ToolActionsMenu.tsx`, `src/app/contexts/usePlanningState.ts`, `scripts/reply_feedback_report.py`
 - [P2] **Fichiers `JEUX/` modifiés ou supprimés hors de cette session, non commités** (`JeuxLauncher.tsx`, `catalogue.ts`, `planning_energie/`, `tri_calme/` supprimés, contextes de la zone) : à relire et commiter par la zone `jeux`, non inclus au commit de ce `/close`. — fait quand : commités ou écartés — réf : `git status`, `JEUX/_contexte/statut.md`
+- [P2] **Synchronisation avant renouvellement du consentement** (revue `medium` du 2026-10-12, non corrigé) : `syncClient.ts` ne contrôle que `isSyncConsentGranted()`, pas `isSyncConsentCurrent()` ; `syncNow()` part au démarrage et après import/`updateProfile`, avant l'écran de renouvellement. Un profil déjà doté de catégories (import) peut donc être envoyé sous un consentement de version ancienne. Décider du blocage avant `/deploy`. — fait quand : envoi conditionné à la version courante ou risque accepté — réf : `src/data/sync/syncClient.ts`, `src/data/sync/syncConsent.ts`, `src/app/AppContext.tsx`
+- [P3] **Revue `medium` du 2026-10-12 (non corrigés)** : (a) `PlanningBoard.selectDayFromStrip` laisse `smoothTargetRef` armé si le jour touché est déjà affiché (recalage ignoré ensuite) ; (b) le minuteur de repos de 120 ms peut valider un jour intermédiaire si un défilement marque une pause ; (c) `E111Profile` utilise `isSyncConsentGranted()` au lieu de `isSyncConsentCurrent()` pour dire que les données sont envoyées ; (d) plus de navigation clavier jour par jour depuis le retrait des flèches (demandé par l'utilisateur) ; (e) import sans `getFirst()` saute consentement et rattrapage. Écartés : mot de passe vide = testeur ordinaire (comportement spécifié), refus du renouvellement = retrait du partage (décidé). — fait quand : traités ou jugés acceptables — réf : `src/ui/screens/dashboard/PlanningBoard.tsx`, `src/ui/screens/settings/E111Profile.tsx`, `src/app/AppContext.tsx`
+- [P2] **Feature catégories de profil : tests manuels et déploiement** — code terminé et non commité avant ce `/close` ; tests manuels en attente dans `tests_manuels.md`. — fait quand : tests validés, puis `/deploy` v6.12 — réf : `roadmap_profil_categories.md`, `tests_manuels.md`
 
-## Dernière session (2026-10-10 — déploiement de la v6.11 et message de livraison à Marie)
+## Dernière session (2026-10-12 — catégories de profil, HPI, bandeau des jours)
 
 ## Décisions prises
-- `/deploy` v6.11 mené jusqu'au bout : défauts (a) et (c) corrigés avant, (b) écarté, findings de la revue `high` acceptés et tracés `[P2]`.
-- Les 9 réponses ont été republiées telles quelles après relecture ; `roadmap_retours_2026-10-10.md` archivée.
-- Message de livraison envoyé en urgent sur ordre de l'utilisateur, après un premier refus du classifieur.
+- Catégories + âge à l'onboarding, rattrapage et consentement renouvelé pour tous ; HPI ajouté et bouton « ? » de définition par catégorie.
+- Bandeau des jours de l'Accueil en défilement natif centré, sans flèches, axe verrouillé ; outils placés au-dessus du planning.
 
 ## Livrables produits ou modifiés
-- v6.11 en production (`appli-audhd.netlify.app`, HTTP 200, budget de bundle respecté) ; `WHATS_NEW` vidé, `dernier_deploiement.md` à jour (`71ed338`).
-- Message de livraison : demande `20261010T203939_073308`, consigné dans `historique_conversation_marie.md`.
-- `Archives/roadmap_retours_2026-10-10.md` (`3fd5314`).
+- Feature profil (`profileRules.ts`, `startRoute.ts`, `NeuroCategoryPicker.tsx`, E02/E04/E05/E111, `PlanningBoard.tsx`, `E10Dashboard.tsx`), docs, roadmap : codés, non commités avant ce `/close`, commités par lui.
+- `WHATS_NEW` (3 entrées) et `CHANGELOG.md` v6.12 ajoutés ; `E02Profile.tsx` : bouton non bloqué en cas d'échec.
 
 ## Hypothèses validées / invalidées
-- VALIDE : 1120 tests, `tsc`, `eslint`, build et déploiement, smoke test HTTP 200, 9 réponses republiées sans échec.
-- EN ATTENTE : comportement des correctifs sur téléphone, réponse de Marie, findings de synchronisation non vérifiés, tests manuels de `tests_manuels.md`.
+- VALIDE : 1198 tests, `tsc`, `eslint` ; bandeau des jours et HPI/définitions validés par l'utilisateur sur téléphone.
+- EN ATTENTE : tests manuels du parcours profil, rattrapage et consentement ; revue `medium` : 1 [P2] et 1 [P3] tracés.
 
 ## Prochaine étape exacte
-Sur demande de l'utilisateur, relever la réponse de Marie (`gateway.py poll --agent orchestrateur`) puis traiter ses retours éventuels avec `/traiter_retours`.
+Valider les tests manuels de `tests_manuels.md` (profil/consentement), trancher l'action [P2] sur la synchronisation avant renouvellement, puis `/deploy` v6.12.
 
 ## Question bloquante pour la session suivante
-Aucune
+Bloquer l'envoi de la synchronisation tant que le consentement n'est pas de version courante, ou accepter le risque ?

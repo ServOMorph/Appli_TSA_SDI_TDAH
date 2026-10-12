@@ -1,11 +1,11 @@
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
-import { grantSyncConsent } from '@/data/sync/syncConsent'
+import { grantSyncConsent, revokeSyncConsent } from '@/data/sync/syncConsent'
 
 export function E04Consent() {
   const { goTo, route } = useApp()
-  const next = route.name === 'consent' && route.next ? route.next : 'tester-code'
+  const next = route.name === 'consent' && route.next ? route.next : 'profile'
 
   function accept() {
     grantSyncConsent()
@@ -13,6 +13,7 @@ export function E04Consent() {
   }
 
   function decline() {
+    revokeSyncConsent()
     goTo(next)
   }
 
@@ -45,6 +46,18 @@ export function E04Consent() {
           Vos tâches, votre planning, votre historique d’énergie, votre budget, vos listes et vos
           résultats de tests. Aucune adresse e-mail, aucun mot de passe : l’appareil est identifié
           par un code technique.
+        </p>
+      </Card>
+
+      <Card>
+        <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text)' }}>
+          Données de santé et âge
+        </p>
+        <p style={{ margin: '4px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+          Les catégories que vous choisissez ensuite (TSA, TDAH, SDI, avec DI, HPI, neurotypique) et votre
+          âge sont aussi envoyés. Les catégories sont des données de santé : en acceptant, vous
+          consentez expressément à leur envoi. Si vous continuez sans partager, elles restent sur
+          votre appareil.
         </p>
       </Card>
 

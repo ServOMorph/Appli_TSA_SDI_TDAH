@@ -4,7 +4,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useState } from 'react'
 import { AppProvider, useApp } from './AppContext'
 import { db, userRepo } from '@/app/repositories'
-import { grantSyncConsent, revokeSyncConsent } from '@/data/sync/syncConsent'
+import { grantSyncConsent, LEGACY_CONSENT_VERSION, revokeSyncConsent } from '@/data/sync/syncConsent'
+import { ADMIN_CREDENTIAL_HASHES } from '@/domain/rules/adminCredentials'
 
 /**
  * Les tâches créées par un test (y compris les tests qui s'appuient sur `inboxTasks[0]`
@@ -28,7 +29,7 @@ function CreateUserButton() {
   const { createUser, goTo, completeOnboarding } = useApp()
   return (
     <>
-      <button onClick={async () => { await createUser('student'); goTo('energy') }}>
+      <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); goTo('energy') }}>
         créer
       </button>
       <button onClick={() => completeOnboarding()}>finir onboarding</button>
@@ -646,7 +647,7 @@ describe('AppProvider — settings et données', () => {
         <div data-testid="screen">{s}</div>
         <div data-testid="font-size">{settings?.font_size ?? 'none'}</div>
         <div data-testid="user-id">{currentUser?.id ?? 'none'}</div>
-        <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); goTo('dashboard') }}>créer utilisateur</button>
         <button onClick={() => updateSettings({ font_size: 'large' })}>changer font</button>
         <button onClick={() => updateSettings({ energy_checkin_always: true })}>activer énergie systématique</button>
         <button onClick={() => exportData()}>exporter</button>
@@ -654,12 +655,22 @@ describe('AppProvider — settings et données', () => {
         <button
           onClick={() =>
             importData({
-              user: { id: 'imported-user', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+              user: { id: 'imported-user', neuro_categories: ['tsa'], age: 30, onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
               tasks: [],
             })
           }
         >
           importer valide
+        </button>
+        <button
+          onClick={() =>
+            importData({
+              user: { id: 'imported-legacy', profile_type: 'adult', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+              tasks: [],
+            })
+          }
+        >
+          importer ancien profil
         </button>
         <button onClick={() => importData({ not_a_user: true })}>importer invalide</button>
       </>
@@ -726,6 +737,18 @@ describe('AppProvider — settings et données', () => {
     revokeSyncConsent()
   })
 
+  it('importData d’un ancien profil sans catégories passe par le rattrapage du profil', async () => {
+    grantSyncConsent()
+    render(<AppProvider><DataPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'importer ancien profil' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('profile'))
+    revokeSyncConsent()
+  })
+
   it('importData rejette un fichier sans profil utilisateur sans toucher aux données actuelles', async () => {
     render(<AppProvider><DataPanel /></AppProvider>)
     await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
@@ -776,7 +799,7 @@ describe('AppProvider — outils et dossiers (V5-3)', () => {
         <div data-testid="screen">{s}</div>
         <div data-testid="tool-count">{tools.length}</div>
         <div data-testid="folder-count">{folders.length}</div>
-        <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); goTo('dashboard') }}>créer utilisateur</button>
         <button onClick={() => createFolder('Maison')}>créer dossier</button>
         <button onClick={() => createToolList('Courses', null)}>créer liste</button>
         <button onClick={() => folders[0] && deleteFolder(folders[0].id)}>supprimer dossier</button>
@@ -832,7 +855,7 @@ describe('AppProvider — outils et dossiers (V5-3)', () => {
           <div data-testid="in-folder">{inFolder.length}</div>
           <div data-testid="tool-count">{tools.length}</div>
           <div data-testid="budget-folder">{budget ? String(budget.folder_id) : 'absent'}</div>
-          <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
+          <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); goTo('dashboard') }}>créer utilisateur</button>
           <button onClick={() => createFolder('Maison')}>créer dossier</button>
           <button onClick={() => { if (folder) for (const t of tools) void moveTool(t.id, folder.id) }}>tout ranger</button>
           <button onClick={() => folder && deleteFolder(folder.id)}>supprimer dossier</button>
@@ -866,7 +889,7 @@ describe('AppProvider — catégories de tâche (#35)', () => {
         <div data-testid="category-count">{taskCategories.length}</div>
         {first && <div data-testid="category-name">{first.name}</div>}
         {first && <div data-testid="category-color">{first.color}</div>}
-        <button onClick={async () => { await createUser('student'); goTo('dashboard') }}>créer utilisateur</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); goTo('dashboard') }}>créer utilisateur</button>
         <button onClick={() => createTaskCategory('Travail', '#4a7c99')}>créer catégorie</button>
         <button onClick={() => first && renameTaskCategory(first.id, 'Boulot')}>renommer catégorie</button>
         <button onClick={() => first && updateTaskCategoryColor(first.id, '#ff8800')}>changer couleur</button>
@@ -927,7 +950,7 @@ describe('AppProvider — createDetailedTask (E21)', () => {
     if (loading) return <div data-testid="loading">chargement</div>
     return (
       <>
-        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); await completeOnboarding() }}>init</button>
         <button
           onClick={() =>
             createDetailedTask({
@@ -1037,7 +1060,7 @@ describe('AppProvider — updateTaskFields / deleteTaskScoped sur une série ré
 
     return (
       <>
-        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); await completeOnboarding() }}>init</button>
         <button onClick={createSeries}>créer série</button>
         <button onClick={modifySeries}>modifier série</button>
         <button onClick={detachRoot}>détacher occurrence de départ</button>
@@ -1144,7 +1167,7 @@ describe('AppProvider — création d\'une série récurrente dont la date de cr
 
     return (
       <>
-        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); await completeOnboarding() }}>init</button>
         <button onClick={createSeries}>créer série</button>
         <button onClick={inspect}>inspecter</button>
         <div data-testid="count-creation-date">{countOnCreationDate}</div>
@@ -1201,7 +1224,7 @@ describe('AppProvider — sous-tâches saisies à la création d\'une tâche ré
 
     return (
       <>
-        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); await completeOnboarding() }}>init</button>
         <button onClick={createSeries}>créer série</button>
         <button onClick={inspect}>inspecter</button>
         <div data-testid="subtask-counts">{subTaskCountByOccurrence}</div>
@@ -1267,7 +1290,7 @@ describe('AppProvider — ajout ou modification de la récurrence depuis la fich
 
     return (
       <>
-        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); await completeOnboarding() }}>init</button>
         <button onClick={createLoneTask}>créer tâche seule</button>
         <button onClick={addRecurrence}>ajouter récurrence</button>
         <button onClick={inspect}>inspecter</button>
@@ -1340,7 +1363,7 @@ describe('AppProvider — ajout ou modification de la récurrence depuis la fich
 
     return (
       <>
-        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); await completeOnboarding() }}>init</button>
         <button onClick={createWeeklySeries}>créer série hebdo</button>
         <button onClick={switchToDaily}>passer en quotidien</button>
         <button onClick={inspect}>inspecter</button>
@@ -1395,7 +1418,7 @@ describe('AppProvider — horizon de matérialisation des récurrences', () => {
 
     return (
       <>
-        <button onClick={async () => { await createUser('student'); await completeOnboarding() }}>init</button>
+        <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); await completeOnboarding() }}>init</button>
         <button onClick={createSeries}>créer série quotidienne</button>
         <output data-testid="series-dates">{JSON.stringify(dates)}</output>
       </>
@@ -1413,5 +1436,79 @@ describe('AppProvider — horizon de matérialisation des récurrences', () => {
     expect(dates).toContain('2026-09-06')
     expect(dates).toContain('2026-12-05')
     expect(dates).not.toContain('2026-12-06')
+  })
+})
+
+describe('AppProvider — démarrage d’un utilisateur existant', () => {
+  async function startWithExistingUser(prepare: () => Promise<void>) {
+    await Promise.all([db.users.clear(), db.energyEntries.clear(), db.settings.clear()])
+    const { unmount } = render(
+      <AppProvider>
+        <ScreenIndicator />
+        <CreateUserButton />
+        <EnergyButton />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+    await userEvent.click(screen.getByRole('button', { name: 'créer' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('energy'))
+    await userEvent.click(screen.getByRole('button', { name: 'sauvegarder énergie' }))
+    unmount()
+    await prepare()
+    render(
+      <AppProvider>
+        <ScreenIndicator />
+      </AppProvider>,
+    )
+    await waitFor(() => expect(screen.queryByText('loading')).toBeNull())
+  }
+
+  const withoutProfile = async () => {
+    await db.users.toCollection().modify((user) => {
+      delete user.neuro_categories
+      delete user.age
+      user.profile_type = 'adult'
+    })
+  }
+
+  const asAdmin = async () => {
+    await db.settings.toCollection().modify({ tester_code: 'marie', admin_key: ADMIN_CREDENTIAL_HASHES.marie })
+  }
+
+  afterEach(() => {
+    revokeSyncConsent()
+  })
+
+  it('un utilisateur dont le profil est complet arrive directement sur l’accueil', async () => {
+    await startWithExistingUser(async () => {})
+    expect(screen.getByTestId('screen').textContent).toBe('dashboard')
+  })
+
+  it('un utilisateur sans catégories ni âge passe par l’écran de rattrapage', async () => {
+    await startWithExistingUser(withoutProfile)
+    expect(screen.getByTestId('screen').textContent).toBe('profile')
+  })
+
+  it('un utilisateur au consentement ancien renouvelle d’abord son consentement', async () => {
+    grantSyncConsent(LEGACY_CONSENT_VERSION)
+    await startWithExistingUser(async () => {})
+    expect(screen.getByTestId('screen').textContent).toBe('consent')
+  })
+
+  it('un administrateur au consentement ancien est traité de la même façon', async () => {
+    grantSyncConsent(LEGACY_CONSENT_VERSION)
+    await startWithExistingUser(asAdmin)
+    expect(screen.getByTestId('screen').textContent).toBe('consent')
+  })
+
+  it('un utilisateur dont le consentement est à jour n’est pas redemandé', async () => {
+    grantSyncConsent()
+    await startWithExistingUser(async () => {})
+    expect(screen.getByTestId('screen').textContent).toBe('dashboard')
+  })
+
+  it('un utilisateur sans consentement n’est pas redemandé au démarrage ordinaire', async () => {
+    await startWithExistingUser(async () => {})
+    expect(screen.getByTestId('screen').textContent).toBe('dashboard')
   })
 })

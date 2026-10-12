@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import type { Task } from '@/domain/entities/task'
 import type { PlannedSubTask, PlannedRoutineOccurrence } from '@/app/AppContext'
@@ -12,25 +12,10 @@ import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle, plannedTaskTintStyle } from '
 import { isCompleted, getTotalPlannedEnergy } from '@/domain/rules/taskRules'
 import { todayStr, addDays, formatDayBadge, formatMonthYear, dateStrip } from '@/domain/rules/planningSlotRules'
 
-const DATE_STRIP_RADIUS = 2
-const SWIPE_THRESHOLD_PX = 50
-
-// Jours supplémentaires rendus (masqués par le overflow:hidden du bandeau) de part et d'autre
-// des jours visibles, pour que le glissement révèle du contenu réel au lieu d'un vide (#38).
-const STRIP_BUFFER_DAYS = 1
-const STRIP_RENDER_RADIUS = DATE_STRIP_RADIUS + STRIP_BUFFER_DAYS
-const STRIP_VISIBLE_COUNT = DATE_STRIP_RADIUS * 2 + 1
-const STRIP_RENDER_COUNT = STRIP_RENDER_RADIUS * 2 + 1
-const STRIP_TRACK_WIDTH_PERCENT = (STRIP_RENDER_COUNT / STRIP_VISIBLE_COUNT) * 100
-
-// Position de la piste, en fonction du "cran" (jours déjà avalés par le glissement en cours,
-// -1/0/1) et du décalage brut du doigt en px. Exprimée en % (calc), la cible d'un cran est
-// résolue par le navigateur en pixels réels au moment du calcul — ce qui permet à la transition
-// CSS d'interpoler correctement entre un état suivi au pixel près (glissement) et un état exprimé
-// en fraction de la piste (cran final), sans mesure de layout côté JS.
-function stripShiftTransform(shiftNumerator: number, dragPx: number): string {
-  return `translateX(calc(-100% * ${shiftNumerator} / ${STRIP_RENDER_COUNT} + ${dragPx}px))`
-}
+const STRIP_VISIBLE_COUNT = 5
+const STRIP_WINDOW_RADIUS = 21
+const STRIP_RECENTER_DISTANCE = 10
+const SCROLL_SETTLE_MS = 120
 
 type PlanBlock =
   | { kind: 'task'; item: Task }
@@ -92,41 +77,47 @@ function dateStripBoxStyle(ambianceColor: string): React.CSSProperties {
   return {
     ...outlineOnlyStyle(ambianceColor),
     borderRadius: 'var(--radius-md)',
-    padding: '4px 2px',
+    padding: '4px 0',
     overflow: 'hidden',
-    touchAction: 'pan-y',
   }
 }
 
-const dateTrackStyle: React.CSSProperties = {
+const dateScrollerStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: '4px',
-  width: `${STRIP_TRACK_WIDTH_PERCENT}%`,
+  overflowX: 'auto',
+  overflowY: 'hidden',
+  touchAction: 'pan-x',
+  overscrollBehaviorX: 'contain',
+  scrollSnapType: 'x mandatory',
+  scrollbarWidth: 'none',
+  WebkitOverflowScrolling: 'touch',
 }
 
-const DAY_CELL_MAX_SCALE = 1.18
-
-// Grossissement du jour au sélecteur central : max au centre, dégressif vers les bords.
-function dayCellScale(distanceFromCenter: number): number {
-  const t = Math.max(0, 1 - distanceFromCenter / 2)
-  return Math.round((1 + t * (DAY_CELL_MAX_SCALE - 1)) * 1000) / 1000
+const stripSpacerStyle: React.CSSProperties = {
+  flex: `0 0 ${((STRIP_VISIBLE_COUNT - 1) / 2 / STRIP_VISIBLE_COUNT) * 100}%`,
 }
 
-function dayCellStyle(isDisplayed: boolean): React.CSSProperties {
+const DAY_CELL_SELECTED_SCALE = 1.1
+
+function dayCellStyle(isDisplayed: boolean, ambianceColor: string): React.CSSProperties {
   return {
-    flex: 1,
+    flex: `0 0 ${100 / STRIP_VISIBLE_COUNT}%`,
+    boxSizing: 'border-box',
+    scrollSnapAlign: 'center',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: '2px',
     padding: '6px 2px',
     backgroundColor: isDisplayed ? 'var(--color-surface)' : 'transparent',
-    border: isDisplayed ? '1px solid var(--color-border)' : '1px solid transparent',
-    borderRadius: 'var(--radius-sm)',
+    border: isDisplayed ? `2px solid ${ambianceColor}` : '2px solid transparent',
+    borderRadius: 'var(--radius-md)',
     cursor: 'pointer',
     color: 'var(--color-text)',
     fontFamily: 'var(--font-body)',
+    transform: isDisplayed ? `scale(${DAY_CELL_SELECTED_SCALE})` : 'scale(1)',
+    transition: 'transform 0.15s ease-out',
   }
 }
 
@@ -143,18 +134,6 @@ function dayNumberStyle(isToday: boolean): React.CSSProperties {
     textDecoration: isToday ? 'underline' : 'none',
     textUnderlineOffset: '3px',
   }
-}
-
-const dayDotStyle: React.CSSProperties = {
-  width: '4px',
-  height: '4px',
-  borderRadius: '50%',
-  background: 'var(--color-accent)',
-}
-
-const dayDotPlaceholderStyle: React.CSSProperties = {
-  width: '4px',
-  height: '4px',
 }
 
 const monthButtonStyle: React.CSSProperties = {
@@ -249,19 +228,6 @@ const todayBtnStyle: React.CSSProperties = {
   color: 'var(--color-text-muted)',
   fontSize: '0.75rem',
   fontFamily: 'var(--font-body)',
-  flexShrink: 0,
-}
-
-const dayArrowBtnStyle: React.CSSProperties = {
-  background: 'none',
-  border: '1px solid var(--color-border)',
-  borderRadius: 'var(--radius-sm)',
-  cursor: 'pointer',
-  color: 'var(--color-text)',
-  fontSize: '1.25rem',
-  lineHeight: 1,
-  minWidth: '44px',
-  minHeight: '44px',
   flexShrink: 0,
 }
 
@@ -419,14 +385,15 @@ export function PlanningBoard() {
   const expenseSubmittingRef = useRef(false)
 
   const displayDateRef = useRef(displayDate)
-  const touchStartX = useRef<number | null>(null)
-  const [phase, setPhase] = useState<'idle' | 'dragging' | 'settling'>('idle')
-  const [dragOffsetPx, setDragOffsetPx] = useState(0)
-  const [pendingShift, setPendingShift] = useState(0)
+  const scrollerRef = useRef<HTMLDivElement | null>(null)
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const smoothTargetRef = useRef<string | null>(null)
+  const [scrubDate, setScrubDate] = useState<string | null>(null)
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
   const [stripCenter, setStripCenter] = useState(() =>
     route.name === 'dashboard' && route.date ? route.date : todayStr(),
   )
+  const stripDates = useMemo(() => dateStrip(stripCenter, STRIP_WINDOW_RADIUS), [stripCenter])
 
   useEffect(() => {
     displayDateRef.current = displayDate
@@ -533,43 +500,57 @@ export function PlanningBoard() {
     goTo('task-detail')
   }
 
-  function handleTouchStart(event: React.TouchEvent) {
-    touchStartX.current = event.touches[0]?.clientX ?? null
-    setPhase('dragging')
-    setDragOffsetPx(0)
-    setPendingShift(0)
+  function cellWidth(): number {
+    return (scrollerRef.current?.clientWidth ?? 0) / STRIP_VISIBLE_COUNT
   }
 
-  function handleTouchMove(event: React.TouchEvent) {
-    if (touchStartX.current === null) return
-    const currentX = event.touches[0]?.clientX ?? touchStartX.current
-    setDragOffsetPx(currentX - touchStartX.current)
-  }
-
-  // Au relâchement, la piste continue de glisser (transition CSS) jusqu'au cran plein le plus
-  // proche — jamais un saut brut à 0 — et ce n'est qu'une fois cette animation terminée
-  // (handleTrackTransitionEnd) que le jour affiché change réellement. Sans ce découplage, changer
-  // le jour en même temps que réinitialiser le décalage produit le saut visuel signalé (#38).
-  function handleTouchEnd(event: React.TouchEvent) {
-    if (touchStartX.current === null) {
-      setPhase('idle')
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current
+    const width = cellWidth()
+    if (!scroller || !width) return
+    if (smoothTargetRef.current === displayDate) {
+      smoothTargetRef.current = null
       return
     }
-    const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
-    const delta = endX - touchStartX.current
-    touchStartX.current = null
-    const shift = Math.abs(delta) < SWIPE_THRESHOLD_PX ? 0 : delta < 0 ? 1 : -1
-    setPendingShift(shift)
-    setDragOffsetPx(0)
-    setPhase('settling')
+    const index = stripDates.indexOf(displayDate)
+    if (index < 0) return
+    const target = index * width
+    if (Math.abs(scroller.scrollLeft - target) > 1) scroller.scrollLeft = target
+  }, [stripDates, displayDate])
+
+  useEffect(
+    () => () => {
+      if (settleTimer.current) clearTimeout(settleTimer.current)
+    },
+    [],
+  )
+
+  function settleScroll(date: string, index: number) {
+    setScrubDate(null)
+    if (date !== displayDateRef.current) updateDisplayDate(date)
+    if (Math.abs(index - STRIP_WINDOW_RADIUS) >= STRIP_RECENTER_DISTANCE) setStripCenter(date)
   }
 
-  function handleTrackTransitionEnd(event: React.TransitionEvent) {
-    if (event.target !== event.currentTarget) return
-    if (phase !== 'settling') return
-    setPhase('idle')
-    setPendingShift(0)
-    if (pendingShift !== 0) jumpTo(addDays(displayDate, pendingShift))
+  function handleStripScroll() {
+    const scroller = scrollerRef.current
+    const width = cellWidth()
+    if (!scroller || !width) return
+    const index = Math.min(stripDates.length - 1, Math.max(0, Math.round(scroller.scrollLeft / width)))
+    const date = stripDates[index]
+    setScrubDate(date)
+    if (settleTimer.current) clearTimeout(settleTimer.current)
+    settleTimer.current = setTimeout(() => settleScroll(date, index), SCROLL_SETTLE_MS)
+  }
+
+  function selectDayFromStrip(date: string) {
+    const scroller = scrollerRef.current
+    const width = cellWidth()
+    const index = stripDates.indexOf(date)
+    if (scroller && width && index >= 0) {
+      smoothTargetRef.current = date
+      scroller.scrollTo?.({ left: index * width, behavior: 'smooth' })
+    }
+    updateDisplayDate(date)
   }
 
   const isToday = displayDate === todayStr()
@@ -621,22 +602,6 @@ export function PlanningBoard() {
             <BatteryIcon size={16} />
             {totalEnergy}
           </span>
-          <button
-            type="button"
-            style={dayArrowBtnStyle}
-            aria-label="Jour précédent"
-            onClick={() => jumpTo(addDays(displayDate, -1))}
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            style={dayArrowBtnStyle}
-            aria-label="Jour suivant"
-            onClick={() => jumpTo(addDays(displayDate, 1))}
-          >
-            ›
-          </button>
           {!isToday && (
             <button style={todayBtnStyle} onClick={() => jumpTo(todayStr())}>
               Aujourd'hui
@@ -644,51 +609,26 @@ export function PlanningBoard() {
           )}
         </div>
       </div>
-      <div
-        aria-label="Bandeau des jours de la semaine"
-        style={dateStripBoxStyle(ambianceColor)}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div
-          style={{
-            ...dateTrackStyle,
-            transform: stripShiftTransform(
-              STRIP_BUFFER_DAYS + (phase === 'settling' ? pendingShift : 0),
-              phase === 'dragging' ? dragOffsetPx : 0,
-            ),
-            transition: phase === 'dragging' ? 'none' : 'transform 0.2s ease-out',
-          }}
-          onTransitionEnd={handleTrackTransitionEnd}
-        >
-          {dateStrip(stripCenter, STRIP_RENDER_RADIUS).map((d, i) => {
-            const offset = i - STRIP_RENDER_RADIUS
-            const isBuffer = Math.abs(offset) > DATE_STRIP_RADIUS
+      <div aria-label="Bandeau des jours de la semaine" style={dateStripBoxStyle(ambianceColor)}>
+        <div ref={scrollerRef} style={dateScrollerStyle} onScroll={handleStripScroll}>
+          <div style={stripSpacerStyle} aria-hidden />
+          {stripDates.map((d) => {
             const badge = formatDayBadge(d)
-            const isDisplayed = d === displayDate
-            const scale = dayCellScale(Math.abs(offset))
+            const isDisplayed = d === (scrubDate ?? displayDate)
             return (
               <button
                 key={d}
-                style={{
-                  ...dayCellStyle(isDisplayed),
-                  transform: `scale(${scale})`,
-                  transition: phase === 'dragging' ? 'none' : 'transform 0.2s ease-out',
-                  ...(scale > 1 ? { position: 'relative', zIndex: 2 } : null),
-                }}
-                onClick={() => jumpTo(d)}
-                aria-current={isDisplayed ? 'date' : undefined}
+                style={dayCellStyle(isDisplayed, ambianceColor)}
+                onClick={() => selectDayFromStrip(d)}
+                aria-current={d === displayDate ? 'date' : undefined}
                 aria-label={d}
-                aria-hidden={isBuffer || undefined}
-                tabIndex={isBuffer ? -1 : undefined}
               >
                 <span style={dayWeekdayStyle}>{badge.weekday}</span>
                 <span style={dayNumberStyle(d === todayStr())}>{badge.day}</span>
-                <span style={isDisplayed ? dayDotStyle : dayDotPlaceholderStyle} aria-hidden />
               </button>
             )
           })}
+          <div style={stripSpacerStyle} aria-hidden />
         </div>
       </div>
 

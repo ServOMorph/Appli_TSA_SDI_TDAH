@@ -39,7 +39,9 @@ test('T59 — export JSON puis réimport après perte totale des données restau
   const json = JSON.parse(fs.readFileSync(savedPath, 'utf-8')) as Record<string, unknown>
   expect(typeof json.version).toBe('string')
   expect(json).toHaveProperty('export_date')
-  expect((json.user as { profile_type?: string } | undefined)?.profile_type).toBeTruthy()
+  const exportedUser = json.user as { neuro_categories?: string[]; age?: number } | undefined
+  expect(exportedUser?.neuro_categories).toEqual(['tsa'])
+  expect(exportedUser?.age).toBe(30)
   expect(Array.isArray(json.tasks)).toBe(true)
   expect(JSON.stringify(json.tasks)).toContain(marker)
   // Exclusion assumée : les retours annotés ne sont pas sérialisés

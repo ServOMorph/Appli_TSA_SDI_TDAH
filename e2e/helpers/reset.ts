@@ -16,12 +16,18 @@ export async function resetApp(page: Page, url = '/') {
   await page.waitForSelector('h1')
 }
 
+export async function completeProfile(page: Page) {
+  await page.getByRole('checkbox', { name: 'TSA' }).check()
+  await page.getByLabel('Votre âge').fill('30')
+  await page.getByRole('button', { name: 'Continuer' }).click()
+}
+
 export async function completeFastOnboarding(page: Page, testerCode?: string) {
   await page.getByRole('button', { name: 'Entrer' }).click()
-  await page.getByRole('button', { name: 'Continuer sans partager' }).click()
   if (testerCode) await page.getByRole('textbox', { name: 'Code testeur' }).fill(testerCode)
   await page.getByRole('button', { name: 'Continuer' }).click()
-  await page.getByRole('button', { name: 'Étudiant' }).click()
+  await page.getByRole('button', { name: 'Continuer sans partager' }).click()
+  await completeProfile(page)
   await page.getByRole('button', { name: '5' }).click()
   await page.getByRole('button', { name: 'Valider' }).click()
   await page.waitForSelector('h1:has-text("AuDHD")')

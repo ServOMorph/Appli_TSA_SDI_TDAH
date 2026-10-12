@@ -1,9 +1,14 @@
+export type StartDestination = 'dashboard' | 'energy-checkin'
+
+/** Suite d'un écran de consentement ouvert hors onboarding : destination, ou rattrapage du profil d'abord. */
+export type PostConsentTarget = StartDestination | { name: 'profile'; next: StartDestination }
+
 export type Route =
   | { name: 'welcome' }
   | { name: 'init-error' }
-  | { name: 'consent'; next?: 'dashboard' | 'energy-checkin' }
+  | { name: 'consent'; next?: PostConsentTarget }
   | { name: 'tester-code' }
-  | { name: 'profile' }
+  | { name: 'profile'; next?: StartDestination }
   | { name: 'energy' }
   | { name: 'dashboard'; date?: string }
   | { name: 'inbox' }

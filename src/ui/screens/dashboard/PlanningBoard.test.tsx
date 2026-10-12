@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor, fireEvent, within } from '@testing-library/react'
+import { screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PlanningBoard } from './PlanningBoard'
 import { makeAppContext, renderWithApp } from '@/test/testUtils'
@@ -19,6 +19,15 @@ function makeTaskV2(overrides: Partial<Task> = {}): Task {
   return baseTask({ title: 'Médecin', status: 'planned', ...overrides })
 }
 
+const CELL_WIDTH = 100
+const STRIP_RADIUS = 21
+
+function scrollerOf(date: string): HTMLElement {
+  const scroller = screen.getByLabelText(date).parentElement as HTMLElement
+  Object.defineProperty(scroller, 'clientWidth', { configurable: true, value: CELL_WIDTH * 5 })
+  return scroller
+}
+
 function renderExpanded(ctx = makeAppContext()) {
   return renderWithApp(<PlanningBoard />, ctx)
 }
@@ -35,64 +44,65 @@ describe('PlanningBoard', () => {
     expect(screen.getByLabelText('2026-07-02')).toBeInTheDocument()
   })
 
-  it('glisser vers la gauche charge le jour suivant, une fois la piste posée (#38)', async () => {
-    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
-    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
-
-    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
-    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
-    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 100 }] })
-    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-01')
-    fireEvent.transitionEnd(strip)
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
-  })
-
-  it('glisser vers la droite charge le jour précédent, une fois la piste posée (#38)', async () => {
-    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
-    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
-
-    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
-    fireEvent.touchStart(strip, { touches: [{ clientX: 100 }] })
-    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 200 }] })
-    fireEvent.transitionEnd(strip)
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
-  })
-
-  it('un glissement sous le seuil revient à sa position sans changer de jour (#38)', async () => {
-    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
-    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
-
-    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
-    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
-    fireEvent.touchMove(strip, { touches: [{ clientX: 180 }] })
-    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 180 }] })
-    fireEvent.transitionEnd(strip)
-    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-01')
-    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-06-29')
-  })
-
-  it('le relâchement poursuit le glissement jusqu’au cran plein, sans saut brut à zéro (#38)', async () => {
+  it('rend une large fenêtre de jours pour un défilement continu, au-delà de la semaine', async () => {
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-
-    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
-    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
-    fireEvent.touchMove(strip, { touches: [{ clientX: 100 }] })
-    expect(strip.style.transform).toBe(`translateX(calc(-100% * 1 / ${7} + -100px))`)
-
-    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 100 }] })
-    expect(strip.style.transform).toBe(`translateX(calc(-100% * 2 / ${7} + 0px))`)
+    expect(screen.getByLabelText('2026-07-15')).toBeInTheDocument()
+    expect(screen.getByLabelText('2026-06-10')).toBeInTheDocument()
   })
 
-  it('rend un jour tampon masqué de chaque côté pour un glissement sans vide (#38)', async () => {
+  it('le défilement vers la droite sélectionne le jour centré, même hors de la semaine', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
+
+    const scroller = scrollerOf('2026-06-30')
+    scroller.scrollLeft = (STRIP_RADIUS + 9) * CELL_WIDTH
+    fireEvent.scroll(scroller)
+    expect(screen.getByLabelText('2026-07-09').style.transform).toBe('scale(1.1)')
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-09'))
+  })
+
+  it('le défilement vers la gauche sélectionne un jour précédent', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
+
+    const scroller = scrollerOf('2026-06-30')
+    scroller.scrollLeft = (STRIP_RADIUS - 3) * CELL_WIDTH
+    fireEvent.scroll(scroller)
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-27'))
+  })
+
+  it('ne change pas de jour tant que le défilement n’est pas terminé', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
+
+    const scroller = scrollerOf('2026-06-30')
+    scroller.scrollLeft = (STRIP_RADIUS + 2) * CELL_WIDTH
+    fireEvent.scroll(scroller)
+    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-02')
+  })
+
+  it('recentre la fenêtre de jours après un long défilement, sans perdre le jour', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderExpanded(makeAppContext({ getPlannedTasksForDate }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
+
+    const scroller = scrollerOf('2026-06-30')
+    scroller.scrollLeft = (STRIP_RADIUS + 15) * CELL_WIDTH
+    fireEvent.scroll(scroller)
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-15'))
+    await waitFor(() => expect(scrollerOf('2026-07-15').scrollLeft).toBe(STRIP_RADIUS * CELL_WIDTH))
+    expect(screen.getByLabelText('2026-07-15')).toHaveAttribute('aria-current', 'date')
+  })
+
+  it('n’affiche plus de flèches de changement de jour', async () => {
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-    expect(screen.getByLabelText('2026-06-27')).toHaveAttribute('aria-hidden', 'true')
-    expect(screen.getByLabelText('2026-07-03')).toHaveAttribute('aria-hidden', 'true')
-    expect(screen.getByLabelText('2026-06-28')).not.toHaveAttribute('aria-hidden')
+    expect(screen.queryByRole('button', { name: 'Jour précédent' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Jour suivant' })).toBeNull()
   })
 
   it('encadre le bandeau de dates avec la couleur d’ambiance (AP2)', async () => {
@@ -117,84 +127,28 @@ describe('PlanningBoard', () => {
     expect(strip.style.backgroundColor).toBe('var(--color-surface)')
   })
 
-  it('garde le jour affiché identifiable sur le fond coloré du bandeau (#19)', async () => {
+  it('encadre le jour sélectionné et grossit sa case', async () => {
     renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
     const displayed = screen.getByLabelText('2026-06-30')
     const other = screen.getByLabelText('2026-06-28')
     expect(displayed.style.backgroundColor).toBe('var(--color-surface)')
+    expect(displayed.style.transform).toBe('scale(1.1)')
     expect(other.style.backgroundColor).toBe('transparent')
+    expect(other.style.transform).toBe('scale(1)')
   })
 
-  it('suit le doigt au pixel près pendant le glissement du bandeau (AP2, #38)', async () => {
-    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
-    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-
-    const strip = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
-    fireEvent.touchStart(strip, { touches: [{ clientX: 200 }] })
-    fireEvent.touchMove(strip, { touches: [{ clientX: 170 }] })
-    expect(strip.style.transform).toBe('translateX(calc(-100% * 1 / 7 + -30px))')
-
-    fireEvent.touchEnd(strip, { changedTouches: [{ clientX: 170 }] })
-    fireEvent.transitionEnd(strip)
-    expect(strip.style.transform).toBe('translateX(calc(-100% * 1 / 7 + 0px))')
-  })
-
-  it('au glissement, seule la piste interne se translate, pas la case (#21)', async () => {
-    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
-    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-
-    const box = screen.getByLabelText('Bandeau des jours de la semaine')
-    const track = screen.getByLabelText('2026-06-30').parentElement as HTMLElement
-    expect(track).not.toBe(box)
-    expect(box.contains(track)).toBe(true)
-
-    fireEvent.touchStart(box, { touches: [{ clientX: 200 }] })
-    fireEvent.touchMove(box, { touches: [{ clientX: 170 }] })
-    expect(track.style.transform).toBe('translateX(calc(-100% * 1 / 7 + -30px))')
-    expect(box.style.transform).toBe('')
-
-    fireEvent.touchEnd(box, { changedTouches: [{ clientX: 170 }] })
-  })
-
-  it('grossit le jour au sélecteur central du bandeau (#21)', async () => {
-    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
-    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-
-    const center = screen.getByLabelText('2026-06-30')
-    const edge = screen.getByLabelText('2026-06-28')
-    expect(center.style.transform).toBe('scale(1.18)')
-    expect(edge.style.transform).toBe('scale(1)')
-  })
-
-  it('recentre le bandeau sur le jour cliqué au lieu de déplacer la case sélectionnée (#6f90c375)', async () => {
+  it('un clic sur un jour le sélectionne et le recentre', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
+    const scroller = scrollerOf('2026-06-30')
+    scroller.scrollTo = vi.fn()
 
     await userEvent.click(screen.getByLabelText('2026-07-01'))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
-
     expect(screen.getByLabelText('2026-07-01')).toHaveAttribute('aria-current', 'date')
-    expect(screen.getByLabelText('2026-07-03')).not.toHaveAttribute('aria-hidden')
-    expect(screen.getByLabelText('2026-06-29')).not.toHaveAttribute('aria-hidden')
-  })
-
-  it('garde la case sélectionnée à la même position du bandeau quel que soit le jour cliqué (#6f90c375)', async () => {
-    renderExpanded(makeAppContext({ getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
-    await waitFor(() => expect(screen.getByLabelText('2026-06-30')).toBeInTheDocument())
-    const strip = screen.getByLabelText('Bandeau des jours de la semaine')
-    const indexBefore = within(strip)
-      .getAllByRole('button')
-      .findIndex((b) => b.getAttribute('aria-current') === 'date')
-
-    await userEvent.click(screen.getByLabelText('2026-07-01'))
-    await waitFor(() => expect(screen.getByLabelText('2026-07-01')).toHaveAttribute('aria-current', 'date'))
-
-    const indexAfter = within(strip)
-      .getAllByRole('button')
-      .findIndex((b) => b.getAttribute('aria-current') === 'date')
-    expect(indexAfter).toBe(indexBefore)
+    expect(scroller.scrollTo).toHaveBeenCalledWith({ left: (STRIP_RADIUS + 1) * CELL_WIDTH, behavior: 'smooth' })
   })
 
   it('ouvre le planning de la semaine depuis le logo à gauche du mois (#22)', async () => {
@@ -213,16 +167,13 @@ describe('PlanningBoard', () => {
     expect(screen.queryByRole('button', { name: /semaine suivante/i })).toBeNull()
   })
 
-  it('les flèches changent le jour affiché et Aujourd’hui revient au jour courant', async () => {
+  it('Aujourd’hui revient au jour courant', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderExpanded(makeAppContext({ getPlannedTasksForDate }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-30'))
 
-    await userEvent.click(screen.getByRole('button', { name: 'Jour suivant' }))
+    await userEvent.click(screen.getByLabelText('2026-07-01'))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-07-01'))
-    await userEvent.click(screen.getByRole('button', { name: 'Jour précédent' }))
-    await userEvent.click(screen.getByRole('button', { name: 'Jour précédent' }))
-    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
     await userEvent.click(screen.getByRole('button', { name: "Aujourd'hui" }))
     await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenLastCalledWith('2026-06-30'))
   })

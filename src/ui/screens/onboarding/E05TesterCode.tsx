@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
+import { isAdminIdentity } from '@/domain/rules/adminCredentials'
+import { verifyAdminSecret } from '@/domain/rules/adminLogin'
 import { Button } from '@/ui/components/Button'
 
 const inputStyle: React.CSSProperties = {
@@ -13,12 +15,30 @@ const inputStyle: React.CSSProperties = {
 }
 
 export function E05TesterCode() {
-  const { pendingTesterCode, setPendingTesterCode, goTo } = useApp()
+  const { pendingTesterCode, setPendingTesterCode, setPendingAdminKey, goTo } = useApp()
   const [code, setCode] = useState(pendingTesterCode)
+  const [adminSecret, setAdminSecret] = useState('')
+  const [adminError, setAdminError] = useState<string | null>(null)
+  const [checking, setChecking] = useState(false)
+  const showAdminField = isAdminIdentity(code)
 
-  function next() {
-    setPendingTesterCode(code.trim())
-    goTo('profile')
+  async function next() {
+    const trimmed = code.trim()
+    setAdminError(null)
+    if (isAdminIdentity(trimmed) && adminSecret) {
+      setChecking(true)
+      const verification = await verifyAdminSecret(trimmed, adminSecret)
+      setChecking(false)
+      if (!verification.ok) {
+        setAdminError(verification.error)
+        return
+      }
+      setPendingAdminKey(verification.adminKey)
+    } else {
+      setPendingAdminKey('')
+    }
+    setPendingTesterCode(trimmed)
+    goTo('consent')
   }
 
   return (
@@ -54,7 +74,23 @@ export function E05TesterCode() {
         spellCheck={false}
         style={inputStyle}
       />
-      <Button fullWidth onClick={next}>
+      {showAdminField && (
+        <input
+          type="password"
+          aria-label="Mot de passe administrateur"
+          value={adminSecret}
+          onChange={(e) => setAdminSecret(e.target.value)}
+          placeholder="Mot de passe administrateur"
+          autoComplete="off"
+          style={inputStyle}
+        />
+      )}
+      {adminError && (
+        <p role="alert" style={{ margin: 0, color: 'var(--color-error)', fontSize: '0.875rem' }}>
+          {adminError}
+        </p>
+      )}
+      <Button fullWidth onClick={next} disabled={checking}>
         Continuer
       </Button>
     </main>

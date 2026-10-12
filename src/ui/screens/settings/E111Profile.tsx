@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
-import {
-  ADMIN_CREDENTIAL_HASHES,
-  deriveAdminKey,
-  isAdminIdentity,
-  normalizeIdentity,
-} from '@/domain/rules/adminCredentials'
+import { NeuroCategoryPicker } from '@/ui/components/NeuroCategoryPicker'
+import { isSyncConsentGranted } from '@/data/sync/syncConsent'
+import type { NeuroCategory } from '@/domain/entities/user'
+import { MAX_AGE, MIN_AGE, parseAge } from '@/domain/rules/profileRules'
+import { isAdminIdentity, normalizeIdentity } from '@/domain/rules/adminCredentials'
+import { verifyAdminSecret } from '@/domain/rules/adminLogin'
 
 const backBtnStyle: React.CSSProperties = {
   background: 'none',
@@ -31,18 +31,17 @@ const inputStyle: React.CSSProperties = {
   color: 'var(--color-text)',
 }
 
-const profileLabels: Record<string, string> = {
-  teenager: 'Adolescent',
-  student: 'Étudiant',
-  adult: 'Adulte',
-}
-
 export function E111Profile() {
-  const { currentUser, settings, updateSettings, goTo } = useApp()
+  const { currentUser, settings, updateSettings, updateProfile, goTo } = useApp()
 
-  const profileLabel = currentUser?.profile_type
-    ? (profileLabels[currentUser.profile_type] ?? currentUser.profile_type)
-    : 'Non défini'
+  const savedCategories = currentUser?.neuro_categories ?? []
+  const savedAge = currentUser?.age
+  const [categories, setCategories] = useState<NeuroCategory[]>(savedCategories)
+  const [ageInput, setAgeInput] = useState(savedAge !== undefined ? String(savedAge) : '')
+  const age = parseAge(ageInput)
+  const ageInvalid = ageInput.trim() !== '' && age === null
+  const profileDirty = categories.join() !== savedCategories.join() || age !== (savedAge ?? null)
+  const profileValid = categories.length > 0 && age !== null
 
   const testerCode = (settings?.tester_code ?? '').trim()
   const [testerCodeInput, setTesterCodeInput] = useState(testerCode)
@@ -73,12 +72,43 @@ export function E111Profile() {
       <h1>Profil</h1>
 
       <Card>
-        <p style={{ margin: '0 0 var(--spacing-xs)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-          Type de profil
+        <p style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+          Catégories
         </p>
-        <p style={{ margin: 0, fontWeight: 600, color: 'var(--color-text)' }} aria-label="type de profil">
-          {profileLabel}
-        </p>
+        <NeuroCategoryPicker value={categories} onChange={setCategories} />
+        <label
+          htmlFor="profile-age"
+          style={{ display: 'block', margin: 'var(--spacing-md) 0 var(--spacing-xs)', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}
+        >
+          Âge
+        </label>
+        <input
+          id="profile-age"
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={ageInput}
+          onChange={(e) => setAgeInput(e.target.value)}
+          aria-invalid={ageInvalid}
+          style={{ ...inputStyle, flex: 'none', width: '100%', boxSizing: 'border-box' }}
+        />
+        {ageInvalid && (
+          <p role="alert" style={{ margin: 'var(--spacing-xs) 0 0', color: 'var(--color-error)', fontSize: '0.875rem' }}>
+            Entrez un âge entre {MIN_AGE} et {MAX_AGE}.
+          </p>
+        )}
+        <div style={{ marginTop: 'var(--spacing-md)' }}>
+          <Button
+            fullWidth
+            disabled={!profileDirty || !profileValid}
+            onClick={async () => {
+              if (age === null) return
+              await updateProfile({ neuro_categories: categories, age })
+            }}
+          >
+            Enregistrer le profil
+          </Button>
+        </div>
       </Card>
 
       <Card>
@@ -102,18 +132,12 @@ export function E111Profile() {
               const trimmed = testerCodeInput.trim()
               setAdminError(null)
               if (isAdminIdentity(trimmed) && adminSecret) {
-                let adminKey: string
-                try {
-                  adminKey = await deriveAdminKey(trimmed, adminSecret)
-                } catch {
-                  setAdminError('Vérification impossible sur cet appareil (connexion non sécurisée).')
+                const verification = await verifyAdminSecret(trimmed, adminSecret)
+                if (!verification.ok) {
+                  setAdminError(verification.error)
                   return
                 }
-                if (adminKey !== ADMIN_CREDENTIAL_HASHES[normalizeIdentity(trimmed)]) {
-                  setAdminError('Mot de passe incorrect.')
-                  return
-                }
-                await updateSettings({ tester_code: trimmed, admin_key: adminKey })
+                await updateSettings({ tester_code: trimmed, admin_key: verification.adminKey })
               } else if (isAdminIdentity(trimmed) && normalizeIdentity(trimmed) === normalizeIdentity(testerCode)) {
                 await updateSettings({ tester_code: trimmed })
               } else {
@@ -150,7 +174,9 @@ export function E111Profile() {
           Informations
         </p>
         <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
-          Les données de profil sont stockées localement sur votre appareil.
+          {isSyncConsentGranted()
+            ? 'Les données de profil, y compris les catégories (données de santé) et l’âge, sont stockées sur votre appareil et incluses dans la copie envoyée à l’équipe. Vous pouvez retirer le partage dans Paramètres, rubrique « Vie privée ».'
+            : 'Les données de profil sont stockées localement sur votre appareil.'}
         </p>
       </Card>
 

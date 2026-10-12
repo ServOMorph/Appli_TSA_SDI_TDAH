@@ -3,12 +3,19 @@ import { db, listRepo, newId, settingsRepo, toolRepo, userRepo } from '@/app/rep
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
 import { setFeedbackMessagesCursor } from '@/data/sync/feedbackMessagesCursor'
-import { grantSyncConsent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
+import {
+  getSyncConsentVersion,
+  grantSyncConsent,
+  isSyncConsentGranted,
+  LEGACY_CONSENT_VERSION,
+  revokeSyncConsent,
+} from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { createList } from '@/domain/rules/listRules'
+import { sanitizeAge, sanitizeNeuroCategories } from '@/domain/rules/profileRules'
 import { createTool } from '@/domain/rules/toolRules'
 import type { Settings } from '@/domain/entities/settings'
-import type { User, ProfileType } from '@/domain/entities/user'
+import type { User, NeuroCategory } from '@/domain/entities/user'
 import type { Task } from '@/domain/entities/task'
 import type { TaskRecurrence } from '@/domain/entities/taskRecurrence'
 import type { TaskException } from '@/domain/entities/taskException'
@@ -32,6 +39,11 @@ import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
 import type { RoutineStepCompletion } from '@/domain/entities/routineStepCompletion'
 
 export type ImportResult = { ok: true } | { ok: false; error: string }
+
+export interface ProfileInput {
+  neuro_categories: NeuroCategory[]
+  age: number
+}
 
 const IMPORT_TABLES = [
   db.users, db.tasks, db.taskRecurrences, db.taskExceptions, db.taskCategories,
@@ -115,12 +127,13 @@ export function useSettingsState() {
     setSettings(null)
   }
 
-  async function createUser(profile: ProfileType, testerCode?: string) {
+  async function createUser(profile: ProfileInput, testerCode?: string, adminKey?: string) {
     const now = new Date().toISOString()
     const userId = newId()
     const user: User = {
       id: userId,
-      profile_type: profile,
+      neuro_categories: profile.neuro_categories,
+      age: profile.age,
       onboarding_completed: false,
       created_at: now,
       updated_at: now,
@@ -133,6 +146,7 @@ export function useSettingsState() {
       font_size: 'medium',
       reduced_motion: false,
       ...(trimmedTesterCode ? { tester_code: trimmedTesterCode } : {}),
+      ...(trimmedTesterCode && adminKey ? { admin_key: adminKey } : {}),
     }
     await userRepo.create(user)
     await settingsRepo.create(defaultSettings)
@@ -167,6 +181,14 @@ export function useSettingsState() {
     void syncNow()
   }
 
+  async function updateProfile(patch: Partial<ProfileInput>) {
+    if (!currentUser) return
+    const updated: User = { ...currentUser, ...patch, updated_at: new Date().toISOString() }
+    await userRepo.update(updated)
+    setCurrentUser(updated)
+    void syncNow()
+  }
+
   async function exportData() {
     if (!currentUser) return
     const snapshot = await buildSnapshotPayload()
@@ -177,6 +199,7 @@ export function useSettingsState() {
       device_id: deviceId,
       device_secret: deviceSecret,
       sync_consent_granted: isSyncConsentGranted(),
+      sync_consent_version: getSyncConsentVersion(),
       ...snapshot,
     }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
@@ -241,12 +264,18 @@ export function useSettingsState() {
     if (
       !importedUser ||
       typeof importedUser !== 'object' ||
-      typeof (importedUser as User).id !== 'string' ||
-      typeof (importedUser as User).profile_type !== 'string'
+      typeof (importedUser as User).id !== 'string'
     ) {
       return { ok: false, error: 'Fichier invalide : profil utilisateur manquant ou incomplet.' }
     }
-    const user = importedUser as User
+    const { neuro_categories: rawCategories, age: rawAge, ...importedUserFields } = importedUser as User
+    const neuroCategories = sanitizeNeuroCategories(rawCategories)
+    const age = sanitizeAge(rawAge)
+    const user: User = {
+      ...importedUserFields,
+      ...(neuroCategories ? { neuro_categories: neuroCategories } : {}),
+      ...(age !== undefined ? { age } : {}),
+    }
     let tasks: Task[], taskRecurrences: TaskRecurrence[], taskExceptions: TaskException[], taskCategories: TaskCategory[]
     let lists: List[], rawListItems: (ListItem & { section?: string | null })[], listItemSubTasks: ListItemSubTask[], listCategories: ListCategory[]
     let folders: Folder[], tools: Tool[], energyEntries: EnergyEntry[], categories: BudgetCategory[], entries: BudgetEntry[]
@@ -419,7 +448,9 @@ export function useSettingsState() {
     }
 
     if (importedIdentity) setDeviceIdentity(importedIdentity.deviceId, importedIdentity.deviceSecret)
-    if (data.sync_consent_granted === true) grantSyncConsent()
+    if (data.sync_consent_granted === true) {
+      grantSyncConsent(typeof data.sync_consent_version === 'number' ? data.sync_consent_version : LEGACY_CONSENT_VERSION)
+    }
     if (data.sync_consent_granted === false) revokeSyncConsent()
 
     setCurrentUser(user)
@@ -441,6 +472,7 @@ export function useSettingsState() {
     setCurrentUser,
     setSettings,
     createUser,
+    updateProfile,
     updateSettings,
     exportData,
     importData,

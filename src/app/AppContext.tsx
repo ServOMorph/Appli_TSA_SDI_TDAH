@@ -23,7 +23,8 @@ import { usePlanningState } from '@/app/contexts/usePlanningState'
 import { isOverloaded } from '@/domain/rules/energyRules'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
 import { syncNow } from '@/data/sync/syncClient'
-import { backfillSyncConsentFromHistory, isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { backfillSyncConsentFromHistory } from '@/data/sync/syncConsent'
+import { resolveStartRoute } from '@/app/startRoute'
 import { startFeedbackSync } from '@/data/sync/feedbackClient'
 
 export type { Screen, Route } from '@/app/navigation'
@@ -50,6 +51,8 @@ type SessionValue = {
   importData: (raw: unknown) => Promise<ImportResult>
   pendingTesterCode: string
   setPendingTesterCode: (code: string) => void
+  pendingAdminKey: string
+  setPendingAdminKey: (key: string) => void
 }
 
 type AppContextValue = NavigationValue &
@@ -73,6 +76,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [stack, setStack] = useState<NavStack>([{ name: 'welcome' }])
   const [loading, setLoading] = useState(true)
   const [pendingTesterCode, setPendingTesterCode] = useState('')
+  const [pendingAdminKey, setPendingAdminKey] = useState('')
 
   const route = currentRoute(stack)
   const goTo = useCallback((target: Screen | Route) => setStack((prev) => pushRoute(prev, target)), [])
@@ -117,7 +121,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   } = session
 
   async function createUser(profile: Parameters<typeof createUserAndSeedTools>[0]) {
-    await createUserAndSeedTools(profile, pendingTesterCode)
+    await createUserAndSeedTools(profile, pendingTesterCode, pendingAdminKey)
     await Promise.all([loadLists(), loadTools()])
   }
 
@@ -157,7 +161,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           if (s) setSettings(s)
           const entry = await energyRepo.getByDate(todayDate())
           await loadAll()
-          setStack([{ name: entry && !s?.energy_checkin_always ? 'dashboard' : 'energy-checkin' }])
+          setStack([
+            resolveStartRoute({
+              user: effectiveUser,
+              destination: entry && !s?.energy_checkin_always ? 'dashboard' : 'energy-checkin',
+              askMissingConsent: false,
+            }),
+          ])
           void syncNow()
         }
       } catch (error) {
@@ -219,8 +229,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (result.ok) {
       await loadAll()
       const entry = await energyRepo.getByDate(todayDate())
-      const next = entry ? 'dashboard' : 'energy-checkin'
-      setStack([isSyncConsentGranted() ? { name: next } : { name: 'consent', next }])
+      const destination = entry ? 'dashboard' : 'energy-checkin'
+      const importedUser = await userRepo.getFirst()
+      setStack([
+        importedUser
+          ? resolveStartRoute({ user: importedUser, destination, askMissingConsent: true })
+          : { name: destination },
+      ])
     }
     return result
   }
@@ -244,6 +259,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         importData,
         pendingTesterCode,
         setPendingTesterCode,
+        pendingAdminKey,
+        setPendingAdminKey,
         ...tasksValue,
         ...planningValue,
         ...energyValue,

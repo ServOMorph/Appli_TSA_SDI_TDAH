@@ -65,7 +65,7 @@ export function E01Welcome() {
           }}
         />
       </div>
-      <Button fullWidth onClick={() => goTo('consent')} style={{ flex: '0 0 auto' }}>
+      <Button fullWidth onClick={() => goTo('tester-code')} style={{ flex: '0 0 auto' }}>
         {import.meta.env.VITE_APP_VERSION ? `Entrer dans la ${import.meta.env.VITE_APP_VERSION}` : 'Entrer'}
       </Button>
       {importError && (

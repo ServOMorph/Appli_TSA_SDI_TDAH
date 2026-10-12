@@ -3,7 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { E111Profile } from './E111Profile'
 import { makeAppContext } from '@/test/testUtils'
 import { AppContext } from '@/app/AppContext'
+import { grantSyncConsent, revokeSyncConsent } from '@/data/sync/syncConsent'
 import type { Settings } from '@/domain/entities/settings'
+import type { User } from '@/domain/entities/user'
 import { ADMIN_CREDENTIAL_HASHES, deriveAdminKey } from '@/domain/rules/adminCredentials'
 
 vi.mock('@/domain/rules/adminCredentials', async (importOriginal) => {
@@ -15,6 +17,13 @@ vi.mock('@/domain/rules/adminCredentials', async (importOriginal) => {
 })
 
 const deriveMock = vi.mocked(deriveAdminKey)
+
+const baseUser: User = {
+  id: '1',
+  onboarding_completed: true,
+  created_at: '',
+  updated_at: '',
+}
 
 const baseSettings: Settings = {
   id: 'settings-1',
@@ -39,22 +48,50 @@ describe('E111Profile', () => {
     expect(screen.getByText('Profil')).toBeInTheDocument()
   })
 
-  it('affiche Non défini quand pas d\'utilisateur', () => {
-    renderE111({ currentUser: null })
-    expect(screen.getByLabelText('type de profil')).toHaveTextContent('Non défini')
+  it('affiche des catégories décochées et un âge vide pour un utilisateur sans profil renseigné', () => {
+    renderE111({ currentUser: { ...baseUser, profile_type: 'adult' } })
+    for (const label of ['TSA', 'TDAH', 'SDI', 'Avec DI', 'HPI', 'Neurotypique', 'Je ne sais pas']) {
+      expect(screen.getByRole('checkbox', { name: label })).not.toBeChecked()
+    }
+    expect(screen.getByLabelText('Âge')).toHaveValue('')
+    expect(screen.getByRole('button', { name: 'Enregistrer le profil' })).toBeDisabled()
   })
 
-  it('affiche le label du profil', () => {
-    renderE111({
-      currentUser: {
-        id: '1',
-        profile_type: 'teenager',
-        onboarding_completed: true,
-        created_at: '',
-        updated_at: '',
-      },
-    })
-    expect(screen.getByLabelText('type de profil')).toHaveTextContent('Adolescent')
+  it('affiche les catégories et l\'âge enregistrés', () => {
+    renderE111({ currentUser: { ...baseUser, neuro_categories: ['tsa', 'tdah'], age: 28 } })
+    expect(screen.getByRole('checkbox', { name: 'TSA' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'TDAH' })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: 'SDI' })).not.toBeChecked()
+    expect(screen.getByLabelText('Âge')).toHaveValue('28')
+    expect(screen.getByRole('button', { name: 'Enregistrer le profil' })).toBeDisabled()
+  })
+
+  it('enregistre les catégories et l\'âge modifiés', () => {
+    const updateProfile = vi.fn().mockResolvedValue(undefined)
+    renderE111({ currentUser: { ...baseUser, neuro_categories: ['tsa'], age: 28 }, updateProfile })
+    fireEvent.click(screen.getByRole('checkbox', { name: 'TDAH' }))
+    fireEvent.change(screen.getByLabelText('Âge'), { target: { value: '29' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enregistrer le profil' }))
+    expect(updateProfile).toHaveBeenCalledWith({ neuro_categories: ['tsa', 'tdah'], age: 29 })
+  })
+
+  it('refuse un âge invalide et garde Enregistrer le profil désactivé', () => {
+    renderE111({ currentUser: { ...baseUser, neuro_categories: ['tsa'], age: 28 } })
+    fireEvent.change(screen.getByLabelText('Âge'), { target: { value: '500' } })
+    expect(screen.getByRole('alert')).toHaveTextContent('Entrez un âge entre 1 et 120.')
+    expect(screen.getByRole('button', { name: 'Enregistrer le profil' })).toBeDisabled()
+  })
+
+  it('mentionne l\'envoi des données de santé quand le partage est actif', () => {
+    grantSyncConsent()
+    renderE111({ currentUser: { ...baseUser, neuro_categories: ['tsa'], age: 28 } })
+    expect(screen.getByText(/incluses dans la copie envoyée/)).toBeInTheDocument()
+    revokeSyncConsent()
+  })
+
+  it('indique un stockage local quand le partage est inactif', () => {
+    renderE111({ currentUser: { ...baseUser, neuro_categories: ['tsa'], age: 28 } })
+    expect(screen.getByText('Les données de profil sont stockées localement sur votre appareil.')).toBeInTheDocument()
   })
 
   it('navigue vers settings via Retour', () => {

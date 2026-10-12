@@ -9,14 +9,14 @@ import { useState } from 'react'
 import { db, listItemRepo, settingsRepo, toolRepo } from '@/app/repositories'
 import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
 import { getFeedbackMessagesCursor, setFeedbackMessagesCursor } from '@/data/sync/feedbackMessagesCursor'
-import { grantSyncConsent, isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { CURRENT_CONSENT_VERSION, grantSyncConsent, isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { useSettingsState } from './useSettingsState'
 
 const syncNowMock = vi.mocked(syncNow)
 
 function SettingsPanel() {
-  const { createUser, exportData, importData, updateSettings, currentUser, settings } = useSettingsState()
+  const { createUser, updateProfile, exportData, importData, updateSettings, currentUser, settings } = useSettingsState()
   const [lastImport, setLastImport] = useState('')
   async function runImport(data: unknown) {
     const result = await importData(data)
@@ -26,8 +26,39 @@ function SettingsPanel() {
     <>
       <div data-testid="user">{currentUser?.id ?? 'aucun'}</div>
       <div data-testid="settings-tester-code">{settings?.tester_code ?? 'aucun'}</div>
-      <button onClick={() => createUser('student')}>Créer l’utilisateur</button>
-      <button onClick={() => createUser('student', ' RaphTest ')}>Créer l’utilisateur avec code testeur</button>
+      <div data-testid="user-profile">{JSON.stringify({ categories: currentUser?.neuro_categories, age: currentUser?.age })}</div>
+      <button onClick={() => updateProfile({ neuro_categories: ['tsa', 'tdah'], age: 41 })}>Modifier le profil</button>
+      <button
+        onClick={() =>
+          importData({
+            user: { id: 'imported-profile', neuro_categories: ['tdah', 'inconnue', 'tdah', 'tsa'], age: 200, onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+          })
+        }
+      >
+        Importer profil à nettoyer
+      </button>
+      <button
+        onClick={() =>
+          importData({
+            user: { id: 'imported-profile', neuro_categories: ['ne_sais_pas', 'tsa'], age: 33, onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+          })
+        }
+      >
+        Importer profil avec Je ne sais pas
+      </button>
+      <button
+        onClick={() =>
+          runImport({
+            user: { id: 'imported-legacy', profile_type: 'student', onboarding_completed: true, created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' },
+          })
+        }
+      >
+        Importer ancien profil
+      </button>
+      <button onClick={() => createUser({ neuro_categories: ['ne_sais_pas'], age: 30 })}>Créer l’utilisateur</button>
+      <button onClick={() => createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }, ' RaphTest ')}>Créer l’utilisateur avec code testeur</button>
+      <button onClick={() => createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }, 'marie', 'cle-admin')}>Créer l’utilisateur administrateur</button>
+      <button onClick={() => createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }, undefined, 'cle-admin')}>Créer l’utilisateur avec clé sans code</button>
       <button onClick={() => updateSettings({ tester_code: 'marie' })}>Modifier les réglages</button>
       <output data-testid="import-result">{lastImport}</output>
       <button onClick={() => exportData()}>Exporter</button>
@@ -113,6 +144,9 @@ function SettingsPanel() {
       >
         Importer avec identité d’appareil
       </button>
+      <button onClick={() => runImport({ user: { id: 'u-version', profile_type: 'student' }, sync_consent_granted: true, sync_consent_version: 2 })}>
+        Importer avec consentement à jour
+      </button>
       <button onClick={() => runImport({ user: { id: 'u-sans-identite', profile_type: 'student' } })}>
         Importer sans identité d’appareil
       </button>
@@ -152,6 +186,23 @@ describe('useSettingsState — createUser', () => {
     expect(screen.getByTestId('settings-tester-code')).toHaveTextContent('RaphTest')
   })
 
+  it('enregistre la clé administrateur avec le code testeur dès la création', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur administrateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    const settings = await settingsRepo.getByUserId(screen.getByTestId('user').textContent as string)
+    expect(settings?.tester_code).toBe('marie')
+    expect(settings?.admin_key).toBe('cle-admin')
+  })
+
+  it('n’enregistre pas de clé administrateur sans code testeur', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur avec clé sans code' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    const settings = await settingsRepo.getByUserId(screen.getByTestId('user').textContent as string)
+    expect(settings?.admin_key).toBeUndefined()
+  })
+
   it('ne fixe pas de code testeur quand aucun n’est fourni', async () => {
     render(<SettingsPanel />)
     await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
@@ -159,6 +210,38 @@ describe('useSettingsState — createUser', () => {
     const userId = screen.getByTestId('user').textContent as string
     const settings = await settingsRepo.getByUserId(userId)
     expect(settings?.tester_code).toBeUndefined()
+  })
+
+  it('enregistre les catégories et l’âge sans ancien type de profil', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    const stored = await db.users.get(screen.getByTestId('user').textContent as string)
+    expect(stored?.neuro_categories).toEqual(['ne_sais_pas'])
+    expect(stored?.age).toBe(30)
+    expect(stored).not.toHaveProperty('profile_type')
+  })
+})
+
+describe('useSettingsState — updateProfile', () => {
+  it('écrit les catégories et l’âge puis déclenche une synchronisation', async () => {
+    render(<SettingsPanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Créer l’utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('user')).not.toHaveTextContent('aucun'))
+    const userId = screen.getByTestId('user').textContent as string
+    syncNowMock.mockClear()
+
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Modifier le profil' }))
+    })
+
+    await waitFor(async () => {
+      const stored = await db.users.get(userId)
+      expect(stored?.neuro_categories).toEqual(['tsa', 'tdah'])
+      expect(stored?.age).toBe(41)
+    })
+    expect(screen.getByTestId('user-profile')).toHaveTextContent('"age":41')
+    expect(syncNowMock).toHaveBeenCalled()
   })
 })
 
@@ -198,6 +281,37 @@ describe('useSettingsState — export/import', () => {
       })
       expect(screen.getByTestId('import-result')).toHaveTextContent(error)
     }
+  })
+
+  it('écarte les catégories inconnues et l’âge hors bornes à l’import', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer profil à nettoyer' }))
+    })
+    const stored = await db.users.get('imported-profile')
+    expect(stored?.neuro_categories).toEqual(['tsa', 'tdah'])
+    expect(stored).not.toHaveProperty('age')
+  })
+
+  it('ne garde que « Je ne sais pas » quand il est combiné à d’autres catégories dans le fichier', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer profil avec Je ne sais pas' }))
+    })
+    const stored = await db.users.get('imported-profile')
+    expect(stored?.neuro_categories).toEqual(['ne_sais_pas'])
+    expect(stored?.age).toBe(33)
+  })
+
+  it('accepte un export antérieur qui ne porte que l’ancien type de profil', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer ancien profil' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    const stored = await db.users.get('imported-legacy')
+    expect(stored?.profile_type).toBe('student')
+    expect(stored).not.toHaveProperty('neuro_categories')
   })
 
   it('annule entièrement l’import lorsqu’une écriture échoue', async () => {
@@ -376,6 +490,7 @@ describe('useSettingsState — export/import', () => {
     expect(payload.device_id).toBe(deviceId)
     expect(payload.device_secret).toBe(deviceSecret)
     expect(payload.sync_consent_granted).toBe(true)
+    expect(payload.sync_consent_version).toBe(CURRENT_CONSENT_VERSION)
 
     clickSpy.mockRestore()
     vi.unstubAllGlobals()
@@ -389,6 +504,16 @@ describe('useSettingsState — export/import', () => {
     await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
     expect(getDeviceIdentity()).toEqual({ deviceId: 'device-exporte', deviceSecret: 'secret-exporte' })
     expect(isSyncConsentGranted()).toBe(true)
+    expect(isSyncConsentCurrent()).toBe(false)
+  })
+
+  it('restaure la version du consentement quand l’export la contient', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer avec consentement à jour' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(isSyncConsentCurrent()).toBe(true)
   })
 
   it('conserve l’identité d’appareil actuelle quand l’export ne la contient pas', async () => {

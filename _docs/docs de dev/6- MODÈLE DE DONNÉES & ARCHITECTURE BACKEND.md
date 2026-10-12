@@ -85,7 +85,9 @@ Profil principal.
 ```json
 {
   "id": "uuid",
-  "profile_type": "adult",
+  "neuro_categories": ["tsa", "tdah"],
+  "age": 28,
+  "onboarding_completed": true,
   "created_at": "datetime",
   "updated_at": "datetime"
 }
@@ -93,27 +95,39 @@ Profil principal.
 
 ---
 
-## profile_type
+## neuro_categories
+
+Liste à choix multiple, renseignée à l'onboarding (écran E02) et modifiable dans Paramètres > Profil.
 
 Valeurs :
 
-* teenager
-* student
-* adult
+* tsa
+* tdah
+* sdi
+* avec_di
+* hpi
+* neurotypique
+* ne_sais_pas (exclusif : incompatible avec toutes les autres valeurs)
+
+`neurotypique` est lui aussi exclusif. Les deux s'excluent mutuellement ; à l'import d'un fichier qui les combine avec d'autres valeurs, `ne_sais_pas` prime, puis `neurotypique`.
+
+Ce sont des données de santé. Elles font partie du snapshot de synchronisation (comme le reste de l'entité User) : le consentement de l'écran E04 le mentionne expressément.
+
+## age
+
+Entier, de 1 à 120, en années. Obligatoire à l'onboarding.
+
+## profile_type (hérité)
+
+Ancien champ à valeur unique (`teenager`, `student`, `adult`), remplacé par `neuro_categories`. Il n'est plus écrit : il subsiste uniquement sur les enregistrements et les exports antérieurs, sans conversion vers `neuro_categories` (ces utilisateurs ont une liste vide jusqu'à ce qu'ils la renseignent dans Paramètres > Profil).
 
 ---
 
-## Effet du profile_type
+## Effet du profil
 
-Le profil ne modifie ni l'architecture, ni les fonctionnalités, ni la navigation (cf. cahier Phase 13).
+Le profil ne modifie ni l'architecture, ni les fonctionnalités, ni la navigation (cf. cahier Phase 13). Aucune donnée utilisateur n'est filtrée ou masquée selon le profil. Il est modifiable à tout moment sans perte de données.
 
-Il agit uniquement sur les **contenus préchargés et les exemples affichés** :
-
-* jeux d'exemples de tâches proposés (placeholder du champ, suggestions d'onboarding)
-* libellés d'exemples dans les états vides
-* sélection de modèles sociaux mis en avant
-
-Aucune donnée utilisateur n'est filtrée ou masquée selon le profil. Le profil est modifiable à tout moment sans perte de données.
+Le code actuel n'utilise ni les catégories ni l'âge pour adapter des contenus : ils sont stockés pour usage ultérieur.
 
 ---
 

@@ -4,6 +4,7 @@ Lancer avec : python scripts/test_reply_feedback_report.py
 """
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -18,7 +19,9 @@ from reply_feedback_report import (  # noqa: E402
     build_tester_devices_query,
     deposit_reply,
     find_report,
+    is_hidden_by_state,
     list_reports_needing_reply,
+    read_body,
     read_thread,
 )
 
@@ -28,6 +31,12 @@ class ReplyFeedbackReportTests(unittest.TestCase):
         queue_patch = patch("reply_feedback_report.read_queue", return_value=[])
         self.read_queue = queue_patch.start()
         self.addCleanup(queue_patch.stop)
+        state_patch = patch("reply_feedback_report.read_state", return_value={})
+        self.read_state = state_patch.start()
+        self.addCleanup(state_patch.stop)
+        clear_patch = patch("reply_feedback_report.clear_state")
+        self.clear_state = clear_patch.start()
+        self.addCleanup(clear_patch.stop)
 
     def test_requete_retours_ouverts_filtre_et_trie(self):
         query = build_open_reports_query()
@@ -73,12 +82,41 @@ class ReplyFeedbackReportTests(unittest.TestCase):
         self.assertEqual([r["id"] for r in result], ["retour-1"])
         self.assertTrue(result[0]["reponse_en_attente"])
 
-    def test_entree_en_attente_sans_horodatage_reste_exclue(self):
+    def test_entree_en_attente_sans_horodatage_remonte_la_relance(self):
         self.read_queue.return_value = [{"report_id": "retour-1"}]
         reports = [{"id": "retour-1"}]
         messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-09T10:00:00Z"}]
         with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
-            self.assertEqual(list_reports_needing_reply("https://example.test", "key"), [])
+            result = list_reports_needing_reply("https://example.test", "key")
+        self.assertEqual([r["id"] for r in result], ["retour-1"])
+        self.assertTrue(result[0]["reponse_en_attente"])
+
+    def test_etat_masque_le_retour_sans_relance_posterieure(self):
+        self.read_state.return_value = {"retour-1": {"statut": "en_roadmap", "updated_at": "2026-10-10T10:00:00+00:00"}}
+        reports = [{"id": "retour-1"}, {"id": "retour-2"}]
+        messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-09T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
+            result = list_reports_needing_reply("https://example.test", "key")
+        self.assertEqual([r["id"] for r in result if not is_hidden_by_state(r)], ["retour-2"])
+        self.assertEqual(result[0]["etat"]["statut"], "en_roadmap")
+
+    def test_etat_ne_masque_pas_une_relance_posterieure(self):
+        self.read_state.return_value = {"retour-1": {"statut": "attend_testeur", "updated_at": "2026-10-10T10:00:00+00:00"}}
+        reports = [{"id": "retour-1"}]
+        messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-11T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
+            result = list_reports_needing_reply("https://example.test", "key")
+        self.assertFalse(is_hidden_by_state(result[0]))
+
+    def test_corps_lu_depuis_un_fichier(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "reponse.txt"
+            path.write_text("Ligne « une ».\nLigne deux.", encoding="utf-8")
+            self.assertEqual(read_body(None, str(path)), "Ligne « une ».\nLigne deux.")
+
+    def test_corps_et_fichier_exclusifs(self):
+        with self.assertRaises(SupabaseError):
+            read_body("texte", "fichier.txt")
 
     def test_fil_complet_retourne_le_retour_et_ses_messages(self):
         report = {"id": "retour-1", "resolved_at": None}
@@ -147,6 +185,7 @@ class ReplyFeedbackReportTests(unittest.TestCase):
         self.assertEqual(message["device_id"], "appareil-1")
         self.assertEqual(message["author"], "agent")
         self.assertEqual(message["body"], "Le correctif est en ligne.")
+        self.clear_state.assert_called_once_with("retour-1")
 
 
 if __name__ == "__main__":

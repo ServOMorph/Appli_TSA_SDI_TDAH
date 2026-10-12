@@ -63,14 +63,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("feedback-reports"),
-        help="Dossier de telechargement des images (defaut : feedback-reports)",
+        default=Path("scratchpad/feedback-reports"),
+        help="Dossier de telechargement des images (defaut : scratchpad/feedback-reports, gitignore)",
     )
     parser.add_argument("--no-download", action="store_true", help="Lister sans telecharger les images")
     return parser.parse_args()
 
 
 def main() -> int:
+    sys.stdout.reconfigure(encoding="utf-8")
     args = parse_args()
     try:
         url, service_key = read_credentials()

@@ -2,7 +2,7 @@
 description: Build la dist versionnée et la déploie en prod sur Netlify
 argument-hint: [version]
 model: sonnet
-allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python scripts/queue_pending_feedback_reply.py:*), Bash(python scripts/count_netlify_deploys.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(node scripts/check_bundle_budget.mjs:*)
+allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Bash(npx netlify deploy:*), Bash(python scripts/backup_testeur_snapshots.py:*), Bash(python scripts/republish_pending_feedback_replies.py:*), Bash(python scripts/queue_pending_feedback_reply.py:*), Bash(python scripts/check_feedback_replies_vs_changes.py:*), Bash(python scripts/reply_feedback_report.py:*), Bash(python scripts/count_netlify_deploys.py:*), Bash(python DISCORD/discord_com/gateway.py:*), Bash(grep -m1:*), Bash(grep -q:*), Bash(grep -qE:*), Bash(test -f:*), Bash(test -d:*), Bash(ls -A:*), Bash(git status:*), Bash(git branch --show-current:*), Bash(git rev-parse:*), Bash(git rev-list:*), Bash(git diff:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(npx vitest run:*), Bash(npm run lint:*), Bash(curl:*), Bash(node scripts/check_bundle_budget.mjs:*)
 ---
 
 # /deploy [version]
@@ -219,6 +219,24 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    final mais n'invalide pas le déploiement déjà effectué (Netlify l'a déjà confirmé) — c'est une vérification
    indépendante supplémentaire, pas une nouvelle porte bloquante.
 
+   Contrôler les réponses déjà publiées face à cette livraison, **avant** la mise à jour de
+   `_contexte/dernier_deploiement.md` ci-dessous (le script en lit le commit comme base) :
+   ```
+   python scripts/check_feedback_replies_vs_changes.py
+   ```
+   `a_revoir` liste les retours ouverts, ou validés depuis le déploiement précédent, dont la
+   dernière réponse d'agent porte sur un écran modifié par cette livraison (rattachement par
+   heuristique, sur-inclusif : la plupart ne seront pas contredits ; `fichiers_src_non_rattaches`
+   est à parcourir à la main). Pour chacun, comparer le texte de la réponse au diff de l'écran :
+   - réponse toujours exacte → rien à faire ;
+   - réponse contredite (fonction annoncée puis retirée ou changée), retour **ouvert** → rédiger
+     un complément, relecture et accord écrit de l'utilisateur, puis dépôt direct (le code est en
+     production) : `python scripts/reply_feedback_report.py --report-id <id> --body-file <fichier>` ;
+   - réponse contredite, retour **validé** → plus de dépôt possible dans son fil : retenir le
+     changement pour l'inventaire de communication (étape 10), il doit figurer dans le message de
+     livraison.
+   Échec du script (hors ligne) : le signaler dans le rapport final sans bloquer la suite.
+
    Republier les réponses aux retours testeur laissées en attente de cette livraison. D'abord les
    afficher :
    ```
@@ -227,7 +245,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    File non vide : présenter à l'utilisateur le texte exact de chaque réponse et attendre son accord
    écrit avant de republier — c'est le dernier contrôle avant que le testeur ne lise la réponse. Une
    réponse devenue obsolète (correctif retiré de la livraison, texte à reprendre) se retire avec
-   `--remove --report-id <id>` ou se corrige avec `--replace --report-id <id> --body <texte>`. Puis :
+   `--remove --report-id <id>` ou se corrige avec `--replace --report-id <id> --body-file <fichier>`. Puis :
    ```
    python scripts/republish_pending_feedback_replies.py
    ```
@@ -266,7 +284,8 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     - les changements de la version cible dans `CHANGELOG.md` et `WHATS_NEW` ;
     - les roadmaps terminées ou modifiées par cette livraison, y compris leurs écarts assumés et décisions non tranchées ;
     - les retours ouverts de Marie nécessitant une réponse (`python scripts/reply_feedback_report.py`)
-      et les actions encore ouvertes dans la partie active de `_contexte/signals.md`.
+      et les actions encore ouvertes dans la partie active de `_contexte/signals.md` ;
+    - les retours validés dont la réponse est contredite par cette livraison, relevés à l'étape 8.
 
     L'inventaire doit distinguer explicitement : ce qui est livré, les choix attendus d'elle, les écarts assumés
     et les retours de ses exports déjà corrigés. Ne pas reprendre les archives ou les signaux historiques clos

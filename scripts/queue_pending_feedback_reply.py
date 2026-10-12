@@ -20,11 +20,8 @@ import sys
 from datetime import datetime, timezone
 
 from _supabase import SupabaseError, read_credentials
-from reply_feedback_report import QUEUE_FILE, find_report, read_queue
-
-
-def write_queue(entries: list[dict]) -> None:
-    QUEUE_FILE.write_text(json.dumps(entries, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+from feedback_state import clear_state
+from reply_feedback_report import find_report, read_body, read_queue, write_queue
 
 
 def queue_reply(report_id: str, screen_code: str, body: str, replace: bool = False) -> None:
@@ -45,6 +42,7 @@ def queue_reply(report_id: str, screen_code: str, body: str, replace: bool = Fal
         "queued_at": datetime.now(timezone.utc).isoformat(),
     })
     write_queue(entries)
+    clear_state(report_id)
 
 
 def remove_reply(report_id: str) -> None:
@@ -59,6 +57,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--report-id", help="Identifiant du retour a traiter")
     parser.add_argument("--body", help="Texte de la reponse")
+    parser.add_argument("--body-file", help="Fichier UTF-8 contenant le texte de la reponse (a la place de --body)")
     parser.add_argument("--replace", action="store_true", help="Remplacer la reponse deja en attente")
     parser.add_argument("--remove", action="store_true", help="Retirer la reponse en attente du retour")
     parser.add_argument("--list", action="store_true", help="Afficher les reponses en attente")
@@ -79,19 +78,20 @@ def main() -> int:
             remove_reply(args.report_id)
             print(f"Reponse en attente retiree pour {args.report_id}.")
             return 0
-        if not args.body:
-            print("ERREUR: --body est requis pour mettre une reponse en attente.", file=sys.stderr)
+        body = read_body(args.body, args.body_file)
+        if not body:
+            print("ERREUR: --body ou --body-file est requis pour mettre une reponse en attente.", file=sys.stderr)
             return 1
         url, service_key = read_credentials()
         report = find_report(url, service_key, args.report_id)
         if report.get("resolved_at"):
             print(f"ERREUR: retour deja valide par le testeur : {args.report_id}.", file=sys.stderr)
             return 1
-        queue_reply(args.report_id, report.get("screen_code", ""), args.body, replace=args.replace)
+        queue_reply(args.report_id, report.get("screen_code", ""), body, replace=args.replace)
         action = "remplacee" if args.replace else "mise en attente"
         print(f"Reponse {action} pour {args.report_id} (publiee au prochain /deploy).")
         return 0
-    except SupabaseError as e:
+    except (SupabaseError, OSError) as e:
         print(f"ERREUR: {e}.", file=sys.stderr)
         return 1
 

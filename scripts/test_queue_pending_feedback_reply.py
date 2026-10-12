@@ -13,6 +13,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _supabase import SupabaseError  # noqa: E402
+import feedback_state  # noqa: E402
 import queue_pending_feedback_reply as queue_module  # noqa: E402
 import reply_feedback_report  # noqa: E402
 from republish_pending_feedback_replies import publish_entries  # noqa: E402
@@ -24,8 +25,11 @@ class QueueTestCase(unittest.TestCase):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         self.queue_file = Path(directory.name) / "file.json"
-        for target in (reply_feedback_report, queue_module):
-            file_patch = patch.object(target, "QUEUE_FILE", self.queue_file)
+        for target, name, value in (
+            (reply_feedback_report, "QUEUE_FILE", self.queue_file),
+            (feedback_state, "STATE_FILE", Path(directory.name) / "etat.json"),
+        ):
+            file_patch = patch.object(target, name, value)
             file_patch.start()
             self.addCleanup(file_patch.stop)
 
@@ -63,6 +67,15 @@ class QueuePendingFeedbackReplyTests(QueueTestCase):
     def test_retrait_d_une_entree_absente_refuse(self):
         with self.assertRaises(SupabaseError):
             queue_module.remove_reply("retour-1")
+
+    def test_mise_en_file_retire_l_etat_du_retour(self):
+        feedback_state.set_state("retour-1", "en_roadmap", "roadmap_x.md Phase 1")
+        queue_module.queue_reply("retour-1", "E10", "Corrige.")
+        self.assertEqual(feedback_state.read_state(), {})
+
+    def test_ecriture_atomique_ne_laisse_pas_de_fichier_temporaire(self):
+        queue_module.queue_reply("retour-1", "E10", "Un.")
+        self.assertEqual(sorted(p.name for p in self.queue_file.parent.iterdir()), ["file.json"])
 
 
 class RepublishTests(QueueTestCase):

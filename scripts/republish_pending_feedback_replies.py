@@ -13,14 +13,13 @@ Necessite SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans l'environnement. La cle
 n'est jamais affichee ni ecrite par ce script.
 """
 
-import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _supabase import SupabaseError, read_credentials  # noqa: E402
-from reply_feedback_report import QUEUE_FILE, ReportResolvedError, deposit_reply, read_queue  # noqa: E402
+from reply_feedback_report import QUEUE_FILE, ReportResolvedError, deposit_reply, read_queue, write_queue  # noqa: E402
 
 
 def publish_entries(url: str, service_key: str, entries: list[dict]) -> tuple[int, int, list[dict]]:
@@ -54,7 +53,7 @@ def main() -> int:
 
     url, service_key = read_credentials()
     published, dropped, remaining = publish_entries(url, service_key, entries)
-    QUEUE_FILE.write_text(json.dumps(remaining, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_queue(remaining)
 
     print(
         f"{published} reponse(s) republiee(s), {dropped} retiree(s) (retour deja valide), "

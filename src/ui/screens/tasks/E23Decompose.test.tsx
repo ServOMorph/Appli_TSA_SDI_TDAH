@@ -53,10 +53,34 @@ describe('E23Decompose', () => {
     await waitFor(() => expect(screen.getByText('Aucune sous-étape.')).toBeDefined())
     await userEvent.type(screen.getByLabelText('Nouvelle sous-étape'), 'Prendre le téléphone')
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
-    expect(ctx.addSubTask).toHaveBeenCalledWith('task-1', 'Prendre le téléphone')
+    expect(ctx.addSubTaskScoped).toHaveBeenCalledWith('task-1', 'Prendre le téléphone', 'occurrence')
     await waitFor(() => {
       expect(screen.getByText('Prendre le téléphone')).toBeDefined()
     })
+  })
+
+  it("tâche récurrente : demande la portée avant d'ajouter (80dcd005)", async () => {
+    const task = makeTask({ recurrence_id: 'rec-1' })
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+    renderWithApp(<E23Decompose />, ctx)
+    await userEvent.type(screen.getByLabelText('Nouvelle sous-étape'), 'Prendre le téléphone')
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+    expect(ctx.addSubTaskScoped).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: 'Toutes les occurrences' }))
+    expect(ctx.addSubTaskScoped).toHaveBeenCalledWith('task-1', 'Prendre le téléphone', 'series')
+  })
+
+  it("tâche récurrente : 'Cette occurrence' et 'Annuler'", async () => {
+    const task = makeTask({ recurrence_id: 'rec-1' })
+    const ctx = makeAppContext({ selectedTaskId: 'task-1', inboxTasks: [task] })
+    renderWithApp(<E23Decompose />, ctx)
+    await userEvent.type(screen.getByLabelText('Nouvelle sous-étape'), 'A')
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Annuler' }))
+    expect(ctx.addSubTaskScoped).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Cette occurrence' }))
+    expect(ctx.addSubTaskScoped).toHaveBeenCalledWith('task-1', 'A', 'occurrence')
   })
 
   it('supprime une sous-étape et recharge la liste', async () => {

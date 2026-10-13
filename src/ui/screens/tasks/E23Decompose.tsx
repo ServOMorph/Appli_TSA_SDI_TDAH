@@ -4,6 +4,7 @@ import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { DurationRoller } from '@/ui/components/DurationRoller'
 import type { Task } from '@/domain/entities/task'
+import type { TaskEditScope } from '@/app/contexts/usePlanningState'
 import { isCompleted, addMinutesToTime, maxDurationBeforeMidnight } from '@/domain/rules/taskRules'
 import { todayStr, formatFrenchDate } from '@/domain/rules/planningSlotRules'
 import {
@@ -46,6 +47,29 @@ const backBtnStyle: React.CSSProperties = {
   fontSize: '1rem',
   padding: 0,
   alignSelf: 'flex-start',
+}
+
+const modalOverlay: React.CSSProperties = {
+  position: 'fixed',
+  inset: 0,
+  backgroundColor: 'rgba(0,0,0,0.75)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1000,
+}
+
+const modalBox: React.CSSProperties = {
+  backgroundColor: 'var(--color-surface)',
+  border: '1px solid var(--color-border)',
+  boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+  borderRadius: 'var(--radius-lg)',
+  padding: 'var(--spacing-xl)',
+  maxWidth: '360px',
+  width: '90%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--spacing-md)',
 }
 
 const inputStyle: React.CSSProperties = {
@@ -223,7 +247,7 @@ export function E23Decompose() {
     inboxTasks,
     getSubTasks,
     getTaskById,
-    addSubTask,
+    addSubTaskScoped,
     deleteSubTask,
     toggleSubTask,
     reorderSubTasks,
@@ -235,6 +259,7 @@ export function E23Decompose() {
   const [subTasks, setSubTasks] = useState<Task[]>([])
   const [newTitle, setNewTitle] = useState('')
   const [fetchedTask, setFetchedTask] = useState<Task | null>(null)
+  const [pendingTitle, setPendingTitle] = useState<string | null>(null)
 
   const taskFromLists = inboxTasks.find((t) => t.id === selectedTaskId)
   const task = taskFromLists ?? fetchedTask ?? undefined
@@ -277,14 +302,30 @@ export function E23Decompose() {
       )
   }
 
+  async function addWithScope(title: string, scope: TaskEditScope) {
+    if (!selectedTaskId) return
+    await addSubTaskScoped(selectedTaskId, title, scope)
+    setNewTitle('')
+    const updated = await getSubTasks(selectedTaskId)
+    setSubTasks(updated)
+  }
+
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = newTitle.trim()
     if (!selectedTaskId || !trimmed) return
-    await addSubTask(selectedTaskId, trimmed)
-    setNewTitle('')
-    const updated = await getSubTasks(selectedTaskId)
-    setSubTasks(updated)
+    if (task?.recurrence_id) {
+      setPendingTitle(trimmed)
+      return
+    }
+    await addWithScope(trimmed, 'occurrence')
+  }
+
+  async function confirmScope(scope: TaskEditScope) {
+    if (pendingTitle === null) return
+    const title = pendingTitle
+    setPendingTitle(null)
+    await addWithScope(title, scope)
   }
 
   async function handleDelete(id: string) {
@@ -361,6 +402,27 @@ export function E23Decompose() {
           Ajouter
         </Button>
       </form>
+
+      {pendingTitle !== null && (
+        <div role="dialog" aria-modal="true" aria-label="Modifier la série récurrente" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Tâche récurrente</h2>
+            <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
+              Ajouter la sous-étape à cette occurrence seulement, ou à toutes les occurrences
+              futures de la série ?
+            </p>
+            <Button fullWidth onClick={() => confirmScope('occurrence')}>
+              Cette occurrence
+            </Button>
+            <Button fullWidth onClick={() => confirmScope('series')}>
+              Toutes les occurrences
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setPendingTitle(null)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

@@ -41,12 +41,6 @@
     "note": "",
     "updated_at": "2026-10-13T16:40:39.208742+00:00"
   },
-  "80dcd005-a42e-45c7-aadd-66c5a703164b": {
-    "statut": "attend_testeur",
-    "ref": "Personnaliser l'occurrence : jours de la semaine ou dates (A en Phase 1 quater)",
-    "note": "",
-    "updated_at": "2026-10-13T16:40:39.292507+00:00"
-  },
   "b5087222-f587-4a21-a17c-32e1ef22cc3f": {
     "statut": "en_roadmap",
     "ref": "roadmap_retours_2026-10-12 Phase 1 bis (reponse en file)",
@@ -64,5 +58,11 @@
     "ref": "roadmap_retours_2026-10-12 Phase 1 ter",
     "note": "",
     "updated_at": "2026-10-13T17:50:46.508456+00:00"
+  },
+  "80dcd005-a42e-45c7-aadd-66c5a703164b": {
+    "statut": "en_roadmap",
+    "ref": "roadmap_retours_2026-10-12.md Phase 1 quater (option B en attente de Marie)",
+    "note": "",
+    "updated_at": "2026-10-13T17:57:09.249749+00:00"
   }
 }

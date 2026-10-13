@@ -28,5 +28,11 @@
     "screen_code": "E79",
     "body": "Fait : dans E79, la fenêtre « Modifier l'étape » permet maintenant d'ajouter et de supprimer des sous-tâches pour chaque étape.",
     "queued_at": "2026-10-13T17:50:43.819938+00:00"
+  },
+  {
+    "report_id": "80dcd005-a42e-45c7-aadd-66c5a703164b",
+    "screen_code": "E22",
+    "body": "E23 : à l'ajout d'une sous-étape sur une tâche récurrente, l'appli demande maintenant si elle s'applique à cette occurrence ou à toutes les occurrences à venir. Le choix de jours précis reste à définir avec toi.",
+    "queued_at": "2026-10-13T17:57:09.140629+00:00"
   }
 ]

@@ -146,6 +146,12 @@ précises, quelles modifications concernées), puis phase dédiée.
   occurrences (jours de la semaine) pour toute modification. A est moyen, sans migration ; B est
   lourd (interface de sélection, règles de propagation). Décision à prendre avant de planifier.
 
+**Réalisé (option A)** : `addSubTaskScoped(taskId, title, scope)` dans `usePlanningState.ts`
+(même périmètre que `updateTaskFields` : occurrence ouverte + suivantes non détachées) ; E23
+(`E23Decompose.tsx`) ouvre le choix « Cette occurrence / Toutes les occurrences / Annuler » à
+l'ajout si la tâche est récurrente. 4 tests ajoutés/adaptés (1207 tests verts, `tsc -b` et lint verts).
+Non couvert : la suppression d'une sous-étape reste limitée à l'occurrence ouverte ; option B en attente de Marie.
+
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 

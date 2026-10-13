@@ -55,6 +55,7 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     completeTask: vi.fn().mockResolvedValue(undefined),
     deleteTask: vi.fn().mockResolvedValue(undefined),
     addSubTask: vi.fn().mockResolvedValue(undefined),
+    addSubTaskScoped: vi.fn().mockResolvedValue(undefined),
     deleteSubTask: vi.fn().mockResolvedValue(undefined),
     toggleSubTask: vi.fn().mockResolvedValue(undefined),
     reorderSubTasks: vi.fn().mockResolvedValue(undefined),

@@ -411,8 +411,35 @@ export function usePlanningState(reloadTasks: () => Promise<void>) {
     await load()
   }
 
+  /**
+   * Ajoute une sous-tâche. `'occurrence'` : uniquement à la tâche ouverte. `'series'` : à cette
+   * occurrence et à toutes les occurrences futures non détachées de la série (même périmètre
+   * que `updateTaskFields`).
+   */
+  async function addSubTaskScoped(taskId: string, title: string, scope: TaskEditScope = 'occurrence'): Promise<void> {
+    const task = await taskRepo.getById(taskId)
+    if (!task) return
+    const now = new Date().toISOString()
+    let targetIds = [taskId]
+    if (task.recurrence_id && scope === 'series') {
+      const series = await taskRepo.getByRecurrenceId(task.recurrence_id)
+      targetIds = series
+        .filter((t) => (t.id === taskId || !t.recurrence_exception) && (t.scheduled_date ?? '') >= (task.scheduled_date ?? ''))
+        .map((t) => t.id)
+    }
+    const subTasks: Task[] = []
+    for (const id of targetIds) {
+      const existing = await taskRepo.getChildren(id)
+      subTasks.push(createTaskRule(newId(), title, 'inbox', false, now, id, existing.length))
+    }
+    await persistSeriesBatch(db, { tasksToCreate: subTasks })
+    await reloadTasks()
+    await load()
+  }
+
   return {
     todayPlannedTasks,
+    addSubTaskScoped,
     scheduleTask,
     getPlannedTasksForDate,
     completeTaskById,

@@ -24,12 +24,28 @@ function report(overrides: Partial<FeedbackReport> = {}): FeedbackReport {
 }
 
 describe('isFeedbackReportValid', () => {
-  it('exige une image, un code d’écran et un commentaire ou une annotation', () => {
+  it('exige un code d’écran et un commentaire ou une annotation', () => {
     expect(isFeedbackReportValid(report())).toBe(true)
     expect(isFeedbackReportValid(report({ screen_code: '  ' }))).toBe(false)
     expect(isFeedbackReportValid(report({ image_blob: new Blob(), image_bytes: 0 }))).toBe(false)
     expect(isFeedbackReportValid(report({ comment: ' ', strokes: [] }))).toBe(false)
     expect(isFeedbackReportValid(report({ comment: ' ', strokes: [{ points: [{ x: 1, y: 2 }] }] }))).toBe(true)
+  })
+})
+
+describe('isFeedbackReportValid sans image (c755cb11)', () => {
+  const noImage = { image_blob: null, image_bytes: 0 }
+
+  it('accepte un texte seul', () => {
+    expect(isFeedbackReportValid(report(noImage))).toBe(true)
+  })
+
+  it('refuse un retour sans image ni commentaire', () => {
+    expect(isFeedbackReportValid(report({ ...noImage, comment: '  ', strokes: [] }))).toBe(false)
+  })
+
+  it('refuse sans code d’écran', () => {
+    expect(isFeedbackReportValid(report({ ...noImage, screen_code: ' ' }))).toBe(false)
   })
 })
 

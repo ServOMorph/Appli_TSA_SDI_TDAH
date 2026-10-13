@@ -1,4 +1,4 @@
-"""Liste les retours annotes et telecharge leurs images privees.
+"""Liste les retours annotes et telecharge leurs images privees (image facultative : un retour sans image n'est pas telecharge).
 
 Necessite SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans l'environnement.
 La cle service_role n'est jamais affichee ni ecrite par ce script.
@@ -43,6 +43,8 @@ def download_images(url: str, service_key: str, reports: list[dict], output_dir:
     downloaded = 0
     for report in reports:
         storage_path = report.get("storage_path")
+        if storage_path is None:
+            continue
         if not isinstance(storage_path, str) or not storage_path:
             raise SupabaseError("retour Supabase sans chemin Storage exploitable")
         target = output_dir / image_filename(report)

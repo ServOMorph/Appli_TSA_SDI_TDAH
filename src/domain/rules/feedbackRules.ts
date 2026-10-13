@@ -1,14 +1,13 @@
 import type { FeedbackReport } from '@/domain/entities/feedbackReport'
 
+/** L'image est facultative : sans image, le commentaire est obligatoire. */
 export function isFeedbackReportValid(
   report: Pick<FeedbackReport, 'screen_code' | 'comment' | 'image_blob' | 'image_bytes' | 'strokes'>,
 ): boolean {
-  return (
-    report.screen_code.trim().length > 0 &&
-    report.image_blob.size > 0 &&
-    report.image_bytes > 0 &&
-    (report.comment.trim().length > 0 || report.strokes.length > 0)
-  )
+  const hasComment = report.comment.trim().length > 0
+  if (report.screen_code.trim().length === 0) return false
+  if (report.image_blob === null) return hasComment
+  return report.image_blob.size > 0 && report.image_bytes > 0 && (hasComment || report.strokes.length > 0)
 }
 
 const MAX_MESSAGE_LENGTH = 2000

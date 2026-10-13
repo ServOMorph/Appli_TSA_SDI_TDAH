@@ -48,10 +48,23 @@ class ReadFeedbackReportsTests(unittest.TestCase):
             self.assertEqual((output / "retour-2.jpg").read_bytes(), b"b")
             self.assertEqual(download.call_count, 2)
 
-    def test_chemin_storage_absent_est_rejete(self):
+    def test_chemin_storage_invalide_est_rejete(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(SupabaseError):
-                download_images("https://example.test", "key", [{"id": "retour-1"}], Path(directory))
+                download_images("https://example.test", "key", [{"id": "retour-1", "storage_path": ""}], Path(directory))
+
+    def test_retour_sans_image_n_est_pas_telecharge(self):
+        reports = [
+            {"id": "retour-1", "storage_path": None},
+            {"id": "retour-2", "storage_path": "device-1/retour-2.jpg"},
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "images"
+            with patch("read_feedback_reports.download_storage_object", return_value=b"b") as download:
+                self.assertEqual(download_images("https://example.test", "key", reports, output), 1)
+            self.assertFalse((output / "retour-1.jpg").exists())
+            self.assertEqual((output / "retour-2.jpg").read_bytes(), b"b")
+            self.assertEqual(download.call_count, 1)
 
 
 if __name__ == "__main__":

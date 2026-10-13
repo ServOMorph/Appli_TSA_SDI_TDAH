@@ -265,5 +265,26 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   Python.
 - Critère de sortie : gates verts, migration appliquée et un envoi sans image constaté en base.
 
+### Réalisé (2026-10-13)
+
+- Domaine : `FeedbackReport.image_blob: Blob | null` (champ Dexie non indexé, aucune migration
+  locale) ; `isFeedbackReportValid` accepte un texte seul, exige un commentaire sans image, refuse
+  un retour vide.
+- Envoi (`feedbackClient.ts`) : sans image, pas de téléversement Storage, `p_storage_path` et
+  `p_image_bytes` envoyés à `null`.
+- E122 : envoi possible sans capture (texte d'aide mis à jour) ; E124 : pas de capture affichée
+  sans image (E123 n'affiche pas l'image).
+- `scripts/read_feedback_reports.py` : un retour sans `storage_path` n'est pas téléchargé.
+- `supabase/feedback.sql` (section ajoutée en fin de fichier) : `storage_path` et `image_bytes`
+  nullables (la contrainte `image_bytes > 0` laisse passer `NULL`), `submit_feedback_v2` remplacée
+  (même signature, chemin nul accepté avec octets nuls et commentaire non vide ; contrôles
+  inchangés quand un chemin est fourni, donc anciens clients compatibles).
+- Tests : `feedbackRules.test.ts` (+3), `feedbackClient.test.ts` (+1), `E122FeedbackCapture.test.tsx`
+  (+1), `E124FeedbackDetail.test.tsx` (+2), `test_read_feedback_reports.py` (+1). Gates : vitest
+  1245/1245, `tsc -b`, lint, scripts Python 100/100.
+- **Reste à faire avant `/deploy`** : appliquer la section SQL ajoutée en fin de `supabase/feedback.sql`
+  dans le SQL Editor Supabase, puis constater un envoi sans image en base (critère de sortie non
+  atteint tant que ce n'est pas fait).
+
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

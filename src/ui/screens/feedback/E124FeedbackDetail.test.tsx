@@ -67,6 +67,18 @@ describe('E124FeedbackDetail', () => {
 
   afterEach(() => localStorage.clear())
 
+  it('affiche la capture quand le retour en a une, et rien sans image (c755cb11)', async () => {
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    expect(await screen.findByAltText('Capture du retour')).toBeInTheDocument()
+  })
+
+  it('affiche un retour sans image sans capture (c755cb11)', async () => {
+    mocks.getById.mockResolvedValue({ ...REPORT, image_blob: null, image_bytes: 0 })
+    renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))
+    expect(await screen.findByText('Le bouton est masqué')).toBeInTheDocument()
+    expect(screen.queryByAltText('Capture du retour')).not.toBeInTheDocument()
+  })
+
   it('propose Relancer sous un message en échec et le remet en attente', async () => {
     mocks.getByReport.mockResolvedValue([{ ...AGENT_MESSAGE, id: 'message-9', author: 'user' as const, sync_status: 'failed' as const }])
     renderWithApp(<E124FeedbackDetail />, makeAppContext({ screen: 'feedback-detail', route: { name: 'feedback-detail', reportId: 'report-1' } }))

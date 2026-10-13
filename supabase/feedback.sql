@@ -459,3 +459,78 @@ $$;
 
 revoke all on function close_feedback_report_v2(uuid, text, uuid, timestamptz) from public;
 grant execute on function close_feedback_report_v2(uuid, text, uuid, timestamptz) to anon;
+
+-- Image facultative (roadmap_retours_2026-10-12.md, Phase 5, retour c755cb11).
+-- A appliquer sur Supabase AVANT de deployer le client : un retour peut alors etre envoye sans
+-- image (p_storage_path et p_image_bytes nuls). La contrainte `image_bytes > 0` reste en place :
+-- elle ne rejette pas la valeur NULL. Les clients anterieurs envoient toujours une image et
+-- restent compatibles (meme signature, memes controles quand un chemin est fourni).
+alter table feedback_reports alter column storage_path drop not null;
+alter table feedback_reports alter column image_bytes drop not null;
+
+create or replace function submit_feedback_v2(
+  p_id uuid,
+  p_device_id uuid,
+  p_device_secret text,
+  p_screen_code text,
+  p_comment text,
+  p_storage_path text,
+  p_image_bytes integer,
+  p_strokes jsonb,
+  p_app_version text,
+  p_created_at timestamptz
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not exists (
+    select 1 from device_snapshots
+    where device_id = p_device_id and device_secret = p_device_secret
+  ) then
+    return 'device_unknown';
+  end if;
+
+  if p_storage_path is null then
+    if p_image_bytes is not null then
+      return 'invalid';
+    end if;
+  elsif p_storage_path <> format('%s/%s.jpg', p_device_id, p_id)
+     or p_image_bytes is null
+     or p_image_bytes <= 0
+     or p_image_bytes > 8388608 then
+    return 'invalid';
+  end if;
+
+  if char_length(p_screen_code) > 100
+     or char_length(p_comment) > 10000
+     or octet_length(coalesce(p_strokes, '[]'::jsonb)::text) > 2097152
+     or char_length(coalesce(p_app_version, '')) > 50 then
+    return 'invalid';
+  end if;
+
+  if p_storage_path is null and char_length(btrim(p_comment)) = 0 then
+    return 'invalid';
+  end if;
+
+  if (select count(*) from feedback_reports
+      where device_id = p_device_id
+        and received_at > now() - interval '24 hours') >= 50 then
+    return 'rate_limited';
+  end if;
+
+  insert into feedback_reports (
+    id, device_id, screen_code, comment, storage_path, image_bytes, strokes, app_version, created_at
+  ) values (
+    p_id, p_device_id, p_screen_code, p_comment, p_storage_path, p_image_bytes,
+    coalesce(p_strokes, '[]'::jsonb), p_app_version, p_created_at
+  ) on conflict (id) do nothing;
+
+  return 'ok';
+end;
+$$;
+
+revoke all on function submit_feedback_v2(uuid, uuid, text, text, text, text, integer, jsonb, text, timestamptz) from public;
+grant execute on function submit_feedback_v2(uuid, uuid, text, text, text, text, integer, jsonb, text, timestamptz) to anon;

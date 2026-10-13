@@ -41,9 +41,20 @@ describe('E122FeedbackCapture', () => {
     expect(screen.queryByText(/partage des données est désactivé/i)).not.toBeInTheDocument()
   })
 
-  it('désactive l’envoi sans image', () => {
+  it('désactive l’envoi sans image ni commentaire', () => {
     renderWithApp(<E122FeedbackCapture />, makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } }))
     expect(screen.getByRole('button', { name: 'Envoyer' })).toBeDisabled()
+  })
+
+  it('envoie un retour sans image avec un commentaire seul (c755cb11)', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    const ctx = makeAppContext({ screen: 'feedback', route: { name: 'feedback', sourceScreen: 'dashboard' } })
+    renderWithApp(<E122FeedbackCapture />, ctx)
+    await userEvent.type(screen.getByLabelText('Commentaire'), 'Le bouton ne répond pas')
+    await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }))
+    expect(mocks.flattenImage).not.toHaveBeenCalled()
+    expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({ image_blob: null, image_bytes: 0, comment: 'Le bouton ne répond pas' }))
+    expect(ctx.replace).toHaveBeenCalledWith('feedback-list')
   })
 
   it('attache une image collée dans la page', () => {

@@ -129,6 +129,22 @@ describe('syncFeedbackNow', () => {
     expect(reportRepo.markSent).toHaveBeenCalledWith(item.id, expect.any(String))
   })
 
+  it('envoie un retour sans image sans téléverser (c755cb11)', async () => {
+    const item = report({ image_blob: null, image_bytes: 0 })
+    reportRepo.getToSync.mockResolvedValue([item])
+
+    await expect(syncFeedbackNow()).resolves.toBe(true)
+
+    expect(uploadMock).not.toHaveBeenCalled()
+    expect(reportRepo.markImageUploaded).not.toHaveBeenCalled()
+    expect(callRpcMock).toHaveBeenCalledWith('submit_feedback_v2', expect.objectContaining({
+      p_id: item.id,
+      p_storage_path: null,
+      p_image_bytes: null,
+    }))
+    expect(reportRepo.markSent).toHaveBeenCalledWith(item.id, expect.any(String))
+  })
+
   it('garde le chemin local et échoue silencieusement si les métadonnées sont refusées', async () => {
     const item = report()
     reportRepo.getToSync.mockResolvedValue([item])

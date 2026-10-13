@@ -71,7 +71,10 @@ export function E124FeedbackDetail() {
   }, [reportId, load])
 
   useEffect(() => {
-    if (!report) return
+    if (!report?.image_blob) {
+      setImageUrl(null)
+      return
+    }
     const url = URL.createObjectURL(report.image_blob)
     setImageUrl(url)
     return () => URL.revokeObjectURL(url)

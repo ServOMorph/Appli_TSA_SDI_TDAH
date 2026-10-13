@@ -15,7 +15,7 @@ export interface FeedbackReport {
   id: string
   screen_code: string
   comment: string
-  image_blob: Blob
+  image_blob: Blob | null
   image_path: string | null
   image_bytes: number
   strokes: FeedbackStroke[]

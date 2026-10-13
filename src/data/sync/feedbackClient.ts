@@ -69,7 +69,7 @@ async function settle(attempt: () => Promise<Outcome>, on: Settlers): Promise<bo
 function sendReport(report: FeedbackReport, deviceId: string, deviceSecret: string): Promise<boolean> {
   return settle(async () => {
     let storagePath = report.image_path
-    if (!storagePath) {
+    if (!storagePath && report.image_blob) {
       const upload = await uploadFeedbackImage(deviceId, report.id, report.image_blob)
       if (upload.error || !upload.data) return 'failed'
       storagePath = upload.data.path
@@ -82,7 +82,7 @@ function sendReport(report: FeedbackReport, deviceId: string, deviceSecret: stri
       p_screen_code: report.screen_code,
       p_comment: report.comment,
       p_storage_path: storagePath,
-      p_image_bytes: report.image_bytes,
+      p_image_bytes: storagePath ? report.image_bytes : null,
       p_strokes: report.strokes,
       p_app_version: report.app_version,
       p_created_at: report.created_at,

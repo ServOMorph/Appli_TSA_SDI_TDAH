@@ -93,21 +93,21 @@ export function E122FeedbackCapture() {
     }
   }
 
-  const canSend = Boolean(image && isFeedbackReportValid({ screen_code: screenCode, comment, image_blob: image, image_bytes: image.size, strokes }))
+  const canSend = isFeedbackReportValid({ screen_code: screenCode, comment, image_blob: image, image_bytes: image?.size ?? 0, strokes })
 
   async function send() {
-    if (!image || !canSend) return
+    if (!canSend) return
     setSaving(true)
     setError('')
     try {
-      const flattened = await flattenImage(image, strokes)
+      const flattened = image ? await flattenImage(image, strokes) : null
       await feedbackReportRepo.create({
         id: newId(),
         screen_code: screenCode.trim(),
         comment: comment.trim(),
         image_blob: flattened,
         image_path: null,
-        image_bytes: flattened.size,
+        image_bytes: flattened?.size ?? 0,
         strokes,
         app_version: __APP_DEV_VERSION__,
         created_at: new Date().toISOString(),
@@ -132,7 +132,7 @@ export function E122FeedbackCapture() {
       <button onClick={() => back('dashboard')} aria-label="Retour" style={{ alignSelf: 'flex-start', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)', fontSize: '1rem', padding: 0 }}>← Retour</button>
       <div>
         <h1 style={{ margin: 0 }}>Nouveau retour</h1>
-        <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>Ajoutez une capture. L’annotation au crayon est facultative : activez-la si vous voulez entourer ce qui pose problème.</p>
+        <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>La capture est facultative : sans capture, décrivez le problème dans le commentaire. L’annotation au crayon est facultative aussi.</p>
       </div>
       <input ref={inputRef} aria-label="Choisir une image" type="file" accept="image/*" hidden onChange={(event) => chooseImage(event.target.files?.[0])} />
       {!imageUrl ? (

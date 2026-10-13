@@ -22,21 +22,39 @@ describe('ToolCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Nouveau dossier' }))
     await user.type(screen.getByLabelText('Nom du dossier'), '  Maison ')
     await user.click(screen.getByRole('button', { name: 'Créer' }))
-    expect(createFolder).toHaveBeenCalledWith('Maison')
+    expect(createFolder).toHaveBeenCalledWith('Maison', null)
     expect(onFolderCreated).toHaveBeenCalledWith('folder-9')
   })
 
-  it('ne propose pas de dossier à l\'intérieur d\'un dossier', () => {
-    renderWithApp(<ToolCreateModal folderId="folder-1" onClose={vi.fn()} onListCreated={vi.fn()} onRoutineCreated={vi.fn()} onFolderCreated={vi.fn()} />)
-    expect(screen.queryByRole('button', { name: 'Nouveau dossier' })).toBeNull()
+  it('crée un sous-dossier à l\'intérieur d\'un dossier', async () => {
+    const createFolder = vi.fn().mockResolvedValue('folder-10')
+    const user = userEvent.setup()
+    renderWithApp(
+      <ToolCreateModal folderId="folder-1" onClose={vi.fn()} onListCreated={vi.fn()} onRoutineCreated={vi.fn()} onFolderCreated={vi.fn()} />,
+      makeAppContext({ createFolder }),
+    )
+    await user.click(screen.getByRole('button', { name: 'Nouveau dossier' }))
+    await user.type(screen.getByLabelText('Nom du dossier'), 'Cuisine')
+    await user.click(screen.getByRole('button', { name: 'Créer' }))
+    expect(createFolder).toHaveBeenCalledWith('Cuisine', 'folder-1')
   })
 
-  it('le bouton Créer reste désactivé tant qu\'aucune catégorie n\'est ajoutée', async () => {
+  it('crée une liste sans catégorie dès que le nom est saisi (b8f42e4e)', async () => {
     const user = userEvent.setup()
-    renderWithApp(<ToolCreateModal folderId={null} onClose={vi.fn()} onListCreated={vi.fn()} onRoutineCreated={vi.fn()} />)
+    const onListCreated = vi.fn()
+    const createToolList = vi.fn().mockResolvedValue('list-9')
+    const createListCategory = vi.fn().mockResolvedValue('cat-1')
+    renderWithApp(
+      <ToolCreateModal folderId={null} onClose={vi.fn()} onListCreated={onListCreated} onRoutineCreated={vi.fn()} />,
+      makeAppContext({ createToolList, createListCategory }),
+    )
     await user.click(screen.getByRole('button', { name: 'Nouvelle liste' }))
-    await user.type(screen.getByLabelText('Nom de la liste'), 'Courses')
     expect(screen.getByRole('button', { name: 'Créer' })).toHaveProperty('disabled', true)
+    await user.type(screen.getByLabelText('Nom de la liste'), 'Courses')
+    await user.click(screen.getByRole('button', { name: 'Créer' }))
+    expect(createToolList).toHaveBeenCalledWith('Courses', null)
+    expect(createListCategory).not.toHaveBeenCalled()
+    expect(onListCreated).toHaveBeenCalledWith('list-9')
   })
 
   it('ajoute une catégorie à la liste et permet de la retirer', async () => {

@@ -15,7 +15,7 @@ test('T54 — la To Do et le Budget sont présents d’office à l’installatio
   await openTools(page)
 
   await page.getByRole('button', { name: 'To Do', exact: true }).click()
-  await expect(page.getByText("Cette liste n'a pas encore de catégorie.")).toBeVisible()
+  await expect(page.getByText("Cette liste est vide.")).toBeVisible()
 })
 
 test('T55 — créer une liste avec catégorie, ajouter des éléments, cocher trie la liste', async ({ page }) => {

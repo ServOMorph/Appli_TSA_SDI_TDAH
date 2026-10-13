@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { canMoveFolder, getDescendantFolderIds } from '@/domain/rules/folderRules'
 import type { Folder } from '@/domain/entities/folder'
 import type { Tool } from '@/domain/entities/tool'
 
@@ -164,14 +165,27 @@ export function ToolActionsMenu({ tool, label }: { tool: Tool; label: string }) 
 }
 
 export function FolderActionsMenu({ folder }: { folder: Folder }) {
-  const { tools, deleteFolder } = useApp()
+  const { tools, folders, deleteFolder, moveFolder } = useApp()
   const [open, setOpen] = useState(false)
   const [view, setView] = useState<View>('menu')
-  const count = tools.filter((t) => t.folder_id === folder.id && t.type !== 'tableau_comptage').length
+  const descendantIds = getDescendantFolderIds(folders, folder.id)
+  const scope = [folder.id, ...descendantIds]
+  const count = tools.filter((t) => t.folder_id !== null && scope.includes(t.folder_id) && t.type !== 'tableau_comptage').length
+  const subCount = descendantIds.length
+  const contentParts = [
+    ...(subCount > 0 ? [subCount === 1 ? 'le sous-dossier' : `les ${subCount} sous-dossiers`] : []),
+    ...(count > 0 ? [count === 1 ? "l'outil" : `les ${count} outils`] : []),
+  ]
   const deleteMessage =
-    count === 0
+    contentParts.length === 0
       ? `Supprimer le dossier « ${folder.name} » ?`
-      : `Supprimer le dossier « ${folder.name} » et ${count === 1 ? "l'outil qu'il contient" : `les ${count} outils qu'il contient`} ?`
+      : `Supprimer le dossier « ${folder.name} » et ${contentParts.join(' et ')} qu'il contient ?`
+  const moveTargets = [
+    ...(folder.parent_id ? [{ id: null as string | null, name: 'Accueil' }] : []),
+    ...folders
+      .filter((f) => f.id !== folder.parent_id && canMoveFolder(folders, folder.id, f.id))
+      .map((f) => ({ id: f.id as string | null, name: f.name })),
+  ]
 
   function close() {
     setOpen(false)
@@ -189,8 +203,11 @@ export function FolderActionsMenu({ folder }: { folder: Folder }) {
           view={view}
           setView={setView}
           onClose={close}
-          moveTargets={[]}
-          onMove={() => {}}
+          moveTargets={moveTargets}
+          onMove={(parentId) => {
+            void moveFolder(folder.id, parentId)
+            close()
+          }}
           deleteMessage={deleteMessage}
           onDelete={() => {
             void deleteFolder(folder.id)

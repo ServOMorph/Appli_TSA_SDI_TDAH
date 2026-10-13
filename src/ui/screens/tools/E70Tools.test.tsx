@@ -74,6 +74,15 @@ describe('E70Tools', () => {
     expect(ctx.goTo).toHaveBeenCalledWith({ name: 'folder-detail', folderId: 'f1' })
   })
 
+  it('n\'affiche que les dossiers racine', () => {
+    const ctx = makeAppContext({
+      folders: [makeFolder({ id: 'f1', name: 'Maison' }), makeFolder({ id: 'f2', name: 'Cuisine', parent_id: 'f1' })],
+    })
+    renderWithApp(<E70Tools />, ctx)
+    expect(screen.getByRole('button', { name: /^📁 Maison$/ })).toBeDefined()
+    expect(screen.queryByRole('button', { name: /^📁 Cuisine$/ })).toBeNull()
+  })
+
   it('le retour navigue vers dashboard', async () => {
     const ctx = makeAppContext()
     renderWithApp(<E70Tools />, ctx)

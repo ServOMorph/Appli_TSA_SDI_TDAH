@@ -255,6 +255,19 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
     })
 
+    it('n’affiche à l’Accueil que les dossiers racine (5cd28d81)', async () => {
+      const ctx = makeAppContext({
+        folders: [
+          { id: 'f1', name: 'Maison', position: 0, created_at: '', updated_at: '' },
+          { id: 'f2', name: 'Cuisine', parent_id: 'f1', position: 0, created_at: '', updated_at: '' },
+        ],
+      })
+      renderWithApp(<E10Dashboard />, ctx)
+      await deplierOutils()
+      expect(screen.getByRole('button', { name: '📁 Maison' })).toBeDefined()
+      expect(screen.queryByRole('button', { name: '📁 Cuisine' })).toBeNull()
+    })
+
     it('les cartes d’outils tiennent dans la largeur de l’écran (#6fbf95e8)', async () => {
       renderWithApp(<E10Dashboard />, makeAppContext())
       await deplierOutils()

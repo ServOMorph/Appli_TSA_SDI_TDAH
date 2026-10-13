@@ -170,6 +170,15 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   liste avec catégories inchangée.
 - Critère de sortie : gates verts, e2e listes si couvert.
 
+**Réalisé** : approche retenue = élément sans catégorie stocké avec `category_id` vide (aucune
+migration Dexie, aucun changement de synchronisation). `ToolCreateModal.tsx` : catégories facultatives,
+« Créer » actif dès que le nom est saisi. `E61ListDetail.tsx` : une liste sans catégorie affiche
+directement ses éléments (ajout, cochage, suppression) ; si des catégories sont ajoutées ensuite,
+une ligne « Sans catégorie » conserve l'accès aux éléments existants. 3 tests ajoutés/adaptés
+(1210 tests verts, `tsc -b` et lint verts). e2e `09-tools-folders-lists` : 4 tests en échec dans
+l'onboarding (`e2e/helpers/reset.ts:29`), échec reproduit sans le correctif (antérieur) ; texte
+attendu de T54 aligné sur le nouvel écran, non exécutable tant que l'onboarding e2e est cassé.
+
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
@@ -190,6 +199,22 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   migration.
 - Critère de sortie : gates verts, e2e dossiers si couvert.
 
+**Réalisé (2026-10-13)** :
+- `Folder.parent_id` facultatif (absent ou `null` = racine) : aucune migration Dexie (pas d'index,
+  filtrage en mémoire), sync par blob JSON inchangée, anciens dossiers lus comme racine.
+- `folderRules.ts` : `getChildFolders`, `getDescendantFolderIds`, `canMoveFolder` (refus : soi-même,
+  descendant, même parent, dossier ou cible inconnus).
+- `useToolsState.ts` : `createFolder(name, parentId)`, `moveFolder`, `deleteFolder` récursif (outils
+  de tous les sous-dossiers effacés, Budget ramené à la racine).
+- UI : « Nouveau dossier » proposé aussi dans un dossier (`ToolCreateModal.tsx`) ; E10 et E70 limités
+  aux dossiers racine ; E72 liste ses sous-dossiers ; `FolderActionsMenu` propose « Déplacer » (sans
+  soi-même ni descendants) et annonce sous-dossiers et outils effacés.
+- Tests : `folderRules.test.ts` (+10), `AppContext.test.tsx` (+1 : cycle refusé, suppression
+  récursive), `ToolActionsMenu`, `ToolCreateModal`, `E72FolderDetail`, `E70Tools`, `E10Dashboard`.
+  Gates : vitest 1229/1229, `tsc -b` et lint verts.
+- E2E `09-tools-folders-lists` non relancé : cassé à l'onboarding avant les correctifs (signalé en
+  Phase 2).
+
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.
 
@@ -204,6 +229,21 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
   E80 à côté de l'heure, prise en compte dans le planning (heure de fin) ; migration Dexie + sync.
 - Tests : durée du jour prioritaire sur la durée commune, repli, heure de fin dans le planning.
 - Critère de sortie : gates verts.
+
+### Réalisé (2026-10-13)
+
+- `RoutineSchedule.duration_minutes?: number | null` (`routineSchedule.ts`) : champ facultatif, non
+  indexé, donc aucune migration Dexie ; la synchronisation (blob JSON) et l'import le conservent
+  (`useSettingsState.ts` copie le planning par `...schedule`).
+- Règle `effectiveRoutineDuration(schedule, routine)` (`routineRules.ts`) : durée du jour si
+  définie, sinon `Routine.duration_minutes`.
+- `useRoutineState.ts` : `setRoutineDayDuration(routineId, weekday, minutes | null)` ne touche que
+  le jour visé ; `getPlannedRoutinesForDate` calcule durée et heure de fin avec la règle, ce qui
+  alimente la hauteur et l'heure de fin du planning (`PlanningBoard.tsx`) sans autre changement.
+- E80 : bouton « Durée : N min » (ou « Définir la durée ») sous la date, fenêtre « Changer la
+  durée » (sélecteur de durée existant, « Enregistrer », « Utiliser la durée de la routine »).
+- Tests : `routineRules.test.ts` (+3), `useRoutineState.test.tsx` (+2), `E80RoutineSteps.test.tsx`
+  (+4). Gates : vitest 1238/1238, `tsc -b` et `npm run lint` verts.
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
-import { ToolCard } from '@/ui/components/ToolWidgetCard'
+import { FolderCard, ToolCard } from '@/ui/components/ToolWidgetCard'
+import { getChildFolders } from '@/domain/rules/folderRules'
 
 const pageStyle: React.CSSProperties = {
   display: 'flex',
@@ -23,6 +24,7 @@ export function E72FolderDetail() {
   const folder = folders.find((f) => f.id === folderId) ?? null
   const [showCreate, setShowCreate] = useState(false)
   const folderTools = folderId ? tools.filter((t) => t.folder_id === folderId) : []
+  const subFolders = folderId ? getChildFolders(folders, folderId) : []
 
   function openTool(toolId: string) {
     const tool = folderTools.find((t) => t.id === toolId)
@@ -66,11 +68,15 @@ export function E72FolderDetail() {
         </Button>
       </header>
 
-      {folderTools.length === 0 && (
+      {subFolders.length === 0 && folderTools.length === 0 && (
         <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
           Ce dossier est vide.
         </p>
       )}
+
+      {subFolders.map((sub) => (
+        <FolderCard key={sub.id} folder={sub} onOpen={() => goTo({ name: 'folder-detail', folderId: sub.id })} />
+      ))}
 
       {folderTools.map((tool) => (
         <ToolCard key={tool.id} tool={tool} onOpen={() => openTool(tool.id)} />
@@ -82,6 +88,7 @@ export function E72FolderDetail() {
           onClose={() => setShowCreate(false)}
           onListCreated={handleListCreated}
           onRoutineCreated={handleRoutineCreated}
+          onFolderCreated={() => setShowCreate(false)}
         />
       )}
     </main>

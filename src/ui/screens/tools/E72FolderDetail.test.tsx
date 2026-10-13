@@ -88,7 +88,7 @@ describe('E72FolderDetail', () => {
     expect(ctx.back).toHaveBeenCalledWith('tools')
   })
 
-  it('le "+" ouvre le sélecteur sans option dossier', async () => {
+  it('le "+" propose aussi de créer un sous-dossier', async () => {
     const ctx = makeAppContext({
       route: { name: 'folder-detail', folderId: 'folder-1' },
       folders: [makeFolder()],
@@ -96,6 +96,25 @@ describe('E72FolderDetail', () => {
     renderWithApp(<E72FolderDetail />, ctx)
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter un outil' }))
     expect(screen.getByRole('button', { name: 'Nouvelle liste' })).toBeDefined()
-    expect(screen.queryByRole('button', { name: 'Nouveau dossier' })).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Nouveau dossier' }))
+    await userEvent.type(screen.getByLabelText('Nom du dossier'), 'Cuisine')
+    await userEvent.click(screen.getByRole('button', { name: 'Créer' }))
+    expect(ctx.createFolder).toHaveBeenCalledWith('Cuisine', 'folder-1')
+  })
+
+  it('liste les sous-dossiers du dossier courant et ouvre un sous-dossier au clic', async () => {
+    const ctx = makeAppContext({
+      route: { name: 'folder-detail', folderId: 'folder-1' },
+      folders: [
+        makeFolder(),
+        makeFolder({ id: 'folder-2', name: 'Cuisine', parent_id: 'folder-1' }),
+        makeFolder({ id: 'folder-3', name: 'Garage', parent_id: null }),
+      ],
+    })
+    renderWithApp(<E72FolderDetail />, ctx)
+    expect(screen.queryByText('Ce dossier est vide.')).toBeNull()
+    expect(screen.queryByRole('button', { name: '📁 Garage' })).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: '📁 Cuisine' }))
+    expect(ctx.goTo).toHaveBeenCalledWith({ name: 'folder-detail', folderId: 'folder-2' })
   })
 })

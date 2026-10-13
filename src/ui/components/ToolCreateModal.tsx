@@ -89,7 +89,7 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
 
   async function handleCreateList() {
     const trimmed = name.trim()
-    if (!trimmed || categories.length === 0) return
+    if (!trimmed) return
     setSubmitting(true)
     const listId = await createToolList(trimmed, folderId)
     for (const category of categories) {
@@ -112,7 +112,7 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
     const trimmed = name.trim()
     if (!trimmed || !onFolderCreated) return
     setSubmitting(true)
-    const newFolderId = await createFolder(trimmed)
+    const newFolderId = await createFolder(trimmed, folderId)
     setSubmitting(false)
     onFolderCreated(newFolderId)
   }
@@ -129,7 +129,7 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
             <Button fullWidth onClick={() => setMode('new-routine')}>
               Nouvelle routine
             </Button>
-            {onFolderCreated && folderId === null && (
+            {onFolderCreated && (
               <Button fullWidth onClick={() => setMode('new-folder')}>
                 Nouveau dossier
               </Button>
@@ -163,7 +163,7 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
               style={inputStyle}
             />
 
-            <label style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Catégories</label>
+            <label style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Catégories (facultatif)</label>
             {categories.map((category, i) => (
               <div key={i} style={categoryRowStyle}>
                 <span>{category}</span>
@@ -198,7 +198,7 @@ export function ToolCreateModal({ folderId, onClose, onListCreated, onRoutineCre
             </div>
 
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-              <Button fullWidth disabled={!name.trim() || categories.length === 0 || submitting} onClick={handleCreateList}>
+              <Button fullWidth disabled={!name.trim() || submitting} onClick={handleCreateList}>
                 Créer
               </Button>
               <Button fullWidth variant="secondary" onClick={onClose}>

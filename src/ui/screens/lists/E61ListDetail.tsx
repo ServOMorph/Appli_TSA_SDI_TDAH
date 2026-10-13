@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { RecurrenceEditor } from '@/ui/components/RecurrenceEditor'
-import { groupListItemsByCategory } from '@/domain/rules/listItemSortRules'
+import { groupListItemsByCategory, sortListItems } from '@/domain/rules/listItemSortRules'
 import { todayDate } from '@/app/repositories'
 import type { ListItem } from '@/domain/entities/listItem'
 import type { ListCategory } from '@/domain/entities/listCategory'
@@ -58,6 +58,7 @@ export function E61ListDetail() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     route.name === 'list-detail' ? route.categoryId ?? null : null,
   )
+  const [viewUncategorized, setViewUncategorized] = useState(false)
   const [showAddCategoryForm, setShowAddCategoryForm] = useState(false)
   const [addCategoryName, setAddCategoryName] = useState('')
   const [addingCategory, setAddingCategory] = useState(false)
@@ -87,9 +88,9 @@ export function E61ListDetail() {
 
   async function handleAdd() {
     const title = newTitle.trim()
-    if (!title || !selectedListId || !selectedCategoryId) return
+    if (!title || !selectedListId || !itemsView) return
     setSubmitting(true)
-    await addListItem(selectedListId, title, selectedCategoryId)
+    await addListItem(selectedListId, title, selectedCategoryId ?? '')
     await refresh()
     setNewTitle('')
     setShowAddForm(false)
@@ -123,6 +124,7 @@ export function E61ListDetail() {
   }
 
   function selectCategory(categoryId: string | null) {
+    setViewUncategorized(false)
     setSelectedCategoryId(categoryId)
     replace(categoryId ? { name: 'list-detail', categoryId } : 'list-detail')
   }
@@ -172,7 +174,10 @@ export function E61ListDetail() {
   const groups = groupListItemsByCategory(items, categories)
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null
   const currentGroup = groups.find((g) => g.category.id === selectedCategoryId) ?? null
-  const currentItems = currentGroup?.items ?? []
+  const uncategorizedItems = items.filter((i) => !i.category_id || !categories.some((c) => c.id === i.category_id))
+  const flatList = categories.length === 0
+  const itemsView = !!selectedCategory || viewUncategorized || flatList
+  const currentItems = selectedCategory ? currentGroup?.items ?? [] : sortListItems(uncategorizedItems)
 
   const currentItemIdsKey = currentItems.map((i) => i.id).join(',')
   useEffect(() => {
@@ -228,7 +233,7 @@ export function E61ListDetail() {
       <header style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
         <button
           aria-label="Retour"
-          onClick={() => (selectedCategory ? selectCategory(null) : back('tools'))}
+          onClick={() => (selectedCategory || viewUncategorized ? selectCategory(null) : back('tools'))}
           style={{
             background: 'none',
             border: 'none',
@@ -268,109 +273,11 @@ export function E61ListDetail() {
         </button>
       </header>
 
-      {!selectedCategory && (
-        <>
-          {categories.length === 0 && (
-            <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
-              Cette liste n'a pas encore de catégorie.
-            </p>
-          )}
-
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
-            {groups.map(({ category, items: categoryItems }) => (
-              <li
-                key={category.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--spacing-sm)',
-                }}
-              >
-                <button
-                  onClick={() => selectCategory(category.id)}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    flex: 1,
-                    minWidth: 0,
-                    gap: 'var(--spacing-sm)',
-                    background: 'var(--color-surface)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-sm)',
-                    padding: 'var(--spacing-md)',
-                    cursor: 'pointer',
-                    color: 'var(--color-text)',
-                    fontSize: '1rem',
-                  }}
-                >
-                  <span>{category.name}</span>
-                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-                    {categoryItems.length}
-                  </span>
-                </button>
-                <button
-                  aria-label={`Supprimer la catégorie ${category.name}`}
-                  onClick={() => setDeletingCategory(category)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '1.1rem',
-                    color: 'var(--color-error)',
-                    padding: '0 4px',
-                    flexShrink: 0,
-                  }}
-                >
-                  ×
-                </button>
-              </li>
-            ))}
-          </ul>
-
-          {showAddCategoryForm ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-              <input
-                type="text"
-                value={addCategoryName}
-                onChange={(e) => setAddCategoryName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAddCategory()
-                }}
-                autoFocus
-                placeholder="Nom de la catégorie…"
-                aria-label="Nom de la catégorie"
-                style={{ ...fieldInputStyle, width: '100%' }}
-              />
-              <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-                <Button fullWidth onClick={handleAddCategory} disabled={!addCategoryName.trim() || addingCategory}>
-                  Ajouter
-                </Button>
-                <Button
-                  fullWidth
-                  variant="secondary"
-                  onClick={() => {
-                    setShowAddCategoryForm(false)
-                    setAddCategoryName('')
-                  }}
-                >
-                  Annuler
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <Button fullWidth variant="secondary" onClick={() => setShowAddCategoryForm(true)}>
-              Ajouter une catégorie
-            </Button>
-          )}
-        </>
-      )}
-
-      {selectedCategory && (
+      {itemsView && (
         <>
           {currentItems.length === 0 && !showAddForm && (
             <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
-              Cette catégorie est vide.
+              {selectedCategory ? 'Cette catégorie est vide.' : 'Cette liste est vide.'}
             </p>
           )}
 
@@ -521,6 +428,125 @@ export function E61ListDetail() {
           <Button fullWidth onClick={() => setShowAddForm(true)}>
             Ajouter un élément
           </Button>
+        </>
+      )}
+
+      {!selectedCategory && !viewUncategorized && (
+        <>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--spacing-xs)' }}>
+            {groups.map(({ category, items: categoryItems }) => (
+              <li
+                key={category.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--spacing-sm)',
+                }}
+              >
+                <button
+                  onClick={() => selectCategory(category.id)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flex: 1,
+                    minWidth: 0,
+                    gap: 'var(--spacing-sm)',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: 'var(--spacing-md)',
+                    cursor: 'pointer',
+                    color: 'var(--color-text)',
+                    fontSize: '1rem',
+                  }}
+                >
+                  <span>{category.name}</span>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                    {categoryItems.length}
+                  </span>
+                </button>
+                <button
+                  aria-label={`Supprimer la catégorie ${category.name}`}
+                  onClick={() => setDeletingCategory(category)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '1.1rem',
+                    color: 'var(--color-error)',
+                    padding: '0 4px',
+                    flexShrink: 0,
+                  }}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+            {categories.length > 0 && uncategorizedItems.length > 0 && (
+              <li style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                <button
+                  onClick={() => setViewUncategorized(true)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flex: 1,
+                    minWidth: 0,
+                    gap: 'var(--spacing-sm)',
+                    background: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: 'var(--spacing-md)',
+                    cursor: 'pointer',
+                    color: 'var(--color-text)',
+                    fontSize: '1rem',
+                  }}
+                >
+                  <span>Sans catégorie</span>
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+                    {uncategorizedItems.length}
+                  </span>
+                </button>
+              </li>
+            )}
+          </ul>
+
+          {showAddCategoryForm ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="text"
+                value={addCategoryName}
+                onChange={(e) => setAddCategoryName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddCategory()
+                }}
+                autoFocus
+                placeholder="Nom de la catégorie…"
+                aria-label="Nom de la catégorie"
+                style={{ ...fieldInputStyle, width: '100%' }}
+              />
+              <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+                <Button fullWidth onClick={handleAddCategory} disabled={!addCategoryName.trim() || addingCategory}>
+                  Ajouter
+                </Button>
+                <Button
+                  fullWidth
+                  variant="secondary"
+                  onClick={() => {
+                    setShowAddCategoryForm(false)
+                    setAddCategoryName('')
+                  }}
+                >
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button fullWidth variant="secondary" onClick={() => setShowAddCategoryForm(true)}>
+              Ajouter une catégorie
+            </Button>
+          )}
         </>
       )}
 

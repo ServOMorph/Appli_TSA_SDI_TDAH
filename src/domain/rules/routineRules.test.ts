@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   createRoutine,
   createRoutineStep,
+  effectiveRoutineDuration,
   emptyKeypadDigits,
   isKeypadDigitAllowed,
   isRoutineOccurrenceCompleted,
@@ -165,5 +166,20 @@ describe('isRoutineOccurrenceCompleted', () => {
 
   it('n\'est jamais terminée pour une routine sans étape', () => {
     expect(isRoutineOccurrenceCompleted([], new Set())).toBe(false)
+  })
+})
+
+describe('effectiveRoutineDuration', () => {
+  it('la durée du jour prime sur celle de la routine (979d0ddd)', () => {
+    expect(effectiveRoutineDuration({ duration_minutes: 20 }, { duration_minutes: 45 })).toBe(20)
+  })
+
+  it('se replie sur la durée de la routine sans durée propre au jour', () => {
+    expect(effectiveRoutineDuration({}, { duration_minutes: 45 })).toBe(45)
+    expect(effectiveRoutineDuration({ duration_minutes: null }, { duration_minutes: 45 })).toBe(45)
+  })
+
+  it('vaut null sans aucune durée', () => {
+    expect(effectiveRoutineDuration({}, { duration_minutes: null })).toBeNull()
   })
 })

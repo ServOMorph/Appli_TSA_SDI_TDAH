@@ -72,8 +72,49 @@ describe('E61ListDetail', () => {
       })
       renderWithApp(<E61ListDetail />, ctx)
       await waitFor(() => {
-        expect(screen.getByText("Cette liste n'a pas encore de catégorie.")).toBeDefined()
+        expect(screen.getByText("Cette liste est vide.")).toBeDefined()
       })
+    })
+
+    it("liste sans catégorie : affiche directement les éléments et permet d'en ajouter (b8f42e4e)", async () => {
+      const item = makeListItem({ id: 'item-9', title: 'Pain', category_id: '' })
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue([item]),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await waitFor(() => expect(screen.getByText('Pain')).toBeDefined())
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter un élément' }))
+      await userEvent.type(screen.getByPlaceholderText("Nom de l'élément…"), 'Lait')
+      await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
+      expect(ctx.addListItem).toHaveBeenCalledWith('list-1', 'Lait', '')
+    })
+
+    it('liste avec catégories : une ligne « Sans catégorie » donne accès aux éléments sans catégorie (b8f42e4e)', async () => {
+      const item = makeListItem({ id: 'item-9', title: 'Pain', category_id: '' })
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListItems: vi.fn().mockResolvedValue([item]),
+        getListCategories: vi.fn().mockResolvedValue([makeCategory({ id: 'cat-ete', name: 'Été' })]),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await userEvent.click(await screen.findByRole('button', { name: /^Sans catégorie/ }))
+      expect(screen.getByText('Pain')).toBeDefined()
+      await userEvent.click(screen.getByRole('button', { name: 'Retour' }))
+      expect(screen.getByRole('button', { name: /^Été/ })).toBeDefined()
+    })
+
+    it('liste avec catégories mais sans élément orphelin : pas de ligne « Sans catégorie »', async () => {
+      const ctx = makeAppContext({
+        lists: [makeList()],
+        selectedListId: 'list-1',
+        getListCategories: vi.fn().mockResolvedValue([makeCategory({ id: 'cat-ete', name: 'Été' })]),
+      })
+      renderWithApp(<E61ListDetail />, ctx)
+      await screen.findByRole('button', { name: /^Été/ })
+      expect(screen.queryByRole('button', { name: /^Sans catégorie/ })).toBeNull()
     })
 
     it('liste les catégories de la liste', async () => {

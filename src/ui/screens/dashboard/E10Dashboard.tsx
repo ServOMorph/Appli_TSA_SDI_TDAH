@@ -1,6 +1,7 @@
 import { useApp } from '@/app/AppContext'
 import { useEffect, useState } from 'react'
 import { getRemainingPlannedCost } from '@/domain/rules/taskRules'
+import { getChildFolders } from '@/domain/rules/folderRules'
 import { Card } from '@/ui/components/Card'
 import { Button } from '@/ui/components/Button'
 import { TopBar } from '@/ui/components/TopBar'
@@ -57,7 +58,7 @@ export function E10Dashboard() {
   const [hasUnreadFeedback, setHasUnreadFeedback] = useState(false)
   const feedbackAccess = hasFeedbackAccess(settings)
 
-  const rootFolders = folders
+  const rootFolders = getChildFolders(folders, null)
   const rootTools = tools.filter((t) => t.folder_id === null)
 
   useEffect(() => {

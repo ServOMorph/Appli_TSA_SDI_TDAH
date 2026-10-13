@@ -9,6 +9,7 @@ import {
 } from '@/app/repositories'
 import {
   createRoutineStep as createRoutineStepRule,
+  effectiveRoutineDuration,
   isRoutineOccurrenceCompleted,
   resolveRoutineStepsForWeekday,
 } from '@/domain/rules/routineRules'
@@ -130,6 +131,12 @@ export function useRoutineState() {
     }
   }
 
+  async function setRoutineDayDuration(routineId: string, weekday: number, durationMinutes: number | null) {
+    const current = (await routineScheduleRepo.getByRoutineId(routineId)).find((s) => s.weekday === weekday)
+    if (!current) return
+    await routineScheduleRepo.update({ ...current, duration_minutes: durationMinutes, updated_at: new Date().toISOString() })
+  }
+
   async function removeRoutineDaySchedule(id: string) {
     const schedule = await routineScheduleRepo.getById(id)
     if (schedule?.steps_overridden) {
@@ -243,7 +250,7 @@ export function useRoutineState() {
       schedules.map(async (schedule): Promise<PlannedRoutineOccurrence | null> => {
         const routine = await routineRepo.getById(schedule.routine_id)
         if (!routine) return null
-        const durationMinutes = routine.duration_minutes ?? null
+        const durationMinutes = effectiveRoutineDuration(schedule, routine)
         return {
           scheduleId: schedule.id,
           routineId: schedule.routine_id,
@@ -273,6 +280,7 @@ export function useRoutineState() {
     reorderRoutineSteps,
     getRoutineSchedules,
     setRoutineDaySchedule,
+    setRoutineDayDuration,
     removeRoutineDaySchedule,
     getPlannedRoutinesForDate,
     getRoutineStepCompletionsForDate,

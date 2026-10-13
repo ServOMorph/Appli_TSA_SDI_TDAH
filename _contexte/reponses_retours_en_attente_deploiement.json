@@ -34,5 +34,23 @@
     "screen_code": "E22",
     "body": "E23 : à l'ajout d'une sous-étape sur une tâche récurrente, l'appli demande maintenant si elle s'applique à cette occurrence ou à toutes les occurrences à venir. Le choix de jours précis reste à définir avec toi.",
     "queued_at": "2026-10-13T17:57:09.140629+00:00"
+  },
+  {
+    "report_id": "b8f42e4e-7020-4498-85ed-7c04dc4dc53d",
+    "screen_code": "E72",
+    "body": "E72 : tu peux maintenant créer une liste en saisissant seulement son nom, sans catégorie. Tu ajoutes ensuite tes éléments directement dans la liste.",
+    "queued_at": "2026-10-13T18:16:14.395122+00:00"
+  },
+  {
+    "report_id": "5cd28d81-6f0b-432a-98db-6f9ad53f4397",
+    "screen_code": "E72",
+    "body": "E72 : tu peux maintenant créer un dossier dans un dossier, avec le « + ». Tu peux aussi déplacer un dossier dans un autre depuis son menu « ⋯ ». Si tu supprimes un dossier, ses sous-dossiers et leur contenu sont supprimés aussi : un message te le précise avant.",
+    "queued_at": "2026-10-13T18:22:10.073597+00:00"
+  },
+  {
+    "report_id": "979d0ddd-56b0-4e1e-b446-44d99e40009b",
+    "screen_code": "E80",
+    "body": "E80 : tu peux maintenant changer la durée de la routine pour un seul jour. Appuie sur « Durée » sous la date. Les autres jours gardent la durée habituelle de la routine. Le planning (E12) affiche l'heure de fin avec cette nouvelle durée.",
+    "queued_at": "2026-10-13T19:05:23.563213+00:00"
   }
 ]

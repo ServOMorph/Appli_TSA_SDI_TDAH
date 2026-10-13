@@ -211,6 +211,72 @@ describe('E80RoutineSteps', () => {
     expect(setRoutineDaySchedule).toHaveBeenCalledWith('routine-1', 3, '09:30')
   })
 
+  it('affiche la durée de la routine quand le jour n\'a pas de durée propre (979d0ddd)', async () => {
+    renderScreen(
+      makeAppContext({
+        route: ROUTE,
+        routines: [makeRoutine({ duration_minutes: 45 })],
+        selectedRoutineId: 'routine-1',
+        getRoutineStepsForDate: vi.fn().mockResolvedValue(stepsResult([makeStep()])),
+        getRoutineSchedules: vi.fn().mockResolvedValue([makeSchedule()]),
+      }),
+    )
+    expect(await screen.findByRole('button', { name: 'Changer la durée de ce jour' })).toHaveTextContent('Durée : 45 min')
+  })
+
+  it('affiche la durée propre au jour quand elle est définie (979d0ddd)', async () => {
+    renderScreen(
+      makeAppContext({
+        route: ROUTE,
+        routines: [makeRoutine({ duration_minutes: 45 })],
+        selectedRoutineId: 'routine-1',
+        getRoutineStepsForDate: vi.fn().mockResolvedValue(stepsResult([makeStep()])),
+        getRoutineSchedules: vi.fn().mockResolvedValue([makeSchedule({ duration_minutes: 20 })]),
+      }),
+    )
+    expect(await screen.findByRole('button', { name: 'Changer la durée de ce jour' })).toHaveTextContent('Durée : 20 min')
+  })
+
+  it('enregistre la durée de ce jour uniquement (979d0ddd)', async () => {
+    const setRoutineDayDuration = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    renderScreen(
+      makeAppContext({
+        route: ROUTE,
+        routines: [makeRoutine({ duration_minutes: 45 })],
+        selectedRoutineId: 'routine-1',
+        getRoutineStepsForDate: vi.fn().mockResolvedValue(stepsResult([makeStep()])),
+        getRoutineSchedules: vi.fn().mockResolvedValue([makeSchedule()]),
+        setRoutineDayDuration,
+      }),
+    )
+    await user.click(await screen.findByRole('button', { name: 'Changer la durée de ce jour' }))
+    const dialog = screen.getByRole('dialog', { name: 'Changer la durée' })
+    await user.click(within(dialog).getByRole('button', { name: 'Minutes' }))
+    await user.click(within(dialog).getByRole('button', { name: '2' }))
+    await user.click(within(dialog).getByRole('button', { name: '0' }))
+    await user.click(within(dialog).getByRole('button', { name: 'Enregistrer' }))
+    expect(setRoutineDayDuration).toHaveBeenCalledWith('routine-1', 3, 20)
+  })
+
+  it('revient à la durée de la routine pour ce jour (979d0ddd)', async () => {
+    const setRoutineDayDuration = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    renderScreen(
+      makeAppContext({
+        route: ROUTE,
+        routines: [makeRoutine({ duration_minutes: 45 })],
+        selectedRoutineId: 'routine-1',
+        getRoutineStepsForDate: vi.fn().mockResolvedValue(stepsResult([makeStep()])),
+        getRoutineSchedules: vi.fn().mockResolvedValue([makeSchedule({ duration_minutes: 20 })]),
+        setRoutineDayDuration,
+      }),
+    )
+    await user.click(await screen.findByRole('button', { name: 'Changer la durée de ce jour' }))
+    await user.click(screen.getByRole('button', { name: 'Utiliser la durée de la routine' }))
+    expect(setRoutineDayDuration).toHaveBeenCalledWith('routine-1', 3, null)
+  })
+
   it("n'affiche pas le changement d'heure si la routine n'est pas planifiée ce jour-là", async () => {
     renderScreen(
       makeAppContext({

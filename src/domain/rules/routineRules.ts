@@ -1,5 +1,6 @@
 import type { Routine } from '@/domain/entities/routine'
 import type { RoutineStep } from '@/domain/entities/routineStep'
+import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
 
 export function createRoutine(
   id: string,
@@ -30,6 +31,13 @@ export function createRoutineStep(
  */
 export function resolveRoutineStepsForWeekday(steps: RoutineStep[], weekday: number, overridden: boolean): RoutineStep[] {
   return steps.filter((s) => (overridden ? s.weekday === weekday : s.weekday === null)).sort((a, b) => a.position - b.position)
+}
+
+/** Durée d'une routine pour un jour planifié : celle du jour si elle est définie, sinon celle de la routine. */
+export function effectiveRoutineDuration(schedule: Pick<RoutineSchedule, 'duration_minutes'>, routine: Pick<Routine, 'duration_minutes'>): number | null {
+  const dayDuration = schedule.duration_minutes
+  if (dayDuration != null && dayDuration > 0) return dayDuration
+  return routine.duration_minutes ?? null
 }
 
 /** Les 4 chiffres saisis au pavé numérique, dans l'ordre : dizaine heures, unité heures, dizaine minutes, unité minutes. */

@@ -10,7 +10,12 @@ import {
   routineStepRepo,
   toolRepo,
 } from '@/app/repositories'
-import { createFolder as createFolderRule } from '@/domain/rules/folderRules'
+import {
+  canMoveFolder,
+  createFolder as createFolderRule,
+  getChildFolders,
+  getDescendantFolderIds,
+} from '@/domain/rules/folderRules'
 import { createList as createListRule } from '@/domain/rules/listRules'
 import { createRoutine as createRoutineRule } from '@/domain/rules/routineRules'
 import { createTool as createToolRule } from '@/domain/rules/toolRules'
@@ -31,9 +36,10 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
     setFolders([])
   }
 
-  async function createFolder(name: string): Promise<string> {
+  async function createFolder(name: string, parentId: string | null = null): Promise<string> {
     const now = new Date().toISOString()
-    const folder = createFolderRule(newId(), name, folders.length, now)
+    const siblings = getChildFolders(folders, parentId)
+    const folder = createFolderRule(newId(), name, siblings.length, now, parentId)
     await folderRepo.create(folder)
     setFolders((prev) => [...prev, folder])
     return folder.id
@@ -104,8 +110,19 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
     setTools((prev) => prev.map((t) => (t.id === id ? updated : t)))
   }
 
+  async function moveFolder(id: string, parentId: string | null) {
+    if (!canMoveFolder(folders, id, parentId)) return
+    const folder = folders.find((f) => f.id === id)
+    if (!folder) return
+    const siblings = getChildFolders(folders, parentId)
+    const updated = { ...folder, parent_id: parentId, position: siblings.length, updated_at: new Date().toISOString() }
+    await folderRepo.update(updated)
+    setFolders((prev) => prev.map((f) => (f.id === id ? updated : f)))
+  }
+
   async function deleteFolder(id: string) {
-    const contained = tools.filter((t) => t.folder_id === id)
+    const doomed = [id, ...getDescendantFolderIds(folders, id)]
+    const contained = tools.filter((t) => t.folder_id !== null && doomed.includes(t.folder_id))
     const rootSiblings = tools.filter((t) => t.folder_id === null).length
     let kept = 0
     for (const tool of contained) {
@@ -118,8 +135,10 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
         await deleteTool(tool.id)
       }
     }
-    await folderRepo.delete(id)
-    setFolders((prev) => prev.filter((f) => f.id !== id))
+    for (const folderId of [...doomed].reverse()) {
+      await folderRepo.delete(folderId)
+    }
+    setFolders((prev) => prev.filter((f) => !doomed.includes(f.id)))
   }
 
   return {
@@ -131,6 +150,7 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
     deleteTool,
     updateToolColor,
     moveTool,
+    moveFolder,
     deleteFolder,
     load,
     reset,

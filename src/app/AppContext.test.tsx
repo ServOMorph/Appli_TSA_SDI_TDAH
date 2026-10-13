@@ -909,6 +909,51 @@ describe('AppProvider — outils et dossiers (V5-3)', () => {
     await waitFor(() => expect(Number(screen.getByTestId('tool-count').textContent)).toBe(1))
     expect(screen.getByTestId('budget-folder').textContent).toBe('null')
   })
+
+  it('dossiers imbriqués : cycle refusé, suppression récursive qui garde le Budget', async () => {
+    function NestedPanel() {
+      const { createUser, goTo, screen: s, tools, folders, createFolder, moveFolder, moveTool, deleteFolder } = useApp()
+      const parent = folders.find((f) => f.name === 'Parent')
+      const child = folders.find((f) => f.name === 'Enfant')
+      return (
+        <>
+          <div data-testid="screen">{s}</div>
+          <div data-testid="folder-count">{folders.length}</div>
+          <div data-testid="child-parent">{child ? String(child.parent_id) : 'absent'}</div>
+          <div data-testid="parent-parent">{parent ? String(parent.parent_id) : 'absent'}</div>
+          <div data-testid="tool-count">{tools.length}</div>
+          <div data-testid="budget-folder">{String(tools.find((t) => t.type === 'tableau_comptage')?.folder_id)}</div>
+          <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); goTo('dashboard') }}>créer utilisateur</button>
+          <button onClick={() => createFolder('Parent')}>créer parent</button>
+          <button onClick={() => parent && createFolder('Enfant', parent.id)}>créer enfant</button>
+          <button onClick={() => parent && child && moveFolder(parent.id, child.id)}>parent dans enfant</button>
+          <button onClick={() => child && tools.forEach((t) => void moveTool(t.id, child.id))}>tout ranger dans enfant</button>
+          <button onClick={() => parent && deleteFolder(parent.id)}>supprimer parent</button>
+        </>
+      )
+    }
+    render(<AppProvider><NestedPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await waitFor(() => expect(screen.getByTestId('budget-folder').textContent).toBe('null'))
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer parent' })) })
+    await waitFor(() => expect(screen.getByTestId('folder-count').textContent).toBe('1'))
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer enfant' })) })
+    await waitFor(() => expect(screen.getByTestId('folder-count').textContent).toBe('2'))
+    expect(screen.getByTestId('child-parent').textContent).not.toBe('null')
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'parent dans enfant' })) })
+    expect(screen.getByTestId('parent-parent').textContent).toBe('null')
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'tout ranger dans enfant' })) })
+    await waitFor(() => expect(screen.getByTestId('budget-folder').textContent).not.toBe('null'))
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'supprimer parent' })) })
+    await waitFor(() => expect(screen.getByTestId('folder-count').textContent).toBe('0'))
+    expect(screen.getByTestId('tool-count').textContent).toBe('1')
+    expect(screen.getByTestId('budget-folder').textContent).toBe('null')
+  })
 })
 
 describe('AppProvider — catégories de tâche (#35)', () => {

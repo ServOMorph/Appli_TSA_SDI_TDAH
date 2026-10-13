@@ -1,4 +1,5 @@
 import { useApp } from '@/app/AppContext'
+import { getChildFolders } from '@/domain/rules/folderRules'
 import { FolderCard, ToolCard } from '@/ui/components/ToolWidgetCard'
 
 const pageStyle: React.CSSProperties = {
@@ -17,6 +18,7 @@ const pageStyle: React.CSSProperties = {
 export function E70Tools() {
   const { goTo, folders, tools, selectList } = useApp()
   const rootTools = tools.filter((t) => t.folder_id === null)
+  const rootFolders = getChildFolders(folders, null)
 
   function openTool(toolId: string) {
     const tool = rootTools.find((t) => t.id === toolId)
@@ -42,13 +44,13 @@ export function E70Tools() {
         <h1 style={{ margin: 0, fontSize: '1.25rem', flex: 1 }}>Outils</h1>
       </header>
 
-      {folders.length === 0 && rootTools.length === 0 && (
+      {rootFolders.length === 0 && rootTools.length === 0 && (
         <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', margin: 0 }}>
           Aucun outil pour l'instant.
         </p>
       )}
 
-      {folders.map((folder) => (
+      {rootFolders.map((folder) => (
         <FolderCard key={folder.id} folder={folder} onOpen={() => goTo({ name: 'folder-detail', folderId: folder.id })} />
       ))}
 

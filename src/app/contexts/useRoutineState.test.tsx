@@ -7,7 +7,7 @@ import type { Task } from '@/domain/entities/task'
 import { useRoutineState } from './useRoutineState'
 
 function RoutinePanel() {
-  const { detachRoutineDay, deleteRoutineStep, getPlannedRoutinesForDate } = useRoutineState()
+  const { detachRoutineDay, deleteRoutineStep, getPlannedRoutinesForDate, setRoutineDayDuration } = useRoutineState()
   const [result, setResult] = useState('')
 
   return (
@@ -28,6 +28,14 @@ function RoutinePanel() {
         }}
       >
         Planifiées
+      </button>
+      <button
+        onClick={async () => {
+          await setRoutineDayDuration('routine-1', 3, 20)
+          setResult('duration-set')
+        }}
+      >
+        Durée du jour
       </button>
       <button
         onClick={async () => {
@@ -122,5 +130,28 @@ describe('useRoutineState', () => {
     render(<RoutinePanel />)
     await userEvent.click(screen.getByRole('button', { name: 'Planifiées' }))
     await waitFor(() => expect(screen.getByTestId('result')).toHaveTextContent('07:15>08:00'))
+  })
+
+  it('getPlannedRoutinesForDate utilise la durée propre au jour (979d0ddd)', async () => {
+    await db.routines.add({ id: 'routine-1', name: 'Routine du matin', color: null, duration_minutes: 45, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineSchedules.add({ id: 'schedule-1', routine_id: 'routine-1', weekday: 3, time: '07:15', steps_overridden: false, duration_minutes: 20, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+
+    render(<RoutinePanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Planifiées' }))
+    await waitFor(() => expect(screen.getByTestId('result')).toHaveTextContent('07:15>07:35'))
+  })
+
+  it('setRoutineDayDuration ne change que le jour visé, pas la durée de la routine (979d0ddd)', async () => {
+    await db.routines.add({ id: 'routine-1', name: 'Routine du matin', color: null, duration_minutes: 45, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineSchedules.add({ id: 'schedule-1', routine_id: 'routine-1', weekday: 3, time: '07:15', steps_overridden: false, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineSchedules.add({ id: 'schedule-2', routine_id: 'routine-1', weekday: 5, time: '08:00', steps_overridden: false, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+
+    render(<RoutinePanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Durée du jour' }))
+    await waitFor(() => expect(screen.getByTestId('result')).toHaveTextContent('duration-set'))
+
+    expect((await db.routineSchedules.get('schedule-1'))?.duration_minutes).toBe(20)
+    expect((await db.routineSchedules.get('schedule-2'))?.duration_minutes).toBeUndefined()
+    expect((await db.routines.get('routine-1'))?.duration_minutes).toBe(45)
   })
 })

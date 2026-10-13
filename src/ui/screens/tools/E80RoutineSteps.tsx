@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
+import { DurationRoller } from '@/ui/components/DurationRoller'
 import { RoutineTimeKeypad } from '@/ui/components/RoutineTimeKeypad'
 import type { RoutineStep } from '@/domain/entities/routineStep'
 import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
 import type { Task } from '@/domain/entities/task'
 import { isCompleted } from '@/domain/rules/taskRules'
+import { effectiveRoutineDuration } from '@/domain/rules/routineRules'
 import { todayStr, weekdayOf } from '@/domain/rules/planningSlotRules'
 import { dangerLinkStyle, inputStyle, modalBox, modalOverlay, neutralLinkStyle, pageStyle } from '@/ui/styles/routine'
 import {
@@ -32,6 +34,10 @@ function parsedDuration(value: string): number | null {
   if (!trimmed) return null
   const amount = Number(trimmed)
   return Number.isFinite(amount) && amount > 0 ? amount : null
+}
+
+function dayDurationLabel(minutes: number | null): string {
+  return minutes ? `Durée : ${minutes} min` : 'Définir la durée'
 }
 
 const stepRowStyle: React.CSSProperties = {
@@ -231,6 +237,7 @@ export function E80RoutineSteps() {
     detachRoutineDay,
     reattachRoutineDay,
     setRoutineDaySchedule,
+    setRoutineDayDuration,
     getSubTasks,
     addSubTask,
     deleteSubTask,
@@ -260,6 +267,8 @@ export function E80RoutineSteps() {
   const [editStepDuration, setEditStepDuration] = useState('')
   const [detaching, setDetaching] = useState(false)
   const [changingTime, setChangingTime] = useState(false)
+  const [changingDuration, setChangingDuration] = useState(false)
+  const [draftDuration, setDraftDuration] = useState<number | null>(null)
 
   const daySchedule = schedules.find((s) => s.weekday === weekday) ?? null
 
@@ -355,6 +364,18 @@ export function E80RoutineSteps() {
     setChangingTime(false)
   }
 
+  function openChangeDuration() {
+    setDraftDuration(daySchedule?.duration_minutes ?? null)
+    setChangingDuration(true)
+  }
+
+  async function handleSaveDuration(minutes: number | null) {
+    if (!selectedRoutineId) return
+    await setRoutineDayDuration(selectedRoutineId, weekday, minutes)
+    await reload()
+    setChangingDuration(false)
+  }
+
   async function handleAddStep() {
     if (!selectedRoutineId || !newStepTitle.trim()) return
     await addRoutineStep(selectedRoutineId, newStepTitle, parsedDuration(newStepDuration), weekday)
@@ -432,6 +453,11 @@ export function E80RoutineSteps() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <h1 style={{ margin: 0, fontSize: '1.25rem' }}>{routine.name}</h1>
           <p style={{ margin: 0, color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>{formatFullDate(date)}</p>
+          {daySchedule && routine && (
+            <button aria-label="Changer la durée de ce jour" onClick={openChangeDuration} style={neutralLinkStyle}>
+              {dayDurationLabel(effectiveRoutineDuration(daySchedule, routine))}
+            </button>
+          )}
         </div>
         {daySchedule && (
           <button aria-label="Changer l'heure de ce jour" onClick={() => setChangingTime(true)} style={neutralLinkStyle}>
@@ -594,6 +620,27 @@ export function E80RoutineSteps() {
             <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>Horaire actuel : {daySchedule.time}</p>
             <RoutineTimeKeypad onComplete={handleChangeTime} />
             <Button variant="secondary" fullWidth onClick={() => setChangingTime(false)}>
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {changingDuration && daySchedule && routine && (
+        <div role="dialog" aria-modal="true" aria-label="Changer la durée" style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ margin: 0 }}>Changer la durée</h2>
+            <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
+              Ce jour uniquement. Durée de la routine : {routine.duration_minutes ? `${routine.duration_minutes} min` : 'non définie'}.
+            </p>
+            <DurationRoller minutes={draftDuration} onChange={setDraftDuration} />
+            <Button fullWidth onClick={() => handleSaveDuration(draftDuration)} disabled={draftDuration === null}>
+              Enregistrer
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => handleSaveDuration(null)}>
+              Utiliser la durée de la routine
+            </Button>
+            <Button variant="secondary" fullWidth onClick={() => setChangingDuration(false)}>
               Annuler
             </Button>
           </div>

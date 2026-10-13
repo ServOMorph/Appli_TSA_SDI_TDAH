@@ -106,4 +106,50 @@ describe('FolderActionsMenu', () => {
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Supprimer' }))
     expect(deleteFolder).toHaveBeenCalledWith('folder-1')
   })
+
+  it('annonce aussi les sous-dossiers et les outils qu\'ils contiennent', async () => {
+    const user = userEvent.setup()
+    const folders = [makeFolder(), makeFolder({ id: 'folder-2', name: 'Cuisine', parent_id: 'folder-1' })]
+    const tools = [makeTool({ folder_id: 'folder-2' })]
+    renderWithApp(<FolderActionsMenu folder={folders[0]} />, makeAppContext({ folders, tools }))
+    await user.click(screen.getByRole('button', { name: 'Options de Maison' }))
+    await user.click(screen.getByRole('button', { name: 'Supprimer' }))
+    expect(screen.getByText('Supprimer le dossier « Maison » et le sous-dossier et l\'outil qu\'il contient ?')).toBeDefined()
+  })
+
+  it('déplace un dossier dans un autre sans proposer lui-même ni ses descendants', async () => {
+    const moveFolder = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    const folders = [
+      makeFolder(),
+      makeFolder({ id: 'folder-2', name: 'Cuisine', parent_id: 'folder-1' }),
+      makeFolder({ id: 'folder-3', name: 'Garage' }),
+    ]
+    renderWithApp(<FolderActionsMenu folder={folders[0]} />, makeAppContext({ folders, moveFolder }))
+    await user.click(screen.getByRole('button', { name: 'Options de Maison' }))
+    await user.click(screen.getByRole('button', { name: 'Déplacer' }))
+    expect(screen.queryByRole('button', { name: '📁 Maison' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '📁 Cuisine' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Accueil' })).toBeNull()
+    await user.click(screen.getByRole('button', { name: '📁 Garage' }))
+    expect(moveFolder).toHaveBeenCalledWith('folder-1', 'folder-3')
+  })
+
+  it('propose de ressortir un sous-dossier vers l\'Accueil', async () => {
+    const moveFolder = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    const folders = [makeFolder(), makeFolder({ id: 'folder-2', name: 'Cuisine', parent_id: 'folder-1' })]
+    renderWithApp(<FolderActionsMenu folder={folders[1]} />, makeAppContext({ folders, moveFolder }))
+    await user.click(screen.getByRole('button', { name: 'Options de Cuisine' }))
+    await user.click(screen.getByRole('button', { name: 'Déplacer' }))
+    await user.click(screen.getByRole('button', { name: 'Accueil' }))
+    expect(moveFolder).toHaveBeenCalledWith('folder-2', null)
+  })
+
+  it('masque Déplacer quand aucune destination n\'existe', async () => {
+    const user = userEvent.setup()
+    renderWithApp(<FolderActionsMenu folder={makeFolder()} />, makeAppContext({ folders: [makeFolder()] }))
+    await user.click(screen.getByRole('button', { name: 'Options de Maison' }))
+    expect(screen.queryByRole('button', { name: 'Déplacer' })).toBeNull()
+  })
 })

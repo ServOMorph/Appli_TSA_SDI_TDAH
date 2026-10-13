@@ -497,8 +497,40 @@ describe('PlanningBoard', () => {
     await userEvent.click(await screen.findByLabelText('0 sur 1 sous-étapes, déplier'))
     await userEvent.click(await screen.findByLabelText('Terminer Étape 1'))
 
-    expect(toggleSubTask).toHaveBeenCalledWith(child)
+    expect(toggleSubTask).toHaveBeenCalledWith(child, { deferExpenseParent: true })
     expect(goTo).not.toHaveBeenCalledWith('task-detail')
+  })
+
+  it('cocher la dernière sous-étape d’un parent à dépense ouvre la fenêtre de dépense, puis termine le parent (E10)', async () => {
+    const completeTaskById = vi.fn().mockResolvedValue(undefined)
+    const createBudgetEntry = vi.fn().mockResolvedValue(undefined)
+    const clearTaskExpensePlanned = vi.fn().mockResolvedValue(undefined)
+    const parent = makeTaskV2({ id: 't1', scheduled_date: '2026-06-30', scheduled_start: '09:00', scheduled_end: '10:00', expense_planned: true })
+    const child = baseTask({ id: 'c1', parent_id: 't1', title: 'Étape 1', status: 'inbox' })
+    const toggleSubTask = vi.fn().mockResolvedValue(parent)
+    const budgetCategories = [
+      { id: 'k1', name: 'Courses', period: 'week' as const, amount: 50, position: 0, created_at: '2026-06-01T00:00:00.000Z', updated_at: '2026-06-01T00:00:00.000Z' },
+    ]
+    renderExpanded(
+      makeAppContext({
+        toggleSubTask,
+        completeTaskById,
+        createBudgetEntry,
+        clearTaskExpensePlanned,
+        budgetCategories,
+        getPlannedTasksForDate: vi.fn().mockResolvedValue([parent]),
+        getSubTasks: vi.fn().mockResolvedValue([child]),
+      }),
+    )
+    await userEvent.click(await screen.findByLabelText('0 sur 1 sous-étapes, déplier'))
+    await userEvent.click(await screen.findByLabelText('Terminer Étape 1'))
+
+    expect(completeTaskById).not.toHaveBeenCalled()
+    await userEvent.type(await screen.findByLabelText('Montant'), '8')
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }))
+
+    await waitFor(() => expect(completeTaskById).toHaveBeenCalledWith('t1'))
+    expect(createBudgetEntry).toHaveBeenCalledWith('k1', 8, 'Médecin', expect.any(String))
   })
 
   it('cocher une sous-étape dépliée appelle toggleSubTask', async () => {
@@ -515,7 +547,7 @@ describe('PlanningBoard', () => {
     const toggle = await screen.findByLabelText('0 sur 1 sous-étapes, déplier')
     await userEvent.click(toggle)
     await userEvent.click(await screen.findByLabelText('Terminer Étape 1'))
-    expect(toggleSubTask).toHaveBeenCalledWith(child)
+    expect(toggleSubTask).toHaveBeenCalledWith(child, { deferExpenseParent: true })
   })
 
   it('affiche une sous-tâche planifiée indépendamment avec le titre du parent (E9b)', async () => {
@@ -541,7 +573,7 @@ describe('PlanningBoard', () => {
     )
     await waitFor(() => expect(screen.getByText('Rangement - Ranger le bureau')).toBeInTheDocument())
     await userEvent.click(screen.getByLabelText('Terminer Rangement - Ranger le bureau'))
-    expect(toggleSubTask).toHaveBeenCalledWith(sub)
+    expect(toggleSubTask).toHaveBeenCalledWith(sub, { deferExpenseParent: true })
   })
 
   it('affiche un message quand rien n’est planifié ce jour-là', async () => {

@@ -76,6 +76,30 @@ describe('E12WeekPlanning', () => {
     expect(grid.style.backgroundColor).toBe('var(--color-surface)')
   })
 
+  it('fait défiler les 7 jours ensemble, sans défilement par colonne (#754db232)', async () => {
+    renderWeek(makeAppContext({ route: WEEK_ROUTE, getPlannedTasksForDate: vi.fn().mockResolvedValue([]) }))
+    await screen.findByLabelText('Tâches du 2026-06-29')
+
+    expect(screen.getByTestId('week-scroll').style.overflowY).toBe('auto')
+    expect(screen.getByLabelText('Tâches du 2026-06-29').style.overflowY).toBe('')
+    const header = screen.getByLabelText('Tâches du 2026-06-29').previousElementSibling as HTMLElement
+    expect(header.style.position).toBe('sticky')
+  })
+
+  it('un geste surtout vertical ne change pas de semaine (#754db232)', async () => {
+    const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
+    renderWeek(makeAppContext({ route: WEEK_ROUTE, getPlannedTasksForDate }))
+    await waitFor(() => expect(getPlannedTasksForDate).toHaveBeenCalledWith('2026-06-29'))
+
+    const grid = screen.getByLabelText('Planning de la semaine')
+    fireEvent.touchStart(grid, { touches: [{ clientX: 240, clientY: 400 }] })
+    fireEvent.touchEnd(grid, { changedTouches: [{ clientX: 180, clientY: 150 }] })
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-07-06')
+    expect(getPlannedTasksForDate).not.toHaveBeenCalledWith('2026-06-22')
+  })
+
   it('glisser vers la gauche affiche la semaine suivante (#22)', async () => {
     const getPlannedTasksForDate = vi.fn().mockResolvedValue([])
     renderWeek(makeAppContext({ route: WEEK_ROUTE, getPlannedTasksForDate }))

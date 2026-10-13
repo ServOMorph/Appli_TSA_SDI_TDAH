@@ -536,6 +536,38 @@ describe('AppProvider — coche automatique de la tâche parente (#cd7529b6)', (
     })
     expect(screen.getByTestId('inbox-count')).toHaveTextContent('1')
   })
+
+  it('laisse la tâche parente à dépense prévue ouverte quand l’écran demande de différer (b5087222)', async () => {
+    let deferred: string | null | undefined
+    function DeferPanel() {
+      const { createTaskInbox, inboxTasks, addSubTask, getSubTasks, toggleSubTask } = useApp()
+      const first = inboxTasks[0]
+      async function run() {
+        if (!first) return
+        await db.tasks.update(first.id, { expense_planned: true })
+        await addSubTask(first.id, 'Sous-tâche 1')
+        const [sub] = await getSubTasks(first.id)
+        const parent = await toggleSubTask(sub, { deferExpenseParent: true })
+        deferred = parent?.id
+      }
+      return (
+        <>
+          <button onClick={() => createTaskInbox('Tâche à dépense')}>créer tâche</button>
+          <button onClick={run} disabled={!first}>cocher</button>
+        </>
+      )
+    }
+    render(<AppProvider><DeferPanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer tâche' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'cocher' })).not.toBeDisabled())
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'cocher' }))
+    })
+    await waitFor(() => expect(deferred).toBeTruthy())
+    const [parent] = await db.tasks.filter((t) => !t.parent_id).toArray()
+    expect(deferred).toBe(parent.id)
+    expect(parent.status).not.toBe('completed')
+  })
 })
 
 describe('AppProvider — planification des sous-tâches (E9a)', () => {

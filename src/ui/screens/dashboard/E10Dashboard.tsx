@@ -8,7 +8,7 @@ import { AppShell } from '@/ui/components/AppShell'
 import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
-import { FolderActionsMenu, ToolActionsMenu, cardWithMenuStyle } from '@/ui/components/ToolActionsMenu'
+import { FolderActionsMenu, ToolActionsMenu } from '@/ui/components/ToolActionsMenu'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
 import { feedbackMessageRepo } from '@/app/repositories'
 import { syncFeedbackNow } from '@/data/sync/feedbackClient'
@@ -26,6 +26,15 @@ const widgetBtnStyle: React.CSSProperties = {
   fontSize: '1rem',
   fontFamily: 'ui-rounded, "SF Pro Rounded", "Segoe UI Rounded", var(--font-body)',
   padding: 0,
+  overflowWrap: 'anywhere',
+  hyphens: 'auto',
+  WebkitHyphens: 'auto',
+}
+
+const toolCardStyle: React.CSSProperties = {
+  position: 'relative',
+  minWidth: 0,
+  padding: '28px var(--spacing-12) var(--spacing-12)',
 }
 
 export function E10Dashboard() {
@@ -134,18 +143,18 @@ export function E10Dashboard() {
         {toolsOpen && <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
             gap: 'var(--spacing-sm)',
             marginTop: 'var(--spacing-md)',
           }}
         >
-          <Card style={settings?.mon_compte_color ? outlineOnlyStyle(settings.mon_compte_color) : undefined}>
+          <Card style={toolCardStyle}>
             <button style={widgetBtnStyle} onClick={() => goTo('budget-account')}>
               Mon compte
             </button>
           </Card>
           {rootFolders.map((folder) => (
-            <Card key={folder.id} style={cardWithMenuStyle}>
+            <Card key={folder.id} style={toolCardStyle}>
               <button style={widgetBtnStyle} onClick={() => goTo({ name: 'folder-detail', folderId: folder.id })}>
                 📁 {folder.name}
               </button>
@@ -155,12 +164,12 @@ export function E10Dashboard() {
           {rootTools.map((tool) => {
             const list = tool.list_id ? lists.find((l) => l.id === tool.list_id) : undefined
             const routine = tool.routine_id ? routines.find((r) => r.id === tool.routine_id) : undefined
-            const accentColor = tool.type === 'routine' ? routine?.color : tool.color
+            const accentColor = tool.type === 'routine' ? routine?.color : undefined
             const label = toolLabel(tool, list?.name, routine?.name)
             return (
               <Card
                 key={tool.id}
-                style={{ ...cardWithMenuStyle, ...(accentColor ? outlineOnlyStyle(accentColor) : {}) }}
+                style={{ ...toolCardStyle, ...(accentColor ? outlineOnlyStyle(accentColor) : {}) }}
               >
                 <button style={widgetBtnStyle} onClick={() => openTool(tool.id)}>
                   {label}

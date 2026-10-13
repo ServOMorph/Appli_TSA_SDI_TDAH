@@ -73,10 +73,16 @@ function weekBoxStyle(ambianceColor: string): React.CSSProperties {
   }
 }
 
+const weekScrollStyle: React.CSSProperties = {
+  height: '100%',
+  overflowY: 'auto',
+  overscrollBehavior: 'contain',
+}
+
 const weekGridStyle: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(7, 1fr)',
-  height: '100%',
+  gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+  minHeight: '100%',
 }
 
 function dayColumnStyle(index: number): React.CSSProperties {
@@ -88,18 +94,19 @@ function dayColumnStyle(index: number): React.CSSProperties {
   }
 }
 
-function dayHeaderStyle(isToday: boolean): React.CSSProperties {
-  return {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '1px',
-    padding: '6px 0',
-    background: isToday ? 'var(--color-surface)' : 'transparent',
-    borderBottom: '1px solid var(--color-border)',
-    fontFamily: 'var(--font-body)',
-    color: 'var(--color-text)',
-  }
+const dayHeaderStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '1px',
+  padding: '6px 0',
+  position: 'sticky',
+  top: 0,
+  zIndex: 1,
+  background: 'var(--color-surface)',
+  borderBottom: '1px solid var(--color-border)',
+  fontFamily: 'var(--font-body)',
+  color: 'var(--color-text)',
 }
 
 const dayWeekdayStyle: React.CSSProperties = {
@@ -118,9 +125,6 @@ function dayNumberStyle(isToday: boolean): React.CSSProperties {
 }
 
 const dayTasksStyle: React.CSSProperties = {
-  flex: 1,
-  minHeight: 0,
-  overflowY: 'auto',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'stretch',
@@ -182,6 +186,7 @@ export function E12WeekPlanning() {
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
 
   const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
   const [dragOffset, setDragOffset] = useState(0)
   const [dragging, setDragging] = useState(false)
 
@@ -220,24 +225,27 @@ export function E12WeekPlanning() {
 
   function handleTouchStart(event: React.TouchEvent) {
     touchStartX.current = event.touches[0]?.clientX ?? null
+    touchStartY.current = event.touches[0]?.clientY ?? null
     setDragging(true)
   }
 
   function handleTouchMove(event: React.TouchEvent) {
     if (touchStartX.current === null) return
-    const currentX = event.touches[0]?.clientX ?? touchStartX.current
-    setDragOffset(currentX - touchStartX.current)
+    const deltaX = (event.touches[0]?.clientX ?? touchStartX.current) - touchStartX.current
+    const deltaY = (event.touches[0]?.clientY ?? touchStartY.current ?? 0) - (touchStartY.current ?? 0)
+    setDragOffset(Math.abs(deltaY) > Math.abs(deltaX) ? 0 : deltaX)
   }
 
   function handleTouchEnd(event: React.TouchEvent) {
     setDragging(false)
     setDragOffset(0)
     if (touchStartX.current === null) return
-    const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
-    const delta = endX - touchStartX.current
+    const deltaX = (event.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current
+    const deltaY = (event.changedTouches[0]?.clientY ?? touchStartY.current ?? 0) - (touchStartY.current ?? 0)
     touchStartX.current = null
-    if (Math.abs(delta) < SWIPE_THRESHOLD_PX) return
-    shiftWeek(delta < 0 ? 1 : -1)
+    touchStartY.current = null
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX || Math.abs(deltaY) > Math.abs(deltaX)) return
+    shiftWeek(deltaX < 0 ? 1 : -1)
   }
 
   function openTask(taskId: string) {
@@ -287,47 +295,50 @@ export function E12WeekPlanning() {
           onTouchEnd={handleTouchEnd}
         >
           <div
+            data-testid="week-scroll"
             style={{
-              ...weekGridStyle,
+              ...weekScrollStyle,
               transform: `translateX(${dragOffset}px)`,
               transition: dragging ? 'none' : 'transform 0.2s ease-out',
             }}
           >
-            {week.map((d, i) => {
-              const badge = formatDayBadge(d)
-              const isToday = d === today
-              const dayItems = mergeDayItems(tasksByDate[d] ?? [], routinesByDate[d] ?? [])
-              return (
-                <div key={d} style={dayColumnStyle(i)}>
-                  <div style={dayHeaderStyle(isToday)}>
-                    <span style={dayWeekdayStyle}>{badge.weekday}</span>
-                    <span style={dayNumberStyle(isToday)}>{badge.day}</span>
+            <div style={weekGridStyle}>
+              {week.map((d, i) => {
+                const badge = formatDayBadge(d)
+                const isToday = d === today
+                const dayItems = mergeDayItems(tasksByDate[d] ?? [], routinesByDate[d] ?? [])
+                return (
+                  <div key={d} style={dayColumnStyle(i)}>
+                    <div style={dayHeaderStyle}>
+                      <span style={dayWeekdayStyle}>{badge.weekday}</span>
+                      <span style={dayNumberStyle(isToday)}>{badge.day}</span>
+                    </div>
+                    <div style={dayTasksStyle} aria-label={`Tâches du ${d}`}>
+                      {dayItems.map((entry) =>
+                        entry.kind === 'task' ? (
+                          <button
+                            key={entry.item.id}
+                            style={taskChipStyle(entry.item.color)}
+                            onClick={() => openTask(entry.item.id)}
+                          >
+                            {entry.item.title}
+                          </button>
+                        ) : (
+                          <button
+                            key={entry.item.scheduleId}
+                            style={taskChipStyle(entry.item.color)}
+                            onClick={() => openRoutine(entry.item.routineId, d)}
+                          >
+                            <RoutineIcon size={12} />
+                            {`routine « ${entry.item.routineName} »`}
+                          </button>
+                        ),
+                      )}
+                    </div>
                   </div>
-                  <div style={dayTasksStyle} aria-label={`Tâches du ${d}`}>
-                    {dayItems.map((entry) =>
-                      entry.kind === 'task' ? (
-                        <button
-                          key={entry.item.id}
-                          style={taskChipStyle(entry.item.color)}
-                          onClick={() => openTask(entry.item.id)}
-                        >
-                          {entry.item.title}
-                        </button>
-                      ) : (
-                        <button
-                          key={entry.item.scheduleId}
-                          style={taskChipStyle(entry.item.color)}
-                          onClick={() => openRoutine(entry.item.routineId, d)}
-                        >
-                          <RoutineIcon size={12} />
-                          {`routine « ${entry.item.routineName} »`}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </section>
       </main>

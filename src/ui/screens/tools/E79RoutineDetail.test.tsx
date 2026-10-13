@@ -160,6 +160,47 @@ describe('E79RoutineDetail', () => {
     expect(updateRoutineStep).toHaveBeenCalledWith('step-1', 'Se laver les mains', 5)
   })
 
+  it('affiche les sous-tâches d’une étape dans la fenêtre de modification (951ce1c6)', async () => {
+    const getSubTasks = vi.fn().mockResolvedValue([{ id: 'sub-1', title: 'Dentifrice', parent_id: 'step-1' }])
+    renderWithApp(<E79RoutineDetail />, renderScreen({
+      routines: [makeRoutine()],
+      getRoutineSteps: vi.fn().mockResolvedValue([makeStep()]),
+      getSubTasks,
+    }))
+    await userEvent.click(await screen.findByRole('button', { name: /Modifier Se brosser les dents/ }))
+    const dialog = screen.getByRole('dialog', { name: 'Modifier l\'étape' })
+    expect(await within(dialog).findByText('Dentifrice')).toBeDefined()
+    expect(getSubTasks).toHaveBeenCalledWith('step-1')
+  })
+
+  it('ajoute une sous-tâche à une étape depuis la fenêtre de modification (951ce1c6)', async () => {
+    const addSubTask = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E79RoutineDetail />, renderScreen({
+      routines: [makeRoutine()],
+      getRoutineSteps: vi.fn().mockResolvedValue([makeStep()]),
+      addSubTask,
+    }))
+    await userEvent.click(await screen.findByRole('button', { name: /Modifier Se brosser les dents/ }))
+    const dialog = screen.getByRole('dialog', { name: 'Modifier l\'étape' })
+    await userEvent.type(within(dialog).getByLabelText('Nom de la sous-tâche'), 'Rincer la brosse')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Ajouter la sous-tâche' }))
+    expect(addSubTask).toHaveBeenCalledWith('step-1', 'Rincer la brosse')
+  })
+
+  it('supprime une sous-tâche d’une étape depuis la fenêtre de modification (951ce1c6)', async () => {
+    const deleteSubTask = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E79RoutineDetail />, renderScreen({
+      routines: [makeRoutine()],
+      getRoutineSteps: vi.fn().mockResolvedValue([makeStep()]),
+      getSubTasks: vi.fn().mockResolvedValue([{ id: 'sub-1', title: 'Dentifrice', parent_id: 'step-1' }]),
+      deleteSubTask,
+    }))
+    await userEvent.click(await screen.findByRole('button', { name: /Modifier Se brosser les dents/ }))
+    const dialog = screen.getByRole('dialog', { name: 'Modifier l\'étape' })
+    await userEvent.click(await within(dialog).findByRole('button', { name: 'Supprimer la sous-tâche Dentifrice' }))
+    expect(deleteSubTask).toHaveBeenCalledWith('sub-1')
+  })
+
   it('supprime une étape', async () => {
     const deleteRoutineStep = vi.fn().mockResolvedValue(undefined)
     renderWithApp(<E79RoutineDetail />, renderScreen({

@@ -96,22 +96,28 @@ export function useTasksState() {
     await taskRepo.delete(id)
   }
 
-  async function toggleSubTask(subTask: Task) {
+  async function toggleSubTask(
+    subTask: Task,
+    options?: { deferExpenseParent?: boolean },
+  ): Promise<Task | null> {
     const now = new Date().toISOString()
     const updated = toggleTaskCompletionRule(subTask, now)
     await taskRepo.update(updated)
 
+    let deferredParent: Task | null = null
     if (isCompleted(updated) && subTask.parent_id) {
       const siblings = await taskRepo.getChildren(subTask.parent_id)
       if (siblings.length > 0 && siblings.every(isCompleted)) {
         const parent = await taskRepo.getById(subTask.parent_id)
         if (parent && !isCompleted(parent)) {
-          await taskRepo.update(completeTaskRule(parent, now))
+          if (options?.deferExpenseParent && parent.expense_planned) deferredParent = parent
+          else await taskRepo.update(completeTaskRule(parent, now))
         }
       }
     }
 
     await load()
+    return deferredParent
   }
 
   async function reorderSubTasks(_taskId: string, ids: string[]) {

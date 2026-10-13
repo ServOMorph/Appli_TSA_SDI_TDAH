@@ -115,7 +115,8 @@ Section réservée aux règles propres à ce projet, hors périmètre du kit. Ce
 ### Réponses aux retours testeurs (`scripts/reply_feedback_report.py`)
 Règle de rédaction (roadmap_retours_conversationnels.md, Phase 5) : réponse **synthétique, sans
 jargon, sans nom de fichier ni de commit**, une idée par phrase — alignée sur le style exigé pour
-les messages à Marie. Un retour reste ouvert tant que le testeur ne l'a pas validé lui-même dans
+les messages à Marie. Tout écran cité (réponse ou question) est nommé par son code (ex. « E79 »,
+cf. `src/domain/data/screenCodes.ts`) — décision du 2026-10-13. Un retour reste ouvert tant que le testeur ne l'a pas validé lui-même dans
 E124 : ce script dépose une réponse d'agent mais n'appelle jamais `close_feedback_report`, il ne
 clôt jamais un retour à la place du testeur. Décision du 2026-09-14 : aucune automatisation,
 appel explicite du script en session quand un retour est traité — pas de rattachement à `/close`

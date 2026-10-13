@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
 import { db } from '@/app/repositories'
+import type { Task } from '@/domain/entities/task'
 import { useRoutineState } from './useRoutineState'
 
 function RoutinePanel() {
@@ -45,6 +46,7 @@ afterEach(async () => {
   await db.routineSteps.clear()
   await db.routineSchedules.clear()
   await db.routineStepCompletions.clear()
+  await db.tasks.clear()
 })
 
 describe('useRoutineState', () => {
@@ -83,6 +85,34 @@ describe('useRoutineState', () => {
 
     expect(await db.routineSteps.toArray()).toEqual([])
     expect(await db.routineStepCompletions.toArray()).toEqual([])
+  })
+
+  it('detachRoutineDay copie les sous-tâches de l’étape vers l’étape clonée (951ce1c6)', async () => {
+    await db.routines.add({ id: 'routine-1', name: 'Routine du matin', color: null, duration_minutes: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineSteps.add({ id: 'step-1', routine_id: 'routine-1', title: 'Se brosser les dents', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.routineSchedules.add({ id: 'schedule-1', routine_id: 'routine-1', weekday: 3, time: '07:15', steps_overridden: false, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.tasks.add({ id: 'sub-1', title: 'Dentifrice', parent_id: 'step-1', status: 'inbox', position: 0, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' } as Task)
+
+    render(<RoutinePanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Détacher' }))
+    await waitFor(() => expect(screen.getByTestId('result')).toHaveTextContent('detached'))
+
+    const clonedStep = (await db.routineSteps.toArray()).find((s) => s.weekday === 3)!
+    const subTasks = await db.tasks.toArray()
+    expect(subTasks).toHaveLength(2)
+    expect(subTasks.filter((t) => t.parent_id === 'step-1')).toHaveLength(1)
+    expect(subTasks.filter((t) => t.parent_id === clonedStep.id).map((t) => t.title)).toEqual(['Dentifrice'])
+  })
+
+  it('deleteRoutineStep supprime aussi les sous-tâches de l’étape (951ce1c6)', async () => {
+    await db.routineSteps.add({ id: 'step-1', routine_id: 'routine-1', title: 'Se brosser les dents', position: 0, duration_minutes: null, weekday: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' })
+    await db.tasks.add({ id: 'sub-1', title: 'Dentifrice', parent_id: 'step-1', status: 'inbox', position: 0, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' } as Task)
+
+    render(<RoutinePanel />)
+    await userEvent.click(screen.getByRole('button', { name: 'Supprimer' }))
+    await waitFor(() => expect(screen.getByTestId('result')).toHaveTextContent('deleted'))
+
+    expect(await db.tasks.toArray()).toEqual([])
   })
 
   it('getPlannedRoutinesForDate calcule l’heure de fin depuis la durée totale', async () => {

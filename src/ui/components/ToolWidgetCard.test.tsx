@@ -26,12 +26,11 @@ describe('ToolCard', () => {
     expect(screen.queryByRole('button', { name: /Retirer la couleur/ })).toBeNull()
   })
 
-  it('couleur d’outil : contour coloré, pas de fond (#36)', () => {
+  it('couleur propre d’un outil non routine ignorée : pas de contour coloré (bac22741)', () => {
     const ctx = makeAppContext({ lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }] })
     renderWithApp(<ToolCard tool={makeTool({ color: '#ff8800' })} onOpen={() => {}} />, ctx)
     const card = screen.getByRole('button', { name: 'Courses' }).parentElement as HTMLElement
-    expect(card.style.border).toBe('2px solid rgb(255, 136, 0)')
-    expect(card.style.backgroundColor).toBe('var(--color-surface)')
+    expect(card.style.border).not.toBe('2px solid rgb(255, 136, 0)')
   })
 
   it('affiche le nom de la routine référencée, avec le contour de sa couleur propre', () => {

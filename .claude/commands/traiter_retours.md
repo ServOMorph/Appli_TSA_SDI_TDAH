@@ -144,7 +144,8 @@ qu'après son accord explicite.
    - Documenter le résultat dans la phase (§ Réalisé), comme `Archives/roadmap_demandes_marie_2026-09-10.md`.
    - Rédiger la réponse de chaque retour couvert par la phase. Règle de rédaction (CLAUDE.md
      § Réponses aux retours testeurs) : synthétique, sans jargon, sans nom de fichier ni de commit,
-     une idée par phrase.
+     une idée par phrase. Nommer chaque écran cité par son code (ex. « E79 », `screenCodes.ts`),
+     dans les réponses comme dans les questions posées au testeur (étape 3).
    - **Relecture obligatoire** : présenter à l'utilisateur le texte exact de chaque réponse (id
      retour, écran, texte) et attendre son accord écrit, ou sa version corrigée. Aucune réponse
      n'est déposée ni mise en file sans cet accord.

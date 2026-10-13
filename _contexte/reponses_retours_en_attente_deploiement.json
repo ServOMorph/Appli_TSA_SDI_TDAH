@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "report_id": "6fbf95e8-64e0-4a84-bc45-9ba1603d014c",
+    "screen_code": "E10",
+    "body": "Les cartes des outils tiennent maintenant dans la largeur de l'écran. Un nom trop long passe à la ligne au lieu de sortir de la page. Dis-moi si l'alignement te convient.",
+    "queued_at": "2026-10-13T06:46:38.296861+00:00"
+  },
+  {
+    "report_id": "754db232-d37b-44d6-8e2b-1c39e7d16a0a",
+    "screen_code": "E12",
+    "body": "Tu peux maintenant faire défiler tout le planning de la semaine vers le bas. Les sept jours défilent ensemble, et leurs noms restent visibles en haut. Dis-moi si cela te convient.",
+    "queued_at": "2026-10-13T06:46:38.958790+00:00"
+  },
+  {
+    "report_id": "b5087222-f587-4a21-a17c-32e1ef22cc3f",
+    "screen_code": "E10",
+    "body": "Corrigé : sur l'Accueil (E10), quand tu coches la dernière sous-tâche d'une tâche avec dépense, l'appli te demande maintenant la dépense avant de terminer la tâche.",
+    "queued_at": "2026-10-13T17:41:58.086611+00:00"
+  },
+  {
+    "report_id": "bac22741-b27c-4c74-8bff-dfff2234d993",
+    "screen_code": "E112",
+    "body": "Fait : le choix de couleur par outil est retiré des réglages (E112). Les outils prennent la couleur d'ambiance. Les routines gardent leur couleur.",
+    "queued_at": "2026-10-13T17:41:58.465990+00:00"
+  },
+  {
+    "report_id": "951ce1c6-85fb-45da-87f1-805e6b55ff1e",
+    "screen_code": "E79",
+    "body": "Fait : dans E79, la fenêtre « Modifier l'étape » permet maintenant d'ajouter et de supprimer des sous-tâches pour chaque étape.",
+    "queued_at": "2026-10-13T17:50:43.819938+00:00"
+  }
+]

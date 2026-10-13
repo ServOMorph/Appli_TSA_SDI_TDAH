@@ -98,39 +98,12 @@ describe('E112Accessibility', () => {
     expect(screen.getByLabelText("Couleur d'ambiance")).toHaveValue('#4a7c99')
   })
 
-  it('permet de choisir et retirer la couleur d’un outil depuis les paramètres', () => {
-    const updateToolColor = vi.fn().mockResolvedValue(undefined)
-    renderE112({ tools: [defaultTool], lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }], updateToolColor })
-    fireEvent.change(screen.getByLabelText('Couleur de fond pour Courses'), { target: { value: '#ff8800' } })
-    expect(updateToolColor).toHaveBeenCalledWith('tool-1', '#ff8800')
-  })
-
-  it('retire la couleur d’un outil depuis les paramètres', () => {
-    const updateToolColor = vi.fn().mockResolvedValue(undefined)
-    renderE112({ tools: [{ ...defaultTool, color: '#ff8800' }], lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }], updateToolColor })
-    fireEvent.click(screen.getByRole('button', { name: 'Retirer la couleur de Courses' }))
-    expect(updateToolColor).toHaveBeenCalledWith('tool-1', null)
-  })
-
-  it('propose une entrée « Mon compte » même sans aucun outil (#31)', () => {
-    renderE112({ tools: [] })
-    expect(screen.getByLabelText('Couleur de fond pour Mon compte')).toBeInTheDocument()
-    expect(screen.getByLabelText('Couleur de fond pour Mon compte')).toHaveValue('#4a7c99')
-    expect(screen.getByText('Aucun autre outil à personnaliser.')).toBeInTheDocument()
-  })
-
-  it('changer la couleur de « Mon compte » appelle updateSettings (#31)', () => {
-    const updateSettings = vi.fn().mockResolvedValue(undefined)
-    renderE112({ updateSettings })
-    fireEvent.change(screen.getByLabelText('Couleur de fond pour Mon compte'), { target: { value: '#22aa55' } })
-    expect(updateSettings).toHaveBeenCalledWith({ mon_compte_color: '#22aa55' })
-  })
-
-  it('retirer la couleur de « Mon compte » repasse à la valeur par défaut (#31)', () => {
-    const updateSettings = vi.fn().mockResolvedValue(undefined)
-    renderE112({ settings: { ...defaultSettings, mon_compte_color: '#22aa55' }, updateSettings })
-    fireEvent.click(screen.getByRole('button', { name: 'Retirer la couleur de Mon compte' }))
-    expect(updateSettings).toHaveBeenCalledWith({ mon_compte_color: undefined })
+  it('ne propose plus de couleur par outil ni pour « Mon compte » (bac22741)', () => {
+    renderE112({ tools: [defaultTool], lists: [{ id: 'list-1', name: 'Courses', created_at: '', updated_at: '' }] })
+    expect(screen.queryByText('Couleur des outils')).toBeNull()
+    expect(screen.queryByLabelText('Couleur de fond pour Courses')).toBeNull()
+    expect(screen.queryByLabelText('Couleur de fond pour Mon compte')).toBeNull()
+    expect(screen.getByLabelText("Couleur d'ambiance")).toBeInTheDocument()
   })
 
   it('sans catégorie configurée, affiche un message vide (#35)', () => {

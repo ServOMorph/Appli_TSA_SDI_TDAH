@@ -255,6 +255,14 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('list-detail')
     })
 
+    it('les cartes d’outils tiennent dans la largeur de l’écran (#6fbf95e8)', async () => {
+      renderWithApp(<E10Dashboard />, makeAppContext())
+      await deplierOutils()
+      const card = screen.getByRole('button', { name: 'Mon compte' }).parentElement as HTMLElement
+      expect((card.parentElement as HTMLElement).style.gridTemplateColumns).toBe('repeat(3, minmax(0, 1fr))')
+      expect(card.style.minWidth).toBe('0')
+    })
+
     it('le widget « Mon compte » navigue vers l’écran budget-account', async () => {
       const ctx = makeAppContext()
       renderWithApp(<E10Dashboard />, ctx)
@@ -263,7 +271,7 @@ describe('E10Dashboard', () => {
       expect(ctx.goTo).toHaveBeenCalledWith('budget-account')
     })
 
-    it('applique la couleur de l’outil en contour de sa carte sur l’accueil, sans fond (#36)', async () => {
+    it('ignore la couleur propre d’un outil non routine : pas de contour personnalisé (bac22741)', async () => {
       const ctx = makeAppContext({
         lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
         tools: [
@@ -273,36 +281,27 @@ describe('E10Dashboard', () => {
       renderWithApp(<E10Dashboard />, ctx)
       await deplierOutils()
       const card = (await screen.findByRole('button', { name: 'Courses' })).closest('div') as HTMLElement
-      expect(card.style.border).toBe('2px solid rgb(255, 136, 0)')
-      expect(card.style.backgroundColor).toBe('var(--color-surface)')
+      expect(card.style.border).not.toBe('2px solid rgb(255, 136, 0)')
     })
 
-    it('ne pose aucun contour personnalisé sur une carte d’outil sans couleur (#36)', async () => {
+    it('garde la couleur de la routine en contour de sa carte, sans fond (bac22741)', async () => {
       const ctx = makeAppContext({
-        lists: [{ id: 'l1', name: 'Courses', created_at: '', updated_at: '' }],
+        routines: [{ id: 'r1', name: 'Matin', color: '#ff8800', created_at: '', updated_at: '' }] as never,
         tools: [
-          { id: 't1', type: 'liste', folder_id: null, list_id: 'l1', routine_id: null, position: 0, created_at: '', updated_at: '' },
+          { id: 't1', type: 'routine', folder_id: null, list_id: null, routine_id: 'r1', position: 0, created_at: '', updated_at: '' },
         ],
       })
       renderWithApp(<E10Dashboard />, ctx)
       await deplierOutils()
-      const card = (await screen.findByRole('button', { name: 'Courses' })).closest('div') as HTMLElement
-      expect(card.style.border).not.toBe('2px solid rgb(255, 136, 0)')
-    })
-
-    it('applique la couleur configurée en contour de la carte « Mon compte », sans fond (#36)', async () => {
-      const ctx = makeAppContext({
-        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, mon_compte_color: '#22aa55' },
-      })
-      renderWithApp(<E10Dashboard />, ctx)
-      await deplierOutils()
-      const card = (await screen.findByRole('button', { name: 'Mon compte' })).closest('div') as HTMLElement
-      expect(card.style.border).toBe('2px solid rgb(34, 170, 85)')
+      const card = (await screen.findByRole('button', { name: 'Matin' })).closest('div') as HTMLElement
+      expect(card.style.border).toBe('2px solid rgb(255, 136, 0)')
       expect(card.style.backgroundColor).toBe('var(--color-surface)')
     })
 
-    it('ne pose aucun contour sur la carte « Mon compte » sans couleur configurée (#36)', async () => {
-      const ctx = makeAppContext()
+    it('ignore l’ancienne couleur configurée de « Mon compte » (bac22741)', async () => {
+      const ctx = makeAppContext({
+        settings: { id: 's1', user_id: 'u1', dark_mode: false, font_size: 'medium', reduced_motion: false, mon_compte_color: '#22aa55' },
+      })
       renderWithApp(<E10Dashboard />, ctx)
       await deplierOutils()
       const card = (await screen.findByRole('button', { name: 'Mon compte' })).closest('div') as HTMLElement

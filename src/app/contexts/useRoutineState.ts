@@ -5,6 +5,7 @@ import {
   routineScheduleRepo,
   routineStepRepo,
   routineStepCompletionRepo,
+  taskRepo,
 } from '@/app/repositories'
 import {
   createRoutineStep as createRoutineStepRule,
@@ -89,7 +90,15 @@ export function useRoutineState() {
     await routineStepRepo.update({ ...step, title: trimmed, duration_minutes: durationMinutes, updated_at: new Date().toISOString() })
   }
 
+  async function deleteStepSubTasks(stepIds: string[]) {
+    for (const stepId of stepIds) {
+      const subTasks = await taskRepo.getChildren(stepId)
+      for (const subTask of subTasks) await taskRepo.delete(subTask.id)
+    }
+  }
+
   async function deleteRoutineStep(id: string) {
+    await deleteStepSubTasks([id])
     await routineStepCompletionRepo.deleteByStepIds([id])
     await routineStepRepo.delete(id)
   }
@@ -126,6 +135,7 @@ export function useRoutineState() {
     if (schedule?.steps_overridden) {
       const daySteps = (await routineStepRepo.getByRoutineId(schedule.routine_id)).filter((s) => s.weekday === schedule.weekday)
       const dayStepIds = daySteps.map((s) => s.id)
+      await deleteStepSubTasks(dayStepIds)
       await routineStepCompletionRepo.deleteByStepIds(dayStepIds)
       await routineStepRepo.deleteMany(dayStepIds)
     }
@@ -176,6 +186,9 @@ export function useRoutineState() {
     for (const step of commonSteps) {
       const clonedId = newId()
       await routineStepRepo.create({ ...step, id: clonedId, weekday, created_at: now, updated_at: now })
+      for (const subTask of await taskRepo.getChildren(step.id)) {
+        await taskRepo.create({ ...subTask, id: newId(), parent_id: clonedId, created_at: now, updated_at: now })
+      }
       const original = completionByStepId.get(step.id)
       if (original) {
         await routineStepCompletionRepo.delete(original.id)
@@ -197,6 +210,7 @@ export function useRoutineState() {
     if (!schedule || !schedule.steps_overridden) return
     const daySteps = (await routineStepRepo.getByRoutineId(routineId)).filter((s) => s.weekday === weekday)
     const dayStepIds = daySteps.map((s) => s.id)
+    await deleteStepSubTasks(dayStepIds)
     await routineStepCompletionRepo.deleteByStepIds(dayStepIds)
     await routineStepRepo.deleteMany(dayStepIds)
     await routineScheduleRepo.update({ ...schedule, steps_overridden: false, updated_at: new Date().toISOString() })

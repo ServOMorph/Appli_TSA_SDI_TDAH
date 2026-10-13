@@ -452,7 +452,10 @@ export function PlanningBoard() {
         return
       }
       await completeTaskById(block.item.id)
-    } else if (block.kind === 'subtask') await toggleSubTask(block.item)
+    } else if (block.kind === 'subtask') {
+      const parent = await toggleSubTask(block.item, { deferExpenseParent: true })
+      if (parent) setExpenseTask(parent)
+    }
     await reload()
   }
 
@@ -474,7 +477,8 @@ export function PlanningBoard() {
   }
 
   async function handleToggleSubTaskRow(taskId: string, subTask: Task) {
-    await toggleSubTask(subTask)
+    const parent = await toggleSubTask(subTask, { deferExpenseParent: true })
+    if (parent) setExpenseTask(parent)
     const updated = await getSubTasks(taskId)
     setSubTasksByTask((prev) => ({ ...prev, [taskId]: updated }))
     await reload()

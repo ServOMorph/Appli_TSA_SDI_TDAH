@@ -8,6 +8,7 @@ import { RoutineWeekdayPicker } from '@/ui/components/RoutineWeekdayPicker'
 import { RoutineTimeKeypad } from '@/ui/components/RoutineTimeKeypad'
 import type { RoutineStep } from '@/domain/entities/routineStep'
 import type { RoutineSchedule } from '@/domain/entities/routineSchedule'
+import type { Task } from '@/domain/entities/task'
 import { dangerLinkStyle, inputStyle, modalBox, modalOverlay, neutralLinkStyle, pageStyle } from '@/ui/styles/routine'
 import {
   DndContext,
@@ -112,6 +113,9 @@ export function E79RoutineDetail() {
     getRoutineSchedules,
     setRoutineDaySchedule,
     removeRoutineDaySchedule,
+    getSubTasks,
+    addSubTask,
+    deleteSubTask,
     deleteTool,
     back,
   } = useApp()
@@ -129,6 +133,8 @@ export function E79RoutineDetail() {
   const [editingStep, setEditingStep] = useState<RoutineStep | null>(null)
   const [editStepTitle, setEditStepTitle] = useState('')
   const [editStepDuration, setEditStepDuration] = useState('')
+  const [editSubTasks, setEditSubTasks] = useState<Task[]>([])
+  const [newSubTaskTitle, setNewSubTaskTitle] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [schedulingWeekday, setSchedulingWeekday] = useState<number | null>(null)
 
@@ -201,6 +207,23 @@ export function E79RoutineDetail() {
     setEditingStep(step)
     setEditStepTitle(step.title)
     setEditStepDuration(step.duration_minutes ? String(step.duration_minutes) : '')
+    setNewSubTaskTitle('')
+    setEditSubTasks([])
+    getSubTasks(step.id).then(setEditSubTasks)
+  }
+
+  async function handleAddSubTask() {
+    const trimmed = newSubTaskTitle.trim()
+    if (!editingStep || !trimmed) return
+    await addSubTask(editingStep.id, trimmed)
+    setEditSubTasks(await getSubTasks(editingStep.id))
+    setNewSubTaskTitle('')
+  }
+
+  async function handleDeleteSubTask(id: string) {
+    if (!editingStep) return
+    await deleteSubTask(id)
+    setEditSubTasks(await getSubTasks(editingStep.id))
   }
 
   async function handleEditStep() {
@@ -339,6 +362,39 @@ export function E79RoutineDetail() {
             <input id="routine-step-edit-title" autoFocus value={editStepTitle} onChange={(e) => setEditStepTitle(e.target.value)} style={inputStyle} />
             <label htmlFor="routine-step-edit-duration">Durée (minutes, optionnel)</label>
             <input id="routine-step-edit-duration" type="text" inputMode="numeric" value={editStepDuration} onChange={(e) => setEditStepDuration(e.target.value)} style={inputStyle} />
+            <span style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>Sous-tâches</span>
+            {editSubTasks.length > 0 && (
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {editSubTasks.map((sub) => (
+                  <li key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+                    <span style={{ flex: 1, minWidth: 0, fontSize: '0.875rem' }}>{sub.title}</span>
+                    <button
+                      aria-label={`Supprimer la sous-tâche ${sub.title}`}
+                      onClick={() => handleDeleteSubTask(sub.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--color-text-muted)', padding: '0 4px' }}
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+              <input
+                type="text"
+                aria-label="Nom de la sous-tâche"
+                placeholder="Nom de la sous-tâche…"
+                value={newSubTaskTitle}
+                onChange={(e) => setNewSubTaskTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddSubTask()
+                }}
+                style={{ ...inputStyle, flex: 1 }}
+              />
+              <Button variant="secondary" onClick={handleAddSubTask} disabled={!newSubTaskTitle.trim()}>
+                Ajouter la sous-tâche
+              </Button>
+            </div>
             <Button fullWidth onClick={handleEditStep} disabled={!editStepTitle.trim()}>
               Enregistrer
             </Button>

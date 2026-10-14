@@ -1387,3 +1387,7 @@ _Suite :_ alerte de l'étape 0.1 de `/deploy` (envoi urgent, demande `20261014T0
 As-tu réorganisé tes séries de tâches et tes routines ces deux derniers jours ?
 Réponds « oui » ou « non ».
 _Suite :_ déposée d'abord en circuit normal (`20261014T095010_706677`, renvoyée comme doublon), puis envoyée en urgent car elle bloque le déploiement (demande `20261014T095103_925842`, message Discord `1559866124454203455`, `--expect-reply`). Cause : le snapshot du 2026-10-14 montre la disparition de 301 occurrences récurrentes (régénérées le 2026-10-12), de 35 étapes de routine propres à un jour, et environ 250 tâches sans date apparues. Réponse de Marie attendue avant la suite de `/deploy`.
+
+**Marie -> (transmis par l'utilisateur, 2026-10-14)**
+Fait, et oui.
+_Suite :_ « fait » répond à l'alerte export de l'étape 0.1 de `/deploy` (demande `20261014T094820_664675`) ; « oui » répond à la question sur la réorganisation de ses séries de tâches et de ses routines (demande `20261014T095103_925842`). Les pertes du snapshot du 2026-10-14 sont donc attribuées à ses actions ; l'utilisateur demande de continuer `/deploy`. Confirmation d'export de l'étape 4ter donnée par l'utilisateur.

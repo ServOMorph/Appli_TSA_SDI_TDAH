@@ -1381,3 +1381,9 @@ Paramètres > Export et import > Exporter en JSON.
 N'envoie plus de retours d'ici l'arrivée de la nouvelle version.
 Réponds « fait » une fois l'export terminé.
 _Suite :_ alerte de l'étape 0.1 de `/deploy` (envoi urgent, demande `20261014T094820_664675`, message Discord `1559865437141864539`, `--expect-reply`). Consigne ajoutée : ne plus envoyer de retours en attendant la nouvelle version. Réponse de Marie attendue ; sa confirmation est recontrôlée par l'utilisateur à l'étape 4ter.
+
+### 2026-10-14 (question avant /deploy v6.12)
+**Dév ->**
+As-tu réorganisé tes séries de tâches et tes routines ces deux derniers jours ?
+Réponds « oui » ou « non ».
+_Suite :_ déposée en gateway (demande `20261014T095010_706677`, `--expect-reply`, circuit normal). Cause : le snapshot du 2026-10-14 montre la disparition de 301 occurrences récurrentes (régénérées le 2026-10-12), de 35 étapes de routine propres à un jour, et environ 250 tâches sans date apparues. Réponse de Marie attendue avant la suite de `/deploy`.

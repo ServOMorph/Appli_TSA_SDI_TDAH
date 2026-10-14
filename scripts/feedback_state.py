@@ -39,7 +39,13 @@ def write_json_atomic(path: Path, data) -> None:
 def read_state() -> dict[str, dict]:
     if not STATE_FILE.exists():
         return {}
-    return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    try:
+        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    except ValueError as e:
+        raise FeedbackStateError(f"{STATE_FILE.name} illisible ({e}) : le reparer ou le supprimer") from e
+    if not isinstance(state, dict):
+        raise FeedbackStateError(f"{STATE_FILE.name} invalide : un objet JSON est attendu")
+    return state
 
 
 def set_state(report_id: str, status: str, ref: str, note: str = "") -> dict:

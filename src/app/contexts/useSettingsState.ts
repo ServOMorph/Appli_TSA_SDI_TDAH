@@ -84,10 +84,10 @@ function assertUniqueIds(name: string, items: { id: string }[]) {
   }
 }
 
-function assertReferences(name: string, items: object[], field: string, ids: Set<string>) {
+function assertReferences(name: string, items: object[], field: string, ids: Set<string>, allowEmpty = false) {
   if (items.some((item) => {
     const value = (item as Record<string, unknown>)[field]
-    return typeof value === 'string' && !ids.has(value)
+    return typeof value === 'string' && !(allowEmpty && value === '') && !ids.has(value)
   })) {
     throw new Error(`Fichier invalide : référence ${name} orpheline.`)
   }
@@ -316,11 +316,13 @@ export function useSettingsState() {
       const depositCategoryIds = new Set(depositCategories.map((item) => item.id))
       const routineIds = new Set(routines.map((item) => item.id))
       const routineStepIds = new Set(routineSteps.map((item) => item.id))
-      assertReferences('tâche parente', tasks, 'parent_id', taskIds)
+      const folderIds = new Set(folders.map((item) => item.id))
+      assertReferences('tâche parente', tasks, 'parent_id', new Set([...taskIds, ...routineStepIds]))
+      assertReferences('dossier parent', folders, 'parent_id', folderIds)
       assertReferences('récurrence de tâche', tasks, 'recurrence_id', recurrenceIds)
       assertReferences('récurrence', taskExceptions, 'recurrence_id', recurrenceIds)
       assertReferences('liste', rawListItems, 'list_id', listIds)
-      assertReferences('catégorie de liste', rawListItems, 'category_id', listCategoryIds)
+      assertReferences('catégorie de liste', rawListItems, 'category_id', listCategoryIds, true)
       assertReferences('élément de liste', listItemSubTasks, 'list_item_id', listItemIds)
       assertReferences('liste d’outil', tools, 'list_id', listIds)
       assertReferences('routine d’outil', tools, 'routine_id', routineIds)
@@ -374,7 +376,7 @@ export function useSettingsState() {
     const categoryIdByListAndName = new Map(repairedCategories.map((c) => [`${c.list_id}::${c.name}`, c.id]))
 
     const repairedListItems: ListItem[] = rawListItems.map((item) => {
-      if (item.category_id) return { ...item, description: item.description ?? '' }
+      if (item.category_id || item.category_id === '') return { ...item, description: item.description ?? '' }
       const name = item.section ?? 'Général'
       const key = `${item.list_id}::${name}`
       let categoryId = categoryIdByListAndName.get(key)

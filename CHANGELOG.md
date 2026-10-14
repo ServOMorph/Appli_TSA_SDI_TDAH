@@ -15,6 +15,7 @@
 ### Corrigé
 - Dépense prévue : cocher la dernière sous-tâche depuis l'Accueil ouvre la fenêtre de dépense au lieu de terminer la tâche sans dépense (`useTasksState.ts`, `PlanningBoard.tsx`, `b5087222`) ; les sous-tâches des étapes sont copiées ou supprimées avec l'étape d'un jour détaché (`useRoutineState.ts`).
 - `E02Profile.tsx` : le bouton « Continuer » ne reste plus bloqué si l'enregistrement du profil échoue.
+- Revue `high` de la livraison : import accepte un élément de liste sans catégorie, une sous-tâche d'étape de routine et signale un dossier orphelin (`useSettingsState.ts`) ; suppression d'une routine supprime les sous-tâches de ses étapes (`useToolsState.ts`) ; recalage du bandeau des jours (`PlanningBoard.tsx`) ; chargement des sous-tâches d'une étape ignoré si le formulaire est fermé (`E79RoutineDetail.tsx`) ; Paramètres > Vie privée mentionne l'envoi des données de santé et de l'âge (`E116Privacy.tsx`) ; lecture stricte du fichier d'état des retours et code de sortie du watcher (`feedback_state.py`, `reply_feedback_report.py`, `watch_feedback_reports.py`).
 
 ## v6.11 — 2026-10-10
 

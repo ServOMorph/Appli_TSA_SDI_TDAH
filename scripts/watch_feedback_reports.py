@@ -12,7 +12,7 @@ Le script ne depose, ne met en file et ne modifie jamais rien : lecture seule.
 --ignorer-existants : le premier controle sert de reference ; seuls les retours ou messages
 apparus ensuite declenchent la sortie (a utiliser quand des retours attendent une decision).
 
-Codes de sortie : 10 = retour(s) a traiter, 1 = erreur persistante (reseau ou identifiants),
+Codes de sortie : 10 = retour(s) a traiter, 1 = erreur (persistante, ou du controle unique avec --une-fois),
 0 = --une-fois sans rien de nouveau.
 
 Necessite SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY ; la cle n'est jamais affichee.
@@ -86,7 +86,7 @@ def main() -> int:
                 log("Rien de nouveau.")
             first = False
         if args.une_fois:
-            return 0
+            return 1 if errors else 0
         time.sleep(args.interval)
 
 

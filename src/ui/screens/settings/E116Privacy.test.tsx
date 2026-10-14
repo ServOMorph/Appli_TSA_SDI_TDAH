@@ -68,6 +68,11 @@ describe('E116Privacy', () => {
     expect(screen.queryByText(/Aucune donnée n'est envoyée/)).not.toBeInTheDocument()
   })
 
+  it('mentionne l’envoi des données de santé et de l’âge à côté de la case de partage', () => {
+    renderE116()
+    expect(screen.getByText(/Les catégories sont des données de santé/)).toBeInTheDocument()
+  })
+
   it('reflète l’état du consentement de synchronisation', () => {
     grantSyncConsent()
     renderE116()

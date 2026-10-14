@@ -1589,3 +1589,38 @@ describe('AppProvider — démarrage d’un utilisateur existant', () => {
     expect(screen.getByTestId('screen').textContent).toBe('dashboard')
   })
 })
+
+describe('AppProvider — suppression d’un outil routine', () => {
+  it('supprime les sous-tâches des étapes avec la routine', async () => {
+    function RoutinePanel() {
+      const { createUser, goTo, screen: s, tools, createToolRoutine, addRoutineStep, addSubTask, deleteTool } = useApp()
+      return (
+        <>
+          <div data-testid="screen">{s}</div>
+          <div data-testid="routine-tools">{tools.filter((t) => t.type === 'routine').length}</div>
+          <button onClick={async () => { await createUser({ neuro_categories: ['ne_sais_pas'], age: 30 }); goTo('dashboard') }}>créer utilisateur</button>
+          <button
+            onClick={async () => {
+              const routineId = await createToolRoutine('Matin', null)
+              await addRoutineStep(routineId, 'Douche', null)
+              const [step] = await db.routineSteps.toArray()
+              await addSubTask(step.id, 'Savon')
+            }}
+          >
+            créer routine
+          </button>
+          <button onClick={() => { const tool = tools.find((t) => t.type === 'routine'); if (tool) void deleteTool(tool.id) }}>supprimer routine</button>
+        </>
+      )
+    }
+    render(<AppProvider><RoutinePanel /></AppProvider>)
+    await userEvent.click(screen.getByRole('button', { name: 'créer utilisateur' }))
+    await waitFor(() => expect(screen.getByTestId('screen').textContent).toBe('dashboard'))
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'créer routine' })) })
+    await waitFor(async () => expect(await db.tasks.count()).toBe(1))
+
+    await act(async () => { await userEvent.click(screen.getByRole('button', { name: 'supprimer routine' })) })
+    await waitFor(async () => expect(await db.routineSteps.count()).toBe(0))
+    expect(await db.tasks.count()).toBe(0)
+  })
+})

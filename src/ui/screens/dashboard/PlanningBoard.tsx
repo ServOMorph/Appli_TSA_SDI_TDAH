@@ -551,7 +551,7 @@ export function PlanningBoard() {
     const width = cellWidth()
     const index = stripDates.indexOf(date)
     if (scroller && width && index >= 0) {
-      smoothTargetRef.current = date
+      smoothTargetRef.current = date !== displayDateRef.current ? date : null
       scroller.scrollTo?.({ left: index * width, behavior: 'smooth' })
     }
     updateDisplayDate(date)

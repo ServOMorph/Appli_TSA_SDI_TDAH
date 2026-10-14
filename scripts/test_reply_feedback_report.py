@@ -12,6 +12,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from _supabase import SupabaseError  # noqa: E402
+from feedback_state import FeedbackStateError  # noqa: E402
 from reply_feedback_report import (  # noqa: E402
     ReportResolvedError,
     build_open_reports_query,
@@ -107,6 +108,15 @@ class ReplyFeedbackReportTests(unittest.TestCase):
         with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
             result = list_reports_needing_reply("https://example.test", "key")
         self.assertFalse(is_hidden_by_state(result[0]))
+
+    def test_etat_illisible_est_ignore_avec_avertissement(self):
+        self.read_state.side_effect = FeedbackStateError("etat_retours.json illisible")
+        reports = [{"id": "retour-1"}]
+        messages = [{"report_id": "retour-1", "author": "user", "body": "x", "created_at": "2026-10-09T10:00:00Z"}]
+        with patch("reply_feedback_report.fetch_rows", side_effect=[reports, messages]):
+            result = list_reports_needing_reply("https://example.test", "key")
+        self.assertEqual([r["id"] for r in result], ["retour-1"])
+        self.assertNotIn("etat", result[0])
 
     def test_corps_lu_depuis_un_fichier(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -8,6 +8,7 @@ import {
   routineScheduleRepo,
   routineStepCompletionRepo,
   routineStepRepo,
+  taskRepo,
   toolRepo,
 } from '@/app/repositories'
 import {
@@ -81,6 +82,7 @@ export function useToolsState(reloadLists: () => Promise<void>, reloadRoutines: 
     }
     if (tool.type === 'routine' && tool.routine_id) {
       const steps = await routineStepRepo.getByRoutineId(tool.routine_id)
+      for (const step of steps) await taskRepo.deleteWithChildren(step.id)
       await Promise.all(steps.map((step) => routineStepRepo.delete(step.id)))
       const schedules = await routineScheduleRepo.getByRoutineId(tool.routine_id)
       await Promise.all(schedules.map((schedule) => routineScheduleRepo.delete(schedule.id)))

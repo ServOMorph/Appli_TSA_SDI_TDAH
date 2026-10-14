@@ -63,6 +63,10 @@ class BoucleTests(unittest.TestCase):
         code, out, _ = self.run_main(["--une-fois"], [[]])
         self.assertEqual((code, out), (0, ""))
 
+    def test_une_fois_sur_erreur_sort_avec_1(self):
+        code, out, _ = self.run_main(["--une-fois"], [SupabaseError("reseau")])
+        self.assertEqual((code, out), (1, ""))
+
     def test_ignorer_existants_attend_un_nouveau_retour(self):
         code, out, _ = self.run_main(
             ["--ignorer-existants"], [[entry("a")], [entry("a")], [entry("a"), entry("b")]]

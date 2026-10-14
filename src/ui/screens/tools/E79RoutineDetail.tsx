@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
@@ -131,6 +131,7 @@ export function E79RoutineDetail() {
   const [stepTitle, setStepTitle] = useState('')
   const [stepDuration, setStepDuration] = useState('')
   const [editingStep, setEditingStep] = useState<RoutineStep | null>(null)
+  const editingStepIdRef = useRef<string | null>(null)
   const [editStepTitle, setEditStepTitle] = useState('')
   const [editStepDuration, setEditStepDuration] = useState('')
   const [editSubTasks, setEditSubTasks] = useState<Task[]>([])
@@ -209,7 +210,10 @@ export function E79RoutineDetail() {
     setEditStepDuration(step.duration_minutes ? String(step.duration_minutes) : '')
     setNewSubTaskTitle('')
     setEditSubTasks([])
-    getSubTasks(step.id).then(setEditSubTasks)
+    editingStepIdRef.current = step.id
+    getSubTasks(step.id).then((subTasks) => {
+      if (editingStepIdRef.current === step.id) setEditSubTasks(subTasks)
+    })
   }
 
   async function handleAddSubTask() {
@@ -230,6 +234,7 @@ export function E79RoutineDetail() {
     if (!editingStep || !editStepTitle.trim()) return
     await updateRoutineStep(editingStep.id, editStepTitle, parsedDuration(editStepDuration))
     await refresh()
+    editingStepIdRef.current = null
     setEditingStep(null)
   }
 
@@ -398,7 +403,7 @@ export function E79RoutineDetail() {
             <Button fullWidth onClick={handleEditStep} disabled={!editStepTitle.trim()}>
               Enregistrer
             </Button>
-            <Button variant="secondary" fullWidth onClick={() => setEditingStep(null)}>
+            <Button variant="secondary" fullWidth onClick={() => { editingStepIdRef.current = null; setEditingStep(null) }}>
               Annuler
             </Button>
           </div>

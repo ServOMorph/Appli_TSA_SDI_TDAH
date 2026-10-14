@@ -108,6 +108,12 @@ export function E116Privacy() {
           immédiatement ; les copies déjà transmises sont supprimées sur demande via le canal de
           retour.
         </p>
+        <p style={{ margin: '8px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+          Les catégories que vous choisissez dans votre profil (TSA, TDAH, SDI, avec DI, HPI,
+          neurotypique) et votre âge sont aussi envoyés. Les catégories sont des données de santé :
+          en activant le partage, vous consentez expressément à leur envoi. Sans partage, elles
+          restent sur votre appareil.
+        </p>
       </Card>
 
       <Card>

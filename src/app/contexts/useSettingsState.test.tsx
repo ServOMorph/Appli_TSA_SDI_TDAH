@@ -126,6 +126,32 @@ function SettingsPanel() {
       >
         Importer avec routine
       </button>
+      <button
+        onClick={() =>
+          runImport({
+            user: { id: 'u-sans-categorie', profile_type: 'student' },
+            lists: [{ id: 'list-1', name: 'Courses', created_at: '2026-01-01T00:00:00.000Z', updated_at: '2026-01-01T00:00:00.000Z' }],
+            list_items: [{ id: 'item-1', list_id: 'list-1', title: 'Pain', position: 0, checked: false, category_id: '', description: '', created_at: '2026-01-01T00:00:00.000Z' }],
+          })
+        }
+      >
+        Importer élément de liste sans catégorie
+      </button>
+      <button
+        onClick={() =>
+          runImport({
+            user: { id: 'u-sous-tache-etape', profile_type: 'student' },
+            routines: [{ id: 'routine-1', name: 'Matin', color: null, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
+            routine_steps: [{ id: 'step-1', routine_id: 'routine-1', title: 'Douche', position: 0, duration_minutes: 5, created_at: '2026-09-23T00:00:00.000Z', updated_at: '2026-09-23T00:00:00.000Z' }],
+            tasks: [{ id: 'sub-1', parent_id: 'step-1', title: 'Savon' }],
+          })
+        }
+      >
+        Importer sous-tâche d’étape de routine
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, folders: [{ id: 'dossier-1', parent_id: 'inconnu' }] })}>
+        Importer dossier orphelin
+      </button>
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, routine_steps: [{ id: 'step-orphelin', routine_id: 'inconnue' }] })}>
         Importer étape de routine orpheline
       </button>
@@ -271,6 +297,7 @@ describe('useSettingsState — export/import', () => {
       ['Importer tableau invalide', 'tasks doit être une liste'],
       ['Importer référence orpheline', 'référence tâche parente orpheline'],
       ['Importer version future', 'version d’export plus récente'],
+      ['Importer dossier orphelin', 'référence dossier parent orpheline'],
       ['Importer étape de routine orpheline', 'référence routine orpheline'],
       ['Importer complétion de routine orpheline', 'référence routine orpheline'],
     ] as const
@@ -425,6 +452,27 @@ describe('useSettingsState — export/import', () => {
     expect(completions).toEqual([
       { id: 'completion-1', routine_step_id: 'step-1', routine_id: 'routine-1', date: '2026-09-23', created_at: '2026-09-23T00:00:00.000Z' },
     ])
+  })
+
+  it('conserve sans catégorie un élément de liste importé avec category_id vide', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer élément de liste sans catégorie' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    const items = await listItemRepo.getByListId('list-1')
+    expect(items).toHaveLength(1)
+    expect(items[0].category_id).toBe('')
+    expect(await db.listCategories.where('list_id').equals('list-1').count()).toBe(0)
+  })
+
+  it('accepte une sous-tâche dont le parent est une étape de routine', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer sous-tâche d’étape de routine' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(await db.tasks.get('sub-1')).toMatchObject({ parent_id: 'step-1' })
   })
 
   it('recrée l’entrée Outil Budget manquante à l’import', async () => {

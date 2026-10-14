@@ -29,7 +29,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from _supabase import SupabaseError, fetch_rows, insert_row, read_credentials
-from feedback_state import clear_state, read_state, write_json_atomic
+from feedback_state import FeedbackStateError, clear_state, read_state, write_json_atomic
 
 QUEUE_FILE = Path(__file__).resolve().parent.parent / "_contexte" / "reponses_retours_en_attente_deploiement.json"
 
@@ -117,7 +117,11 @@ def list_reports_needing_reply(url: str, service_key: str, device_ids: list[str]
     for message in messages:
         last_message[message["report_id"]] = message
     queued = queued_at_by_report()
-    state = read_state()
+    try:
+        state = read_state()
+    except FeedbackStateError as e:
+        print(f"AVERTISSEMENT: {e} ; etats ignores.", file=sys.stderr)
+        state = {}
     result = []
     for report in reports:
         last = last_message.get(report["id"])
@@ -170,7 +174,10 @@ def deposit_reply(url: str, service_key: str, report_id: str, body: str) -> dict
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     inserted = insert_row(url, service_key, "feedback_messages", message)
-    clear_state(report_id)
+    try:
+        clear_state(report_id)
+    except FeedbackStateError as e:
+        print(f"AVERTISSEMENT: reponse deposee, mais l'etat n'a pas ete retire : {e}", file=sys.stderr)
     return inserted
 
 

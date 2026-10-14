@@ -1372,3 +1372,12 @@ Teste le collage d'image : copie une image, puis « Signaler un retour » > « C
 
 Question : les autres livrets sont-ils aussi des provenances possibles d'un dépôt ?
 _Suite :_ message de l'étape 11 de `/deploy`, validé par l'utilisateur, envoyé en urgent le 2026-10-10 (demande `20261010T203939_073308`, message Discord `1558579796135383131`, `--expect-reply`). Réponse attendue sur la question des livrets.
+
+### 2026-10-14 (alerte export avant /deploy v6.12)
+**Dév ->**
+Une nouvelle version sera bientôt disponible.
+Avant, exporte tes données.
+Paramètres > Export et import > Exporter en JSON.
+N'envoie plus de retours d'ici l'arrivée de la nouvelle version.
+Réponds « fait » une fois l'export terminé.
+_Suite :_ alerte de l'étape 0.1 de `/deploy` (envoi urgent, demande `20261014T094820_664675`, message Discord `1559865437141864539`, `--expect-reply`). Consigne ajoutée : ne plus envoyer de retours en attendant la nouvelle version. Réponse de Marie attendue ; sa confirmation est recontrôlée par l'utilisateur à l'étape 4ter.

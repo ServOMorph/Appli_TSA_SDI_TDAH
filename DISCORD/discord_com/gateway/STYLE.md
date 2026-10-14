@@ -20,8 +20,8 @@ mise en forme selon ce fichier, puis `approve`.
 
 ## Ce qui est posé automatiquement (ne pas le mettre dans `body`)
 
-- `to == marie` : `curate()` ajoute l'encadrement `💻🤖` et le tag `<@1368654289584656394>` après
-  le premier `💻🤖`. Le `body` ne contient ni l'encadrement ni le tag.
+- `to == marie` : `curate()` ajoute le tag `<@1368654289584656394>` en tête, sans emoji
+  d'encadrement (retiré de tout corps depuis le 2026-10-14). Le `body` ne contient pas le tag.
 - `to == morpheus` / `to == channel` : aucun encadrement, corps transmis tel quel.
 
 ---
@@ -40,9 +40,8 @@ Ces règles s'appliquent avant les sections par destinataire et priment en cas d
   Énoncer le fait corrigé, sans commentaire sur soi.
 - Un seul message = un seul sujet. Pas de « au fait » ni de digression.
 - Français correct, accents et ponctuation compris.
-- **Aucun emoji dans le corps du message**, quel que soit le destinataire. L'encadrement
-  `💻🤖` et le tag Marie ne comptent pas : ils sont ajoutés par la gateway (`curate()`),
-  jamais tapés dans le `body`.
+- **Aucun emoji dans le corps du message**, quel que soit le destinataire, y compris
+  `💻🤖`, retirés par `curate()`. Le tag Marie est ajouté par la gateway, jamais tapé dans le `body`.
 
 ---
 
@@ -79,7 +78,7 @@ Destinataire : testeuse produit. Aucun contexte technique. Utilise l'appli sur t
 ### Message de livraison (`kind == delivery`)
 
 Gabarit figé dans `.claude/CLAUDE.md` § « Messages pour Marie » (section « Gabarit du message
-de livraison »). Le corps déposé n'inclut ni `💻🤖` ni le tag. Vérifier avant `approve` :
+de livraison »). Le corps déposé n'inclut pas le tag. Vérifier avant `approve` :
 
 - Corps commence par « Version X.Y en ligne. »
 - Nombre de tests = parcours non validés de l'écran « Tests à faire » sur la version déployée.
@@ -148,4 +147,4 @@ Chaîne en dur dans `bot.py`, hors du jugement de l'agent DISCORD.
 ### Format
 
 - Autonome : compréhensible sans le fil de conversation.
-- Pas d'encadrement `💻🤖`, pas de tag Marie.
+- Pas d'emoji d'encadrement, pas de tag Marie.

@@ -13,7 +13,7 @@ Discord ou le timeout de sécurité (jusqu'à 1h).
 MODE URGENT (`enqueue --urgent`) : contourne délibérément le gardien — pas d'attente de
 `bot.py` ni d'une session DISCORD active. La demande est `approve`e puis `drain`ée dans le
 même appel, envoi Discord réel immédiat (indépendant de `bot.py`, cf. `message_marie.py`).
-Seuls restent appliqués : la mise en forme mécanique (`curate` — cadre 💻🤖, tag, limite
+Seuls restent appliqués : la mise en forme mécanique (`curate` — tag, limite
 2000 caractères) et le garde-fou de visibilité asymétrique testeur. Tout le reste du travail
 du gardien (ton, regroupement, dédoublonnage, `hold` d'un sujet en attente) est sauté : le
 message part tel quel, sans relecture. Réservé aux cas où le circuit normal est bloqué
@@ -94,7 +94,7 @@ GARDIEN_WAKE_COMMAND = "__gateway_wake__"
 
 # Canaux ONBOARD Phase 5, visibilité strictement asymétrique (TESTS/ONBOARD/decisions_dispositif.md
 # Décision 5). Un canal par testeur : cible `testeur:<code>` (le testeur écrit, Marie lit) — aucun
-# cadre 💻🤖, aucune mention de Marie. `marie_supervision` = canal privé de Marie (elle lit/écrit,
+# emoji d'encadrement, aucune mention de Marie. `marie_supervision` = canal privé de Marie (elle lit/écrit,
 # aucun testeur ne le voit). Les channel_id vivent dans config_bot_discord.json > channels
 # (`channels.testeurs.<code>.channel_id`, `channels.supervision`) ; les cibles historiques gardent
 # le channel_id unique.
@@ -522,23 +522,27 @@ def curate(to: str, kind: str, body: str) -> str:
     body = (body or "").strip()
     if not body:
         raise GatewayError("corps vide")
+    if not _testeur_code(to):
+        body = body.replace(FRAME, "").strip()
+        if not body:
+            raise GatewayError("corps vide")
     if to == "marie":
         salutation = _salutation_marie()
         if salutation:
-            text = f"{FRAME}\n<@{MARIE_USER_ID}>\n{salutation}\n\n{body}\n{FRAME}"
+            text = f"<@{MARIE_USER_ID}>\n{salutation}\n\n{body}"
         else:
-            text = f"{FRAME}\n<@{MARIE_USER_ID}>\n\n{body}\n{FRAME}"
+            text = f"<@{MARIE_USER_ID}>\n\n{body}"
     elif to == "marie_supervision":
-        # Canal privé de Marie : elle est taguée (notification) mais sans le cadre ni la
+        # Canal privé de Marie : elle est taguée (notification) mais sans la
         # salutation de livraison — ce n'est pas un message produit, c'est de la supervision.
         text = f"<@{MARIE_USER_ID}>\n\n{body}"
     elif _testeur_code(to):
         # Garde-fou de visibilité asymétrique : un message destiné à un testeur ne doit
-        # jamais porter le cadre 💻🤖 ni la mention de Marie (Décision 5). Le gardien
+        # jamais porter les emojis 💻🤖 ni la mention de Marie (Décision 5). Le gardien
         # bounce plutôt que de laisser fuir l'avis de Marie sur un canal testeur.
         if FRAME in body or f"<@{MARIE_USER_ID}>" in body:
             raise GatewayError(
-                "message testeur contient le cadre 💻🤖 ou la mention de Marie — "
+                "message testeur contient les emojis 💻🤖 ou la mention de Marie — "
                 "fuite de visibilité asymétrique (decisions_dispositif.md Décision 5)")
         text = body
     else:

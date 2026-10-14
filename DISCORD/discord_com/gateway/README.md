@@ -75,7 +75,7 @@ python DISCORD/discord_com/gateway.py merge   --ids <id>,<id>
 - Critères de rejet arrêtés : doublon · réponse déjà connue · fond non figé
   (`<placeholder>`, choix non tranché, TODO) · hors périmètre canal (jargon, hash, chemins)
   · incohérence de version. Détail dans `roadmap_gateway_discord_service.md`.
-- `marie` : encadrement `💻🤖`, tag, ton non technique, une idée par phrase, sans politesse
+- `marie` : tag, aucun emoji d'encadrement, ton non technique, une idée par phrase, sans politesse
   (règle `CLAUDE.md`).
 
 **L'envoi lui-même est automatique** : `bot.py` appelle `gateway.drain()` toutes les 5 s et
@@ -98,7 +98,7 @@ python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie 
 `enqueue(..., urgent=True)` fait `approve` + `drain` dans le même appel : envoi Discord réel
 avant le retour de la commande, indépendant de `bot.py` (transport REST direct via
 `message_marie._send`, cf. son en-tête). Restent appliqués : la mise en forme mécanique
-(cadre 💻🤖, tag, limite 2000 caractères) et le garde-fou de visibilité asymétrique testeur.
+(tag, limite 2000 caractères) et le garde-fou de visibilité asymétrique testeur.
 Tout le reste du travail du gardien (ton, regroupement, dédoublonnage, `hold` d'un sujet en
 attente) est sauté — le message part tel quel, sans relecture humaine. Ce n'est jamais un
 usage par défaut ; le circuit normal (`enqueue` sans `--urgent`, jugement du gardien) reste la

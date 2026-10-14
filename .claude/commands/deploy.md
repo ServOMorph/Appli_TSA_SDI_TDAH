@@ -24,7 +24,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
       que la suite de `/deploy` ne rende une nouvelle version accessible (cf. incident du
       2026-09-13 — import d'un ancien fichier sans export préalable, perte de données locales,
       `COMMUNICATION/Marie/historique_conversation_marie.md`). Rédiger le corps (gabarit CLAUDE.md
-      § Messages pour Marie, fond seul, sans `💻🤖` ni tag, une idée par phrase : l'export, puis la
+      § Messages pour Marie, fond seul, sans tag, une idée par phrase : l'export, puis la
       consigne de ne plus envoyer de retours en attendant la nouvelle version) et déposer en urgence :
       ```
       python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie \
@@ -322,7 +322,7 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
     ```
     Ce message est alors déposé avec `--expect-reply` (étape 11bis) pour suivre sa réponse.
 
-    Écrire le corps au fond définitif, **sans** l'encadrement `💻🤖` ni le tag (l'agent DISCORD les pose).
+    Écrire le corps au fond définitif, **sans** le tag (l'agent DISCORD le pose) et sans aucun emoji d'encadrement.
 
 11bis. Validation du message de livraison — gate bloquant côté humain, avant tout dépôt en gateway.
     Afficher à l'utilisateur le corps intégral composé à l'étape 11 et attendre sa confirmation explicite.

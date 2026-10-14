@@ -203,12 +203,17 @@ class GatewayTest(unittest.TestCase):
 
     # -- curate --------------------------------------------------------
 
-    def test_curate_marie_encadre_et_tague(self):
+    def test_curate_marie_tague_sans_emoji_d_encadrement(self):
         out = gateway.curate("marie", "info", "Version 6.0 en ligne.")
-        self.assertTrue(out.startswith(gateway.FRAME))
-        self.assertTrue(out.endswith(gateway.FRAME))
-        self.assertIn(f"<@{gateway.MARIE_USER_ID}>", out)
+        self.assertTrue(out.startswith(f"<@{gateway.MARIE_USER_ID}>"))
+        self.assertNotIn(gateway.FRAME, out)
         self.assertIn("Version 6.0 en ligne.", out)
+
+    def test_curate_retire_les_emojis_d_encadrement_du_corps(self):
+        out = gateway.curate("marie", "info", f"{gateway.FRAME}\nVersion 6.0 en ligne.\n{gateway.FRAME}")
+        self.assertNotIn(gateway.FRAME, out)
+        self.assertIn("Version 6.0 en ligne.", out)
+        self.assertNotIn(gateway.FRAME, gateway.curate("channel", "info", f"{gateway.FRAME} brut"))
 
     def test_curate_channel_inchange(self):
         self.assertEqual(gateway.curate("channel", "info", "brut"), "brut")
@@ -237,7 +242,7 @@ class GatewayTest(unittest.TestCase):
         res = gateway.drain(send_fn=lambda c, i: appels.append(c) or "x", dry_run=True)
         self.assertEqual(appels, [])
         self.assertEqual(res[0]["status"], "dry-run")
-        self.assertIn(gateway.FRAME, res[0]["content"])
+        self.assertNotIn(gateway.FRAME, res[0]["content"])
         self.assertEqual(len(list(gateway.OUTBOX.glob("*.json"))), 1)
 
     def test_drain_dry_run_rend_aussi_les_non_approuvees(self):
@@ -875,7 +880,8 @@ class VisibiliteAsymetriqueTest(unittest.TestCase):
         gateway.approve(rid)
         _, envois = self._drain_reel()
         self.assertEqual(envois[0]["channel_id"], 111)
-        self.assertTrue(envois[0]["content"].startswith(gateway.FRAME))
+        self.assertTrue(envois[0]["content"].startswith(f"<@{gateway.MARIE_USER_ID}>"))
+        self.assertNotIn(gateway.FRAME, envois[0]["content"])
 
     def test_fuite_frame_vers_testeur_bloque_l_envoi(self):
         rid = gateway.enqueue("discord", "testeur:satine",

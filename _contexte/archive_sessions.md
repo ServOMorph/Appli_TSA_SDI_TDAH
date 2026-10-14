@@ -1716,3 +1716,25 @@ Voir Marie : choisir les mots de passe `marie` et `dev`, coller les empreintes, 
 
 ## Question bloquante pour la session suivante
 Aucune
+
+---
+
+## Dernière session (2026-10-12 — catégories de profil, HPI, bandeau des jours)
+
+## Décisions prises
+- Catégories + âge à l'onboarding, rattrapage et consentement renouvelé pour tous ; HPI ajouté et bouton « ? » de définition par catégorie.
+- Bandeau des jours de l'Accueil en défilement natif centré, sans flèches, axe verrouillé ; outils placés au-dessus du planning.
+
+## Livrables produits ou modifiés
+- Feature profil (`profileRules.ts`, `startRoute.ts`, `NeuroCategoryPicker.tsx`, E02/E04/E05/E111, `PlanningBoard.tsx`, `E10Dashboard.tsx`), docs, roadmap : codés, non commités avant ce `/close`, commités par lui.
+- `WHATS_NEW` (3 entrées) et `CHANGELOG.md` v6.12 ajoutés ; `E02Profile.tsx` : bouton non bloqué en cas d'échec.
+
+## Hypothèses validées / invalidées
+- VALIDE : 1198 tests, `tsc`, `eslint` ; bandeau des jours et HPI/définitions validés par l'utilisateur sur téléphone.
+- EN ATTENTE : tests manuels du parcours profil, rattrapage et consentement ; revue `medium` : 1 [P2] et 1 [P3] tracés.
+
+## Prochaine étape exacte
+Valider les tests manuels de `tests_manuels.md` (profil/consentement), trancher l'action [P2] sur la synchronisation avant renouvellement, puis `/deploy` v6.12.
+
+## Question bloquante pour la session suivante
+Bloquer l'envoi de la synchronisation tant que le consentement n'est pas de version courante, ou accepter le risque ?

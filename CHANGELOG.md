@@ -1,13 +1,19 @@
-## v6.12 — 2026-10-12
+## v6.12 — 2026-10-14
 
 ### Ajouté
 - **Onboarding : catégories (TSA, TDAH, SDI, avec DI, HPI, neurotypique, je ne sais pas) et âge** remplacent adolescent / étudiant / adulte ; bouton « ? » de définition par catégorie ; modifiables dans Paramètres > Profil ; synchronisés (`profileRules.ts`, `NeuroCategoryPicker.tsx`, `E02Profile.tsx`, `E111Profile.tsx`).
 - **Écran de rattrapage du profil et renouvellement du consentement** (version de consentement) pour les utilisateurs existants ; le code testeur et le mot de passe admin sont demandés en premier (`startRoute.ts`, `syncConsent.ts`, `E04Consent.tsx`, `E05TesterCode.tsx`).
 
+- **Retours de Marie du 10-12/10 (`roadmap_retours_2026-10-12.md`)** : dossiers dans un dossier, création et déplacement, suppression récursive confirmée (`Folder.parent_id`, `folderRules.ts`, `useToolsState.ts`, `E72FolderDetail.tsx`, `ToolActionsMenu.tsx`, retour `5cd28d81`) ; durée d'une routine propre à un jour (`RoutineSchedule.duration_minutes`, `effectiveRoutineDuration`, `E80RoutineSteps.tsx`, `979d0ddd`) ; sous-tâches par étape depuis E79 (`E79RoutineDetail.tsx`, `951ce1c6`) ; choix de portée à l'ajout d'une sous-étape d'une tâche récurrente (`addSubTaskScoped`, `E23Decompose.tsx`, `80dcd005`) ; envoi d'un retour sans image (`feedbackRules.ts`, `feedbackClient.ts`, `E122FeedbackCapture.tsx`, `supabase/feedback.sql` à appliquer avant déploiement, `c755cb11`).
+
 ### Modifié
 - **Accueil : bandeau des jours à défilement natif** (jour toujours centré, cadre autour du jour, fenêtre de 43 jours recentrée, axe horizontal verrouillé, flèches retirées) (`PlanningBoard.tsx`) ; section « Outils » placée au-dessus du planning (`E10Dashboard.tsx`).
+- **Outils : grille de trois cartes qui tient dans l'écran** (`E10Dashboard.tsx`, `6fbf95e8`) ; planning de la semaine à défilement vertical commun, jours fixés en haut (`E12WeekPlanning.tsx`, `754db232`) ; rubrique « Couleur des outils » retirée (`E112Accessibility.tsx`, `bac22741`).
+- **Listes : catégories facultatives**, une liste sans catégorie accepte ses éléments (`ToolCreateModal.tsx`, `E61ListDetail.tsx`, `b8f42e4e`).
+- **Messages Discord : plus d'emoji d'encadrement** (`gateway.py`, `message_marie.py`) ; l'alerte d'export de `/deploy` demande aussi de ne plus envoyer de retours.
 
 ### Corrigé
+- Dépense prévue : cocher la dernière sous-tâche depuis l'Accueil ouvre la fenêtre de dépense au lieu de terminer la tâche sans dépense (`useTasksState.ts`, `PlanningBoard.tsx`, `b5087222`) ; les sous-tâches des étapes sont copiées ou supprimées avec l'étape d'un jour détaché (`useRoutineState.ts`).
 - `E02Profile.tsx` : le bouton « Continuer » ne reste plus bloqué si l'enregistrement du profil échoue.
 
 ## v6.11 — 2026-10-10

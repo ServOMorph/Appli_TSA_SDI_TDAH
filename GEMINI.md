@@ -179,7 +179,7 @@ contourner.
 **Exception (2026-09-12) — mode urgent.** `enqueue --urgent` (ou `enqueue(..., urgent=True)`)
 contourne délibérément ce qui précède : `approve` + `drain` immédiats dans le même appel, envoi
 Discord réel avant le retour de la commande, indépendant de `bot.py`. Seuls restent appliqués
-la mise en forme mécanique (cadre 💻🤖, tag, limite 2000 caractères) et le garde-fou de
+la mise en forme mécanique (tag, limite 2000 caractères) et le garde-fou de
 visibilité asymétrique testeur — tout le travail de relecture du gardien (ton, regroupement,
 dédoublonnage, `hold`) est sauté. Réservé aux cas où le circuit normal est bloqué (aucune
 session DISCORD active, `bot.py` arrêté) et où le message ne peut pas attendre ; jamais un
@@ -217,7 +217,7 @@ dans la session `discord` » ci-dessus, dont l'affirmation « Aucun hook, aucun 
 pour la zone racine ne tient plus depuis cette date. Traiter une réponse `--expect-reply` de
 Marie reste une décision explicite de l'utilisateur.
 
-### Messages pour Marie : via la gateway Discord, encadrés 💻🤖
+### Messages pour Marie : via la gateway Discord, sans emoji d'encadrement
 Depuis le 2026-09-02, le canal de Marie est **Discord** et **toute communication Discord passe par
 la gateway** (`DISCORD/discord_com/gateway/README.md`). Tout message à l'intention de Marie (pas
 seulement celui de `/deploy`) est **déposé dans la gateway**, jamais envoyé en direct :
@@ -233,10 +233,10 @@ ou `gateway.enqueue("orchestrateur", "marie", corps, kind=..., expect_reply=...)
 écrire dans `queue.json` / `commands.json`.
 
 L'agent DISCORD relit chaque demande, ajuste **ton, format, longueur, moment d'envoi et
-regroupement**, pose l'encadrement `💻🤖` et **tague Marie (`<@1368654289584656394>`) dans
+regroupement**, et **tague Marie (`<@1368654289584656394>`) dans
 chaque message qui lui est adressé, sans exception** (livraison, question, info, relance) —
 **sans changer le fond**. Le tag n'est jamais retiré ni omis ; la gateway (`curate()`,
-`to=marie`) l'insère de toute façon après le premier `💻🤖`. Le corps déposé doit
+`to=marie`) l'insère de toute façon en tête de message. Aucun emoji `💻🤖` n'est jamais ajouté ni conservé (décision du 2026-10-14 : `curate()` les retire de tout corps). Le corps déposé doit
 donc être au fond définitif : question et options de réponse figées. Il ne contient QUE le message
 Marie — aucun commentaire à l'utilisateur (ce qui a été fait, pourquoi, prochaine étape), qui reste
 dans le terminal. Ne jamais demander à l'utilisateur d'envoyer ou de reformater lui-même.
@@ -251,10 +251,9 @@ politesse** — pas de salutation, pas de remerciement, pas de formule de clôtu
 l'information : ce qui est fait, ce qu'elle doit vérifier, une idée par phrase.
 
 **Gabarit du message de livraison** (préférence du 28/08 ; rendu final — le corps déposé dans la
-gateway n'inclut ni les `💻🤖` ni le tag, la gateway / l'agent DISCORD les ajoutent) :
+gateway n'inclut pas le tag, la gateway / l'agent DISCORD l'ajoutent ; aucun emoji d'encadrement) :
 
 ```
-💻🤖
 <@1368654289584656394>
 
 Version <X.Y> en ligne.
@@ -262,8 +261,6 @@ Version <X.Y> en ligne.
 <lien de l'appli sur sa propre ligne>
 
 Détail des changements et questions : commentaires_marie_<X.Y>.docx
-
-💻🤖
 ```
 
 La ligne « Détail des changements et questions : » n'est présente que s'il y a un commentaire utile
@@ -290,7 +287,7 @@ curatée des questions / réponses / décisions produit :
   erreurs d'attribution.
 - **Message rédigé pour Marie** (livraison, question, relance — pas seulement ceux de `/deploy`) :
   l'ajouter au fichier dans le même tour où il est rédigé, avant de le présenter à l'utilisateur.
-  Recopier le texte tel qu'envoyé, sans les emojis d'encadrement `💻🤖`.
+  Recopier le texte tel qu'envoyé.
 - **Message que l'utilisateur transmet** (sa réponse, un message de Marie qu'il colle) : l'ajouter
   au fichier dans le tour où il est reçu.
 - Suivre la convention d'entrée en tête du fichier (`### AAAA-MM-JJ`, `**Dév ->**` / `**Marie ->**`,

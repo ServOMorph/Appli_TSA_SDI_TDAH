@@ -28,7 +28,7 @@ jour par `/close`.
 
 ---
 
-## Phase 1 — Petits correctifs : grille des outils (E10), défilement du planning (E12) [TODO]
+## Phase 1 — Petits correctifs : grille des outils (E10), défilement du planning (E12) [FAIT]
 
 - **6fbf95e8** — Constat : `E10Dashboard.tsx:137` `gridTemplateColumns: 'repeat(3, 1fr)'` ; une
   piste `1fr` ne descend pas sous la largeur min-content de la carte (libellé + `📁` +
@@ -66,7 +66,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 1 bis — Petits correctifs : dépense à la coche automatique (E10), couleur des outils (E112) [TODO]
+## Phase 1 bis — Petits correctifs : dépense à la coche automatique (E10), couleur des outils (E112) [FAIT]
 
 - **b5087222** — Constat : `toggleSubTask` (`useTasksState.ts:99-113`) complète le parent quand toutes
   les sous-tâches le sont, sans passer par la fenêtre de dépense, qui n'existe que dans
@@ -104,7 +104,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 1 ter — Sous-tâches par étape dans la configuration d'une routine (E79) [TODO]
+## Phase 1 ter — Sous-tâches par étape dans la configuration d'une routine (E79) [FAIT]
 
 - **951ce1c6** — Constat : E80 gère déjà les sous-tâches d'une étape (`subTasksByStep`,
   `E80RoutineSteps.tsx:250`, `parent_id` = id de l'étape) ; la fenêtre « Modifier l'étape » d'E79
@@ -129,7 +129,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 1 quater — Portée des modifications d'une tâche récurrente (E22 / E23) [TODO]
+## Phase 1 quater — Portée des modifications d'une tâche récurrente (E22 / E23) [FAIT]
 
 **Décision du 2026-10-13 : option A retenue** (choix de portée à la décomposition). **Option B
 (sélection personnalisée des occurrences, par jours de la semaine) : à cadrer avec Marie avant toute
@@ -157,7 +157,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — Liste sans catégorie (E72 / E61) [TODO]
+## Phase 2 — Liste sans catégorie (E72 / E61) [FAIT]
 
 - **b8f42e4e** — Constat : `ToolCreateModal.tsx:92` et `:201` exigent `categories.length > 0` ;
   `listItem.ts:7` `category_id: string` obligatoire, `E61ListDetail.tsx:273` n'affiche que des
@@ -184,7 +184,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Dossiers dans un dossier (E72 / E10) [TODO]
+## Phase 3 — Dossiers dans un dossier (E72 / E10) [FAIT]
 
 - **5cd28d81** — Constat : `folder.ts` sans dossier parent ; `ToolCreateModal.tsx:132` propose
   « Nouveau dossier » seulement si `folderId === null` ; `E10Dashboard.tsx:51` affiche tous les
@@ -220,7 +220,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 4 — Durée d'une routine pour un jour donné (E80) [TODO]
+## Phase 4 — Durée d'une routine pour un jour donné (E80) [FAIT]
 
 - **979d0ddd** — Constat : `RoutineSchedule` (`routine.ts:15-22`) porte `weekday` et `time`, pas
   de durée ; seule `Routine.duration_minutes` existe. E80 permet de changer l'heure du jour
@@ -250,7 +250,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 5 — Retour sans image (E122, serveur Supabase) [TODO]
+## Phase 5 — Retour sans image (E122, serveur Supabase) [FAIT]
 
 - **c755cb11** — Constat : `E122FeedbackCapture.tsx:96` `canSend` exige une image ;
   `feedbackRules.ts:8-9` image obligatoire ; `feedbackReport.ts:18-20` `image_blob: Blob` ;
@@ -282,9 +282,8 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - Tests : `feedbackRules.test.ts` (+3), `feedbackClient.test.ts` (+1), `E122FeedbackCapture.test.tsx`
   (+1), `E124FeedbackDetail.test.tsx` (+2), `test_read_feedback_reports.py` (+1). Gates : vitest
   1245/1245, `tsc -b`, lint, scripts Python 100/100.
-- **Reste à faire avant `/deploy`** : appliquer la section SQL ajoutée en fin de `supabase/feedback.sql`
-  dans le SQL Editor Supabase, puis constater un envoi sans image en base (critère de sortie non
-  atteint tant que ce n'est pas fait).
+- Migration SQL appliquée sur Supabase le 2026-10-14 ; un envoi sans image constaté en base
+  (critère de sortie atteint ; retour de test supprimé ensuite).
 
 **⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
 Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

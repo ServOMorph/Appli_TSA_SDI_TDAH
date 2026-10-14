@@ -10,7 +10,7 @@ refuse tout envoi réel sans `--force` (réservé à l'agent DISCORD) ; `--dry-r
 
 Indépendant de `bot.py` : poste directement via l'API REST Discord avec le token du bot
 (`DISCORD_BOT_TOKEN` dans `DISCORD/discord_com/.env`, jamais affiché). Respecte le modèle des
-messages pour Marie : tag en tête, encadrement `💻🤖`, contenu fourni tel quel par l'appelant
+messages pour Marie : tag en tête, aucun emoji d'encadrement, contenu fourni tel quel par l'appelant
 (ton court, concret, sans jargon, avec la forme de réponse attendue — à la charge du rédacteur).
 
 Usage :
@@ -22,7 +22,6 @@ Usage :
 Options :
   --file PATH       lit le corps du message depuis un fichier UTF-8 (recommandé pour le multi-ligne)
   --stdin           lit le corps du message sur l'entrée standard
-  --no-frame        n'ajoute pas l'encadrement 💻🤖
   --no-tag          n'ajoute pas le tag de Marie en tête
   --attachment PATH joint un fichier local au message (multipart Discord)
   --dry-run         affiche le contenu final et sort sans rien envoyer
@@ -57,6 +56,8 @@ CONV_LOG = DIR / "logs" / "conversation.jsonl"
 # id relevé dans DISCORD/discord_com/commands.json et logs/conversation.jsonl.
 MARIE_USER_ID = 1368654289584656394
 
+# Jamais ajouté aux messages (décision du 2026-10-14) : sert uniquement à les retirer d'un corps
+# et à bloquer sa fuite vers un testeur.
 FRAME = "💻🤖"
 API = "https://discord.com/api/v10"
 
@@ -89,18 +90,14 @@ def _read_channel_id() -> int:
     return int(channel_id)
 
 
-def _compose(body: str, *, tag: bool, frame: bool) -> str:
-    body = body.strip()
+def _compose(body: str, *, tag: bool) -> str:
+    body = body.replace(FRAME, "").strip()
     if not body:
         raise SystemExit("Erreur : message vide.")
     parts = []
-    if frame:
-        parts.append(FRAME)
     if tag:
         parts.append(f"<@{MARIE_USER_ID}>")
     parts.append(body)
-    if frame:
-        parts.append(FRAME)
     text = "\n".join(parts)
     if len(text) > 2000:
         raise SystemExit(f"Erreur : message de {len(text)} caractères, limite Discord = 2000.")
@@ -183,7 +180,6 @@ def main() -> None:
     parser.add_argument("text", nargs="?", help="corps du message (sinon --file ou --stdin)")
     parser.add_argument("--file", help="lire le corps depuis un fichier UTF-8")
     parser.add_argument("--stdin", action="store_true", help="lire le corps sur stdin")
-    parser.add_argument("--no-frame", action="store_true", help="sans encadrement 💻🤖")
     parser.add_argument("--no-tag", action="store_true", help="sans tag de Marie")
     parser.add_argument("--attachment", default=None, help="fichier local à joindre au message")
     parser.add_argument("--dry-run", action="store_true", help="afficher sans envoyer")
@@ -209,7 +205,7 @@ def main() -> None:
     else:
         body = args.text
 
-    content = _compose(body, tag=not args.no_tag, frame=not args.no_frame)
+    content = _compose(body, tag=not args.no_tag)
 
     if args.dry_run:
         print("--- message (dry-run, non envoyé) ---")

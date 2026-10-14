@@ -20,3 +20,6 @@ Dans Budget > un livret : déposer une somme en choisissant « Provenance » (mo
 
 ## Dépense liée à une tâche (ajouté le 2026-10-10)
 Créer une tâche avec la case « Dépense » cochée et la planifier ; la cocher dans le planning : la fenêtre « Dépense » s'ouvre. Enregistrer un montant et une catégorie, puis vérifier la dépense dans Budget. Refaire avec « Terminer sans dépense ». Contrôler l'affichage de la fenêtre sur téléphone.
+
+## Rendu mobile des retours du 2026-10-12 (ajouté le 2026-10-14)
+Sur un iPhone (Safari), `npm run dev -- --host --port 5000 --strictPort` : sur l'Accueil, vérifier que trois cartes d'outils dont un nom long (ex. « Administratif ») tiennent dans la largeur et que la césure du mot est correcte (non vérifié : le Chromium de test n'a pas de dictionnaire français) ; dans le planning de la semaine, vérifier le défilement vertical commun avec les jours fixés en haut.

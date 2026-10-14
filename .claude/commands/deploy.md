@@ -19,11 +19,13 @@ allowed-tools: Bash(npx tsc -b:*), Bash(VITE_APP_VERSION=* npx vite build:*), Ba
    ne subsiste que comme repli manuel (voir son en-tête) et ne fait pas partie de ce flux.
    1. Alerter Marie en urgence, avant toute autre analyse : lui demander d'exporter ses données
       maintenant (Paramètres > Export et import > Exporter en JSON), avant qu'une nouvelle version
-      ne soit disponible. Objectif : lui laisser le temps de sauvegarder son état courant avant
+      ne soit disponible, **et de ne plus envoyer de retours** (bouton « Signaler un retour »)
+      d'ici l'arrivée de la nouvelle version. Objectif : lui laisser le temps de sauvegarder son état courant avant
       que la suite de `/deploy` ne rende une nouvelle version accessible (cf. incident du
       2026-09-13 — import d'un ancien fichier sans export préalable, perte de données locales,
       `COMMUNICATION/Marie/historique_conversation_marie.md`). Rédiger le corps (gabarit CLAUDE.md
-      § Messages pour Marie, fond seul, sans `💻🤖` ni tag) et déposer en urgence :
+      § Messages pour Marie, fond seul, sans `💻🤖` ni tag, une idée par phrase : l'export, puis la
+      consigne de ne plus envoyer de retours en attendant la nouvelle version) et déposer en urgence :
       ```
       python DISCORD/discord_com/gateway.py enqueue --source orchestrateur --to marie \
         --kind question --expect-reply --urgent --file <corps.txt>

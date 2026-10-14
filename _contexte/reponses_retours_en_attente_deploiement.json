@@ -52,5 +52,11 @@
     "screen_code": "E80",
     "body": "E80 : tu peux maintenant changer la durée de la routine pour un seul jour. Appuie sur « Durée » sous la date. Les autres jours gardent la durée habituelle de la routine. Le planning (E12) affiche l'heure de fin avec cette nouvelle durée.",
     "queued_at": "2026-10-13T19:05:23.563213+00:00"
+  },
+  {
+    "report_id": "c755cb11-dfa3-4f79-83e2-30caf611358e",
+    "screen_code": "E122",
+    "body": "E122 : tu peux maintenant envoyer un retour sans image. Écris simplement ton commentaire, la capture est facultative.",
+    "queued_at": "2026-10-13T19:18:06.284598+00:00"
   }
 ]

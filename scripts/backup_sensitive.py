@@ -4,7 +4,7 @@ Complète claude-vibecoding-kit/backup_project.py, qui exclut ces fichiers du ba
 Périmètre : donnees_testeurs/ et les fichiers dont le nom correspond aux motifs sensibles du kit
 (.env, clés, jetons, settings.local.json...). Noms et contenus sont chiffrés côté Drive.
 
-  python scripts/backup_sensitive.py --setup    crée le remote chiffré (saisie masquée des mots de passe)
+  python scripts/backup_sensitive.py --setup    crée le remote chiffré (saisie visible des mots de passe)
   python scripts/backup_sensitive.py --list     affiche les fichiers concernés
   python scripts/backup_sensitive.py --upload   copie (rclone copy, ne supprime rien côté Drive)
   python scripts/backup_sensitive.py --check    compare local et Drive (rclone cryptcheck)
@@ -15,7 +15,6 @@ configuration. Sans ces deux mots de passe, les fichiers du Drive sont irrécup�
 
 import argparse
 import fnmatch
-import getpass
 import json
 import os
 import subprocess
@@ -73,12 +72,12 @@ def setup() -> int:
     if f"{name}:" in rclone("listremotes").stdout.split():
         print(f"Le remote {name}: existe déjà. Rien à faire.")
         return 0
-    password = getpass.getpass("Mot de passe de chiffrement : ")
-    if not password or getpass.getpass("Confirmer : ") != password:
+    password = input("Mot de passe de chiffrement : ")
+    if not password or input("Confirmer : ") != password:
         print("ERREUR : saisies vides ou différentes.")
         return 1
-    salt = getpass.getpass("Second mot de passe (sel), différent du premier : ")
-    if not salt or salt == password or getpass.getpass("Confirmer : ") != salt:
+    salt = input("Second mot de passe (sel), différent du premier : ")
+    if not salt or salt == password or input("Confirmer : ") != salt:
         print("ERREUR : saisies vides, identiques au premier ou différentes.")
         return 1
     result = rclone(

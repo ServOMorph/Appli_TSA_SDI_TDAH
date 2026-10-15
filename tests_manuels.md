@@ -3,9 +3,6 @@
 ## Catégories de profil et âge (ajouté le 2026-10-11)
 Sur un téléphone, `npm run dev -- --host --port 5000 --strictPort`, après suppression des données : à l'onboarding, vérifier que l'écran « Votre profil » affiche les 7 cases (dont HPI) avec un bouton « ? » de définition par case, que « Je ne sais pas » décoche les autres, que « Continuer » reste grisé sans catégorie ni âge valide, et que le clavier numérique s'ouvre sur le champ âge. Ouvrir ensuite Paramètres > Profil : modifier une catégorie et l'âge, enregistrer, quitter puis revenir pour vérifier la persistance. Relire le nouveau bloc « Données de santé et âge » de l'écran de consentement (formulation à valider par l'utilisateur). Cocher « Neurotypique » : les autres catégories se décochent.
 
-## Rattrapage du profil et renouvellement du consentement (ajouté le 2026-10-11)
-Sur un appareil qui a déjà un profil (ancien format) : à l'ouverture, l'écran « Votre profil » apparaît avant l'accueil et reste affiché à chaque ouverture tant qu'il n'est pas rempli. Sur un appareil qui avait accepté le partage avant ce changement (tous les utilisateurs, administrateurs ou non) : l'écran de consentement apparaît une seule fois, avant le profil. Accepter puis rouvrir l'appli : il ne revient pas. Refuser : le partage est retiré (Paramètres > Vie privée) et l'écran ne revient pas non plus. À contrôler aussi sur le serveur de dev sur le port 5000 : tout appareil dont le partage était accepté y déclenche ces écrans dès maintenant.
-
 ## Sauvegarde chiffrée des fichiers sensibles (ajouté le 2026-10-10)
 Lancer dans un terminal, depuis la racine : `python scripts/backup_sensitive.py --setup` (deux mots de passe distincts, à ranger dans un gestionnaire), puis `--upload` et `--check`. Attendu : « Copie chiffrée OK » puis « Contrôle OK » (108 fichiers environ), noms illisibles dans `BackUps/Appli_TSA_SDI_TDAH_chiffre` sur le Drive.
 

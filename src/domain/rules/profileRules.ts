@@ -22,10 +22,14 @@ function sortCategories(categories: NeuroCategory[]): NeuroCategory[] {
 /** Par ordre de priorité : une catégorie exclusive exclut toutes les autres, et inversement. */
 const EXCLUSIVE_CATEGORIES: NeuroCategory[] = ['ne_sais_pas', 'neurotypique']
 
+/** Paires qui s'excluent mutuellement : cocher l'une décoche l'autre. */
+const OPPOSITE_CATEGORY: Partial<Record<NeuroCategory, NeuroCategory>> = { sdi: 'avec_di', avec_di: 'sdi' }
+
 export function toggleNeuroCategory(current: NeuroCategory[], category: NeuroCategory): NeuroCategory[] {
   if (current.includes(category)) return current.filter((c) => c !== category)
   if (EXCLUSIVE_CATEGORIES.includes(category)) return [category]
-  return sortCategories([...current.filter((c) => !EXCLUSIVE_CATEGORIES.includes(c)), category])
+  const opposite = OPPOSITE_CATEGORY[category]
+  return sortCategories([...current.filter((c) => !EXCLUSIVE_CATEGORIES.includes(c) && c !== opposite), category])
 }
 
 export function getNeuroCategoryLabels(categories: NeuroCategory[] | undefined): string[] {

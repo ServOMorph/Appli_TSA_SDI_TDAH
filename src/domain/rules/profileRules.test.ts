@@ -38,6 +38,11 @@ describe('toggleNeuroCategory', () => {
     expect(toggleNeuroCategory(['ne_sais_pas'], 'neurotypique')).toEqual(['neurotypique'])
   })
 
+  it('« SDI » et « Avec DI » se décochent mutuellement', () => {
+    expect(toggleNeuroCategory(['tsa', 'sdi'], 'avec_di')).toEqual(['tsa', 'avec_di'])
+    expect(toggleNeuroCategory(['tsa', 'avec_di'], 'sdi')).toEqual(['tsa', 'sdi'])
+  })
+
   it('décocher « Je ne sais pas » laisse la liste vide', () => {
     expect(toggleNeuroCategory(['ne_sais_pas'], 'ne_sais_pas')).toEqual([])
   })

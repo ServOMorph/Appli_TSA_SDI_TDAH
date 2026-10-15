@@ -120,6 +120,39 @@ describe('E77BudgetLivretDetail', () => {
     expect(deleteBudgetDeposit).toHaveBeenCalledWith('deposit-1')
   })
 
+  it('refuse de supprimer un dépôt dont un retrait dépend, mais accepte le retrait', async () => {
+    const deleteBudgetDeposit = vi.fn().mockResolvedValue(undefined)
+    renderWithApp(<E77BudgetLivretDetail />, renderScreen({
+      budgetAccounts: [makeAccount()],
+      budgetDeposits: [
+        makeDeposit({ date: '2026-01-01' }),
+        makeDeposit({ id: 'deposit-2', amount: -40, date: '2026-01-05', label: 'Retrait' }),
+      ],
+      deleteBudgetDeposit,
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Afficher les mouvements de Livret A' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Supprimer le mouvement du 01/01/2026' }))
+    expect(deleteBudgetDeposit).not.toHaveBeenCalled()
+    expect(screen.getByRole('alert').textContent).toMatch(/Suppression impossible/)
+    await userEvent.click(screen.getByRole('button', { name: 'Supprimer le mouvement du 05/01/2026' }))
+    expect(deleteBudgetDeposit).toHaveBeenCalledWith('deposit-2')
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('désactive l enregistrement d un dépôt abaissé sous les retraits existants', async () => {
+    renderWithApp(<E77BudgetLivretDetail />, renderScreen({
+      budgetAccounts: [makeAccount()],
+      budgetDeposits: [makeDeposit(), makeDeposit({ id: 'deposit-2', amount: -40, label: 'Retrait' })],
+    }))
+    await userEvent.click(screen.getByRole('button', { name: 'Afficher les mouvements de Livret A' }))
+    await userEvent.click(screen.getAllByRole('button', { name: /Modifier le mouvement/ })[0])
+    const dialog = screen.getByRole('dialog', { name: 'Modifier le mouvement' })
+    await userEvent.clear(within(dialog).getByLabelText('Montant'))
+    await userEvent.type(within(dialog).getByLabelText('Montant'), '10')
+    expect(within(dialog).getByRole('button', { name: 'Enregistrer' }).hasAttribute('disabled')).toBe(true)
+    expect(within(dialog).getByText(/rendrait négatif le solde d'une catégorie/)).toBeDefined()
+  })
+
   it('affiche le non classé sous le nom du livret et le solde de chaque catégorie, sans les mouvements', () => {
     renderWithApp(<E77BudgetLivretDetail />, renderScreen({
       budgetAccounts: [makeAccount()],

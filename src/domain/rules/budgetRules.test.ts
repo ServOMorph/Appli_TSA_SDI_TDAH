@@ -8,6 +8,7 @@ import {
   getDepositCategoryBalance,
   getGaugeLevel,
   getGaugeRatio,
+  getLinkedDepositIds,
   getMonComptePrevisions,
   getMonCompteSolde,
   getPeriodBounds,
@@ -18,6 +19,7 @@ import {
   getTotalIncomeEntries,
   getUncategorizedBalance,
   isDateInPeriod,
+  makesBucketNegative,
 } from './budgetRules'
 
 const category = (overrides: Partial<BudgetCategory> = {}): BudgetCategory => ({
@@ -230,6 +232,61 @@ describe('budgetRules', () => {
     it('reste neutre sur un budget nul non consommé', () => {
       expect(getGaugeLevel(0, 0)).toBe('ok')
       expect(getGaugeLevel(5, 0)).toBe('over')
+    })
+  })
+
+  describe('makesBucketNegative et getLinkedDepositIds', () => {
+    const dep = (overrides: Partial<BudgetDeposit>): BudgetDeposit => ({
+      id: 'd',
+      account_id: 'livret-a',
+      amount: 0,
+      date: '2026-10-01',
+      created_at: '2026-10-01T00:00:00.000Z',
+      ...overrides,
+    })
+    const base = [
+      dep({ id: 'a1', category_id: 'A', amount: 100 }),
+      dep({ id: 'a2', category_id: 'A', amount: -60 }),
+      dep({ id: 'u1', amount: 50 }),
+    ]
+
+    it('refuse la suppression d un depot dont des retraits dependent', () => {
+      expect(makesBucketNegative(base, 'livret-a', ['a1'], [])).toBe(true)
+    })
+
+    it('accepte la suppression d un retrait', () => {
+      expect(makesBucketNegative(base, 'livret-a', ['a2'], [])).toBe(false)
+    })
+
+    it('refuse de baisser un depot sous les retraits, ou de le deplacer', () => {
+      expect(makesBucketNegative(base, 'livret-a', ['a1'], [dep({ id: 'a1', category_id: 'A', amount: 10 })])).toBe(true)
+      expect(makesBucketNegative(base, 'livret-a', ['a1'], [dep({ id: 'a1', category_id: 'B', amount: 100 })])).toBe(true)
+    })
+
+    it('refuse un retrait ou un virement depassant le solde de la categorie', () => {
+      expect(makesBucketNegative(base, 'livret-a', [], [dep({ id: 'n', category_id: 'A', amount: -41 })])).toBe(true)
+      expect(makesBucketNegative(base, 'livret-a', [], [dep({ id: 'n', category_id: 'A', amount: -40 })])).toBe(false)
+    })
+
+    it('ne bloque pas un changement qui n aggrave pas un solde deja negatif', () => {
+      const legacy = [dep({ id: 'x1', category_id: 'A', amount: -20 })]
+      expect(makesBucketNegative(legacy, 'livret-a', [], [dep({ id: 'n', category_id: 'A', amount: 5 })])).toBe(false)
+      expect(makesBucketNegative(legacy, 'livret-a', [], [dep({ id: 'n', category_id: 'A', amount: -5 })])).toBe(true)
+    })
+
+    it('ignore les mouvements des autres livrets', () => {
+      const other = [...base, dep({ id: 'o1', account_id: 'livret-b', category_id: 'A', amount: -500 })]
+      expect(makesBucketNegative(other, 'livret-a', [], [dep({ id: 'n', category_id: 'A', amount: -40 })])).toBe(false)
+    })
+
+    it('retrouve les deux jambes d un virement', () => {
+      const transfer = [
+        dep({ id: 't1', category_id: 'A', amount: -10, transfer_id: 'T' }),
+        dep({ id: 't2', amount: 10, transfer_id: 'T' }),
+        dep({ id: 'z', amount: 1 }),
+      ]
+      expect(getLinkedDepositIds(transfer, transfer[0]).sort()).toEqual(['t1', 't2'])
+      expect(getLinkedDepositIds(transfer, transfer[2])).toEqual(['z'])
     })
   })
 })

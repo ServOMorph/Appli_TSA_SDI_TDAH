@@ -15,7 +15,7 @@ import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetDepositCategory } from '@/domain/entities/budgetDepositCategory'
 import type { BudgetEntry } from '@/domain/entities/budgetEntry'
 import type { BudgetIncomeEntry } from '@/domain/entities/budgetIncomeEntry'
-import { getPeriodBounds } from '@/domain/rules/budgetRules'
+import { getLinkedDepositIds, getPeriodBounds, makesBucketNegative } from '@/domain/rules/budgetRules'
 
 export function useBudgetState() {
   const [budgetCategories, setBudgetCategories] = useState<BudgetCategory[]>([])
@@ -225,6 +225,7 @@ export function useBudgetState() {
       date,
       created_at: new Date().toISOString(),
     }
+    if (makesBucketNegative(await budgetDepositRepo.getAll(), accountId, [], [deposit])) return
     await budgetDepositRepo.create(deposit)
     setBudgetDeposits(await budgetDepositRepo.getAll())
   }
@@ -240,6 +241,7 @@ export function useBudgetState() {
       date: date ?? deposit.date,
       category_id: categoryId || undefined,
     }
+    if (makesBucketNegative(await budgetDepositRepo.getAll(), deposit.account_id, [id], [updated])) return
     await budgetDepositRepo.update(updated)
     setBudgetDeposits((previous) => previous.map((item) => (item.id === id ? updated : item)))
   }
@@ -284,17 +286,17 @@ export function useBudgetState() {
       transfer_id: transferId,
       created_at: createdAt,
     }
+    if (makesBucketNegative(await budgetDepositRepo.getAll(), accountId, [], [outgoing, incoming])) return
     await budgetDepositRepo.createMany([outgoing, incoming])
     setBudgetDeposits(await budgetDepositRepo.getAll())
   }
 
   async function deleteBudgetDeposit(id: string) {
-    const deposit = await budgetDepositRepo.getById(id)
-    const ids = deposit?.transfer_id
-      ? (await budgetDepositRepo.getByAccountId(deposit.account_id))
-          .filter((item) => item.transfer_id === deposit.transfer_id)
-          .map((item) => item.id)
-      : [id]
+    const all = await budgetDepositRepo.getAll()
+    const deposit = all.find((item) => item.id === id)
+    if (!deposit) return
+    const ids = getLinkedDepositIds(all, deposit)
+    if (makesBucketNegative(all, deposit.account_id, ids, [])) return
     await budgetDepositRepo.deleteMany(ids)
     setBudgetDeposits(await budgetDepositRepo.getAll())
   }

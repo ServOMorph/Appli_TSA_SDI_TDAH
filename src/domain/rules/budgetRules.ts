@@ -142,6 +142,46 @@ export function getDepositCategoryBalance(deposits: BudgetDeposit[], categoryId:
     .reduce((total, deposit) => total + deposit.amount, 0)
 }
 
+/** Identifiants du mouvement et, s'il fait partie d'un virement, de l'autre jambe. */
+export function getLinkedDepositIds(deposits: BudgetDeposit[], deposit: BudgetDeposit): string[] {
+  if (!deposit.transfer_id) return [deposit.id]
+  return deposits.filter((item) => item.transfer_id === deposit.transfer_id).map((item) => item.id)
+}
+
+function bucketBalances(deposits: BudgetDeposit[], accountId: string): Map<string, number> {
+  const balances = new Map<string, number>()
+  for (const deposit of deposits) {
+    if (deposit.account_id !== accountId) continue
+    const key = deposit.category_id ?? ''
+    balances.set(key, (balances.get(key) ?? 0) + deposit.amount)
+  }
+  return balances
+}
+
+/**
+ * Vrai si retirer `removedIds` et ajouter `added` fait descendre sous zéro le solde d'une
+ * catégorie du livret (ou du non classé) en l'aggravant. Un solde déjà négatif avant le
+ * changement ne bloque pas un changement qui ne l'aggrave pas.
+ */
+export function makesBucketNegative(
+  deposits: BudgetDeposit[],
+  accountId: string,
+  removedIds: string[],
+  added: BudgetDeposit[],
+): boolean {
+  const before = bucketBalances(deposits, accountId)
+  const removed = new Set(removedIds)
+  const after = bucketBalances(
+    [...deposits.filter((deposit) => !removed.has(deposit.id)), ...added],
+    accountId,
+  )
+  for (const [key, balance] of after) {
+    const previous = before.get(key) ?? 0
+    if (balance < -0.005 && balance < previous - 0.005) return true
+  }
+  return false
+}
+
 /** Somme des mouvements d'un livret qui ne sont rattachés à aucune sous-catégorie. */
 export function getUncategorizedBalance(deposits: BudgetDeposit[], accountId: string): number {
   return deposits

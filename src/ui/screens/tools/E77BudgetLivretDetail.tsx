@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useApp } from '@/app/AppContext'
 import { todayDate } from '@/app/repositories'
 import { formatFrenchDate } from '@/domain/rules/planningSlotRules'
-import { getAccountBalance, getDepositCategoryBalance, getUncategorizedBalance } from '@/domain/rules/budgetRules'
+import { getAccountBalance, getDepositCategoryBalance, getLinkedDepositIds, getUncategorizedBalance, makesBucketNegative } from '@/domain/rules/budgetRules'
 import type { BudgetDeposit } from '@/domain/entities/budgetDeposit'
 import type { BudgetDepositCategory } from '@/domain/entities/budgetDepositCategory'
 import { Button } from '@/ui/components/Button'
@@ -66,6 +66,8 @@ export function E77BudgetLivretDetail() {
   const [categoryRenameValue, setCategoryRenameValue] = useState('')
   const [deletingCategory, setDeletingCategory] = useState<BudgetDepositCategory | null>(null)
   const [openBucket, setOpenBucket] = useState<string | null>(null)
+  const [movementError, setMovementError] = useState<string | null>(null)
+  const submitting = useRef(false)
 
   if (!account) {
     return (
@@ -108,40 +110,70 @@ export function E77BudgetLivretDetail() {
     return Number.isFinite(amount) && amount > bucketBalance(form.source) ? 'insufficient' : null
   }
 
+  function breaksBucket(form: MovementFormState, excludeDepositId?: string): boolean {
+    if (!account) return false
+    const amount = parsedAmount(form)
+    if (!Number.isFinite(amount)) return false
+    const categoryId = form.categoryId || undefined
+    const base = { account_id: account.id, date: form.date, created_at: '' }
+    const added: BudgetDeposit[] = isInternalTransfer(form)
+      ? [
+          { ...base, id: 'new-out', amount: -amount, category_id: form.source === UNCATEGORIZED ? undefined : form.source },
+          { ...base, id: 'new-in', amount, category_id: categoryId },
+        ]
+      : [{ ...base, id: 'new', amount: form.kind === 'withdrawal' ? -amount : amount, category_id: categoryId }]
+    return makesBucketNegative(deposits, account.id, excludeDepositId ? [excludeDepositId] : [], added)
+  }
+
   function canSubmit(form: MovementFormState, excludeDepositId?: string): boolean {
     const amount = parsedAmount(form)
     if (!Number.isFinite(amount) || amount <= 0) return false
     if (transferProblem(form)) return false
-    if (form.kind !== 'withdrawal') return true
-    const remaining = deposits.filter((deposit) => deposit.id !== excludeDepositId)
-    const currentBalance = remaining.reduce((total, deposit) => total + deposit.amount, 0)
-    if (amount > currentBalance) return false
-    const bucket = form.categoryId || UNCATEGORIZED
-    const bucketBalanceValue = remaining
-      .filter((deposit) => (deposit.category_id || UNCATEGORIZED) === bucket)
-      .reduce((total, deposit) => total + deposit.amount, 0)
-    return amount <= bucketBalanceValue
+    return !breaksBucket(form, excludeDepositId)
+  }
+
+  function showsBucketError(form: MovementFormState, excludeDepositId?: string): boolean {
+    return parsedAmount(form) > 0 && !transferProblem(form) && breaksBucket(form, excludeDepositId)
   }
 
   async function handleAddSubmit() {
-    if (!account || !canSubmit(addForm)) return
-    const amount = parsedAmount(addForm)
-    if (isInternalTransfer(addForm)) {
-      const fromCategoryId = addForm.source === UNCATEGORIZED ? undefined : addForm.source
-      await transferBudgetDeposit(account.id, amount, fromCategoryId, addForm.categoryId || undefined, addForm.label, addForm.date)
-    } else {
-      const signedAmount = addForm.kind === 'withdrawal' ? -amount : amount
-      await createBudgetDeposit(account.id, signedAmount, addForm.label, addForm.date, addForm.categoryId || undefined)
+    if (!account || submitting.current || !canSubmit(addForm)) return
+    submitting.current = true
+    try {
+      const amount = parsedAmount(addForm)
+      if (isInternalTransfer(addForm)) {
+        const fromCategoryId = addForm.source === UNCATEGORIZED ? undefined : addForm.source
+        await transferBudgetDeposit(account.id, amount, fromCategoryId, addForm.categoryId || undefined, addForm.label, addForm.date)
+      } else {
+        const signedAmount = addForm.kind === 'withdrawal' ? -amount : amount
+        await createBudgetDeposit(account.id, signedAmount, addForm.label, addForm.date, addForm.categoryId || undefined)
+      }
+      setShowAddForm(false)
+    } finally {
+      submitting.current = false
     }
-    setShowAddForm(false)
   }
 
   async function handleEditSubmit() {
-    if (!editingDeposit || !canSubmit(editForm, editingDeposit.id)) return
-    const amount = parsedAmount(editForm)
-    const signedAmount = editForm.kind === 'withdrawal' ? -amount : amount
-    await updateBudgetDeposit(editingDeposit.id, signedAmount, editForm.label, editForm.date, editForm.categoryId || undefined)
-    setEditingDeposit(null)
+    if (!editingDeposit || submitting.current || !canSubmit(editForm, editingDeposit.id)) return
+    submitting.current = true
+    try {
+      const amount = parsedAmount(editForm)
+      const signedAmount = editForm.kind === 'withdrawal' ? -amount : amount
+      await updateBudgetDeposit(editingDeposit.id, signedAmount, editForm.label, editForm.date, editForm.categoryId || undefined)
+      setEditingDeposit(null)
+    } finally {
+      submitting.current = false
+    }
+  }
+
+  async function handleDeleteDeposit(deposit: BudgetDeposit) {
+    if (makesBucketNegative(deposits, deposit.account_id, getLinkedDepositIds(deposits, deposit), [])) {
+      setMovementError("Suppression impossible : le solde d'une catégorie deviendrait négatif. Supprimez d'abord les retraits qui en dépendent.")
+      return
+    }
+    setMovementError(null)
+    await deleteBudgetDeposit(deposit.id)
   }
 
   async function handleCreateCategory() {
@@ -191,7 +223,7 @@ export function E77BudgetLivretDetail() {
               )}
               <button
                 aria-label={`Supprimer le mouvement du ${formatFrenchDate(deposit.date)}`}
-                onClick={() => deleteBudgetDeposit(deposit.id)}
+                onClick={() => handleDeleteDeposit(deposit)}
                 style={dangerLinkStyle}
               >
                 Supprimer
@@ -209,7 +241,7 @@ export function E77BudgetLivretDetail() {
       <button
         aria-expanded={isOpen}
         aria-label={`${isOpen ? 'Masquer' : 'Afficher'} les mouvements de ${name}`}
-        onClick={() => setOpenBucket(isOpen ? null : bucket)}
+        onClick={() => { setMovementError(null); setOpenBucket(isOpen ? null : bucket) }}
         style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--spacing-sm)', width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: 'var(--color-text)', font: 'inherit', textAlign: 'left' }}
       >
         <span>{name}</span>
@@ -222,7 +254,14 @@ export function E77BudgetLivretDetail() {
     if (items.length === 0) {
       return <p style={{ margin: 'var(--spacing-sm) 0 0', color: 'var(--color-text-muted)' }}>Aucun mouvement.</p>
     }
-    return <div style={{ marginTop: 'var(--spacing-sm)' }}>{renderMovementList(items)}</div>
+    return (
+      <div style={{ marginTop: 'var(--spacing-sm)' }}>
+        {movementError && (
+          <p role="alert" style={{ margin: '0 0 var(--spacing-sm)', color: 'var(--color-error)', fontSize: '0.875rem' }}>{movementError}</p>
+        )}
+        {renderMovementList(items)}
+      </div>
+    )
   }
 
   return (
@@ -275,8 +314,8 @@ export function E77BudgetLivretDetail() {
             </select>
             <label htmlFor="livret-add-amount">Montant</label>
             <input id="livret-add-amount" type="text" inputMode="decimal" autoFocus value={addForm.amount} onChange={(event) => setAddForm({ ...addForm, amount: event.target.value })} style={inputStyle} />
-            {addForm.kind === 'withdrawal' && !canSubmit(addForm) && parsedAmount(addForm) > 0 && (
-              <p style={{ margin: 0, color: 'var(--color-error)', fontSize: '0.8125rem' }}>Le retrait dépasse le solde du livret ({formatEuro(balance)}).</p>
+            {showsBucketError(addForm) && (
+              <p style={{ margin: 0, color: 'var(--color-error)', fontSize: '0.8125rem' }}>Ce mouvement rendrait négatif le solde d'une catégorie.</p>
             )}
             <label htmlFor="livret-add-label">Motif</label>
             <input id="livret-add-label" value={addForm.label} onChange={(event) => setAddForm({ ...addForm, label: event.target.value })} style={inputStyle} />
@@ -328,8 +367,8 @@ export function E77BudgetLivretDetail() {
             </select>
             <label htmlFor="livret-edit-amount">Montant</label>
             <input id="livret-edit-amount" type="text" inputMode="decimal" autoFocus value={editForm.amount} onChange={(event) => setEditForm({ ...editForm, amount: event.target.value })} style={inputStyle} />
-            {editForm.kind === 'withdrawal' && !canSubmit(editForm, editingDeposit.id) && parsedAmount(editForm) > 0 && (
-              <p style={{ margin: 0, color: 'var(--color-error)', fontSize: '0.8125rem' }}>Le retrait dépasse le solde du livret ({formatEuro(balance)}).</p>
+            {showsBucketError(editForm, editingDeposit.id) && (
+              <p style={{ margin: 0, color: 'var(--color-error)', fontSize: '0.8125rem' }}>Ce mouvement rendrait négatif le solde d'une catégorie.</p>
             )}
             <label htmlFor="livret-edit-label">Motif</label>
             <input id="livret-edit-label" value={editForm.label} onChange={(event) => setEditForm({ ...editForm, label: event.target.value })} style={inputStyle} />

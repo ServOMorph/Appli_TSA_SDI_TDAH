@@ -1391,3 +1391,22 @@ _Suite :_ déposée d'abord en circuit normal (`20261014T095010_706677`, renvoy�
 **Marie -> (transmis par l'utilisateur, 2026-10-14)**
 Fait, et oui.
 _Suite :_ « fait » répond à l'alerte export de l'étape 0.1 de `/deploy` (demande `20261014T094820_664675`) ; « oui » répond à la question sur la réorganisation de ses séries de tâches et de ses routines (demande `20261014T095103_925842`). Les pertes du snapshot du 2026-10-14 sont donc attribuées à ses actions ; l'utilisateur demande de continuer `/deploy`. Confirmation d'export de l'étape 4ter donnée par l'utilisateur.
+
+### 2026-10-17 (livraison v6.12)
+**Dév ->**
+Version 6.12 en ligne.
+
+https://appli-audhd.netlify.app
+
+Détail des changements : bouton « Nouveautés » dans l'application.
+
+Livré : catégories et âge dans le profil, dossiers dans un dossier, liste sans catégorie, durée de routine pour un seul jour, sous-tâches dans les étapes de routine, choix « cette occurrence » ou « toutes » pour une sous-étape récurrente, retour sans image, planning de la semaine qui défile, bandeau des jours, rubrique « Couleur des outils » retirée.
+
+À l'ouverture, l'appli te redemande ton accord pour le partage de tes données. Tu peux refuser seulement les données de santé.
+
+À tester dans le livret : un dépôt avec provenance. Une suppression ou un retrait qui rendrait une catégorie négative est maintenant refusé.
+À tester sur une tâche avec dépense : la cocher, enregistrer la dépense, puis essayer « Terminer sans dépense ».
+La fenêtre de dépense s'ouvre seulement depuis l'Accueil.
+
+Question : les autres livrets sont-ils aussi des provenances possibles d'un dépôt ?
+_Suite :_ message de l'étape 11 de `/deploy` v6.12, validé par l'utilisateur, déposé en gateway le 2026-10-17 (demande `20261017T112252_674642`, `--kind delivery --expect-reply`). Reprend la question des livrets restée sans réponse depuis la livraison v6.11.

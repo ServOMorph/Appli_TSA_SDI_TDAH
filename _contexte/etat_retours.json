@@ -16,53 +16,5 @@
     "ref": "Mon compte : supprimer = masquer (A) ou effacer le budget (B) ?",
     "note": "",
     "updated_at": "2026-10-13T16:40:39.208742+00:00"
-  },
-  "b5087222-f587-4a21-a17c-32e1ef22cc3f": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12 Phase 1 bis (reponse en file)",
-    "note": "",
-    "updated_at": "2026-10-13T17:41:58.569983+00:00"
-  },
-  "bac22741-b27c-4c74-8bff-dfff2234d993": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12 Phase 1 bis (reponse en file)",
-    "note": "",
-    "updated_at": "2026-10-13T17:41:58.662900+00:00"
-  },
-  "951ce1c6-85fb-45da-87f1-805e6b55ff1e": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12 Phase 1 ter",
-    "note": "",
-    "updated_at": "2026-10-13T17:50:46.508456+00:00"
-  },
-  "80dcd005-a42e-45c7-aadd-66c5a703164b": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12.md Phase 1 quater (option B en attente de Marie)",
-    "note": "",
-    "updated_at": "2026-10-13T17:57:09.249749+00:00"
-  },
-  "b8f42e4e-7020-4498-85ed-7c04dc4dc53d": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12.md Phase 2",
-    "note": "",
-    "updated_at": "2026-10-13T18:16:14.587730+00:00"
-  },
-  "5cd28d81-6f0b-432a-98db-6f9ad53f4397": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12.md Phase 3",
-    "note": "",
-    "updated_at": "2026-10-13T18:22:10.489202+00:00"
-  },
-  "979d0ddd-56b0-4e1e-b446-44d99e40009b": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12.md Phase 4",
-    "note": "",
-    "updated_at": "2026-10-13T19:05:23.671596+00:00"
-  },
-  "c755cb11-dfa3-4f79-83e2-30caf611358e": {
-    "statut": "en_roadmap",
-    "ref": "roadmap_retours_2026-10-12.md Phase 5",
-    "note": "",
-    "updated_at": "2026-10-13T19:18:06.378001+00:00"
   }
 }

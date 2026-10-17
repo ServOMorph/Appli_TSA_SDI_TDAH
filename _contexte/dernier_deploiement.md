@@ -2,7 +2,7 @@
 
 Mis à jour automatiquement par `/deploy` (étape 7). Ne pas éditer manuellement.
 
-- Version : v6.11
-- Date : 2026-10-10
+- Version : v6.12
+- Date : 2026-10-17
 - URL de production : https://appli-audhd.netlify.app
-- Commit : 77cecad1c0cfd34f133dcf18af1f1dfa380dda8b
+- Commit : f0c164224cd5211a37764d9c464ad6efb2466543

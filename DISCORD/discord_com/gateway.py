@@ -538,11 +538,11 @@ def curate(to: str, kind: str, body: str) -> str:
         text = f"<@{MARIE_USER_ID}>\n\n{body}"
     elif _testeur_code(to):
         # Garde-fou de visibilité asymétrique : un message destiné à un testeur ne doit
-        # jamais porter les emojis 💻🤖 ni la mention de Marie (Décision 5). Le gardien
+        # jamais porter le cadre FRAME ni la mention de Marie (Décision 5). Le gardien
         # bounce plutôt que de laisser fuir l'avis de Marie sur un canal testeur.
         if FRAME in body or f"<@{MARIE_USER_ID}>" in body:
             raise GatewayError(
-                "message testeur contient les emojis 💻🤖 ou la mention de Marie — "
+                "message testeur contient le cadre FRAME ou la mention de Marie — "
                 "fuite de visibilité asymétrique (decisions_dispositif.md Décision 5)")
         text = body
     else:

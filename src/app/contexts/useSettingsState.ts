@@ -7,6 +7,7 @@ import {
   getSyncConsentVersion,
   grantSyncConsent,
   isSyncConsentGranted,
+  CURRENT_CONSENT_VERSION,
   LEGACY_CONSENT_VERSION,
   revokeSyncConsent,
 } from '@/data/sync/syncConsent'
@@ -90,6 +91,19 @@ function assertReferences(name: string, items: object[], field: string, ids: Set
     return typeof value === 'string' && !(allowEmpty && value === '') && !ids.has(value)
   })) {
     throw new Error(`Fichier invalide : référence ${name} orpheline.`)
+  }
+}
+
+function assertNoFolderCycle(folders: { id: string; parent_id?: string | null }[]) {
+  const parentOf = new Map(folders.map((folder) => [folder.id, folder.parent_id ?? null]))
+  for (const folder of folders) {
+    const seen = new Set<string>()
+    let current: string | null = folder.id
+    while (current) {
+      if (seen.has(current)) throw new Error('Fichier invalide : dossiers en boucle.')
+      seen.add(current)
+      current = parentOf.get(current) ?? null
+    }
   }
 }
 
@@ -319,6 +333,7 @@ export function useSettingsState() {
       const folderIds = new Set(folders.map((item) => item.id))
       assertReferences('tâche parente', tasks, 'parent_id', new Set([...taskIds, ...routineStepIds]))
       assertReferences('dossier parent', folders, 'parent_id', folderIds)
+      assertNoFolderCycle(folders)
       assertReferences('récurrence de tâche', tasks, 'recurrence_id', recurrenceIds)
       assertReferences('récurrence', taskExceptions, 'recurrence_id', recurrenceIds)
       assertReferences('liste', rawListItems, 'list_id', listIds)
@@ -451,7 +466,11 @@ export function useSettingsState() {
 
     if (importedIdentity) setDeviceIdentity(importedIdentity.deviceId, importedIdentity.deviceSecret)
     if (data.sync_consent_granted === true) {
-      grantSyncConsent(typeof data.sync_consent_version === 'number' ? data.sync_consent_version : LEGACY_CONSENT_VERSION)
+      grantSyncConsent(
+        Number.isInteger(data.sync_consent_version) && (data.sync_consent_version as number) >= LEGACY_CONSENT_VERSION
+          ? Math.min(data.sync_consent_version as number, CURRENT_CONSENT_VERSION)
+          : LEGACY_CONSENT_VERSION,
+      )
     }
     if (data.sync_consent_granted === false) revokeSyncConsent()
 

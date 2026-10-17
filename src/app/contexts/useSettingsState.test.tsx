@@ -152,6 +152,12 @@ function SettingsPanel() {
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, folders: [{ id: 'dossier-1', parent_id: 'inconnu' }] })}>
         Importer dossier orphelin
       </button>
+      <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, folders: [{ id: 'a', parent_id: 'b' }, { id: 'b', parent_id: 'a' }] })}>
+        Importer dossiers en boucle
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u-version', profile_type: 'student' }, sync_consent_granted: true, sync_consent_version: 99 })}>
+        Importer consentement version excessive
+      </button>
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, routine_steps: [{ id: 'step-orphelin', routine_id: 'inconnue' }] })}>
         Importer étape de routine orpheline
       </button>
@@ -298,6 +304,7 @@ describe('useSettingsState — export/import', () => {
       ['Importer référence orpheline', 'référence tâche parente orpheline'],
       ['Importer version future', 'version d’export plus récente'],
       ['Importer dossier orphelin', 'référence dossier parent orpheline'],
+      ['Importer dossiers en boucle', 'dossiers en boucle'],
       ['Importer étape de routine orpheline', 'référence routine orpheline'],
       ['Importer complétion de routine orpheline', 'référence routine orpheline'],
     ] as const
@@ -562,6 +569,15 @@ describe('useSettingsState — export/import', () => {
     })
     await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
     expect(isSyncConsentCurrent()).toBe(true)
+  })
+
+  it('plafonne la version du consentement importée à la version courante', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer consentement version excessive' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(localStorage.getItem('sync_consent_version')).toBe(String(CURRENT_CONSENT_VERSION))
   })
 
   it('conserve l’identité d’appareil actuelle quand l’export ne la contient pas', async () => {

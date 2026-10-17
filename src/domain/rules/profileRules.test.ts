@@ -71,6 +71,10 @@ describe('parseAge', () => {
 })
 
 describe('sanitizeNeuroCategories', () => {
+  it('ne garde pas SDI et Avec DI ensemble', () => {
+    expect(sanitizeNeuroCategories(['avec_di', 'tsa', 'sdi'])).toEqual(['tsa', 'sdi'])
+  })
+
   it('ignore les valeurs inconnues et les doublons', () => {
     expect(sanitizeNeuroCategories(['tdah', 'x', 'tdah', 'tsa'])).toEqual(['tsa', 'tdah'])
   })

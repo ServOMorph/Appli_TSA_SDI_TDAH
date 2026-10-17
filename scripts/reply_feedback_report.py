@@ -201,6 +201,9 @@ def main() -> int:
         if bool(args.report_id) != (body is not None):
             print("ERREUR: --report-id et --body (ou --body-file) doivent etre fournis ensemble.", file=sys.stderr)
             return 1
+        if args.report_id and not body.strip():
+            print("ERREUR: la reponse ne peut pas etre vide.", file=sys.stderr)
+            return 1
         url, service_key = read_credentials()
         if args.report_id:
             message = deposit_reply(url, service_key, args.report_id, body)

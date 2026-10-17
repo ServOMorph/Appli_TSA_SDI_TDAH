@@ -20,7 +20,7 @@ import sys
 from datetime import datetime, timezone
 
 from _supabase import SupabaseError, read_credentials
-from feedback_state import clear_state
+from feedback_state import FeedbackStateError, clear_state
 from reply_feedback_report import find_report, read_body, read_queue, write_queue
 
 
@@ -42,7 +42,10 @@ def queue_reply(report_id: str, screen_code: str, body: str, replace: bool = Fal
         "queued_at": datetime.now(timezone.utc).isoformat(),
     })
     write_queue(entries)
-    clear_state(report_id)
+    try:
+        clear_state(report_id)
+    except FeedbackStateError as e:
+        print(f"AVERTISSEMENT: reponse mise en attente, mais l'etat n'a pas ete retire : {e}", file=sys.stderr)
 
 
 def remove_reply(report_id: str) -> None:

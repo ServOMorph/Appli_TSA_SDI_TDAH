@@ -1,5 +1,5 @@
 import { isSyncEnabled } from '@/data/sync/syncConfig'
-import { isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { callRpc } from '@/data/sync/rpc'
 import { getDeviceIdentity } from '@/data/sync/deviceIdentity'
 import { buildSnapshotPayload, SNAPSHOT_SCHEMA_VERSION } from '@/data/sync/buildSnapshot'
@@ -38,8 +38,15 @@ export async function syncNow(options: { force?: boolean } = {}): Promise<boolea
   localStorage.setItem(LAST_ATTEMPT_KEY, String(now()))
 
   try {
-    const payload = await buildSnapshotPayload()
-    if (!payload) return false
+    const snapshot = await buildSnapshotPayload()
+    if (!snapshot) return false
+
+    // Categories de sante et age : envoyes uniquement avec un consentement sur le texte actuel.
+    let payload = snapshot
+    if (!isSyncConsentCurrent()) {
+      const { neuro_categories: _neuroCategories, age: _age, ...user } = snapshot.user
+      payload = { ...snapshot, user }
+    }
 
     const { deviceId, deviceSecret } = getDeviceIdentity()
     const { data, error } = await callRpc<boolean>('sync_device_snapshot', {

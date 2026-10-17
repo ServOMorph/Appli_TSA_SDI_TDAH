@@ -13,6 +13,8 @@ type MovementKind = 'deposit' | 'withdrawal'
 
 const SOURCE_TOTAL = 'total'
 const UNCATEGORIZED = 'uncategorized'
+const MOVEMENT_REFUSED_MESSAGE = "Mouvement refusé : le solde d'une catégorie deviendrait négatif. Les données ont changé, vérifiez les soldes."
+const DELETE_REFUSED_MESSAGE = "Suppression impossible : le solde d'une catégorie deviendrait négatif. Supprimez d'abord les retraits qui en dépendent."
 
 interface MovementFormState {
   kind: MovementKind
@@ -141,13 +143,19 @@ export function E77BudgetLivretDetail() {
     submitting.current = true
     try {
       const amount = parsedAmount(addForm)
+      let applied: boolean | void
       if (isInternalTransfer(addForm)) {
         const fromCategoryId = addForm.source === UNCATEGORIZED ? undefined : addForm.source
-        await transferBudgetDeposit(account.id, amount, fromCategoryId, addForm.categoryId || undefined, addForm.label, addForm.date)
+        applied = await transferBudgetDeposit(account.id, amount, fromCategoryId, addForm.categoryId || undefined, addForm.label, addForm.date)
       } else {
         const signedAmount = addForm.kind === 'withdrawal' ? -amount : amount
-        await createBudgetDeposit(account.id, signedAmount, addForm.label, addForm.date, addForm.categoryId || undefined)
+        applied = await createBudgetDeposit(account.id, signedAmount, addForm.label, addForm.date, addForm.categoryId || undefined)
       }
+      if (applied === false) {
+        setMovementError(MOVEMENT_REFUSED_MESSAGE)
+        return
+      }
+      setMovementError(null)
       setShowAddForm(false)
     } finally {
       submitting.current = false
@@ -160,7 +168,12 @@ export function E77BudgetLivretDetail() {
     try {
       const amount = parsedAmount(editForm)
       const signedAmount = editForm.kind === 'withdrawal' ? -amount : amount
-      await updateBudgetDeposit(editingDeposit.id, signedAmount, editForm.label, editForm.date, editForm.categoryId || undefined)
+      const applied = await updateBudgetDeposit(editingDeposit.id, signedAmount, editForm.label, editForm.date, editForm.categoryId || undefined)
+      if (applied === false) {
+        setMovementError(MOVEMENT_REFUSED_MESSAGE)
+        return
+      }
+      setMovementError(null)
       setEditingDeposit(null)
     } finally {
       submitting.current = false
@@ -169,11 +182,11 @@ export function E77BudgetLivretDetail() {
 
   async function handleDeleteDeposit(deposit: BudgetDeposit) {
     if (makesBucketNegative(deposits, deposit.account_id, getLinkedDepositIds(deposits, deposit), [])) {
-      setMovementError("Suppression impossible : le solde d'une catégorie deviendrait négatif. Supprimez d'abord les retraits qui en dépendent.")
+      setMovementError(DELETE_REFUSED_MESSAGE)
       return
     }
-    setMovementError(null)
-    await deleteBudgetDeposit(deposit.id)
+    const applied = await deleteBudgetDeposit(deposit.id)
+    setMovementError(applied === false ? DELETE_REFUSED_MESSAGE : null)
   }
 
   async function handleCreateCategory() {

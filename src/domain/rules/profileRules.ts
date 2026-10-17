@@ -49,7 +49,11 @@ export function sanitizeNeuroCategories(value: unknown): NeuroCategory[] | undef
   if (!Array.isArray(value)) return undefined
   const known = CATEGORY_ORDER.filter((category) => value.includes(category))
   const exclusive = EXCLUSIVE_CATEGORIES.find((category) => known.includes(category))
-  return exclusive ? [exclusive] : known
+  if (exclusive) return [exclusive]
+  return known.filter((category, index) => {
+    const opposite = OPPOSITE_CATEGORY[category]
+    return !opposite || known.indexOf(opposite) < 0 || known.indexOf(opposite) > index
+  })
 }
 
 export function sanitizeAge(value: unknown): number | undefined {

@@ -468,6 +468,15 @@ grant execute on function close_feedback_report_v2(uuid, text, uuid, timestamptz
 alter table feedback_reports alter column storage_path drop not null;
 alter table feedback_reports alter column image_bytes drop not null;
 
+-- Garde de dernier recours, valable aussi pour l'ancienne RPC submit_feedback (qui ne controle pas
+-- un chemin nul) : sans image, le commentaire ne peut pas etre vide, et chemin et taille vont de pair.
+alter table feedback_reports drop constraint if exists feedback_reports_image_or_comment;
+alter table feedback_reports add constraint feedback_reports_image_or_comment
+  check (storage_path is not null or char_length(btrim(comment)) > 0);
+alter table feedback_reports drop constraint if exists feedback_reports_image_pair;
+alter table feedback_reports add constraint feedback_reports_image_pair
+  check ((storage_path is null) = (image_bytes is null));
+
 create or replace function submit_feedback_v2(
   p_id uuid,
   p_device_id uuid,
@@ -511,7 +520,9 @@ begin
     return 'invalid';
   end if;
 
-  if p_storage_path is null and char_length(btrim(p_comment)) = 0 then
+  if p_comment is null
+     or p_screen_code is null
+     or (p_storage_path is null and char_length(btrim(p_comment)) = 0) then
     return 'invalid';
   end if;
 

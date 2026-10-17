@@ -5,6 +5,7 @@ vi.mock('@/data/sync/syncConfig', () => ({
 }))
 vi.mock('@/data/sync/syncConsent', () => ({
   isSyncConsentGranted: vi.fn(),
+  isSyncConsentCurrent: vi.fn(),
 }))
 vi.mock('@/data/sync/rpc', () => ({
   callRpc: vi.fn(),
@@ -18,13 +19,14 @@ vi.mock('@/data/sync/buildSnapshot', () => ({
 }))
 
 import { isSyncEnabled } from '@/data/sync/syncConfig'
-import { isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { callRpc } from '@/data/sync/rpc'
 import { buildSnapshotPayload } from '@/data/sync/buildSnapshot'
 import { getLastSyncSuccessAt, syncNow } from './syncClient'
 
 const isSyncEnabledMock = vi.mocked(isSyncEnabled)
 const isSyncConsentGrantedMock = vi.mocked(isSyncConsentGranted)
+const isSyncConsentCurrentMock = vi.mocked(isSyncConsentCurrent)
 const callRpcMock = vi.mocked(callRpc)
 const buildSnapshotPayloadMock = vi.mocked(buildSnapshotPayload)
 
@@ -34,6 +36,8 @@ beforeEach(() => {
   isSyncEnabledMock.mockReset()
   isSyncConsentGrantedMock.mockReset()
   isSyncConsentGrantedMock.mockReturnValue(true)
+  isSyncConsentCurrentMock.mockReset()
+  isSyncConsentCurrentMock.mockReturnValue(true)
   buildSnapshotPayloadMock.mockClear()
 })
 
@@ -87,6 +91,37 @@ describe('syncNow', () => {
       p_app_version: __APP_DEV_VERSION__,
     })
     expect(getLastSyncSuccessAt()).not.toBeNull()
+  })
+
+  it('retire les catégories de santé et l’âge si le consentement est ancien', async () => {
+    isSyncEnabledMock.mockReturnValue(true)
+    isSyncConsentCurrentMock.mockReturnValue(false)
+    callRpcMock.mockResolvedValue({ data: true, error: null })
+    buildSnapshotPayloadMock.mockResolvedValueOnce({
+      version: '3.3',
+      user: { id: 'user-1', neuro_categories: ['tsa'], age: 30 },
+    } as never)
+
+    await syncNow()
+
+    expect(callRpcMock).toHaveBeenCalledWith(
+      'sync_device_snapshot',
+      expect.objectContaining({ p_payload: { version: '3.3', user: { id: 'user-1' } } }),
+    )
+  })
+
+  it('conserve les catégories de santé et l’âge si le consentement est à jour', async () => {
+    isSyncEnabledMock.mockReturnValue(true)
+    callRpcMock.mockResolvedValue({ data: true, error: null })
+    const user = { id: 'user-1', neuro_categories: ['tsa'], age: 30 }
+    buildSnapshotPayloadMock.mockResolvedValueOnce({ version: '3.3', user } as never)
+
+    await syncNow()
+
+    expect(callRpcMock).toHaveBeenCalledWith(
+      'sync_device_snapshot',
+      expect.objectContaining({ p_payload: { version: '3.3', user } }),
+    )
   })
 
   it('renvoie false sans lever si le secret est refusé (data: false)', async () => {

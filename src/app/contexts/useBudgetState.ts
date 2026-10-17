@@ -214,8 +214,8 @@ export function useBudgetState() {
     label?: string,
     date = todayDate(),
     categoryId?: string,
-  ) {
-    if (!Number.isFinite(amount) || amount === 0) return
+  ): Promise<boolean> {
+    if (!Number.isFinite(amount) || amount === 0) return true
     const deposit: BudgetDeposit = {
       id: newId(),
       account_id: accountId,
@@ -225,15 +225,22 @@ export function useBudgetState() {
       date,
       created_at: new Date().toISOString(),
     }
-    if (makesBucketNegative(await budgetDepositRepo.getAll(), accountId, [], [deposit])) return
+    if (makesBucketNegative(await budgetDepositRepo.getAll(), accountId, [], [deposit])) return false
     await budgetDepositRepo.create(deposit)
     setBudgetDeposits(await budgetDepositRepo.getAll())
+    return true
   }
 
-  async function updateBudgetDeposit(id: string, amount: number, label?: string, date?: string, categoryId?: string) {
-    if (!Number.isFinite(amount) || amount === 0) return
+  async function updateBudgetDeposit(
+    id: string,
+    amount: number,
+    label?: string,
+    date?: string,
+    categoryId?: string,
+  ): Promise<boolean> {
+    if (!Number.isFinite(amount) || amount === 0) return true
     const deposit = budgetDeposits.find((item) => item.id === id)
-    if (!deposit || deposit.transfer_id) return
+    if (!deposit || deposit.transfer_id) return true
     const updated: BudgetDeposit = {
       ...deposit,
       amount,
@@ -241,9 +248,10 @@ export function useBudgetState() {
       date: date ?? deposit.date,
       category_id: categoryId || undefined,
     }
-    if (makesBucketNegative(await budgetDepositRepo.getAll(), deposit.account_id, [id], [updated])) return
+    if (makesBucketNegative(await budgetDepositRepo.getAll(), deposit.account_id, [id], [updated])) return false
     await budgetDepositRepo.update(updated)
     setBudgetDeposits((previous) => previous.map((item) => (item.id === id ? updated : item)))
+    return true
   }
 
   /**
@@ -257,9 +265,9 @@ export function useBudgetState() {
     toCategoryId: string | undefined,
     label?: string,
     date = todayDate(),
-  ) {
-    if (!Number.isFinite(amount) || amount <= 0) return
-    if ((fromCategoryId || undefined) === (toCategoryId || undefined)) return
+  ): Promise<boolean> {
+    if (!Number.isFinite(amount) || amount <= 0) return true
+    if ((fromCategoryId || undefined) === (toCategoryId || undefined)) return true
     const accountName = budgetAccounts.find((item) => item.id === accountId)?.name ?? 'Livret'
     const bucketName = (categoryId: string | undefined) =>
       categoryId ? (budgetDepositCategories.find((item) => item.id === categoryId)?.name ?? 'Catégorie') : accountName
@@ -286,19 +294,21 @@ export function useBudgetState() {
       transfer_id: transferId,
       created_at: createdAt,
     }
-    if (makesBucketNegative(await budgetDepositRepo.getAll(), accountId, [], [outgoing, incoming])) return
+    if (makesBucketNegative(await budgetDepositRepo.getAll(), accountId, [], [outgoing, incoming])) return false
     await budgetDepositRepo.createMany([outgoing, incoming])
     setBudgetDeposits(await budgetDepositRepo.getAll())
+    return true
   }
 
-  async function deleteBudgetDeposit(id: string) {
+  async function deleteBudgetDeposit(id: string): Promise<boolean> {
     const all = await budgetDepositRepo.getAll()
     const deposit = all.find((item) => item.id === id)
-    if (!deposit) return
+    if (!deposit) return true
     const ids = getLinkedDepositIds(all, deposit)
-    if (makesBucketNegative(all, deposit.account_id, ids, [])) return
+    if (makesBucketNegative(all, deposit.account_id, ids, [])) return false
     await budgetDepositRepo.deleteMany(ids)
     setBudgetDeposits(await budgetDepositRepo.getAll())
+    return true
   }
 
   async function createBudgetIncomeEntry(amount: number, label?: string, date = todayDate()) {

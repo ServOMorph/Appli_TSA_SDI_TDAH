@@ -16,6 +16,7 @@ const STRIP_VISIBLE_COUNT = 5
 const STRIP_WINDOW_RADIUS = 21
 const STRIP_RECENTER_DISTANCE = 10
 const SCROLL_SETTLE_MS = 120
+const CLICK_SCROLL_MAX_MS = 800
 
 type PlanBlock =
   | { kind: 'task'; item: Task }
@@ -388,6 +389,7 @@ export function PlanningBoard() {
   const scrollerRef = useRef<HTMLDivElement | null>(null)
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const smoothTargetRef = useRef<string | null>(null)
+  const clickScrollRef = useRef<{ left: number; timer: ReturnType<typeof setTimeout> } | null>(null)
   const [scrubDate, setScrubDate] = useState<string | null>(null)
   const [monthPickerOpen, setMonthPickerOpen] = useState(false)
   const [stripCenter, setStripCenter] = useState(() =>
@@ -525,9 +527,16 @@ export function PlanningBoard() {
   useEffect(
     () => () => {
       if (settleTimer.current) clearTimeout(settleTimer.current)
+      if (clickScrollRef.current) clearTimeout(clickScrollRef.current.timer)
     },
     [],
   )
+
+  function endClickScroll() {
+    if (!clickScrollRef.current) return
+    clearTimeout(clickScrollRef.current.timer)
+    clickScrollRef.current = null
+  }
 
   function settleScroll(date: string, index: number) {
     setScrubDate(null)
@@ -539,6 +548,10 @@ export function PlanningBoard() {
     const scroller = scrollerRef.current
     const width = cellWidth()
     if (!scroller || !width) return
+    if (clickScrollRef.current) {
+      if (Math.abs(scroller.scrollLeft - clickScrollRef.current.left) <= 1) endClickScroll()
+      return
+    }
     const index = Math.min(stripDates.length - 1, Math.max(0, Math.round(scroller.scrollLeft / width)))
     const date = stripDates[index]
     setScrubDate(date)
@@ -552,6 +565,11 @@ export function PlanningBoard() {
     const index = stripDates.indexOf(date)
     if (scroller && width && index >= 0) {
       smoothTargetRef.current = date !== displayDateRef.current ? date : null
+      if (settleTimer.current) clearTimeout(settleTimer.current)
+      endClickScroll()
+      if (typeof scroller.scrollTo === 'function' && Math.abs(scroller.scrollLeft - index * width) > 1) {
+        clickScrollRef.current = { left: index * width, timer: setTimeout(endClickScroll, CLICK_SCROLL_MAX_MS) }
+      }
       scroller.scrollTo?.({ left: index * width, behavior: 'smooth' })
     }
     updateDisplayDate(date)

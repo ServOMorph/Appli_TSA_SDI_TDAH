@@ -104,7 +104,9 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 3 — Traiter les nouveaux retours de Marie [TODO]
+## Phase 3 — Traiter les nouveaux retours de Marie [FAIT]
+
+> Soldée le 2026-10-17 : au `/deploy` v6.12, aucun retour n'attendait de réponse d'agent (seul `df7ee31d` est en décision), les 10 réponses en file ont été publiées.
 
 - Lancer `/traiter_retours` sur les retours de `192f2411` reçus le 2026-09-28 au soir :
   E77 (catégories et « livret jeune »), E10 (dossiers et rangement des outils), E21 (case

@@ -3,7 +3,7 @@ import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
 import { NeuroCategoryPicker } from '@/ui/components/NeuroCategoryPicker'
-import { isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import type { NeuroCategory } from '@/domain/entities/user'
 import { MAX_AGE, MIN_AGE, parseAge } from '@/domain/rules/profileRules'
 import { isAdminIdentity, normalizeIdentity } from '@/domain/rules/adminCredentials'
@@ -174,9 +174,11 @@ export function E111Profile() {
           Informations
         </p>
         <p style={{ margin: 0, color: 'var(--color-text-muted)' }}>
-          {isSyncConsentGranted()
+          {isSyncConsentCurrent()
             ? 'Les données de profil, y compris les catégories (données de santé) et l’âge, sont stockées sur votre appareil et incluses dans la copie envoyée à l’équipe. Vous pouvez retirer le partage dans Paramètres, rubrique « Vie privée ».'
-            : 'Les données de profil sont stockées localement sur votre appareil.'}
+            : isSyncConsentGranted()
+              ? 'Les données de profil sont stockées sur votre appareil. Les catégories (données de santé) et l’âge ne sont pas envoyés à l’équipe.'
+              : 'Les données de profil sont stockées localement sur votre appareil.'}
         </p>
       </Card>
 

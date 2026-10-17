@@ -632,7 +632,7 @@ export function PlanningBoard() {
         </div>
       </div>
       <div aria-label="Bandeau des jours de la semaine" style={dateStripBoxStyle(ambianceColor)}>
-        <div ref={scrollerRef} style={dateScrollerStyle} onScroll={handleStripScroll}>
+        <div ref={scrollerRef} style={dateScrollerStyle} onScroll={handleStripScroll} onTouchStart={endClickScroll} onWheel={endClickScroll}>
           <div style={stripSpacerStyle} aria-hidden />
           {stripDates.map((d) => {
             const badge = formatDayBadge(d)

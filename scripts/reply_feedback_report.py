@@ -135,10 +135,11 @@ def list_reports_needing_reply(url: str, service_key: str, device_ids: list[str]
         report_state = state.get(report["id"])
         if report_state:
             entry["etat"] = report_state
+            updated_at = report_state.get("updated_at")
             entry["relance_depuis_etat"] = bool(
                 last
                 and last["author"] != "agent"
-                and parse_timestamp(last["created_at"]) > parse_timestamp(report_state["updated_at"])
+                and (not updated_at or parse_timestamp(last["created_at"]) > parse_timestamp(updated_at))
             )
         result.append(entry)
     return result

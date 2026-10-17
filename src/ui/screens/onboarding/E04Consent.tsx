@@ -1,7 +1,7 @@
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
-import { declineHealthDataConsent, grantSyncConsent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
+import { declineHealthDataConsent, grantSyncConsent, isSyncConsentCurrent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
 
 export function E04Consent() {
   const { goTo, route } = useApp()
@@ -12,7 +12,7 @@ export function E04Consent() {
     goTo(next)
   }
 
-  const renewal = isSyncConsentGranted()
+  const renewal = isSyncConsentGranted() && !isSyncConsentCurrent()
 
   function decline() {
     if (renewal) declineHealthDataConsent()

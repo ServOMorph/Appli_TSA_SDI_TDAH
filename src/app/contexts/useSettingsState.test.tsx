@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { db, listItemRepo, settingsRepo, toolRepo } from '@/app/repositories'
 import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity'
 import { getFeedbackMessagesCursor, setFeedbackMessagesCursor } from '@/data/sync/feedbackMessagesCursor'
-import { CURRENT_CONSENT_VERSION, grantSyncConsent, isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { CURRENT_CONSENT_VERSION, grantSyncConsent, hasDeclinedHealthData, isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import { syncNow } from '@/data/sync/syncClient'
 import { useSettingsState } from './useSettingsState'
 
@@ -157,6 +157,9 @@ function SettingsPanel() {
       </button>
       <button onClick={() => runImport({ user: { id: 'u-version', profile_type: 'student' }, sync_consent_granted: true, sync_consent_version: 99 })}>
         Importer consentement version excessive
+      </button>
+      <button onClick={() => runImport({ user: { id: 'u-decline', profile_type: 'student' }, sync_consent_granted: true, sync_consent_version: 1, sync_health_declined: true })}>
+        Importer refus des données de santé
       </button>
       <button onClick={() => runImport({ user: { id: 'u1', profile_type: 'student' }, routine_steps: [{ id: 'step-orphelin', routine_id: 'inconnue' }] })}>
         Importer étape de routine orpheline
@@ -578,6 +581,16 @@ describe('useSettingsState — export/import', () => {
     })
     await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
     expect(localStorage.getItem('sync_consent_version')).toBe(String(CURRENT_CONSENT_VERSION))
+  })
+
+  it('restaure le refus des données de santé de l’export', async () => {
+    render(<SettingsPanel />)
+    await act(async () => {
+      await userEvent.click(screen.getByRole('button', { name: 'Importer refus des données de santé' }))
+    })
+    await waitFor(() => expect(screen.getByTestId('import-result')).toHaveTextContent('ok'))
+    expect(hasDeclinedHealthData()).toBe(true)
+    expect(isSyncConsentCurrent()).toBe(false)
   })
 
   it('conserve l’identité d’appareil actuelle quand l’export ne la contient pas', async () => {

@@ -5,7 +5,10 @@ import { getDeviceIdentity, setDeviceIdentity } from '@/data/sync/deviceIdentity
 import { setFeedbackMessagesCursor } from '@/data/sync/feedbackMessagesCursor'
 import {
   getSyncConsentVersion,
+  declineHealthDataConsent,
   grantSyncConsent,
+  hasDeclinedHealthData,
+  isSyncConsentCurrent,
   isSyncConsentGranted,
   CURRENT_CONSENT_VERSION,
   LEGACY_CONSENT_VERSION,
@@ -214,6 +217,7 @@ export function useSettingsState() {
       device_secret: deviceSecret,
       sync_consent_granted: isSyncConsentGranted(),
       sync_consent_version: getSyncConsentVersion(),
+      sync_health_declined: hasDeclinedHealthData(),
       ...snapshot,
     }
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
@@ -471,6 +475,7 @@ export function useSettingsState() {
           ? Math.min(data.sync_consent_version as number, CURRENT_CONSENT_VERSION)
           : LEGACY_CONSENT_VERSION,
       )
+      if (data.sync_health_declined === true && !isSyncConsentCurrent()) declineHealthDataConsent()
     }
     if (data.sync_consent_granted === false) revokeSyncConsent()
 

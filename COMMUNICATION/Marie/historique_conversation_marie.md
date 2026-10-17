@@ -1409,4 +1409,4 @@ Livré : catégories et âge dans le profil, dossiers dans un dossier, liste san
 La fenêtre de dépense s'ouvre seulement depuis l'Accueil.
 
 Question : les autres livrets sont-ils aussi des provenances possibles d'un dépôt ?
-_Suite :_ message de l'étape 11 de `/deploy` v6.12, validé par l'utilisateur, déposé en gateway le 2026-10-17 (demande `20261017T112252_674642`, `--kind delivery --expect-reply`). Reprend la question des livrets restée sans réponse depuis la livraison v6.11.
+_Suite :_ message de l'étape 11 de `/deploy` v6.12, validé par l'utilisateur. Déposé d'abord en circuit normal (`20261017T112252_674642`, restée `pending`, renvoyée comme doublon), puis envoyé en urgent sur décision de l'utilisateur (demande `20261017T112349_329827`, message Discord `1560976633832415232`, `--expect-reply`). Reprend la question des livrets restée sans réponse depuis la livraison v6.11.

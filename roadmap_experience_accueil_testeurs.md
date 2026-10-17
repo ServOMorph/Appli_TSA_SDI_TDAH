@@ -61,8 +61,20 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — à définir selon les frictions relevées [TODO]
+## Phase 2 — Accueil de Satine (première testeuse externe) [EN COURS]
 
-Contenu à construire à partir des résultats de la Phase 1 et des ajouts explicitement demandés par
-l'utilisateur (ex. étape de visio d'accueil). Pas de contenu pré-rempli ici pour éviter de figer
-des choix non discutés — cette roadmap se construit au fur et à mesure, comme demandé.
+Décisions du 2026-10-17 : Satine est `testeur` (code `satine`, sans mot de passe) ; elle fait
+l'onboarding complet ; ses retours passent par son salon Discord `#test-satine`, géré à la main
+(`bot.py` non activé) ; le message d'invitation est rédigé par l'utilisateur.
+
+- Fait : `TESTS/ONBOARD/parcours_accueil.md` réécrit (plus de « Tests à faire », code testeur à
+  l'onboarding, retours par le salon, profil AuDHD non exigé).
+- Reste : relecture à blanc du parcours par une personne extérieure ; relecture externe du consentement
+  (texte modifié le 2026-10-12) ; salon privé et permissions Discord contrôlées ; capture d'installation
+  (iPhone ou Android à préciser) ; répétition à blanc avec `raphtest` sur la préprod ; invitation.
+
+**Gate de sortie** : Satine a installé l'application, fait l'onboarding et déposé un premier retour
+dans son salon, accusé de réception envoyé.
+
+**⏸ Checkpoint** — Demander à l'utilisateur de faire `/compact` avant de continuer.
+Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmation.

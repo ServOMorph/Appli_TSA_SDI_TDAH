@@ -76,7 +76,7 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 
 ---
 
-## Phase 2 — Versionnage fiable et livraison des correctifs codés [TODO]
+## Phase 2 — Versionnage fiable et livraison des correctifs codés [FAIT]
 
 - **`/close` étape 9** : ajouter dans le bloc `SPECIFICITES PROJET` de `.claude/commands/close.md`
   (préservé par `/update`) une règle « Étape 9 : » — ne créer une nouvelle version que si `src/` a
@@ -93,6 +93,8 @@ Attendre sa réponse écrite. Ne pas commencer la phase suivante sans confirmati
 - Tests : `tsc -b`, suite complète, e2e via `/deploy`.
 
 **État au 2026-10-09** : v6.10 déployée le 2026-10-07 (`https://appli-audhd.netlify.app`). Restent non faits : l'amendement de `close.md` étape 9, la lecture de « Version v6.10 » par Marie dans Paramètres (non confirmée), et le préfixe `v` de `E124FeedbackDetail.tsx:147` (`v{report.app_version}`, non vérifié si la valeur contient déjà le `v`).
+
+**Clôture (2026-10-17)** : `close.md` étape 9 amendé (ligne 250), E124 passe par `formatVersion`, v6.10 et v6.11 déployées. La lecture de « Version v6.10 » par Marie est caduque (v6.11 en production).
 
 **Gate de sortie** : v6.10 en production, Marie lit « Version v6.10 » dans Paramètres, `close.md`
 amendé et vérifié sur un `/close` sans changement de `src/` (aucune nouvelle version créée).
@@ -165,7 +167,8 @@ Problème (`[P2]` de `signals.md`) : `E123FeedbackList` ne lit que la table loca
 `feedbackReports` ni `feedbackMessages` ne sont exportés (images en `Blob`). Tout changement
 d'adresse ou réinstallation fait disparaître le fil du testeur.
 
-- **Décision préalable** entre :
+- **Décision du 2026-10-17 : option A retenue** (redescente depuis Supabase). Reste à faire : RPC authentifiée (SQL à appliquer à la main), client, tests.
+- Options étudiées :
   - A. Redescente depuis Supabase : RPC authentifiée renvoyant les retours et messages de
     l'appareil ; image sans téléchargement (image locale rendue facultative) ou via URL signée.
   - B. Retours et messages inclus dans l'export (images encodées) : fichier plus lourd, aucun

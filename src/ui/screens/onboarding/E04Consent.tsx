@@ -1,7 +1,7 @@
 import { useApp } from '@/app/AppContext'
 import { Button } from '@/ui/components/Button'
 import { Card } from '@/ui/components/Card'
-import { grantSyncConsent, revokeSyncConsent } from '@/data/sync/syncConsent'
+import { declineHealthDataConsent, grantSyncConsent, isSyncConsentGranted, revokeSyncConsent } from '@/data/sync/syncConsent'
 
 export function E04Consent() {
   const { goTo, route } = useApp()
@@ -12,8 +12,11 @@ export function E04Consent() {
     goTo(next)
   }
 
+  const renewal = isSyncConsentGranted()
+
   function decline() {
-    revokeSyncConsent()
+    if (renewal) declineHealthDataConsent()
+    else revokeSyncConsent()
     goTo(next)
   }
 
@@ -85,7 +88,7 @@ export function E04Consent() {
         J’accepte le partage
       </Button>
       <Button variant="secondary" fullWidth onClick={decline}>
-        Continuer sans partager
+        {renewal ? 'Continuer sans partager mes données de santé' : 'Continuer sans partager'}
       </Button>
     </main>
   )

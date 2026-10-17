@@ -3,11 +3,14 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, it, expect } from 'vitest'
 import { renderWithApp, makeAppContext } from '@/test/testUtils'
 import {
+  declineHealthDataConsent,
   grantSyncConsent,
+  hasDeclinedHealthData,
   isSyncConsentCurrent,
   isSyncConsentGranted,
   LEGACY_CONSENT_VERSION,
 } from '@/data/sync/syncConsent'
+import { needsConsentRenewal } from '@/app/startRoute'
 import { E04Consent } from './E04Consent'
 
 afterEach(() => {
@@ -51,11 +54,21 @@ describe('E04Consent', () => {
     expect(isSyncConsentCurrent()).toBe(true)
   })
 
-  it('Continuer sans partager retire un consentement ancien au lieu de le laisser actif', async () => {
+  it('refuser le renouvellement garde le partage ancien sans les données de santé', async () => {
     grantSyncConsent(LEGACY_CONSENT_VERSION)
     renderWithApp(<E04Consent />)
-    await userEvent.click(screen.getByRole('button', { name: 'Continuer sans partager' }))
-    expect(isSyncConsentGranted()).toBe(false)
+    await userEvent.click(screen.getByRole('button', { name: 'Continuer sans partager mes données de santé' }))
+    expect(isSyncConsentGranted()).toBe(true)
+    expect(isSyncConsentCurrent()).toBe(false)
+    expect(needsConsentRenewal()).toBe(false)
+  })
+
+  it('accepter après un refus rétablit un consentement à jour', async () => {
+    grantSyncConsent(LEGACY_CONSENT_VERSION)
+    declineHealthDataConsent()
+    grantSyncConsent()
+    expect(isSyncConsentCurrent()).toBe(true)
+    expect(hasDeclinedHealthData()).toBe(false)
   })
 
   it('enchaîne vers le rattrapage du profil quand la suite le prévoit', async () => {

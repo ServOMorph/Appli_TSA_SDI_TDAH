@@ -1,5 +1,5 @@
 import type { PostConsentTarget, Route, StartDestination } from '@/app/navigation'
-import { isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
+import { hasDeclinedHealthData, isSyncConsentCurrent, isSyncConsentGranted } from '@/data/sync/syncConsent'
 import type { User } from '@/domain/entities/user'
 
 export function needsProfileCatchUp(user: User): boolean {
@@ -8,10 +8,11 @@ export function needsProfileCatchUp(user: User): boolean {
 
 /**
  * Toute personne dont le consentement date d'avant l'envoi des catégories de santé et de l'âge
- * le renouvelle une fois : l'acceptation (ou le refus, qui retire le partage) ferme la question.
+ * le renouvelle une fois : l'acceptation, ou le refus des seules donnees de sante (le partage
+ * ancien continue sans elles), ferme la question.
  */
 export function needsConsentRenewal(): boolean {
-  return isSyncConsentGranted() && !isSyncConsentCurrent()
+  return isSyncConsentGranted() && !isSyncConsentCurrent() && !hasDeclinedHealthData()
 }
 
 interface StartRouteInput {

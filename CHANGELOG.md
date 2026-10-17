@@ -1,6 +1,7 @@
 ## v6.12 — 2026-10-14
 
 ### Ajouté
+- Consentement : refuser le renouvellement garde le partage existant sans les catégories de santé ni l'âge, au lieu de couper toute la synchronisation. Import : dossiers en boucle refusés, version de consentement plafonnée.
 - **Onboarding : catégories (TSA, TDAH, SDI, avec DI, HPI, neurotypique, je ne sais pas) et âge** remplacent adolescent / étudiant / adulte ; bouton « ? » de définition par catégorie ; modifiables dans Paramètres > Profil ; synchronisés (`profileRules.ts`, `NeuroCategoryPicker.tsx`, `E02Profile.tsx`, `E111Profile.tsx`).
 - **Écran de rattrapage du profil et renouvellement du consentement** (version de consentement) pour les utilisateurs existants ; le code testeur et le mot de passe admin sont demandés en premier (`startRoute.ts`, `syncConsent.ts`, `E04Consent.tsx`, `E05TesterCode.tsx`).
 

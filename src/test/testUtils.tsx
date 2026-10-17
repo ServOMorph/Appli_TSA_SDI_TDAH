@@ -99,7 +99,6 @@ export function makeAppContext(overrides: Partial<Parameters<typeof AppContext.P
     createToolList: vi.fn().mockResolvedValue('list-1'),
     createToolRoutine: vi.fn().mockResolvedValue('routine-1'),
     deleteTool: vi.fn().mockResolvedValue(undefined),
-    updateToolColor: vi.fn().mockResolvedValue(undefined),
     deleteFolder: vi.fn().mockResolvedValue(undefined),
     moveTool: vi.fn().mockResolvedValue(undefined),
     moveFolder: vi.fn().mockResolvedValue(undefined),

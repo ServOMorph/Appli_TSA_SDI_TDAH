@@ -8,7 +8,7 @@ export interface Settings {
   reduced_motion: boolean
   ambiance_color?: string
   energy_max?: number
-  /** Couleur de fond de la carte « Mon compte » de l'accueil (câblage particulier, #31 : ce n'est pas un `Tool`). */
+  /** Obsolète : plus lue ni écrite (réglage « Couleur des outils » retiré). Conservée pour les enregistrements et exports antérieurs. */
   mon_compte_color?: string
   /** Code testeur saisi en Paramètres > Profil. Identifiant humain d'un testeur additionnel, sérialisé tel quel dans le snapshot de synchronisation pour rattacher ses retours sans recoupement manuel de l'UUID d'appareil. */
   tester_code?: string

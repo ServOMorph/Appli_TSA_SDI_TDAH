@@ -9,7 +9,7 @@ import { AppShell } from '@/ui/components/AppShell'
 import { PlanningBoard } from '@/ui/screens/dashboard/PlanningBoard'
 import { ToolCreateModal } from '@/ui/components/ToolCreateModal'
 import { toolLabel } from '@/ui/components/ToolWidgetCard'
-import { FolderActionsMenu, ToolActionsMenu } from '@/ui/components/ToolActionsMenu'
+import { FolderActionsMenu, ToolActionsMenu, cardWithMenuStyle } from '@/ui/components/ToolActionsMenu'
 import { DEFAULT_AMBIANCE_COLOR, outlineOnlyStyle } from '@/ui/styles/ambiance'
 import { feedbackMessageRepo } from '@/app/repositories'
 import { syncFeedbackNow } from '@/data/sync/feedbackClient'
@@ -33,7 +33,7 @@ const widgetBtnStyle: React.CSSProperties = {
 }
 
 const toolCardStyle: React.CSSProperties = {
-  position: 'relative',
+  position: cardWithMenuStyle.position,
   minWidth: 0,
   padding: '28px var(--spacing-12) var(--spacing-12)',
 }
